@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -580,559 +580,559 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! option record for passing protocol options between the client and server</span>
+</span><span class="doccomment">//! option record for passing protocol options between the client and server
 
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</span><span class="kw">use </span>std::collections::HashMap;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident">log::warn</span>;
+<span class="kw">use </span>log::warn;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::dnssec::SupportedAlgorithms</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::rr::dnssec::SupportedAlgorithms;
 
-<span class="doccomment">/// The OPT record type is used for ExtendedDNS records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These allow for additional information to be associated with the DNS request that otherwise</span>
-<span class="doccomment">/// would require changes to the DNS protocol.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6891, EDNS(0) Extensions, April 2013](https://tools.ietf.org/html/rfc6891#section-6)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 6.1.  OPT Record Definition</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 6.1.1.  Basic Elements</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An OPT pseudo-RR (sometimes called a meta-RR) MAY be added to the</span>
-<span class="doccomment">///    additional data section of a request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The OPT RR has RR type 41.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    If an OPT record is present in a received request, compliant</span>
-<span class="doccomment">///    responders MUST include an OPT record in their respective responses.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An OPT record does not carry any DNS data.  It is used only to</span>
-<span class="doccomment">///    contain control information pertaining to the question-and-answer</span>
-<span class="doccomment">///    sequence of a specific transaction.  OPT RRs MUST NOT be cached,</span>
-<span class="doccomment">///    forwarded, or stored in or loaded from Zone Files.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The OPT RR MAY be placed anywhere within the additional data section.</span>
-<span class="doccomment">///    When an OPT RR is included within any DNS message, it MUST be the</span>
-<span class="doccomment">///    only OPT RR in that message.  If a query message with more than one</span>
-<span class="doccomment">///    OPT RR is received, a FORMERR (RCODE=1) MUST be returned.  The</span>
-<span class="doccomment">///    placement flexibility for the OPT RR does not override the need for</span>
-<span class="doccomment">///    the TSIG or SIG(0) RRs to be the last in the additional section</span>
-<span class="doccomment">///    whenever they are present.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 6.1.2.  Wire Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An OPT RR has a fixed part and a variable set of options expressed as</span>
-<span class="doccomment">///    {attribute, value} pairs.  The fixed part holds some DNS metadata,</span>
-<span class="doccomment">///    and also a small collection of basic extension elements that we</span>
-<span class="doccomment">///    expect to be so popular that it would be a waste of wire space to</span>
-<span class="doccomment">///    encode them as {attribute, value} pairs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The fixed part of an OPT RR is structured as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///        +------------+--------------+------------------------------+</span>
-<span class="doccomment">///        | Field Name | Field Type   | Description                  |</span>
-<span class="doccomment">///        +------------+--------------+------------------------------+</span>
-<span class="doccomment">///        | NAME       | domain name  | MUST be 0 (root domain)      |</span>
-<span class="doccomment">///        | TYPE       | u_int16_t    | OPT (41)                     |</span>
-<span class="doccomment">///        | CLASS      | u_int16_t    | requestor&#39;s UDP payload size |</span>
-<span class="doccomment">///        | TTL        | u_int32_t    | extended RCODE and flags     |</span>
-<span class="doccomment">///        | RDLEN      | u_int16_t    | length of all RDATA          |</span>
-<span class="doccomment">///        | RDATA      | octet stream | {attribute,value} pairs      |</span>
-<span class="doccomment">///        +------------+--------------+------------------------------+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                                OPT RR Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The variable part of an OPT RR may contain zero or more options in</span>
-<span class="doccomment">///    the RDATA.  Each option MUST be treated as a bit field.  Each option</span>
-<span class="doccomment">///    is encoded as:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                   +0 (MSB)                            +1 (LSB)</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///     0: |                          OPTION-CODE                          |</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///     2: |                         OPTION-LENGTH                         |</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///     4: |                                                               |</span>
-<span class="doccomment">///        /                          OPTION-DATA                          /</span>
-<span class="doccomment">///        /                                                               /</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    OPTION-CODE</span>
-<span class="doccomment">///       Assigned by the Expert Review process as defined by the DNSEXT</span>
-<span class="doccomment">///       working group and the IESG.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    OPTION-LENGTH</span>
-<span class="doccomment">///       Size (in octets) of OPTION-DATA.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    OPTION-DATA</span>
-<span class="doccomment">///       Varies per OPTION-CODE.  MUST be treated as a bit field.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The order of appearance of option tuples is not defined.  If one</span>
-<span class="doccomment">///    option modifies the behaviour of another or multiple options are</span>
-<span class="doccomment">///    related to one another in some way, they have the same effect</span>
-<span class="doccomment">///    regardless of ordering in the RDATA wire encoding.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    Any OPTION-CODE values not understood by a responder or requestor</span>
-<span class="doccomment">///    MUST be ignored.  Specifications of such options might wish to</span>
-<span class="doccomment">///    include some kind of signaled acknowledgement.  For example, an</span>
-<span class="doccomment">///    option specification might say that if a responder sees and supports</span>
-<span class="doccomment">///    option XYZ, it MUST include option XYZ in its response.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 6.1.3.  OPT Record TTL Field Use</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The extended RCODE and flags, which OPT stores in the RR Time to Live</span>
-<span class="doccomment">///    (TTL) field, are structured as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                   +0 (MSB)                            +1 (LSB)</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///     0: |         EXTENDED-RCODE        |            VERSION            |</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///     2: | DO|                           Z                               |</span>
-<span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    EXTENDED-RCODE</span>
-<span class="doccomment">///       Forms the upper 8 bits of extended 12-bit RCODE (together with the</span>
-<span class="doccomment">///       4 bits defined in [RFC1035].  Note that EXTENDED-RCODE value 0</span>
-<span class="doccomment">///       indicates that an unextended RCODE is in use (values 0 through</span>
-<span class="doccomment">///       15).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    VERSION</span>
-<span class="doccomment">///       Indicates the implementation level of the setter.  Full</span>
-<span class="doccomment">///       conformance with this specification is indicated by version &#39;0&#39;.</span>
-<span class="doccomment">///       Requestors are encouraged to set this to the lowest implemented</span>
-<span class="doccomment">///       level capable of expressing a transaction, to minimise the</span>
-<span class="doccomment">///       responder and network load of discovering the greatest common</span>
-<span class="doccomment">///       implementation level between requestor and responder.  A</span>
-<span class="doccomment">///       requestor&#39;s version numbering strategy MAY ideally be a run-time</span>
-<span class="doccomment">///       configuration option.</span>
-<span class="doccomment">///       If a responder does not implement the VERSION level of the</span>
-<span class="doccomment">///       request, then it MUST respond with RCODE=BADVERS.  All responses</span>
-<span class="doccomment">///       MUST be limited in format to the VERSION level of the request, but</span>
-<span class="doccomment">///       the VERSION of each response SHOULD be the highest implementation</span>
-<span class="doccomment">///       level of the responder.  In this way, a requestor will learn the</span>
-<span class="doccomment">///       implementation level of a responder as a side effect of every</span>
-<span class="doccomment">///       response, including error responses and including RCODE=BADVERS.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 6.1.4.  Flags</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    DO</span>
-<span class="doccomment">///       DNSSEC OK bit as defined by [RFC3225].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    Z</span>
-<span class="doccomment">///       Set to zero by senders and ignored by receivers, unless modified</span>
-<span class="doccomment">///       in a subsequent specification.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OPT</span> {
-    <span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The OPT record type is used for ExtendedDNS records.
+///
+/// These allow for additional information to be associated with the DNS request that otherwise
+/// would require changes to the DNS protocol.
+///
+/// [RFC 6891, EDNS(0) Extensions, April 2013](https://tools.ietf.org/html/rfc6891#section-6)
+///
+/// ```text
+/// 6.1.  OPT Record Definition
+///
+/// 6.1.1.  Basic Elements
+///
+///    An OPT pseudo-RR (sometimes called a meta-RR) MAY be added to the
+///    additional data section of a request.
+///
+///    The OPT RR has RR type 41.
+///
+///    If an OPT record is present in a received request, compliant
+///    responders MUST include an OPT record in their respective responses.
+///
+///    An OPT record does not carry any DNS data.  It is used only to
+///    contain control information pertaining to the question-and-answer
+///    sequence of a specific transaction.  OPT RRs MUST NOT be cached,
+///    forwarded, or stored in or loaded from Zone Files.
+///
+///    The OPT RR MAY be placed anywhere within the additional data section.
+///    When an OPT RR is included within any DNS message, it MUST be the
+///    only OPT RR in that message.  If a query message with more than one
+///    OPT RR is received, a FORMERR (RCODE=1) MUST be returned.  The
+///    placement flexibility for the OPT RR does not override the need for
+///    the TSIG or SIG(0) RRs to be the last in the additional section
+///    whenever they are present.
+///
+/// 6.1.2.  Wire Format
+///
+///    An OPT RR has a fixed part and a variable set of options expressed as
+///    {attribute, value} pairs.  The fixed part holds some DNS metadata,
+///    and also a small collection of basic extension elements that we
+///    expect to be so popular that it would be a waste of wire space to
+///    encode them as {attribute, value} pairs.
+///
+///    The fixed part of an OPT RR is structured as follows:
+///
+///        +------------+--------------+------------------------------+
+///        | Field Name | Field Type   | Description                  |
+///        +------------+--------------+------------------------------+
+///        | NAME       | domain name  | MUST be 0 (root domain)      |
+///        | TYPE       | u_int16_t    | OPT (41)                     |
+///        | CLASS      | u_int16_t    | requestor&#39;s UDP payload size |
+///        | TTL        | u_int32_t    | extended RCODE and flags     |
+///        | RDLEN      | u_int16_t    | length of all RDATA          |
+///        | RDATA      | octet stream | {attribute,value} pairs      |
+///        +------------+--------------+------------------------------+
+///
+///                                OPT RR Format
+///
+///    The variable part of an OPT RR may contain zero or more options in
+///    the RDATA.  Each option MUST be treated as a bit field.  Each option
+///    is encoded as:
+///
+///                   +0 (MSB)                            +1 (LSB)
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///     0: |                          OPTION-CODE                          |
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///     2: |                         OPTION-LENGTH                         |
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///     4: |                                                               |
+///        /                          OPTION-DATA                          /
+///        /                                                               /
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///
+///    OPTION-CODE
+///       Assigned by the Expert Review process as defined by the DNSEXT
+///       working group and the IESG.
+///
+///    OPTION-LENGTH
+///       Size (in octets) of OPTION-DATA.
+///
+///    OPTION-DATA
+///       Varies per OPTION-CODE.  MUST be treated as a bit field.
+///
+///    The order of appearance of option tuples is not defined.  If one
+///    option modifies the behaviour of another or multiple options are
+///    related to one another in some way, they have the same effect
+///    regardless of ordering in the RDATA wire encoding.
+///
+///    Any OPTION-CODE values not understood by a responder or requestor
+///    MUST be ignored.  Specifications of such options might wish to
+///    include some kind of signaled acknowledgement.  For example, an
+///    option specification might say that if a responder sees and supports
+///    option XYZ, it MUST include option XYZ in its response.
+///
+/// 6.1.3.  OPT Record TTL Field Use
+///
+///    The extended RCODE and flags, which OPT stores in the RR Time to Live
+///    (TTL) field, are structured as follows:
+///
+///                   +0 (MSB)                            +1 (LSB)
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///     0: |         EXTENDED-RCODE        |            VERSION            |
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///     2: | DO|                           Z                               |
+///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+///
+///    EXTENDED-RCODE
+///       Forms the upper 8 bits of extended 12-bit RCODE (together with the
+///       4 bits defined in [RFC1035].  Note that EXTENDED-RCODE value 0
+///       indicates that an unextended RCODE is in use (values 0 through
+///       15).
+///
+///    VERSION
+///       Indicates the implementation level of the setter.  Full
+///       conformance with this specification is indicated by version &#39;0&#39;.
+///       Requestors are encouraged to set this to the lowest implemented
+///       level capable of expressing a transaction, to minimise the
+///       responder and network load of discovering the greatest common
+///       implementation level between requestor and responder.  A
+///       requestor&#39;s version numbering strategy MAY ideally be a run-time
+///       configuration option.
+///       If a responder does not implement the VERSION level of the
+///       request, then it MUST respond with RCODE=BADVERS.  All responses
+///       MUST be limited in format to the VERSION level of the request, but
+///       the VERSION of each response SHOULD be the highest implementation
+///       level of the responder.  In this way, a requestor will learn the
+///       implementation level of a responder as a side effect of every
+///       response, including error responses and including RCODE=BADVERS.
+///
+/// 6.1.4.  Flags
+///
+///    DO
+///       DNSSEC OK bit as defined by [RFC3225].
+///
+///    Z
+///       Set to zero by senders and ignored by receivers, unless modified
+///       in a subsequent specification.
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
+</span><span class="kw">pub struct </span>OPT {
+    options: HashMap&lt;EdnsCode, EdnsOption&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">OPT</span> {
-    <span class="doccomment">/// Creates a new OPT record data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `options` - A map of the codes and record types</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The newly created OPT data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">options</span> }
+<span class="kw">impl </span>OPT {
+    <span class="doccomment">/// Creates a new OPT record data.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A map of the codes and record types
+    ///
+    /// # Return value
+    ///
+    /// The newly created OPT data
+    </span><span class="kw">pub fn </span>new(options: HashMap&lt;EdnsCode, EdnsOption&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ options }
     }
 
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use as_ref() or as_mut() for shared/mutable references&quot;</span>)]</span>
-    <span class="doccomment">/// The entire map of options</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>
+    <span class="attribute">#[deprecated(note = <span class="string">&quot;Please use as_ref() or as_mut() for shared/mutable references&quot;</span>)]
+    </span><span class="doccomment">/// The entire map of options
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;EdnsCode, EdnsOption&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.options
     }
 
-    <span class="doccomment">/// Get a single option based on the code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">EdnsCode</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EdnsOption</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>)
+    <span class="doccomment">/// Get a single option based on the code
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, code: EdnsCode) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>EdnsOption&gt; {
+        <span class="self">self</span>.options.get(<span class="kw-2">&amp;</span>code)
     }
 
-    <span class="doccomment">/// Insert a new option, the key is derived from the `EdnsOption`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">EdnsOption</span>) {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">insert</span>((<span class="kw-2">&amp;</span><span class="ident">option</span>).<span class="ident">into</span>(), <span class="ident">option</span>);
+    <span class="doccomment">/// Insert a new option, the key is derived from the `EdnsOption`
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: EdnsOption) {
+        <span class="self">self</span>.options.insert((<span class="kw-2">&amp;</span>option).into(), option);
     }
 
-    <span class="doccomment">/// Remove an option, the key is derived from the `EdnsOption`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">EdnsCode</span>) {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">option</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OPT</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">options</span>
+    <span class="doccomment">/// Remove an option, the key is derived from the `EdnsOption`
+    </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: EdnsCode) {
+        <span class="self">self</span>.options.remove(<span class="kw-2">&amp;</span>option);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OPT</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>
+<span class="kw">impl </span>AsMut&lt;HashMap&lt;EdnsCode, EdnsOption&gt;&gt; <span class="kw">for </span>OPT {
+    <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>HashMap&lt;EdnsCode, EdnsOption&gt; {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.options
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">OPT</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">OptReadState</span> <span class="op">=</span> <span class="ident">OptReadState::ReadCode</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">let</span> <span class="ident">start_idx</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>();
+<span class="kw">impl </span>AsRef&lt;HashMap&lt;EdnsCode, EdnsOption&gt;&gt; <span class="kw">for </span>OPT {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;EdnsCode, EdnsOption&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.options
+    }
+}
 
-    <span class="comment">// There is no unsafe direct use of the rdata length after this point</span>
-    <span class="kw">let</span> <span class="ident">rdata_length</span> <span class="op">=</span>
-        <span class="ident">rdata_length</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unverified</span>(<span class="comment">/*rdata length usage is bounded*/</span>);
-    <span class="kw">while</span> <span class="ident">rdata_length</span> <span class="op">&gt;</span> <span class="ident">decoder</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="ident">start_idx</span> {
-        <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">OptReadState::ReadCode</span> =&gt; {
-                <span class="ident">state</span> <span class="op">=</span> <span class="ident">OptReadState::Code</span> {
-                    <span class="ident">code</span>: <span class="ident">EdnsCode::from</span>(
-                        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*EdnsCode is verified as safe*/</span>),
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;, rdata_length: Restrict&lt;u16&gt;) -&gt; ProtoResult&lt;OPT&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>state: OptReadState = OptReadState::ReadCode;
+    <span class="kw">let </span><span class="kw-2">mut </span>options: HashMap&lt;EdnsCode, EdnsOption&gt; = HashMap::new();
+    <span class="kw">let </span>start_idx = decoder.index();
+
+    <span class="comment">// There is no unsafe direct use of the rdata length after this point
+    </span><span class="kw">let </span>rdata_length =
+        rdata_length.map(|u| u <span class="kw">as </span>usize).unverified(<span class="comment">/*rdata length usage is bounded*/</span>);
+    <span class="kw">while </span>rdata_length &gt; decoder.index() - start_idx {
+        <span class="kw">match </span>state {
+            OptReadState::ReadCode =&gt; {
+                state = OptReadState::Code {
+                    code: EdnsCode::from(
+                        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*EdnsCode is verified as safe*/</span>),
                     ),
                 };
             }
-            <span class="ident">OptReadState::Code</span> { <span class="ident">code</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">decoder</span>
-                    .<span class="ident">read_u16</span>()<span class="question-mark">?</span>
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>)
-                    .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">u</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">rdata_length</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;OPT value length exceeds rdata length&quot;</span>))<span class="question-mark">?</span>;
-                <span class="comment">// If we know that the length is 0, we can avoid the `OptReadState::Data` state</span>
-                <span class="comment">// and directly add the option to the map.</span>
-                <span class="comment">// The data state does not process 0-length correctly, since it always reads at</span>
-                <span class="comment">// least 1 byte, thus making the length check fail.</span>
-                <span class="ident">state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">code</span>, (<span class="ident">code</span>, <span class="kw-2">&amp;</span>[] <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]).<span class="ident">into</span>());
-                    <span class="ident">OptReadState::ReadCode</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">OptReadState::Data</span> {
-                        <span class="ident">code</span>,
-                        <span class="ident">length</span>,
-                        <span class="comment">// TODO: this cean be replaced with decoder.read_vec(), right?</span>
-                        <span class="comment">//  the current version allows for malformed opt to be skipped...</span>
-                        <span class="ident">collected</span>: <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>(<span class="ident">length</span>),
+            OptReadState::Code { code } =&gt; {
+                <span class="kw">let </span>length = decoder
+                    .read_u16()<span class="question-mark">?
+                    </span>.map(|u| u <span class="kw">as </span>usize)
+                    .verify_unwrap(|u| <span class="kw-2">*</span>u &lt;= rdata_length)
+                    .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;OPT value length exceeds rdata length&quot;</span>))<span class="question-mark">?</span>;
+                <span class="comment">// If we know that the length is 0, we can avoid the `OptReadState::Data` state
+                // and directly add the option to the map.
+                // The data state does not process 0-length correctly, since it always reads at
+                // least 1 byte, thus making the length check fail.
+                </span>state = <span class="kw">if </span>length == <span class="number">0 </span>{
+                    options.insert(code, (code, <span class="kw-2">&amp;</span>[] <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]).into());
+                    OptReadState::ReadCode
+                } <span class="kw">else </span>{
+                    OptReadState::Data {
+                        code,
+                        length,
+                        <span class="comment">// TODO: this cean be replaced with decoder.read_vec(), right?
+                        //  the current version allows for malformed opt to be skipped...
+                        </span>collected: Vec::&lt;u8&gt;::with_capacity(length),
                     }
                 };
             }
-            <span class="ident">OptReadState::Data</span> {
-                <span class="ident">code</span>,
-                <span class="ident">length</span>,
-                <span class="kw-2">mut</span> <span class="ident">collected</span>,
+            OptReadState::Data {
+                code,
+                length,
+                <span class="kw-2">mut </span>collected,
             } =&gt; {
-                <span class="comment">// TODO: can this be replaced by read_slice()?</span>
-                <span class="ident">collected</span>.<span class="ident">push</span>(<span class="ident">decoder</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*byte array is safe*/</span>));
-                <span class="kw">if</span> <span class="ident">length</span> <span class="op">==</span> <span class="ident">collected</span>.<span class="ident">len</span>() {
-                    <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">code</span>, (<span class="ident">code</span>, <span class="kw-2">&amp;</span><span class="ident">collected</span> <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]).<span class="ident">into</span>());
-                    <span class="ident">state</span> <span class="op">=</span> <span class="ident">OptReadState::ReadCode</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">state</span> <span class="op">=</span> <span class="ident">OptReadState::Data</span> {
-                        <span class="ident">code</span>,
-                        <span class="ident">length</span>,
-                        <span class="ident">collected</span>,
+                <span class="comment">// TODO: can this be replaced by read_slice()?
+                </span>collected.push(decoder.pop()<span class="question-mark">?</span>.unverified(<span class="comment">/*byte array is safe*/</span>));
+                <span class="kw">if </span>length == collected.len() {
+                    options.insert(code, (code, <span class="kw-2">&amp;</span>collected <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]).into());
+                    state = OptReadState::ReadCode;
+                } <span class="kw">else </span>{
+                    state = OptReadState::Data {
+                        code,
+                        length,
+                        collected,
                     };
                 }
             }
         }
     }
 
-    <span class="kw">if</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">OptReadState::ReadCode</span> {
-        <span class="comment">// there was some problem parsing the data for the options, ignoring them</span>
-        <span class="comment">// TODO: should we ignore all of the EDNS data in this case?</span>
-        <span class="macro">warn!</span>(<span class="string">&quot;incomplete or poorly formatted EDNS options: {:?}&quot;</span>, <span class="ident">state</span>);
-        <span class="ident">options</span>.<span class="ident">clear</span>();
+    <span class="kw">if </span>state != OptReadState::ReadCode {
+        <span class="comment">// there was some problem parsing the data for the options, ignoring them
+        // TODO: should we ignore all of the EDNS data in this case?
+        </span><span class="macro">warn!</span>(<span class="string">&quot;incomplete or poorly formatted EDNS options: {:?}&quot;</span>, state);
+        options.clear();
     }
 
-    <span class="comment">// the record data is stored as unstructured data, the expectation is that this will be processed after initial parsing.</span>
-    <span class="prelude-val">Ok</span>(<span class="ident">OPT::new</span>(<span class="ident">options</span>))
+    <span class="comment">// the record data is stored as unstructured data, the expectation is that this will be processed after initial parsing.
+    </span><span class="prelude-val">Ok</span>(OPT::new(options))
 }
 
-<span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">opt</span>: <span class="kw-2">&amp;</span><span class="ident">OPT</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">for</span> (<span class="ident">edns_code</span>, <span class="ident">edns_option</span>) <span class="kw">in</span> <span class="ident">opt</span>.<span class="ident">as_ref</span>().<span class="ident">iter</span>() {
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="ident">edns_code</span>))<span class="question-mark">?</span>;
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">edns_option</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
-        <span class="ident">edns_option</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>
-    }
+<span class="doccomment">/// Write the RData from the given Decoder
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, opt: <span class="kw-2">&amp;</span>OPT) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">for </span>(edns_code, edns_option) <span class="kw">in </span>opt.as_ref().iter() {
+        encoder.emit_u16(u16::from(<span class="kw-2">*</span>edns_code))<span class="question-mark">?</span>;
+        encoder.emit_u16(edns_option.len())<span class="question-mark">?</span>;
+        edns_option.emit(encoder)<span class="question-mark">?
+    </span>}
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">OptReadState</span> {
-    <span class="ident">ReadCode</span>,
-    <span class="ident">Code</span> {
-        <span class="ident">code</span>: <span class="ident">EdnsCode</span>,
-    }, <span class="comment">// expect LSB for the opt code, store the high byte</span>
-    <span class="ident">Data</span> {
-        <span class="ident">code</span>: <span class="ident">EdnsCode</span>,
-        <span class="ident">length</span>: <span class="ident">usize</span>,
-        <span class="ident">collected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    }, <span class="comment">// expect the data for the option</span>
+<span class="attribute">#[derive(Debug, PartialEq, Eq)]
+</span><span class="kw">enum </span>OptReadState {
+    ReadCode,
+    Code {
+        code: EdnsCode,
+    }, <span class="comment">// expect LSB for the opt code, store the high byte
+    </span>Data {
+        code: EdnsCode,
+        length: usize,
+        collected: Vec&lt;u8&gt;,
+    }, <span class="comment">// expect the data for the option
+</span>}
+
+<span class="doccomment">/// The code of the EDNS data option
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Hash, Debug, Copy, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>EdnsCode {
+    <span class="doccomment">/// [RFC 6891, Reserved](https://tools.ietf.org/html/rfc6891)
+    </span>Zero,
+
+    <span class="doccomment">/// [RFC 8764l, Apple&#39;s Long-Lived Queries, Optional](https://tools.ietf.org/html/rfc8764)
+    </span>LLQ,
+
+    <span class="doccomment">/// [UL On-hold](http://files.dns-sd.org/draft-sekar-dns-ul.txt)
+    </span>UL,
+
+    <span class="doccomment">/// [RFC 5001, NSID](https://tools.ietf.org/html/rfc5001)
+    </span>NSID,
+    <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-
+    </span><span class="doccomment">/// [RFC 6975, DNSSEC Algorithm Understood](https://tools.ietf.org/html/rfc6975)
+    </span>DAU,
+
+    <span class="doccomment">/// [RFC 6975, DS Hash Understood](https://tools.ietf.org/html/rfc6975)
+    </span>DHU,
+
+    <span class="doccomment">/// [RFC 6975, NSEC3 Hash Understood](https://tools.ietf.org/html/rfc6975)
+    </span>N3U,
+
+    <span class="doccomment">/// [RFC 7871, Client Subnet, Optional](https://tools.ietf.org/html/rfc7871)
+    </span>Subnet,
+
+    <span class="doccomment">/// [RFC 7314, EDNS EXPIRE, Optional](https://tools.ietf.org/html/rfc7314)
+    </span>Expire,
+
+    <span class="doccomment">/// [RFC 7873, DNS Cookies](https://tools.ietf.org/html/rfc7873)
+    </span>Cookie,
+
+    <span class="doccomment">/// [RFC 7828, edns-tcp-keepalive](https://tools.ietf.org/html/rfc7828)
+    </span>Keepalive,
+
+    <span class="doccomment">/// [RFC 7830, The EDNS(0) Padding](https://tools.ietf.org/html/rfc7830)
+    </span>Padding,
+
+    <span class="doccomment">/// [RFC 7901, CHAIN Query Requests in DNS, Optional](https://tools.ietf.org/html/rfc7901)
+    </span>Chain,
+
+    <span class="doccomment">/// Unknown, used to deal with unknown or unsupported codes
+    </span>Unknown(u16),
 }
 
-<span class="doccomment">/// The code of the EDNS data option</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Hash</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EdnsCode</span> {
-    <span class="doccomment">/// [RFC 6891, Reserved](https://tools.ietf.org/html/rfc6891)</span>
-    <span class="ident">Zero</span>,
-
-    <span class="doccomment">/// [RFC 8764l, Apple&#39;s Long-Lived Queries, Optional](https://tools.ietf.org/html/rfc8764)</span>
-    <span class="ident">LLQ</span>,
-
-    <span class="doccomment">/// [UL On-hold](http://files.dns-sd.org/draft-sekar-dns-ul.txt)</span>
-    <span class="ident">UL</span>,
-
-    <span class="doccomment">/// [RFC 5001, NSID](https://tools.ietf.org/html/rfc5001)</span>
-    <span class="ident">NSID</span>,
-    <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-</span>
-    <span class="doccomment">/// [RFC 6975, DNSSEC Algorithm Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="ident">DAU</span>,
-
-    <span class="doccomment">/// [RFC 6975, DS Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="ident">DHU</span>,
-
-    <span class="doccomment">/// [RFC 6975, NSEC3 Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="ident">N3U</span>,
-
-    <span class="doccomment">/// [RFC 7871, Client Subnet, Optional](https://tools.ietf.org/html/rfc7871)</span>
-    <span class="ident">Subnet</span>,
-
-    <span class="doccomment">/// [RFC 7314, EDNS EXPIRE, Optional](https://tools.ietf.org/html/rfc7314)</span>
-    <span class="ident">Expire</span>,
-
-    <span class="doccomment">/// [RFC 7873, DNS Cookies](https://tools.ietf.org/html/rfc7873)</span>
-    <span class="ident">Cookie</span>,
-
-    <span class="doccomment">/// [RFC 7828, edns-tcp-keepalive](https://tools.ietf.org/html/rfc7828)</span>
-    <span class="ident">Keepalive</span>,
-
-    <span class="doccomment">/// [RFC 7830, The EDNS(0) Padding](https://tools.ietf.org/html/rfc7830)</span>
-    <span class="ident">Padding</span>,
-
-    <span class="doccomment">/// [RFC 7901, CHAIN Query Requests in DNS, Optional](https://tools.ietf.org/html/rfc7901)</span>
-    <span class="ident">Chain</span>,
-
-    <span class="doccomment">/// Unknown, used to deal with unknown or unsupported codes</span>
-    <span class="ident">Unknown</span>(<span class="ident">u16</span>),
-}
-
-<span class="comment">// TODO: implement a macro to perform these inversions</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Zero</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::LLQ</span>,
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::UL</span>,
-            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::NSID</span>,
-            <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-</span>
-            <span class="number">5</span> =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>,
-            <span class="number">6</span> =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>,
-            <span class="number">7</span> =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>,
-            <span class="number">8</span> =&gt; <span class="ident"><span class="self">Self</span>::Subnet</span>,
-            <span class="number">9</span> =&gt; <span class="ident"><span class="self">Self</span>::Expire</span>,
-            <span class="number">10</span> =&gt; <span class="ident"><span class="self">Self</span>::Cookie</span>,
-            <span class="number">11</span> =&gt; <span class="ident"><span class="self">Self</span>::Keepalive</span>,
-            <span class="number">12</span> =&gt; <span class="ident"><span class="self">Self</span>::Padding</span>,
-            <span class="number">13</span> =&gt; <span class="ident"><span class="self">Self</span>::Chain</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">value</span>),
+<span class="comment">// TODO: implement a macro to perform these inversions
+</span><span class="kw">impl </span>From&lt;u16&gt; <span class="kw">for </span>EdnsCode {
+    <span class="kw">fn </span>from(value: u16) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::Zero,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::LLQ,
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::UL,
+            <span class="number">3 </span>=&gt; <span class="self">Self</span>::NSID,
+            <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-
+            </span><span class="number">5 </span>=&gt; <span class="self">Self</span>::DAU,
+            <span class="number">6 </span>=&gt; <span class="self">Self</span>::DHU,
+            <span class="number">7 </span>=&gt; <span class="self">Self</span>::N3U,
+            <span class="number">8 </span>=&gt; <span class="self">Self</span>::Subnet,
+            <span class="number">9 </span>=&gt; <span class="self">Self</span>::Expire,
+            <span class="number">10 </span>=&gt; <span class="self">Self</span>::Cookie,
+            <span class="number">11 </span>=&gt; <span class="self">Self</span>::Keepalive,
+            <span class="number">12 </span>=&gt; <span class="self">Self</span>::Padding,
+            <span class="number">13 </span>=&gt; <span class="self">Self</span>::Chain,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(value),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EdnsCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">EdnsCode</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">EdnsCode::Zero</span> =&gt; <span class="number">0</span>,
-            <span class="ident">EdnsCode::LLQ</span> =&gt; <span class="number">1</span>,
-            <span class="ident">EdnsCode::UL</span> =&gt; <span class="number">2</span>,
-            <span class="ident">EdnsCode::NSID</span> =&gt; <span class="number">3</span>,
-            <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-</span>
-            <span class="ident">EdnsCode::DAU</span> =&gt; <span class="number">5</span>,
-            <span class="ident">EdnsCode::DHU</span> =&gt; <span class="number">6</span>,
-            <span class="ident">EdnsCode::N3U</span> =&gt; <span class="number">7</span>,
-            <span class="ident">EdnsCode::Subnet</span> =&gt; <span class="number">8</span>,
-            <span class="ident">EdnsCode::Expire</span> =&gt; <span class="number">9</span>,
-            <span class="ident">EdnsCode::Cookie</span> =&gt; <span class="number">10</span>,
-            <span class="ident">EdnsCode::Keepalive</span> =&gt; <span class="number">11</span>,
-            <span class="ident">EdnsCode::Padding</span> =&gt; <span class="number">12</span>,
-            <span class="ident">EdnsCode::Chain</span> =&gt; <span class="number">13</span>,
-            <span class="ident">EdnsCode::Unknown</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
+<span class="kw">impl </span>From&lt;EdnsCode&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(value: EdnsCode) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value {
+            EdnsCode::Zero =&gt; <span class="number">0</span>,
+            EdnsCode::LLQ =&gt; <span class="number">1</span>,
+            EdnsCode::UL =&gt; <span class="number">2</span>,
+            EdnsCode::NSID =&gt; <span class="number">3</span>,
+            <span class="comment">// 4 Reserved [draft-cheshire-edns0-owner-option] -EXPIRED-
+            </span>EdnsCode::DAU =&gt; <span class="number">5</span>,
+            EdnsCode::DHU =&gt; <span class="number">6</span>,
+            EdnsCode::N3U =&gt; <span class="number">7</span>,
+            EdnsCode::Subnet =&gt; <span class="number">8</span>,
+            EdnsCode::Expire =&gt; <span class="number">9</span>,
+            EdnsCode::Cookie =&gt; <span class="number">10</span>,
+            EdnsCode::Keepalive =&gt; <span class="number">11</span>,
+            EdnsCode::Padding =&gt; <span class="number">12</span>,
+            EdnsCode::Chain =&gt; <span class="number">13</span>,
+            EdnsCode::Unknown(value) =&gt; value,
         }
     }
 }
 
-<span class="doccomment">/// options used to pass information about capabilities between client and server</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `note: Not all EdnsOptions are supported at this time.`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13&gt;</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialOrd</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EdnsOption</span> {
-    <span class="doccomment">/// [RFC 6975, DNSSEC Algorithm Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
-    <span class="ident">DAU</span>(<span class="ident">SupportedAlgorithms</span>),
+<span class="doccomment">/// options used to pass information about capabilities between client and server
+///
+/// `note: Not all EdnsOptions are supported at this time.`
+///
+/// &lt;http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13&gt;
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialOrd, PartialEq, Eq, Clone, Hash)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>EdnsOption {
+    <span class="doccomment">/// [RFC 6975, DNSSEC Algorithm Understood](https://tools.ietf.org/html/rfc6975)
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dnssec&quot;</span>)))]
+    </span>DAU(SupportedAlgorithms),
 
-    <span class="doccomment">/// [RFC 6975, DS Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
-    <span class="ident">DHU</span>(<span class="ident">SupportedAlgorithms</span>),
+    <span class="doccomment">/// [RFC 6975, DS Hash Understood](https://tools.ietf.org/html/rfc6975)
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dnssec&quot;</span>)))]
+    </span>DHU(SupportedAlgorithms),
 
-    <span class="doccomment">/// [RFC 6975, NSEC3 Hash Understood](https://tools.ietf.org/html/rfc6975)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
-    <span class="ident">N3U</span>(<span class="ident">SupportedAlgorithms</span>),
+    <span class="doccomment">/// [RFC 6975, NSEC3 Hash Understood](https://tools.ietf.org/html/rfc6975)
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dnssec&quot;</span>)))]
+    </span>N3U(SupportedAlgorithms),
 
-    <span class="doccomment">/// Unknown, used to deal with unknown or unsupported codes</span>
-    <span class="ident">Unknown</span>(<span class="ident">u16</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Unknown, used to deal with unknown or unsupported codes
+    </span>Unknown(u16, Vec&lt;u8&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">EdnsOption</span> {
-    <span class="doccomment">/// Returns the length in bytes of the EdnsOption</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::DHU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::N3U</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>) =&gt; <span class="ident">algorithms</span>.<span class="ident">len</span>(),
-            <span class="ident">EdnsOption::Unknown</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>, <span class="comment">// TODO: should we verify?</span>
-        }
+<span class="kw">impl </span>EdnsOption {
+    <span class="doccomment">/// Returns the length in bytes of the EdnsOption
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DAU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::DHU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::N3U(<span class="kw-2">ref </span>algorithms) =&gt; algorithms.len(),
+            EdnsOption::Unknown(<span class="kw">_</span>, <span class="kw-2">ref </span>data) =&gt; data.len() <span class="kw">as </span>u16, <span class="comment">// TODO: should we verify?
+        </span>}
     }
 
-    <span class="doccomment">/// Returns `true` if the length in bytes of the EdnsOption is 0</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::DHU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::N3U</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>) =&gt; <span class="ident">algorithms</span>.<span class="ident">is_empty</span>(),
-            <span class="ident">EdnsOption::Unknown</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">is_empty</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">EdnsOption</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::DHU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::N3U</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>) =&gt; <span class="ident">algorithms</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>),
-            <span class="ident">EdnsOption::Unknown</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">data</span>), <span class="comment">// gah, clone needed or make a crazy api.</span>
+    <span class="doccomment">/// Returns `true` if the length in bytes of the EdnsOption is 0
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DAU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::DHU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::N3U(<span class="kw-2">ref </span>algorithms) =&gt; algorithms.is_empty(),
+            EdnsOption::Unknown(<span class="kw">_</span>, <span class="kw-2">ref </span>data) =&gt; data.is_empty(),
         }
     }
 }
 
-<span class="doccomment">/// only the supported extensions are listed right now.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">EdnsCode</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsOption</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_single_binding</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: (<span class="ident">EdnsCode</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span>.<span class="number">0</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::DAU</span> =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::DHU</span> =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsCode::N3U</span> =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>(<span class="ident">value</span>.<span class="number">1</span>.<span class="ident">into</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="number">1</span>.<span class="ident">to_vec</span>()),
+<span class="kw">impl </span>BinEncodable <span class="kw">for </span>EdnsOption {
+    <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DAU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::DHU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::N3U(<span class="kw-2">ref </span>algorithms) =&gt; algorithms.emit(encoder),
+            EdnsOption::Unknown(<span class="kw">_</span>, <span class="kw-2">ref </span>data) =&gt; encoder.emit_vec(data), <span class="comment">// gah, clone needed or make a crazy api.
+        </span>}
+    }
+}
+
+<span class="doccomment">/// only the supported extensions are listed right now.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(EdnsCode, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8])&gt; <span class="kw">for </span>EdnsOption {
+    <span class="attribute">#[allow(clippy::match_single_binding)]
+    </span><span class="kw">fn </span>from(value: (EdnsCode, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8])) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value.<span class="number">0 </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsCode::DAU =&gt; <span class="self">Self</span>::DAU(value.<span class="number">1</span>.into()),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsCode::DHU =&gt; <span class="self">Self</span>::DHU(value.<span class="number">1</span>.into()),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsCode::N3U =&gt; <span class="self">Self</span>::N3U(value.<span class="number">1</span>.into()),
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(value.<span class="number">0</span>.into(), value.<span class="number">1</span>.to_vec()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::DHU</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>)
-            <span class="op">|</span> <span class="ident">EdnsOption::N3U</span>(<span class="kw-2">ref</span> <span class="ident">algorithms</span>) =&gt; <span class="ident">algorithms</span>.<span class="ident">into</span>(),
-            <span class="ident">EdnsOption::Unknown</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">clone</span>(), <span class="comment">// gah, clone needed or make a crazy api.</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EdnsOption&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EdnsOption) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DAU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::DHU(<span class="kw-2">ref </span>algorithms)
+            | EdnsOption::N3U(<span class="kw-2">ref </span>algorithms) =&gt; algorithms.into(),
+            EdnsOption::Unknown(<span class="kw">_</span>, <span class="kw-2">ref </span>data) =&gt; data.clone(), <span class="comment">// gah, clone needed or make a crazy api.
+        </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EdnsOption&gt; <span class="kw">for </span>EdnsCode {
+    <span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EdnsOption) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DAU(..) =&gt; <span class="self">Self</span>::DAU,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::DHU(..) =&gt; <span class="self">Self</span>::DHU,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>EdnsOption::N3U(..) =&gt; <span class="self">Self</span>::N3U,
+            EdnsOption::Unknown(code, <span class="kw">_</span>) =&gt; code.into(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdnsCode</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdnsOption</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DAU</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::DAU</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::DHU</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::DHU</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">EdnsOption::N3U</span>(..) =&gt; <span class="ident"><span class="self">Self</span>::N3U</span>,
-            <span class="ident">EdnsOption::Unknown</span>(<span class="ident">code</span>, <span class="kw">_</span>) =&gt; <span class="ident">code</span>.<span class="ident">into</span>(),
-        }
-    }
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">let </span><span class="kw-2">mut </span>rdata = OPT::default();
+        rdata.insert(EdnsOption::DAU(SupportedAlgorithms::all()));
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">OPT::default</span>();
-        <span class="ident">rdata</span>.<span class="ident">insert</span>(<span class="ident">EdnsOption::DAU</span>(<span class="ident">SupportedAlgorithms::all</span>()));
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">restrict</span> <span class="op">=</span> <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">restrict</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>restrict = Restrict::new(bytes.len() <span class="kw">as </span>u16);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder, restrict).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_empty_option_at_end_of_opt</span>() {
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_empty_option_at_end_of_opt() {
+        <span class="kw">let </span>bytes: Vec&lt;u8&gt; = <span class="macro">vec!</span>[
             <span class="number">0x00</span>, <span class="number">0x0a</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>, <span class="number">0x00</span>, <span class="number">0x08</span>,
             <span class="number">0x00</span>, <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x0b</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
         ];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(<span class="kw-2">&amp;*</span>bytes);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(bytes.len() <span class="kw">as </span>u16));
         <span class="macro">assert!</span>(
-            <span class="ident">read_rdata</span>.<span class="ident">is_ok</span>(),
+            read_rdata.is_ok(),
             <span class="string">&quot;error decoding: {:?}&quot;</span>,
-            <span class="ident">read_rdata</span>.<span class="ident">unwrap_err</span>()
+            read_rdata.unwrap_err()
         );
 
-        <span class="kw">let</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident">read_rdata</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HashMap::default</span>();
-        <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Subnet</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">8</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]));
-        <span class="ident">options</span>.<span class="ident">insert</span>(
-            <span class="ident">EdnsCode::Cookie</span>,
-            <span class="ident">EdnsOption::Unknown</span>(<span class="number">10</span>, <span class="macro">vec!</span>[<span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>]),
+        <span class="kw">let </span>opt = read_rdata.unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>options = HashMap::default();
+        options.insert(EdnsCode::Subnet, EdnsOption::Unknown(<span class="number">8</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]));
+        options.insert(
+            EdnsCode::Cookie,
+            EdnsOption::Unknown(<span class="number">10</span>, <span class="macro">vec!</span>[<span class="number">0x0b</span>, <span class="number">0x64</span>, <span class="number">0xb4</span>, <span class="number">0xdc</span>, <span class="number">0xd7</span>, <span class="number">0xb0</span>, <span class="number">0xcc</span>, <span class="number">0x8f</span>]),
         );
-        <span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">EdnsCode::Keepalive</span>, <span class="ident">EdnsOption::Unknown</span>(<span class="number">11</span>, <span class="macro">vec!</span>[]));
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">OPT::new</span>(<span class="ident">options</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">opt</span>, <span class="ident">options</span>);
+        options.insert(EdnsCode::Keepalive, EdnsOption::Unknown(<span class="number">11</span>, <span class="macro">vec!</span>[]));
+        <span class="kw">let </span>options = OPT::new(options);
+        <span class="macro">assert_eq!</span>(opt, options);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

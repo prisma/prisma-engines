@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/index.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>index.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/index.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>index.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -326,333 +326,333 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldAttributeWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast,
+    types::{IndexAlgorithm, IndexAttribute},
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    ParserDatabase, ScalarFieldType,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CompositeTypeFieldWalker</span>;
+<span class="kw">use </span><span class="kw">super</span>::CompositeTypeFieldWalker;
 
-<span class="doccomment">/// An index, unique or fulltext attribute.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="ident">ast::AttributeId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span>,
+<span class="doccomment">/// An index, unique or fulltext attribute.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>IndexWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) index: ast::AttributeId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) index_attribute: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>IndexAttribute,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The mapped name of the index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index([a, b], map: &quot;theName&quot;)</span>
-    <span class="doccomment">///                      ^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; IndexWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The mapped name of the index.
+    ///
+    /// ```ignore
+    /// @@index([a, b], map: &quot;theName&quot;)
+    ///                      ^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.index_attribute.mapped_name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// The attribute name: `&quot;index&quot;` for `@@unique`, `&quot;fulltext&quot;` for `@@fultext` and `&quot;index&quot;`</span>
-    <span class="doccomment">/// for `@index` and `@@index`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_defined_on_field</span>() {
-            <span class="string">&quot;@unique&quot;</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() {
-            <span class="string">&quot;@@unique&quot;</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_fulltext</span>() {
-            <span class="string">&quot;@@fulltext&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;@@index&quot;</span>
-        }
+    <span class="doccomment">/// The attribute name: `&quot;index&quot;` for `@@unique`, `&quot;fulltext&quot;` for `@@fultext` and `&quot;index&quot;`
+    /// for `@index` and `@@index`.
+    </span><span class="kw">pub fn </span>attribute_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">if </span><span class="self">self</span>.is_unique() &amp;&amp; <span class="self">self</span>.is_defined_on_field() {
+            <span class="string">&quot;@unique&quot;
+        </span>} <span class="kw">else if </span><span class="self">self</span>.is_unique() {
+            <span class="string">&quot;@@unique&quot;
+        </span>} <span class="kw">else if </span><span class="self">self</span>.is_fulltext() {
+            <span class="string">&quot;@@fulltext&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;@@index&quot;
+        </span>}
     }
 
-    <span class="doccomment">/// The id of the index, if explicitly defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::AttributeId</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
+    <span class="doccomment">/// The id of the index, if explicitly defined.
+    </span><span class="kw">pub fn </span>attribute_id(<span class="self">self</span>) -&gt; ast::AttributeId {
+        <span class="self">self</span>.index
     }
 
-    <span class="doccomment">/// The index type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_type</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::types::IndexType</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>().<span class="ident">r#type</span>
+    <span class="doccomment">/// The index type.
+    </span><span class="kw">pub fn </span>index_type(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::types::IndexType {
+        <span class="self">self</span>.attribute().r#type
     }
 
-    <span class="doccomment">/// The `name` argument of the index attribute. The client name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index([a, b], name: &quot;theName&quot;)</span>
-    <span class="doccomment">///                      ^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The `name` argument of the index attribute. The client name.
+    ///
+    /// ```ignore
+    /// @@index([a, b], name: &quot;theName&quot;)
+    ///                      ^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.index_attribute.name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// The index algorithm, if a specific one was specified for the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>
+    <span class="doccomment">/// The index algorithm, if a specific one was specified for the index.
+    </span><span class="kw">pub fn </span>algorithm(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt; {
+        <span class="self">self</span>.attribute().algorithm
     }
 
-    <span class="doccomment">/// The AST node of the index/unique attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">index</span>]
+    <span class="doccomment">/// The AST node of the index/unique attribute.
+    </span><span class="kw">pub fn </span>ast_attribute(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.index]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attribute(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>IndexAttribute {
+        <span class="self">self</span>.index_attribute
     }
 
-    <span class="kw">fn</span> <span class="ident">fields_array</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::Expression</span>] {
-        <span class="self">self</span>.<span class="ident">ast_attribute</span>()
-            .<span class="ident">arguments</span>
-            .<span class="ident">arguments</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">ident</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;fields&quot;</span> =&gt; <span class="bool-val">true</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
+    <span class="kw">fn </span>fields_array(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[ast::Expression] {
+        <span class="self">self</span>.ast_attribute()
+            .arguments
+            .arguments
+            .iter()
+            .find(|arg| <span class="kw">match </span><span class="kw-2">&amp;</span>arg.name {
+                <span class="prelude-val">Some</span>(ident) <span class="kw">if </span>ident.name.is_empty() || ident.name == <span class="string">&quot;fields&quot; </span>=&gt; <span class="bool-val">true</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             })
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_array</span>())
-            .<span class="ident">unwrap</span>()
-            .<span class="number">0</span>
-    }
+            .and_then(|arg| arg.value.as_array())
+            .unwrap()
+            .<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Iterate over all the names in all the paths in the fields argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, `@@index([a, b.c.d])` would return an iterator over &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_field_names</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields_array</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">path</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">path</span> {
-                <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">name</span>, <span class="kw">_</span>) =&gt; <span class="ident">name</span>,
-                <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">name</span>,
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="doccomment">/// Iterate over all the names in all the paths in the fields argument.
+    ///
+    /// For example, `@@index([a, b.c.d])` would return an iterator over &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;.
+    </span><span class="kw">pub fn </span>all_field_names(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.fields_array()
+            .iter()
+            .map(|path| <span class="kw">match </span>path {
+                ast::Expression::ConstantValue(name, <span class="kw">_</span>) =&gt; name,
+                ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; name,
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             })
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>))
+            .flat_map(|name| name.split(<span class="string">&#39;.&#39;</span>))
     }
 
-    <span class="doccomment">/// The scalar fields covered by the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">attributes</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attributes</span>.<span class="ident">path</span>;
-            <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
+    <span class="doccomment">/// The scalar fields covered by the index.
+    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.index_attribute.fields.iter().map(<span class="kw">move </span>|attributes| {
+            <span class="kw">let </span>path = <span class="kw-2">&amp;</span>attributes.path;
+            <span class="kw">let </span>field_id = path.field_in_index();
 
-            <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>).<span class="ident">field</span>(<span class="ident">field_id</span>);
-                    <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+            <span class="kw">match </span>path.type_holding_the_indexed_field() {
+                <span class="prelude-val">Some</span>(ctid) =&gt; {
+                    <span class="kw">let </span>walker = <span class="self">self</span>.db.walk_composite_type(ctid).field(field_id);
+                    IndexFieldWalker::new(walker)
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
-                    <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>walker = <span class="self">self</span>.model().scalar_field(field_id);
+                    IndexFieldWalker::new(walker)
                 }
             }
         })
     }
 
-    <span class="doccomment">/// The scalar fields covered by the index, and their arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>()
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">field_arg_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">ScalarFieldAttributeWalker</span> {
-                <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-                <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attribute</span>().<span class="ident">fields</span>,
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-                <span class="ident">field_arg_id</span>,
+    <span class="doccomment">/// The scalar fields covered by the index, and their arguments.
+    </span><span class="kw">pub fn </span>scalar_field_attributes(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.attribute()
+            .fields
+            .iter()
+            .enumerate()
+            .map(<span class="kw">move </span>|(field_arg_id, <span class="kw">_</span>)| ScalarFieldAttributeWalker {
+                model_id: <span class="self">self</span>.model_id,
+                fields: <span class="kw-2">&amp;</span><span class="self">self</span>.attribute().fields,
+                db: <span class="self">self</span>.db,
+                field_arg_id,
             })
     }
 
-    <span class="doccomment">/// True if the field contains exactly the same fields in the same order,</span>
-    <span class="doccomment">/// and with the same attributes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_exactly_the_fields</span>(
+    <span class="doccomment">/// True if the field contains exactly the same fields in the same order,
+    /// and with the same attributes.
+    </span><span class="kw">pub fn </span>contains_exactly_the_fields(
         <span class="self">self</span>,
-        <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        fields: <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;,
+    ) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.scalar_field_attributes().len() != fields.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">zip</span>(<span class="ident">fields</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">same_attributes</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">sort_order</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">sort_order</span>() <span class="op">&amp;&amp;</span> <span class="ident">a</span>.<span class="ident">length</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">length</span>();
-            <span class="kw">let</span> <span class="ident">same_path</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_path_to_indexed_field</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">as_path_to_indexed_field</span>();
+        <span class="self">self</span>.scalar_field_attributes().zip(fields).all(|(a, b)| {
+            <span class="kw">let </span>same_attributes = a.sort_order() == b.sort_order() &amp;&amp; a.length() == b.length();
+            <span class="kw">let </span>same_path = a.as_path_to_indexed_field() == b.as_path_to_indexed_field();
 
-            <span class="ident">same_path</span> <span class="op">&amp;&amp;</span> <span class="ident">same_attributes</span>
+            same_path &amp;&amp; same_attributes
         })
     }
 
-    <span class="doccomment">/// Whether the index is defined on a single field (otherwise: on the model).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_defined_on_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">source_field</span>.<span class="ident">is_some</span>()
+    <span class="doccomment">/// Whether the index is defined on a single field (otherwise: on the model).
+    </span><span class="kw">pub fn </span>is_defined_on_field(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.index_attribute.source_field.is_some()
     }
 
-    <span class="doccomment">/// Is this an `@@unique`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_unique</span>()
+    <span class="doccomment">/// Is this an `@@unique`?
+    </span><span class="kw">pub fn </span>is_unique(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.index_attribute.is_unique()
     }
 
-    <span class="doccomment">/// Is this a `@@fulltext`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_fulltext</span>()
+    <span class="doccomment">/// Is this a `@@fulltext`?
+    </span><span class="kw">pub fn </span>is_fulltext(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.index_attribute.is_fulltext()
     }
 
-    <span class="doccomment">/// Is this an `@@index`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_normal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">is_normal</span>()
+    <span class="doccomment">/// Is this an `@@index`?
+    </span><span class="kw">pub fn </span>is_normal(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.index_attribute.is_normal()
     }
 
-    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly</span>
-    <span class="doccomment">/// matters on SQL Server where one can change the clustering.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">clustered</span>
+    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly
+    /// matters on SQL Server where one can change the clustering.
+    </span><span class="kw">pub fn </span>clustered(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.index_attribute.clustered
     }
 
-    <span class="doccomment">/// The model the index is defined on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+    <span class="doccomment">/// The model the index is defined on.
+    </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
     }
 
-    <span class="doccomment">/// The field the model was defined on, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">source_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>
-            .<span class="ident">source_field</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">scalar_field</span>(<span class="ident">field_id</span>))
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">InnerIndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InnerIndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>)
+    <span class="doccomment">/// The field the model was defined on, if any.
+    </span><span class="kw">pub fn </span>source_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.index_attribute
+            .source_field
+            .map(|field_id| <span class="self">self</span>.model().scalar_field(field_id))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InnerIndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>)
+<span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>InnerIndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    Scalar(ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+    Composite(CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>InnerIndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(sf: ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(sf)
     }
 }
 
-<span class="doccomment">/// A field in an index definition. It can point to a scalar field in the</span>
-<span class="doccomment">/// current model, or through embedding a field in a composite type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">InnerIndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>InnerIndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(cf: CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(cf)
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">InnerIndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">inner</span>.<span class="ident">into</span>() }
+<span class="doccomment">/// A field in an index definition. It can point to a scalar field in the
+/// current model, or through embedding a field in a composite type.
+</span><span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>IndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    inner: InnerIndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; IndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(inner: <span class="kw">impl </span>Into&lt;InnerIndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: inner.into() }
     }
 
-    <span class="doccomment">/// Is the field optional / nullable?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_optional</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">arity</span>().<span class="ident">is_optional</span>(),
+    <span class="doccomment">/// Is the field optional / nullable?
+    </span><span class="kw">pub fn </span>is_optional(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.is_optional(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.arity().is_optional(),
         }
     }
 
-    <span class="doccomment">/// Is the type of the field `Unsupported(&quot;...&quot;)`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_unsupported</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">r#type</span>().<span class="ident">is_unsupported</span>(),
+    <span class="doccomment">/// Is the type of the field `Unsupported(&quot;...&quot;)`?
+    </span><span class="kw">pub fn </span>is_unsupported(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.is_unsupported(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.r#type().is_unsupported(),
         }
     }
 
-    <span class="doccomment">/// The ID of the field node in the AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">field_id</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">field_id</span>(),
+    <span class="doccomment">/// The ID of the field node in the AST.
+    </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.field_id(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.field_id(),
         }
     }
 
-    <span class="doccomment">/// The name of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">name</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">name</span>(),
+    <span class="doccomment">/// The name of the field.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.name(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.name(),
         }
     }
 
-    <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">database_name</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">database_name</span>(),
+    <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.
+    </span><span class="kw">pub fn </span>database_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.database_name(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.database_name(),
         }
     }
 
-    <span class="doccomment">/// The type of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_type</span>(<span class="self">self</span>) -&gt; <span class="ident">ScalarFieldType</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">scalar_field_type</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="kw-2">*</span><span class="ident">cf</span>.<span class="ident">r#type</span>(),
+    <span class="doccomment">/// The type of the field.
+    </span><span class="kw">pub fn </span>scalar_field_type(<span class="self">self</span>) -&gt; ScalarFieldType {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.scalar_field_type(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; <span class="kw-2">*</span>cf.r#type(),
         }
     }
 
-    <span class="doccomment">/// Convert the walker to a scalar field, if the underlying field is in a</span>
-    <span class="doccomment">/// model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Convert the walker to a scalar field, if the underlying field is in a
+    /// model.
+    </span><span class="kw">pub fn </span>as_scalar_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf),
+            InnerIndexFieldWalker::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Convert the walker to a composite field, if the underlying field is in a</span>
-    <span class="doccomment">/// composite type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cf</span>),
+    <span class="doccomment">/// Convert the walker to a composite field, if the underlying field is in a
+    /// composite type.
+    </span><span class="kw">pub fn </span>as_composite_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            InnerIndexFieldWalker::Composite(cf) =&gt; <span class="prelude-val">Some</span>(cf),
         }
     }
 
-    <span class="doccomment">/// True if the index field is a scalar field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scalar_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// True if the index field is a scalar field.
+    </span><span class="kw">pub fn </span>is_scalar_field(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.inner, InnerIndexFieldWalker::Scalar(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// True if the index field is a composite field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_composite_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// True if the index field is a composite field.
+    </span><span class="kw">pub fn </span>is_composite_field(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.inner, InnerIndexFieldWalker::Composite(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Does the field define a primary key by its own.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single_pk</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_single_pk</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Does the field define a primary key by its own.
+    </span><span class="kw">pub fn </span>is_single_pk(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.is_single_pk(),
+            InnerIndexFieldWalker::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">ast::Span</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">raw_native_type</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">raw_native_type</span>(),
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)
+    </span><span class="kw">pub fn </span>raw_native_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[String], ast::Span)&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.raw_native_type(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.raw_native_type(),
         }
     }
 
-    <span class="doccomment">/// The field node in the AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerIndexFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">ast_field</span>(),
-            <span class="ident">InnerIndexFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">ast_field</span>(),
+    <span class="doccomment">/// The field node in the AST.
+    </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerIndexFieldWalker::Scalar(sf) =&gt; sf.ast_field(),
+            InnerIndexFieldWalker::Composite(cf) =&gt; cf.ast_field(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

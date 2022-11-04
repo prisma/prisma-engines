@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/flate2-1.0.24/src/ffi/c.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>c.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../flate2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../flate2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../flate2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/flate2-1.0.24/src/ffi/c.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>c.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../flate2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../flate2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../flate2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -419,426 +419,426 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Implementation for C backends.</span>
-<span class="kw">use</span> <span class="ident">std::alloc</span>::{<span class="self">self</span>, <span class="ident">Layout</span>};
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::marker</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_int</span>, <span class="ident">c_uint</span>, <span class="ident">c_void</span>};
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Implementation for C backends.
+</span><span class="kw">use </span>std::alloc::{<span class="self">self</span>, Layout};
+<span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::marker;
+<span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>std::os::raw::{c_int, c_uint, c_void};
+<span class="kw">use </span>std::ptr;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mem</span>::{<span class="self">self</span>, <span class="ident">FlushDecompress</span>, <span class="ident">Status</span>};
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::mem::{<span class="self">self</span>, FlushDecompress, Status};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorMessage</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>ErrorMessage(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;);
 
-<span class="kw">impl</span> <span class="ident">ErrorMessage</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>ErrorMessage {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">pub struct </span>StreamWrapper {
+    <span class="kw">pub </span>inner: Box&lt;mz_stream&gt;,
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>StreamWrapper {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="macro">write!</span>(f, <span class="string">&quot;StreamWrapper&quot;</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamWrapper</span> {
-    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">mz_stream</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">StreamWrapper</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;StreamWrapper&quot;</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">StreamWrapper</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">StreamWrapper</span> {
-        <span class="ident">StreamWrapper</span> {
-            <span class="ident">inner</span>: <span class="ident">Box::new</span>(<span class="ident">mz_stream</span> {
-                <span class="ident">next_in</span>: <span class="ident">ptr::null_mut</span>(),
-                <span class="ident">avail_in</span>: <span class="number">0</span>,
-                <span class="ident">total_in</span>: <span class="number">0</span>,
-                <span class="ident">next_out</span>: <span class="ident">ptr::null_mut</span>(),
-                <span class="ident">avail_out</span>: <span class="number">0</span>,
-                <span class="ident">total_out</span>: <span class="number">0</span>,
-                <span class="ident">msg</span>: <span class="ident">ptr::null_mut</span>(),
-                <span class="ident">adler</span>: <span class="number">0</span>,
-                <span class="ident">data_type</span>: <span class="number">0</span>,
-                <span class="ident">reserved</span>: <span class="number">0</span>,
-                <span class="ident">opaque</span>: <span class="ident">ptr::null_mut</span>(),
-                <span class="ident">state</span>: <span class="ident">ptr::null_mut</span>(),
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;any_zlib&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare-zlib-sys&quot;</span>)))]</span>
-                <span class="ident">zalloc</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;any_zlib&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare-zlib-sys&quot;</span>)))]</span>
-                <span class="ident">zfree</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;any_zlib&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare-zlib-sys&quot;</span>))))]</span>
-                <span class="ident">zalloc</span>: <span class="prelude-val">Some</span>(<span class="ident">zalloc</span>),
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;any_zlib&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare-zlib-sys&quot;</span>))))]</span>
-                <span class="ident">zfree</span>: <span class="prelude-val">Some</span>(<span class="ident">zfree</span>),
+<span class="kw">impl </span>Default <span class="kw">for </span>StreamWrapper {
+    <span class="kw">fn </span>default() -&gt; StreamWrapper {
+        StreamWrapper {
+            inner: Box::new(mz_stream {
+                next_in: ptr::null_mut(),
+                avail_in: <span class="number">0</span>,
+                total_in: <span class="number">0</span>,
+                next_out: ptr::null_mut(),
+                avail_out: <span class="number">0</span>,
+                total_out: <span class="number">0</span>,
+                msg: ptr::null_mut(),
+                adler: <span class="number">0</span>,
+                data_type: <span class="number">0</span>,
+                reserved: <span class="number">0</span>,
+                opaque: ptr::null_mut(),
+                state: ptr::null_mut(),
+                <span class="attribute">#[cfg(all(feature = <span class="string">&quot;any_zlib&quot;</span>, not(feature = <span class="string">&quot;cloudflare-zlib-sys&quot;</span>)))]
+                </span>zalloc,
+                <span class="attribute">#[cfg(all(feature = <span class="string">&quot;any_zlib&quot;</span>, not(feature = <span class="string">&quot;cloudflare-zlib-sys&quot;</span>)))]
+                </span>zfree,
+                <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;any_zlib&quot;</span>, not(feature = <span class="string">&quot;cloudflare-zlib-sys&quot;</span>))))]
+                </span>zalloc: <span class="prelude-val">Some</span>(zalloc),
+                <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;any_zlib&quot;</span>, not(feature = <span class="string">&quot;cloudflare-zlib-sys&quot;</span>))))]
+                </span>zfree: <span class="prelude-val">Some</span>(zfree),
             }),
         }
     }
 }
 
-<span class="kw">const</span> <span class="ident">ALIGN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
+<span class="kw">const </span>ALIGN: usize = std::mem::align_of::&lt;usize&gt;();
 
-<span class="kw">fn</span> <span class="ident">align_up</span>(<span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">align</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    (<span class="ident">size</span> <span class="op">+</span> <span class="ident">align</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="op">!</span>(<span class="ident">align</span> <span class="op">-</span> <span class="number">1</span>)
+<span class="kw">fn </span>align_up(size: usize, align: usize) -&gt; usize {
+    (size + align - <span class="number">1</span>) &amp; !(align - <span class="number">1</span>)
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">zalloc</span>(<span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">items</span>: <span class="ident">AllocSize</span>, <span class="ident">item_size</span>: <span class="ident">AllocSize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-    <span class="comment">// We need to multiply `items` and `item_size` to get the actual desired</span>
-    <span class="comment">// allocation size. Since `zfree` doesn&#39;t receive a size argument we</span>
-    <span class="comment">// also need to allocate space for a `usize` as a header so we can store</span>
-    <span class="comment">// how large the allocation is to deallocate later.</span>
-    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">items</span>
-        .<span class="ident">checked_mul</span>(<span class="ident">item_size</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">usize::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">size</span><span class="op">|</span> <span class="ident">align_up</span>(<span class="ident">size</span>, <span class="ident">ALIGN</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">checked_add</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()))
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>zalloc(_ptr: <span class="kw-2">*mut </span>c_void, items: AllocSize, item_size: AllocSize) -&gt; <span class="kw-2">*mut </span>c_void {
+    <span class="comment">// We need to multiply `items` and `item_size` to get the actual desired
+    // allocation size. Since `zfree` doesn&#39;t receive a size argument we
+    // also need to allocate space for a `usize` as a header so we can store
+    // how large the allocation is to deallocate later.
+    </span><span class="kw">let </span>size = <span class="kw">match </span>items
+        .checked_mul(item_size)
+        .and_then(|i| usize::try_from(i).ok())
+        .map(|size| align_up(size, ALIGN))
+        .and_then(|i| i.checked_add(std::mem::size_of::&lt;usize&gt;()))
     {
-        <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">ptr::null_mut</span>(),
+        <span class="prelude-val">Some</span>(i) =&gt; i,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>ptr::null_mut(),
     };
 
-    <span class="comment">// Make sure the `size` isn&#39;t too big to fail `Layout`&#39;s restrictions</span>
-    <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">layout</span>) =&gt; <span class="ident">layout</span>,
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">ptr::null_mut</span>(),
+    <span class="comment">// Make sure the `size` isn&#39;t too big to fail `Layout`&#39;s restrictions
+    </span><span class="kw">let </span>layout = <span class="kw">match </span>Layout::from_size_align(size, ALIGN) {
+        <span class="prelude-val">Ok</span>(layout) =&gt; layout,
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span>ptr::null_mut(),
     };
 
-    <span class="kw">unsafe</span> {
-        <span class="comment">// Allocate the data, and if successful store the size we allocated</span>
-        <span class="comment">// at the beginning and then return an offset pointer.</span>
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">alloc::alloc</span>(<span class="ident">layout</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
+    <span class="kw">unsafe </span>{
+        <span class="comment">// Allocate the data, and if successful store the size we allocated
+        // at the beginning and then return an offset pointer.
+        </span><span class="kw">let </span>ptr = alloc::alloc(layout) <span class="kw">as </span><span class="kw-2">*mut </span>usize;
+        <span class="kw">if </span>ptr.is_null() {
+            <span class="kw">return </span>ptr <span class="kw">as </span><span class="kw-2">*mut </span>c_void;
         }
-        <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">size</span>;
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>
+        <span class="kw-2">*</span>ptr = size;
+        ptr.add(<span class="number">1</span>) <span class="kw">as </span><span class="kw-2">*mut </span>c_void
     }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">zfree</span>(<span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">address</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) {
-    <span class="kw">unsafe</span> {
-        <span class="comment">// Move our address being freed back one pointer, read the size we</span>
-        <span class="comment">// stored in `zalloc`, and then free it using the standard Rust</span>
-        <span class="comment">// allocator.</span>
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">address</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>).<span class="ident">offset</span>(<span class="op">-</span><span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ptr</span>;
-        <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align_unchecked</span>(<span class="ident">size</span>, <span class="ident">ALIGN</span>);
-        <span class="ident">alloc::dealloc</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">layout</span>)
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>zfree(_ptr: <span class="kw-2">*mut </span>c_void, address: <span class="kw-2">*mut </span>c_void) {
+    <span class="kw">unsafe </span>{
+        <span class="comment">// Move our address being freed back one pointer, read the size we
+        // stored in `zalloc`, and then free it using the standard Rust
+        // allocator.
+        </span><span class="kw">let </span>ptr = (address <span class="kw">as </span><span class="kw-2">*mut </span>usize).offset(-<span class="number">1</span>);
+        <span class="kw">let </span>size = <span class="kw-2">*</span>ptr;
+        <span class="kw">let </span>layout = Layout::from_size_align_unchecked(size, ALIGN);
+        alloc::dealloc(ptr <span class="kw">as </span><span class="kw-2">*mut </span>u8, layout)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">StreamWrapper</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">mz_stream</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>StreamWrapper {
+    <span class="kw">type </span>Target = mz_stream;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;*</span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">StreamWrapper</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>
+<span class="kw">impl </span>DerefMut <span class="kw">for </span>StreamWrapper {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Direction</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Direction</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;D: Direction&gt; Send <span class="kw">for </span>Stream&lt;D&gt; {}
+<span class="kw">unsafe impl</span>&lt;D: Direction&gt; Sync <span class="kw">for </span>Stream&lt;D&gt; {}
 
-<span class="doccomment">/// Trait used to call the right destroy/end function on the inner</span>
-<span class="doccomment">/// stream object on drop.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Direction</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">stream</span>: <span class="kw-2">*mut</span> <span class="ident">mz_stream</span>) -&gt; <span class="ident">c_int</span>;
+<span class="doccomment">/// Trait used to call the right destroy/end function on the inner
+/// stream object on drop.
+</span><span class="kw">pub trait </span>Direction {
+    <span class="kw">unsafe fn </span>destroy(stream: <span class="kw-2">*mut </span>mz_stream) -&gt; c_int;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DirCompress</span> {}
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DirDecompress</span> {}
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DirCompress {}
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DirDecompress {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Direction</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">stream_wrapper</span>: <span class="ident">StreamWrapper</span>,
-    <span class="kw">pub</span> <span class="ident">total_in</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">total_out</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">_marker</span>: <span class="ident">marker::PhantomData</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Stream&lt;D: Direction&gt; {
+    <span class="kw">pub </span>stream_wrapper: StreamWrapper,
+    <span class="kw">pub </span>total_in: u64,
+    <span class="kw">pub </span>total_out: u64,
+    <span class="kw">pub </span>_marker: marker::PhantomData&lt;D&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Direction</span><span class="op">&gt;</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorMessage</span> {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream_wrapper</span>.<span class="ident">msg</span>;
-        <span class="ident">ErrorMessage</span>(<span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">is_null</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::ffi::CStr::from_ptr</span>(<span class="ident">msg</span>) };
-            <span class="ident">std::str::from_utf8</span>(<span class="ident">s</span>.<span class="ident">to_bytes</span>()).<span class="ident">ok</span>()
+<span class="kw">impl</span>&lt;D: Direction&gt; Stream&lt;D&gt; {
+    <span class="kw">pub fn </span>msg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ErrorMessage {
+        <span class="kw">let </span>msg = <span class="self">self</span>.stream_wrapper.msg;
+        ErrorMessage(<span class="kw">if </span>msg.is_null() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span>s = <span class="kw">unsafe </span>{ std::ffi::CStr::from_ptr(msg) };
+            std::str::from_utf8(s.to_bytes()).ok()
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Direction</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">D::destroy</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">stream_wrapper</span>);
+<span class="kw">impl</span>&lt;D: Direction&gt; Drop <span class="kw">for </span>Stream&lt;D&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let _ </span>= D::destroy(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.stream_wrapper);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Direction</span> <span class="kw">for</span> <span class="ident">DirCompress</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">stream</span>: <span class="kw-2">*mut</span> <span class="ident">mz_stream</span>) -&gt; <span class="ident">c_int</span> {
-        <span class="ident">mz_deflateEnd</span>(<span class="ident">stream</span>)
+<span class="kw">impl </span>Direction <span class="kw">for </span>DirCompress {
+    <span class="kw">unsafe fn </span>destroy(stream: <span class="kw-2">*mut </span>mz_stream) -&gt; c_int {
+        mz_deflateEnd(stream)
     }
 }
-<span class="kw">impl</span> <span class="ident">Direction</span> <span class="kw">for</span> <span class="ident">DirDecompress</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">stream</span>: <span class="kw-2">*mut</span> <span class="ident">mz_stream</span>) -&gt; <span class="ident">c_int</span> {
-        <span class="ident">mz_inflateEnd</span>(<span class="ident">stream</span>)
+<span class="kw">impl </span>Direction <span class="kw">for </span>DirDecompress {
+    <span class="kw">unsafe fn </span>destroy(stream: <span class="kw-2">*mut </span>mz_stream) -&gt; c_int {
+        mz_inflateEnd(stream)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Inflate</span> {
-    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirDecompress</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Inflate {
+    <span class="kw">pub </span>inner: Stream&lt;DirDecompress&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">InflateBackend</span> <span class="kw">for</span> <span class="ident">Inflate</span> {
-    <span class="kw">fn</span> <span class="ident">make</span>(<span class="ident">zlib_header</span>: <span class="ident">bool</span>, <span class="ident">window_bits</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">StreamWrapper::default</span>();
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">mz_inflateInit2</span>(
-                <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">state</span>,
-                <span class="kw">if</span> <span class="ident">zlib_header</span> {
-                    <span class="ident">window_bits</span> <span class="kw">as</span> <span class="ident">c_int</span>
-                } <span class="kw">else</span> {
-                    <span class="op">-</span>(<span class="ident">window_bits</span> <span class="kw">as</span> <span class="ident">c_int</span>)
+<span class="kw">impl </span>InflateBackend <span class="kw">for </span>Inflate {
+    <span class="kw">fn </span>make(zlib_header: bool, window_bits: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>state = StreamWrapper::default();
+            <span class="kw">let </span>ret = mz_inflateInit2(
+                <span class="kw-2">&amp;mut *</span>state,
+                <span class="kw">if </span>zlib_header {
+                    window_bits <span class="kw">as </span>c_int
+                } <span class="kw">else </span>{
+                    -(window_bits <span class="kw">as </span>c_int)
                 },
             );
-            <span class="macro">assert_eq!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
-            <span class="ident">Inflate</span> {
-                <span class="ident">inner</span>: <span class="ident">Stream</span> {
-                    <span class="ident">stream_wrapper</span>: <span class="ident">state</span>,
-                    <span class="ident">total_in</span>: <span class="number">0</span>,
-                    <span class="ident">total_out</span>: <span class="number">0</span>,
-                    <span class="ident">_marker</span>: <span class="ident">marker::PhantomData</span>,
+            <span class="macro">assert_eq!</span>(ret, <span class="number">0</span>);
+            Inflate {
+                inner: Stream {
+                    stream_wrapper: state,
+                    total_in: <span class="number">0</span>,
+                    total_out: <span class="number">0</span>,
+                    _marker: marker::PhantomData,
                 },
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decompress</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">flush</span>: <span class="ident">FlushDecompress</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream_wrapper</span>;
-        <span class="ident">raw</span>.<span class="ident">msg</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-        <span class="ident">raw</span>.<span class="ident">next_in</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>;
-        <span class="ident">raw</span>.<span class="ident">avail_in</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">c_uint::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">c_uint</span>;
-        <span class="ident">raw</span>.<span class="ident">next_out</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">as_mut_ptr</span>();
-        <span class="ident">raw</span>.<span class="ident">avail_out</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">output</span>.<span class="ident">len</span>(), <span class="ident">c_uint::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">c_uint</span>;
+    <span class="kw">fn </span>decompress(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;</span>[u8],
+        output: <span class="kw-2">&amp;mut </span>[u8],
+        flush: FlushDecompress,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Status, DecompressError&gt; {
+        <span class="kw">let </span>raw = <span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.stream_wrapper;
+        raw.msg = ptr::null_mut();
+        raw.next_in = input.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8;
+        raw.avail_in = cmp::min(input.len(), c_uint::max_value() <span class="kw">as </span>usize) <span class="kw">as </span>c_uint;
+        raw.next_out = output.as_mut_ptr();
+        raw.avail_out = cmp::min(output.len(), c_uint::max_value() <span class="kw">as </span>usize) <span class="kw">as </span>c_uint;
 
-        <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mz_inflate</span>(<span class="ident">raw</span>, <span class="ident">flush</span> <span class="kw">as</span> <span class="ident">c_int</span>) };
+        <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ mz_inflate(raw, flush <span class="kw">as </span>c_int) };
 
-        <span class="comment">// Unfortunately the total counters provided by zlib might be only</span>
-        <span class="comment">// 32 bits wide and overflow while processing large amounts of data.</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">raw</span>.<span class="ident">next_in</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">input</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">raw</span>.<span class="ident">next_out</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">output</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="comment">// Unfortunately the total counters provided by zlib might be only
+        // 32 bits wide and overflow while processing large amounts of data.
+        </span><span class="self">self</span>.inner.total_in += (raw.next_in <span class="kw">as </span>usize - input.as_ptr() <span class="kw">as </span>usize) <span class="kw">as </span>u64;
+        <span class="self">self</span>.inner.total_out += (raw.next_out <span class="kw">as </span>usize - output.as_ptr() <span class="kw">as </span>usize) <span class="kw">as </span>u64;
 
-        <span class="kw">match</span> <span class="ident">rc</span> {
-            <span class="ident">MZ_DATA_ERROR</span> <span class="op">|</span> <span class="ident">MZ_STREAM_ERROR</span> =&gt; <span class="ident">mem::decompress_failed</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">msg</span>()),
-            <span class="ident">MZ_OK</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>),
-            <span class="ident">MZ_BUF_ERROR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>),
-            <span class="ident">MZ_STREAM_END</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>),
-            <span class="ident">MZ_NEED_DICT</span> =&gt; <span class="ident">mem::decompress_need_dict</span>(<span class="ident">raw</span>.<span class="ident">adler</span> <span class="kw">as</span> <span class="ident">u32</span>),
-            <span class="ident">c</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown return code: {}&quot;</span>, <span class="ident">c</span>),
+        <span class="kw">match </span>rc {
+            MZ_DATA_ERROR | MZ_STREAM_ERROR =&gt; mem::decompress_failed(<span class="self">self</span>.inner.msg()),
+            MZ_OK =&gt; <span class="prelude-val">Ok</span>(Status::Ok),
+            MZ_BUF_ERROR =&gt; <span class="prelude-val">Ok</span>(Status::BufError),
+            MZ_STREAM_END =&gt; <span class="prelude-val">Ok</span>(Status::StreamEnd),
+            MZ_NEED_DICT =&gt; mem::decompress_need_dict(raw.adler <span class="kw">as </span>u32),
+            c =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown return code: {}&quot;</span>, c),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">zlib_header</span>: <span class="ident">bool</span>) {
-        <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">zlib_header</span> {
-            <span class="ident">MZ_DEFAULT_WINDOW_BITS</span>
-        } <span class="kw">else</span> {
-            <span class="op">-</span><span class="ident">MZ_DEFAULT_WINDOW_BITS</span>
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, zlib_header: bool) {
+        <span class="kw">let </span>bits = <span class="kw">if </span>zlib_header {
+            MZ_DEFAULT_WINDOW_BITS
+        } <span class="kw">else </span>{
+            -MZ_DEFAULT_WINDOW_BITS
         };
-        <span class="kw">unsafe</span> {
-            <span class="ident">inflateReset2</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream_wrapper</span>, <span class="ident">bits</span>);
+        <span class="kw">unsafe </span>{
+            inflateReset2(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.stream_wrapper, bits);
         }
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.inner.total_out = <span class="number">0</span>;
+        <span class="self">self</span>.inner.total_in = <span class="number">0</span>;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Backend</span> <span class="kw">for</span> <span class="ident">Inflate</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span>
+<span class="kw">impl </span>Backend <span class="kw">for </span>Inflate {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>total_in(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.inner.total_in
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>total_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.inner.total_out
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Deflate</span> {
-    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">DirCompress</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Deflate {
+    <span class="kw">pub </span>inner: Stream&lt;DirCompress&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DeflateBackend</span> <span class="kw">for</span> <span class="ident">Deflate</span> {
-    <span class="kw">fn</span> <span class="ident">make</span>(<span class="ident">level</span>: <span class="ident">Compression</span>, <span class="ident">zlib_header</span>: <span class="ident">bool</span>, <span class="ident">window_bits</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">StreamWrapper::default</span>();
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">mz_deflateInit2</span>(
-                <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">state</span>,
-                <span class="ident">level</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-                <span class="ident">MZ_DEFLATED</span>,
-                <span class="kw">if</span> <span class="ident">zlib_header</span> {
-                    <span class="ident">window_bits</span> <span class="kw">as</span> <span class="ident">c_int</span>
-                } <span class="kw">else</span> {
-                    <span class="op">-</span>(<span class="ident">window_bits</span> <span class="kw">as</span> <span class="ident">c_int</span>)
+<span class="kw">impl </span>DeflateBackend <span class="kw">for </span>Deflate {
+    <span class="kw">fn </span>make(level: Compression, zlib_header: bool, window_bits: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>state = StreamWrapper::default();
+            <span class="kw">let </span>ret = mz_deflateInit2(
+                <span class="kw-2">&amp;mut *</span>state,
+                level.<span class="number">0 </span><span class="kw">as </span>c_int,
+                MZ_DEFLATED,
+                <span class="kw">if </span>zlib_header {
+                    window_bits <span class="kw">as </span>c_int
+                } <span class="kw">else </span>{
+                    -(window_bits <span class="kw">as </span>c_int)
                 },
                 <span class="number">8</span>,
-                <span class="ident">MZ_DEFAULT_STRATEGY</span>,
+                MZ_DEFAULT_STRATEGY,
             );
-            <span class="macro">assert_eq!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
-            <span class="ident">Deflate</span> {
-                <span class="ident">inner</span>: <span class="ident">Stream</span> {
-                    <span class="ident">stream_wrapper</span>: <span class="ident">state</span>,
-                    <span class="ident">total_in</span>: <span class="number">0</span>,
-                    <span class="ident">total_out</span>: <span class="number">0</span>,
-                    <span class="ident">_marker</span>: <span class="ident">marker::PhantomData</span>,
+            <span class="macro">assert_eq!</span>(ret, <span class="number">0</span>);
+            Deflate {
+                inner: Stream {
+                    stream_wrapper: state,
+                    total_in: <span class="number">0</span>,
+                    total_out: <span class="number">0</span>,
+                    _marker: marker::PhantomData,
                 },
             }
         }
     }
-    <span class="kw">fn</span> <span class="ident">compress</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">flush</span>: <span class="ident">FlushCompress</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">CompressError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream_wrapper</span>;
-        <span class="ident">raw</span>.<span class="ident">msg</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-        <span class="ident">raw</span>.<span class="ident">next_in</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>;
-        <span class="ident">raw</span>.<span class="ident">avail_in</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">c_uint::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">c_uint</span>;
-        <span class="ident">raw</span>.<span class="ident">next_out</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">as_mut_ptr</span>();
-        <span class="ident">raw</span>.<span class="ident">avail_out</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">output</span>.<span class="ident">len</span>(), <span class="ident">c_uint::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">c_uint</span>;
+    <span class="kw">fn </span>compress(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;</span>[u8],
+        output: <span class="kw-2">&amp;mut </span>[u8],
+        flush: FlushCompress,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Status, CompressError&gt; {
+        <span class="kw">let </span>raw = <span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.stream_wrapper;
+        raw.msg = ptr::null_mut();
+        raw.next_in = input.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>;
+        raw.avail_in = cmp::min(input.len(), c_uint::max_value() <span class="kw">as </span>usize) <span class="kw">as </span>c_uint;
+        raw.next_out = output.as_mut_ptr();
+        raw.avail_out = cmp::min(output.len(), c_uint::max_value() <span class="kw">as </span>usize) <span class="kw">as </span>c_uint;
 
-        <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mz_deflate</span>(<span class="ident">raw</span>, <span class="ident">flush</span> <span class="kw">as</span> <span class="ident">c_int</span>) };
+        <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ mz_deflate(raw, flush <span class="kw">as </span>c_int) };
 
-        <span class="comment">// Unfortunately the total counters provided by zlib might be only</span>
-        <span class="comment">// 32 bits wide and overflow while processing large amounts of data.</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">raw</span>.<span class="ident">next_in</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">input</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">raw</span>.<span class="ident">next_out</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">output</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="comment">// Unfortunately the total counters provided by zlib might be only
+        // 32 bits wide and overflow while processing large amounts of data.
+        </span><span class="self">self</span>.inner.total_in += (raw.next_in <span class="kw">as </span>usize - input.as_ptr() <span class="kw">as </span>usize) <span class="kw">as </span>u64;
+        <span class="self">self</span>.inner.total_out += (raw.next_out <span class="kw">as </span>usize - output.as_ptr() <span class="kw">as </span>usize) <span class="kw">as </span>u64;
 
-        <span class="kw">match</span> <span class="ident">rc</span> {
-            <span class="ident">MZ_OK</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>),
-            <span class="ident">MZ_BUF_ERROR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>),
-            <span class="ident">MZ_STREAM_END</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>),
-            <span class="ident">MZ_STREAM_ERROR</span> =&gt; <span class="ident">mem::compress_failed</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">msg</span>()),
-            <span class="ident">c</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown return code: {}&quot;</span>, <span class="ident">c</span>),
+        <span class="kw">match </span>rc {
+            MZ_OK =&gt; <span class="prelude-val">Ok</span>(Status::Ok),
+            MZ_BUF_ERROR =&gt; <span class="prelude-val">Ok</span>(Status::BufError),
+            MZ_STREAM_END =&gt; <span class="prelude-val">Ok</span>(Status::StreamEnd),
+            MZ_STREAM_ERROR =&gt; mem::compress_failed(<span class="self">self</span>.inner.msg()),
+            c =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown return code: {}&quot;</span>, c),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mz_deflateReset</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream_wrapper</span>) };
-        <span class="macro">assert_eq!</span>(<span class="ident">rc</span>, <span class="ident">MZ_OK</span>);
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.total_in = <span class="number">0</span>;
+        <span class="self">self</span>.inner.total_out = <span class="number">0</span>;
+        <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ mz_deflateReset(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.stream_wrapper) };
+        <span class="macro">assert_eq!</span>(rc, MZ_OK);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Backend</span> <span class="kw">for</span> <span class="ident">Deflate</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_in</span>
+<span class="kw">impl </span>Backend <span class="kw">for </span>Deflate {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>total_in(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.inner.total_in
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">total_out</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>total_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.inner.total_out
     }
 }
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::c_backend</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::c_backend::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// For backwards compatibility, we provide symbols as `mz_` to mimic the miniz API</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-<span class="kw">mod</span> <span class="ident">c_backend</span> {
-    <span class="kw">use</span> <span class="ident">std::mem</span>;
-    <span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>};
+<span class="doccomment">/// For backwards compatibility, we provide symbols as `mz_` to mimic the miniz API
+</span><span class="attribute">#[allow(bad_style)]
+</span><span class="kw">mod </span>c_backend {
+    <span class="kw">use </span>std::mem;
+    <span class="kw">use </span>std::os::raw::{c_char, c_int};
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-ng&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">libz_ng_sys</span> <span class="kw">as</span> <span class="ident">libz</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-ng&quot;</span>)]
+    </span><span class="kw">use </span>libz_ng_sys <span class="kw">as </span>libz;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-ng&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare_zlib&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident">cloudflare_zlib_sys</span> <span class="kw">as</span> <span class="ident">libz</span>;
+    <span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;zlib-ng&quot;</span>), feature = <span class="string">&quot;cloudflare_zlib&quot;</span>))]
+    </span><span class="kw">use </span>cloudflare_zlib_sys <span class="kw">as </span>libz;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cloudflare_zlib&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-ng&quot;</span>)))]</span>
-    <span class="kw">use</span> <span class="ident">libz_sys</span> <span class="kw">as</span> <span class="ident">libz</span>;
+    <span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;cloudflare_zlib&quot;</span>), not(feature = <span class="string">&quot;zlib-ng&quot;</span>)))]
+    </span><span class="kw">use </span>libz_sys <span class="kw">as </span>libz;
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::deflate</span> <span class="kw">as</span> <span class="ident">mz_deflate</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::deflateEnd</span> <span class="kw">as</span> <span class="ident">mz_deflateEnd</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::deflateReset</span> <span class="kw">as</span> <span class="ident">mz_deflateReset</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::inflate</span> <span class="kw">as</span> <span class="ident">mz_inflate</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::inflateEnd</span> <span class="kw">as</span> <span class="ident">mz_inflateEnd</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::z_stream</span> <span class="kw">as</span> <span class="ident">mz_stream</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub use </span>libz::deflate <span class="kw">as </span>mz_deflate;
+    <span class="kw">pub use </span>libz::deflateEnd <span class="kw">as </span>mz_deflateEnd;
+    <span class="kw">pub use </span>libz::deflateReset <span class="kw">as </span>mz_deflateReset;
+    <span class="kw">pub use </span>libz::inflate <span class="kw">as </span>mz_inflate;
+    <span class="kw">pub use </span>libz::inflateEnd <span class="kw">as </span>mz_inflateEnd;
+    <span class="kw">pub use </span>libz::z_stream <span class="kw">as </span>mz_stream;
+    <span class="kw">pub use </span>libz::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_BLOCK</span> <span class="kw">as</span> <span class="ident">MZ_BLOCK</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_BUF_ERROR</span> <span class="kw">as</span> <span class="ident">MZ_BUF_ERROR</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_DATA_ERROR</span> <span class="kw">as</span> <span class="ident">MZ_DATA_ERROR</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_DEFAULT_STRATEGY</span> <span class="kw">as</span> <span class="ident">MZ_DEFAULT_STRATEGY</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_DEFLATED</span> <span class="kw">as</span> <span class="ident">MZ_DEFLATED</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_FINISH</span> <span class="kw">as</span> <span class="ident">MZ_FINISH</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_FULL_FLUSH</span> <span class="kw">as</span> <span class="ident">MZ_FULL_FLUSH</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_NEED_DICT</span> <span class="kw">as</span> <span class="ident">MZ_NEED_DICT</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_NO_FLUSH</span> <span class="kw">as</span> <span class="ident">MZ_NO_FLUSH</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_OK</span> <span class="kw">as</span> <span class="ident">MZ_OK</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_PARTIAL_FLUSH</span> <span class="kw">as</span> <span class="ident">MZ_PARTIAL_FLUSH</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_STREAM_END</span> <span class="kw">as</span> <span class="ident">MZ_STREAM_END</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_STREAM_ERROR</span> <span class="kw">as</span> <span class="ident">MZ_STREAM_ERROR</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">libz::Z_SYNC_FLUSH</span> <span class="kw">as</span> <span class="ident">MZ_SYNC_FLUSH</span>;
-    <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AllocSize</span> <span class="op">=</span> <span class="ident">libz::uInt</span>;
+    <span class="kw">pub use </span>libz::Z_BLOCK <span class="kw">as </span>MZ_BLOCK;
+    <span class="kw">pub use </span>libz::Z_BUF_ERROR <span class="kw">as </span>MZ_BUF_ERROR;
+    <span class="kw">pub use </span>libz::Z_DATA_ERROR <span class="kw">as </span>MZ_DATA_ERROR;
+    <span class="kw">pub use </span>libz::Z_DEFAULT_STRATEGY <span class="kw">as </span>MZ_DEFAULT_STRATEGY;
+    <span class="kw">pub use </span>libz::Z_DEFLATED <span class="kw">as </span>MZ_DEFLATED;
+    <span class="kw">pub use </span>libz::Z_FINISH <span class="kw">as </span>MZ_FINISH;
+    <span class="kw">pub use </span>libz::Z_FULL_FLUSH <span class="kw">as </span>MZ_FULL_FLUSH;
+    <span class="kw">pub use </span>libz::Z_NEED_DICT <span class="kw">as </span>MZ_NEED_DICT;
+    <span class="kw">pub use </span>libz::Z_NO_FLUSH <span class="kw">as </span>MZ_NO_FLUSH;
+    <span class="kw">pub use </span>libz::Z_OK <span class="kw">as </span>MZ_OK;
+    <span class="kw">pub use </span>libz::Z_PARTIAL_FLUSH <span class="kw">as </span>MZ_PARTIAL_FLUSH;
+    <span class="kw">pub use </span>libz::Z_STREAM_END <span class="kw">as </span>MZ_STREAM_END;
+    <span class="kw">pub use </span>libz::Z_STREAM_ERROR <span class="kw">as </span>MZ_STREAM_ERROR;
+    <span class="kw">pub use </span>libz::Z_SYNC_FLUSH <span class="kw">as </span>MZ_SYNC_FLUSH;
+    <span class="kw">pub type </span>AllocSize = libz::uInt;
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MZ_DEFAULT_WINDOW_BITS</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">15</span>;
+    <span class="kw">pub const </span>MZ_DEFAULT_WINDOW_BITS: c_int = <span class="number">15</span>;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-ng&quot;</span>)]</span>
-    <span class="kw">const</span> <span class="ident">ZLIB_VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;2.1.0.devel\0&quot;</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-ng&quot;</span>))]</span>
-    <span class="kw">const</span> <span class="ident">ZLIB_VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;1.2.8\0&quot;</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;zlib-ng&quot;</span>)]
+    </span><span class="kw">const </span>ZLIB_VERSION: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;2.1.0.devel\0&quot;</span>;
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;zlib-ng&quot;</span>))]
+    </span><span class="kw">const </span>ZLIB_VERSION: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;1.2.8\0&quot;</span>;
 
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">mz_deflateInit2</span>(
-        <span class="ident">stream</span>: <span class="kw-2">*mut</span> <span class="ident">mz_stream</span>,
-        <span class="ident">level</span>: <span class="ident">c_int</span>,
-        <span class="ident">method</span>: <span class="ident">c_int</span>,
-        <span class="ident">window_bits</span>: <span class="ident">c_int</span>,
-        <span class="ident">mem_level</span>: <span class="ident">c_int</span>,
-        <span class="ident">strategy</span>: <span class="ident">c_int</span>,
-    ) -&gt; <span class="ident">c_int</span> {
-        <span class="ident">libz::deflateInit2_</span>(
-            <span class="ident">stream</span>,
-            <span class="ident">level</span>,
-            <span class="ident">method</span>,
-            <span class="ident">window_bits</span>,
-            <span class="ident">mem_level</span>,
-            <span class="ident">strategy</span>,
-            <span class="ident">ZLIB_VERSION</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-            <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">mz_stream</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>mz_deflateInit2(
+        stream: <span class="kw-2">*mut </span>mz_stream,
+        level: c_int,
+        method: c_int,
+        window_bits: c_int,
+        mem_level: c_int,
+        strategy: c_int,
+    ) -&gt; c_int {
+        libz::deflateInit2_(
+            stream,
+            level,
+            method,
+            window_bits,
+            mem_level,
+            strategy,
+            ZLIB_VERSION.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char,
+            mem::size_of::&lt;mz_stream&gt;() <span class="kw">as </span>c_int,
         )
     }
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">mz_inflateInit2</span>(<span class="ident">stream</span>: <span class="kw-2">*mut</span> <span class="ident">mz_stream</span>, <span class="ident">window_bits</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
-        <span class="ident">libz::inflateInit2_</span>(
-            <span class="ident">stream</span>,
-            <span class="ident">window_bits</span>,
-            <span class="ident">ZLIB_VERSION</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-            <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">mz_stream</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
+    <span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>mz_inflateInit2(stream: <span class="kw-2">*mut </span>mz_stream, window_bits: c_int) -&gt; c_int {
+        libz::inflateInit2_(
+            stream,
+            window_bits,
+            ZLIB_VERSION.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char,
+            mem::size_of::&lt;mz_stream&gt;() <span class="kw">as </span>c_int,
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="flate2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="flate2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/walker_ext_traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walker_ext_traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/walker_ext_traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walker_ext_traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -160,167 +160,167 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{
-    <span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationMode</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::{
+    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
 };
-<span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">walkers</span>::<span class="kw-2">*</span>,
+<span class="kw">use </span>parser_database::{
+    ast::{<span class="self">self</span>, WithSpan},
+    walkers::<span class="kw-2">*</span>,
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IndexWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>IndexWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">IndexWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">mapped_name</span>() {
-            <span class="kw">return</span> <span class="ident">Cow::from</span>(<span class="ident">mapped_name</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; IndexWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; <span class="kw">for </span>IndexWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = <span class="self">self</span>.mapped_name() {
+            <span class="kw">return </span>Cow::from(mapped_name);
         }
 
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
-        <span class="kw">let</span> <span class="ident">model_db_name</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">database_name</span>();
+        <span class="kw">let </span>model = <span class="self">self</span>.model();
+        <span class="kw">let </span>model_db_name = model.database_name();
 
-        <span class="kw">let</span> <span class="ident">field_db_names</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">scalar_field_attributes</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_mapped_path_to_indexed_field</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span>)
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>field_db_names = <span class="self">self
+            </span>.scalar_field_attributes()
+            .flat_map(|f| f.as_mapped_path_to_indexed_field())
+            .map(|(i, <span class="kw">_</span>)| i)
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unique</span>() {
-            <span class="ident">ConstraintNames::unique_index_name</span>(<span class="ident">model_db_name</span>, <span class="kw-2">&amp;</span><span class="ident">field_db_names</span>, <span class="ident">connector</span>).<span class="ident">into</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">ConstraintNames::non_unique_index_name</span>(<span class="ident">model_db_name</span>, <span class="kw-2">&amp;</span><span class="ident">field_db_names</span>, <span class="ident">connector</span>).<span class="ident">into</span>()
+        <span class="kw">if </span><span class="self">self</span>.is_unique() {
+            ConstraintNames::unique_index_name(model_db_name, <span class="kw-2">&amp;</span>field_db_names, connector).into()
+        } <span class="kw">else </span>{
+            ConstraintNames::non_unique_index_name(model_db_name, <span class="kw-2">&amp;</span>field_db_names, connector).into()
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DefaultValueExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>DefaultValueExt&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">DefaultValueExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(
-                <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">model</span>().<span class="ident">database_name</span>(),
-                <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">database_name</span>(),
-                <span class="ident">connector</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; DefaultValueExt&lt;<span class="lifetime">&#39;db</span>&gt; <span class="kw">for </span>DefaultValueWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt; {
+        <span class="self">self</span>.mapped_name().map(Cow::from).unwrap_or_else(|| {
+            <span class="kw">let </span>name = ConstraintNames::default_name(
+                <span class="self">self</span>.field().model().database_name(),
+                <span class="self">self</span>.field().database_name(),
+                connector,
             );
 
-            <span class="ident">Cow::from</span>(<span class="ident">name</span>)
+            Cow::from(name)
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PrimaryKeyWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// This will be None if and only if the connector does not support named primary keys. It can</span>
-    <span class="doccomment">/// be a generated name or one explicitly set in the schema.</span>
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>PrimaryKeyWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// This will be None if and only if the connector does not support named primary keys. It can
+    /// be a generated name or one explicitly set in the schema.
+    </span><span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;db</span>, str&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">supports_named_primary_keys</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PrimaryKeyWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; <span class="kw">for </span>PrimaryKeyWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;db</span>, str&gt;&gt; {
+        <span class="kw">if </span>!connector.supports_named_primary_keys() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
         <span class="prelude-val">Some</span>(
-            <span class="self">self</span>.<span class="ident">mapped_name</span>()
-                .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ConstraintNames::primary_key_name</span>(<span class="self">self</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(), <span class="ident">connector</span>).<span class="ident">into</span>()),
+            <span class="self">self</span>.mapped_name()
+                .map(Cow::Borrowed)
+                .unwrap_or_else(|| ConstraintNames::primary_key_name(<span class="self">self</span>.model().database_name(), connector).into()),
         )
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CompleteInlineRelationWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Gives the onDelete referential action of the relation. If not defined</span>
-    <span class="doccomment">/// explicitly, returns the default value.</span>
-    <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>) -&gt; <span class="ident">ReferentialAction</span>;
+<span class="kw">pub trait </span>CompleteInlineRelationWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// Gives the onDelete referential action of the relation. If not defined
+    /// explicitly, returns the default value.
+    </span><span class="kw">fn </span>on_delete(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector, relation_mode: RelationMode) -&gt; ReferentialAction;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompleteInlineRelationWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; CompleteInlineRelationWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; <span class="kw">for </span>CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>on_delete(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector, relation_mode: RelationMode) -&gt; ReferentialAction {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
 
-        <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">explicit_on_delete</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">supports_restrict</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">relation_mode</span>, <span class="ident">Restrict</span>);
+        <span class="self">self</span>.referencing_field().explicit_on_delete().unwrap_or_else(|| {
+            <span class="kw">let </span>supports_restrict = connector.supports_referential_action(<span class="kw-2">&amp;</span>relation_mode, Restrict);
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referential_arity</span>() {
-                <span class="ident">ast::FieldArity::Required</span> <span class="kw">if</span> <span class="ident">supports_restrict</span> =&gt; <span class="ident">Restrict</span>,
-                <span class="ident">ast::FieldArity::Required</span> =&gt; <span class="ident">NoAction</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">SetNull</span>,
+            <span class="kw">match </span><span class="self">self</span>.referential_arity() {
+                ast::FieldArity::Required <span class="kw">if </span>supports_restrict =&gt; Restrict,
+                ast::FieldArity::Required =&gt; NoAction,
+                <span class="kw">_ </span>=&gt; SetNull,
             }
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InlineRelationWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>InlineRelationWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">InlineRelationWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">model_database_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">database_name</span>();
-            <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">referencing_fields</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>()).<span class="ident">collect</span>())
-                .<span class="ident">unwrap_or_default</span>();
-            <span class="ident">ConstraintNames::foreign_key_constraint_name</span>(<span class="ident">model_database_name</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="ident">connector</span>).<span class="ident">into</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; InlineRelationWalkerExt&lt;<span class="lifetime">&#39;db</span>&gt; <span class="kw">for </span>InlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>constraint_name(<span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; Cow&lt;<span class="lifetime">&#39;db</span>, str&gt; {
+        <span class="self">self</span>.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
+            <span class="kw">let </span>model_database_name = <span class="self">self</span>.referencing_model().database_name();
+            <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = <span class="self">self
+                </span>.referencing_fields()
+                .map(|fields| fields.map(|f| f.database_name()).collect())
+                .unwrap_or_default();
+            ConstraintNames::foreign_key_constraint_name(model_database_name, <span class="kw-2">&amp;</span>field_names, connector).into()
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScalarFieldWalkerExt</span> {
-    <span class="doccomment">/// This will return None when:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - There is no native type attribute on the field.</span>
-    <span class="doccomment">/// - The native type attribute is not valid for the connector.</span>
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>ScalarFieldWalkerExt {
+    <span class="doccomment">/// This will return None when:
+    ///
+    /// - There is no native type attribute on the field.
+    /// - The native type attribute is not valid for the connector.
+    </span><span class="kw">fn </span>native_type_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
+<span class="kw">impl </span>ScalarFieldWalkerExt <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>native_type_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="self">self</span>.raw_native_type().and_then(|(<span class="kw">_</span>, name, args, <span class="kw">_</span>)| {
+            connector.parse_native_type(name, args, <span class="self">self</span>.ast_field().span(), <span class="kw-2">&amp;mut </span>Default::default())
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
+<span class="kw">impl </span>ScalarFieldWalkerExt <span class="kw">for </span>CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>native_type_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="self">self</span>.raw_native_type().and_then(|(<span class="kw">_</span>, name, args, <span class="kw">_</span>)| {
+            connector.parse_native_type(name, args, <span class="self">self</span>.ast_field().span(), <span class="kw-2">&amp;mut </span>Default::default())
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Default::default</span>())
+<span class="kw">impl </span>ScalarFieldWalkerExt <span class="kw">for </span>IndexFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>native_type_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="self">self</span>.raw_native_type().and_then(|(<span class="kw">_</span>, name, args, <span class="kw">_</span>)| {
+            connector.parse_native_type(name, args, <span class="self">self</span>.ast_field().span(), <span class="kw-2">&amp;mut </span>Default::default())
         })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RelationFieldWalkerExt</span> {
-    <span class="kw">fn</span> <span class="ident">default_on_delete_action</span>(<span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">ReferentialAction</span>;
+<span class="kw">pub trait </span>RelationFieldWalkerExt {
+    <span class="kw">fn </span>default_on_delete_action(<span class="self">self</span>, relation_mode: RelationMode, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; ReferentialAction;
 }
 
-<span class="kw">impl</span> <span class="ident">RelationFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default_on_delete_action</span>(<span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referential_arity</span>() {
-            <span class="ident">ast::FieldArity::Required</span>
-                <span class="kw">if</span> <span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">relation_mode</span>, <span class="ident">ReferentialAction::Restrict</span>) =&gt;
+<span class="kw">impl </span>RelationFieldWalkerExt <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>default_on_delete_action(<span class="self">self</span>, relation_mode: RelationMode, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; ReferentialAction {
+        <span class="kw">match </span><span class="self">self</span>.referential_arity() {
+            ast::FieldArity::Required
+                <span class="kw">if </span>connector.supports_referential_action(<span class="kw-2">&amp;</span>relation_mode, ReferentialAction::Restrict) =&gt;
             {
-                <span class="ident">ReferentialAction::Restrict</span>
+                ReferentialAction::Restrict
             }
-            <span class="ident">ast::FieldArity::Required</span> =&gt; <span class="ident">ReferentialAction::NoAction</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">ReferentialAction::SetNull</span>,
+            ast::FieldArity::Required =&gt; ReferentialAction::NoAction,
+            <span class="kw">_ </span>=&gt; ReferentialAction::SetNull,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

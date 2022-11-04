@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/db/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/db/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -265,272 +265,272 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">bson::doc</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_with::skip_serializing_none</span>;
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+<span class="kw">use </span>bson::doc;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>serde_with::skip_serializing_none;
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::Document</span>,
-    <span class="ident">bson_util</span>,
-    <span class="ident">concern</span>::{<span class="ident">ReadConcern</span>, <span class="ident">WriteConcern</span>},
-    <span class="ident">options::Collation</span>,
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
+<span class="kw">use crate</span>::{
+    bson::Document,
+    bson_util,
+    concern::{ReadConcern, WriteConcern},
+    options::Collation,
+    selection_criteria::SelectionCriteria,
 };
 
-<span class="doccomment">/// These are the valid options for creating a [`Database`](../struct.Database.html) with</span>
-<span class="doccomment">/// [`Client::database_with_options`](../struct.Client.html#method.database_with_options).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseOptions</span> {
-    <span class="doccomment">/// The default read preference for operations.</span>
-    <span class="kw">pub</span> <span class="ident">selection_criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
+<span class="doccomment">/// These are the valid options for creating a [`Database`](../struct.Database.html) with
+/// [`Client::database_with_options`](../struct.Client.html#method.database_with_options).
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, TypedBuilder)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>DatabaseOptions {
+    <span class="doccomment">/// The default read preference for operations.
+    </span><span class="kw">pub </span>selection_criteria: <span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;,
 
-    <span class="doccomment">/// The default read concern for operations.</span>
-    <span class="kw">pub</span> <span class="ident">read_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default read concern for operations.
+    </span><span class="kw">pub </span>read_concern: <span class="prelude-ty">Option</span>&lt;ReadConcern&gt;,
 
-    <span class="doccomment">/// The default write concern for operations.</span>
-    <span class="kw">pub</span> <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default write concern for operations.
+    </span><span class="kw">pub </span>write_concern: <span class="prelude-ty">Option</span>&lt;WriteConcern&gt;,
 }
 
-<span class="doccomment">/// These are the valid options for creating a collection with</span>
-<span class="doccomment">/// [`Database::create_collection`](../struct.Database.html#method.create_collection).</span>
-<span class="attribute">#[<span class="ident">skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateCollectionOptions</span> {
-    <span class="doccomment">/// Whether the collection should be capped. If true, `size` must also be set.</span>
-    <span class="kw">pub</span> <span class="ident">capped</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// These are the valid options for creating a collection with
+/// [`Database::create_collection`](../struct.Database.html#method.create_collection).
+</span><span class="attribute">#[skip_serializing_none]
+#[derive(Clone, Debug, Default, Deserialize, TypedBuilder, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CreateCollectionOptions {
+    <span class="doccomment">/// Whether the collection should be capped. If true, `size` must also be set.
+    </span><span class="kw">pub </span>capped: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The maximum size (in bytes) for a capped collection. This option is ignored if `capped` is</span>
-    <span class="doccomment">/// not set to true.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum size (in bytes) for a capped collection. This option is ignored if `capped` is
+    /// not set to true.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]
+    </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 
-    <span class="doccomment">/// The maximum number of documents in a capped collection. The `size` limit takes precedence</span>
-    <span class="doccomment">/// over this option. If a capped collection reaches the size limit before it reaches the</span>
-    <span class="doccomment">/// maximum number of documents, MongoDB removes old documents.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum number of documents in a capped collection. The `size` limit takes precedence
+    /// over this option. If a capped collection reaches the size limit before it reaches the
+    /// maximum number of documents, MongoDB removes old documents.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]
+    </span><span class="kw">pub </span>max: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 
-    <span class="doccomment">/// The storage engine that the collection should use. The value should take the following</span>
-    <span class="doccomment">/// form:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `{ &lt;storage-engine-name&gt;: &lt;options&gt; }`</span>
-    <span class="kw">pub</span> <span class="ident">storage_engine</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The storage engine that the collection should use. The value should take the following
+    /// form:
+    ///
+    /// `{ &lt;storage-engine-name&gt;: &lt;options&gt; }`
+    </span><span class="kw">pub </span>storage_engine: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// Specifies a validator to restrict the schema of documents which can exist in the</span>
-    <span class="doccomment">/// collection. Expressions can be specified using any query operators except `$near`,</span>
-    <span class="doccomment">/// `$nearSphere`, `$text`, and `$where`.</span>
-    <span class="kw">pub</span> <span class="ident">validator</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies a validator to restrict the schema of documents which can exist in the
+    /// collection. Expressions can be specified using any query operators except `$near`,
+    /// `$nearSphere`, `$text`, and `$where`.
+    </span><span class="kw">pub </span>validator: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// Specifies how strictly the database should apply the validation rules to existing documents</span>
-    <span class="doccomment">/// during an update.</span>
-    <span class="kw">pub</span> <span class="ident">validation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationLevel</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies how strictly the database should apply the validation rules to existing documents
+    /// during an update.
+    </span><span class="kw">pub </span>validation_level: <span class="prelude-ty">Option</span>&lt;ValidationLevel&gt;,
 
-    <span class="doccomment">/// Specifies whether the database should return an error or simply raise a warning if inserted</span>
-    <span class="doccomment">/// documents do not pass the validation.</span>
-    <span class="kw">pub</span> <span class="ident">validation_action</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValidationAction</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies whether the database should return an error or simply raise a warning if inserted
+    /// documents do not pass the validation.
+    </span><span class="kw">pub </span>validation_action: <span class="prelude-ty">Option</span>&lt;ValidationAction&gt;,
 
-    <span class="doccomment">/// The name of the source collection or view to base this view on. If specified, this will</span>
-    <span class="doccomment">/// cause a view to be created rather than a collection.</span>
-    <span class="kw">pub</span> <span class="ident">view_on</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The name of the source collection or view to base this view on. If specified, this will
+    /// cause a view to be created rather than a collection.
+    </span><span class="kw">pub </span>view_on: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// An array that consists of the aggregation pipeline stages to run against `view_on` to</span>
-    <span class="doccomment">/// determine the contents of the view.</span>
-    <span class="kw">pub</span> <span class="ident">pipeline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An array that consists of the aggregation pipeline stages to run against `view_on` to
+    /// determine the contents of the view.
+    </span><span class="kw">pub </span>pipeline: <span class="prelude-ty">Option</span>&lt;Vec&lt;Document&gt;&gt;,
 
-    <span class="doccomment">/// The default collation for the collection or view.   </span>
-    <span class="kw">pub</span> <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default collation for the collection or view.   
+    </span><span class="kw">pub </span>collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
 
-    <span class="doccomment">/// The write concern for the operation.   </span>
-    <span class="kw">pub</span> <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The write concern for the operation.   
+    </span><span class="kw">pub </span>write_concern: <span class="prelude-ty">Option</span>&lt;WriteConcern&gt;,
 
-    <span class="doccomment">/// The default configuration for indexes created on this collection, including the _id index.</span>
-    <span class="kw">pub</span> <span class="ident">index_option_defaults</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexOptionDefaults</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default configuration for indexes created on this collection, including the _id index.
+    </span><span class="kw">pub </span>index_option_defaults: <span class="prelude-ty">Option</span>&lt;IndexOptionDefaults&gt;,
 
-    <span class="doccomment">/// An object containing options for creating time series collections. See the [`create`</span>
-    <span class="doccomment">/// command documentation](https://www.mongodb.com/docs/manual/reference/command/create/) for</span>
-    <span class="doccomment">/// supported options, and the [Time Series Collections documentation](</span>
-    <span class="doccomment">/// https://www.mongodb.com/docs/manual/core/timeseries-collections/) for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This feature is only available on server versions 5.0 and above.</span>
-    <span class="kw">pub</span> <span class="ident">timeseries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TimeseriesOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An object containing options for creating time series collections. See the [`create`
+    /// command documentation](https://www.mongodb.com/docs/manual/reference/command/create/) for
+    /// supported options, and the [Time Series Collections documentation](
+    /// https://www.mongodb.com/docs/manual/core/timeseries-collections/) for more information.
+    ///
+    /// This feature is only available on server versions 5.0 and above.
+    </span><span class="kw">pub </span>timeseries: <span class="prelude-ty">Option</span>&lt;TimeseriesOptions&gt;,
 
-    <span class="doccomment">/// Used to automatically delete documents in time series collections. See the [`create`</span>
-    <span class="doccomment">/// command documentation](https://www.mongodb.com/docs/manual/reference/command/create/) for more</span>
-    <span class="doccomment">/// information.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">expire_after_seconds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Used to automatically delete documents in time series collections. See the [`create`
+    /// command documentation](https://www.mongodb.com/docs/manual/reference/command/create/) for more
+    /// information.
+    </span><span class="attribute">#[serde(
+        default,
+        deserialize_with = <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
+        serialize_with = <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;
+    </span>)]
+    </span><span class="kw">pub </span>expire_after_seconds: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// Options for supporting change stream pre- and post-images.</span>
-    <span class="kw">pub</span> <span class="ident">change_stream_pre_and_post_images</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamPreAndPostImages</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Options for supporting change stream pre- and post-images.
+    </span><span class="kw">pub </span>change_stream_pre_and_post_images: <span class="prelude-ty">Option</span>&lt;ChangeStreamPreAndPostImages&gt;,
 
-    <span class="doccomment">/// Options for clustered collections.</span>
-    <span class="kw">pub</span> <span class="ident">clustered_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusteredIndex</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Options for clustered collections.
+    </span><span class="kw">pub </span>clustered_index: <span class="prelude-ty">Option</span>&lt;ClusteredIndex&gt;,
 }
 
-<span class="doccomment">/// Specifies how strictly the database should apply validation rules to existing documents during</span>
-<span class="doccomment">/// an update.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValidationLevel</span> {
-    <span class="doccomment">/// Perform no validation for inserts and updates.</span>
-    <span class="ident">Off</span>,
-    <span class="doccomment">/// Perform validation on all inserts and updates.</span>
-    <span class="ident">Strict</span>,
-    <span class="doccomment">/// Perform validation on inserts as well as updates on existing valid documents, but do not</span>
-    <span class="doccomment">/// perform validations on updates on existing invalid documents.</span>
-    <span class="ident">Moderate</span>,
+<span class="doccomment">/// Specifies how strictly the database should apply validation rules to existing documents during
+/// an update.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ValidationLevel {
+    <span class="doccomment">/// Perform no validation for inserts and updates.
+    </span>Off,
+    <span class="doccomment">/// Perform validation on all inserts and updates.
+    </span>Strict,
+    <span class="doccomment">/// Perform validation on inserts as well as updates on existing valid documents, but do not
+    /// perform validations on updates on existing invalid documents.
+    </span>Moderate,
 }
 
-<span class="doccomment">/// Specifies whether the database should return an error or simply raise a warning if inserted</span>
-<span class="doccomment">/// documents do not pass the validation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValidationAction</span> {
-    <span class="doccomment">/// Return an error if inserted documents do not pass the validation.</span>
-    <span class="ident">Error</span>,
-    <span class="doccomment">/// Raise a warning if inserted documents do not pass the validation.</span>
-    <span class="ident">Warn</span>,
+<span class="doccomment">/// Specifies whether the database should return an error or simply raise a warning if inserted
+/// documents do not pass the validation.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ValidationAction {
+    <span class="doccomment">/// Return an error if inserted documents do not pass the validation.
+    </span>Error,
+    <span class="doccomment">/// Raise a warning if inserted documents do not pass the validation.
+    </span>Warn,
 }
 
-<span class="doccomment">/// Specifies options for a clustered collection.  Some fields have required values; the `Default`</span>
-<span class="doccomment">/// impl uses those values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClusteredIndex</span> {
-    <span class="doccomment">/// Key pattern; currently required to be `{_id: 1}`.</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">Document</span>,
+<span class="doccomment">/// Specifies options for a clustered collection.  Some fields have required values; the `Default`
+/// impl uses those values.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ClusteredIndex {
+    <span class="doccomment">/// Key pattern; currently required to be `{_id: 1}`.
+    </span><span class="kw">pub </span>key: Document,
 
-    <span class="doccomment">/// Currently required to be `true`.</span>
-    <span class="kw">pub</span> <span class="ident">unique</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Currently required to be `true`.
+    </span><span class="kw">pub </span>unique: bool,
 
-    <span class="doccomment">/// Optional; will be automatically generated if not provided.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optional; will be automatically generated if not provided.
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Optional; currently must be `2` if provided.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">v</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optional; currently must be `2` if provided.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>v: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ClusteredIndex</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">key</span>: <span class="macro">doc!</span> { <span class="string">&quot;_id&quot;</span>: <span class="number">1</span> },
-            <span class="ident">unique</span>: <span class="bool-val">true</span>,
-            <span class="ident">name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">v</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>ClusteredIndex {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            key: <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: <span class="number">1 </span>},
+            unique: <span class="bool-val">true</span>,
+            name: <span class="prelude-val">None</span>,
+            v: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// Specifies default configuration for indexes created on a collection, including the _id index.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">TypedBuilder</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexOptionDefaults</span> {
-    <span class="doccomment">/// The `storageEngine` document should be in the following form:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `{ &lt;storage-engine-name&gt;: &lt;options&gt; }`</span>
-    <span class="kw">pub</span> <span class="ident">storage_engine</span>: <span class="ident">Document</span>,
+<span class="doccomment">/// Specifies default configuration for indexes created on a collection, including the _id index.
+</span><span class="attribute">#[derive(Clone, Debug, TypedBuilder, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>IndexOptionDefaults {
+    <span class="doccomment">/// The `storageEngine` document should be in the following form:
+    ///
+    /// `{ &lt;storage-engine-name&gt;: &lt;options&gt; }`
+    </span><span class="kw">pub </span>storage_engine: Document,
 }
 
-<span class="doccomment">/// Specifies options for creating a timeseries collection.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeseriesOptions</span> {
-    <span class="doccomment">/// Name of the top-level field to be used for time. Inserted documents must have this field,</span>
-    <span class="doccomment">/// and the field must be of the BSON UTC datetime type.</span>
-    <span class="kw">pub</span> <span class="ident">time_field</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Specifies options for creating a timeseries collection.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TypedBuilder)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>TimeseriesOptions {
+    <span class="doccomment">/// Name of the top-level field to be used for time. Inserted documents must have this field,
+    /// and the field must be of the BSON UTC datetime type.
+    </span><span class="kw">pub </span>time_field: String,
 
-    <span class="doccomment">/// Name of the top-level field describing the series. This field is used to group related data</span>
-    <span class="doccomment">/// and may be of any BSON type, except for array. This name may not be the same as the</span>
-    <span class="doccomment">/// timeField or _id.</span>
-    <span class="kw">pub</span> <span class="ident">meta_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Name of the top-level field describing the series. This field is used to group related data
+    /// and may be of any BSON type, except for array. This name may not be the same as the
+    /// timeField or _id.
+    </span><span class="kw">pub </span>meta_field: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a</span>
-    <span class="doccomment">/// time-series.  Defaults to `TimeseriesGranularity::Seconds` if unset.</span>
-    <span class="kw">pub</span> <span class="ident">granularity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TimeseriesGranularity</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a
+    /// time-series.  Defaults to `TimeseriesGranularity::Seconds` if unset.
+    </span><span class="kw">pub </span>granularity: <span class="prelude-ty">Option</span>&lt;TimeseriesGranularity&gt;,
 }
 
-<span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a</span>
-<span class="doccomment">/// time-series.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TimeseriesGranularity</span> {
-    <span class="doccomment">/// The expected interval between subsequent measurements is in seconds.</span>
-    <span class="ident">Seconds</span>,
-    <span class="doccomment">/// The expected interval between subsequent measurements is in minutes.</span>
-    <span class="ident">Minutes</span>,
-    <span class="doccomment">/// The expected interval between subsequent measurements is in hours.</span>
-    <span class="ident">Hours</span>,
+<span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a
+/// time-series.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>TimeseriesGranularity {
+    <span class="doccomment">/// The expected interval between subsequent measurements is in seconds.
+    </span>Seconds,
+    <span class="doccomment">/// The expected interval between subsequent measurements is in minutes.
+    </span>Minutes,
+    <span class="doccomment">/// The expected interval between subsequent measurements is in hours.
+    </span>Hours,
 }
 
-<span class="doccomment">/// Specifies the options to a [`Database::drop`](../struct.Database.html#method.drop) operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropDatabaseOptions</span> {
-    <span class="doccomment">/// The write concern for the operation.</span>
-    <span class="kw">pub</span> <span class="ident">write_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Specifies the options to a [`Database::drop`](../struct.Database.html#method.drop) operation.
+</span><span class="attribute">#[derive(Clone, Debug, Default, TypedBuilder, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>DropDatabaseOptions {
+    <span class="doccomment">/// The write concern for the operation.
+    </span><span class="kw">pub </span>write_concern: <span class="prelude-ty">Option</span>&lt;WriteConcern&gt;,
 }
 
-<span class="doccomment">/// Specifies the options to a</span>
-<span class="doccomment">/// [`Database::list_collections`](../struct.Database.html#method.list_collections) operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListCollectionsOptions</span> {
-    <span class="doccomment">/// The number of documents the server should return per cursor batch.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this does not have any affect on the documents that are returned by a cursor,</span>
-    <span class="doccomment">/// only the number of documents kept in memory at a given time (and by extension, the</span>
-    <span class="doccomment">/// number of round trips needed to return the entire set of documents returned by the</span>
-    <span class="doccomment">/// query).</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_u32_option_as_batch_size&quot;</span>,
-        <span class="ident">rename</span>(<span class="ident">serialize</span> <span class="op">=</span> <span class="string">&quot;cursor&quot;</span>)
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">batch_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Specifies the options to a
+/// [`Database::list_collections`](../struct.Database.html#method.list_collections) operation.
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, TypedBuilder, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ListCollectionsOptions {
+    <span class="doccomment">/// The number of documents the server should return per cursor batch.
+    ///
+    /// Note that this does not have any affect on the documents that are returned by a cursor,
+    /// only the number of documents kept in memory at a given time (and by extension, the
+    /// number of round trips needed to return the entire set of documents returned by the
+    /// query).
+    </span><span class="attribute">#[serde(
+        serialize_with = <span class="string">&quot;bson_util::serialize_u32_option_as_batch_size&quot;</span>,
+        rename(serialize = <span class="string">&quot;cursor&quot;</span>)
+    )]
+    </span><span class="kw">pub </span>batch_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="doccomment">/// Specifies the options to a</span>
-<span class="doccomment">/// [`Client::list_databases`](../struct.Client.html#method.list_databases) operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListDatabasesOptions</span> {
-    <span class="doccomment">/// Determines which databases to return based on the user&#39;s access privileges. This option is</span>
-    <span class="doccomment">/// only supported on server versions 4.0.5+.</span>
-    <span class="kw">pub</span> <span class="ident">authorized_databases</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Specifies the options to a
+/// [`Client::list_databases`](../struct.Client.html#method.list_databases) operation.
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, TypedBuilder, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ListDatabasesOptions {
+    <span class="doccomment">/// Determines which databases to return based on the user&#39;s access privileges. This option is
+    /// only supported on server versions 4.0.5+.
+    </span><span class="kw">pub </span>authorized_databases: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// Specifies how change stream pre- and post-images should be supported.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">TypedBuilder</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeStreamPreAndPostImages</span> {
-    <span class="doccomment">/// If `true`, change streams will be able to include pre- and post-images.</span>
-    <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Specifies how change stream pre- and post-images should be supported.
+</span><span class="attribute">#[derive(Clone, Debug, Default, Deserialize, TypedBuilder, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default, setter(into)))]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ChangeStreamPreAndPostImages {
+    <span class="doccomment">/// If `true`, change streams will be able to include pre- and post-images.
+    </span><span class="kw">pub </span>enabled: bool,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

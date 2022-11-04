@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/soa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>soa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/soa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>soa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -374,335 +374,335 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! start of authority record defining ownership and defaults for the zone</span>
+</span><span class="doccomment">//! start of authority record defining ownership and defaults for the zone
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 3.3.13. SOA RDATA format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     /                     MNAME                     /</span>
-<span class="doccomment">///     /                                               /</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     /                     RNAME                     /</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    SERIAL                     |</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    REFRESH                    |</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                     RETRY                     |</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    EXPIRE                     |</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    MINIMUM                    |</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// where:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// SOA records cause no additional section processing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All times are in units of seconds.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Most of these fields are pertinent only for name server maintenance</span>
-<span class="doccomment">/// operations.  However, MINIMUM is used in all query operations that</span>
-<span class="doccomment">/// retrieve RRs from a zone.  Whenever a RR is sent in a response to a</span>
-<span class="doccomment">/// query, the TTL field is set to the maximum of the TTL field from the RR</span>
-<span class="doccomment">/// and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower</span>
-<span class="doccomment">/// bound on the TTL field for all RRs in a zone.  Note that this use of</span>
-<span class="doccomment">/// MINIMUM should occur when the RRs are copied into the response and not</span>
-<span class="doccomment">/// when the zone is loaded from a Zone File or via a zone transfer.  The</span>
-<span class="doccomment">/// reason for this provison is to allow future dynamic update facilities to</span>
-<span class="doccomment">/// change the SOA RR with known semantics.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SOA</span> {
-    <span class="ident">mname</span>: <span class="ident">Name</span>,
-    <span class="ident">rname</span>: <span class="ident">Name</span>,
-    <span class="ident">serial</span>: <span class="ident">u32</span>,
-    <span class="ident">refresh</span>: <span class="ident">i32</span>,
-    <span class="ident">retry</span>: <span class="ident">i32</span>,
-    <span class="ident">expire</span>: <span class="ident">i32</span>,
-    <span class="ident">minimum</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+///
+/// ```text
+/// 3.3.13. SOA RDATA format
+///
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     /                     MNAME                     /
+///     /                                               /
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     /                     RNAME                     /
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    SERIAL                     |
+///     |                                               |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    REFRESH                    |
+///     |                                               |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                     RETRY                     |
+///     |                                               |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    EXPIRE                     |
+///     |                                               |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    MINIMUM                    |
+///     |                                               |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///
+/// where:
+///
+/// SOA records cause no additional section processing.
+///
+/// All times are in units of seconds.
+///
+/// Most of these fields are pertinent only for name server maintenance
+/// operations.  However, MINIMUM is used in all query operations that
+/// retrieve RRs from a zone.  Whenever a RR is sent in a response to a
+/// query, the TTL field is set to the maximum of the TTL field from the RR
+/// and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower
+/// bound on the TTL field for all RRs in a zone.  Note that this use of
+/// MINIMUM should occur when the RRs are copied into the response and not
+/// when the zone is loaded from a Zone File or via a zone transfer.  The
+/// reason for this provison is to allow future dynamic update facilities to
+/// change the SOA RR with known semantics.
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>SOA {
+    mname: Name,
+    rname: Name,
+    serial: u32,
+    refresh: i32,
+    retry: i32,
+    expire: i32,
+    minimum: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">SOA</span> {
-    <span class="doccomment">/// Creates a new SOA record data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `mname` - the name of the primary or authority for this zone.</span>
-    <span class="doccomment">/// * `rname` - the name of the responsible party for this zone, e.g. an email address.</span>
-    <span class="doccomment">/// * `serial` - the serial number of the zone, used for caching purposes.</span>
-    <span class="doccomment">/// * `refresh` - the amount of time to wait before a zone is resynched.</span>
-    <span class="doccomment">/// * `retry` - the minimum period to wait if there is a failure during refresh.</span>
-    <span class="doccomment">/// * `expire` - the time until this primary is no longer authoritative for the zone.</span>
-    <span class="doccomment">/// * `minimum` - no zone records should have time-to-live values less than this minimum.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The newly created SOA record data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">mname</span>: <span class="ident">Name</span>,
-        <span class="ident">rname</span>: <span class="ident">Name</span>,
-        <span class="ident">serial</span>: <span class="ident">u32</span>,
-        <span class="ident">refresh</span>: <span class="ident">i32</span>,
-        <span class="ident">retry</span>: <span class="ident">i32</span>,
-        <span class="ident">expire</span>: <span class="ident">i32</span>,
-        <span class="ident">minimum</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">mname</span>,
-            <span class="ident">rname</span>,
-            <span class="ident">serial</span>,
-            <span class="ident">refresh</span>,
-            <span class="ident">retry</span>,
-            <span class="ident">expire</span>,
-            <span class="ident">minimum</span>,
+<span class="kw">impl </span>SOA {
+    <span class="doccomment">/// Creates a new SOA record data.
+    ///
+    /// # Arguments
+    ///
+    /// * `mname` - the name of the primary or authority for this zone.
+    /// * `rname` - the name of the responsible party for this zone, e.g. an email address.
+    /// * `serial` - the serial number of the zone, used for caching purposes.
+    /// * `refresh` - the amount of time to wait before a zone is resynched.
+    /// * `retry` - the minimum period to wait if there is a failure during refresh.
+    /// * `expire` - the time until this primary is no longer authoritative for the zone.
+    /// * `minimum` - no zone records should have time-to-live values less than this minimum.
+    ///
+    /// # Return value
+    ///
+    /// The newly created SOA record data.
+    </span><span class="kw">pub fn </span>new(
+        mname: Name,
+        rname: Name,
+        serial: u32,
+        refresh: i32,
+        retry: i32,
+        expire: i32,
+        minimum: u32,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            mname,
+            rname,
+            serial,
+            refresh,
+            retry,
+            expire,
+            minimum,
         }
     }
 
-    <span class="doccomment">/// Increments the serial number by one</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_serial</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">serial</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>; <span class="comment">// TODO: what to do on overflow?</span>
+    <span class="doccomment">/// Increments the serial number by one
+    </span><span class="kw">pub fn </span>increment_serial(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.serial += <span class="number">1</span>; <span class="comment">// TODO: what to do on overflow?
+    </span>}
+
+    <span class="doccomment">/// ```text
+    /// MNAME           The &lt;domain-name&gt; of the name server that was the
+    ///                 original or primary source of data for this zone.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// The `domain-name` of the name server that was the original or primary source of data for
+    /// this zone, i.e. the Primary Name Server.
+    </span><span class="kw">pub fn </span>mname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.mname
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// MNAME           The &lt;domain-name&gt; of the name server that was the</span>
-    <span class="doccomment">///                 original or primary source of data for this zone.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `domain-name` of the name server that was the original or primary source of data for</span>
-    <span class="doccomment">/// this zone, i.e. the Primary Name Server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mname</span>
+    <span class="doccomment">/// ```text
+    /// RNAME           A &lt;domain-name&gt; which specifies the mailbox of the
+    ///                 person responsible for this zone.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// A `domain-name` which specifies the mailbox of the person responsible for this zone, i.e.
+    /// the responsible name.
+    </span><span class="kw">pub fn </span>rname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.rname
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RNAME           A &lt;domain-name&gt; which specifies the mailbox of the</span>
-    <span class="doccomment">///                 person responsible for this zone.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `domain-name` which specifies the mailbox of the person responsible for this zone, i.e.</span>
-    <span class="doccomment">/// the responsible name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rname</span>
+    <span class="doccomment">/// ```text
+    /// SERIAL          The unsigned 32 bit version number of the original copy
+    ///                 of the zone.  Zone transfers preserve this value.  This
+    ///                 value wraps and should be compared using sequence space
+    ///                 arithmetic.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// The unsigned 32 bit version number of the original copy of the zone. Zone transfers
+    /// preserve this value. This value wraps and should be compared using sequence space arithmetic.
+    </span><span class="kw">pub fn </span>serial(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.serial
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// SERIAL          The unsigned 32 bit version number of the original copy</span>
-    <span class="doccomment">///                 of the zone.  Zone transfers preserve this value.  This</span>
-    <span class="doccomment">///                 value wraps and should be compared using sequence space</span>
-    <span class="doccomment">///                 arithmetic.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The unsigned 32 bit version number of the original copy of the zone. Zone transfers</span>
-    <span class="doccomment">/// preserve this value. This value wraps and should be compared using sequence space arithmetic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">serial</span>
+    <span class="doccomment">/// ```text
+    /// REFRESH         A 32 bit time interval before the zone should be
+    ///                 refreshed.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// A 32 bit time interval before the zone should be refreshed, in seconds.
+    </span><span class="kw">pub fn </span>refresh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.refresh
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// REFRESH         A 32 bit time interval before the zone should be</span>
-    <span class="doccomment">///                 refreshed.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A 32 bit time interval before the zone should be refreshed, in seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">refresh</span>
+    <span class="doccomment">/// ```text
+    /// RETRY           A 32 bit time interval that should elapse before a
+    ///                 failed refresh should be retried.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// A 32 bit time interval that should elapse before a failed refresh should be retried,
+    /// in seconds.
+    </span><span class="kw">pub fn </span>retry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.retry
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RETRY           A 32 bit time interval that should elapse before a</span>
-    <span class="doccomment">///                 failed refresh should be retried.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A 32 bit time interval that should elapse before a failed refresh should be retried,</span>
-    <span class="doccomment">/// in seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">retry</span>
+    <span class="doccomment">/// ```text
+    /// EXPIRE          A 32 bit time value that specifies the upper limit on
+    ///                 the time interval that can elapse before the zone is no
+    ///                 longer authoritative.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// A 32 bit time value that specifies the upper limit on the time interval that can elapse
+    /// before the zone is no longer authoritative, in seconds
+    </span><span class="kw">pub fn </span>expire(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.expire
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// EXPIRE          A 32 bit time value that specifies the upper limit on</span>
-    <span class="doccomment">///                 the time interval that can elapse before the zone is no</span>
-    <span class="doccomment">///                 longer authoritative.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A 32 bit time value that specifies the upper limit on the time interval that can elapse</span>
-    <span class="doccomment">/// before the zone is no longer authoritative, in seconds</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">expire</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// MINIMUM         The unsigned 32 bit minimum TTL field that should be</span>
-    <span class="doccomment">///                 exported with any RR from this zone.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The unsigned 32 bit minimum TTL field that should be exported with any RR from this zone.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">minimum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">minimum</span>
+    <span class="doccomment">/// ```text
+    /// MINIMUM         The unsigned 32 bit minimum TTL field that should be
+    ///                 exported with any RR from this zone.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// The unsigned 32 bit minimum TTL field that should be exported with any RR from this zone.
+    </span><span class="kw">pub fn </span>minimum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.minimum
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">SOA</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">SOA</span> {
-        <span class="ident">mname</span>: <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>,
-        <span class="ident">rname</span>: <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>,
-        <span class="ident">serial</span>: <span class="ident">decoder</span>.<span class="ident">read_u32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u32 is valid*/</span>),
-        <span class="ident">refresh</span>: <span class="ident">decoder</span>.<span class="ident">read_i32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any i32 is valid*/</span>),
-        <span class="ident">retry</span>: <span class="ident">decoder</span>.<span class="ident">read_i32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any i32 is valid*/</span>),
-        <span class="ident">expire</span>: <span class="ident">decoder</span>.<span class="ident">read_i32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any i32 is valid*/</span>),
-        <span class="ident">minimum</span>: <span class="ident">decoder</span>.<span class="ident">read_u32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u32 is valid*/</span>),
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;SOA&gt; {
+    <span class="prelude-val">Ok</span>(SOA {
+        mname: Name::read(decoder)<span class="question-mark">?</span>,
+        rname: Name::read(decoder)<span class="question-mark">?</span>,
+        serial: decoder.read_u32()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u32 is valid*/</span>),
+        refresh: decoder.read_i32()<span class="question-mark">?</span>.unverified(<span class="comment">/*any i32 is valid*/</span>),
+        retry: decoder.read_i32()<span class="question-mark">?</span>.unverified(<span class="comment">/*any i32 is valid*/</span>),
+        expire: decoder.read_i32()<span class="question-mark">?</span>.unverified(<span class="comment">/*any i32 is valid*/</span>),
+        minimum: decoder.read_u32()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u32 is valid*/</span>),
     })
 }
 
-<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is accurate for all currently known name records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 6.2.  Canonical RR Form</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For the purposes of DNS security, the canonical form of an RR is the</span>
-<span class="doccomment">///    wire format of the RR where:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    ...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,</span>
-<span class="doccomment">///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,</span>
-<span class="doccomment">///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase</span>
-<span class="doccomment">///        US-ASCII letters in the DNS names contained within the RDATA are replaced</span>
-<span class="doccomment">///        by the corresponding lowercase US-ASCII letters;</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">soa</span>: <span class="kw-2">&amp;</span><span class="ident">SOA</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
+<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005
+///
+/// This is accurate for all currently known name records.
+///
+/// ```text
+/// 6.2.  Canonical RR Form
+///
+///    For the purposes of DNS security, the canonical form of an RR is the
+///    wire format of the RR where:
+///
+///    ...
+///
+///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,
+///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,
+///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase
+///        US-ASCII letters in the DNS names contained within the RDATA are replaced
+///        by the corresponding lowercase US-ASCII letters;
+/// ```
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, soa: <span class="kw-2">&amp;</span>SOA) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">let </span>is_canonical_names = encoder.is_canonical_names();
 
-    <span class="ident">soa</span>.<span class="ident">mname</span>.<span class="ident">emit_with_lowercase</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)<span class="question-mark">?</span>;
-    <span class="ident">soa</span>.<span class="ident">rname</span>.<span class="ident">emit_with_lowercase</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u32</span>(<span class="ident">soa</span>.<span class="ident">serial</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_i32</span>(<span class="ident">soa</span>.<span class="ident">refresh</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_i32</span>(<span class="ident">soa</span>.<span class="ident">retry</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_i32</span>(<span class="ident">soa</span>.<span class="ident">expire</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u32</span>(<span class="ident">soa</span>.<span class="ident">minimum</span>)<span class="question-mark">?</span>;
+    soa.mname.emit_with_lowercase(encoder, is_canonical_names)<span class="question-mark">?</span>;
+    soa.rname.emit_with_lowercase(encoder, is_canonical_names)<span class="question-mark">?</span>;
+    encoder.emit_u32(soa.serial)<span class="question-mark">?</span>;
+    encoder.emit_i32(soa.refresh)<span class="question-mark">?</span>;
+    encoder.emit_i32(soa.retry)<span class="question-mark">?</span>;
+    encoder.emit_i32(soa.expire)<span class="question-mark">?</span>;
+    encoder.emit_u32(soa.minimum)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// [RFC 1033](https://tools.ietf.org/html/rfc1033), DOMAIN OPERATIONS GUIDE, November 1987</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// SOA  (Start Of Authority)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;name&gt;  [&lt;ttl&gt;]  [&lt;class&gt;]  SOA  &lt;origin&gt;  &lt;person&gt;  (</span>
-<span class="doccomment">///    &lt;serial&gt;</span>
-<span class="doccomment">///    &lt;refresh&gt;</span>
-<span class="doccomment">///    &lt;retry&gt;</span>
-<span class="doccomment">///    &lt;expire&gt;</span>
-<span class="doccomment">///    &lt;minimum&gt; )</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Start Of Authority record designates the start of a zone.  The</span>
-<span class="doccomment">/// zone ends at the next SOA record.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;name&gt; is the name of the zone.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;origin&gt; is the name of the host on which the master zone file</span>
-<span class="doccomment">/// resides.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;person&gt; is a mailbox for the person responsible for the zone.  It is</span>
-<span class="doccomment">/// formatted like a mailing address but the at-sign that normally</span>
-<span class="doccomment">/// separates the user from the host name is replaced with a dot.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;serial&gt; is the version number of the zone file.  It should be</span>
-<span class="doccomment">/// incremented anytime a change is made to data in the zone.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;refresh&gt; is how long, in seconds, a secondary name server is to</span>
-<span class="doccomment">/// check with the primary name server to see if an update is needed.  A</span>
-<span class="doccomment">/// good value here would be one hour (3600).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;retry&gt; is how long, in seconds, a secondary name server is to retry</span>
-<span class="doccomment">/// after a failure to check for a refresh.  A good value here would be</span>
-<span class="doccomment">/// 10 minutes (600).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;expire&gt; is the upper limit, in seconds, that a secondary name server</span>
-<span class="doccomment">/// is to use the data before it expires for lack of getting a refresh.</span>
-<span class="doccomment">/// You want this to be rather large, and a nice value is 3600000, about</span>
-<span class="doccomment">/// 42 days.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;minimum&gt; is the minimum number of seconds to be used for TTL values</span>
-<span class="doccomment">/// in RRs.  A minimum of at least a day is a good value here (86400).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There should only be one SOA record per zone.  A sample SOA record</span>
-<span class="doccomment">/// would look something like:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @   IN   SOA   SRI-NIC.ARPA.   HOSTMASTER.SRI-NIC.ARPA. (</span>
-<span class="doccomment">///     45         ;serial</span>
-<span class="doccomment">///     3600       ;refresh</span>
-<span class="doccomment">///     600        ;retry</span>
-<span class="doccomment">///     3600000    ;expire</span>
-<span class="doccomment">///     86400 )    ;minimum</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SOA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="doccomment">/// [RFC 1033](https://tools.ietf.org/html/rfc1033), DOMAIN OPERATIONS GUIDE, November 1987
+///
+/// ```text
+/// SOA  (Start Of Authority)
+///
+/// &lt;name&gt;  [&lt;ttl&gt;]  [&lt;class&gt;]  SOA  &lt;origin&gt;  &lt;person&gt;  (
+///    &lt;serial&gt;
+///    &lt;refresh&gt;
+///    &lt;retry&gt;
+///    &lt;expire&gt;
+///    &lt;minimum&gt; )
+///
+/// The Start Of Authority record designates the start of a zone.  The
+/// zone ends at the next SOA record.
+///
+/// &lt;name&gt; is the name of the zone.
+///
+/// &lt;origin&gt; is the name of the host on which the master zone file
+/// resides.
+///
+/// &lt;person&gt; is a mailbox for the person responsible for the zone.  It is
+/// formatted like a mailing address but the at-sign that normally
+/// separates the user from the host name is replaced with a dot.
+///
+/// &lt;serial&gt; is the version number of the zone file.  It should be
+/// incremented anytime a change is made to data in the zone.
+///
+/// &lt;refresh&gt; is how long, in seconds, a secondary name server is to
+/// check with the primary name server to see if an update is needed.  A
+/// good value here would be one hour (3600).
+///
+/// &lt;retry&gt; is how long, in seconds, a secondary name server is to retry
+/// after a failure to check for a refresh.  A good value here would be
+/// 10 minutes (600).
+///
+/// &lt;expire&gt; is the upper limit, in seconds, that a secondary name server
+/// is to use the data before it expires for lack of getting a refresh.
+/// You want this to be rather large, and a nice value is 3600000, about
+/// 42 days.
+///
+/// &lt;minimum&gt; is the minimum number of seconds to be used for TTL values
+/// in RRs.  A minimum of at least a day is a good value here (86400).
+///
+/// There should only be one SOA record per zone.  A sample SOA record
+/// would look something like:
+///
+/// @   IN   SOA   SRI-NIC.ARPA.   HOSTMASTER.SRI-NIC.ARPA. (
+///     45         ;serial
+///     3600       ;refresh
+///     600        ;retry
+///     3600000    ;expire
+///     86400 )    ;minimum
+/// ```
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>SOA {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{mname} {rname} {serial} {refresh} {retry} {expire} {min}&quot;</span>,
-            <span class="ident">mname</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mname</span>,
-            <span class="ident">rname</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rname</span>,
-            <span class="ident">serial</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">serial</span>,
-            <span class="ident">refresh</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">refresh</span>,
-            <span class="ident">retry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retry</span>,
-            <span class="ident">expire</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expire</span>,
-            <span class="ident">min</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">minimum</span>
+            mname = <span class="self">self</span>.mname,
+            rname = <span class="self">self</span>.rname,
+            serial = <span class="self">self</span>.serial,
+            refresh = <span class="self">self</span>.refresh,
+            retry = <span class="self">self</span>.retry,
+            expire = <span class="self">self</span>.expire,
+            min = <span class="self">self</span>.minimum
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">use </span>std::str::FromStr;
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">SOA::new</span>(
-            <span class="ident">Name::from_str</span>(<span class="string">&quot;m.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Name::from_str</span>(<span class="string">&quot;r.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+        <span class="kw">let </span>rdata = SOA::new(
+            Name::from_str(<span class="string">&quot;m.example.com&quot;</span>).unwrap(),
+            Name::from_str(<span class="string">&quot;r.example.com&quot;</span>).unwrap(),
             <span class="number">1</span>,
             <span class="number">2</span>,
             <span class="number">3</span>,
@@ -710,17 +710,17 @@
             <span class="number">5</span>,
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

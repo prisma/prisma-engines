@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/sync/queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/sync/queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -467,474 +467,474 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Michael-Scott lock-free queue.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Usable with any number of producers and consumers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Michael and Scott.  Simple, Fast, and Practical Non-Blocking and Blocking Concurrent Queue</span>
-<span class="doccomment">//! Algorithms.  PODC 1996.  &lt;http://dl.acm.org/citation.cfm?id=248106&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Simon Doherty, Lindsay Groves, Victor Luchangco, and Mark Moir. 2004b. Formal Verification of a</span>
-<span class="doccomment">//! Practical Lock-Free Queue Algorithm. &lt;https://doi.org/10.1007/978-3-540-30232-2_7&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Michael-Scott lock-free queue.
+//!
+//! Usable with any number of producers and consumers.
+//!
+//! Michael and Scott.  Simple, Fast, and Practical Non-Blocking and Blocking Concurrent Queue
+//! Algorithms.  PODC 1996.  &lt;http://dl.acm.org/citation.cfm?id=248106&gt;
+//!
+//! Simon Doherty, Lindsay Groves, Victor Luchangco, and Mark Moir. 2004b. Formal Verification of a
+//! Practical Lock-Free Queue Algorithm. &lt;https://doi.org/10.1007/978-3-540-30232-2_7&gt;
 
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>::{<span class="ident">Acquire</span>, <span class="ident">Relaxed</span>, <span class="ident">Release</span>};
+</span><span class="kw">use </span>core::mem::MaybeUninit;
+<span class="kw">use </span>core::sync::atomic::Ordering::{Acquire, Relaxed, Release};
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils::CachePadded</span>;
+<span class="kw">use </span>crossbeam_utils::CachePadded;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">unprotected</span>, <span class="ident">Atomic</span>, <span class="ident">Guard</span>, <span class="ident">Owned</span>, <span class="ident">Shared</span>};
+<span class="kw">use crate</span>::{unprotected, Atomic, Guard, Owned, Shared};
 
-<span class="comment">// The representation here is a singly-linked list, with a sentinel node at the front. In general</span>
-<span class="comment">// the `tail` pointer may lag behind the actual tail. Non-sentinel nodes are either all `Data` or</span>
-<span class="comment">// all `Blocked` (requests for data from blocked threads).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">head</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">tail</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="comment">// The representation here is a singly-linked list, with a sentinel node at the front. In general
+// the `tail` pointer may lag behind the actual tail. Non-sentinel nodes are either all `Data` or
+// all `Blocked` (requests for data from blocked threads).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Queue&lt;T&gt; {
+    head: CachePadded&lt;Atomic&lt;Node&lt;T&gt;&gt;&gt;,
+    tail: CachePadded&lt;Atomic&lt;Node&lt;T&gt;&gt;&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The slot in which a value of type `T` can be stored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The type of `data` is `MaybeUninit&lt;T&gt;` because a `Node&lt;T&gt;` doesn&#39;t always contain a `T`.</span>
-    <span class="doccomment">/// For example, the sentinel node in a queue never contains a value: its slot is always empty.</span>
-    <span class="doccomment">/// Other nodes start their life with a push operation and contain a value until it gets popped</span>
-    <span class="doccomment">/// out. After that such empty nodes get added to the collector for destruction.</span>
-    <span class="ident">data</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Node&lt;T&gt; {
+    <span class="doccomment">/// The slot in which a value of type `T` can be stored.
+    ///
+    /// The type of `data` is `MaybeUninit&lt;T&gt;` because a `Node&lt;T&gt;` doesn&#39;t always contain a `T`.
+    /// For example, the sentinel node in a queue never contains a value: its slot is always empty.
+    /// Other nodes start their life with a push operation and contain a value until it gets popped
+    /// out. After that such empty nodes get added to the collector for destruction.
+    </span>data: MaybeUninit&lt;T&gt;,
 
-    <span class="ident">next</span>: <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    next: Atomic&lt;Node&lt;T&gt;&gt;,
 }
 
-<span class="comment">// Any particular `T` should never be accessed concurrently, so no need for `Sync`.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// Any particular `T` should never be accessed concurrently, so no need for `Sync`.
+</span><span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>Queue&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>Queue&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new, empty queue.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Queue</span> {
-            <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Atomic::null</span>()),
-            <span class="ident">tail</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Atomic::null</span>()),
+<span class="kw">impl</span>&lt;T&gt; Queue&lt;T&gt; {
+    <span class="doccomment">/// Create a new, empty queue.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; Queue&lt;T&gt; {
+        <span class="kw">let </span>q = Queue {
+            head: CachePadded::new(Atomic::null()),
+            tail: CachePadded::new(Atomic::null()),
         };
-        <span class="kw">let</span> <span class="ident">sentinel</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Node</span> {
-            <span class="ident">data</span>: <span class="ident">MaybeUninit::uninit</span>(),
-            <span class="ident">next</span>: <span class="ident">Atomic::null</span>(),
+        <span class="kw">let </span>sentinel = Owned::new(Node {
+            data: MaybeUninit::uninit(),
+            next: Atomic::null(),
         });
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">unprotected</span>();
-            <span class="kw">let</span> <span class="ident">sentinel</span> <span class="op">=</span> <span class="ident">sentinel</span>.<span class="ident">into_shared</span>(<span class="ident">guard</span>);
-            <span class="ident">q</span>.<span class="ident">head</span>.<span class="ident">store</span>(<span class="ident">sentinel</span>, <span class="ident">Relaxed</span>);
-            <span class="ident">q</span>.<span class="ident">tail</span>.<span class="ident">store</span>(<span class="ident">sentinel</span>, <span class="ident">Relaxed</span>);
-            <span class="ident">q</span>
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = unprotected();
+            <span class="kw">let </span>sentinel = sentinel.into_shared(guard);
+            q.head.store(sentinel, Relaxed);
+            q.tail.store(sentinel, Relaxed);
+            q
         }
     }
 
-    <span class="doccomment">/// Attempts to atomically place `n` into the `next` pointer of `onto`, and returns `true` on</span>
-    <span class="doccomment">/// success. The queue&#39;s `tail` pointer may be updated.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">push_internal</span>(
+    <span class="doccomment">/// Attempts to atomically place `n` into the `next` pointer of `onto`, and returns `true` on
+    /// success. The queue&#39;s `tail` pointer may be updated.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>push_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">onto</span>: <span class="ident">Shared</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="ident">Shared</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// is `onto` the actual tail?</span>
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">onto</span>.<span class="ident">deref</span>() };
-        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">o</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">next</span>.<span class="ident">as_ref</span>().<span class="ident">is_some</span>() } {
-            <span class="comment">// if not, try to &quot;help&quot; by moving the tail pointer forward</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">tail</span>
-                .<span class="ident">compare_exchange</span>(<span class="ident">onto</span>, <span class="ident">next</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-            <span class="bool-val">false</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// looks like the actual tail; attempt to link in `n`</span>
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">o</span>
-                .<span class="ident">next</span>
-                .<span class="ident">compare_exchange</span>(<span class="ident">Shared::null</span>(), <span class="ident">new</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>)
-                .<span class="ident">is_ok</span>();
-            <span class="kw">if</span> <span class="ident">result</span> {
-                <span class="comment">// try to move the tail pointer forward</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">tail</span>
-                    .<span class="ident">compare_exchange</span>(<span class="ident">onto</span>, <span class="ident">new</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>);
+        onto: Shared&lt;<span class="lifetime">&#39;_</span>, Node&lt;T&gt;&gt;,
+        new: Shared&lt;<span class="lifetime">&#39;_</span>, Node&lt;T&gt;&gt;,
+        guard: <span class="kw-2">&amp;</span>Guard,
+    ) -&gt; bool {
+        <span class="comment">// is `onto` the actual tail?
+        </span><span class="kw">let </span>o = <span class="kw">unsafe </span>{ onto.deref() };
+        <span class="kw">let </span>next = o.next.load(Acquire, guard);
+        <span class="kw">if unsafe </span>{ next.as_ref().is_some() } {
+            <span class="comment">// if not, try to &quot;help&quot; by moving the tail pointer forward
+            </span><span class="kw">let _ </span>= <span class="self">self
+                </span>.tail
+                .compare_exchange(onto, next, Release, Relaxed, guard);
+            <span class="bool-val">false
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// looks like the actual tail; attempt to link in `n`
+            </span><span class="kw">let </span>result = o
+                .next
+                .compare_exchange(Shared::null(), new, Release, Relaxed, guard)
+                .is_ok();
+            <span class="kw">if </span>result {
+                <span class="comment">// try to move the tail pointer forward
+                </span><span class="kw">let _ </span>= <span class="self">self
+                    </span>.tail
+                    .compare_exchange(onto, new, Release, Relaxed, guard);
             }
-            <span class="ident">result</span>
+            result
         }
     }
 
-    <span class="doccomment">/// Adds `t` to the back of the queue, possibly waking up threads blocked on `pop`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) {
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Node</span> {
-            <span class="ident">data</span>: <span class="ident">MaybeUninit::new</span>(<span class="ident">t</span>),
-            <span class="ident">next</span>: <span class="ident">Atomic::null</span>(),
+    <span class="doccomment">/// Adds `t` to the back of the queue, possibly waking up threads blocked on `pop`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, t: T, guard: <span class="kw-2">&amp;</span>Guard) {
+        <span class="kw">let </span>new = Owned::new(Node {
+            data: MaybeUninit::new(t),
+            next: Atomic::null(),
         });
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">Owned::into_shared</span>(<span class="ident">new</span>, <span class="ident">guard</span>);
+        <span class="kw">let </span>new = Owned::into_shared(new, guard);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// We push onto the tail, so we&#39;ll start optimistically by looking there first.</span>
-            <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
+        <span class="kw">loop </span>{
+            <span class="comment">// We push onto the tail, so we&#39;ll start optimistically by looking there first.
+            </span><span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Acquire, guard);
 
-            <span class="comment">// Attempt to push onto the `tail` snapshot; fails if `tail.next` has changed.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">push_internal</span>(<span class="ident">tail</span>, <span class="ident">new</span>, <span class="ident">guard</span>) {
+            <span class="comment">// Attempt to push onto the `tail` snapshot; fails if `tail.next` has changed.
+            </span><span class="kw">if </span><span class="self">self</span>.push_internal(tail, new, guard) {
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="doccomment">/// Attempts to pop a data node. `Ok(None)` if queue is empty; `Err(())` if lost race to pop.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pop_internal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">head</span>.<span class="ident">deref</span>() };
-        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">next</span>.<span class="ident">as_ref</span>() } {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">head</span>
-                    .<span class="ident">compare_exchange</span>(<span class="ident">head</span>, <span class="ident">next</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-                        <span class="comment">// Advance the tail so that we don&#39;t retire a pointer to a reachable node.</span>
-                        <span class="kw">if</span> <span class="ident">head</span> <span class="op">==</span> <span class="ident">tail</span> {
-                            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-                                .<span class="ident">tail</span>
-                                .<span class="ident">compare_exchange</span>(<span class="ident">tail</span>, <span class="ident">next</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>);
+    <span class="doccomment">/// Attempts to pop a data node. `Ok(None)` if queue is empty; `Err(())` if lost race to pop.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>pop_internal(<span class="kw-2">&amp;</span><span class="self">self</span>, guard: <span class="kw-2">&amp;</span>Guard) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, ()&gt; {
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Acquire, guard);
+        <span class="kw">let </span>h = <span class="kw">unsafe </span>{ head.deref() };
+        <span class="kw">let </span>next = h.next.load(Acquire, guard);
+        <span class="kw">match unsafe </span>{ next.as_ref() } {
+            <span class="prelude-val">Some</span>(n) =&gt; <span class="kw">unsafe </span>{
+                <span class="self">self</span>.head
+                    .compare_exchange(head, next, Release, Relaxed, guard)
+                    .map(|<span class="kw">_</span>| {
+                        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Relaxed, guard);
+                        <span class="comment">// Advance the tail so that we don&#39;t retire a pointer to a reachable node.
+                        </span><span class="kw">if </span>head == tail {
+                            <span class="kw">let _ </span>= <span class="self">self
+                                </span>.tail
+                                .compare_exchange(tail, next, Release, Relaxed, guard);
                         }
-                        <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">head</span>);
-                        <span class="comment">// TODO: Replace with MaybeUninit::read when api is stable</span>
-                        <span class="prelude-val">Some</span>(<span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>().<span class="ident">read</span>())
+                        guard.defer_destroy(head);
+                        <span class="comment">// TODO: Replace with MaybeUninit::read when api is stable
+                        </span><span class="prelude-val">Some</span>(n.data.as_ptr().read())
                     })
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+                    .map_err(|<span class="kw">_</span>| ())
             },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Attempts to pop a data node, if the data satisfies the given condition. `Ok(None)` if queue</span>
-    <span class="doccomment">/// is empty or the data does not satisfy the condition; `Err(())` if lost race to pop.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pop_if_internal</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">condition</span>: <span class="ident">F</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Sync</span>,
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+    <span class="doccomment">/// Attempts to pop a data node, if the data satisfies the given condition. `Ok(None)` if queue
+    /// is empty or the data does not satisfy the condition; `Err(())` if lost race to pop.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>pop_if_internal&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, condition: F, guard: <span class="kw-2">&amp;</span>Guard) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, ()&gt;
+    <span class="kw">where
+        </span>T: Sync,
+        F: Fn(<span class="kw-2">&amp;</span>T) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">head</span>.<span class="ident">deref</span>() };
-        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-        <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">next</span>.<span class="ident">as_ref</span>() } {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">condition</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>() }) =&gt; <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">head</span>
-                    .<span class="ident">compare_exchange</span>(<span class="ident">head</span>, <span class="ident">next</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-                        <span class="comment">// Advance the tail so that we don&#39;t retire a pointer to a reachable node.</span>
-                        <span class="kw">if</span> <span class="ident">head</span> <span class="op">==</span> <span class="ident">tail</span> {
-                            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-                                .<span class="ident">tail</span>
-                                .<span class="ident">compare_exchange</span>(<span class="ident">tail</span>, <span class="ident">next</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>);
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Acquire, guard);
+        <span class="kw">let </span>h = <span class="kw">unsafe </span>{ head.deref() };
+        <span class="kw">let </span>next = h.next.load(Acquire, guard);
+        <span class="kw">match unsafe </span>{ next.as_ref() } {
+            <span class="prelude-val">Some</span>(n) <span class="kw">if </span>condition(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>n.data.as_ptr() }) =&gt; <span class="kw">unsafe </span>{
+                <span class="self">self</span>.head
+                    .compare_exchange(head, next, Release, Relaxed, guard)
+                    .map(|<span class="kw">_</span>| {
+                        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Relaxed, guard);
+                        <span class="comment">// Advance the tail so that we don&#39;t retire a pointer to a reachable node.
+                        </span><span class="kw">if </span>head == tail {
+                            <span class="kw">let _ </span>= <span class="self">self
+                                </span>.tail
+                                .compare_exchange(tail, next, Release, Relaxed, guard);
                         }
-                        <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">head</span>);
-                        <span class="prelude-val">Some</span>(<span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>().<span class="ident">read</span>())
+                        guard.defer_destroy(head);
+                        <span class="prelude-val">Some</span>(n.data.as_ptr().read())
                     })
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+                    .map_err(|<span class="kw">_</span>| ())
             },
-            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Attempts to dequeue from the front.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the queue is observed to be empty.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">head</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop_internal</span>(<span class="ident">guard</span>) {
-                <span class="kw">return</span> <span class="ident">head</span>;
+    <span class="doccomment">/// Attempts to dequeue from the front.
+    ///
+    /// Returns `None` if the queue is observed to be empty.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_pop(<span class="kw-2">&amp;</span><span class="self">self</span>, guard: <span class="kw-2">&amp;</span>Guard) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(head) = <span class="self">self</span>.pop_internal(guard) {
+                <span class="kw">return </span>head;
             }
         }
     }
 
-    <span class="doccomment">/// Attempts to dequeue from the front, if the item satisfies the given condition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the queue is observed to be empty, or the head does not satisfy the given</span>
-    <span class="doccomment">/// condition.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_pop_if</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">condition</span>: <span class="ident">F</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Sync</span>,
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+    <span class="doccomment">/// Attempts to dequeue from the front, if the item satisfies the given condition.
+    ///
+    /// Returns `None` if the queue is observed to be empty, or the head does not satisfy the given
+    /// condition.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_pop_if&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, condition: F, guard: <span class="kw-2">&amp;</span>Guard) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span>T: Sync,
+        F: Fn(<span class="kw-2">&amp;</span>T) -&gt; bool,
     {
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">head</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop_if_internal</span>(<span class="kw-2">&amp;</span><span class="ident">condition</span>, <span class="ident">guard</span>) {
-                <span class="kw">return</span> <span class="ident">head</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(head) = <span class="self">self</span>.pop_if_internal(<span class="kw-2">&amp;</span>condition, guard) {
+                <span class="kw">return </span>head;
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">unprotected</span>();
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Queue&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = unprotected();
 
-            <span class="kw">while</span> <span class="self">self</span>.<span class="ident">try_pop</span>(<span class="ident">guard</span>).<span class="ident">is_some</span>() {}
+            <span class="kw">while </span><span class="self">self</span>.try_pop(guard).is_some() {}
 
-            <span class="comment">// Destroy the remaining sentinel node.</span>
-            <span class="kw">let</span> <span class="ident">sentinel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-            <span class="ident">drop</span>(<span class="ident">sentinel</span>.<span class="ident">into_owned</span>());
+            <span class="comment">// Destroy the remaining sentinel node.
+            </span><span class="kw">let </span>sentinel = <span class="self">self</span>.head.load(Relaxed, guard);
+            drop(sentinel.into_owned());
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">crossbeam_loom</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pin</span>;
-    <span class="kw">use</span> <span class="ident">crossbeam_utils::thread</span>;
+<span class="attribute">#[cfg(all(test, not(crossbeam_loom)))]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::pin;
+    <span class="kw">use </span>crossbeam_utils::thread;
 
-    <span class="kw">struct</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">queue</span>: <span class="ident"><span class="kw">super</span>::Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="kw">struct </span>Queue&lt;T&gt; {
+        queue: <span class="kw">super</span>::Queue&lt;T&gt;,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="ident">Queue</span> {
-                <span class="ident">queue</span>: <span class="ident"><span class="kw">super</span>::Queue::new</span>(),
+    <span class="kw">impl</span>&lt;T&gt; Queue&lt;T&gt; {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; Queue&lt;T&gt; {
+            Queue {
+                queue: <span class="kw">super</span>::Queue::new(),
             }
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pin</span>();
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">t</span>, <span class="ident">guard</span>);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, t: T) {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>pin();
+            <span class="self">self</span>.queue.push(t, guard);
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pin</span>();
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>);
-            <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">head</span>.<span class="ident">deref</span>() };
-            <span class="ident">h</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>).<span class="ident">is_null</span>()
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>pin();
+            <span class="kw">let </span>head = <span class="self">self</span>.queue.head.load(Acquire, guard);
+            <span class="kw">let </span>h = <span class="kw">unsafe </span>{ head.deref() };
+            h.next.load(Acquire, guard).is_null()
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pin</span>();
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">try_pop</span>(<span class="ident">guard</span>)
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_pop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+            <span class="kw">let </span>guard = <span class="kw-2">&amp;</span>pin();
+            <span class="self">self</span>.queue.try_pop(guard)
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">T</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_pop</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="kw">return</span> <span class="ident">t</span>,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
+            <span class="kw">loop </span>{
+                <span class="kw">match </span><span class="self">self</span>.try_pop() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+                    <span class="prelude-val">Some</span>(t) =&gt; <span class="kw">return </span>t,
                 }
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">miri</span>)]</span>
-    <span class="kw">const</span> <span class="ident">CONC_COUNT</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">1000</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
-    <span class="kw">const</span> <span class="ident">CONC_COUNT</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">1000000</span>;
+    <span class="attribute">#[cfg(miri)]
+    </span><span class="kw">const </span>CONC_COUNT: i64 = <span class="number">1000</span>;
+    <span class="attribute">#[cfg(not(miri))]
+    </span><span class="kw">const </span>CONC_COUNT: i64 = <span class="number">1000000</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_1</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">37</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">try_pop</span>(), <span class="prelude-val">Some</span>(<span class="number">37</span>));
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_1() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        q.push(<span class="number">37</span>);
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="macro">assert_eq!</span>(q.try_pop(), <span class="prelude-val">Some</span>(<span class="number">37</span>));
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_2</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">37</span>);
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">48</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">try_pop</span>(), <span class="prelude-val">Some</span>(<span class="number">37</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">try_pop</span>(), <span class="prelude-val">Some</span>(<span class="number">48</span>));
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_2() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        q.push(<span class="number">37</span>);
+        q.push(<span class="number">48</span>);
+        <span class="macro">assert_eq!</span>(q.try_pop(), <span class="prelude-val">Some</span>(<span class="number">37</span>));
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="macro">assert_eq!</span>(q.try_pop(), <span class="prelude-val">Some</span>(<span class="number">48</span>));
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_many_seq</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">200</span> {
-            <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">i</span>)
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_many_seq() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">200 </span>{
+            q.push(i)
         }
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">200</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">try_pop</span>(), <span class="prelude-val">Some</span>(<span class="ident">i</span>));
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">200 </span>{
+            <span class="macro">assert_eq!</span>(q.try_pop(), <span class="prelude-val">Some</span>(i));
         }
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_pop_1</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">37</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="number">37</span>);
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_pop_1() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        q.push(<span class="number">37</span>);
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="macro">assert_eq!</span>(q.pop(), <span class="number">37</span>);
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_pop_2</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">37</span>);
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">48</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="number">37</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="number">48</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_pop_2() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        q.push(<span class="number">37</span>);
+        q.push(<span class="number">48</span>);
+        <span class="macro">assert_eq!</span>(q.pop(), <span class="number">37</span>);
+        <span class="macro">assert_eq!</span>(q.pop(), <span class="number">48</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_pop_many_seq</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">200</span> {
-            <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">i</span>)
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_pop_many_seq() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">200 </span>{
+            q.push(i)
         }
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">200</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="ident">i</span>);
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">200 </span>{
+            <span class="macro">assert_eq!</span>(q.pop(), i);
         }
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_many_spsc</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_many_spsc() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="number">0</span>;
+        thread::scope(|scope| {
+            scope.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>next = <span class="number">0</span>;
 
-                <span class="kw">while</span> <span class="ident">next</span> <span class="op">&lt;</span> <span class="ident">CONC_COUNT</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">q</span>.<span class="ident">try_pop</span>() {
-                        <span class="macro">assert_eq!</span>(<span class="ident">elem</span>, <span class="ident">next</span>);
-                        <span class="ident">next</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="kw">while </span>next &lt; CONC_COUNT {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = q.try_pop() {
+                        <span class="macro">assert_eq!</span>(elem, next);
+                        next += <span class="number">1</span>;
                     }
                 }
             });
 
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">CONC_COUNT</span> {
-                <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">i</span>)
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..CONC_COUNT {
+                q.push(i)
             }
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_many_spmc</span>() {
-        <span class="kw">fn</span> <span class="ident">recv</span>(<span class="ident">_t</span>: <span class="ident">i32</span>, <span class="ident">q</span>: <span class="kw-2">&amp;</span><span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
-            <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">CONC_COUNT</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">q</span>.<span class="ident">try_pop</span>() {
-                    <span class="macro">assert!</span>(<span class="ident">elem</span> <span class="op">&gt;</span> <span class="ident">cur</span>);
-                    <span class="ident">cur</span> <span class="op">=</span> <span class="ident">elem</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_many_spmc() {
+        <span class="kw">fn </span>recv(_t: i32, q: <span class="kw-2">&amp;</span>Queue&lt;i64&gt;) {
+            <span class="kw">let </span><span class="kw-2">mut </span>cur = -<span class="number">1</span>;
+            <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..CONC_COUNT {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = q.try_pop() {
+                    <span class="macro">assert!</span>(elem &gt; cur);
+                    cur = elem;
 
-                    <span class="kw">if</span> <span class="ident">cur</span> <span class="op">==</span> <span class="ident">CONC_COUNT</span> <span class="op">-</span> <span class="number">1</span> {
+                    <span class="kw">if </span>cur == CONC_COUNT - <span class="number">1 </span>{
                         <span class="kw">break</span>;
                     }
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-                <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">q</span>;
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">recv</span>(<span class="ident">i</span>, <span class="ident">q</span>));
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
+        thread::scope(|scope| {
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+                <span class="kw">let </span>q = <span class="kw-2">&amp;</span>q;
+                scope.spawn(<span class="kw">move </span>|<span class="kw">_</span>| recv(i, q));
             }
 
-            <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">CONC_COUNT</span> {
-                    <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+            scope.spawn(|<span class="kw">_</span>| {
+                <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..CONC_COUNT {
+                    q.push(i);
                 }
             });
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_try_pop_many_mpmc</span>() {
-        <span class="kw">enum</span> <span class="ident">LR</span> {
-            <span class="ident">Left</span>(<span class="ident">i64</span>),
-            <span class="ident">Right</span>(<span class="ident">i64</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_try_pop_many_mpmc() {
+        <span class="kw">enum </span>LR {
+            Left(i64),
+            Right(i64),
         }
 
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">LR</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+        <span class="kw">let </span>q: Queue&lt;LR&gt; = Queue::new();
+        <span class="macro">assert!</span>(q.is_empty());
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="ident">_t</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span> {
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">CONC_COUNT</span> <span class="op">-</span> <span class="number">1</span>..<span class="ident">CONC_COUNT</span> {
-                        <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">LR::Left</span>(<span class="ident">i</span>))
+        thread::scope(|scope| {
+            <span class="kw">for </span>_t <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
+                scope.spawn(|<span class="kw">_</span>| {
+                    <span class="kw">for </span>i <span class="kw">in </span>CONC_COUNT - <span class="number">1</span>..CONC_COUNT {
+                        q.push(LR::Left(i))
                     }
                 });
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">CONC_COUNT</span> <span class="op">-</span> <span class="number">1</span>..<span class="ident">CONC_COUNT</span> {
-                        <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">LR::Right</span>(<span class="ident">i</span>))
+                scope.spawn(|<span class="kw">_</span>| {
+                    <span class="kw">for </span>i <span class="kw">in </span>CONC_COUNT - <span class="number">1</span>..CONC_COUNT {
+                        q.push(LR::Right(i))
                     }
                 });
-                <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vl</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vr</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                    <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">CONC_COUNT</span> {
-                        <span class="kw">match</span> <span class="ident">q</span>.<span class="ident">try_pop</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">LR::Left</span>(<span class="ident">x</span>)) =&gt; <span class="ident">vl</span>.<span class="ident">push</span>(<span class="ident">x</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">LR::Right</span>(<span class="ident">x</span>)) =&gt; <span class="ident">vr</span>.<span class="ident">push</span>(<span class="ident">x</span>),
-                            <span class="kw">_</span> =&gt; {}
+                scope.spawn(|<span class="kw">_</span>| {
+                    <span class="kw">let </span><span class="kw-2">mut </span>vl = <span class="macro">vec!</span>[];
+                    <span class="kw">let </span><span class="kw-2">mut </span>vr = <span class="macro">vec!</span>[];
+                    <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..CONC_COUNT {
+                        <span class="kw">match </span>q.try_pop() {
+                            <span class="prelude-val">Some</span>(LR::Left(x)) =&gt; vl.push(x),
+                            <span class="prelude-val">Some</span>(LR::Right(x)) =&gt; vr.push(x),
+                            <span class="kw">_ </span>=&gt; {}
                         }
                     }
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vl2</span> <span class="op">=</span> <span class="ident">vl</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vr2</span> <span class="op">=</span> <span class="ident">vr</span>.<span class="ident">clone</span>();
-                    <span class="ident">vl2</span>.<span class="ident">sort_unstable</span>();
-                    <span class="ident">vr2</span>.<span class="ident">sort_unstable</span>();
+                    <span class="kw">let </span><span class="kw-2">mut </span>vl2 = vl.clone();
+                    <span class="kw">let </span><span class="kw-2">mut </span>vr2 = vr.clone();
+                    vl2.sort_unstable();
+                    vr2.sort_unstable();
 
-                    <span class="macro">assert_eq!</span>(<span class="ident">vl</span>, <span class="ident">vl2</span>);
-                    <span class="macro">assert_eq!</span>(<span class="ident">vr</span>, <span class="ident">vr2</span>);
+                    <span class="macro">assert_eq!</span>(vl, vl2);
+                    <span class="macro">assert_eq!</span>(vr, vr2);
                 });
             }
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push_pop_many_spsc</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>push_pop_many_spsc() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">while</span> <span class="ident">next</span> <span class="op">&lt;</span> <span class="ident">CONC_COUNT</span> {
-                    <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="ident">next</span>);
-                    <span class="ident">next</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        thread::scope(|scope| {
+            scope.spawn(|<span class="kw">_</span>| {
+                <span class="kw">let </span><span class="kw-2">mut </span>next = <span class="number">0</span>;
+                <span class="kw">while </span>next &lt; CONC_COUNT {
+                    <span class="macro">assert_eq!</span>(q.pop(), next);
+                    next += <span class="number">1</span>;
                 }
             });
 
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">CONC_COUNT</span> {
-                <span class="ident">q</span>.<span class="ident">push</span>(<span class="ident">i</span>)
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..CONC_COUNT {
+                q.push(i)
             }
         })
-        .<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">is_empty</span>());
+        .unwrap();
+        <span class="macro">assert!</span>(q.is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty_dont_pop</span>() {
-        <span class="kw">let</span> <span class="ident">q</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Queue::new</span>();
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">20</span>);
-        <span class="ident">q</span>.<span class="ident">push</span>(<span class="number">20</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">q</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert!</span>(<span class="ident">q</span>.<span class="ident">try_pop</span>().<span class="ident">is_some</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_empty_dont_pop() {
+        <span class="kw">let </span>q: Queue&lt;i64&gt; = Queue::new();
+        q.push(<span class="number">20</span>);
+        q.push(<span class="number">20</span>);
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="macro">assert!</span>(!q.is_empty());
+        <span class="macro">assert!</span>(q.try_pop().is_some());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

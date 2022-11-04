@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-backend-0.2.83/src/encode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-backend-0.2.83/src/encode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_backend/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -534,541 +534,541 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::ShortHash</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">std::cell</span>::{<span class="ident">Cell</span>, <span class="ident">RefCell</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::env</span>;
-<span class="kw">use</span> <span class="ident">std::fs</span>;
-<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::util::ShortHash;
+<span class="kw">use </span>proc_macro2::{Ident, Span};
+<span class="kw">use </span>std::cell::{Cell, RefCell};
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::env;
+<span class="kw">use </span>std::fs;
+<span class="kw">use </span>std::path::PathBuf;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Diagnostic</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ast;
+<span class="kw">use </span><span class="kw">crate</span>::Diagnostic;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EncodeResult</span> {
-    <span class="kw">pub</span> <span class="ident">custom_section</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">included_files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>EncodeResult {
+    <span class="kw">pub </span>custom_section: Vec&lt;u8&gt;,
+    <span class="kw">pub </span>included_files: Vec&lt;PathBuf&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">program</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Program</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EncodeResult</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Encoder::new</span>();
-    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">Interner::new</span>();
-    <span class="ident">shared_program</span>(<span class="ident">program</span>, <span class="kw-2">&amp;</span><span class="ident">i</span>)<span class="question-mark">?</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>);
-    <span class="kw">let</span> <span class="ident">custom_section</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">finish</span>();
-    <span class="kw">let</span> <span class="ident">included_files</span> <span class="op">=</span> <span class="ident">i</span>
-        .<span class="ident">files</span>
-        .<span class="ident">borrow</span>()
-        .<span class="ident">values</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">path</span>)
-        .<span class="ident">cloned</span>()
-        .<span class="ident">collect</span>();
-    <span class="prelude-val">Ok</span>(<span class="ident">EncodeResult</span> {
-        <span class="ident">custom_section</span>,
-        <span class="ident">included_files</span>,
+<span class="kw">pub fn </span>encode(program: <span class="kw-2">&amp;</span>ast::Program) -&gt; <span class="prelude-ty">Result</span>&lt;EncodeResult, Diagnostic&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>e = Encoder::new();
+    <span class="kw">let </span>i = Interner::new();
+    shared_program(program, <span class="kw-2">&amp;</span>i)<span class="question-mark">?</span>.encode(<span class="kw-2">&amp;mut </span>e);
+    <span class="kw">let </span>custom_section = e.finish();
+    <span class="kw">let </span>included_files = i
+        .files
+        .borrow()
+        .values()
+        .map(|p| <span class="kw-2">&amp;</span>p.path)
+        .cloned()
+        .collect();
+    <span class="prelude-val">Ok</span>(EncodeResult {
+        custom_section,
+        included_files,
     })
 }
 
-<span class="kw">struct</span> <span class="ident">Interner</span> {
-    <span class="ident">bump</span>: <span class="ident">bumpalo::Bump</span>,
-    <span class="ident">files</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">LocalFile</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">root</span>: <span class="ident">PathBuf</span>,
-    <span class="ident">crate_name</span>: <span class="ident">String</span>,
-    <span class="ident">has_package_json</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Interner {
+    bump: bumpalo::Bump,
+    files: RefCell&lt;HashMap&lt;String, LocalFile&gt;&gt;,
+    root: PathBuf,
+    crate_name: String,
+    has_package_json: Cell&lt;bool&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">LocalFile</span> {
-    <span class="ident">path</span>: <span class="ident">PathBuf</span>,
-    <span class="ident">definition</span>: <span class="ident">Span</span>,
-    <span class="ident">new_identifier</span>: <span class="ident">String</span>,
+<span class="kw">struct </span>LocalFile {
+    path: PathBuf,
+    definition: Span,
+    new_identifier: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Interner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Interner</span> {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">env::var_os</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;should have CARGO_MANIFEST_DIR env var&quot;</span>)
-            .<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">crate_name</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;should have CARGO_PKG_NAME env var&quot;</span>);
-        <span class="ident">Interner</span> {
-            <span class="ident">bump</span>: <span class="ident">bumpalo::Bump::new</span>(),
-            <span class="ident">files</span>: <span class="ident">RefCell::new</span>(<span class="ident">HashMap::new</span>()),
-            <span class="ident">root</span>,
-            <span class="ident">crate_name</span>,
-            <span class="ident">has_package_json</span>: <span class="ident">Cell::new</span>(<span class="bool-val">false</span>),
+<span class="kw">impl </span>Interner {
+    <span class="kw">fn </span>new() -&gt; Interner {
+        <span class="kw">let </span>root = env::var_os(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)
+            .expect(<span class="string">&quot;should have CARGO_MANIFEST_DIR env var&quot;</span>)
+            .into();
+        <span class="kw">let </span>crate_name = env::var(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>).expect(<span class="string">&quot;should have CARGO_PKG_NAME env var&quot;</span>);
+        Interner {
+            bump: bumpalo::Bump::new(),
+            files: RefCell::new(HashMap::new()),
+            root,
+            crate_name,
+            has_package_json: Cell::new(<span class="bool-val">false</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">intern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn </span>intern(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>Ident) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.intern_str(<span class="kw-2">&amp;</span>s.to_string())
     }
 
-    <span class="kw">fn</span> <span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="comment">// NB: eventually this could be used to intern `s` to only allocate one</span>
-        <span class="comment">// copy, but for now let&#39;s just &quot;transmute&quot; `s` to have the same</span>
-        <span class="comment">// lifetime as this struct itself (which is our main goal here)</span>
-        <span class="self">self</span>.<span class="ident">bump</span>.<span class="ident">alloc_str</span>(<span class="ident">s</span>)
+    <span class="kw">fn </span>intern_str(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="comment">// NB: eventually this could be used to intern `s` to only allocate one
+        // copy, but for now let&#39;s just &quot;transmute&quot; `s` to have the same
+        // lifetime as this struct itself (which is our main goal here)
+        </span><span class="self">self</span>.bump.alloc_str(s)
     }
 
-    <span class="doccomment">/// Given an import to a local module `id` this generates a unique module id</span>
-    <span class="doccomment">/// to assign to the contents of `id`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that repeated invocations of this function will be memoized, so the</span>
-    <span class="doccomment">/// same `id` will always return the same resulting unique `id`.</span>
-    <span class="kw">fn</span> <span class="ident">resolve_import_module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ImportModule</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">files</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">borrow_mut</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file</span>) <span class="op">=</span> <span class="ident">files</span>.<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ImportModule::Named</span>(<span class="self">self</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">new_identifier</span>)));
+    <span class="doccomment">/// Given an import to a local module `id` this generates a unique module id
+    /// to assign to the contents of `id`.
+    ///
+    /// Note that repeated invocations of this function will be memoized, so the
+    /// same `id` will always return the same resulting unique `id`.
+    </span><span class="kw">fn </span>resolve_import_module(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>str, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;ImportModule, Diagnostic&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>files = <span class="self">self</span>.files.borrow_mut();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(file) = files.get(id) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(ImportModule::Named(<span class="self">self</span>.intern_str(<span class="kw-2">&amp;</span>file.new_identifier)));
         }
-        <span class="self">self</span>.<span class="ident">check_for_package_json</span>();
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">starts_with</span>(<span class="string">&quot;/&quot;</span>) {
-            <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>[<span class="number">1</span>..])
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">starts_with</span>(<span class="string">&quot;./&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">starts_with</span>(<span class="string">&quot;../&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;relative module paths aren&#39;t supported yet&quot;</span>;
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Diagnostic::span_error</span>(<span class="ident">span</span>, <span class="ident">msg</span>));
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ImportModule::RawNamed</span>(<span class="self">self</span>.<span class="ident">intern_str</span>(<span class="ident">id</span>)));
+        <span class="self">self</span>.check_for_package_json();
+        <span class="kw">let </span>path = <span class="kw">if </span>id.starts_with(<span class="string">&quot;/&quot;</span>) {
+            <span class="self">self</span>.root.join(<span class="kw-2">&amp;</span>id[<span class="number">1</span>..])
+        } <span class="kw">else if </span>id.starts_with(<span class="string">&quot;./&quot;</span>) || id.starts_with(<span class="string">&quot;../&quot;</span>) {
+            <span class="kw">let </span>msg = <span class="string">&quot;relative module paths aren&#39;t supported yet&quot;</span>;
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Diagnostic::span_error(span, msg));
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(ImportModule::RawNamed(<span class="self">self</span>.intern_str(id)));
         };
 
-        <span class="comment">// Generate a unique ID which is somewhat readable as well, so mix in</span>
-        <span class="comment">// the crate name, hash to make it unique, and then the original path.</span>
-        <span class="kw">let</span> <span class="ident">new_identifier</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">unique_crate_identifier</span>(), <span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">LocalFile</span> {
-            <span class="ident">path</span>,
-            <span class="ident">definition</span>: <span class="ident">span</span>,
-            <span class="ident">new_identifier</span>,
+        <span class="comment">// Generate a unique ID which is somewhat readable as well, so mix in
+        // the crate name, hash to make it unique, and then the original path.
+        </span><span class="kw">let </span>new_identifier = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.unique_crate_identifier(), id);
+        <span class="kw">let </span>file = LocalFile {
+            path,
+            definition: span,
+            new_identifier,
         };
-        <span class="ident">files</span>.<span class="ident">insert</span>(<span class="ident">id</span>.<span class="ident">to_string</span>(), <span class="ident">file</span>);
-        <span class="ident">drop</span>(<span class="ident">files</span>);
-        <span class="self">self</span>.<span class="ident">resolve_import_module</span>(<span class="ident">id</span>, <span class="ident">span</span>)
+        files.insert(id.to_string(), file);
+        drop(files);
+        <span class="self">self</span>.resolve_import_module(id, span)
     }
 
-    <span class="kw">fn</span> <span class="ident">unique_crate_identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, <span class="self">self</span>.<span class="ident">crate_name</span>, <span class="ident">ShortHash</span>(<span class="number">0</span>))
+    <span class="kw">fn </span>unique_crate_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, <span class="self">self</span>.crate_name, ShortHash(<span class="number">0</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">check_for_package_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_package_json</span>.<span class="ident">get</span>() {
+    <span class="kw">fn </span>check_for_package_json(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.has_package_json.get() {
             <span class="kw">return</span>;
         }
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">join</span>(<span class="string">&quot;package.json&quot;</span>);
-        <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">exists</span>() {
-            <span class="self">self</span>.<span class="ident">has_package_json</span>.<span class="ident">set</span>(<span class="bool-val">true</span>);
+        <span class="kw">let </span>path = <span class="self">self</span>.root.join(<span class="string">&quot;package.json&quot;</span>);
+        <span class="kw">if </span>path.exists() {
+            <span class="self">self</span>.has_package_json.set(<span class="bool-val">true</span>);
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_program</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">prog</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Program</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Program</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">Program</span> {
-        <span class="ident">exports</span>: <span class="ident">prog</span>
-            .<span class="ident">exports</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">shared_export</span>(<span class="ident">a</span>, <span class="ident">intern</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="ident">structs</span>: <span class="ident">prog</span>
-            .<span class="ident">structs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">shared_struct</span>(<span class="ident">a</span>, <span class="ident">intern</span>))
-            .<span class="ident">collect</span>(),
-        <span class="ident">enums</span>: <span class="ident">prog</span>.<span class="ident">enums</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">shared_enum</span>(<span class="ident">a</span>, <span class="ident">intern</span>)).<span class="ident">collect</span>(),
-        <span class="ident">imports</span>: <span class="ident">prog</span>
-            .<span class="ident">imports</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">shared_import</span>(<span class="ident">a</span>, <span class="ident">intern</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="ident">typescript_custom_sections</span>: <span class="ident">prog</span>
-            .<span class="ident">typescript_custom_sections</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> { <span class="kw-2">&amp;</span><span class="ident">x</span> })
-            .<span class="ident">collect</span>(),
-        <span class="ident">local_modules</span>: <span class="ident">intern</span>
-            .<span class="ident">files</span>
-            .<span class="ident">borrow</span>()
-            .<span class="ident">values</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">file</span><span class="op">|</span> {
-                <span class="ident">fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">path</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">LocalModule</span> {
-                        <span class="ident">identifier</span>: <span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">new_identifier</span>),
-                        <span class="ident">contents</span>: <span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>),
+<span class="kw">fn </span>shared_program&lt;<span class="lifetime">&#39;a</span>&gt;(
+    prog: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Program,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Program&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="prelude-val">Ok</span>(Program {
+        exports: prog
+            .exports
+            .iter()
+            .map(|a| shared_export(a, intern))
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>,
+        structs: prog
+            .structs
+            .iter()
+            .map(|a| shared_struct(a, intern))
+            .collect(),
+        enums: prog.enums.iter().map(|a| shared_enum(a, intern)).collect(),
+        imports: prog
+            .imports
+            .iter()
+            .map(|a| shared_import(a, intern))
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>,
+        typescript_custom_sections: prog
+            .typescript_custom_sections
+            .iter()
+            .map(|x| -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str { <span class="kw-2">&amp;</span>x })
+            .collect(),
+        local_modules: intern
+            .files
+            .borrow()
+            .values()
+            .map(|file| {
+                fs::read_to_string(<span class="kw-2">&amp;</span>file.path)
+                    .map(|s| LocalModule {
+                        identifier: intern.intern_str(<span class="kw-2">&amp;</span>file.new_identifier),
+                        contents: intern.intern_str(<span class="kw-2">&amp;</span>s),
                     })
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;failed to read file `{}`: {}&quot;</span>, <span class="ident">file</span>.<span class="ident">path</span>.<span class="ident">display</span>(), <span class="ident">e</span>);
-                        <span class="ident">Diagnostic::span_error</span>(<span class="ident">file</span>.<span class="ident">definition</span>, <span class="ident">msg</span>)
+                    .map_err(|e| {
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;failed to read file `{}`: {}&quot;</span>, file.path.display(), e);
+                        Diagnostic::span_error(file.definition, msg)
                     })
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="ident">inline_js</span>: <span class="ident">prog</span>
-            .<span class="ident">inline_js</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">js</span><span class="op">|</span> <span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="ident">js</span>))
-            .<span class="ident">collect</span>(),
-        <span class="ident">unique_crate_identifier</span>: <span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">intern</span>.<span class="ident">unique_crate_identifier</span>()),
-        <span class="ident">package_json</span>: <span class="kw">if</span> <span class="ident">intern</span>.<span class="ident">has_package_json</span>.<span class="ident">get</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="ident">intern</span>.<span class="ident">root</span>.<span class="ident">join</span>(<span class="string">&quot;package.json&quot;</span>).<span class="ident">to_str</span>().<span class="ident">unwrap</span>()))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        },
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>,
+        inline_js: prog
+            .inline_js
+            .iter()
+            .map(|js| intern.intern_str(js))
+            .collect(),
+        unique_crate_identifier: intern.intern_str(<span class="kw-2">&amp;</span>intern.unique_crate_identifier()),
+        package_json: <span class="kw">if </span>intern.has_package_json.get() {
+            <span class="prelude-val">Some</span>(intern.intern_str(intern.root.join(<span class="string">&quot;package.json&quot;</span>).to_str().unwrap()))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>},
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_export</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">export</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Export</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Export</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">export</span>.<span class="ident">method_self</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ast::MethodSelf::ByValue</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">fn </span>shared_export&lt;<span class="lifetime">&#39;a</span>&gt;(
+    export: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Export,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Export&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="kw">let </span>consumed = <span class="kw">match </span>export.method_self {
+        <span class="prelude-val">Some</span>(ast::MethodSelf::ByValue) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     };
-    <span class="kw">let</span> <span class="ident">method_kind</span> <span class="op">=</span> <span class="ident">from_ast_method_kind</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">function</span>, <span class="ident">intern</span>, <span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">method_kind</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">Export</span> {
-        <span class="ident">class</span>: <span class="ident">export</span>.<span class="ident">js_class</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>),
-        <span class="ident">comments</span>: <span class="ident">export</span>.<span class="ident">comments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>(),
-        <span class="ident">consumed</span>,
-        <span class="ident">function</span>: <span class="ident">shared_function</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>.<span class="ident">function</span>, <span class="ident">intern</span>),
-        <span class="ident">method_kind</span>,
-        <span class="ident">start</span>: <span class="ident">export</span>.<span class="ident">start</span>,
+    <span class="kw">let </span>method_kind = from_ast_method_kind(<span class="kw-2">&amp;</span>export.function, intern, <span class="kw-2">&amp;</span>export.method_kind)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(Export {
+        class: export.js_class.as_ref().map(|s| <span class="kw-2">&amp;**</span>s),
+        comments: export.comments.iter().map(|s| <span class="kw-2">&amp;**</span>s).collect(),
+        consumed,
+        function: shared_function(<span class="kw-2">&amp;</span>export.function, intern),
+        method_kind,
+        start: export.start,
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Function</span>, <span class="ident">_intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arg_names</span> <span class="op">=</span> <span class="ident">func</span>
-        .<span class="ident">arguments</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">arg</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Pat::Ident</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">pat</span> {
-                <span class="kw">return</span> <span class="ident">x</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
+<span class="kw">fn </span>shared_function&lt;<span class="lifetime">&#39;a</span>&gt;(func: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Function, _intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; Function&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>arg_names = func
+        .arguments
+        .iter()
+        .enumerate()
+        .map(|(idx, arg)| {
+            <span class="kw">if let </span>syn::Pat::Ident(x) = <span class="kw-2">&amp;*</span>arg.pat {
+                <span class="kw">return </span>x.ident.to_string();
             }
-            <span class="macro">format!</span>(<span class="string">&quot;arg{}&quot;</span>, <span class="ident">idx</span>)
+            <span class="macro">format!</span>(<span class="string">&quot;arg{}&quot;</span>, idx)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">Function</span> {
-        <span class="ident">arg_names</span>,
-        <span class="ident">asyncness</span>: <span class="ident">func</span>.<span class="ident">r#async</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">func</span>.<span class="ident">name</span>,
-        <span class="ident">generate_typescript</span>: <span class="ident">func</span>.<span class="ident">generate_typescript</span>,
-        <span class="ident">variadic</span>: <span class="ident">func</span>.<span class="ident">variadic</span>,
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    Function {
+        arg_names,
+        asyncness: func.r#async,
+        name: <span class="kw-2">&amp;</span>func.name,
+        generate_typescript: func.generate_typescript,
+        variadic: func.variadic,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Enum</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">Enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Enum</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">js_name</span>,
-        <span class="ident">variants</span>: <span class="ident">e</span>
-            .<span class="ident">variants</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">shared_variant</span>(<span class="ident">v</span>, <span class="ident">intern</span>))
-            .<span class="ident">collect</span>(),
-        <span class="ident">comments</span>: <span class="ident">e</span>.<span class="ident">comments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>(),
-        <span class="ident">generate_typescript</span>: <span class="ident">e</span>.<span class="ident">generate_typescript</span>,
+<span class="kw">fn </span>shared_enum&lt;<span class="lifetime">&#39;a</span>&gt;(e: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Enum, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; Enum&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Enum {
+        name: <span class="kw-2">&amp;</span>e.js_name,
+        variants: e
+            .variants
+            .iter()
+            .map(|v| shared_variant(v, intern))
+            .collect(),
+        comments: e.comments.iter().map(|s| <span class="kw-2">&amp;**</span>s).collect(),
+        generate_typescript: e.generate_typescript,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_variant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Variant</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">EnumVariant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">EnumVariant</span> {
-        <span class="ident">name</span>: <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">name</span>),
-        <span class="ident">value</span>: <span class="ident">v</span>.<span class="ident">value</span>,
-        <span class="ident">comments</span>: <span class="ident">v</span>.<span class="ident">comments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>(),
+<span class="kw">fn </span>shared_variant&lt;<span class="lifetime">&#39;a</span>&gt;(v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Variant, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
+    EnumVariant {
+        name: intern.intern(<span class="kw-2">&amp;</span>v.name),
+        value: v.value,
+        comments: v.comments.iter().map(|s| <span class="kw-2">&amp;**</span>s).collect(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Import</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Import</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">Import</span> {
-        <span class="ident">module</span>: <span class="ident">i</span>
-            .<span class="ident">module</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">shared_module</span>(<span class="ident">m</span>, <span class="ident">intern</span>))
-            .<span class="ident">transpose</span>()<span class="question-mark">?</span>,
-        <span class="ident">js_namespace</span>: <span class="ident">i</span>.<span class="ident">js_namespace</span>.<span class="ident">clone</span>(),
-        <span class="ident">kind</span>: <span class="ident">shared_import_kind</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">kind</span>, <span class="ident">intern</span>)<span class="question-mark">?</span>,
+<span class="kw">fn </span>shared_import&lt;<span class="lifetime">&#39;a</span>&gt;(i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Import, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; <span class="prelude-ty">Result</span>&lt;Import&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="prelude-val">Ok</span>(Import {
+        module: i
+            .module
+            .as_ref()
+            .map(|m| shared_module(m, intern))
+            .transpose()<span class="question-mark">?</span>,
+        js_namespace: i.js_namespace.clone(),
+        kind: shared_import_kind(<span class="kw-2">&amp;</span>i.kind, intern)<span class="question-mark">?</span>,
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_module</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportModule</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ImportModule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">m</span> {
-        <span class="ident">ast::ImportModule::Named</span>(<span class="ident">m</span>, <span class="ident">span</span>) =&gt; <span class="ident">intern</span>.<span class="ident">resolve_import_module</span>(<span class="ident">m</span>, <span class="kw-2">*</span><span class="ident">span</span>)<span class="question-mark">?</span>,
-        <span class="ident">ast::ImportModule::RawNamed</span>(<span class="ident">m</span>, <span class="ident">_span</span>) =&gt; <span class="ident">ImportModule::RawNamed</span>(<span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="ident">m</span>)),
-        <span class="ident">ast::ImportModule::Inline</span>(<span class="ident">idx</span>, <span class="kw">_</span>) =&gt; <span class="ident">ImportModule::Inline</span>(<span class="kw-2">*</span><span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>),
+<span class="kw">fn </span>shared_module&lt;<span class="lifetime">&#39;a</span>&gt;(
+    m: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportModule,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ImportModule&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="prelude-val">Ok</span>(<span class="kw">match </span>m {
+        ast::ImportModule::Named(m, span) =&gt; intern.resolve_import_module(m, <span class="kw-2">*</span>span)<span class="question-mark">?</span>,
+        ast::ImportModule::RawNamed(m, _span) =&gt; ImportModule::RawNamed(intern.intern_str(m)),
+        ast::ImportModule::Inline(idx, <span class="kw">_</span>) =&gt; ImportModule::Inline(<span class="kw-2">*</span>idx <span class="kw">as </span>u32),
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import_kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportKind</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ImportKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">i</span> {
-        <span class="ident">ast::ImportKind::Function</span>(<span class="ident">f</span>) =&gt; <span class="ident">ImportKind::Function</span>(<span class="ident">shared_import_function</span>(<span class="ident">f</span>, <span class="ident">intern</span>)<span class="question-mark">?</span>),
-        <span class="ident">ast::ImportKind::Static</span>(<span class="ident">f</span>) =&gt; <span class="ident">ImportKind::Static</span>(<span class="ident">shared_import_static</span>(<span class="ident">f</span>, <span class="ident">intern</span>)),
-        <span class="ident">ast::ImportKind::Type</span>(<span class="ident">f</span>) =&gt; <span class="ident">ImportKind::Type</span>(<span class="ident">shared_import_type</span>(<span class="ident">f</span>, <span class="ident">intern</span>)),
-        <span class="ident">ast::ImportKind::Enum</span>(<span class="ident">f</span>) =&gt; <span class="ident">ImportKind::Enum</span>(<span class="ident">shared_import_enum</span>(<span class="ident">f</span>, <span class="ident">intern</span>)),
+<span class="kw">fn </span>shared_import_kind&lt;<span class="lifetime">&#39;a</span>&gt;(
+    i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportKind,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ImportKind&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="prelude-val">Ok</span>(<span class="kw">match </span>i {
+        ast::ImportKind::Function(f) =&gt; ImportKind::Function(shared_import_function(f, intern)<span class="question-mark">?</span>),
+        ast::ImportKind::Static(f) =&gt; ImportKind::Static(shared_import_static(f, intern)),
+        ast::ImportKind::Type(f) =&gt; ImportKind::Type(shared_import_type(f, intern)),
+        ast::ImportKind::Enum(f) =&gt; ImportKind::Enum(shared_import_enum(f, intern)),
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import_function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportFunction</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ImportFunction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">kind</span> {
-        <span class="ident">ast::ImportFunctionKind::Method</span> { <span class="ident">class</span>, <span class="ident">kind</span>, .. } =&gt; {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">from_ast_method_kind</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">function</span>, <span class="ident">intern</span>, <span class="ident">kind</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">MethodData</span> { <span class="ident">class</span>, <span class="ident">kind</span> })
+<span class="kw">fn </span>shared_import_function&lt;<span class="lifetime">&#39;a</span>&gt;(
+    i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportFunction,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ImportFunction&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="kw">let </span>method = <span class="kw">match </span><span class="kw-2">&amp;</span>i.kind {
+        ast::ImportFunctionKind::Method { class, kind, .. } =&gt; {
+            <span class="kw">let </span>kind = from_ast_method_kind(<span class="kw-2">&amp;</span>i.function, intern, kind)<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(MethodData { class, kind })
         }
-        <span class="ident">ast::ImportFunctionKind::Normal</span> =&gt; <span class="prelude-val">None</span>,
+        ast::ImportFunctionKind::Normal =&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">ImportFunction</span> {
-        <span class="ident">shim</span>: <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">shim</span>),
-        <span class="ident">catch</span>: <span class="ident">i</span>.<span class="ident">catch</span>,
-        <span class="ident">method</span>,
-        <span class="ident">assert_no_shim</span>: <span class="ident">i</span>.<span class="ident">assert_no_shim</span>,
-        <span class="ident">structural</span>: <span class="ident">i</span>.<span class="ident">structural</span>,
-        <span class="ident">function</span>: <span class="ident">shared_function</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">function</span>, <span class="ident">intern</span>),
-        <span class="ident">variadic</span>: <span class="ident">i</span>.<span class="ident">variadic</span>,
+    <span class="prelude-val">Ok</span>(ImportFunction {
+        shim: intern.intern(<span class="kw-2">&amp;</span>i.shim),
+        catch: i.catch,
+        method,
+        assert_no_shim: i.assert_no_shim,
+        structural: i.structural,
+        function: shared_function(<span class="kw-2">&amp;</span>i.function, intern),
+        variadic: i.variadic,
     })
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import_static</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportStatic</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">ImportStatic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ImportStatic</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">js_name</span>,
-        <span class="ident">shim</span>: <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">shim</span>),
+<span class="kw">fn </span>shared_import_static&lt;<span class="lifetime">&#39;a</span>&gt;(i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportStatic, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; ImportStatic&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ImportStatic {
+        name: <span class="kw-2">&amp;</span>i.js_name,
+        shim: intern.intern(<span class="kw-2">&amp;</span>i.shim),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import_type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportType</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">ImportType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ImportType</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">js_name</span>,
-        <span class="ident">instanceof_shim</span>: <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">instanceof_shim</span>,
-        <span class="ident">vendor_prefixes</span>: <span class="ident">i</span>.<span class="ident">vendor_prefixes</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="ident">x</span>)).<span class="ident">collect</span>(),
+<span class="kw">fn </span>shared_import_type&lt;<span class="lifetime">&#39;a</span>&gt;(i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportType, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; ImportType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ImportType {
+        name: <span class="kw-2">&amp;</span>i.js_name,
+        instanceof_shim: <span class="kw-2">&amp;</span>i.instanceof_shim,
+        vendor_prefixes: i.vendor_prefixes.iter().map(|x| intern.intern(x)).collect(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_import_enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">_i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::ImportEnum</span>, <span class="ident">_intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">ImportEnum</span> {
-    <span class="ident">ImportEnum</span> {}
+<span class="kw">fn </span>shared_import_enum&lt;<span class="lifetime">&#39;a</span>&gt;(_i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::ImportEnum, _intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; ImportEnum {
+    ImportEnum {}
 }
 
-<span class="kw">fn</span> <span class="ident">shared_struct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Struct</span>, <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">Struct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Struct</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">js_name</span>,
-        <span class="ident">fields</span>: <span class="ident">s</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">shared_struct_field</span>(<span class="ident">s</span>, <span class="ident">intern</span>))
-            .<span class="ident">collect</span>(),
-        <span class="ident">comments</span>: <span class="ident">s</span>.<span class="ident">comments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>(),
-        <span class="ident">is_inspectable</span>: <span class="ident">s</span>.<span class="ident">is_inspectable</span>,
-        <span class="ident">generate_typescript</span>: <span class="ident">s</span>.<span class="ident">generate_typescript</span>,
+<span class="kw">fn </span>shared_struct&lt;<span class="lifetime">&#39;a</span>&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Struct, intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; Struct&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Struct {
+        name: <span class="kw-2">&amp;</span>s.js_name,
+        fields: s
+            .fields
+            .iter()
+            .map(|s| shared_struct_field(s, intern))
+            .collect(),
+        comments: s.comments.iter().map(|s| <span class="kw-2">&amp;**</span>s).collect(),
+        is_inspectable: s.is_inspectable,
+        generate_typescript: s.generate_typescript,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">shared_struct_field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::StructField</span>, <span class="ident">_intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>) -&gt; <span class="ident">StructField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">StructField</span> {
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">js_name</span>,
-        <span class="ident">readonly</span>: <span class="ident">s</span>.<span class="ident">readonly</span>,
-        <span class="ident">comments</span>: <span class="ident">s</span>.<span class="ident">comments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">collect</span>(),
-        <span class="ident">generate_typescript</span>: <span class="ident">s</span>.<span class="ident">generate_typescript</span>,
+<span class="kw">fn </span>shared_struct_field&lt;<span class="lifetime">&#39;a</span>&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::StructField, _intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner) -&gt; StructField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    StructField {
+        name: <span class="kw-2">&amp;</span>s.js_name,
+        readonly: s.readonly,
+        comments: s.comments.iter().map(|s| <span class="kw-2">&amp;**</span>s).collect(),
+        generate_typescript: s.generate_typescript,
     }
 }
 
-<span class="kw">trait</span> <span class="ident">Encode</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>);
+<span class="kw">trait </span>Encode {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder);
 }
 
-<span class="kw">struct</span> <span class="ident">Encoder</span> {
-    <span class="ident">dst</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Encoder {
+    dst: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Encoder</span> {
-        <span class="ident">Encoder</span> {
-            <span class="ident">dst</span>: <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+<span class="kw">impl </span>Encoder {
+    <span class="kw">fn </span>new() -&gt; Encoder {
+        Encoder {
+            dst: <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">dst</span>[..<span class="number">4</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>.<span class="ident">to_le_bytes</span>()[..]);
-        <span class="self">self</span>.<span class="ident">dst</span>
+    <span class="kw">fn </span>finish(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>len = (<span class="self">self</span>.dst.len() - <span class="number">4</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.dst[..<span class="number">4</span>].copy_from_slice(<span class="kw-2">&amp;</span>len.to_le_bytes()[..]);
+        <span class="self">self</span>.dst
     }
 
-    <span class="kw">fn</span> <span class="ident">byte</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">dst</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">bool</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="ident">dst</span>.<span class="ident">byte</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>);
+    <span class="kw">fn </span>byte(<span class="kw-2">&amp;mut </span><span class="self">self</span>, byte: u8) {
+        <span class="self">self</span>.dst.push(byte);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">while</span> (<span class="ident">val</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">dst</span>.<span class="ident">byte</span>((<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="number">0x80</span>);
-            <span class="ident">val</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">7</span>;
+<span class="kw">impl </span>Encode <span class="kw">for </span>bool {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        dst.byte(<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8);
+    }
+}
+
+<span class="kw">impl </span>Encode <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="kw">while </span>(val &gt;&gt; <span class="number">7</span>) != <span class="number">0 </span>{
+            dst.byte((val <span class="kw">as </span>u8) | <span class="number">0x80</span>);
+            val &gt;&gt;= <span class="number">7</span>;
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>, <span class="number">0</span>);
-        <span class="ident">dst</span>.<span class="ident">byte</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u8</span>);
+        <span class="macro">assert_eq!</span>(val &gt;&gt; <span class="number">7</span>, <span class="number">0</span>);
+        dst.byte(val <span class="kw">as </span>u8);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
-        (<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">encode</span>(<span class="ident">dst</span>);
+<span class="kw">impl </span>Encode <span class="kw">for </span>usize {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="self">self </span>&lt;= u32::max_value() <span class="kw">as </span>usize);
+        (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u32).encode(dst);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="self">self</span>.<span class="ident">len</span>().<span class="ident">encode</span>(<span class="ident">dst</span>);
-        <span class="ident">dst</span>.<span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">*</span><span class="self">self</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="self">self</span>.len().encode(dst);
+        dst.dst.extend_from_slice(<span class="kw-2">*</span><span class="self">self</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">encode</span>(<span class="ident">dst</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="self">self</span>.as_bytes().encode(dst);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">encode</span>(<span class="ident">dst</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode <span class="kw">for </span>String {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="self">self</span>.as_bytes().encode(dst);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Encode</span><span class="op">&gt;</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="self">self</span>.<span class="ident">len</span>().<span class="ident">encode</span>(<span class="ident">dst</span>);
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span> {
-            <span class="ident">item</span>.<span class="ident">encode</span>(<span class="ident">dst</span>);
+<span class="kw">impl</span>&lt;T: Encode&gt; Encode <span class="kw">for </span>Vec&lt;T&gt; {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="self">self</span>.len().encode(dst);
+        <span class="kw">for </span>item <span class="kw">in </span><span class="self">self </span>{
+            item.encode(dst);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Encode</span><span class="op">&gt;</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">dst</span>.<span class="ident">byte</span>(<span class="number">0</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
-                <span class="ident">dst</span>.<span class="ident">byte</span>(<span class="number">1</span>);
-                <span class="ident">val</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)
+<span class="kw">impl</span>&lt;T: Encode&gt; Encode <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="prelude-val">None </span>=&gt; dst.byte(<span class="number">0</span>),
+            <span class="prelude-val">Some</span>(val) =&gt; {
+                dst.byte(<span class="number">1</span>);
+                val.encode(dst)
             }
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">encode_struct</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>,)<span class="kw-2">*</span>) =&gt; {
-        <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> {
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>,)<span class="op">*</span>
+<span class="macro">macro_rules! </span>encode_struct {
+    (<span class="macro-nonterminal">$name</span>:ident ($(<span class="macro-nonterminal">$lt</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$field</span>:ident: <span class="macro-nonterminal">$ty</span>:ty,)<span class="kw-2">*</span>) =&gt; {
+        <span class="kw">struct </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$lt</span>)* {
+            $(<span class="macro-nonterminal">$field</span>: <span class="macro-nonterminal">$ty</span>,)*
         }
 
-        <span class="kw">impl</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> {
-            <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-                $(<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>.<span class="ident">encode</span>(<span class="ident">_dst</span>);)<span class="op">*</span>
+        <span class="kw">impl </span>$(<span class="macro-nonterminal">$lt</span>)* Encode <span class="kw">for </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$lt</span>)* {
+            <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, _dst: <span class="kw-2">&amp;mut </span>Encoder) {
+                $(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>.encode(_dst);)*
             }
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">encode_enum</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
-        <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>)<span class="op">*</span> }
+<span class="macro">macro_rules! </span>encode_enum {
+    (<span class="macro-nonterminal">$name</span>:ident ($(<span class="macro-nonterminal">$lt</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$fields</span>:tt)<span class="kw-2">*</span>) =&gt; (
+        <span class="kw">enum </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$lt</span>)* { $(<span class="macro-nonterminal">$fields</span>)* }
 
-        <span class="kw">impl</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>)<span class="op">*</span> {
-            <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Encoder</span>) {
-                <span class="kw">use</span> <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>::<span class="kw-2">*</span>;
-                <span class="macro">encode_enum!</span>(@<span class="ident">arms</span> <span class="self">self</span> <span class="ident">dst</span> (<span class="number">0</span>) () $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>)<span class="kw-2">*</span>)
+        <span class="kw">impl</span>$(<span class="macro-nonterminal">$lt</span>)* Encode <span class="kw">for </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$lt</span>)* {
+            <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Encoder) {
+                <span class="kw">use </span><span class="self">self</span>::<span class="macro-nonterminal">$name</span>::<span class="kw-2">*</span>;
+                <span class="macro">encode_enum!</span>(@arms <span class="self">self </span>dst (<span class="number">0</span>) () $(<span class="macro-nonterminal">$fields</span>)<span class="kw-2">*</span>)
             }
         }
     );
 
-    (@<span class="ident">arms</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">ident</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span>:<span class="ident">expr</span>) ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) =&gt; (
-        <span class="macro">encode_enum!</span>(@<span class="ident">expr</span> <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>)<span class="op">*</span> })
+    (@arms <span class="macro-nonterminal">$me</span>:ident <span class="macro-nonterminal">$dst</span>:ident (<span class="macro-nonterminal">$cnt</span>:expr) ($(<span class="macro-nonterminal">$arms</span>:tt)<span class="kw-2">*</span>)) =&gt; (
+        <span class="macro">encode_enum!</span>(@expr <span class="kw">match </span><span class="macro-nonterminal">$me </span>{ $(<span class="macro-nonterminal">$arms</span>)* })
     );
 
-    (@<span class="ident">arms</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">ident</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span>:<span class="ident">expr</span>) ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
+    (@arms <span class="macro-nonterminal">$me</span>:ident <span class="macro-nonterminal">$dst</span>:ident (<span class="macro-nonterminal">$cnt</span>:expr) ($(<span class="macro-nonterminal">$arms</span>:tt)<span class="kw-2">*</span>) <span class="macro-nonterminal">$name</span>:ident, $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
         <span class="macro">encode_enum!</span>(
-            @<span class="ident">arms</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span><span class="op">+</span><span class="number">1</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>.<span class="ident">byte</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span>),)
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+            @arms
+            <span class="macro-nonterminal">$me
+            $dst
+            </span>(<span class="macro-nonterminal">$cnt</span>+<span class="number">1</span>)
+            ($(<span class="macro-nonterminal">$arms</span>)* <span class="macro-nonterminal">$name </span>=&gt; <span class="macro-nonterminal">$dst</span>.byte(<span class="macro-nonterminal">$cnt</span>),)
+            $(<span class="macro-nonterminal">$rest</span>)*
         )
     );
 
-    (@<span class="ident">arms</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">ident</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span>:<span class="ident">expr</span>) ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>), $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
+    (@arms <span class="macro-nonterminal">$me</span>:ident <span class="macro-nonterminal">$dst</span>:ident (<span class="macro-nonterminal">$cnt</span>:expr) ($(<span class="macro-nonterminal">$arms</span>:tt)<span class="kw-2">*</span>) <span class="macro-nonterminal">$name</span>:ident(<span class="macro-nonterminal">$t</span>:ty), $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
         <span class="macro">encode_enum!</span>(
-            @<span class="ident">arms</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span><span class="op">+</span><span class="number">1</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arms</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">val</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>.<span class="ident">byte</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cnt</span>); <span class="ident">val</span>.<span class="ident">encode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>) })
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+            @arms
+            <span class="macro-nonterminal">$me
+            $dst
+            </span>(<span class="macro-nonterminal">$cnt</span>+<span class="number">1</span>)
+            ($(<span class="macro-nonterminal">$arms</span>)* <span class="macro-nonterminal">$name</span>(val) =&gt; { <span class="macro-nonterminal">$dst</span>.byte(<span class="macro-nonterminal">$cnt</span>); val.encode(<span class="macro-nonterminal">$dst</span>) })
+            $(<span class="macro-nonterminal">$rest</span>)*
         )
     );
 
-    (@<span class="ident">expr</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
+    (@expr <span class="macro-nonterminal">$e</span>:expr) =&gt; (<span class="macro-nonterminal">$e</span>);
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">encode_api</span> {
+<span class="macro">macro_rules! </span>encode_api {
     () =&gt; ();
-    (<span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>:<span class="ident">tt</span>)<span class="op">*</span> } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
-        <span class="macro">encode_struct!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> (<span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>)<span class="kw-2">*</span>);
-        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>);
+    (<span class="kw">struct </span><span class="macro-nonterminal">$name</span>:ident&lt;<span class="lifetime">&#39;a</span>&gt; { $(<span class="macro-nonterminal">$fields</span>:tt)* } $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
+        <span class="macro">encode_struct!</span>(<span class="macro-nonterminal">$name </span>(&lt;<span class="lifetime">&#39;a</span>&gt;) $(<span class="macro-nonterminal">$fields</span>)<span class="kw-2">*</span>);
+        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>);
     );
-    (<span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>:<span class="ident">tt</span>)<span class="op">*</span> } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
-        <span class="macro">encode_struct!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> () $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fields</span>)<span class="kw-2">*</span>);
-        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>);
+    (<span class="kw">struct </span><span class="macro-nonterminal">$name</span>:ident { $(<span class="macro-nonterminal">$fields</span>:tt)* } $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
+        <span class="macro">encode_struct!</span>(<span class="macro-nonterminal">$name </span>() $(<span class="macro-nonterminal">$fields</span>)<span class="kw-2">*</span>);
+        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>);
     );
-    (<span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variants</span>:<span class="ident">tt</span>)<span class="op">*</span> } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
-        <span class="macro">encode_enum!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> (<span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variants</span>)<span class="kw-2">*</span>);
-        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>);
+    (<span class="kw">enum </span><span class="macro-nonterminal">$name</span>:ident&lt;<span class="lifetime">&#39;a</span>&gt; { $(<span class="macro-nonterminal">$variants</span>:tt)* } $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
+        <span class="macro">encode_enum!</span>(<span class="macro-nonterminal">$name </span>(&lt;<span class="lifetime">&#39;a</span>&gt;) $(<span class="macro-nonterminal">$variants</span>)<span class="kw-2">*</span>);
+        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>);
     );
-    (<span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variants</span>:<span class="ident">tt</span>)<span class="op">*</span> } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (
-        <span class="macro">encode_enum!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> () $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variants</span>)<span class="kw-2">*</span>);
-        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>);
+    (<span class="kw">enum </span><span class="macro-nonterminal">$name</span>:ident { $(<span class="macro-nonterminal">$variants</span>:tt)* } $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; (
+        <span class="macro">encode_enum!</span>(<span class="macro-nonterminal">$name </span>() $(<span class="macro-nonterminal">$variants</span>)<span class="kw-2">*</span>);
+        <span class="macro">encode_api!</span>($(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>);
     );
 }
-<span class="macro">wasm_bindgen_shared::shared_api!</span>(<span class="ident">encode_api</span>);
+<span class="macro">wasm_bindgen_shared::shared_api!</span>(encode_api);
 
-<span class="kw">fn</span> <span class="ident">from_ast_method_kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">function</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Function</span>,
-    <span class="ident">intern</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Interner</span>,
-    <span class="ident">method_kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::MethodKind</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MethodKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">method_kind</span> {
-        <span class="ident">ast::MethodKind::Constructor</span> =&gt; <span class="ident">MethodKind::Constructor</span>,
-        <span class="ident">ast::MethodKind::Operation</span>(<span class="ident">ast::Operation</span> { <span class="ident">is_static</span>, <span class="ident">kind</span> }) =&gt; {
-            <span class="kw">let</span> <span class="ident">is_static</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">is_static</span>;
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">kind</span> {
-                <span class="ident">ast::OperationKind::Getter</span>(<span class="ident">g</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="ident">g</span>));
-                    <span class="ident">OperationKind::Getter</span>(<span class="ident">g</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">function</span>.<span class="ident">infer_getter_property</span>()))
+<span class="kw">fn </span>from_ast_method_kind&lt;<span class="lifetime">&#39;a</span>&gt;(
+    function: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::Function,
+    intern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Interner,
+    method_kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::MethodKind,
+) -&gt; <span class="prelude-ty">Result</span>&lt;MethodKind&lt;<span class="lifetime">&#39;a</span>&gt;, Diagnostic&gt; {
+    <span class="prelude-val">Ok</span>(<span class="kw">match </span>method_kind {
+        ast::MethodKind::Constructor =&gt; MethodKind::Constructor,
+        ast::MethodKind::Operation(ast::Operation { is_static, kind }) =&gt; {
+            <span class="kw">let </span>is_static = <span class="kw-2">*</span>is_static;
+            <span class="kw">let </span>kind = <span class="kw">match </span>kind {
+                ast::OperationKind::Getter(g) =&gt; {
+                    <span class="kw">let </span>g = g.as_ref().map(|g| intern.intern(g));
+                    OperationKind::Getter(g.unwrap_or_else(|| function.infer_getter_property()))
                 }
-                <span class="ident">ast::OperationKind::Regular</span> =&gt; <span class="ident">OperationKind::Regular</span>,
-                <span class="ident">ast::OperationKind::Setter</span>(<span class="ident">s</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">intern</span>.<span class="ident">intern</span>(<span class="ident">s</span>));
-                    <span class="ident">OperationKind::Setter</span>(<span class="kw">match</span> <span class="ident">s</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-                        <span class="prelude-val">None</span> =&gt; <span class="ident">intern</span>.<span class="ident">intern_str</span>(<span class="kw-2">&amp;</span><span class="ident">function</span>.<span class="ident">infer_setter_property</span>()<span class="question-mark">?</span>),
+                ast::OperationKind::Regular =&gt; OperationKind::Regular,
+                ast::OperationKind::Setter(s) =&gt; {
+                    <span class="kw">let </span>s = s.as_ref().map(|s| intern.intern(s));
+                    OperationKind::Setter(<span class="kw">match </span>s {
+                        <span class="prelude-val">Some</span>(s) =&gt; s,
+                        <span class="prelude-val">None </span>=&gt; intern.intern_str(<span class="kw-2">&amp;</span>function.infer_setter_property()<span class="question-mark">?</span>),
                     })
                 }
-                <span class="ident">ast::OperationKind::IndexingGetter</span> =&gt; <span class="ident">OperationKind::IndexingGetter</span>,
-                <span class="ident">ast::OperationKind::IndexingSetter</span> =&gt; <span class="ident">OperationKind::IndexingSetter</span>,
-                <span class="ident">ast::OperationKind::IndexingDeleter</span> =&gt; <span class="ident">OperationKind::IndexingDeleter</span>,
+                ast::OperationKind::IndexingGetter =&gt; OperationKind::IndexingGetter,
+                ast::OperationKind::IndexingSetter =&gt; OperationKind::IndexingSetter,
+                ast::OperationKind::IndexingDeleter =&gt; OperationKind::IndexingDeleter,
             };
-            <span class="ident">MethodKind::Operation</span>(<span class="ident">Operation</span> { <span class="ident">is_static</span>, <span class="ident">kind</span> })
+            MethodKind::Operation(Operation { is_static, kind })
         }
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_backend" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_backend" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

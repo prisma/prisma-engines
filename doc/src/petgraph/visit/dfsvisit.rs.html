@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/dfsvisit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfsvisit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/dfsvisit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfsvisit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -195,198 +195,198 @@
 <span id="195">195</span>
 </pre><pre class="rust"><code>
 
-<span class="kw">use</span> <span class="ident">visit::IntoNeighbors</span>;
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">VisitMap</span>, <span class="ident">Visitable</span>};
+<span class="kw">use </span>visit::IntoNeighbors;
+<span class="kw">use </span>visit::{VisitMap, Visitable};
 
-<span class="doccomment">/// Strictly monotonically increasing event time for a depth first search.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">Default</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Time</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
+<span class="doccomment">/// Strictly monotonically increasing event time for a depth first search.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Default, Hash)]
+</span><span class="kw">pub struct </span>Time(<span class="kw">pub </span>usize);
 
-<span class="doccomment">/// A depth first search (DFS) visitor event.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="ident">Discover</span>(<span class="ident">N</span>, <span class="ident">Time</span>),
-    <span class="doccomment">/// An edge of the tree formed by the traversal.</span>
-    <span class="ident">TreeEdge</span>(<span class="ident">N</span>, <span class="ident">N</span>),
-    <span class="doccomment">/// An edge to an already visited node.</span>
-    <span class="ident">BackEdge</span>(<span class="ident">N</span>, <span class="ident">N</span>),
-    <span class="doccomment">/// A cross or forward edge.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For an edge *(u, v)*, if the discover time of *v* is greater than *u*,</span>
-    <span class="doccomment">/// then it is a forward edge, else a cross edge.</span>
-    <span class="ident">CrossForwardEdge</span>(<span class="ident">N</span>, <span class="ident">N</span>),
-    <span class="ident">Finish</span>(<span class="ident">N</span>, <span class="ident">Time</span>),
+<span class="doccomment">/// A depth first search (DFS) visitor event.
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub enum </span>DfsEvent&lt;N&gt; {
+    Discover(N, Time),
+    <span class="doccomment">/// An edge of the tree formed by the traversal.
+    </span>TreeEdge(N, N),
+    <span class="doccomment">/// An edge to an already visited node.
+    </span>BackEdge(N, N),
+    <span class="doccomment">/// A cross or forward edge.
+    ///
+    /// For an edge *(u, v)*, if the discover time of *v* is greater than *u*,
+    /// then it is a forward edge, else a cross edge.
+    </span>CrossForwardEdge(N, N),
+    Finish(N, Time),
 }
 
-<span class="doccomment">/// Return if the expression is a break value.</span>
-<span class="macro">macro_rules!</span> <span class="ident">try_control</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="ident">x</span> =&gt; <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">should_break</span>() {
-                <span class="kw">return</span> <span class="ident">x</span>;
+<span class="doccomment">/// Return if the expression is a break value.
+</span><span class="macro">macro_rules! </span>try_control {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+            x =&gt; <span class="kw">if </span>x.should_break() {
+                <span class="kw">return </span>x;
             }
         }
     }
 }
 
-<span class="doccomment">/// Control flow for callbacks.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Break` can carry a value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">Continue</span>,
-    <span class="ident">Break</span>(<span class="ident">B</span>),
+<span class="doccomment">/// Control flow for callbacks.
+///
+/// `Break` can carry a value.
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub enum </span>Control&lt;B&gt; {
+    Continue,
+    Break(B),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">breaking</span>() -&gt; <span class="ident">Control</span><span class="op">&lt;</span>()<span class="op">&gt;</span> { <span class="ident">Control::Break</span>(()) }
-    <span class="doccomment">/// Get the value in `Control::Break(_)`, if present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">break_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Control::Continue</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Control::Break</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">b</span>),
+<span class="kw">impl</span>&lt;B&gt; Control&lt;B&gt; {
+    <span class="kw">pub fn </span>breaking() -&gt; Control&lt;()&gt; { Control::Break(()) }
+    <span class="doccomment">/// Get the value in `Control::Break(_)`, if present.
+    </span><span class="kw">pub fn </span>break_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;B&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Control::Continue =&gt; <span class="prelude-val">None</span>,
+            Control::Break(b) =&gt; <span class="prelude-val">Some</span>(b),
         }
     }
 }
 
-<span class="doccomment">/// Control flow for callbacks.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The empty return value `()` is equivalent to continue.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ControlFlow</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="doccomment">/// Control flow for callbacks.
+///
+/// The empty return value `()` is equivalent to continue.
+</span><span class="kw">pub trait </span>ControlFlow {
+    <span class="kw">fn </span>continuing() -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>should_break(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="kw">impl</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> () {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() { }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
+<span class="kw">impl </span>ControlFlow <span class="kw">for </span>() {
+    <span class="kw">fn </span>continuing() { }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>should_break(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="bool-val">false </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Control::Break</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="bool-val">true</span> } <span class="kw">else</span> { <span class="bool-val">false</span> }
+<span class="kw">impl</span>&lt;B&gt; ControlFlow <span class="kw">for </span>Control&lt;B&gt; {
+    <span class="kw">fn </span>continuing() -&gt; <span class="self">Self </span>{ Control::Continue }
+    <span class="kw">fn </span>should_break(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if let </span>Control::Break(<span class="kw">_</span>) = <span class="kw-2">*</span><span class="self">self </span>{ <span class="bool-val">true </span>} <span class="kw">else </span>{ <span class="bool-val">false </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span> { <span class="prelude-val">Ok</span>(()) }
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_err</span>()
+<span class="kw">impl</span>&lt;E&gt; ControlFlow <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;(), E&gt; {
+    <span class="kw">fn </span>continuing() -&gt; <span class="self">Self </span>{ <span class="prelude-val">Ok</span>(()) }
+    <span class="kw">fn </span>should_break(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_err()
     }
 }
 
-<span class="doccomment">/// The default is `Continue`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
+<span class="doccomment">/// The default is `Continue`.
+</span><span class="kw">impl</span>&lt;B&gt; Default <span class="kw">for </span>Control&lt;B&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{ Control::Continue }
 }
 
-<span class="doccomment">/// A recursive depth first search.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Starting points are the nodes in the iterator `starts` (specify just one</span>
-<span class="doccomment">/// start vertex *x* by using `Some(x)`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The traversal emits discovery and finish events for each reachable vertex,</span>
-<span class="doccomment">/// and edge classification of each reachable edge. `visitor` is called for each</span>
-<span class="doccomment">/// event, see [`DfsEvent`][de] for possible values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the return value of the visitor is simply `()`, the visit runs until it</span>
-<span class="doccomment">/// is finished. If the return value is a `Control&lt;B&gt;`, it can be used to</span>
-<span class="doccomment">/// break the visit early, and the last control value is returned by the</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [de]: enum.DfsEvent.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Find a path from vertex 0 to 5, and exit the visit as soon as we reach</span>
-<span class="doccomment">/// the goal vertex.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use petgraph::prelude::*;</span>
-<span class="doccomment">/// use petgraph::graph::node_index as n;</span>
-<span class="doccomment">/// use petgraph::visit::depth_first_search;</span>
-<span class="doccomment">/// use petgraph::visit::{DfsEvent, Control};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let gr: Graph&lt;(), ()&gt; = Graph::from_edges(&amp;[</span>
-<span class="doccomment">///     (0, 1), (0, 2), (0, 3),</span>
-<span class="doccomment">///     (1, 3),</span>
-<span class="doccomment">///     (2, 3), (2, 4),</span>
-<span class="doccomment">///     (4, 0), (4, 5),</span>
-<span class="doccomment">/// ]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // record each predecessor, mapping node → node</span>
-<span class="doccomment">/// let mut predecessor = vec![NodeIndex::end(); gr.node_count()];</span>
-<span class="doccomment">/// let start = n(0);</span>
-<span class="doccomment">/// let goal = n(5);</span>
-<span class="doccomment">/// depth_first_search(&amp;gr, Some(start), |event| {</span>
-<span class="doccomment">///     if let DfsEvent::TreeEdge(u, v) = event {</span>
-<span class="doccomment">///         predecessor[v.index()] = u;</span>
-<span class="doccomment">///         if v == goal {</span>
-<span class="doccomment">///             return Control::Break(v);</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     Control::Continue</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut next = goal;</span>
-<span class="doccomment">/// let mut path = vec![next];</span>
-<span class="doccomment">/// while next != start {</span>
-<span class="doccomment">///     let pred = predecessor[next.index()];</span>
-<span class="doccomment">///     path.push(pred);</span>
-<span class="doccomment">///     next = pred;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// path.reverse();</span>
-<span class="doccomment">/// assert_eq!(&amp;path, &amp;[n(0), n(2), n(4), n(5)]);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">depth_first_search</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">starts</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">visitor</span>: <span class="ident">F</span>) -&gt; <span class="ident">C</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>,
-          <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) -&gt; <span class="ident">C</span>,
-          <span class="ident">C</span>: <span class="ident">ControlFlow</span>,
+<span class="doccomment">/// A recursive depth first search.
+///
+/// Starting points are the nodes in the iterator `starts` (specify just one
+/// start vertex *x* by using `Some(x)`).
+///
+/// The traversal emits discovery and finish events for each reachable vertex,
+/// and edge classification of each reachable edge. `visitor` is called for each
+/// event, see [`DfsEvent`][de] for possible values.
+///
+/// If the return value of the visitor is simply `()`, the visit runs until it
+/// is finished. If the return value is a `Control&lt;B&gt;`, it can be used to
+/// break the visit early, and the last control value is returned by the
+/// function.
+///
+/// [de]: enum.DfsEvent.html
+///
+/// # Example
+///
+/// Find a path from vertex 0 to 5, and exit the visit as soon as we reach
+/// the goal vertex.
+///
+/// ```
+/// use petgraph::prelude::*;
+/// use petgraph::graph::node_index as n;
+/// use petgraph::visit::depth_first_search;
+/// use petgraph::visit::{DfsEvent, Control};
+///
+/// let gr: Graph&lt;(), ()&gt; = Graph::from_edges(&amp;[
+///     (0, 1), (0, 2), (0, 3),
+///     (1, 3),
+///     (2, 3), (2, 4),
+///     (4, 0), (4, 5),
+/// ]);
+///
+/// // record each predecessor, mapping node → node
+/// let mut predecessor = vec![NodeIndex::end(); gr.node_count()];
+/// let start = n(0);
+/// let goal = n(5);
+/// depth_first_search(&amp;gr, Some(start), |event| {
+///     if let DfsEvent::TreeEdge(u, v) = event {
+///         predecessor[v.index()] = u;
+///         if v == goal {
+///             return Control::Break(v);
+///         }
+///     }
+///     Control::Continue
+/// });
+///
+/// let mut next = goal;
+/// let mut path = vec![next];
+/// while next != start {
+///     let pred = predecessor[next.index()];
+///     path.push(pred);
+///     next = pred;
+/// }
+/// path.reverse();
+/// assert_eq!(&amp;path, &amp;[n(0), n(2), n(4), n(5)]);
+/// ```
+</span><span class="kw">pub fn </span>depth_first_search&lt;G, I, F, C&gt;(graph: G, starts: I, <span class="kw-2">mut </span>visitor: F) -&gt; C
+    <span class="kw">where </span>G: IntoNeighbors + Visitable,
+          I: IntoIterator&lt;Item=G::NodeId&gt;,
+          F: FnMut(DfsEvent&lt;G::NodeId&gt;) -&gt; C,
+          C: ControlFlow,
 {
-    <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Time</span>(<span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">discovered</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">graph</span>.<span class="ident">visit_map</span>();
-    <span class="kw">let</span> <span class="ident">finished</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">graph</span>.<span class="ident">visit_map</span>();
+    <span class="kw">let </span>time = <span class="kw-2">&amp;mut </span>Time(<span class="number">0</span>);
+    <span class="kw">let </span>discovered = <span class="kw-2">&amp;mut </span>graph.visit_map();
+    <span class="kw">let </span>finished = <span class="kw-2">&amp;mut </span>graph.visit_map();
 
-    <span class="kw">for</span> <span class="ident">start</span> <span class="kw">in</span> <span class="ident">starts</span> {
-        <span class="macro">try_control!</span>(<span class="ident">dfs_visitor</span>(<span class="ident">graph</span>, <span class="ident">start</span>, <span class="kw-2">&amp;mut</span> <span class="ident">visitor</span>, <span class="ident">discovered</span>, <span class="ident">finished</span>, <span class="ident">time</span>));
+    <span class="kw">for </span>start <span class="kw">in </span>starts {
+        <span class="macro">try_control!</span>(dfs_visitor(graph, start, <span class="kw-2">&amp;mut </span>visitor, discovered, finished, time));
     }
-    <span class="ident">C::continuing</span>()
+    C::continuing()
 }
 
-<span class="kw">fn</span> <span class="ident">dfs_visitor</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">u</span>: <span class="ident">G::NodeId</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">F</span>,
-                     <span class="ident">discovered</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G::Map</span>, <span class="ident">finished</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G::Map</span>,
-                     <span class="ident">time</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Time</span>) -&gt; <span class="ident">C</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) -&gt; <span class="ident">C</span>,
-          <span class="ident">C</span>: <span class="ident">ControlFlow</span>,
+<span class="kw">fn </span>dfs_visitor&lt;G, F, C&gt;(graph: G, u: G::NodeId, visitor: <span class="kw-2">&amp;mut </span>F,
+                     discovered: <span class="kw-2">&amp;mut </span>G::Map, finished: <span class="kw-2">&amp;mut </span>G::Map,
+                     time: <span class="kw-2">&amp;mut </span>Time) -&gt; C
+    <span class="kw">where </span>G: IntoNeighbors + Visitable,
+          F: FnMut(DfsEvent&lt;G::NodeId&gt;) -&gt; C,
+          C: ControlFlow,
 {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">u</span>) {
-        <span class="kw">return</span> <span class="ident">C::continuing</span>();
+    <span class="kw">if </span>!discovered.visit(u) {
+        <span class="kw">return </span>C::continuing();
     }
-    <span class="macro">try_control!</span>(<span class="ident">visitor</span>(<span class="ident">DfsEvent::Discover</span>(<span class="ident">u</span>, <span class="ident">time_post_inc</span>(<span class="ident">time</span>))));
-    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">graph</span>.<span class="ident">neighbors</span>(<span class="ident">u</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">discovered</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>) {
-            <span class="macro">try_control!</span>(<span class="ident">visitor</span>(<span class="ident">DfsEvent::TreeEdge</span>(<span class="ident">u</span>, <span class="ident">v</span>)));
-            <span class="macro">try_control!</span>(<span class="ident">dfs_visitor</span>(<span class="ident">graph</span>, <span class="ident">v</span>, <span class="ident">visitor</span>, <span class="ident">discovered</span>, <span class="ident">finished</span>, <span class="ident">time</span>));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">finished</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>) {
-            <span class="macro">try_control!</span>(<span class="ident">visitor</span>(<span class="ident">DfsEvent::BackEdge</span>(<span class="ident">u</span>, <span class="ident">v</span>)));
-        } <span class="kw">else</span> {
-            <span class="macro">try_control!</span>(<span class="ident">visitor</span>(<span class="ident">DfsEvent::CrossForwardEdge</span>(<span class="ident">u</span>, <span class="ident">v</span>)));
+    <span class="macro">try_control!</span>(visitor(DfsEvent::Discover(u, time_post_inc(time))));
+    <span class="kw">for </span>v <span class="kw">in </span>graph.neighbors(u) {
+        <span class="kw">if </span>!discovered.is_visited(<span class="kw-2">&amp;</span>v) {
+            <span class="macro">try_control!</span>(visitor(DfsEvent::TreeEdge(u, v)));
+            <span class="macro">try_control!</span>(dfs_visitor(graph, v, visitor, discovered, finished, time));
+        } <span class="kw">else if </span>!finished.is_visited(<span class="kw-2">&amp;</span>v) {
+            <span class="macro">try_control!</span>(visitor(DfsEvent::BackEdge(u, v)));
+        } <span class="kw">else </span>{
+            <span class="macro">try_control!</span>(visitor(DfsEvent::CrossForwardEdge(u, v)));
         }
     }
-    <span class="kw">let</span> <span class="ident">first_finish</span> <span class="op">=</span> <span class="ident">finished</span>.<span class="ident">visit</span>(<span class="ident">u</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">first_finish</span>);
-    <span class="macro">try_control!</span>(<span class="ident">visitor</span>(<span class="ident">DfsEvent::Finish</span>(<span class="ident">u</span>, <span class="ident">time_post_inc</span>(<span class="ident">time</span>))));
-    <span class="ident">C::continuing</span>()
+    <span class="kw">let </span>first_finish = finished.visit(u);
+    <span class="macro">debug_assert!</span>(first_finish);
+    <span class="macro">try_control!</span>(visitor(DfsEvent::Finish(u, time_post_inc(time))));
+    C::continuing()
 }
 
-<span class="kw">fn</span> <span class="ident">time_post_inc</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Time</span>) -&gt; <span class="ident">Time</span> {
-    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>;
-    <span class="ident">x</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    <span class="ident">v</span>
+<span class="kw">fn </span>time_post_inc(x: <span class="kw-2">&amp;mut </span>Time) -&gt; Time {
+    <span class="kw">let </span>v = <span class="kw-2">*</span>x;
+    x.<span class="number">0 </span>+= <span class="number">1</span>;
+    v
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

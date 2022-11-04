@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/runtime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>runtime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/runtime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>runtime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -130,135 +130,135 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Provides an abstraction of several async runtimes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This  allows OpenTelemetry to work with any current or future runtime. There are currently</span>
-<span class="doccomment">//! builtin implementations for [Tokio] and [async-std].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Tokio]: https://crates.io/crates/tokio</span>
-<span class="doccomment">//! [async-std]: https://crates.io/crates/async-std</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Provides an abstraction of several async runtimes
+//!
+//! This  allows OpenTelemetry to work with any current or future runtime. There are currently
+//! builtin implementations for [Tokio] and [async-std].
+//!
+//! [Tokio]: https://crates.io/crates/tokio
+//! [async-std]: https://crates.io/crates/async-std
 
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">stream::Stream</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future::Future</span>, <span class="ident">time::Duration</span>};
+</span><span class="kw">use </span>futures_util::{future::BoxFuture, stream::Stream};
+<span class="kw">use </span>std::{future::Future, time::Duration};
 
-<span class="doccomment">/// A runtime is an abstraction of an async runtime like [Tokio] or [async-std]. It allows</span>
-<span class="doccomment">/// OpenTelemetry to work with any current and hopefully future runtime implementation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Tokio]: https://crates.io/crates/tokio</span>
-<span class="doccomment">/// [async-std]: https://crates.io/crates/async-std</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Runtime</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="doccomment">/// A future stream, which returns items in a previously specified interval. The item type is</span>
-    <span class="doccomment">/// not important.</span>
-    <span class="kw">type</span> <span class="ident">Interval</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Send</span>;
+<span class="doccomment">/// A runtime is an abstraction of an async runtime like [Tokio] or [async-std]. It allows
+/// OpenTelemetry to work with any current and hopefully future runtime implementation.
+///
+/// [Tokio]: https://crates.io/crates/tokio
+/// [async-std]: https://crates.io/crates/async-std
+</span><span class="kw">pub trait </span>Runtime: Clone + Send + Sync + <span class="lifetime">&#39;static </span>{
+    <span class="doccomment">/// A future stream, which returns items in a previously specified interval. The item type is
+    /// not important.
+    </span><span class="kw">type </span>Interval: Stream + Send;
 
-    <span class="doccomment">/// A future, which resolves after a previously specified amount of time. The output type is</span>
-    <span class="doccomment">/// not important.</span>
-    <span class="kw">type</span> <span class="ident">Delay</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span>;
+    <span class="doccomment">/// A future, which resolves after a previously specified amount of time. The output type is
+    /// not important.
+    </span><span class="kw">type </span>Delay: Future + Send;
 
-    <span class="doccomment">/// Create a [Stream][futures_util::stream::Stream], which returns a new item every</span>
-    <span class="doccomment">/// [Duration][std::time::Duration].</span>
-    <span class="kw">fn</span> <span class="ident">interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Interval</span>;
+    <span class="doccomment">/// Create a [Stream][futures_util::stream::Stream], which returns a new item every
+    /// [Duration][std::time::Duration].
+    </span><span class="kw">fn </span>interval(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Interval;
 
-    <span class="doccomment">/// Spawn a new task or thread, which executes the given future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is mainly used to run batch span processing in the background. Note, that the function</span>
-    <span class="doccomment">/// does not return a handle. OpenTelemetry will use a different way to wait for the future to</span>
-    <span class="doccomment">/// finish when TracerProvider gets shutdown. At the moment this happens by blocking the</span>
-    <span class="doccomment">/// current thread. This means runtime implementations need to make sure they can still execute</span>
-    <span class="doccomment">/// the given future even if the main thread is blocked.</span>
-    <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>);
+    <span class="doccomment">/// Spawn a new task or thread, which executes the given future.
+    ///
+    /// # Note
+    ///
+    /// This is mainly used to run batch span processing in the background. Note, that the function
+    /// does not return a handle. OpenTelemetry will use a different way to wait for the future to
+    /// finish when TracerProvider gets shutdown. At the moment this happens by blocking the
+    /// current thread. This means runtime implementations need to make sure they can still execute
+    /// the given future even if the main thread is blocked.
+    </span><span class="kw">fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>, future: BoxFuture&lt;<span class="lifetime">&#39;static</span>, ()&gt;);
 
-    <span class="doccomment">/// Return a new future, which resolves after the specified [Duration][std::time::Duration].</span>
-    <span class="kw">fn</span> <span class="ident">delay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Delay</span>;
+    <span class="doccomment">/// Return a new future, which resolves after the specified [Duration][std::time::Duration].
+    </span><span class="kw">fn </span>delay(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Delay;
 }
 
-<span class="doccomment">/// Runtime implementation, which works with Tokio&#39;s multi thread runtime.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tokio</span>;
+<span class="doccomment">/// Runtime implementation, which works with Tokio&#39;s multi thread runtime.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)))]
+#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Tokio;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Runtime</span> <span class="kw">for</span> <span class="ident">Tokio</span> {
-    <span class="kw">type</span> <span class="ident">Interval</span> <span class="op">=</span> <span class="ident">tokio_stream::wrappers::IntervalStream</span>;
-    <span class="kw">type</span> <span class="ident">Delay</span> <span class="op">=</span> <span class="ident">tokio::time::Sleep</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-tokio&quot;</span>)))]
+</span><span class="kw">impl </span>Runtime <span class="kw">for </span>Tokio {
+    <span class="kw">type </span>Interval = tokio_stream::wrappers::IntervalStream;
+    <span class="kw">type </span>Delay = tokio::time::Sleep;
 
-    <span class="kw">fn</span> <span class="ident">interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Interval</span> {
-        <span class="ident"><span class="kw">crate</span>::util::tokio_interval_stream</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>interval(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Interval {
+        <span class="kw">crate</span>::util::tokio_interval_stream(duration)
     }
 
-    <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tokio::spawn</span>(<span class="ident">future</span>);
+    <span class="kw">fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>, future: BoxFuture&lt;<span class="lifetime">&#39;static</span>, ()&gt;) {
+        <span class="kw">let _ </span>= tokio::spawn(future);
     }
 
-    <span class="kw">fn</span> <span class="ident">delay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Delay</span> {
-        <span class="ident">tokio::time::sleep</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>delay(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Delay {
+        tokio::time::sleep(duration)
     }
 }
 
-<span class="doccomment">/// Runtime implementation, which works with Tokio&#39;s current thread runtime.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioCurrentThread</span>;
+<span class="doccomment">/// Runtime implementation, which works with Tokio&#39;s current thread runtime.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)))]
+#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>TokioCurrentThread;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Runtime</span> <span class="kw">for</span> <span class="ident">TokioCurrentThread</span> {
-    <span class="kw">type</span> <span class="ident">Interval</span> <span class="op">=</span> <span class="ident">tokio_stream::wrappers::IntervalStream</span>;
-    <span class="kw">type</span> <span class="ident">Delay</span> <span class="op">=</span> <span class="ident">tokio::time::Sleep</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-tokio-current-thread&quot;</span>)))]
+</span><span class="kw">impl </span>Runtime <span class="kw">for </span>TokioCurrentThread {
+    <span class="kw">type </span>Interval = tokio_stream::wrappers::IntervalStream;
+    <span class="kw">type </span>Delay = tokio::time::Sleep;
 
-    <span class="kw">fn</span> <span class="ident">interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Interval</span> {
-        <span class="ident"><span class="kw">crate</span>::util::tokio_interval_stream</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>interval(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Interval {
+        <span class="kw">crate</span>::util::tokio_interval_stream(duration)
     }
 
-    <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-        <span class="comment">// We cannot force push tracing in current thread tokio scheduler because we rely on</span>
-        <span class="comment">// BatchSpanProcessor to export spans in a background task, meanwhile we need to block the</span>
-        <span class="comment">// shutdown function so that the runtime will not finish the blocked task and kill any</span>
-        <span class="comment">// remaining tasks. But there is only one thread to run task, so it&#39;s a deadlock</span>
-        <span class="comment">//</span>
-        <span class="comment">// Thus, we spawn the background task in a separate thread.</span>
-        <span class="ident">std::thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">tokio::runtime::Builder::new_current_thread</span>()
-                .<span class="ident">enable_all</span>()
-                .<span class="ident">build</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;failed to create Tokio current thead runtime for OpenTelemetry batch processing&quot;</span>);
-            <span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="ident">future</span>);
+    <span class="kw">fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>, future: BoxFuture&lt;<span class="lifetime">&#39;static</span>, ()&gt;) {
+        <span class="comment">// We cannot force push tracing in current thread tokio scheduler because we rely on
+        // BatchSpanProcessor to export spans in a background task, meanwhile we need to block the
+        // shutdown function so that the runtime will not finish the blocked task and kill any
+        // remaining tasks. But there is only one thread to run task, so it&#39;s a deadlock
+        //
+        // Thus, we spawn the background task in a separate thread.
+        </span>std::thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>rt = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .expect(<span class="string">&quot;failed to create Tokio current thead runtime for OpenTelemetry batch processing&quot;</span>);
+            rt.block_on(future);
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">delay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Delay</span> {
-        <span class="ident">tokio::time::sleep</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>delay(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Delay {
+        tokio::time::sleep(duration)
     }
 }
 
-<span class="doccomment">/// Runtime implementation, which works with async-std.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-async-std&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-async-std&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AsyncStd</span>;
+<span class="doccomment">/// Runtime implementation, which works with async-std.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;rt-async-std&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-async-std&quot;</span>)))]
+#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>AsyncStd;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-async-std&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-async-std&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Runtime</span> <span class="kw">for</span> <span class="ident">AsyncStd</span> {
-    <span class="kw">type</span> <span class="ident">Interval</span> <span class="op">=</span> <span class="ident">async_std::stream::Interval</span>;
-    <span class="kw">type</span> <span class="ident">Delay</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rt-async-std&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-async-std&quot;</span>)))]
+</span><span class="kw">impl </span>Runtime <span class="kw">for </span>AsyncStd {
+    <span class="kw">type </span>Interval = async_std::stream::Interval;
+    <span class="kw">type </span>Delay = BoxFuture&lt;<span class="lifetime">&#39;static</span>, ()&gt;;
 
-    <span class="kw">fn</span> <span class="ident">interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Interval</span> {
-        <span class="ident">async_std::stream::interval</span>(<span class="ident">duration</span>)
+    <span class="kw">fn </span>interval(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Interval {
+        async_std::stream::interval(duration)
     }
 
-    <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, ()<span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">async_std::task::spawn</span>(<span class="ident">future</span>);
+    <span class="kw">fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>, future: BoxFuture&lt;<span class="lifetime">&#39;static</span>, ()&gt;) {
+        <span class="kw">let _ </span>= async_std::task::spawn(future);
     }
 
-    <span class="kw">fn</span> <span class="ident">delay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Delay</span> {
-        <span class="ident">Box::pin</span>(<span class="ident">async_std::task::sleep</span>(<span class="ident">duration</span>))
+    <span class="kw">fn </span>delay(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Delay {
+        Box::pin(async_std::task::sleep(duration))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

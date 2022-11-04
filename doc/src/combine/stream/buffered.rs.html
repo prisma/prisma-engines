@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/buffered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/buffered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -128,135 +128,135 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
-<span class="kw">use</span> <span class="ident">error::StreamError</span>;
-<span class="kw">use</span> <span class="ident">stream</span>::{<span class="ident">Positioned</span>, <span class="ident">Resetable</span>, <span class="ident">StreamErrorFor</span>, <span class="ident">StreamOnce</span>};
+<span class="kw">use </span>error::StreamError;
+<span class="kw">use </span>stream::{Positioned, Resetable, StreamErrorFor, StreamOnce};
 
-<span class="doccomment">/// `Stream` which buffers items from an instance of `StreamOnce` into a ring buffer.</span>
-<span class="doccomment">/// Instances of `StreamOnce` which is not able to implement `Resetable` (such as `ReadStream`) may</span>
-<span class="doccomment">/// use this as a way to implement `Resetable` and become a full `Stream` instance.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The drawback is that the buffer only stores a limited number of items which limits how many</span>
-<span class="doccomment">/// tokens that can be reset and replayed. If a `BufferedStream` is reset past this limit an error</span>
-<span class="doccomment">/// will be returned when `uncons` is next called.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// NOTE: If this stream is used in conjunction with an error enhancing stream such as</span>
-<span class="doccomment">/// `easy::Stream` (also via the `easy_parser` method) it is recommended that the `BufferedStream`</span>
-<span class="doccomment">/// instance wraps the `easy::Stream` instance instead of the other way around.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// // DO</span>
-<span class="doccomment">/// BufferedStream::new(easy::Stream(..), ..)</span>
-<span class="doccomment">/// // DON&#39;T</span>
-<span class="doccomment">/// easy::Stream(BufferedStream::new(.., ..))</span>
-<span class="doccomment">/// parser.easy_parse(BufferedStream::new(..));</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
+<span class="doccomment">/// `Stream` which buffers items from an instance of `StreamOnce` into a ring buffer.
+/// Instances of `StreamOnce` which is not able to implement `Resetable` (such as `ReadStream`) may
+/// use this as a way to implement `Resetable` and become a full `Stream` instance.
+///
+/// The drawback is that the buffer only stores a limited number of items which limits how many
+/// tokens that can be reset and replayed. If a `BufferedStream` is reset past this limit an error
+/// will be returned when `uncons` is next called.
+///
+/// NOTE: If this stream is used in conjunction with an error enhancing stream such as
+/// `easy::Stream` (also via the `easy_parser` method) it is recommended that the `BufferedStream`
+/// instance wraps the `easy::Stream` instance instead of the other way around.
+///
+/// ```ignore
+/// // DO
+/// BufferedStream::new(easy::Stream(..), ..)
+/// // DON&#39;T
+/// easy::Stream(BufferedStream::new(.., ..))
+/// parser.easy_parse(BufferedStream::new(..));
+/// ```
+</span><span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub struct </span>BufferedStream&lt;I&gt;
+<span class="kw">where
+    </span>I: StreamOnce + Positioned,
 {
-    <span class="ident">offset</span>: <span class="ident">usize</span>,
-    <span class="ident">iter</span>: <span class="ident">I</span>,
-    <span class="ident">buffer_offset</span>: <span class="ident">usize</span>,
-    <span class="ident">buffer</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">I::Item</span>, <span class="ident">I::Position</span>)<span class="op">&gt;</span>,
+    offset: usize,
+    iter: I,
+    buffer_offset: usize,
+    buffer: VecDeque&lt;(I::Item, I::Position)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Resetable</span> <span class="kw">for</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Positioned</span>,
+<span class="kw">impl</span>&lt;I&gt; Resetable <span class="kw">for </span>BufferedStream&lt;I&gt;
+<span class="kw">where
+    </span>I: Positioned,
 {
-    <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
-        <span class="self">self</span>.<span class="ident">offset</span>
+    <span class="kw">type </span>Checkpoint = usize;
+    <span class="kw">fn </span>checkpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Checkpoint {
+        <span class="self">self</span>.offset
     }
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident"><span class="self">Self</span>::Checkpoint</span>) {
-        <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">checkpoint</span>;
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, checkpoint: <span class="self">Self</span>::Checkpoint) {
+        <span class="self">self</span>.offset = checkpoint;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
-    <span class="ident">I::Position</span>: <span class="ident">Clone</span>,
-    <span class="ident">I::Item</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;I&gt; BufferedStream&lt;I&gt;
+<span class="kw">where
+    </span>I: StreamOnce + Positioned,
+    I::Position: Clone,
+    I::Item: Clone,
 {
-    <span class="doccomment">/// Constructs a new `BufferedStream` from a `StreamOnce` instance with a `lookahead`</span>
-    <span class="doccomment">/// number of elements that can be stored in the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">lookahead</span>: <span class="ident">usize</span>) -&gt; <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">BufferedStream</span> {
-            <span class="ident">offset</span>: <span class="number">0</span>,
-            <span class="ident">iter</span>: <span class="ident">iter</span>,
-            <span class="ident">buffer_offset</span>: <span class="number">0</span>,
-            <span class="ident">buffer</span>: <span class="ident">VecDeque::with_capacity</span>(<span class="ident">lookahead</span>),
+    <span class="doccomment">/// Constructs a new `BufferedStream` from a `StreamOnce` instance with a `lookahead`
+    /// number of elements that can be stored in the buffer.
+    </span><span class="kw">pub fn </span>new(iter: I, lookahead: usize) -&gt; BufferedStream&lt;I&gt; {
+        BufferedStream {
+            offset: <span class="number">0</span>,
+            iter: iter,
+            buffer_offset: <span class="number">0</span>,
+            buffer: VecDeque::with_capacity(lookahead),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Positioned</span> <span class="kw">for</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
+<span class="kw">impl</span>&lt;I&gt; Positioned <span class="kw">for </span>BufferedStream&lt;I&gt;
+<span class="kw">where
+    </span>I: StreamOnce + Positioned,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> {
-            <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">position</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">buffer</span>
-                .<span class="ident">front</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;At least 1 element in the buffer&quot;</span>)
-                .<span class="number">1</span>
-                .<span class="ident">clone</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">buffer</span>[<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span>)]
-                .<span class="number">1</span>
-                .<span class="ident">clone</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Position {
+        <span class="kw">if </span><span class="self">self</span>.offset &gt;= <span class="self">self</span>.buffer_offset {
+            <span class="self">self</span>.iter.position()
+        } <span class="kw">else if </span><span class="self">self</span>.offset &lt; <span class="self">self</span>.buffer_offset - <span class="self">self</span>.buffer.len() {
+            <span class="self">self</span>.buffer
+                .front()
+                .expect(<span class="string">&quot;At least 1 element in the buffer&quot;</span>)
+                .<span class="number">1
+                </span>.clone()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.buffer[<span class="self">self</span>.buffer.len() - (<span class="self">self</span>.buffer_offset - <span class="self">self</span>.offset)]
+                .<span class="number">1
+                </span>.clone()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">StreamOnce</span> <span class="kw">for</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
-    <span class="ident">I::Item</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;I&gt; StreamOnce <span class="kw">for </span>BufferedStream&lt;I&gt;
+<span class="kw">where
+    </span>I: StreamOnce + Positioned,
+    I::Item: Clone + PartialEq,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">Range</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">Position</span> <span class="op">=</span> <span class="ident">I::Position</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">I::Error</span>;
+    <span class="kw">type </span>Item = I::Item;
+    <span class="kw">type </span>Range = I::Range;
+    <span class="kw">type </span>Position = I::Position;
+    <span class="kw">type </span>Error = I::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> {
-            <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">position</span>();
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="macro">try!</span>(<span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">uncons</span>());
-            <span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="comment">// We want the VecDeque to only keep the last .capacity() elements so we need to remove</span>
-            <span class="comment">// an element if it gets to large</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">capacity</span>() {
-                <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">pop_front</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;I::Item, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.offset &gt;= <span class="self">self</span>.buffer_offset {
+            <span class="kw">let </span>position = <span class="self">self</span>.iter.position();
+            <span class="kw">let </span>item = <span class="macro">try!</span>(<span class="self">self</span>.iter.uncons());
+            <span class="self">self</span>.buffer_offset += <span class="number">1</span>;
+            <span class="comment">// We want the VecDeque to only keep the last .capacity() elements so we need to remove
+            // an element if it gets to large
+            </span><span class="kw">if </span><span class="self">self</span>.buffer.len() == <span class="self">self</span>.buffer.capacity() {
+                <span class="self">self</span>.buffer.pop_front();
             }
-            <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">push_back</span>((<span class="ident">item</span>.<span class="ident">clone</span>(), <span class="ident">position</span>.<span class="ident">clone</span>()));
-            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">item</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
-            <span class="comment">// We have backtracked to far</span>
-            <span class="prelude-val">Err</span>(<span class="ident">StreamError::message_static_message</span>(
-                <span class="string">&quot;Backtracked to far&quot;</span>.<span class="ident">into</span>(),
+            <span class="self">self</span>.buffer.push_back((item.clone(), position.clone()));
+            <span class="self">self</span>.offset += <span class="number">1</span>;
+            <span class="prelude-val">Ok</span>(item)
+        } <span class="kw">else if </span><span class="self">self</span>.offset &lt; <span class="self">self</span>.buffer_offset - <span class="self">self</span>.buffer.len() {
+            <span class="comment">// We have backtracked to far
+            </span><span class="prelude-val">Err</span>(StreamError::message_static_message(
+                <span class="string">&quot;Backtracked to far&quot;</span>.into(),
             ))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span>)]
-                .<span class="number">0</span>
-                .<span class="ident">clone</span>();
-            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>value = <span class="self">self</span>.buffer[<span class="self">self</span>.buffer.len() - (<span class="self">self</span>.buffer_offset - <span class="self">self</span>.offset)]
+                .<span class="number">0
+                </span>.clone();
+            <span class="self">self</span>.offset += <span class="number">1</span>;
+            <span class="prelude-val">Ok</span>(value)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">is_partial</span>()
+    <span class="kw">fn </span>is_partial(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.iter.is_partial()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

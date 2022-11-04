@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-2.2.0/src/cmp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cmp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../derivative/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-2.2.0/src/cmp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cmp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../derivative/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -405,168 +405,168 @@
 <span id="405">405</span>
 <span id="406">406</span>
 <span id="407">407</span>
-</pre><pre class="rust"><code><span class="comment">// https://github.com/rust-lang/rust/issues/13101</span>
+</pre><pre class="rust"><code><span class="comment">// https://github.com/rust-lang/rust/issues/13101
 
-<span class="kw">use</span> <span class="ident">ast</span>;
-<span class="kw">use</span> <span class="ident">attr</span>;
-<span class="kw">use</span> <span class="ident">matcher</span>;
-<span class="kw">use</span> <span class="ident">paths</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>;
-<span class="kw">use</span> <span class="ident">syn</span>;
-<span class="kw">use</span> <span class="ident">utils</span>;
+</span><span class="kw">use </span>ast;
+<span class="kw">use </span>attr;
+<span class="kw">use </span>matcher;
+<span class="kw">use </span>paths;
+<span class="kw">use </span>proc_macro2;
+<span class="kw">use </span>syn;
+<span class="kw">use </span>utils;
 
-<span class="doccomment">/// Derive `Eq` for `input`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_eq</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
+<span class="doccomment">/// Derive `Eq` for `input`.
+</span><span class="kw">pub fn </span>derive_eq(input: <span class="kw-2">&amp;</span>ast::Input) -&gt; proc_macro2::TokenStream {
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>input.ident;
 
-    <span class="kw">let</span> <span class="ident">eq_trait_path</span> <span class="op">=</span> <span class="ident">eq_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">utils::build_impl_generics</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">eq_trait_path</span>,
-        <span class="ident">needs_eq_bound</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">eq_bound</span>(),
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">eq_bound</span>(),
+    <span class="kw">let </span>eq_trait_path = eq_trait_path();
+    <span class="kw">let </span>generics = utils::build_impl_generics(
+        input,
+        <span class="kw-2">&amp;</span>eq_trait_path,
+        needs_eq_bound,
+        |field| field.eq_bound(),
+        |input| input.eq_bound(),
     );
-    <span class="kw">let</span> <span class="ident">new_where_clause</span>;
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="kw-2">mut</span> <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>new_where_clause;
+    <span class="kw">let </span>(impl_generics, ty_generics, <span class="kw-2">mut </span>where_clause) = generics.split_for_impl();
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_where_clause2</span>) <span class="op">=</span>
-        <span class="ident">maybe_add_copy</span>(<span class="ident">input</span>, <span class="ident">where_clause</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>())
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_eq())
     {
-        <span class="ident">new_where_clause</span> <span class="op">=</span> <span class="ident">new_where_clause2</span>;
-        <span class="ident">where_clause</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">new_where_clause</span>);
+        new_where_clause = new_where_clause2;
+        where_clause = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>new_where_clause);
     }
 
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">eq_trait_path</span> <span class="kw">for</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {}
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[allow(unused_qualifications)]
+        </span><span class="kw">impl </span>#impl_generics #eq_trait_path <span class="kw">for </span>#name #ty_generics #where_clause {}
     }
 }
 
-<span class="doccomment">/// Derive `PartialEq` for `input`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_partial_eq</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">discriminant_cmp</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::Body::Enum</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">body</span> {
-        <span class="kw">let</span> <span class="ident">discriminant_path</span> <span class="op">=</span> <span class="ident">paths::discriminant_path</span>();
+<span class="doccomment">/// Derive `PartialEq` for `input`.
+</span><span class="kw">pub fn </span>derive_partial_eq(input: <span class="kw-2">&amp;</span>ast::Input) -&gt; proc_macro2::TokenStream {
+    <span class="kw">let </span>discriminant_cmp = <span class="kw">if let </span>ast::Body::Enum(<span class="kw">_</span>) = input.body {
+        <span class="kw">let </span>discriminant_path = paths::discriminant_path();
 
-        <span class="macro">quote!</span>((#<span class="ident">discriminant_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>) <span class="op">==</span> #<span class="ident">discriminant_path</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">other</span>)))
-    } <span class="kw">else</span> {
+        <span class="macro">quote!</span>((#discriminant_path(<span class="kw-2">&amp;*</span><span class="self">self</span>) == #discriminant_path(<span class="kw-2">&amp;*</span>other)))
+    } <span class="kw">else </span>{
         <span class="macro">quote!</span>(<span class="bool-val">true</span>)
     };
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>input.ident;
 
-    <span class="kw">let</span> <span class="ident">partial_eq_trait_path</span> <span class="op">=</span> <span class="ident">partial_eq_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">utils::build_impl_generics</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">partial_eq_trait_path</span>,
-        <span class="ident">needs_partial_eq_bound</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">partial_eq_bound</span>(),
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">partial_eq_bound</span>(),
+    <span class="kw">let </span>partial_eq_trait_path = partial_eq_trait_path();
+    <span class="kw">let </span>generics = utils::build_impl_generics(
+        input,
+        <span class="kw-2">&amp;</span>partial_eq_trait_path,
+        needs_partial_eq_bound,
+        |field| field.partial_eq_bound(),
+        |input| input.partial_eq_bound(),
     );
-    <span class="kw">let</span> <span class="ident">new_where_clause</span>;
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="kw-2">mut</span> <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>new_where_clause;
+    <span class="kw">let </span>(impl_generics, ty_generics, <span class="kw-2">mut </span>where_clause) = generics.split_for_impl();
 
-    <span class="kw">let</span> <span class="ident">match_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_trivial_enum</span>() {
+    <span class="kw">let </span>match_fields = <span class="kw">if </span>input.is_trivial_enum() {
         <span class="macro">quote!</span>(<span class="bool-val">true</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-            .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>())
-            .<span class="ident">build_2_arms</span>(
-                (<span class="macro">quote!</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="macro">quote!</span>(<span class="kw-2">*</span><span class="ident">other</span>)),
-                (<span class="ident">input</span>, <span class="string">&quot;__self&quot;</span>),
-                (<span class="ident">input</span>, <span class="string">&quot;__other&quot;</span>),
-                <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, (<span class="ident">left_variant</span>, <span class="ident">right_variant</span>)<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">cmp</span> <span class="op">=</span> <span class="ident">left_variant</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">right_variant</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">o</span>, <span class="ident">i</span>)<span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">outer_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">expr</span>;
-                        <span class="kw">let</span> <span class="ident">inner_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">expr</span>;
+    } <span class="kw">else </span>{
+        matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+            .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_partial_eq())
+            .build_2_arms(
+                (<span class="macro">quote!</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="macro">quote!</span>(<span class="kw-2">*</span>other)),
+                (input, <span class="string">&quot;__self&quot;</span>),
+                (input, <span class="string">&quot;__other&quot;</span>),
+                |<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, (left_variant, right_variant)| {
+                    <span class="kw">let </span>cmp = left_variant.iter().zip(<span class="kw-2">&amp;</span>right_variant).map(|(o, i)| {
+                        <span class="kw">let </span>outer_name = <span class="kw-2">&amp;</span>o.expr;
+                        <span class="kw">let </span>inner_name = <span class="kw-2">&amp;</span>i.expr;
 
-                        <span class="kw">if</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>() {
-                            <span class="prelude-val">None</span>
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">compare_fn</span>) <span class="op">=</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">partial_eq_compare_with</span>() {
-                            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="op">&amp;&amp;</span> #<span class="ident">compare_fn</span>(<span class="kw-2">&amp;</span>#<span class="ident">outer_name</span>, <span class="kw-2">&amp;</span>#<span class="ident">inner_name</span>)))
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(<span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span>#<span class="ident">outer_name</span> <span class="op">==</span> <span class="kw-2">&amp;</span>#<span class="ident">inner_name</span>))
+                        <span class="kw">if </span>o.field.attrs.ignore_partial_eq() {
+                            <span class="prelude-val">None
+                        </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(compare_fn) = o.field.attrs.partial_eq_compare_with() {
+                            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(&amp;&amp; #compare_fn(<span class="kw-2">&amp;</span>#outer_name, <span class="kw-2">&amp;</span>#inner_name)))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">Some</span>(<span class="macro">quote!</span>(&amp;&amp; <span class="kw-2">&amp;</span>#outer_name == <span class="kw-2">&amp;</span>#inner_name))
                         }
                     });
 
-                    <span class="macro">quote!</span>(<span class="bool-val">true</span> #(#<span class="ident">cmp</span>)<span class="kw-2">*</span>)
+                    <span class="macro">quote!</span>(<span class="bool-val">true </span>#(#cmp)<span class="kw-2">*</span>)
                 },
             )
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_where_clause2</span>) <span class="op">=</span>
-        <span class="ident">maybe_add_copy</span>(<span class="ident">input</span>, <span class="ident">where_clause</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>())
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_eq())
     {
-        <span class="ident">new_where_clause</span> <span class="op">=</span> <span class="ident">new_where_clause2</span>;
-        <span class="ident">where_clause</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">new_where_clause</span>);
+        new_where_clause = new_where_clause2;
+        where_clause = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>new_where_clause);
     }
 
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unneeded_field_pattern</span>)]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">partial_eq_trait_path</span> <span class="kw">for</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-                #<span class="ident">discriminant_cmp</span> <span class="op">&amp;&amp;</span> #<span class="ident">match_fields</span>
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[allow(unused_qualifications)]
+        #[allow(clippy::unneeded_field_pattern)]
+        </span><span class="kw">impl </span>#impl_generics #partial_eq_trait_path <span class="kw">for </span>#name #ty_generics #where_clause {
+            <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+                #discriminant_cmp &amp;&amp; #match_fields
             }
         }
     }
 }
 
-<span class="doccomment">/// Derive `PartialOrd` for `input`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_partial_ord</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::Body::Enum</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">body</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">partial_ord_on_enum</span>() {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;can&#39;t use `#[derivative(PartialOrd)]` on an enumeration without \
+<span class="doccomment">/// Derive `PartialOrd` for `input`.
+</span><span class="kw">pub fn </span>derive_partial_ord(
+    input: <span class="kw-2">&amp;</span>ast::Input,
+    errors: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream,
+) -&gt; proc_macro2::TokenStream {
+    <span class="kw">if let </span>ast::Body::Enum(<span class="kw">_</span>) = input.body {
+        <span class="kw">if </span>!input.attrs.partial_ord_on_enum() {
+            <span class="kw">let </span>message = <span class="string">&quot;can&#39;t use `#[derivative(PartialOrd)]` on an enumeration without \
             `feature_allow_slow_enum`; see the documentation for more details&quot;</span>;
-            <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">syn::Error::new</span>(<span class="ident">input</span>.<span class="ident">span</span>, <span class="ident">message</span>).<span class="ident">to_compile_error</span>());
+            errors.extend(syn::Error::new(input.span, message).to_compile_error());
         }
     }
 
-    <span class="kw">let</span> <span class="ident">option_path</span> <span class="op">=</span> <span class="ident">option_path</span>();
-    <span class="kw">let</span> <span class="ident">ordering_path</span> <span class="op">=</span> <span class="ident">ordering_path</span>();
+    <span class="kw">let </span>option_path = option_path();
+    <span class="kw">let </span>ordering_path = ordering_path();
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-        .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_ord</span>())
-        .<span class="ident">build_arms</span>(<span class="ident">input</span>, <span class="string">&quot;__self&quot;</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">n</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">outer_bis</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-                .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_ord</span>())
-                .<span class="ident">build_arms</span>(<span class="ident">input</span>, <span class="string">&quot;__other&quot;</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">m</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">inner_bis</span><span class="op">|</span> {
-                    <span class="kw">match</span> <span class="ident">n</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>) {
-                        <span class="ident">::std::cmp::Ordering::Less</span> =&gt; {
-                            <span class="macro">quote!</span>(#<span class="ident">option_path::Some</span>(#<span class="ident">ordering_path::Less</span>))
+    <span class="kw">let </span>body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_partial_ord())
+        .build_arms(input, <span class="string">&quot;__self&quot;</span>, |<span class="kw">_</span>, n, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, outer_bis| {
+            <span class="kw">let </span>body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+                .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_partial_ord())
+                .build_arms(input, <span class="string">&quot;__other&quot;</span>, |<span class="kw">_</span>, m, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, inner_bis| {
+                    <span class="kw">match </span>n.cmp(<span class="kw-2">&amp;</span>m) {
+                        ::std::cmp::Ordering::Less =&gt; {
+                            <span class="macro">quote!</span>(#option_path::Some(#ordering_path::Less))
                         }
-                        <span class="ident">::std::cmp::Ordering::Greater</span> =&gt; {
-                            <span class="macro">quote!</span>(#<span class="ident">option_path::Some</span>(#<span class="ident">ordering_path::Greater</span>))
+                        ::std::cmp::Ordering::Greater =&gt; {
+                            <span class="macro">quote!</span>(#option_path::Some(#ordering_path::Greater))
                         }
-                        <span class="ident">::std::cmp::Ordering::Equal</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">equal_path</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">ordering_path::Equal</span>);
-                            <span class="ident">outer_bis</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">rev</span>()
-                                .<span class="ident">zip</span>(<span class="ident">inner_bis</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>())
-                                .<span class="ident">fold</span>(<span class="macro">quote!</span>(#<span class="ident">option_path::Some</span>(#<span class="ident">equal_path</span>)), <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">o</span>, <span class="ident">i</span>)<span class="op">|</span> {
-                                    <span class="kw">let</span> <span class="ident">outer_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">expr</span>;
-                                    <span class="kw">let</span> <span class="ident">inner_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">expr</span>;
+                        ::std::cmp::Ordering::Equal =&gt; {
+                            <span class="kw">let </span>equal_path = <span class="macro">quote!</span>(#ordering_path::Equal);
+                            outer_bis
+                                .iter()
+                                .rev()
+                                .zip(inner_bis.into_iter().rev())
+                                .fold(<span class="macro">quote!</span>(#option_path::Some(#equal_path)), |acc, (o, i)| {
+                                    <span class="kw">let </span>outer_name = <span class="kw-2">&amp;</span>o.expr;
+                                    <span class="kw">let </span>inner_name = <span class="kw-2">&amp;</span>i.expr;
 
-                                    <span class="kw">if</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_ord</span>() {
-                                        <span class="ident">acc</span>
-                                    } <span class="kw">else</span> {
-                                        <span class="kw">let</span> <span class="ident">cmp_fn</span> <span class="op">=</span> <span class="ident">o</span>
-                                            .<span class="ident">field</span>
-                                            .<span class="ident">attrs</span>
-                                            .<span class="ident">partial_ord_compare_with</span>()
-                                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">quote!</span>(#<span class="ident">f</span>))
-                                            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                                                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">partial_ord_trait_path</span>();
-                                                <span class="macro">quote!</span>(#<span class="ident">path::partial_cmp</span>)
+                                    <span class="kw">if </span>o.field.attrs.ignore_partial_ord() {
+                                        acc
+                                    } <span class="kw">else </span>{
+                                        <span class="kw">let </span>cmp_fn = o
+                                            .field
+                                            .attrs
+                                            .partial_ord_compare_with()
+                                            .map(|f| <span class="macro">quote!</span>(#f))
+                                            .unwrap_or_else(|| {
+                                                <span class="kw">let </span>path = partial_ord_trait_path();
+                                                <span class="macro">quote!</span>(#path::partial_cmp)
                                             });
 
-                                        <span class="macro">quote!</span>(<span class="kw">match</span> #<span class="ident">cmp_fn</span>(<span class="kw-2">&amp;</span>#<span class="ident">outer_name</span>, <span class="kw-2">&amp;</span>#<span class="ident">inner_name</span>) {
-                                            #<span class="ident">option_path::Some</span>(#<span class="ident">equal_path</span>) =&gt; #<span class="ident">acc</span>,
-                                            <span class="ident">__derive_ordering_other</span> =&gt; <span class="ident">__derive_ordering_other</span>,
+                                        <span class="macro">quote!</span>(<span class="kw">match </span>#cmp_fn(<span class="kw-2">&amp;</span>#outer_name, <span class="kw-2">&amp;</span>#inner_name) {
+                                            #option_path::Some(#equal_path) =&gt; #acc,
+                                            __derive_ordering_other =&gt; __derive_ordering_other,
                                         })
                                     }
                                 })
@@ -574,97 +574,97 @@
                     }
                 });
 
-            <span class="macro">quote!</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">other</span> {
-                    #<span class="ident">body</span>
+            <span class="macro">quote! </span>{
+                <span class="kw">match </span><span class="kw-2">*</span>other {
+                    #body
                 }
 
             }
         });
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>input.ident;
 
-    <span class="kw">let</span> <span class="ident">partial_ord_trait_path</span> <span class="op">=</span> <span class="ident">partial_ord_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">utils::build_impl_generics</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">partial_ord_trait_path</span>,
-        <span class="ident">needs_partial_ord_bound</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">partial_ord_bound</span>(),
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">partial_ord_bound</span>(),
+    <span class="kw">let </span>partial_ord_trait_path = partial_ord_trait_path();
+    <span class="kw">let </span>generics = utils::build_impl_generics(
+        input,
+        <span class="kw-2">&amp;</span>partial_ord_trait_path,
+        needs_partial_ord_bound,
+        |field| field.partial_ord_bound(),
+        |input| input.partial_ord_bound(),
     );
-    <span class="kw">let</span> <span class="ident">new_where_clause</span>;
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="kw-2">mut</span> <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>new_where_clause;
+    <span class="kw">let </span>(impl_generics, ty_generics, <span class="kw-2">mut </span>where_clause) = generics.split_for_impl();
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_where_clause2</span>) <span class="op">=</span>
-        <span class="ident">maybe_add_copy</span>(<span class="ident">input</span>, <span class="ident">where_clause</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_partial_ord</span>())
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(new_where_clause2) =
+        maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_partial_ord())
     {
-        <span class="ident">new_where_clause</span> <span class="op">=</span> <span class="ident">new_where_clause2</span>;
-        <span class="ident">where_clause</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">new_where_clause</span>);
+        new_where_clause = new_where_clause2;
+        where_clause = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>new_where_clause);
     }
 
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unneeded_field_pattern</span>)]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">partial_ord_trait_path</span> <span class="kw">for</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; #<span class="ident">option_path</span><span class="op">&lt;</span>#<span class="ident">ordering_path</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                    #<span class="ident">body</span>
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[allow(unused_qualifications)]
+        #[allow(clippy::unneeded_field_pattern)]
+        </span><span class="kw">impl </span>#impl_generics #partial_ord_trait_path <span class="kw">for </span>#name #ty_generics #where_clause {
+            <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; #option_path&lt;#ordering_path&gt; {
+                <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                    #body
                 }
             }
         }
     }
 }
 
-<span class="doccomment">/// Derive `Ord` for `input`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_ord</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::Body::Enum</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">body</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">ord_on_enum</span>() {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;can&#39;t use `#[derivative(Ord)]` on an enumeration without \
+<span class="doccomment">/// Derive `Ord` for `input`.
+</span><span class="kw">pub fn </span>derive_ord(
+    input: <span class="kw-2">&amp;</span>ast::Input,
+    errors: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream,
+) -&gt; proc_macro2::TokenStream {
+    <span class="kw">if let </span>ast::Body::Enum(<span class="kw">_</span>) = input.body {
+        <span class="kw">if </span>!input.attrs.ord_on_enum() {
+            <span class="kw">let </span>message = <span class="string">&quot;can&#39;t use `#[derivative(Ord)]` on an enumeration without \
             `feature_allow_slow_enum`; see the documentation for more details&quot;</span>;
-            <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">syn::Error::new</span>(<span class="ident">input</span>.<span class="ident">span</span>, <span class="ident">message</span>).<span class="ident">to_compile_error</span>());
+            errors.extend(syn::Error::new(input.span, message).to_compile_error());
         }
     }
 
-    <span class="kw">let</span> <span class="ident">ordering_path</span> <span class="op">=</span> <span class="ident">ordering_path</span>();
+    <span class="kw">let </span>ordering_path = ordering_path();
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-        .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_ord</span>())
-        .<span class="ident">build_arms</span>(<span class="ident">input</span>, <span class="string">&quot;__self&quot;</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">n</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">outer_bis</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-                .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_ord</span>())
-                .<span class="ident">build_arms</span>(<span class="ident">input</span>, <span class="string">&quot;__other&quot;</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">m</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">inner_bis</span><span class="op">|</span> {
-                    <span class="kw">match</span> <span class="ident">n</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>) {
-                        <span class="ident">::std::cmp::Ordering::Less</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ordering_path::Less</span>),
-                        <span class="ident">::std::cmp::Ordering::Greater</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ordering_path::Greater</span>),
-                        <span class="ident">::std::cmp::Ordering::Equal</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">equal_path</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">ordering_path::Equal</span>);
-                            <span class="ident">outer_bis</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">rev</span>()
-                                .<span class="ident">zip</span>(<span class="ident">inner_bis</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>())
-                                .<span class="ident">fold</span>(<span class="macro">quote!</span>(#<span class="ident">equal_path</span>), <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">o</span>, <span class="ident">i</span>)<span class="op">|</span> {
-                                    <span class="kw">let</span> <span class="ident">outer_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">o</span>.<span class="ident">expr</span>;
-                                    <span class="kw">let</span> <span class="ident">inner_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">expr</span>;
+    <span class="kw">let </span>body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_ord())
+        .build_arms(input, <span class="string">&quot;__self&quot;</span>, |<span class="kw">_</span>, n, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, outer_bis| {
+            <span class="kw">let </span>body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+                .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_ord())
+                .build_arms(input, <span class="string">&quot;__other&quot;</span>, |<span class="kw">_</span>, m, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, inner_bis| {
+                    <span class="kw">match </span>n.cmp(<span class="kw-2">&amp;</span>m) {
+                        ::std::cmp::Ordering::Less =&gt; <span class="macro">quote!</span>(#ordering_path::Less),
+                        ::std::cmp::Ordering::Greater =&gt; <span class="macro">quote!</span>(#ordering_path::Greater),
+                        ::std::cmp::Ordering::Equal =&gt; {
+                            <span class="kw">let </span>equal_path = <span class="macro">quote!</span>(#ordering_path::Equal);
+                            outer_bis
+                                .iter()
+                                .rev()
+                                .zip(inner_bis.into_iter().rev())
+                                .fold(<span class="macro">quote!</span>(#equal_path), |acc, (o, i)| {
+                                    <span class="kw">let </span>outer_name = <span class="kw-2">&amp;</span>o.expr;
+                                    <span class="kw">let </span>inner_name = <span class="kw-2">&amp;</span>i.expr;
 
-                                    <span class="kw">if</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">ignore_ord</span>() {
-                                        <span class="ident">acc</span>
-                                    } <span class="kw">else</span> {
-                                        <span class="kw">let</span> <span class="ident">cmp_fn</span> <span class="op">=</span> <span class="ident">o</span>
-                                            .<span class="ident">field</span>
-                                            .<span class="ident">attrs</span>
-                                            .<span class="ident">ord_compare_with</span>()
-                                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">quote!</span>(#<span class="ident">f</span>))
-                                            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                                                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">ord_trait_path</span>();
-                                                <span class="macro">quote!</span>(#<span class="ident">path::cmp</span>)
+                                    <span class="kw">if </span>o.field.attrs.ignore_ord() {
+                                        acc
+                                    } <span class="kw">else </span>{
+                                        <span class="kw">let </span>cmp_fn = o
+                                            .field
+                                            .attrs
+                                            .ord_compare_with()
+                                            .map(|f| <span class="macro">quote!</span>(#f))
+                                            .unwrap_or_else(|| {
+                                                <span class="kw">let </span>path = ord_trait_path();
+                                                <span class="macro">quote!</span>(#path::cmp)
                                             });
 
-                                        <span class="macro">quote!</span>(<span class="kw">match</span> #<span class="ident">cmp_fn</span>(<span class="kw-2">&amp;</span>#<span class="ident">outer_name</span>, <span class="kw-2">&amp;</span>#<span class="ident">inner_name</span>) {
-                                           #<span class="ident">equal_path</span> =&gt; #<span class="ident">acc</span>,
-                                            <span class="ident">__derive_ordering_other</span> =&gt; <span class="ident">__derive_ordering_other</span>,
+                                        <span class="macro">quote!</span>(<span class="kw">match </span>#cmp_fn(<span class="kw-2">&amp;</span>#outer_name, <span class="kw-2">&amp;</span>#inner_name) {
+                                           #equal_path =&gt; #acc,
+                                            __derive_ordering_other =&gt; __derive_ordering_other,
                                         })
                                     }
                                 })
@@ -672,145 +672,145 @@
                     }
                 });
 
-            <span class="macro">quote!</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">other</span> {
-                    #<span class="ident">body</span>
+            <span class="macro">quote! </span>{
+                <span class="kw">match </span><span class="kw-2">*</span>other {
+                    #body
                 }
 
             }
         });
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>input.ident;
 
-    <span class="kw">let</span> <span class="ident">ord_trait_path</span> <span class="op">=</span> <span class="ident">ord_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">utils::build_impl_generics</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">ord_trait_path</span>,
-        <span class="ident">needs_ord_bound</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ord_bound</span>(),
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">ord_bound</span>(),
+    <span class="kw">let </span>ord_trait_path = ord_trait_path();
+    <span class="kw">let </span>generics = utils::build_impl_generics(
+        input,
+        <span class="kw-2">&amp;</span>ord_trait_path,
+        needs_ord_bound,
+        |field| field.ord_bound(),
+        |input| input.ord_bound(),
     );
-    <span class="kw">let</span> <span class="ident">new_where_clause</span>;
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="kw-2">mut</span> <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>new_where_clause;
+    <span class="kw">let </span>(impl_generics, ty_generics, <span class="kw-2">mut </span>where_clause) = generics.split_for_impl();
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_where_clause2</span>) <span class="op">=</span> <span class="ident">maybe_add_copy</span>(<span class="ident">input</span>, <span class="ident">where_clause</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_ord</span>())
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(new_where_clause2) = maybe_add_copy(input, where_clause, |f| !f.attrs.ignore_ord())
     {
-        <span class="ident">new_where_clause</span> <span class="op">=</span> <span class="ident">new_where_clause2</span>;
-        <span class="ident">where_clause</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">new_where_clause</span>);
+        new_where_clause = new_where_clause2;
+        where_clause = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>new_where_clause);
     }
 
-    <span class="macro">quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unneeded_field_pattern</span>)]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">ord_trait_path</span> <span class="kw">for</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; #<span class="ident">ordering_path</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                    #<span class="ident">body</span>
+    <span class="macro">quote! </span>{
+        <span class="attribute">#[allow(unused_qualifications)]
+        #[allow(clippy::unneeded_field_pattern)]
+        </span><span class="kw">impl </span>#impl_generics #ord_trait_path <span class="kw">for </span>#name #ty_generics #where_clause {
+            <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; #ordering_path {
+                <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                    #body
                 }
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">needs_partial_eq_bound</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">attr::Field</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span><span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>() <span class="op">&amp;&amp;</span> <span class="ident">attrs</span>.<span class="ident">partial_eq_bound</span>().<span class="ident">is_none</span>()
+<span class="kw">fn </span>needs_partial_eq_bound(attrs: <span class="kw-2">&amp;</span>attr::Field) -&gt; bool {
+    !attrs.ignore_partial_eq() &amp;&amp; attrs.partial_eq_bound().is_none()
 }
 
-<span class="kw">fn</span> <span class="ident">needs_partial_ord_bound</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">attr::Field</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span><span class="ident">attrs</span>.<span class="ident">ignore_partial_ord</span>() <span class="op">&amp;&amp;</span> <span class="ident">attrs</span>.<span class="ident">partial_ord_bound</span>().<span class="ident">is_none</span>()
+<span class="kw">fn </span>needs_partial_ord_bound(attrs: <span class="kw-2">&amp;</span>attr::Field) -&gt; bool {
+    !attrs.ignore_partial_ord() &amp;&amp; attrs.partial_ord_bound().is_none()
 }
 
-<span class="kw">fn</span> <span class="ident">needs_ord_bound</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">attr::Field</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span><span class="ident">attrs</span>.<span class="ident">ignore_ord</span>() <span class="op">&amp;&amp;</span> <span class="ident">attrs</span>.<span class="ident">ord_bound</span>().<span class="ident">is_none</span>()
+<span class="kw">fn </span>needs_ord_bound(attrs: <span class="kw-2">&amp;</span>attr::Field) -&gt; bool {
+    !attrs.ignore_ord() &amp;&amp; attrs.ord_bound().is_none()
 }
 
-<span class="kw">fn</span> <span class="ident">needs_eq_bound</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">attr::Field</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span><span class="ident">attrs</span>.<span class="ident">ignore_partial_eq</span>() <span class="op">&amp;&amp;</span> <span class="ident">attrs</span>.<span class="ident">eq_bound</span>().<span class="ident">is_none</span>()
+<span class="kw">fn </span>needs_eq_bound(attrs: <span class="kw-2">&amp;</span>attr::Field) -&gt; bool {
+    !attrs.ignore_partial_eq() &amp;&amp; attrs.eq_bound().is_none()
 }
 
-<span class="doccomment">/// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.</span>
-<span class="kw">fn</span> <span class="ident">eq_trait_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::cmp::Eq</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::cmp::Eq</span>)
+<span class="doccomment">/// Return the path of the `Eq` trait, that is `::std::cmp::Eq`.
+</span><span class="kw">fn </span>eq_trait_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::cmp::Eq)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::cmp::Eq)
     }
 }
 
-<span class="doccomment">/// Return the path of the `PartialEq` trait, that is `::std::cmp::PartialEq`.</span>
-<span class="kw">fn</span> <span class="ident">partial_eq_trait_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::cmp::PartialEq</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::cmp::PartialEq</span>)
+<span class="doccomment">/// Return the path of the `PartialEq` trait, that is `::std::cmp::PartialEq`.
+</span><span class="kw">fn </span>partial_eq_trait_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::cmp::PartialEq)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::cmp::PartialEq)
     }
 }
 
-<span class="doccomment">/// Return the path of the `PartialOrd` trait, that is `::std::cmp::PartialOrd`.</span>
-<span class="kw">fn</span> <span class="ident">partial_ord_trait_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::cmp::PartialOrd</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::cmp::PartialOrd</span>)
+<span class="doccomment">/// Return the path of the `PartialOrd` trait, that is `::std::cmp::PartialOrd`.
+</span><span class="kw">fn </span>partial_ord_trait_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::cmp::PartialOrd)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::cmp::PartialOrd)
     }
 }
 
-<span class="doccomment">/// Return the path of the `Ord` trait, that is `::std::cmp::Ord`.</span>
-<span class="kw">fn</span> <span class="ident">ord_trait_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::cmp::Ord</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::cmp::Ord</span>)
+<span class="doccomment">/// Return the path of the `Ord` trait, that is `::std::cmp::Ord`.
+</span><span class="kw">fn </span>ord_trait_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::cmp::Ord)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::cmp::Ord)
     }
 }
 
-<span class="doccomment">/// Return the path of the `Option` trait, that is `::std::option::Option`.</span>
-<span class="kw">fn</span> <span class="ident">option_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::option::Option</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::option::Option</span>)
+<span class="doccomment">/// Return the path of the `Option` trait, that is `::std::option::Option`.
+</span><span class="kw">fn </span>option_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::option::Option)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::option::Option)
     }
 }
 
-<span class="doccomment">/// Return the path of the `Ordering` trait, that is `::std::cmp::Ordering`.</span>
-<span class="kw">fn</span> <span class="ident">ordering_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::cmp::Ordering</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::cmp::Ordering</span>)
+<span class="doccomment">/// Return the path of the `Ordering` trait, that is `::std::cmp::Ordering`.
+</span><span class="kw">fn </span>ordering_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::cmp::Ordering)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::cmp::Ordering)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">maybe_add_copy</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>,
-    <span class="ident">where_clause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::WhereClause</span><span class="op">&gt;</span>,
-    <span class="ident">field_filter</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">ast::Field</span>) -&gt; <span class="ident">bool</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::WhereClause</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">body</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_where_clause</span> <span class="op">=</span> <span class="ident">where_clause</span>.<span class="ident">cloned</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syn::WhereClause</span> {
-            <span class="ident">where_token</span>: <span class="macro">parse_quote!</span>(<span class="kw">where</span>),
-            <span class="ident">predicates</span>: <span class="ident">Default::default</span>(),
+<span class="kw">fn </span>maybe_add_copy(
+    input: <span class="kw-2">&amp;</span>ast::Input,
+    where_clause: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>syn::WhereClause&gt;,
+    field_filter: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>ast::Field) -&gt; bool,
+) -&gt; <span class="prelude-ty">Option</span>&lt;syn::WhereClause&gt; {
+    <span class="kw">if </span>input.attrs.is_packed &amp;&amp; !input.body.is_empty() {
+        <span class="kw">let </span><span class="kw-2">mut </span>new_where_clause = where_clause.cloned().unwrap_or_else(|| syn::WhereClause {
+            where_token: <span class="macro">parse_quote!</span>(<span class="kw">where</span>),
+            predicates: Default::default(),
         });
 
-        <span class="ident">new_where_clause</span>.<span class="ident">predicates</span>.<span class="ident">extend</span>(
-            <span class="ident">input</span>
-                .<span class="ident">body</span>
-                .<span class="ident">all_fields</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">field_filter</span>(<span class="ident">f</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">ty</span>;
+        new_where_clause.predicates.extend(
+            input
+                .body
+                .all_fields()
+                .into_iter()
+                .filter(|f| field_filter(f))
+                .map(|f| {
+                    <span class="kw">let </span>ty = f.ty;
 
-                    <span class="kw">let</span> <span class="ident">pred</span>: <span class="ident">syn::WherePredicate</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(#<span class="ident">ty</span>: <span class="ident">Copy</span>);
-                    <span class="ident">pred</span>
+                    <span class="kw">let </span>pred: syn::WherePredicate = <span class="macro">parse_quote!</span>(#ty: Copy);
+                    pred
                 }),
         );
 
-        <span class="prelude-val">Some</span>(<span class="ident">new_where_clause</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">Some</span>(new_where_clause)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="derivative" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="derivative" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

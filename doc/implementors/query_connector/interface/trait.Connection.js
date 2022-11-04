@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["mongodb_query_connector"] = [{"text":"impl <a class=\"trait\" href=\"query_connector/interface/trait.Connection.html\" title=\"trait query_connector::interface::Connection\">Connection</a> for <a class=\"struct\" href=\"mongodb_query_connector/struct.MongoDbConnection.html\" title=\"struct mongodb_query_connector::MongoDbConnection\">MongoDbConnection</a>","synthetic":false,"types":["mongodb_query_connector::interface::connection::MongoDbConnection"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"mongodb_query_connector":[["impl <a class=\"trait\" href=\"query_connector/interface/trait.Connection.html\" title=\"trait query_connector::interface::Connection\">Connection</a> for <a class=\"struct\" href=\"mongodb_query_connector/struct.MongoDbConnection.html\" title=\"struct mongodb_query_connector::MongoDbConnection\">MongoDbConnection</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

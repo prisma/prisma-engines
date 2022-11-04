@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/signal/unix/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/signal/unix/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -205,206 +205,206 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![cfg_attr(not(feature = <span class="string">&quot;rt&quot;</span>), allow(dead_code))]
 
-<span class="doccomment">//! Signal driver</span>
+</span><span class="doccomment">//! Signal driver
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io::interest::Interest</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io::PollEvented</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::Park</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::io::Driver</span> <span class="kw">as</span> <span class="ident">IoDriver</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signal::registry::globals</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::io::interest::Interest;
+<span class="kw">use </span><span class="kw">crate</span>::io::PollEvented;
+<span class="kw">use </span><span class="kw">crate</span>::park::Park;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::io::Driver <span class="kw">as </span>IoDriver;
+<span class="kw">use </span><span class="kw">crate</span>::signal::registry::globals;
 
-<span class="kw">use</span> <span class="ident">mio::net::UnixStream</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Read</span>};
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>};
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">RawWaker</span>, <span class="ident">RawWakerVTable</span>, <span class="ident">Waker</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>mio::net::UnixStream;
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Read};
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::sync::{Arc, Weak};
+<span class="kw">use </span>std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+<span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Responsible for registering wakeups when an OS signal is received, and</span>
-<span class="doccomment">/// subsequently dispatching notifications to any signal listeners as appropriate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: this driver relies on having an enabled IO driver in order to listen to</span>
-<span class="doccomment">/// pipe write wakeups.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Driver</span> {
-    <span class="doccomment">/// Thread parker. The `Driver` park implementation delegates to this.</span>
-    <span class="ident">park</span>: <span class="ident">IoDriver</span>,
+<span class="doccomment">/// Responsible for registering wakeups when an OS signal is received, and
+/// subsequently dispatching notifications to any signal listeners as appropriate.
+///
+/// Note: this driver relies on having an enabled IO driver in order to listen to
+/// pipe write wakeups.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Driver {
+    <span class="doccomment">/// Thread parker. The `Driver` park implementation delegates to this.
+    </span>park: IoDriver,
 
-    <span class="doccomment">/// A pipe for receiving wake events from the signal handler</span>
-    <span class="ident">receiver</span>: <span class="ident">PollEvented</span><span class="op">&lt;</span><span class="ident">UnixStream</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A pipe for receiving wake events from the signal handler
+    </span>receiver: PollEvented&lt;UnixStream&gt;,
 
-    <span class="doccomment">/// Shared state</span>
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Shared state
+    </span>inner: Arc&lt;Inner&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handle</span> {
-    <span class="ident">inner</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Handle {
+    inner: Weak&lt;Inner&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Inner</span>(());
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Inner(());
 
-<span class="comment">// ===== impl Driver =====</span>
+<span class="comment">// ===== impl Driver =====
 
-<span class="kw">impl</span> <span class="ident">Driver</span> {
-    <span class="doccomment">/// Creates a new signal `Driver` instance that delegates wakeups to `park`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">park</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
-        <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>};
+</span><span class="kw">impl </span>Driver {
+    <span class="doccomment">/// Creates a new signal `Driver` instance that delegates wakeups to `park`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(park: IoDriver) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>std::mem::ManuallyDrop;
+        <span class="kw">use </span>std::os::unix::io::{AsRawFd, FromRawFd};
 
-        <span class="comment">// NB: We give each driver a &quot;fresh&quot; receiver file descriptor to avoid</span>
-        <span class="comment">// the issues described in alexcrichton/tokio-process#42.</span>
-        <span class="comment">//</span>
-        <span class="comment">// In the past we would reuse the actual receiver file descriptor and</span>
-        <span class="comment">// swallow any errors around double registration of the same descriptor.</span>
-        <span class="comment">// I&#39;m not sure if the second (failed) registration simply doesn&#39;t end</span>
-        <span class="comment">// up receiving wake up notifications, or there could be some race</span>
-        <span class="comment">// condition when consuming readiness events, but having distinct</span>
-        <span class="comment">// descriptors for distinct PollEvented instances appears to mitigate</span>
-        <span class="comment">// this.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Unfortunately we cannot just use a single global PollEvented instance</span>
-        <span class="comment">// either, since we can&#39;t compare Handles or assume they will always</span>
-        <span class="comment">// point to the exact same reactor.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Mio 0.7 removed `try_clone()` as an API due to unexpected behavior</span>
-        <span class="comment">// with registering dups with the same reactor. In this case, duping is</span>
-        <span class="comment">// safe as each dup is registered with separate reactors **and** we</span>
-        <span class="comment">// only expect at least one dup to receive the notification.</span>
+        <span class="comment">// NB: We give each driver a &quot;fresh&quot; receiver file descriptor to avoid
+        // the issues described in alexcrichton/tokio-process#42.
+        //
+        // In the past we would reuse the actual receiver file descriptor and
+        // swallow any errors around double registration of the same descriptor.
+        // I&#39;m not sure if the second (failed) registration simply doesn&#39;t end
+        // up receiving wake up notifications, or there could be some race
+        // condition when consuming readiness events, but having distinct
+        // descriptors for distinct PollEvented instances appears to mitigate
+        // this.
+        //
+        // Unfortunately we cannot just use a single global PollEvented instance
+        // either, since we can&#39;t compare Handles or assume they will always
+        // point to the exact same reactor.
+        //
+        // Mio 0.7 removed `try_clone()` as an API due to unexpected behavior
+        // with registering dups with the same reactor. In this case, duping is
+        // safe as each dup is registered with separate reactors **and** we
+        // only expect at least one dup to receive the notification.
 
-        <span class="comment">// Manually drop as we don&#39;t actually own this instance of UnixStream.</span>
-        <span class="kw">let</span> <span class="ident">receiver_fd</span> <span class="op">=</span> <span class="ident">globals</span>().<span class="ident">receiver</span>.<span class="ident">as_raw_fd</span>();
+        // Manually drop as we don&#39;t actually own this instance of UnixStream.
+        </span><span class="kw">let </span>receiver_fd = globals().receiver.as_raw_fd();
 
-        <span class="comment">// safety: there is nothing unsafe about this, but the `from_raw_fd` fn is marked as unsafe.</span>
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span>
-            <span class="ident">ManuallyDrop::new</span>(<span class="kw">unsafe</span> { <span class="ident">std::os::unix::net::UnixStream::from_raw_fd</span>(<span class="ident">receiver_fd</span>) });
-        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">UnixStream::from_std</span>(<span class="ident">original</span>.<span class="ident">try_clone</span>()<span class="question-mark">?</span>);
-        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span>
-            <span class="ident">PollEvented::new_with_interest_and_handle</span>(<span class="ident">receiver</span>, <span class="ident">Interest::READABLE</span>, <span class="ident">park</span>.<span class="ident">handle</span>())<span class="question-mark">?</span>;
+        <span class="comment">// safety: there is nothing unsafe about this, but the `from_raw_fd` fn is marked as unsafe.
+        </span><span class="kw">let </span>original =
+            ManuallyDrop::new(<span class="kw">unsafe </span>{ std::os::unix::net::UnixStream::from_raw_fd(receiver_fd) });
+        <span class="kw">let </span>receiver = UnixStream::from_std(original.try_clone()<span class="question-mark">?</span>);
+        <span class="kw">let </span>receiver =
+            PollEvented::new_with_interest_and_handle(receiver, Interest::READABLE, park.handle())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">park</span>,
-            <span class="ident">receiver</span>,
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span>(())),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            park,
+            receiver,
+            inner: Arc::new(Inner(())),
         })
     }
 
-    <span class="doccomment">/// Returns a handle to this event loop which can be sent across threads</span>
-    <span class="doccomment">/// and can be used as a proxy to the event loop itself.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
-        <span class="ident">Handle</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
+    <span class="doccomment">/// Returns a handle to this event loop which can be sent across threads
+    /// and can be used as a proxy to the event loop itself.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle {
+        Handle {
+            inner: Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.inner),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">process</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// Check if the pipe is ready to read and therefore has &quot;woken&quot; us up</span>
-        <span class="comment">//</span>
-        <span class="comment">// To do so, we will `poll_read_ready` with a noop waker, since we don&#39;t</span>
-        <span class="comment">// need to actually be notified when read ready...</span>
-        <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Waker::from_raw</span>(<span class="ident">RawWaker::new</span>(<span class="ident">ptr::null</span>(), <span class="kw-2">&amp;</span><span class="ident">NOOP_WAKER_VTABLE</span>)) };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">waker</span>);
+    <span class="kw">fn </span>process(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="comment">// Check if the pipe is ready to read and therefore has &quot;woken&quot; us up
+        //
+        // To do so, we will `poll_read_ready` with a noop waker, since we don&#39;t
+        // need to actually be notified when read ready...
+        </span><span class="kw">let </span>waker = <span class="kw">unsafe </span>{ Waker::from_raw(RawWaker::new(ptr::null(), <span class="kw-2">&amp;</span>NOOP_WAKER_VTABLE)) };
+        <span class="kw">let </span><span class="kw-2">mut </span>cx = Context::from_waker(<span class="kw-2">&amp;</span>waker);
 
-        <span class="kw">let</span> <span class="ident">ev</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">registration</span>().<span class="ident">poll_read_ready</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">ev</span>)) =&gt; <span class="ident">ev</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;reactor gone: {}&quot;</span>, <span class="ident">e</span>),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span>, <span class="comment">// No wake has arrived, bail</span>
-        };
+        <span class="kw">let </span>ev = <span class="kw">match </span><span class="self">self</span>.receiver.registration().poll_read_ready(<span class="kw-2">&amp;mut </span>cx) {
+            Poll::Ready(<span class="prelude-val">Ok</span>(ev)) =&gt; ev,
+            Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;reactor gone: {}&quot;</span>, e),
+            Poll::Pending =&gt; <span class="kw">return</span>, <span class="comment">// No wake has arrived, bail
+        </span>};
 
-        <span class="comment">// Drain the pipe completely so we can receive a new readiness event</span>
-        <span class="comment">// if another signal has come in.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">128</span>];
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">receiver</span>).<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
+        <span class="comment">// Drain the pipe completely so we can receive a new readiness event
+        // if another signal has come in.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">128</span>];
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.receiver).read(<span class="kw-2">&amp;mut </span>buf) {
                 <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;EOF on self-pipe&quot;</span>),
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>, <span class="comment">// Keep reading</span>
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Bad read on self-pipe: {}&quot;</span>, <span class="ident">e</span>),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>, <span class="comment">// Keep reading
+                </span><span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.kind() == io::ErrorKind::WouldBlock =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Bad read on self-pipe: {}&quot;</span>, e),
             }
         }
 
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">registration</span>().<span class="ident">clear_readiness</span>(<span class="ident">ev</span>);
+        <span class="self">self</span>.receiver.registration().clear_readiness(ev);
 
-        <span class="comment">// Broadcast any signals which were received</span>
-        <span class="ident">globals</span>().<span class="ident">broadcast</span>();
+        <span class="comment">// Broadcast any signals which were received
+        </span>globals().broadcast();
     }
 }
 
-<span class="kw">const</span> <span class="ident">NOOP_WAKER_VTABLE</span>: <span class="ident">RawWakerVTable</span> <span class="op">=</span> <span class="ident">RawWakerVTable::new</span>(<span class="ident">noop_clone</span>, <span class="ident">noop</span>, <span class="ident">noop</span>, <span class="ident">noop</span>);
+<span class="kw">const </span>NOOP_WAKER_VTABLE: RawWakerVTable = RawWakerVTable::new(noop_clone, noop, noop, noop);
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">noop_clone</span>(<span class="ident">_data</span>: <span class="kw-2">*const</span> ()) -&gt; <span class="ident">RawWaker</span> {
-    <span class="ident">RawWaker::new</span>(<span class="ident">ptr::null</span>(), <span class="kw-2">&amp;</span><span class="ident">NOOP_WAKER_VTABLE</span>)
+<span class="kw">unsafe fn </span>noop_clone(_data: <span class="kw-2">*const </span>()) -&gt; RawWaker {
+    RawWaker::new(ptr::null(), <span class="kw-2">&amp;</span>NOOP_WAKER_VTABLE)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">noop</span>(<span class="ident">_data</span>: <span class="kw-2">*const</span> ()) {}
+<span class="kw">unsafe fn </span>noop(_data: <span class="kw-2">*const </span>()) {}
 
-<span class="comment">// ===== impl Park for Driver =====</span>
+<span class="comment">// ===== impl Park for Driver =====
 
-<span class="kw">impl</span> <span class="ident">Park</span> <span class="kw">for</span> <span class="ident">Driver</span> {
-    <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">IoDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+</span><span class="kw">impl </span>Park <span class="kw">for </span>Driver {
+    <span class="kw">type </span>Unpark = &lt;IoDriver <span class="kw">as </span>Park&gt;::Unpark;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unpark</span> {
-        <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">unpark</span>()
+    <span class="kw">fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Unpark {
+        <span class="self">self</span>.park.unpark()
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">park</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">process</span>();
+    <span class="kw">fn </span>park(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.park.park()<span class="question-mark">?</span>;
+        <span class="self">self</span>.process();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">park_timeout</span>(<span class="ident">duration</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">process</span>();
+    <span class="kw">fn </span>park_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.park.park_timeout(duration)<span class="question-mark">?</span>;
+        <span class="self">self</span>.process();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">shutdown</span>()
+    <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.park.shutdown()
     }
 }
 
-<span class="comment">// ===== impl Handle =====</span>
+<span class="comment">// ===== impl Handle =====
 
-<span class="kw">impl</span> <span class="ident">Handle</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">check_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">strong_count</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+</span><span class="kw">impl </span>Handle {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.inner.strong_count() &gt; <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;signal driver gone&quot;</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(io::Error::new(io::ErrorKind::Other, <span class="string">&quot;signal driver gone&quot;</span>))
         }
     }
 }
 
-<span class="macro">cfg_rt!</span> {
-    <span class="kw">impl</span> <span class="ident">Handle</span> {
-        <span class="doccomment">/// Returns a handle to the current driver</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Panics</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This function panics if there is no current signal driver set.</span>
-        <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
-            <span class="ident"><span class="kw">crate</span>::runtime::context::signal_handle</span>().<span class="ident">expect</span>(
+<span class="macro">cfg_rt! </span>{
+    <span class="kw">impl </span>Handle {
+        <span class="doccomment">/// Returns a handle to the current driver
+        ///
+        /// # Panics
+        ///
+        /// This function panics if there is no current signal driver set.
+        </span><span class="attribute">#[track_caller]
+        </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>current() -&gt; <span class="self">Self </span>{
+            <span class="kw">crate</span>::runtime::context::signal_handle().expect(
                 <span class="string">&quot;there is no signal driver running, must be called from the context of Tokio runtime&quot;</span>,
             )
         }
     }
 }
 
-<span class="macro">cfg_not_rt!</span> {
-    <span class="kw">impl</span> <span class="ident">Handle</span> {
-        <span class="doccomment">/// Returns a handle to the current driver</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Panics</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This function panics if there is no current signal driver set.</span>
-        <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
+<span class="macro">cfg_not_rt! </span>{
+    <span class="kw">impl </span>Handle {
+        <span class="doccomment">/// Returns a handle to the current driver
+        ///
+        /// # Panics
+        ///
+        /// This function panics if there is no current signal driver set.
+        </span><span class="attribute">#[track_caller]
+        </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>current() -&gt; <span class="self">Self </span>{
             <span class="macro">panic!</span>(
                 <span class="string">&quot;there is no signal driver running, must be called from the context of Tokio runtime or with\
                 `rt` enabled.&quot;</span>,
@@ -413,4 +413,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

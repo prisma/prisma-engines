@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/response_ir/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/response_ir/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -176,183 +176,183 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Prisma Response IR (Intermediate Representation).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module takes care of processing query execution results</span>
-<span class="doccomment">//! and transforming them into a different AST.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This IR is meant for general processing and storage.</span>
-<span class="doccomment">//! It can also be easily serialized.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions</span>
-<span class="doccomment">//! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).</span>
-<span class="kw">mod</span> <span class="ident">internal</span>;
-<span class="kw">mod</span> <span class="ident">ir_serializer</span>;
-<span class="kw">mod</span> <span class="ident">response</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Prisma Response IR (Intermediate Representation).
+//!
+//! This module takes care of processing query execution results
+//! and transforming them into a different AST.
+//!
+//! This IR is meant for general processing and storage.
+//! It can also be easily serialized.
+//!
+//! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
+//! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
+</span><span class="kw">mod </span>internal;
+<span class="kw">mod </span>ir_serializer;
+<span class="kw">mod </span>response;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::QueryValue</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeMap</span>, <span class="ident">SerializeSeq</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span><span class="kw">crate</span>::QueryValue;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>prisma_models::PrismaValue;
+<span class="kw">use </span>serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
+<span class="kw">use </span>std::{fmt, sync::Arc};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ir_serializer</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">response</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>ir_serializer::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>response::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A `key -&gt; value` map to an IR item</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `key -&gt; value` map to an IR item
+</span><span class="kw">pub type </span>Map = IndexMap&lt;String, Item&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">List</span> {
-    <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>List {
+    inner: Vec&lt;Item&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">List</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>List {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.inner.fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">List</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
+<span class="kw">impl </span>List {
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.len()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_by</span>(<span class="self">self</span>, <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span>, <span class="ident">Map</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>());
+    <span class="kw">pub fn </span>index_by(<span class="self">self</span>, keys: <span class="kw-2">&amp;</span>[String]) -&gt; Vec&lt;(Vec&lt;QueryValue&gt;, Map)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = Vec::with_capacity(<span class="self">self</span>.len());
 
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">into_map</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for </span>item <span class="kw">in </span><span class="self">self</span>.into_iter() {
+            <span class="kw">let </span>inner = item.into_map().unwrap();
 
-            <span class="kw">let</span> <span class="ident">key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">keys</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">into_value</span>().<span class="ident">unwrap</span>())
-                .<span class="ident">map</span>(<span class="ident">QueryValue::from</span>)
-                .<span class="ident">collect</span>();
+            <span class="kw">let </span>key: Vec&lt;QueryValue&gt; = keys
+                .iter()
+                .map(|key| inner.get(key).unwrap().clone().into_value().unwrap())
+                .map(QueryValue::from)
+                .collect();
 
-            <span class="ident">map</span>.<span class="ident">push</span>((<span class="ident">key</span>, <span class="ident">inner</span>));
+            map.push((key, inner));
         }
 
-        <span class="ident">map</span>
+        map
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">List</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span> }
+<span class="kw">impl </span>From&lt;Vec&lt;Item&gt;&gt; <span class="kw">for </span>List {
+    <span class="kw">fn </span>from(inner: Vec&lt;Item&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">List</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Item</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>List {
+    <span class="kw">type </span>Item = Item;
+    <span class="kw">type </span>IntoIter = std::vec::IntoIter&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.inner.into_iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">List</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Item</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>List {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Item;
+    <span class="kw">type </span>IntoIter = std::slice::Iter&lt;<span class="lifetime">&#39;a</span>, Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.inner.iter()
     }
 }
 
-<span class="doccomment">/// Convenience type wrapper for Arc&lt;Item&gt;.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ItemRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Convenience type wrapper for Arc&lt;Item&gt;.
+</span><span class="kw">pub type </span>ItemRef = Arc&lt;Item&gt;;
 
-<span class="doccomment">/// An IR item that either expands to a subtype or leaf-record.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Item</span> {
-    <span class="ident">Map</span>(<span class="ident">Map</span>),
-    <span class="ident">List</span>(<span class="ident">List</span>),
-    <span class="ident">Value</span>(<span class="ident">PrismaValue</span>),
-    <span class="ident">Json</span>(<span class="ident">serde_json::Value</span>),
+<span class="doccomment">/// An IR item that either expands to a subtype or leaf-record.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Item {
+    Map(Map),
+    List(List),
+    Value(PrismaValue),
+    Json(serde_json::Value),
 
-    <span class="doccomment">/// Wrapper type to allow multiple parent records</span>
-    <span class="doccomment">/// to claim the same item without copying data</span>
-    <span class="doccomment">/// (serialization can then choose how to copy if necessary).</span>
-    <span class="ident">Ref</span>(<span class="ident">ItemRef</span>),
+    <span class="doccomment">/// Wrapper type to allow multiple parent records
+    /// to claim the same item without copying data
+    /// (serialization can then choose how to copy if necessary).
+    </span>Ref(ItemRef),
 }
 
-<span class="kw">impl</span> <span class="ident">Item</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">null</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">PrismaValue::Null</span>)
+<span class="kw">impl </span>Item {
+    <span class="kw">pub fn </span>null() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Value(PrismaValue::Null)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">List::from</span>(<span class="ident">inner</span>))
+    <span class="kw">pub fn </span>list(inner: Vec&lt;Item&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::List(List::from(inner))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Map</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Map</span>(<span class="ident">m</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">m</span>),
-            <span class="ident"><span class="self">Self</span>::Ref</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">as_map</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_map</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Map</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Map</span>(<span class="ident">m</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">m</span>),
-            <span class="ident"><span class="self">Self</span>::Ref</span>(<span class="ident">r</span>) =&gt; <span class="ident">Arc::try_unwrap</span>(<span class="ident">r</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_map</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_map(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Map&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Map(m) =&gt; <span class="prelude-val">Some</span>(m),
+            <span class="self">Self</span>::Ref(r) =&gt; r.as_map(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">pv</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">pv</span>),
-            <span class="ident"><span class="self">Self</span>::Ref</span>(<span class="ident">r</span>) =&gt; <span class="ident">Arc::try_unwrap</span>(<span class="ident">r</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_value</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>into_map(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Map&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Map(m) =&gt; <span class="prelude-val">Some</span>(m),
+            <span class="self">Self</span>::Ref(r) =&gt; Arc::try_unwrap(r).ok().and_then(|r| r.into_map()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_list</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">List</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">l</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">l</span>),
-            <span class="ident"><span class="self">Self</span>::Ref</span>(<span class="ident">r</span>) =&gt; <span class="ident">Arc::try_unwrap</span>(<span class="ident">r</span>).<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_list</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>into_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Value(pv) =&gt; <span class="prelude-val">Some</span>(pv),
+            <span class="self">Self</span>::Ref(r) =&gt; Arc::try_unwrap(r).ok().and_then(|r| r.into_value()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>into_list(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;List&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::List(l) =&gt; <span class="prelude-val">Some</span>(l),
+            <span class="self">Self</span>::Ref(r) =&gt; Arc::try_unwrap(r).ok().and_then(|r| r.into_list()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Item</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Item {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Map</span>(<span class="ident">m</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">Some</span>(<span class="ident">m</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Map(m) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = serializer.serialize_map(<span class="prelude-val">Some</span>(m.len()))<span class="question-mark">?</span>;
 
-                <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">m</span> {
-                    <span class="ident">map</span>.<span class="ident">serialize_entry</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>(k, v) <span class="kw">in </span>m {
+                    map.serialize_entry(k, v)<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">map</span>.<span class="ident">end</span>()
+                map.end()
             }
-            <span class="ident"><span class="self">Self</span>::List</span>(<span class="ident">l</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">l</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+            <span class="self">Self</span>::List(l) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>seq = serializer.serialize_seq(<span class="prelude-val">Some</span>(l.len()))<span class="question-mark">?</span>;
 
-                <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">l</span> {
-                    <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">e</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>e <span class="kw">in </span>l {
+                    seq.serialize_element(e)<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">seq</span>.<span class="ident">end</span>()
+                seq.end()
             }
-            <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">pv</span>) =&gt; <span class="ident">pv</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident"><span class="self">Self</span>::Json</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident"><span class="self">Self</span>::Ref</span>(<span class="ident">item_ref</span>) =&gt; <span class="ident">item_ref</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="self">Self</span>::Value(pv) =&gt; pv.serialize(serializer),
+            <span class="self">Self</span>::Json(value) =&gt; value.serialize(serializer),
+            <span class="self">Self</span>::Ref(item_ref) =&gt; item_ref.serialize(serializer),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

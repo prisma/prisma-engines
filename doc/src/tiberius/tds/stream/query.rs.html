@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/stream/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/stream/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -399,406 +399,406 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds::stream::ReceivedToken</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">row::ColumnType</span>, <span class="ident">Column</span>, <span class="ident">Row</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::{
-    <span class="ident">ready</span>,
-    <span class="ident">stream</span>::{<span class="ident">BoxStream</span>, <span class="ident">Peekable</span>},
-    <span class="ident">Stream</span>, <span class="ident">StreamExt</span>, <span class="ident">TryStreamExt</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::tds::stream::ReceivedToken;
+<span class="kw">use crate</span>::{row::ColumnType, Column, Row};
+<span class="kw">use </span>futures::{
+    ready,
+    stream::{BoxStream, Peekable},
+    Stream, StreamExt, TryStreamExt,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt::Debug</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="self">self</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>std::{
+    fmt::Debug,
+    pin::Pin,
+    sync::Arc,
+    task::{<span class="self">self</span>, Poll},
 };
 
-<span class="doccomment">/// A set of `Streams` of [`QueryItem`] values, which can be either result</span>
-<span class="doccomment">/// metadata or a row.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `QueryStream` needs to be polled empty before sending another query to</span>
-<span class="doccomment">/// the [`Client`], failing to do so causes a flush before the next query,</span>
-<span class="doccomment">/// slowing it down in an undeterministic way.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Every stream starts with metadata, describing the structure of the incoming</span>
-<span class="doccomment">/// rows, e.g. the columns in the order they are presented in every row.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If after consuming rows from the stream, another metadata result arrives, it</span>
-<span class="doccomment">/// means the stream has multiple results from different queries. This new</span>
-<span class="doccomment">/// metadata item will describe the next rows from here forwards.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If having one set of results in the response, using [`into_row_stream`]</span>
-<span class="doccomment">/// might be more convenient to use.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The struct provides non-streaming APIs with [`into_results`],</span>
-<span class="doccomment">/// [`into_first_result`] and [`into_row`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tiberius::{Config, QueryItem};</span>
-<span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-<span class="doccomment">/// # use std::env;</span>
-<span class="doccomment">/// # use futures::TryStreamExt;</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-<span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-<span class="doccomment">/// # );</span>
-<span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-<span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-<span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-<span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-<span class="doccomment">/// let mut stream = client</span>
-<span class="doccomment">///     .query(</span>
-<span class="doccomment">///         &quot;SELECT @P1 AS first; SELECT @P2 AS second&quot;,</span>
-<span class="doccomment">///         &amp;[&amp;1i32, &amp;2i32],</span>
-<span class="doccomment">///     )</span>
-<span class="doccomment">///     .await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The stream consists of four items, in the following order:</span>
-<span class="doccomment">/// // - Metadata from `SELECT 1`</span>
-<span class="doccomment">/// // - The only resulting row from `SELECT 1`</span>
-<span class="doccomment">/// // - Metadata from `SELECT 2`</span>
-<span class="doccomment">/// // - The only resulting row from `SELECT 2`</span>
-<span class="doccomment">/// while let Some(item) = stream.try_next().await? {</span>
-<span class="doccomment">///     match item {</span>
-<span class="doccomment">///         // our first item is the column data always</span>
-<span class="doccomment">///         QueryItem::Metadata(meta) if meta.result_index() == 0 =&gt; {</span>
-<span class="doccomment">///             // the first result column info can be handled here</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///         // ... and from there on from 0..N rows</span>
-<span class="doccomment">///         QueryItem::Row(row) if row.result_index() == 0 =&gt; {</span>
-<span class="doccomment">///             assert_eq!(Some(1), row.get(0));</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///         // the second result set returns first another metadata item</span>
-<span class="doccomment">///         QueryItem::Metadata(meta) =&gt; {</span>
-<span class="doccomment">///             // .. handling</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///         // ...and, again, we get rows from the second resultset</span>
-<span class="doccomment">///         QueryItem::Row(row) =&gt; {</span>
-<span class="doccomment">///             assert_eq!(Some(2), row.get(0));</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: struct.Client.html</span>
-<span class="doccomment">/// [`into_row_stream`]: struct.QueryStream.html#method.into_row_stream</span>
-<span class="doccomment">/// [`into_results`]: struct.QueryStream.html#method.into_results</span>
-<span class="doccomment">/// [`into_first_result`]: struct.QueryStream.html#method.into_first_result</span>
-<span class="doccomment">/// [`into_row`]: struct.QueryStream.html#method.into_row</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">token_stream</span>: <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">columns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">result_set_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A set of `Streams` of [`QueryItem`] values, which can be either result
+/// metadata or a row.
+///
+/// The `QueryStream` needs to be polled empty before sending another query to
+/// the [`Client`], failing to do so causes a flush before the next query,
+/// slowing it down in an undeterministic way.
+///
+/// Every stream starts with metadata, describing the structure of the incoming
+/// rows, e.g. the columns in the order they are presented in every row.
+///
+/// If after consuming rows from the stream, another metadata result arrives, it
+/// means the stream has multiple results from different queries. This new
+/// metadata item will describe the next rows from here forwards.
+///
+/// If having one set of results in the response, using [`into_row_stream`]
+/// might be more convenient to use.
+///
+/// The struct provides non-streaming APIs with [`into_results`],
+/// [`into_first_result`] and [`into_row`].
+///
+/// # Example
+///
+/// ```
+/// # use tiberius::{Config, QueryItem};
+/// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+/// # use std::env;
+/// # use futures::TryStreamExt;
+/// # #[tokio::main]
+/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+/// # );
+/// # let config = Config::from_ado_string(&amp;c_str)?;
+/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+/// # tcp.set_nodelay(true)?;
+/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+/// let mut stream = client
+///     .query(
+///         &quot;SELECT @P1 AS first; SELECT @P2 AS second&quot;,
+///         &amp;[&amp;1i32, &amp;2i32],
+///     )
+///     .await?;
+///
+/// // The stream consists of four items, in the following order:
+/// // - Metadata from `SELECT 1`
+/// // - The only resulting row from `SELECT 1`
+/// // - Metadata from `SELECT 2`
+/// // - The only resulting row from `SELECT 2`
+/// while let Some(item) = stream.try_next().await? {
+///     match item {
+///         // our first item is the column data always
+///         QueryItem::Metadata(meta) if meta.result_index() == 0 =&gt; {
+///             // the first result column info can be handled here
+///         }
+///         // ... and from there on from 0..N rows
+///         QueryItem::Row(row) if row.result_index() == 0 =&gt; {
+///             assert_eq!(Some(1), row.get(0));
+///         }
+///         // the second result set returns first another metadata item
+///         QueryItem::Metadata(meta) =&gt; {
+///             // .. handling
+///         }
+///         // ...and, again, we get rows from the second resultset
+///         QueryItem::Row(row) =&gt; {
+///             assert_eq!(Some(2), row.get(0));
+///         }
+///     }
+/// }
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`Client`]: struct.Client.html
+/// [`into_row_stream`]: struct.QueryStream.html#method.into_row_stream
+/// [`into_results`]: struct.QueryStream.html#method.into_results
+/// [`into_first_result`]: struct.QueryStream.html#method.into_first_result
+/// [`into_row`]: struct.QueryStream.html#method.into_row
+</span><span class="kw">pub struct </span>QueryStream&lt;<span class="lifetime">&#39;a</span>&gt; {
+    token_stream: Peekable&lt;BoxStream&lt;<span class="lifetime">&#39;a</span>, <span class="kw">crate</span>::Result&lt;ReceivedToken&gt;&gt;&gt;,
+    columns: <span class="prelude-ty">Option</span>&lt;Arc&lt;Vec&lt;Column&gt;&gt;&gt;,
+    result_set_index: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryStream&quot;</span>)
-            .<span class="ident">field</span>(
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>QueryStream&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryStream&quot;</span>)
+            .field(
                 <span class="string">&quot;token_stream&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="string">&quot;BoxStream&lt;&#39;a, crate::Result&lt;ReceivedToken&gt;&gt;&quot;</span>,
             )
-            .<span class="ident">finish</span>()
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token_stream</span>: <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">token_stream</span>: <span class="ident">token_stream</span>.<span class="ident">peekable</span>(),
-            <span class="ident">columns</span>: <span class="prelude-val">None</span>,
-            <span class="ident">result_set_index</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; QueryStream&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(token_stream: BoxStream&lt;<span class="lifetime">&#39;a</span>, <span class="kw">crate</span>::Result&lt;ReceivedToken&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            token_stream: token_stream.peekable(),
+            columns: <span class="prelude-val">None</span>,
+            result_set_index: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Moves the stream forward until having result metadata, stream end or an</span>
-    <span class="doccomment">/// error.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forward_to_metadata</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">token_stream</span>)
-                .<span class="ident">peek</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">as_ref</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">clone</span>()))
-                .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+    <span class="doccomment">/// Moves the stream forward until having result metadata, stream end or an
+    /// error.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>forward_to_metadata(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>item = Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.token_stream)
+                .peek()
+                .<span class="kw">await
+                </span>.map(|r| r.as_ref().map_err(|e| e.clone()))
+                .transpose()<span class="question-mark">?</span>;
 
-            <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::NewResultset</span>(<span class="kw">_</span>)) =&gt; <span class="kw">break</span>,
+            <span class="kw">match </span>item {
+                <span class="prelude-val">Some</span>(ReceivedToken::NewResultset(<span class="kw">_</span>)) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">token_stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="self">self</span>.token_stream.try_next().<span class="kw">await</span><span class="question-mark">?</span>;
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// The list of columns either for the current result set, or for the next</span>
-    <span class="doccomment">/// one. If the stream is just created, or if the next item in the stream</span>
-    <span class="doccomment">/// contains metadata, the metadata will be taken from the stream. Otherwise</span>
-    <span class="doccomment">/// the columns will be returned from the cache and reflect on the current</span>
-    <span class="doccomment">/// result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tiberius::Config;</span>
-    <span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-    <span class="doccomment">/// # use std::env;</span>
-    <span class="doccomment">/// # use futures::TryStreamExt;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; anyhow::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-    <span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-    <span class="doccomment">/// # );</span>
-    <span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-    <span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-    <span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-    <span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-    <span class="doccomment">/// let mut stream = client</span>
-    <span class="doccomment">///     .query(</span>
-    <span class="doccomment">///         &quot;SELECT @P1 AS first; SELECT @P2 AS second&quot;,</span>
-    <span class="doccomment">///         &amp;[&amp;1i32, &amp;2i32],</span>
-    <span class="doccomment">///     )</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Nothing is fetched, the first result set starts.</span>
-    <span class="doccomment">/// let cols = stream.columns().await?.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(&quot;first&quot;, cols[0].name());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Move over the metadata.</span>
-    <span class="doccomment">/// stream.try_next().await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We&#39;re in the first row, seeing the metadata for that set.</span>
-    <span class="doccomment">/// let cols = stream.columns().await?.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(&quot;first&quot;, cols[0].name());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Move over the only row in the first set.</span>
-    <span class="doccomment">/// stream.try_next().await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // End of the first set, getting the metadata by peaking the next item.</span>
-    <span class="doccomment">/// let cols = stream.columns().await?.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(&quot;second&quot;, cols[0].name());</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReceivedToken</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// The list of columns either for the current result set, or for the next
+    /// one. If the stream is just created, or if the next item in the stream
+    /// contains metadata, the metadata will be taken from the stream. Otherwise
+    /// the columns will be returned from the cache and reflect on the current
+    /// result set.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tiberius::Config;
+    /// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+    /// # use std::env;
+    /// # use futures::TryStreamExt;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; anyhow::Result&lt;()&gt; {
+    /// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+    /// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+    /// # );
+    /// # let config = Config::from_ado_string(&amp;c_str)?;
+    /// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+    /// # tcp.set_nodelay(true)?;
+    /// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+    /// let mut stream = client
+    ///     .query(
+    ///         &quot;SELECT @P1 AS first; SELECT @P2 AS second&quot;,
+    ///         &amp;[&amp;1i32, &amp;2i32],
+    ///     )
+    ///     .await?;
+    ///
+    /// // Nothing is fetched, the first result set starts.
+    /// let cols = stream.columns().await?.unwrap();
+    /// assert_eq!(&quot;first&quot;, cols[0].name());
+    ///
+    /// // Move over the metadata.
+    /// stream.try_next().await?;
+    ///
+    /// // We&#39;re in the first row, seeing the metadata for that set.
+    /// let cols = stream.columns().await?.unwrap();
+    /// assert_eq!(&quot;first&quot;, cols[0].name());
+    ///
+    /// // Move over the only row in the first set.
+    /// stream.try_next().await?;
+    ///
+    /// // End of the first set, getting the metadata by peaking the next item.
+    /// let cols = stream.columns().await?.unwrap();
+    /// assert_eq!(&quot;second&quot;, cols[0].name());
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>columns(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Column]&gt;&gt; {
+        <span class="kw">use </span>ReceivedToken::<span class="kw-2">*</span>;
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">token_stream</span>)
-                .<span class="ident">peek</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">as_ref</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">clone</span>()))
-                .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>item = Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.token_stream)
+                .peek()
+                .<span class="kw">await
+                </span>.map(|r| r.as_ref().map_err(|e| e.clone()))
+                .transpose()<span class="question-mark">?</span>;
 
-            <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">token</span>) =&gt; <span class="kw">match</span> <span class="ident">token</span> {
-                    <span class="ident">NewResultset</span>(<span class="ident">metadata</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">metadata</span>.<span class="ident">columns</span>().<span class="ident">collect</span>()));
+            <span class="kw">match </span>item {
+                <span class="prelude-val">Some</span>(token) =&gt; <span class="kw">match </span>token {
+                    NewResultset(metadata) =&gt; {
+                        <span class="self">self</span>.columns = <span class="prelude-val">Some</span>(Arc::new(metadata.columns().collect()));
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">Row</span>(<span class="kw">_</span>) =&gt; {
+                    Row(<span class="kw">_</span>) =&gt; {
                         <span class="kw">break</span>;
                     }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">token_stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="self">self</span>.token_stream.try_next().<span class="kw">await</span><span class="question-mark">?</span>;
                         <span class="kw">continue</span>;
                     }
                 },
-                <span class="prelude-val">None</span> =&gt; {
+                <span class="prelude-val">None </span>=&gt; {
                     <span class="kw">break</span>;
                 }
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_slice</span>()))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.columns.as_ref().map(|c| c.as_slice()))
     }
 
-    <span class="doccomment">/// Collects results from all queries in the stream into memory in the order</span>
-    <span class="doccomment">/// of querying.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_results</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Collects results from all queries in the stream into memory in the order
+    /// of querying.
+    </span><span class="kw">pub async fn </span>into_results(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Vec&lt;Row&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>results: Vec&lt;Vec&lt;Row&gt;&gt; = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>result: <span class="prelude-ty">Option</span>&lt;Vec&lt;Row&gt;&gt; = <span class="prelude-val">None</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">match</span> (<span class="ident">item</span>, <span class="kw-2">&amp;mut</span> <span class="ident">result</span>) {
-                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">row</span>]);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(item) = <span class="self">self</span>.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="kw">match </span>(item, <span class="kw-2">&amp;mut </span>result) {
+                (QueryItem::Row(row), <span class="prelude-val">None</span>) =&gt; {
+                    result = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[row]);
                 }
-                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">result</span>)) =&gt; <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">row</span>),
-                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Vec::new</span>());
+                (QueryItem::Row(row), <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>result)) =&gt; result.push(row),
+                (QueryItem::Metadata(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
+                    result = <span class="prelude-val">Some</span>(Vec::new());
                 }
-                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">previous_result</span>) =&gt; {
-                    <span class="ident">results</span>.<span class="ident">push</span>(<span class="ident">previous_result</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
-                    <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                (QueryItem::Metadata(<span class="kw">_</span>), <span class="kw-2">ref mut </span>previous_result) =&gt; {
+                    results.push(previous_result.take().unwrap());
+                    result = <span class="prelude-val">None</span>;
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">result</span> {
-            <span class="ident">results</span>.<span class="ident">push</span>(<span class="ident">result</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(result) = result {
+            results.push(result);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">results</span>)
+        <span class="prelude-val">Ok</span>(results)
     }
 
-    <span class="doccomment">/// Collects the output of the first query, dropping any further</span>
-    <span class="doccomment">/// results.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_first_result</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_results</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>();
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">results</span>.<span class="ident">next</span>().<span class="ident">unwrap_or_default</span>();
+    <span class="doccomment">/// Collects the output of the first query, dropping any further
+    /// results.
+    </span><span class="kw">pub async fn </span>into_first_result(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Row&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>results = <span class="self">self</span>.into_results().<span class="kw">await</span><span class="question-mark">?</span>.into_iter();
+        <span class="kw">let </span>rows = results.next().unwrap_or_default();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">rows</span>)
+        <span class="prelude-val">Ok</span>(rows)
     }
 
-    <span class="doccomment">/// Collects the first row from the output of the first query, dropping any</span>
-    <span class="doccomment">/// further rows.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_first_result</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>();
+    <span class="doccomment">/// Collects the first row from the output of the first query, dropping any
+    /// further rows.
+    </span><span class="kw">pub async fn </span>into_row(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>results = <span class="self">self</span>.into_first_result().<span class="kw">await</span><span class="question-mark">?</span>.into_iter();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">results</span>.<span class="ident">next</span>())
+        <span class="prelude-val">Ok</span>(results.next())
     }
 
-    <span class="doccomment">/// Convert the stream into a stream of rows, skipping metadata items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row_stream</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_filter_map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">async</span> {
-            <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>)),
-                <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="doccomment">/// Convert the stream into a stream of rows, skipping metadata items.
+    </span><span class="kw">pub fn </span>into_row_stream(<span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;a</span>, <span class="kw">crate</span>::Result&lt;Row&gt;&gt; {
+        <span class="kw">let </span>s = <span class="self">self</span>.try_filter_map(|item| <span class="kw">async </span>{
+            <span class="kw">match </span>item {
+                QueryItem::Row(row) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)),
+                QueryItem::Metadata(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             }
         });
 
-        <span class="ident">Box::pin</span>(<span class="ident">s</span>)
+        Box::pin(s)
     }
 }
 
-<span class="doccomment">/// Info about the following stream of rows.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResultMetadata</span> {
-    <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">result_index</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Info about the following stream of rows.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>ResultMetadata {
+    columns: Arc&lt;Vec&lt;Column&gt;&gt;,
+    result_index: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">ResultMetadata</span> {
-    <span class="doccomment">/// Column info. The order is the same as in the following rows.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">columns</span>
+<span class="kw">impl </span>ResultMetadata {
+    <span class="doccomment">/// Column info. The order is the same as in the following rows.
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.columns
     }
 
-    <span class="doccomment">/// The number of the result set, an incrementing value starting from zero,</span>
-    <span class="doccomment">/// which gives an indication of the position of the result set in the</span>
-    <span class="doccomment">/// stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">result_index</span>
+    <span class="doccomment">/// The number of the result set, an incrementing value starting from zero,
+    /// which gives an indication of the position of the result set in the
+    /// stream.
+    </span><span class="kw">pub fn </span>result_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.result_index
     }
 }
 
-<span class="doccomment">/// Resulting data from a query.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryItem</span> {
-    <span class="doccomment">/// A single row of data.</span>
-    <span class="ident">Row</span>(<span class="ident">Row</span>),
-    <span class="doccomment">/// Information of the upcoming row data.</span>
-    <span class="ident">Metadata</span>(<span class="ident">ResultMetadata</span>),
+<span class="doccomment">/// Resulting data from a query.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>QueryItem {
+    <span class="doccomment">/// A single row of data.
+    </span>Row(Row),
+    <span class="doccomment">/// Information of the upcoming row data.
+    </span>Metadata(ResultMetadata),
 }
 
-<span class="kw">impl</span> <span class="ident">QueryItem</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">result_index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Metadata</span>(<span class="ident">ResultMetadata</span> {
-            <span class="ident">columns</span>,
-            <span class="ident">result_index</span>,
+<span class="kw">impl </span>QueryItem {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>metadata(columns: Arc&lt;Vec&lt;Column&gt;&gt;, result_index: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Metadata(ResultMetadata {
+            columns,
+            result_index,
         })
     }
 
-    <span class="doccomment">/// Returns a reference to the metadata, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw-2">ref</span> <span class="ident">metadata</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
+    <span class="doccomment">/// Returns a reference to the metadata, if the item is of a correct variant.
+    </span><span class="kw">pub fn </span>as_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ResultMetadata&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            QueryItem::Row(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            QueryItem::Metadata(<span class="kw-2">ref </span>metadata) =&gt; <span class="prelude-val">Some</span>(metadata),
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the row, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw-2">ref</span> <span class="ident">row</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row</span>),
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns a reference to the row, if the item is of a correct variant.
+    </span><span class="kw">pub fn </span>as_row(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Row&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            QueryItem::Row(<span class="kw-2">ref </span>row) =&gt; <span class="prelude-val">Some</span>(row),
+            QueryItem::Metadata(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the metadata, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_metadata</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">QueryItem::Metadata</span>(<span class="ident">metadata</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
+    <span class="doccomment">/// Returns the metadata, if the item is of a correct variant.
+    </span><span class="kw">pub fn </span>into_metadata(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResultMetadata&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            QueryItem::Row(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            QueryItem::Metadata(metadata) =&gt; <span class="prelude-val">Some</span>(metadata),
         }
     }
 
-    <span class="doccomment">/// Returns the row, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row</span>),
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the row, if the item is of a correct variant.
+    </span><span class="kw">pub fn </span>into_row(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Row&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            QueryItem::Row(row) =&gt; <span class="prelude-val">Some</span>(row),
+            QueryItem::Metadata(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryItem</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Stream <span class="kw">for </span>QueryStream&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw">crate</span>::Result&lt;QueryItem&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.get_mut();
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">token_stream</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span><span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>token = <span class="kw">match </span><span class="macro">ready!</span>(this.token_stream.poll_next_unpin(cx)) {
+                <span class="prelude-val">Some</span>(res) =&gt; res<span class="question-mark">?</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
             };
 
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">token</span> {
-                <span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">meta</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">column_meta</span> <span class="op">=</span> <span class="ident">meta</span>
-                        .<span class="ident">columns</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Column</span> {
-                            <span class="ident">name</span>: <span class="ident">x</span>.<span class="ident">col_name</span>.<span class="ident">to_string</span>(),
-                            <span class="ident">column_type</span>: <span class="ident">ColumnType::from</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">base</span>.<span class="ident">ty</span>),
+            <span class="kw">return match </span>token {
+                ReceivedToken::NewResultset(meta) =&gt; {
+                    <span class="kw">let </span>column_meta = meta
+                        .columns
+                        .iter()
+                        .map(|x| Column {
+                            name: x.col_name.to_string(),
+                            column_type: ColumnType::from(<span class="kw-2">&amp;</span>x.base.ty),
                         })
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-                    <span class="kw">let</span> <span class="ident">column_meta</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">column_meta</span>);
-                    <span class="ident">this</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">column_meta</span>.<span class="ident">clone</span>());
+                    <span class="kw">let </span>column_meta = Arc::new(column_meta);
+                    this.columns = <span class="prelude-val">Some</span>(column_meta.clone());
 
-                    <span class="ident">this</span>.<span class="ident">result_set_index</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">result_set_index</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>);
+                    this.result_set_index = this.result_set_index.map(|i| i + <span class="number">1</span>);
 
-                    <span class="kw">let</span> <span class="ident">query_item</span> <span class="op">=</span>
-                        <span class="ident">QueryItem::metadata</span>(<span class="ident">column_meta</span>, <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">result_set_index</span>.<span class="ident">get_or_insert</span>(<span class="number">0</span>));
+                    <span class="kw">let </span>query_item =
+                        QueryItem::metadata(column_meta, <span class="kw-2">*</span>this.result_set_index.get_or_insert(<span class="number">0</span>));
 
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">query_item</span>)));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(query_item)));
                 }
-                <span class="ident">ReceivedToken::Row</span>(<span class="ident">data</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">columns</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">result_index</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">result_set_index</span>.<span class="ident">unwrap</span>();
+                ReceivedToken::Row(data) =&gt; {
+                    <span class="kw">let </span>columns = this.columns.as_ref().unwrap().clone();
+                    <span class="kw">let </span>result_index = this.result_set_index.unwrap();
 
-                    <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row</span> {
-                        <span class="ident">columns</span>,
-                        <span class="ident">data</span>,
-                        <span class="ident">result_index</span>,
+                    <span class="kw">let </span>row = Row {
+                        columns,
+                        data,
+                        result_index,
                     };
 
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>))))
+                    Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(QueryItem::Row(row))))
                 }
-                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
             };
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

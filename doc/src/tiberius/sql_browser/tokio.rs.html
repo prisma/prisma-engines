@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/sql_browser/tokio.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokio.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/sql_browser/tokio.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokio.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -72,79 +72,79 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlBrowser</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Config</span>;
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">futures::TryFutureExt</span>;
-<span class="kw">use</span> <span class="ident">net</span>::{<span class="ident">TcpStream</span>, <span class="ident">UdpSocket</span>};
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{
-    <span class="ident">net</span>,
-    <span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">error::Elapsed</span>, <span class="ident">Duration</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlBrowser;
+<span class="kw">use </span><span class="kw">crate</span>::client::Config;
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>futures::TryFutureExt;
+<span class="kw">use </span>net::{TcpStream, UdpSocket};
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>tokio::{
+    net,
+    time::{<span class="self">self</span>, error::Elapsed, Duration},
 };
-<span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use </span>tracing::Level;
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">SqlBrowser</span> <span class="kw">for</span> <span class="ident">TcpStream</span> {
-    <span class="doccomment">/// This method can be used to connect to SQL Server named instances</span>
-    <span class="doccomment">/// when on a Windows paltform with the `sql-browser-tokio` feature</span>
-    <span class="doccomment">/// enabled. Please see the crate examples for more detailed examples.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_named</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">net::lookup_host</span>(<span class="ident">builder</span>.<span class="ident">get_addr</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>SqlBrowser <span class="kw">for </span>TcpStream {
+    <span class="doccomment">/// This method can be used to connect to SQL Server named instances
+    /// when on a Windows paltform with the `sql-browser-tokio` feature
+    /// enabled. Please see the crate examples for more detailed examples.
+    </span><span class="kw">async fn </span>connect_named(builder: <span class="kw-2">&amp;</span>Config) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>addrs = net::lookup_host(builder.get_addr()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">instance_name</span>) <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">instance_name</span> {
-                <span class="comment">// First resolve the instance to a port via the</span>
-                <span class="comment">// SSRP protocol/MS-SQLR protocol [1]</span>
-                <span class="comment">// [1] https://msdn.microsoft.com/en-us/library/cc219703.aspx</span>
+        <span class="kw">for </span><span class="kw-2">mut </span>addr <span class="kw">in </span>addrs {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>instance_name) = builder.instance_name {
+                <span class="comment">// First resolve the instance to a port via the
+                // SSRP protocol/MS-SQLR protocol [1]
+                // [1] https://msdn.microsoft.com/en-us/library/cc219703.aspx
 
-                <span class="kw">let</span> <span class="ident">local_bind</span>: <span class="ident">std::net::SocketAddr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">addr</span>.<span class="ident">is_ipv4</span>() {
-                    <span class="string">&quot;0.0.0.0:0&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;[::]:0&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+                </span><span class="kw">let </span>local_bind: std::net::SocketAddr = <span class="kw">if </span>addr.is_ipv4() {
+                    <span class="string">&quot;0.0.0.0:0&quot;</span>.parse().unwrap()
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;[::]:0&quot;</span>.parse().unwrap()
                 };
 
                 <span class="macro">tracing::event!</span>(
-                    <span class="ident">Level::TRACE</span>,
+                    Level::TRACE,
                     <span class="string">&quot;Connecting to instance `{}` using SQL Browser in port `{}`&quot;</span>,
-                    <span class="ident">instance_name</span>,
-                    <span class="ident">builder</span>.<span class="ident">get_port</span>()
+                    instance_name,
+                    builder.get_port()
                 );
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="number">4u8</span>], <span class="ident">instance_name</span>.<span class="ident">as_bytes</span>()].<span class="ident">concat</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">4096</span>];
+                <span class="kw">let </span>msg = [<span class="kw-2">&amp;</span>[<span class="number">4u8</span>], instance_name.as_bytes()].concat();
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">4096</span>];
 
-                <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">UdpSocket::bind</span>(<span class="kw-2">&amp;</span><span class="ident">local_bind</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">socket</span>.<span class="ident">send_to</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>socket = UdpSocket::bind(<span class="kw-2">&amp;</span>local_bind).<span class="kw">await</span><span class="question-mark">?</span>;
+                socket.send_to(<span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;</span>addr).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">1000</span>);
+                <span class="kw">let </span>timeout = Duration::from_millis(<span class="number">1000</span>);
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">socket</span>.<span class="ident">recv</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>))
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span>: <span class="ident">Elapsed</span><span class="op">|</span> {
-                        <span class="ident"><span class="kw">crate</span>::error::Error::Conversion</span>(
+                <span class="kw">let </span>len = time::timeout(timeout, socket.recv(<span class="kw-2">&amp;mut </span>buf))
+                    .map_err(|<span class="kw">_</span>: Elapsed| {
+                        <span class="kw">crate</span>::error::Error::Conversion(
                             <span class="macro">format!</span>(
                                 <span class="string">&quot;SQL browser timeout during resolving instance {}. Please check if browser is running in port {} and does the instance exist.&quot;</span>,
-                                <span class="ident">instance_name</span>,
-                                <span class="ident">builder</span>.<span class="ident">get_port</span>(),
+                                instance_name,
+                                builder.get_port(),
                             )
-                            .<span class="ident">into</span>(),
+                            .into(),
                         )
                     })
-                    .<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span>;
+                    .<span class="kw">await</span><span class="question-mark">??</span>;
 
-                <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::get_port_from_sql_browser_reply</span>(<span class="ident">buf</span>, <span class="ident">len</span>, <span class="ident">instance_name</span>)<span class="question-mark">?</span>;
-                <span class="macro">tracing::event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;Found port `{}` from SQL Browser&quot;</span>, <span class="ident">port</span>);
-                <span class="ident">addr</span>.<span class="ident">set_port</span>(<span class="ident">port</span>);
+                <span class="kw">let </span>port = <span class="kw">super</span>::get_port_from_sql_browser_reply(buf, len, instance_name)<span class="question-mark">?</span>;
+                <span class="macro">tracing::event!</span>(Level::TRACE, <span class="string">&quot;Found port `{}` from SQL Browser&quot;</span>, port);
+                addr.set_port(port);
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="ident">addr</span>).<span class="kw">await</span> {
-                <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">stream</span>);
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(stream) = TcpStream::connect(addr).<span class="kw">await </span>{
+                stream.set_nodelay(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(stream);
             }
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::NotFound</span>, <span class="string">&quot;Could not resolve server host&quot;</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Err</span>(io::Error::new(io::ErrorKind::NotFound, <span class="string">&quot;Could not resolve server host&quot;</span>).into())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

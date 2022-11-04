@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -397,404 +397,404 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::compare::JsonType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Comparable</span>, <span class="ident">Compare</span>, <span class="ident">Expression</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+</span><span class="kw">use </span><span class="kw">super</span>::compare::JsonType;
+<span class="kw">use </span><span class="kw">crate</span>::ast::{Comparable, Compare, Expression};
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// A collection of values surrounded by parentheses.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A collection of values surrounded by parentheses.
+</span><span class="attribute">#[derive(Debug, Default, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>values: Vec&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Row</span> { <span class="ident">values</span>: <span class="ident">Vec::new</span>() }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Row { values: Vec::new() }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Row</span> {
-            <span class="ident">values</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>),
+    <span class="kw">pub fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        Row {
+            values: Vec::with_capacity(capacity),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">pop</span>()
+    <span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.values.pop()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>push&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: T)
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.values.push(value.into());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>()
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.values.is_empty()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">len</span>()
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.values.len()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_only_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_column</span>())
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_only_columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.values.iter().all(|v| v.is_column())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_columns</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::ast::Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>());
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_columns(<span class="self">self</span>) -&gt; Vec&lt;<span class="kw">crate</span>::ast::Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::with_capacity(<span class="self">self</span>.len());
 
-        <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">expr</span>.<span class="ident">into_column</span>().<span class="ident">unwrap</span>());
+        <span class="kw">for </span>expr <span class="kw">in </span><span class="self">self</span>.values.into_iter() {
+            columns.push(expr.into_column().unwrap());
         }
 
-        <span class="ident">columns</span>
+        columns
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = Expression&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>IntoIter = std::vec::IntoIter&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.values.into_iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vector</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="ident">vector</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>from(vector: Vec&lt;T&gt;) -&gt; Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(vector.len());
 
-        <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">vector</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">v</span>.<span class="ident">into</span>());
+        <span class="kw">for </span>v <span class="kw">in </span>vector.into_iter() {
+            row.push(v.into());
         }
 
-        <span class="ident">row</span>
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">A</span>,)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; From&lt;(A,)&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>A: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">val</span>,): (<span class="ident">A</span>,)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="number">1</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">val</span>);
-        <span class="ident">row</span>
+    <span class="kw">fn </span>from((val,): (A,)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(<span class="number">1</span>);
+        row.push(val);
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">A</span>, <span class="ident">B</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, B&gt; From&lt;(A, B)&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>A: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    B: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vals</span>: (<span class="ident">A</span>, <span class="ident">B</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="number">2</span>);
+    <span class="kw">fn </span>from(vals: (A, B)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(<span class="number">2</span>);
 
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">0</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">1</span>);
+        row.push(vals.<span class="number">0</span>);
+        row.push(vals.<span class="number">1</span>);
 
-        <span class="ident">row</span>
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, B, C&gt; From&lt;(A, B, C)&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>A: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    B: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    C: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vals</span>: (<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="number">3</span>);
+    <span class="kw">fn </span>from(vals: (A, B, C)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(<span class="number">3</span>);
 
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">0</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">1</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">2</span>);
+        row.push(vals.<span class="number">0</span>);
+        row.push(vals.<span class="number">1</span>);
+        row.push(vals.<span class="number">2</span>);
 
-        <span class="ident">row</span>
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, B, C, D&gt; From&lt;(A, B, C, D)&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>A: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    B: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    C: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    D: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vals</span>: (<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="number">4</span>);
+    <span class="kw">fn </span>from(vals: (A, B, C, D)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(<span class="number">4</span>);
 
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">0</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">1</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">2</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">3</span>);
+        row.push(vals.<span class="number">0</span>);
+        row.push(vals.<span class="number">1</span>);
+        row.push(vals.<span class="number">2</span>);
+        row.push(vals.<span class="number">3</span>);
 
-        <span class="ident">row</span>
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, B, C, D, E&gt; From&lt;(A, B, C, D, E)&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>A: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    B: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    C: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    D: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    E: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vals</span>: (<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row::with_capacity</span>(<span class="number">5</span>);
+    <span class="kw">fn </span>from(vals: (A, B, C, D, E)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Row::with_capacity(<span class="number">5</span>);
 
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">0</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">1</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">2</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">3</span>);
-        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">vals</span>.<span class="number">4</span>);
+        row.push(vals.<span class="number">0</span>);
+        row.push(vals.<span class="number">1</span>);
+        row.push(vals.<span class="number">2</span>);
+        row.push(vals.<span class="number">3</span>);
+        row.push(vals.<span class="number">4</span>);
 
-        <span class="ident">row</span>
+        row
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Comparable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Comparable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>equals&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">equals</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.equals(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>not_equals&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">not_equals</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.not_equals(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>less_than&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">less_than</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.less_than(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>less_than_or_equals&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.less_than_or_equals(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>greater_than&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">greater_than</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.greater_than(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">comparison</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>greater_than_or_equals&lt;T&gt;(<span class="self">self</span>, comparison: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">comparison</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.greater_than_or_equals(comparison)
     }
 
-    <span class="kw">fn</span> <span class="ident">in_selection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">selection</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>in_selection&lt;T&gt;(<span class="self">self</span>, selection: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">in_selection</span>(<span class="ident">selection</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.in_selection(selection)
     }
 
-    <span class="kw">fn</span> <span class="ident">not_in_selection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">selection</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>not_in_selection&lt;T&gt;(<span class="self">self</span>, selection: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">not_in_selection</span>(<span class="ident">selection</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.not_in_selection(selection)
     }
 
-    <span class="kw">fn</span> <span class="ident">like</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">pattern</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>like&lt;T&gt;(<span class="self">self</span>, pattern: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">like</span>(<span class="ident">pattern</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.like(pattern)
     }
 
-    <span class="kw">fn</span> <span class="ident">not_like</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">pattern</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>not_like&lt;T&gt;(<span class="self">self</span>, pattern: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">not_like</span>(<span class="ident">pattern</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.not_like(pattern)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="self">self</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">is_null</span>()
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>is_null(<span class="self">self</span>) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.is_null()
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_not_null</span>(<span class="self">self</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">is_not_null</span>()
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">fn </span>is_not_null(<span class="self">self</span>) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.is_not_null()
     }
 
-    <span class="kw">fn</span> <span class="ident">between</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">left</span>: <span class="ident">T</span>, <span class="ident">right</span>: <span class="ident">V</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>between&lt;T, V&gt;(<span class="self">self</span>, left: T, right: V) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        V: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">between</span>(<span class="ident">left</span>, <span class="ident">right</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.between(left, right)
     }
 
-    <span class="kw">fn</span> <span class="ident">not_between</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">left</span>: <span class="ident">T</span>, <span class="ident">right</span>: <span class="ident">V</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>not_between&lt;T, V&gt;(<span class="self">self</span>, left: T, right: V) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        V: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">not_between</span>(<span class="ident">left</span>, <span class="ident">right</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.not_between(left, right)
     }
 
-    <span class="kw">fn</span> <span class="ident">compare_raw</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">raw_comparator</span>: <span class="ident">T</span>, <span class="ident">right</span>: <span class="ident">V</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>compare_raw&lt;T, V&gt;(<span class="self">self</span>, raw_comparator: T, right: V) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        V: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-        <span class="ident">value</span>.<span class="ident">compare_raw</span>(<span class="ident">raw_comparator</span>, <span class="ident">right</span>)
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
+        value.compare_raw(raw_comparator, right)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_contains&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_contains</span>(<span class="ident">item</span>)
+        value.json_array_contains(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_not_contains&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_not_contains</span>(<span class="ident">item</span>)
+        value.json_array_not_contains(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_begins_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_begins_with&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_begins_with</span>(<span class="ident">item</span>)
+        value.json_array_begins_with(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_not_begins_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_not_begins_with&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_not_begins_with</span>(<span class="ident">item</span>)
+        value.json_array_not_begins_with(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_ends_into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_ends_into&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_ends_into</span>(<span class="ident">item</span>)
+        value.json_array_ends_into(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_array_not_ends_into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_array_not_ends_into&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_array_not_ends_into</span>(<span class="ident">item</span>)
+        value.json_array_not_ends_into(item)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_type_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">json_type</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JsonType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_type_equals&lt;T&gt;(<span class="self">self</span>, json_type: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;JsonType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_type_equals</span>(<span class="ident">json_type</span>)
+        value.json_type_equals(json_type)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">json_type_not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">json_type</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JsonType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    </span><span class="kw">fn </span>json_type_not_equals&lt;T&gt;(<span class="self">self</span>, json_type: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;JsonType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">json_type_not_equals</span>(<span class="ident">json_type</span>)
+        value.json_type_not_equals(json_type)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">matches</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">query</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>matches&lt;T&gt;(<span class="self">self</span>, query: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">matches</span>(<span class="ident">query</span>)
+        value.matches(query)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">not_matches</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">query</span>: <span class="ident">T</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>not_matches&lt;T&gt;(<span class="self">self</span>, query: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">not_matches</span>(<span class="ident">query</span>)
+        value.not_matches(query)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">any</span>(<span class="self">self</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>any(<span class="self">self</span>) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">any</span>()
+        value.any()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">all</span>(<span class="self">self</span>) -&gt; <span class="ident">Compare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>all(<span class="self">self</span>) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>value: Expression&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="self">self</span>.into();
 
-        <span class="ident">value</span>.<span class="ident">all</span>()
+        value.all()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

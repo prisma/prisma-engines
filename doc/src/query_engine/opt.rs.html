@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/opt.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>opt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -226,233 +226,233 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::PrismaError</span>, <span class="ident">PrismaResult</span>};
-<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">ffi::OsStr</span>, <span class="ident">fs::File</span>, <span class="ident">io::Read</span>};
-<span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{error::PrismaError, PrismaResult};
+<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>std::{env, ffi::OsStr, fs::File, io::Read};
+<span class="kw">use </span>structopt::StructOpt;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Subcommand</span> {
-    <span class="doccomment">/// Doesn&#39;t start a server, but allows running specific commands against Prisma.</span>
-    <span class="ident">Cli</span>(<span class="ident">CliOpt</span>),
+<span class="attribute">#[derive(Debug, StructOpt, Clone)]
+</span><span class="kw">pub enum </span>Subcommand {
+    <span class="doccomment">/// Doesn&#39;t start a server, but allows running specific commands against Prisma.
+    </span>Cli(CliOpt),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteRequestInput</span> {
-    <span class="doccomment">/// GraphQL query to execute</span>
-    <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Clone, StructOpt)]
+</span><span class="kw">pub struct </span>ExecuteRequestInput {
+    <span class="doccomment">/// GraphQL query to execute
+    </span><span class="kw">pub </span>query: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetConfigInput</span> {
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">ignore_env_var_errors</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, Clone, StructOpt)]
+#[structopt(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>GetConfigInput {
+    <span class="attribute">#[structopt(long)]
+    </span><span class="kw">pub </span>ignore_env_var_errors: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DebugPanicInput</span> {
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, StructOpt)]
+#[structopt(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DebugPanicInput {
+    <span class="attribute">#[structopt(long)]
+    </span><span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CliOpt</span> {
-    <span class="doccomment">/// Output the DMMF from the loaded data model.</span>
-    <span class="ident">Dmmf</span>,
-    <span class="doccomment">/// Get the configuration from the given data model.</span>
-    <span class="ident">GetConfig</span>(<span class="ident">GetConfigInput</span>),
-    <span class="doccomment">/// Executes one request and then terminates.</span>
-    <span class="ident">ExecuteRequest</span>(<span class="ident">ExecuteRequestInput</span>),
-    <span class="doccomment">/// Artificially panic (for testing the CLI) with an optional message.</span>
-    <span class="ident">DebugPanic</span>(<span class="ident">DebugPanicInput</span>),
+<span class="attribute">#[derive(Debug, StructOpt, Clone)]
+</span><span class="kw">pub enum </span>CliOpt {
+    <span class="doccomment">/// Output the DMMF from the loaded data model.
+    </span>Dmmf,
+    <span class="doccomment">/// Get the configuration from the given data model.
+    </span>GetConfig(GetConfigInput),
+    <span class="doccomment">/// Executes one request and then terminates.
+    </span>ExecuteRequest(ExecuteRequestInput),
+    <span class="doccomment">/// Artificially panic (for testing the CLI) with an optional message.
+    </span>DebugPanic(DebugPanicInput),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">version</span> <span class="op">=</span> <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrismaOpt</span> {
-    <span class="doccomment">/// The hostname or IP the query engine should bind to.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;H&quot;</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;127.0.0.1&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">host</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, StructOpt, Clone)]
+#[structopt(version = <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>))]
+</span><span class="kw">pub struct </span>PrismaOpt {
+    <span class="doccomment">/// The hostname or IP the query engine should bind to.
+    </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;H&quot;</span>, default_value = <span class="string">&quot;127.0.0.1&quot;</span>)]
+    </span><span class="kw">pub </span>host: String,
 
-    <span class="doccomment">/// The port the query engine should bind to.</span>
-    <span class="comment">// NOTE: this is mutually exclusive with path</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;4466&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">port</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// The port the query engine should bind to.
+    </span><span class="comment">// NOTE: this is mutually exclusive with path
+    </span><span class="attribute">#[structopt(long, short, default_value = <span class="string">&quot;4466&quot;</span>)]
+    </span><span class="kw">pub </span>port: u16,
 
-    <span class="doccomment">/// The unix socket path to listen on</span>
-    <span class="comment">// NOTE: this is mutually exclusive with port.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span>, <span class="ident">env</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">unix_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The unix socket path to listen on
+    </span><span class="comment">// NOTE: this is mutually exclusive with port.
+    </span><span class="attribute">#[structopt(long, short, env)]
+    </span><span class="kw">pub </span>unix_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Path to the Prisma datamodel file</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;PRISMA_DML_PATH&quot;</span>, <span class="ident">parse</span>(<span class="ident">from_os_str</span> <span class="op">=</span> <span class="ident">load_datamodel_file</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">datamodel_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Path to the Prisma datamodel file
+    </span><span class="attribute">#[structopt(long, env = <span class="string">&quot;PRISMA_DML_PATH&quot;</span>, parse(from_os_str = load_datamodel_file))]
+    </span><span class="kw">pub </span>datamodel_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Base64 encoded Prisma datamodel</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;PRISMA_DML&quot;</span>, <span class="ident">parse</span>(<span class="ident">try_from_str</span> <span class="op">=</span> <span class="ident">parse_base64_string</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Base64 encoded Prisma datamodel
+    </span><span class="attribute">#[structopt(long, env = <span class="string">&quot;PRISMA_DML&quot;</span>, parse(try_from_str = parse_base64_string))]
+    </span><span class="kw">pub </span>datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Base64 encoded datasource urls, overwriting the ones in the schema</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;OVERWRITE_DATASOURCES&quot;</span>, <span class="ident">parse</span>(<span class="ident">try_from_str</span> <span class="op">=</span> <span class="ident">parse_base64_string</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">overwrite_datasources</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Base64 encoded datasource urls, overwriting the ones in the schema
+    </span><span class="attribute">#[structopt(long, env = <span class="string">&quot;OVERWRITE_DATASOURCES&quot;</span>, parse(try_from_str = parse_base64_string))]
+    </span><span class="kw">pub </span>overwrite_datasources: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Enables raw SQL queries with executeRaw/queryRaw mutation</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;r&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enables raw SQL queries with executeRaw/queryRaw mutation
+    </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;r&quot;</span>)]
+    </span><span class="kw">pub </span>enable_raw_queries: bool,
 
-    <span class="doccomment">/// Enables the GraphQL playground</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;g&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">enable_playground</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enables the GraphQL playground
+    </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;g&quot;</span>)]
+    </span><span class="kw">pub </span>enable_playground: bool,
 
-    <span class="doccomment">/// Enables server debug features.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;d&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enables server debug features.
+    </span><span class="attribute">#[structopt(long = <span class="string">&quot;debug&quot;</span>, short = <span class="string">&quot;d&quot;</span>)]
+    </span><span class="kw">pub </span>enable_debug_mode: bool,
 
-    <span class="doccomment">/// Enables the metrics endpoints</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;m&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">enable_metrics</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enables the metrics endpoints
+    </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;m&quot;</span>)]
+    </span><span class="kw">pub </span>enable_metrics: bool,
 
-    <span class="doccomment">/// Enable query logging [env: LOG_QUERIES=y]</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;o&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">log_queries</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enable query logging [env: LOG_QUERIES=y]
+    </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;o&quot;</span>)]
+    </span><span class="kw">pub </span>log_queries: bool,
 
-    <span class="doccomment">/// Set the log format.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;log-format&quot;</span>, <span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;RUST_LOG_FORMAT&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">log_format</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Set the log format.
+    </span><span class="attribute">#[structopt(long = <span class="string">&quot;log-format&quot;</span>, env = <span class="string">&quot;RUST_LOG_FORMAT&quot;</span>)]
+    </span><span class="kw">pub </span>log_format: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Enable OpenTelemetry streaming from requests.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">enable_open_telemetry</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Enable OpenTelemetry streaming from requests.
+    </span><span class="attribute">#[structopt(long)]
+    </span><span class="kw">pub </span>enable_open_telemetry: bool,
 
-    <span class="doccomment">/// The url to the OpenTelemetry collector.</span>
-    <span class="doccomment">/// Enabling this will send the OpenTelemtry tracing to a collector</span>
-    <span class="doccomment">/// and not via our custom stdout tracer</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>, <span class="ident">default_value</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">open_telemetry_endpoint</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The url to the OpenTelemetry collector.
+    /// Enabling this will send the OpenTelemtry tracing to a collector
+    /// and not via our custom stdout tracer
+    </span><span class="attribute">#[structopt(long, default_value)]
+    </span><span class="kw">pub </span>open_telemetry_endpoint: String,
 
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">subcommand</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">subcommand</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Subcommand</span><span class="op">&gt;</span>,
+    <span class="attribute">#[structopt(subcommand)]
+    </span><span class="kw">pub </span>subcommand: <span class="prelude-ty">Option</span>&lt;Subcommand&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SourceOverride</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">url</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+</span><span class="kw">struct </span>SourceOverride {
+    name: String,
+    url: String,
 }
 
-<span class="kw">impl</span> <span class="ident">PrismaOpt</span> {
-    <span class="kw">fn</span> <span class="ident">datamodel_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">datamodel</span>
-            .<span class="ident">as_deref</span>()
-            .<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">datamodel_path</span>.<span class="ident">as_deref</span>())
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">PrismaError::ConfigurationError</span>(
-                    <span class="string">&quot;Datamodel should be provided either as path or base64-encoded string.&quot;</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>PrismaOpt {
+    <span class="kw">fn </span>datamodel_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PrismaResult&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">let </span>res = <span class="self">self
+            </span>.datamodel
+            .as_deref()
+            .or(<span class="self">self</span>.datamodel_path.as_deref())
+            .ok_or_else(|| {
+                PrismaError::ConfigurationError(
+                    <span class="string">&quot;Datamodel should be provided either as path or base64-encoded string.&quot;</span>.into(),
                 )
             })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+        <span class="prelude-val">Ok</span>(res)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignore_env_errors</span>: <span class="ident">bool</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">psl::ValidatedSchema</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">datamodel_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_str</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="ident">datamodel_str</span>.<span class="ident">into</span>());
+    <span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>, ignore_env_errors: bool) -&gt; PrismaResult&lt;psl::ValidatedSchema&gt; {
+        <span class="kw">let </span>datamodel_str = <span class="self">self</span>.datamodel_str()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>schema = psl::validate(datamodel_str.into());
 
-        <span class="ident">schema</span>
-            .<span class="ident">diagnostics</span>
-            .<span class="ident">to_result</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+        schema
+            .diagnostics
+            .to_result()
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">datasource_url_overrides</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">overwrite_datasources</span> {
-            <span class="kw">let</span> <span class="ident">datasource_url_overrides</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SourceOverride</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">json</span>)<span class="question-mark">?</span>;
-            <span class="ident">datasource_url_overrides</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="ident">name</span>, <span class="ident">x</span>.<span class="ident">url</span>)).<span class="ident">collect</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Vec::new</span>()
+        <span class="kw">let </span>datasource_url_overrides: Vec&lt;(String, String)&gt; = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>json) = <span class="self">self</span>.overwrite_datasources {
+            <span class="kw">let </span>datasource_url_overrides: Vec&lt;SourceOverride&gt; = serde_json::from_str(json)<span class="question-mark">?</span>;
+            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
+        } <span class="kw">else </span>{
+            Vec::new()
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ignore_env_errors</span> {
-            <span class="ident">schema</span>
-                .<span class="ident">configuration</span>
-                .<span class="ident">resolve_datasource_urls_from_env</span>(<span class="kw-2">&amp;</span><span class="ident">datasource_url_overrides</span>, <span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+        <span class="kw">if </span>!ignore_env_errors {
+            schema
+                .configuration
+                .resolve_datasource_urls_from_env(<span class="kw-2">&amp;</span>datasource_url_overrides, |key| env::var(key).ok())
+                .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))<span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+        <span class="prelude-val">Ok</span>(schema)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignore_env_errors</span>: <span class="ident">bool</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">psl::Configuration</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">datamodel_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_str</span>()<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>configuration(<span class="kw-2">&amp;</span><span class="self">self</span>, ignore_env_errors: bool) -&gt; PrismaResult&lt;psl::Configuration&gt; {
+        <span class="kw">let </span>datamodel_str = <span class="self">self</span>.datamodel_str()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">datasource_url_overrides</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">overwrite_datasources</span> {
-            <span class="kw">let</span> <span class="ident">datasource_url_overrides</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SourceOverride</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">json</span>)<span class="question-mark">?</span>;
-            <span class="ident">datasource_url_overrides</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>.<span class="ident">name</span>, <span class="ident">x</span>.<span class="ident">url</span>)).<span class="ident">collect</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Vec::new</span>()
+        <span class="kw">let </span>datasource_url_overrides: Vec&lt;(String, String)&gt; = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>json) = <span class="self">self</span>.overwrite_datasources {
+            <span class="kw">let </span>datasource_url_overrides: Vec&lt;SourceOverride&gt; = serde_json::from_str(json)<span class="question-mark">?</span>;
+            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
+        } <span class="kw">else </span>{
+            Vec::new()
         };
 
-        <span class="kw">let</span> <span class="ident">config_result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ignore_env_errors</span> {
-            <span class="ident">psl::parse_configuration</span>(<span class="ident">datamodel_str</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">psl::parse_configuration</span>(<span class="ident">datamodel_str</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">config</span><span class="op">|</span> {
-                <span class="ident">config</span>.<span class="ident">resolve_datasource_urls_from_env</span>(<span class="kw-2">&amp;</span><span class="ident">datasource_url_overrides</span>, <span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>config_result = <span class="kw">if </span>ignore_env_errors {
+            psl::parse_configuration(datamodel_str)
+        } <span class="kw">else </span>{
+            psl::parse_configuration(datamodel_str).and_then(|<span class="kw-2">mut </span>config| {
+                config.resolve_datasource_urls_from_env(<span class="kw-2">&amp;</span>datasource_url_overrides, |key| env::var(key).ok())<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
+                <span class="prelude-val">Ok</span>(config)
             })
         };
-        <span class="ident">config_result</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">errors</span><span class="op">|</span> <span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>()))
+        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
-    <span class="doccomment">/// Extract the log format from on the RUST_LOG_FORMAT env var.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::LogFormat</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">log_format</span>.<span class="ident">as_deref</span>() {
-            <span class="prelude-val">Some</span>(<span class="string">&quot;devel&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::LogFormat::Text</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="kw">crate</span>::LogFormat::Json</span>,
+    <span class="doccomment">/// Extract the log format from on the RUST_LOG_FORMAT env var.
+    </span><span class="kw">pub fn </span>log_format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::LogFormat {
+        <span class="kw">match </span><span class="self">self</span>.log_format.as_deref() {
+            <span class="prelude-val">Some</span>(<span class="string">&quot;devel&quot;</span>) =&gt; <span class="kw">crate</span>::LogFormat::Text,
+            <span class="kw">_ </span>=&gt; <span class="kw">crate</span>::LogFormat::Json,
         }
     }
 
-    <span class="doccomment">/// The unix path to listen on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unix_path</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// The unix path to listen on.
+    </span><span class="kw">pub fn </span>unix_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.unix_path.as_ref()
     }
 
-    <span class="doccomment">/// Enable query logging</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_queries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">std::env::var</span>(<span class="string">&quot;LOG_QUERIES&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>).<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">log_queries</span>)
+    <span class="doccomment">/// Enable query logging
+    </span><span class="kw">pub fn </span>log_queries(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        std::env::var(<span class="string">&quot;LOG_QUERIES&quot;</span>).map(|<span class="kw">_</span>| <span class="bool-val">true</span>).unwrap_or(<span class="self">self</span>.log_queries)
     }
 
-    <span class="comment">// This is added it here to make it easier to create the options when using</span>
-    <span class="comment">// the http server in the tests</span>
-    <span class="comment">// Ok to unwrap here as this is only used in tests</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">list</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">PrismaOpt::from_iter_safe</span>(<span class="ident">list</span>).<span class="ident">unwrap</span>()
+    <span class="comment">// This is added it here to make it easier to create the options when using
+    // the http server in the tests
+    // Ok to unwrap here as this is only used in tests
+    </span><span class="kw">pub fn </span>from_list(list: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; <span class="self">Self </span>{
+        PrismaOpt::from_iter_safe(list).unwrap()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_base64_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">base64::decode</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-            <span class="macro">trace!</span>(<span class="string">&quot;Error decoding {} from Base64 (invalid UTF-8): {:?}&quot;</span>, <span class="ident">s</span>, <span class="ident">e</span>);
+<span class="kw">fn </span>parse_base64_string(s: <span class="kw-2">&amp;</span>str) -&gt; PrismaResult&lt;String&gt; {
+    <span class="kw">match </span>base64::decode(s) {
+        <span class="prelude-val">Ok</span>(bytes) =&gt; String::from_utf8(bytes).map_err(|e| {
+            <span class="macro">trace!</span>(<span class="string">&quot;Error decoding {} from Base64 (invalid UTF-8): {:?}&quot;</span>, s, e);
 
-            <span class="ident">PrismaError::ConfigurationError</span>(<span class="string">&quot;Invalid Base64&quot;</span>.<span class="ident">into</span>())
+            PrismaError::ConfigurationError(<span class="string">&quot;Invalid Base64&quot;</span>.into())
         }),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-            <span class="macro">trace!</span>(<span class="string">&quot;Decoding Base64 failed (might not be encoded): {:?}&quot;</span>, <span class="ident">e</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">String::from</span>(<span class="ident">s</span>))
+        <span class="prelude-val">Err</span>(e) =&gt; {
+            <span class="macro">trace!</span>(<span class="string">&quot;Decoding Base64 failed (might not be encoded): {:?}&quot;</span>, e);
+            <span class="prelude-val">Ok</span>(String::from(s))
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">load_datamodel_file</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not open datamodel file {:?}&quot;</span>, <span class="ident">path</span>));
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">String::new</span>();
+<span class="kw">fn </span>load_datamodel_file(path: <span class="kw-2">&amp;</span>OsStr) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>f = File::open(path).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Could not open datamodel file {:?}&quot;</span>, path));
+    <span class="kw">let </span><span class="kw-2">mut </span>datamodel = String::new();
 
-    <span class="ident">f</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not read datamodel file: {:?}&quot;</span>, <span class="ident">path</span>));
+    f.read_to_string(<span class="kw-2">&amp;mut </span>datamodel)
+        .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Could not read datamodel file: {:?}&quot;</span>, path));
 
-    <span class="ident">datamodel</span>
+    datamodel
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

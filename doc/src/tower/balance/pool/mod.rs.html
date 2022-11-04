@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/balance/pool/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/balance/pool/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -457,464 +457,464 @@
 <span id="457">457</span>
 <span id="458">458</span>
 <span id="459">459</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module defines a load-balanced pool of services that adds new services when load is high.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The pool uses `poll_ready` as a signal indicating whether additional services should be spawned</span>
-<span class="doccomment">//! to handle the current level of load. Specifically, every time `poll_ready` on the inner service</span>
-<span class="doccomment">//! returns `Ready`, [`Pool`] consider that a 0, and every time it returns `Pending`, [`Pool`]</span>
-<span class="doccomment">//! considers it a 1. [`Pool`] then maintains an [exponential moving</span>
-<span class="doccomment">//! average](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average) over those</span>
-<span class="doccomment">//! samples, which gives an estimate of how often the underlying service has been ready when it was</span>
-<span class="doccomment">//! needed &quot;recently&quot; (see [`Builder::urgency`]). If the service is loaded (see</span>
-<span class="doccomment">//! [`Builder::loaded_above`]), a new service is created and added to the underlying [`Balance`].</span>
-<span class="doccomment">//! If the service is underutilized (see [`Builder::underutilized_below`]) and there are two or</span>
-<span class="doccomment">//! more services, then the latest added service is removed. In either case, the load estimate is</span>
-<span class="doccomment">//! reset to its initial value (see [`Builder::initial`] to prevent services from being rapidly</span>
-<span class="doccomment">//! added or removed.</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module defines a load-balanced pool of services that adds new services when load is high.
+//!
+//! The pool uses `poll_ready` as a signal indicating whether additional services should be spawned
+//! to handle the current level of load. Specifically, every time `poll_ready` on the inner service
+//! returns `Ready`, [`Pool`] consider that a 0, and every time it returns `Pending`, [`Pool`]
+//! considers it a 1. [`Pool`] then maintains an [exponential moving
+//! average](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average) over those
+//! samples, which gives an estimate of how often the underlying service has been ready when it was
+//! needed &quot;recently&quot; (see [`Builder::urgency`]). If the service is loaded (see
+//! [`Builder::loaded_above`]), a new service is created and added to the underlying [`Balance`].
+//! If the service is underutilized (see [`Builder::underutilized_below`]) and there are two or
+//! more services, then the latest added service is removed. In either case, the load estimate is
+//! reset to its initial value (see [`Builder::initial`] to prevent services from being rapidly
+//! added or removed.
+</span><span class="attribute">#![deny(missing_docs)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::p2c::Balance</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::discover::Change</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::load::Load</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::make::MakeService</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">slab::Slab</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</span><span class="kw">use </span><span class="kw">super</span>::p2c::Balance;
+<span class="kw">use </span><span class="kw">crate</span>::discover::Change;
+<span class="kw">use </span><span class="kw">crate</span>::load::Load;
+<span class="kw">use </span><span class="kw">crate</span>::make::MakeService;
+<span class="kw">use </span>futures_core::{ready, Stream};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>slab::Slab;
+<span class="kw">use </span>std::{
+    fmt,
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Level</span> {
-    <span class="doccomment">/// Load is low -- remove a service instance.</span>
-    <span class="ident">Low</span>,
-    <span class="doccomment">/// Load is normal -- keep the service set as it is.</span>
-    <span class="ident">Normal</span>,
-    <span class="doccomment">/// Load is high -- add another service instance.</span>
-    <span class="ident">High</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+</span><span class="kw">enum </span>Level {
+    <span class="doccomment">/// Load is low -- remove a service instance.
+    </span>Low,
+    <span class="doccomment">/// Load is normal -- keep the service set as it is.
+    </span>Normal,
+    <span class="doccomment">/// Load is high -- add another service instance.
+    </span>High,
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A wrapper around `MakeService` that discovers a new service when load is high, and removes a</span>
-    <span class="doccomment">/// service when load is low. See [`Pool`].</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A wrapper around `MakeService` that discovers a new service when load is high, and removes a
+    /// service when load is low. See [`Pool`].
+    </span><span class="kw">pub struct </span>PoolDiscoverer&lt;MS, Target, Request&gt;
+    <span class="kw">where
+        </span>MS: MakeService&lt;Target, Request&gt;,
     {
-        <span class="ident">maker</span>: <span class="ident">MS</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">making</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MS::Future</span><span class="op">&gt;</span>,
-        <span class="ident">target</span>: <span class="ident">Target</span>,
-        <span class="ident">load</span>: <span class="ident">Level</span>,
-        <span class="ident">services</span>: <span class="ident">Slab</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-        <span class="ident">died_tx</span>: <span class="ident">tokio::sync::mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">died_rx</span>: <span class="ident">tokio::sync::mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+        maker: MS,
+        <span class="attribute">#[pin]
+        </span>making: <span class="prelude-ty">Option</span>&lt;MS::Future&gt;,
+        target: Target,
+        load: Level,
+        services: Slab&lt;()&gt;,
+        died_tx: tokio::sync::mpsc::UnboundedSender&lt;usize&gt;,
+        <span class="attribute">#[pin]
+        </span>died_rx: tokio::sync::mpsc::UnboundedReceiver&lt;usize&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">Target</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;MS, Target, Request&gt; fmt::Debug <span class="kw">for </span>PoolDiscoverer&lt;MS, Target, Request&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Request&gt; + fmt::Debug,
+    Target: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;PoolDiscoverer&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;maker&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">maker</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;making&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">making</span>.<span class="ident">is_some</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;target&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;load&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">load</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;services&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">services</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">limit</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;PoolDiscoverer&quot;</span>)
+            .field(<span class="string">&quot;maker&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.maker)
+            .field(<span class="string">&quot;making&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.making.is_some())
+            .field(<span class="string">&quot;target&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.target)
+            .field(<span class="string">&quot;load&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.load)
+            .field(<span class="string">&quot;services&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.services)
+            .field(<span class="string">&quot;limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.limit)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">Target</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;MS, Target, Request&gt; Stream <span class="kw">for </span>PoolDiscoverer&lt;MS, Target, Request&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Request&gt;,
+    MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    Target: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">MS::Service</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">MS::MakeError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Change&lt;usize, DropNotifyService&lt;MS::Service&gt;&gt;, MS::MakeError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">sid</span>)) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">died_rx</span>.<span class="ident">as_mut</span>().<span class="ident">poll_recv</span>(<span class="ident">cx</span>) {
-            <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">remove</span>(<span class="ident">sid</span>);
+        <span class="kw">while let </span>Poll::Ready(<span class="prelude-val">Some</span>(sid)) = this.died_rx.as_mut().poll_recv(cx) {
+            this.services.remove(sid);
             <span class="macro">tracing::trace!</span>(
-                <span class="ident">pool</span>.<span class="ident">services</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>(),
-                <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;removing dropped service&quot;</span>
-            );
+                pool.services = this.services.len(),
+                message = <span class="string">&quot;removing dropped service&quot;
+            </span>);
         }
 
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">this</span>.<span class="ident">making</span>.<span class="ident">is_none</span>() {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">maker</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+        <span class="kw">if </span>this.services.is_empty() &amp;&amp; this.making.is_none() {
+            <span class="kw">let _ </span>= <span class="macro">ready!</span>(this.maker.poll_ready(cx))<span class="question-mark">?</span>;
             <span class="macro">tracing::trace!</span>(<span class="string">&quot;construct initial pool connection&quot;</span>);
-            <span class="ident">this</span>.<span class="ident">making</span>
-                .<span class="ident">set</span>(<span class="prelude-val">Some</span>(<span class="ident">this</span>.<span class="ident">maker</span>.<span class="ident">make_service</span>(<span class="ident">this</span>.<span class="ident">target</span>.<span class="ident">clone</span>())));
+            this.making
+                .set(<span class="prelude-val">Some</span>(this.maker.make_service(this.target.clone())));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Level::High</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">load</span> {
-            <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">making</span>.<span class="ident">is_none</span>() {
-                <span class="kw">if</span> <span class="ident">this</span>
-                    .<span class="ident">limit</span>
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">if let </span>Level::High = this.load {
+            <span class="kw">if </span>this.making.is_none() {
+                <span class="kw">if </span>this
+                    .limit
+                    .map(|limit| this.services.len() &gt;= limit)
+                    .unwrap_or(<span class="bool-val">false</span>)
                 {
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                    <span class="kw">return </span>Poll::Pending;
                 }
 
                 <span class="macro">tracing::trace!</span>(
-                    <span class="ident">pool</span>.<span class="ident">services</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>(),
-                    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;decided to add service to loaded pool&quot;</span>
-                );
-                <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">maker</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+                    pool.services = this.services.len(),
+                    message = <span class="string">&quot;decided to add service to loaded pool&quot;
+                </span>);
+                <span class="macro">ready!</span>(this.maker.poll_ready(cx))<span class="question-mark">?</span>;
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;making new service&quot;</span>);
-                <span class="comment">// TODO: it&#39;d be great if we could avoid the clone here and use, say, &amp;Target</span>
-                <span class="ident">this</span>.<span class="ident">making</span>
-                    .<span class="ident">set</span>(<span class="prelude-val">Some</span>(<span class="ident">this</span>.<span class="ident">maker</span>.<span class="ident">make_service</span>(<span class="ident">this</span>.<span class="ident">target</span>.<span class="ident">clone</span>())));
+                <span class="comment">// TODO: it&#39;d be great if we could avoid the clone here and use, say, &amp;Target
+                </span>this.making
+                    .set(<span class="prelude-val">Some</span>(this.maker.make_service(this.target.clone())));
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fut</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">making</span>.<span class="ident">as_mut</span>().<span class="ident">as_pin_mut</span>() {
-            <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-            <span class="ident">this</span>.<span class="ident">making</span>.<span class="ident">set</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fut) = this.making.as_mut().as_pin_mut() {
+            <span class="kw">let </span>svc = <span class="macro">ready!</span>(fut.poll(cx))<span class="question-mark">?</span>;
+            this.making.set(<span class="prelude-val">None</span>);
 
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">insert</span>(());
-            <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">DropNotifyService</span> {
-                <span class="ident">svc</span>,
-                <span class="ident">id</span>,
-                <span class="ident">notify</span>: <span class="ident">this</span>.<span class="ident">died_tx</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>id = this.services.insert(());
+            <span class="kw">let </span>svc = DropNotifyService {
+                svc,
+                id,
+                notify: this.died_tx.clone(),
             };
             <span class="macro">tracing::trace!</span>(
-                <span class="ident">pool</span>.<span class="ident">services</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>(),
-                <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;finished creating new service&quot;</span>
-            );
-            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Normal</span>;
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Change::Insert</span>(<span class="ident">id</span>, <span class="ident">svc</span>))));
+                pool.services = this.services.len(),
+                message = <span class="string">&quot;finished creating new service&quot;
+            </span>);
+            <span class="kw-2">*</span>this.load = Level::Normal;
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(Change::Insert(id, svc))));
         }
 
-        <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">load</span> {
-            <span class="ident">Level::High</span> =&gt; {
+        <span class="kw">match </span>this.load {
+            Level::High =&gt; {
                 <span class="macro">unreachable!</span>(<span class="string">&quot;found high load but no Service being made&quot;</span>);
             }
-            <span class="ident">Level::Normal</span> =&gt; <span class="ident">Poll::Pending</span>,
-            <span class="ident">Level::Low</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">Poll::Pending</span>,
-            <span class="ident">Level::Low</span> =&gt; {
-                <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Normal</span>;
-                <span class="comment">// NOTE: this is a little sad -- we&#39;d prefer to kill short-living services</span>
-                <span class="kw">let</span> <span class="ident">rm</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="number">0</span>;
-                <span class="comment">// note that we _don&#39;t_ remove from self.services here</span>
-                <span class="comment">// that&#39;ll happen automatically on drop</span>
-                <span class="macro">tracing::trace!</span>(
-                    <span class="ident">pool</span>.<span class="ident">services</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>(),
-                    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;removing service for over-provisioned pool&quot;</span>
-                );
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Change::Remove</span>(<span class="ident">rm</span>))))
+            Level::Normal =&gt; Poll::Pending,
+            Level::Low <span class="kw">if </span>this.services.len() == <span class="number">1 </span>=&gt; Poll::Pending,
+            Level::Low =&gt; {
+                <span class="kw-2">*</span>this.load = Level::Normal;
+                <span class="comment">// NOTE: this is a little sad -- we&#39;d prefer to kill short-living services
+                </span><span class="kw">let </span>rm = this.services.iter().next().unwrap().<span class="number">0</span>;
+                <span class="comment">// note that we _don&#39;t_ remove from self.services here
+                // that&#39;ll happen automatically on drop
+                </span><span class="macro">tracing::trace!</span>(
+                    pool.services = this.services.len(),
+                    message = <span class="string">&quot;removing service for over-provisioned pool&quot;
+                </span>);
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(Change::Remove(rm))))
             }
         }
     }
 }
 
-<span class="doccomment">/// A [builder] that lets you configure how a [`Pool`] determines whether the underlying service is</span>
-<span class="doccomment">/// loaded or not. See the [module-level documentation](self) and the builder&#39;s methods for</span>
-<span class="doccomment">/// details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  [builder]: https://rust-lang-nursery.github.io/api-guidelines/type-safety.html#builders-enable-construction-of-complex-values-c-builder</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="ident">low</span>: <span class="ident">f64</span>,
-    <span class="ident">high</span>: <span class="ident">f64</span>,
-    <span class="ident">init</span>: <span class="ident">f64</span>,
-    <span class="ident">alpha</span>: <span class="ident">f64</span>,
-    <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A [builder] that lets you configure how a [`Pool`] determines whether the underlying service is
+/// loaded or not. See the [module-level documentation](self) and the builder&#39;s methods for
+/// details.
+///
+///  [builder]: https://rust-lang-nursery.github.io/api-guidelines/type-safety.html#builders-enable-construction-of-complex-values-c-builder
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub struct </span>Builder {
+    low: f64,
+    high: f64,
+    init: f64,
+    alpha: f64,
+    limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Builder</span> {
-            <span class="ident">init</span>: <span class="number">0.1</span>,
-            <span class="ident">low</span>: <span class="number">0.00001</span>,
-            <span class="ident">high</span>: <span class="number">0.2</span>,
-            <span class="ident">alpha</span>: <span class="number">0.03</span>,
-            <span class="ident">limit</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Builder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Builder {
+            init: <span class="number">0.1</span>,
+            low: <span class="number">0.00001</span>,
+            high: <span class="number">0.2</span>,
+            alpha: <span class="number">0.03</span>,
+            limit: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// Create a new builder with default values for all load settings.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you just want to use the defaults, you can just use [`Pool::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Builder {
+    <span class="doccomment">/// Create a new builder with default values for all load settings.
+    ///
+    /// If you just want to use the defaults, you can just use [`Pool::new`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// When the estimated load (see the [module-level docs](self)) drops below this</span>
-    <span class="doccomment">/// threshold, and there are at least two services active, a service is removed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is 0.01. That is, when one in every 100 `poll_ready` calls return</span>
-    <span class="doccomment">/// `Pending`, then the underlying service is considered underutilized.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underutilized_below</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">low</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">low</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// When the estimated load (see the [module-level docs](self)) drops below this
+    /// threshold, and there are at least two services active, a service is removed.
+    ///
+    /// The default value is 0.01. That is, when one in every 100 `poll_ready` calls return
+    /// `Pending`, then the underlying service is considered underutilized.
+    </span><span class="kw">pub fn </span>underutilized_below(<span class="kw-2">&amp;mut </span><span class="self">self</span>, low: f64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.low = low;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// When the estimated load (see the [module-level docs](self)) exceeds this</span>
-    <span class="doccomment">/// threshold, and no service is currently in the process of being added, a new service is</span>
-    <span class="doccomment">/// scheduled to be added to the underlying [`Balance`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is 0.5. That is, when every other call to `poll_ready` returns</span>
-    <span class="doccomment">/// `Pending`, then the underlying service is considered highly loaded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">loaded_above</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">high</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">high</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// When the estimated load (see the [module-level docs](self)) exceeds this
+    /// threshold, and no service is currently in the process of being added, a new service is
+    /// scheduled to be added to the underlying [`Balance`].
+    ///
+    /// The default value is 0.5. That is, when every other call to `poll_ready` returns
+    /// `Pending`, then the underlying service is considered highly loaded.
+    </span><span class="kw">pub fn </span>loaded_above(<span class="kw-2">&amp;mut </span><span class="self">self</span>, high: f64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.high = high;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The initial estimated load average.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is also the value that the estimated load will be reset to whenever a service is added</span>
-    <span class="doccomment">/// or removed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is 0.1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">init</span> <span class="op">=</span> <span class="ident">init</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The initial estimated load average.
+    ///
+    /// This is also the value that the estimated load will be reset to whenever a service is added
+    /// or removed.
+    ///
+    /// The default value is 0.1.
+    </span><span class="kw">pub fn </span>initial(<span class="kw-2">&amp;mut </span><span class="self">self</span>, init: f64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.init = init;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// How aggressively the estimated load average is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the α parameter of the formula for the [exponential moving</span>
-    <span class="doccomment">/// average](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average), and</span>
-    <span class="doccomment">/// dictates how quickly new samples of the current load affect the estimated load. If the</span>
-    <span class="doccomment">/// value is closer to 1, newer samples affect the load average a lot (when α is 1, the load</span>
-    <span class="doccomment">/// average is immediately set to the current load). If the value is closer to 0, newer samples</span>
-    <span class="doccomment">/// affect the load average very little at a time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The given value is clamped to `[0,1]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is 0.05, meaning, in very approximate terms, that each new load sample</span>
-    <span class="doccomment">/// affects the estimated load by 5%.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">urgency</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>.<span class="ident">max</span>(<span class="number">0.0</span>).<span class="ident">min</span>(<span class="number">1.0</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// How aggressively the estimated load average is updated.
+    ///
+    /// This is the α parameter of the formula for the [exponential moving
+    /// average](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average), and
+    /// dictates how quickly new samples of the current load affect the estimated load. If the
+    /// value is closer to 1, newer samples affect the load average a lot (when α is 1, the load
+    /// average is immediately set to the current load). If the value is closer to 0, newer samples
+    /// affect the load average very little at a time.
+    ///
+    /// The given value is clamped to `[0,1]`.
+    ///
+    /// The default value is 0.05, meaning, in very approximate terms, that each new load sample
+    /// affects the estimated load by 5%.
+    </span><span class="kw">pub fn </span>urgency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alpha: f64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.alpha = alpha.max(<span class="number">0.0</span>).min(<span class="number">1.0</span>);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// The maximum number of backing `Service` instances to maintain.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When the limit is reached, the load estimate is clamped to the high load threshhold, and no</span>
-    <span class="doccomment">/// new service is spawned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No maximum limit is imposed by default.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_services</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">limit</span> <span class="op">=</span> <span class="ident">limit</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// The maximum number of backing `Service` instances to maintain.
+    ///
+    /// When the limit is reached, the load estimate is clamped to the high load threshhold, and no
+    /// new service is spawned.
+    ///
+    /// No maximum limit is imposed by default.
+    </span><span class="kw">pub fn </span>max_services(<span class="kw-2">&amp;mut </span><span class="self">self</span>, limit: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.limit = limit;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// See [`Pool::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`Pool::new`].
+    </span><span class="kw">pub fn </span>build&lt;MS, Target, Request&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">make_service</span>: <span class="ident">MS</span>,
-        <span class="ident">target</span>: <span class="ident">Target</span>,
-    ) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
-        <span class="ident">MS::Service</span>: <span class="ident">Load</span>,
-        <span class="op">&lt;</span><span class="ident">MS::Service</span> <span class="kw">as</span> <span class="ident">Load</span><span class="op">&gt;</span><span class="ident">::Metric</span>: <span class="ident">std::fmt::Debug</span>,
-        <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-        <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-        <span class="ident">Target</span>: <span class="ident">Clone</span>,
+        make_service: MS,
+        target: Target,
+    ) -&gt; Pool&lt;MS, Target, Request&gt;
+    <span class="kw">where
+        </span>MS: MakeService&lt;Target, Request&gt;,
+        MS::Service: Load,
+        &lt;MS::Service <span class="kw">as </span>Load&gt;::Metric: std::fmt::Debug,
+        MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+        MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+        Target: Clone,
     {
-        <span class="kw">let</span> (<span class="ident">died_tx</span>, <span class="ident">died_rx</span>) <span class="op">=</span> <span class="ident">tokio::sync::mpsc::unbounded_channel</span>();
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">PoolDiscoverer</span> {
-            <span class="ident">maker</span>: <span class="ident">make_service</span>,
-            <span class="ident">making</span>: <span class="prelude-val">None</span>,
-            <span class="ident">target</span>,
-            <span class="ident">load</span>: <span class="ident">Level::Normal</span>,
-            <span class="ident">services</span>: <span class="ident">Slab::new</span>(),
-            <span class="ident">died_tx</span>,
-            <span class="ident">died_rx</span>,
-            <span class="ident">limit</span>: <span class="self">self</span>.<span class="ident">limit</span>,
+        <span class="kw">let </span>(died_tx, died_rx) = tokio::sync::mpsc::unbounded_channel();
+        <span class="kw">let </span>d = PoolDiscoverer {
+            maker: make_service,
+            making: <span class="prelude-val">None</span>,
+            target,
+            load: Level::Normal,
+            services: Slab::new(),
+            died_tx,
+            died_rx,
+            limit: <span class="self">self</span>.limit,
         };
 
-        <span class="ident">Pool</span> {
-            <span class="ident">balance</span>: <span class="ident">Balance::new</span>(<span class="ident">Box::pin</span>(<span class="ident">d</span>)),
-            <span class="ident">options</span>: <span class="kw-2">*</span><span class="self">self</span>,
-            <span class="ident">ewma</span>: <span class="self">self</span>.<span class="ident">init</span>,
+        Pool {
+            balance: Balance::new(Box::pin(d)),
+            options: <span class="kw-2">*</span><span class="self">self</span>,
+            ewma: <span class="self">self</span>.init,
         }
     }
 }
 
-<span class="doccomment">/// A dynamically sized, load-balanced pool of `Service` instances.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">Target</span>: <span class="ident">Clone</span>,
+<span class="doccomment">/// A dynamically sized, load-balanced pool of `Service` instances.
+</span><span class="kw">pub struct </span>Pool&lt;MS, Target, Request&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Request&gt;,
+    MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    Target: Clone,
 {
-    <span class="comment">// the Pin&lt;Box&lt;_&gt;&gt; here is needed since Balance requires the Service to be Unpin</span>
-    <span class="ident">balance</span>: <span class="ident">Balance</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">Builder</span>,
-    <span class="ident">ewma</span>: <span class="ident">f64</span>,
+    <span class="comment">// the Pin&lt;Box&lt;_&gt;&gt; here is needed since Balance requires the Service to be Unpin
+    </span>balance: Balance&lt;Pin&lt;Box&lt;PoolDiscoverer&lt;MS, Target, Request&gt;&gt;&gt;, Request&gt;,
+    options: Builder,
+    ewma: f64,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">Target</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
-    <span class="ident">MS::Service</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;MS, Target, Request&gt; fmt::Debug <span class="kw">for </span>Pool&lt;MS, Target, Request&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Request&gt; + fmt::Debug,
+    MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    Target: Clone + fmt::Debug,
+    MS::Service: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Pool&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;balance&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">balance</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ewma&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ewma</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Pool&quot;</span>)
+            .field(<span class="string">&quot;balance&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.balance)
+            .field(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.options)
+            .field(<span class="string">&quot;ewma&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ewma)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Service</span>: <span class="ident">Load</span>,
-    <span class="op">&lt;</span><span class="ident">MS::Service</span> <span class="kw">as</span> <span class="ident">Load</span><span class="op">&gt;</span><span class="ident">::Metric</span>: <span class="ident">std::fmt::Debug</span>,
-    <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">Target</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;MS, Target, Request&gt; Pool&lt;MS, Target, Request&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Request&gt;,
+    MS::Service: Load,
+    &lt;MS::Service <span class="kw">as </span>Load&gt;::Metric: std::fmt::Debug,
+    MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    Target: Clone,
 {
-    <span class="doccomment">/// Construct a new dynamically sized `Pool`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If many calls to `poll_ready` return `Pending`, `new_service` is used to</span>
-    <span class="doccomment">/// construct another `Service` that is then added to the load-balanced pool.</span>
-    <span class="doccomment">/// If many calls to `poll_ready` succeed, the most recently added `Service`</span>
-    <span class="doccomment">/// is dropped from the pool.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">make_service</span>: <span class="ident">MS</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Builder::new</span>().<span class="ident">build</span>(<span class="ident">make_service</span>, <span class="ident">target</span>)
+    <span class="doccomment">/// Construct a new dynamically sized `Pool`.
+    ///
+    /// If many calls to `poll_ready` return `Pending`, `new_service` is used to
+    /// construct another `Service` that is then added to the load-balanced pool.
+    /// If many calls to `poll_ready` succeed, the most recently added `Service`
+    /// is dropped from the pool.
+    </span><span class="kw">pub fn </span>new(make_service: MS, target: Target) -&gt; <span class="self">Self </span>{
+        Builder::new().build(make_service, target)
     }
 }
 
-<span class="kw">type</span> <span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Balance</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Request</span><span class="op">&gt;</span>;
+<span class="kw">type </span>PinBalance&lt;S, Request&gt; = Balance&lt;Pin&lt;Box&lt;S&gt;&gt;, Request&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Service</span>: <span class="ident">Load</span>,
-    <span class="op">&lt;</span><span class="ident">MS::Service</span> <span class="kw">as</span> <span class="ident">Load</span><span class="op">&gt;</span><span class="ident">::Metric</span>: <span class="ident">std::fmt::Debug</span>,
-    <span class="ident">MS::MakeError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">MS::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">Target</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;MS, Target, Req&gt; Service&lt;Req&gt; <span class="kw">for </span>Pool&lt;MS, Target, Req&gt;
+<span class="kw">where
+    </span>MS: MakeService&lt;Target, Req&gt;,
+    MS::Service: Load,
+    &lt;MS::Service <span class="kw">as </span>Load&gt;::Metric: std::fmt::Debug,
+    MS::MakeError: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    MS::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    Target: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>;
+    <span class="kw">type </span>Response = &lt;PinBalance&lt;PoolDiscoverer&lt;MS, Target, Req&gt;, Req&gt; <span class="kw">as </span>Service&lt;Req&gt;&gt;::Response;
+    <span class="kw">type </span>Error = &lt;PinBalance&lt;PoolDiscoverer&lt;MS, Target, Req&gt;, Req&gt; <span class="kw">as </span>Service&lt;Req&gt;&gt;::Error;
+    <span class="kw">type </span>Future = &lt;PinBalance&lt;PoolDiscoverer&lt;MS, Target, Req&gt;, Req&gt; <span class="kw">as </span>Service&lt;Req&gt;&gt;::Future;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(()) <span class="op">=</span> <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)<span class="question-mark">?</span> {
-            <span class="comment">// services was ready -- there are enough services</span>
-            <span class="comment">// update ewma with a 0 sample</span>
-            <span class="self">self</span>.<span class="ident">ewma</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">alpha</span>;
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="kw">if let </span>Poll::Ready(()) = <span class="self">self</span>.balance.poll_ready(cx)<span class="question-mark">? </span>{
+            <span class="comment">// services was ready -- there are enough services
+            // update ewma with a 0 sample
+            </span><span class="self">self</span>.ewma <span class="kw-2">*</span>= <span class="number">1.0 </span>- <span class="self">self</span>.options.alpha;
 
-            <span class="kw">let</span> <span class="ident">discover</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">discover_mut</span>().<span class="ident">as_mut</span>().<span class="ident">project</span>();
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ewma</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">low</span> {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Level::Low</span> {
-                    <span class="macro">tracing::trace!</span>({ <span class="ident">ewma</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">ewma</span> }, <span class="string">&quot;pool is over-provisioned&quot;</span>);
+            <span class="kw">let </span>discover = <span class="self">self</span>.balance.discover_mut().as_mut().project();
+            <span class="kw">if </span><span class="self">self</span>.ewma &lt; <span class="self">self</span>.options.low {
+                <span class="kw">if </span><span class="kw-2">*</span>discover.load != Level::Low {
+                    <span class="macro">tracing::trace!</span>({ ewma = %<span class="self">self</span>.ewma }, <span class="string">&quot;pool is over-provisioned&quot;</span>);
                 }
-                <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Low</span>;
+                <span class="kw-2">*</span>discover.load = Level::Low;
 
-                <span class="kw">if</span> <span class="ident">discover</span>.<span class="ident">services</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                    <span class="comment">// reset EWMA so we don&#39;t immediately try to remove another service</span>
-                    <span class="self">self</span>.<span class="ident">ewma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">init</span>;
+                <span class="kw">if </span>discover.services.len() &gt; <span class="number">1 </span>{
+                    <span class="comment">// reset EWMA so we don&#39;t immediately try to remove another service
+                    </span><span class="self">self</span>.ewma = <span class="self">self</span>.options.init;
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Level::Normal</span> {
-                    <span class="macro">tracing::trace!</span>({ <span class="ident">ewma</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">ewma</span> }, <span class="string">&quot;pool is appropriately provisioned&quot;</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">if </span><span class="kw-2">*</span>discover.load != Level::Normal {
+                    <span class="macro">tracing::trace!</span>({ ewma = %<span class="self">self</span>.ewma }, <span class="string">&quot;pool is appropriately provisioned&quot;</span>);
                 }
-                <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Normal</span>;
+                <span class="kw-2">*</span>discover.load = Level::Normal;
             }
 
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
         }
 
-        <span class="kw">let</span> <span class="ident">discover</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">discover_mut</span>().<span class="ident">as_mut</span>().<span class="ident">project</span>();
-        <span class="kw">if</span> <span class="ident">discover</span>.<span class="ident">making</span>.<span class="ident">is_none</span>() {
-            <span class="comment">// no services are ready -- we&#39;re overloaded</span>
-            <span class="comment">// update ewma with a 1 sample</span>
-            <span class="self">self</span>.<span class="ident">ewma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">alpha</span> <span class="op">+</span> (<span class="number">1.0</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">alpha</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">ewma</span>;
+        <span class="kw">let </span>discover = <span class="self">self</span>.balance.discover_mut().as_mut().project();
+        <span class="kw">if </span>discover.making.is_none() {
+            <span class="comment">// no services are ready -- we&#39;re overloaded
+            // update ewma with a 1 sample
+            </span><span class="self">self</span>.ewma = <span class="self">self</span>.options.alpha + (<span class="number">1.0 </span>- <span class="self">self</span>.options.alpha) * <span class="self">self</span>.ewma;
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ewma</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">high</span> {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Level::High</span> {
-                    <span class="macro">tracing::trace!</span>({ <span class="ident">ewma</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">ewma</span> }, <span class="string">&quot;pool is under-provisioned&quot;</span>);
+            <span class="kw">if </span><span class="self">self</span>.ewma &gt; <span class="self">self</span>.options.high {
+                <span class="kw">if </span><span class="kw-2">*</span>discover.load != Level::High {
+                    <span class="macro">tracing::trace!</span>({ ewma = %<span class="self">self</span>.ewma }, <span class="string">&quot;pool is under-provisioned&quot;</span>);
                 }
-                <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::High</span>;
+                <span class="kw-2">*</span>discover.load = Level::High;
 
-                <span class="comment">// don&#39;t reset the EWMA -- in theory, poll_ready should now start returning</span>
-                <span class="comment">// `Ready`, so we won&#39;t try to launch another service immediately.</span>
-                <span class="comment">// we clamp it to high though in case the # of services is limited.</span>
-                <span class="self">self</span>.<span class="ident">ewma</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">high</span>;
+                <span class="comment">// don&#39;t reset the EWMA -- in theory, poll_ready should now start returning
+                // `Ready`, so we won&#39;t try to launch another service immediately.
+                // we clamp it to high though in case the # of services is limited.
+                </span><span class="self">self</span>.ewma = <span class="self">self</span>.options.high;
 
-                <span class="comment">// we need to call balance again for PoolDiscover to realize</span>
-                <span class="comment">// it can make a new service</span>
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>);
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">discover</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Normal</span>;
+                <span class="comment">// we need to call balance again for PoolDiscover to realize
+                // it can make a new service
+                </span><span class="kw">return </span><span class="self">self</span>.balance.poll_ready(cx);
+            } <span class="kw">else </span>{
+                <span class="kw-2">*</span>discover.load = Level::Normal;
             }
         }
 
-        <span class="ident">Poll::Pending</span>
+        Poll::Pending
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">call</span>(<span class="ident">req</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> {
-    <span class="ident">svc</span>: <span class="ident">Svc</span>,
-    <span class="ident">id</span>: <span class="ident">usize</span>,
-    <span class="ident">notify</span>: <span class="ident">tokio::sync::mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">notify</span>.<span class="ident">send</span>(<span class="self">self</span>.<span class="ident">id</span>).<span class="ident">is_ok</span>();
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Req) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.balance.call(req)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>: <span class="ident">Load</span><span class="op">&gt;</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">Svc::Metric</span>;
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
-        <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">load</span>()
+<span class="attribute">#[doc(hidden)]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>DropNotifyService&lt;Svc&gt; {
+    svc: Svc,
+    id: usize,
+    notify: tokio::sync::mpsc::UnboundedSender&lt;usize&gt;,
+}
+
+<span class="kw">impl</span>&lt;Svc&gt; Drop <span class="kw">for </span>DropNotifyService&lt;Svc&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.notify.send(<span class="self">self</span>.id).is_ok();
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Svc::Response</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">Svc::Future</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Svc::Error</span>;
+<span class="kw">impl</span>&lt;Svc: Load&gt; Load <span class="kw">for </span>DropNotifyService&lt;Svc&gt; {
+    <span class="kw">type </span>Metric = Svc::Metric;
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric {
+        <span class="self">self</span>.svc.load()
+    }
+}
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+<span class="kw">impl</span>&lt;Request, Svc: Service&lt;Request&gt;&gt; Service&lt;Request&gt; <span class="kw">for </span>DropNotifyService&lt;Svc&gt; {
+    <span class="kw">type </span>Response = Svc::Response;
+    <span class="kw">type </span>Future = Svc::Future;
+    <span class="kw">type </span>Error = Svc::Error;
+
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.svc.poll_ready(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">call</span>(<span class="ident">req</span>)
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.svc.call(req)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

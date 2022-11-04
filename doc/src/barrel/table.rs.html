@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../barrel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../barrel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -302,309 +302,309 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A module that represents tables and columns</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A table is a collection of columns and some metadata. Creating</span>
-<span class="doccomment">//! a table gives you access to the metadata fields that can only</span>
-<span class="doccomment">//! be set when creating the table.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can also change existing tables with a closure that can</span>
-<span class="doccomment">//! then access individual columns in that table.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A module that represents tables and columns
+//!
+//! A table is a collection of columns and some metadata. Creating
+//! a table gives you access to the metadata fields that can only
+//! be set when creating the table.
+//!
+//! You can also change existing tables with a closure that can
+//! then access individual columns in that table.
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">backend::SqlGenerator</span>, <span class="ident">ConstraintChange</span>, <span class="ident">ForeignKeyChange</span>, <span class="ident">IndexChange</span>, <span class="ident">PrimaryKeyChange</span>,
-    <span class="ident">TableChange</span>,
+</span><span class="kw">use super</span>::{
+    backend::SqlGenerator, ConstraintChange, ForeignKeyChange, IndexChange, PrimaryKeyChange,
+    TableChange,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Type</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
+<span class="kw">use </span><span class="kw">crate</span>::types::Type;
+<span class="kw">use </span>std::fmt::{Debug, Formatter, <span class="prelude-ty">Result </span><span class="kw">as </span>FmtResult};
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">TableChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;TableChange&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>TableChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; FmtResult {
+        f.write_str(<span class="string">&quot;TableChange&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">IndexChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;IndexChange&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>IndexChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; FmtResult {
+        f.write_str(<span class="string">&quot;IndexChange&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ConstraintChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ConstraintChange&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>ConstraintChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; FmtResult {
+        f.write_str(<span class="string">&quot;ConstraintChange&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ForeignKeyChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ForeignKeyChange&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>ForeignKeyChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FmtResult {
+        f.write_str(<span class="string">&quot;ForeignKeyChange&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">PrimaryKeyChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PrimaryKeyChange&quot;</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>PrimaryKeyChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FmtResult {
+        f.write_str(<span class="string">&quot;PrimaryKeyChange&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Table</span> {
-    <span class="kw">pub</span> <span class="ident">meta</span>: <span class="ident">TableMeta</span>,
-    <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TableChange</span><span class="op">&gt;</span>,
-    <span class="ident">indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexChange</span><span class="op">&gt;</span>,
-    <span class="ident">constraints</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConstraintChange</span><span class="op">&gt;</span>,
-    <span class="ident">foreign_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKeyChange</span><span class="op">&gt;</span>,
-    <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKeyChange</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Table {
+    <span class="kw">pub </span>meta: TableMeta,
+    columns: Vec&lt;TableChange&gt;,
+    indices: Vec&lt;IndexChange&gt;,
+    constraints: Vec&lt;ConstraintChange&gt;,
+    foreign_keys: Vec&lt;ForeignKeyChange&gt;,
+    primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKeyChange&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlChanges</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">constraints</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">foreign_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>SqlChanges {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) indices: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) constraints: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) foreign_keys: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) primary_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Table</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">meta</span>: <span class="ident">TableMeta::new</span>(<span class="ident">name</span>.<span class="ident">into</span>()),
-            <span class="ident">columns</span>: <span class="macro">vec!</span>[],
-            <span class="ident">indices</span>: <span class="macro">vec!</span>[],
-            <span class="ident">constraints</span>: <span class="macro">vec!</span>[],
-            <span class="ident">foreign_keys</span>: <span class="macro">vec!</span>[],
-            <span class="ident">primary_key</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Table {
+    <span class="kw">pub fn </span>new&lt;S: Into&lt;String&gt;&gt;(name: S) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            meta: TableMeta::new(name.into()),
+            columns: <span class="macro">vec!</span>[],
+            indices: <span class="macro">vec!</span>[],
+            constraints: <span class="macro">vec!</span>[],
+            foreign_keys: <span class="macro">vec!</span>[],
+            primary_key: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Add a new column to a table</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use barrel::{types, Migration};</span>
-    <span class="doccomment">/// # let mut m = Migration::new();</span>
-    <span class="doccomment">/// # m.create_table(&quot;users&quot;, |table| {</span>
-    <span class="doccomment">/// table.add_column(&quot;id&quot;, types::primary());</span>
-    <span class="doccomment">/// table.add_column(&quot;name&quot;, types::varchar(64));</span>
-    <span class="doccomment">/// # });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_column</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">_type</span>: <span class="ident">Type</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>
-            .<span class="ident">push</span>(<span class="ident">TableChange::AddColumn</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">_type</span>));
+    <span class="doccomment">/// Add a new column to a table
+    ///
+    /// ```rust
+    /// # use barrel::{types, Migration};
+    /// # let mut m = Migration::new();
+    /// # m.create_table(&quot;users&quot;, |table| {
+    /// table.add_column(&quot;id&quot;, types::primary());
+    /// table.add_column(&quot;name&quot;, types::varchar(64));
+    /// # });
+    /// ```
+    </span><span class="kw">pub fn </span>add_column&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S, _type: Type) -&gt; <span class="kw-2">&amp;mut </span>Type {
+        <span class="self">self</span>.columns
+            .push(TableChange::AddColumn(name.into(), _type));
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() {
-            <span class="kw-2">&amp;mut</span> <span class="ident">TableChange::AddColumn</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">match </span><span class="self">self</span>.columns.last_mut().unwrap() {
+            <span class="kw-2">&amp;mut </span>TableChange::AddColumn(<span class="kw">_</span>, <span class="kw-2">ref mut </span>c) =&gt; c,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drop_column</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">TableChange::DropColumn</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
+    <span class="kw">pub fn </span>drop_column&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S) {
+        <span class="self">self</span>.columns.push(TableChange::DropColumn(name.into()));
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rename_column</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">old</span>: <span class="ident">S</span>, <span class="ident">new</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">columns</span>
-            .<span class="ident">push</span>(<span class="ident">TableChange::RenameColumn</span>(<span class="ident">old</span>.<span class="ident">into</span>(), <span class="ident">new</span>.<span class="ident">into</span>()));
+    <span class="kw">pub fn </span>rename_column&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, old: S, new: S) {
+        <span class="self">self</span>.columns
+            .push(TableChange::RenameColumn(old.into(), new.into()));
     }
 
-    <span class="doccomment">/// Inject a line of custom SQL into the table block</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a bypass to the barrel typesystem, in case there is</span>
-    <span class="doccomment">/// something your database supports that barrel doesn&#39;t, or if</span>
-    <span class="doccomment">/// there is an issue with the way that barrel represents types.</span>
-    <span class="doccomment">/// It does however mean that the SQL provided needs to be</span>
-    <span class="doccomment">/// specific for one database, meaning that future migrations</span>
-    <span class="doccomment">/// might become cumbersome.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject_custom</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">TableChange::CustomLine</span>(<span class="ident">sql</span>.<span class="ident">into</span>()));
+    <span class="doccomment">/// Inject a line of custom SQL into the table block
+    ///
+    /// This is a bypass to the barrel typesystem, in case there is
+    /// something your database supports that barrel doesn&#39;t, or if
+    /// there is an issue with the way that barrel represents types.
+    /// It does however mean that the SQL provided needs to be
+    /// specific for one database, meaning that future migrations
+    /// might become cumbersome.
+    </span><span class="kw">pub fn </span>inject_custom&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sql: S) {
+        <span class="self">self</span>.columns.push(TableChange::CustomLine(sql.into()));
     }
 
-    <span class="doccomment">/// Add a new index to a table, spanning over multiple columns</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_index</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>) {
-        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
+    <span class="doccomment">/// Add a new index to a table, spanning over multiple columns
+    </span><span class="kw">pub fn </span>add_index&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S, columns: Type) {
+        <span class="kw">match </span>columns.inner {
+            <span class="kw">crate</span>::types::BaseType::Index(<span class="kw">_</span>) =&gt; {}
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
         }
 
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">IndexChange::AddIndex</span> {
-            <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">index</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">columns</span>,
+        <span class="self">self</span>.indices.push(IndexChange::AddIndex {
+            table: <span class="self">self</span>.meta.name.clone(),
+            index: name.into(),
+            columns,
         });
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_constraint</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>) {
-        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Constraint` type is not allowed!&quot;</span>),
+    <span class="kw">pub fn </span>add_constraint&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S, columns: Type) {
+        <span class="kw">match </span>columns.inner {
+            <span class="kw">crate</span>::types::BaseType::Constraint(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Constraint` type is not allowed!&quot;</span>),
         }
 
-        <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">push</span>(<span class="ident">ConstraintChange::AddConstraint</span> {
-            <span class="ident">index</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">columns</span>,
+        <span class="self">self</span>.constraints.push(ConstraintChange::AddConstraint {
+            index: name.into(),
+            columns,
         });
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_partial_index</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>, <span class="ident">conditions</span>: <span class="ident">S</span>) {
-        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
+    <span class="kw">pub fn </span>add_partial_index&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S, columns: Type, conditions: S) {
+        <span class="kw">match </span>columns.inner {
+            <span class="kw">crate</span>::types::BaseType::Index(<span class="kw">_</span>) =&gt; {}
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
         }
 
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">IndexChange::AddPartialIndex</span> {
-            <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">index</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">columns</span>,
-            <span class="ident">conditions</span>: <span class="ident">conditions</span>.<span class="ident">into</span>(),
+        <span class="self">self</span>.indices.push(IndexChange::AddPartialIndex {
+            table: <span class="self">self</span>.meta.name.clone(),
+            index: name.into(),
+            columns,
+            conditions: conditions.into(),
         });
     }
 
-    <span class="doccomment">/// Drop an index on this table</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drop_index</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">IndexChange::RemoveIndex</span>(
-            <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">name</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Drop an index on this table
+    </span><span class="kw">pub fn </span>drop_index&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: S) {
+        <span class="self">self</span>.indices.push(IndexChange::RemoveIndex(
+            <span class="self">self</span>.meta.name.clone(),
+            name.into(),
         ));
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_foreign_key</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">columns_on_this_side</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-        <span class="ident">related_table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">columns_on_that_side</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
+    <span class="kw">pub fn </span>add_foreign_key(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        columns_on_this_side: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+        related_table: <span class="kw-2">&amp;</span>str,
+        columns_on_that_side: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     ) {
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">related_table</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>table = related_table.into();
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns_on_this_side</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="kw-2">*</span><span class="ident">c</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>columns = columns_on_this_side
+            .into_iter()
+            .map(|c| String::from(<span class="kw-2">*</span>c))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">relation_columns</span> <span class="op">=</span> <span class="ident">columns_on_that_side</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="kw-2">*</span><span class="ident">c</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>relation_columns = columns_on_that_side
+            .into_iter()
+            .map(|c| String::from(<span class="kw-2">*</span>c))
+            .collect();
 
-        <span class="self">self</span>.<span class="ident">foreign_keys</span>.<span class="ident">push</span>(<span class="ident">ForeignKeyChange::AddForeignKey</span> {
-            <span class="ident">table</span>,
-            <span class="ident">columns</span>,
-            <span class="ident">relation_columns</span>,
+        <span class="self">self</span>.foreign_keys.push(ForeignKeyChange::AddForeignKey {
+            table,
+            columns,
+            relation_columns,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_primary_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) {
-        <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span>
-            <span class="ident">PrimaryKeyChange::AddPrimaryKey</span>(<span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>());
+    <span class="kw">pub fn </span>set_primary_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) {
+        <span class="kw">let </span>primary_key =
+            PrimaryKeyChange::AddPrimaryKey(columns.into_iter().map(|s| s.to_string()).collect());
 
-        <span class="self">self</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">primary_key</span>);
+        <span class="self">self</span>.primary_key = <span class="prelude-val">Some</span>(primary_key);
     }
 
-    <span class="doccomment">/// Generate Sql for this table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SqlGenerator</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">SqlChanges</span> {
-        <span class="kw">use</span> <span class="ident">ConstraintChange</span> <span class="kw">as</span> <span class="ident">CC</span>;
-        <span class="kw">use</span> <span class="ident">ForeignKeyChange</span> <span class="kw">as</span> <span class="ident">KFC</span>;
-        <span class="kw">use</span> <span class="ident">IndexChange</span> <span class="kw">as</span> <span class="ident">IC</span>;
-        <span class="kw">use</span> <span class="ident">PrimaryKeyChange</span> <span class="kw">as</span> <span class="ident">PKC</span>;
-        <span class="kw">use</span> <span class="ident">TableChange</span> <span class="kw">as</span> <span class="ident">TC</span>;
+    <span class="doccomment">/// Generate Sql for this table.
+    </span><span class="kw">pub fn </span>make&lt;T: SqlGenerator&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ex: bool, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SqlChanges {
+        <span class="kw">use </span>ConstraintChange <span class="kw">as </span>CC;
+        <span class="kw">use </span>ForeignKeyChange <span class="kw">as </span>KFC;
+        <span class="kw">use </span>IndexChange <span class="kw">as </span>IC;
+        <span class="kw">use </span>PrimaryKeyChange <span class="kw">as </span>PKC;
+        <span class="kw">use </span>TableChange <span class="kw">as </span>TC;
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">columns</span>
-            .<span class="ident">iter_mut</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="kw-2">&amp;mut</span> <span class="ident">TC::AddColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">col</span>) =&gt; <span class="ident">T::add_column</span>(<span class="ident">ex</span>, <span class="ident">schema</span>, <span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">col</span>),
-                <span class="kw-2">&amp;mut</span> <span class="ident">TC::DropColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">T::drop_column</span>(<span class="ident">name</span>),
-                <span class="kw-2">&amp;mut</span> <span class="ident">TC::RenameColumn</span>(<span class="kw-2">ref</span> <span class="ident">old</span>, <span class="kw-2">ref</span> <span class="ident">new</span>) =&gt; <span class="ident">T::rename_column</span>(<span class="ident">old</span>, <span class="ident">new</span>),
-                <span class="kw-2">&amp;mut</span> <span class="ident">TC::ChangeColumn</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">T::alter_table</span>(<span class="ident">name</span>, <span class="ident">schema</span>),
-                <span class="kw-2">&amp;mut</span> <span class="ident">TC::CustomLine</span>(<span class="kw-2">ref</span> <span class="ident">sql</span>) =&gt; <span class="ident">sql</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>columns = <span class="self">self
+            </span>.columns
+            .iter_mut()
+            .map(|change| <span class="kw">match </span>change {
+                <span class="kw-2">&amp;mut </span>TC::AddColumn(<span class="kw-2">ref </span>name, <span class="kw-2">ref </span>col) =&gt; T::add_column(ex, schema, name, <span class="kw-2">&amp;</span>col),
+                <span class="kw-2">&amp;mut </span>TC::DropColumn(<span class="kw-2">ref </span>name) =&gt; T::drop_column(name),
+                <span class="kw-2">&amp;mut </span>TC::RenameColumn(<span class="kw-2">ref </span>old, <span class="kw-2">ref </span>new) =&gt; T::rename_column(old, new),
+                <span class="kw-2">&amp;mut </span>TC::ChangeColumn(<span class="kw-2">ref mut </span>name, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; T::alter_table(name, schema),
+                <span class="kw-2">&amp;mut </span>TC::CustomLine(<span class="kw-2">ref </span>sql) =&gt; sql.clone(),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">indices</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">indices</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">IC::AddIndex</span> {
-                    <span class="ident">index</span>,
-                    <span class="ident">table</span>,
-                    <span class="ident">columns</span>,
-                } =&gt; <span class="ident">T::create_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>),
-                <span class="ident">IC::AddPartialIndex</span> {
-                    <span class="ident">index</span>,
-                    <span class="ident">table</span>,
-                    <span class="ident">columns</span>,
-                    <span class="ident">conditions</span>,
-                } =&gt; <span class="ident">T::create_partial_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">conditions</span>),
-                <span class="ident">IC::RemoveIndex</span>(<span class="kw">_</span>, <span class="ident">index</span>) =&gt; <span class="ident">T::drop_index</span>(<span class="ident">index</span>),
+        <span class="kw">let </span>indices = <span class="self">self
+            </span>.indices
+            .iter()
+            .map(|change| <span class="kw">match </span>change {
+                IC::AddIndex {
+                    index,
+                    table,
+                    columns,
+                } =&gt; T::create_index(table, schema, index, columns),
+                IC::AddPartialIndex {
+                    index,
+                    table,
+                    columns,
+                    conditions,
+                } =&gt; T::create_partial_index(table, schema, index, columns, conditions),
+                IC::RemoveIndex(<span class="kw">_</span>, index) =&gt; T::drop_index(index),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pk</span> {
-            <span class="ident">PKC::AddPrimaryKey</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) =&gt; <span class="ident">T::add_primary_key</span>(<span class="ident">cols</span>),
+        <span class="kw">let </span>primary_key = <span class="self">self</span>.primary_key.as_ref().map(|pk| <span class="kw">match </span>pk {
+            PKC::AddPrimaryKey(<span class="kw-2">ref </span>cols) =&gt; T::add_primary_key(cols),
         });
 
-        <span class="kw">let</span> <span class="ident">constraints</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">constraints</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">CC::AddConstraint</span> { <span class="ident">index</span>, <span class="ident">columns</span> } =&gt; <span class="ident">T::create_constraint</span>(<span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">schema</span>),
+        <span class="kw">let </span>constraints = <span class="self">self
+            </span>.constraints
+            .iter()
+            .map(|c| <span class="kw">match </span>c {
+                CC::AddConstraint { index, columns } =&gt; T::create_constraint(index, columns, schema),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">foreign_keys</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">KFC::AddForeignKey</span> {
-                    <span class="ident">columns</span>,
-                    <span class="ident">table</span>,
-                    <span class="ident">relation_columns</span>,
-                } =&gt; <span class="ident">T::add_foreign_key</span>(
-                    <span class="ident">columns</span>.<span class="ident">as_slice</span>(),
-                    <span class="ident">table</span>,
-                    <span class="ident">relation_columns</span>.<span class="ident">as_slice</span>(),
-                    <span class="ident">schema</span>,
+        <span class="kw">let </span>foreign_keys = <span class="self">self
+            </span>.foreign_keys
+            .iter()
+            .map(|change| <span class="kw">match </span>change {
+                KFC::AddForeignKey {
+                    columns,
+                    table,
+                    relation_columns,
+                } =&gt; T::add_foreign_key(
+                    columns.as_slice(),
+                    table,
+                    relation_columns.as_slice(),
+                    schema,
                 ),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="ident">SqlChanges</span> {
-            <span class="ident">columns</span>,
-            <span class="ident">indices</span>,
-            <span class="ident">constraints</span>,
-            <span class="ident">foreign_keys</span>,
-            <span class="ident">primary_key</span>,
+        SqlChanges {
+            columns,
+            indices,
+            constraints,
+            foreign_keys,
+            primary_key,
         }
     }
 }
 
-<span class="doccomment">/// Some metadata about a table that was just created</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableMeta</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">encoding</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Some metadata about a table that was just created
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>TableMeta {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>encoding: String,
 }
 
-<span class="kw">impl</span> <span class="ident">TableMeta</span> {
-    <span class="doccomment">/// Create a new tablemeta with default values</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">encoding</span>: <span class="string">&quot;utf-8&quot;</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl </span>TableMeta {
+    <span class="doccomment">/// Create a new tablemeta with default values
+    </span><span class="kw">pub fn </span>new(name: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            encoding: <span class="string">&quot;utf-8&quot;</span>.to_owned(),
         }
     }
 
-    <span class="doccomment">/// Get a clone of the table name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Get a clone of the table name
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.name.clone()
     }
 
-    <span class="doccomment">/// Specify an encoding for this table which might vary from the main encoding</span>
-    <span class="doccomment">/// of your database</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enc</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">TableMeta</span> {
-        <span class="self">self</span>.<span class="ident">encoding</span> <span class="op">=</span> <span class="ident">enc</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specify an encoding for this table which might vary from the main encoding
+    /// of your database
+    </span><span class="kw">pub fn </span>encoding&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enc: S) -&gt; <span class="kw-2">&amp;mut </span>TableMeta {
+        <span class="self">self</span>.encoding = enc.into();
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

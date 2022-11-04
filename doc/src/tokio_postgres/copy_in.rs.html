@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/copy_in.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>copy_in.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/copy_in.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>copy_in.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -230,237 +230,237 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">InnerClient</span>, <span class="ident">Responses</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::FrontendMessage</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connection::RequestMessages</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query</span>, <span class="ident">slice_iter</span>, <span class="ident">Error</span>, <span class="ident">Statement</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">ready</span>, <span class="ident">Sink</span>, <span class="ident">SinkExt</span>, <span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">log::debug</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::backend::Message</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::frontend</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::frontend::CopyData</span>;
-<span class="kw">use</span> <span class="ident">std::marker</span>::{<span class="ident">PhantomData</span>, <span class="ident">PhantomPinned</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::client::{InnerClient, Responses};
+<span class="kw">use </span><span class="kw">crate</span>::codec::FrontendMessage;
+<span class="kw">use </span><span class="kw">crate</span>::connection::RequestMessages;
+<span class="kw">use crate</span>::{query, slice_iter, Error, Statement};
+<span class="kw">use </span>bytes::{Buf, BufMut, BytesMut};
+<span class="kw">use </span>futures_channel::mpsc;
+<span class="kw">use </span>futures_util::{future, ready, Sink, SinkExt, Stream, StreamExt};
+<span class="kw">use </span>log::debug;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>postgres_protocol::message::backend::Message;
+<span class="kw">use </span>postgres_protocol::message::frontend;
+<span class="kw">use </span>postgres_protocol::message::frontend::CopyData;
+<span class="kw">use </span>std::marker::{PhantomData, PhantomPinned};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="kw">enum</span> <span class="ident">CopyInMessage</span> {
-    <span class="ident">Message</span>(<span class="ident">FrontendMessage</span>),
-    <span class="ident">Done</span>,
+<span class="kw">enum </span>CopyInMessage {
+    Message(FrontendMessage),
+    Done,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CopyInReceiver</span> {
-    <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">CopyInMessage</span><span class="op">&gt;</span>,
-    <span class="ident">done</span>: <span class="ident">bool</span>,
+<span class="kw">pub struct </span>CopyInReceiver {
+    receiver: mpsc::Receiver&lt;CopyInMessage&gt;,
+    done: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">CopyInReceiver</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">CopyInMessage</span><span class="op">&gt;</span>) -&gt; <span class="ident">CopyInReceiver</span> {
-        <span class="ident">CopyInReceiver</span> {
-            <span class="ident">receiver</span>,
-            <span class="ident">done</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>CopyInReceiver {
+    <span class="kw">fn </span>new(receiver: mpsc::Receiver&lt;CopyInMessage&gt;) -&gt; CopyInReceiver {
+        CopyInReceiver {
+            receiver,
+            done: <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">CopyInReceiver</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">FrontendMessage</span>;
+<span class="kw">impl </span>Stream <span class="kw">for </span>CopyInReceiver {
+    <span class="kw">type </span>Item = FrontendMessage;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FrontendMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;FrontendMessage&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.done {
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Some</span>(<span class="ident">CopyInMessage::Message</span>(<span class="ident">message</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">message</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">CopyInMessage::Done</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">done</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-                <span class="ident">frontend::copy_done</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-                <span class="ident">frontend::sync</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>())))
+        <span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.receiver.poll_next_unpin(cx)) {
+            <span class="prelude-val">Some</span>(CopyInMessage::Message(message)) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(message)),
+            <span class="prelude-val">Some</span>(CopyInMessage::Done) =&gt; {
+                <span class="self">self</span>.done = <span class="bool-val">true</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+                frontend::copy_done(<span class="kw-2">&amp;mut </span>buf);
+                frontend::sync(<span class="kw-2">&amp;mut </span>buf);
+                Poll::Ready(<span class="prelude-val">Some</span>(FrontendMessage::Raw(buf.freeze())))
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">done</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-                <span class="ident">frontend::copy_fail</span>(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-                <span class="ident">frontend::sync</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>.<span class="ident">freeze</span>())))
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="self">self</span>.done = <span class="bool-val">true</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+                frontend::copy_fail(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;mut </span>buf).unwrap();
+                frontend::sync(<span class="kw-2">&amp;mut </span>buf);
+                Poll::Ready(<span class="prelude-val">Some</span>(FrontendMessage::Raw(buf.freeze())))
             }
         }
     }
 }
 
-<span class="kw">enum</span> <span class="ident">SinkState</span> {
-    <span class="ident">Active</span>,
-    <span class="ident">Closing</span>,
-    <span class="ident">Reading</span>,
+<span class="kw">enum </span>SinkState {
+    Active,
+    Closing,
+    Reading,
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A sink for `COPY ... FROM STDIN` query data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The copy *must* be explicitly completed via the `Sink::close` or `finish` methods. If it is</span>
-    <span class="doccomment">/// not, the copy will be aborted.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">CopyInMessage</span><span class="op">&gt;</span>,
-        <span class="ident">responses</span>: <span class="ident">Responses</span>,
-        <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
-        <span class="ident">state</span>: <span class="ident">SinkState</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">_p</span>: <span class="ident">PhantomPinned</span>,
-        <span class="ident">_p2</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A sink for `COPY ... FROM STDIN` query data.
+    ///
+    /// The copy *must* be explicitly completed via the `Sink::close` or `finish` methods. If it is
+    /// not, the copy will be aborted.
+    </span><span class="kw">pub struct </span>CopyInSink&lt;T&gt; {
+        <span class="attribute">#[pin]
+        </span>sender: mpsc::Sender&lt;CopyInMessage&gt;,
+        responses: Responses,
+        buf: BytesMut,
+        state: SinkState,
+        <span class="attribute">#[pin]
+        </span>_p: PhantomPinned,
+        _p2: PhantomData&lt;T&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;T&gt; CopyInSink&lt;T&gt;
+<span class="kw">where
+    </span>T: Buf + <span class="lifetime">&#39;static </span>+ Send,
 {
-    <span class="doccomment">/// A poll-based version of `finish`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-                <span class="ident">SinkState::Active</span> =&gt; {
-                    <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">poll_flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
-                    <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">as_mut</span>().<span class="ident">poll_ready</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
-                    <span class="ident">this</span>.<span class="ident">sender</span>
-                        .<span class="ident">start_send</span>(<span class="ident">CopyInMessage::Done</span>)
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">SinkState::Closing</span>;
+    <span class="doccomment">/// A poll-based version of `finish`.
+    </span><span class="kw">pub fn </span>poll_finish(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;u64, Error&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.state {
+                SinkState::Active =&gt; {
+                    <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().poll_flush(cx))<span class="question-mark">?</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.as_mut().project();
+                    <span class="macro">ready!</span>(this.sender.as_mut().poll_ready(cx)).map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
+                    this.sender
+                        .start_send(CopyInMessage::Done)
+                        .map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
+                    <span class="kw-2">*</span>this.state = SinkState::Closing;
                 }
-                <span class="ident">SinkState::Closing</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
-                    <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">poll_close</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">SinkState::Reading</span>;
+                SinkState::Closing =&gt; {
+                    <span class="kw">let </span>this = <span class="self">self</span>.as_mut().project();
+                    <span class="macro">ready!</span>(this.sender.poll_close(cx)).map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
+                    <span class="kw-2">*</span>this.state = SinkState::Reading;
                 }
-                <span class="ident">SinkState::Reading</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
-                    <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">responses</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>))<span class="question-mark">?</span> {
-                        <span class="ident">Message::CommandComplete</span>(<span class="ident">body</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">body</span>
-                                .<span class="ident">tag</span>()
-                                .<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>
-                                .<span class="ident">rsplit</span>(<span class="string">&#39; &#39;</span>)
-                                .<span class="ident">next</span>()
-                                .<span class="ident">unwrap</span>()
-                                .<span class="ident">parse</span>()
-                                .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">rows</span>));
+                SinkState::Reading =&gt; {
+                    <span class="kw">let </span>this = <span class="self">self</span>.as_mut().project();
+                    <span class="kw">match </span><span class="macro">ready!</span>(this.responses.poll_next(cx))<span class="question-mark">? </span>{
+                        Message::CommandComplete(body) =&gt; {
+                            <span class="kw">let </span>rows = body
+                                .tag()
+                                .map_err(Error::parse)<span class="question-mark">?
+                                </span>.rsplit(<span class="string">&#39; &#39;</span>)
+                                .next()
+                                .unwrap()
+                                .parse()
+                                .unwrap_or(<span class="number">0</span>);
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(rows));
                         }
-                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>())),
+                        <span class="kw">_ </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::unexpected_message())),
                     }
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Completes the copy, returning the number of rows inserted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `Sink::close` method is equivalent to `finish`, except that it does not return the</span>
-    <span class="doccomment">/// number of rows.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">poll_finish</span>(<span class="ident">cx</span>)).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Completes the copy, returning the number of rows inserted.
+    ///
+    /// The `Sink::close` method is equivalent to `finish`, except that it does not return the
+    /// number of rows.
+    </span><span class="kw">pub async fn </span>finish(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt; {
+        future::poll_fn(|cx| <span class="self">self</span>.as_mut().poll_finish(cx)).<span class="kw">await
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;T&gt; Sink&lt;T&gt; <span class="kw">for </span>CopyInSink&lt;T&gt;
+<span class="kw">where
+    </span>T: Buf + <span class="lifetime">&#39;static </span>+ Send,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>()
-            .<span class="ident">sender</span>
-            .<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())
+    <span class="kw">fn </span>poll_ready(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt; {
+        <span class="self">self</span>.project()
+            .sender
+            .poll_ready(cx)
+            .map_err(|<span class="kw">_</span>| Error::closed())
     }
 
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>start_send(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, item: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Buf</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="number">4096</span> {
-            <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">Box::new</span>(<span class="ident">item</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">Box::new</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>().<span class="ident">chain</span>(<span class="ident">item</span>))
+        <span class="kw">let </span>data: Box&lt;<span class="kw">dyn </span>Buf + Send&gt; = <span class="kw">if </span>item.remaining() &gt; <span class="number">4096 </span>{
+            <span class="kw">if </span>this.buf.is_empty() {
+                Box::new(item)
+            } <span class="kw">else </span>{
+                Box::new(this.buf.split().freeze().chain(item))
             }
-        } <span class="kw">else</span> {
-            <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">put</span>(<span class="ident">item</span>);
-            <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">4096</span> {
-                <span class="ident">Box::new</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>())
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        } <span class="kw">else </span>{
+            this.buf.put(item);
+            <span class="kw">if </span>this.buf.len() &gt; <span class="number">4096 </span>{
+                Box::new(this.buf.split().freeze())
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
         };
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CopyData::new</span>(<span class="ident">data</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
-        <span class="ident">this</span>.<span class="ident">sender</span>
-            .<span class="ident">start_send</span>(<span class="ident">CopyInMessage::Message</span>(<span class="ident">FrontendMessage::CopyData</span>(<span class="ident">data</span>)))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())
+        <span class="kw">let </span>data = CopyData::new(data).map_err(Error::encode)<span class="question-mark">?</span>;
+        this.sender
+            .start_send(CopyInMessage::Message(FrontendMessage::CopyData(data)))
+            .map_err(|<span class="kw">_</span>| Error::closed())
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">as_mut</span>().<span class="ident">poll_ready</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Buf</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>());
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CopyData::new</span>(<span class="ident">data</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
-            <span class="ident">this</span>.<span class="ident">sender</span>
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">start_send</span>(<span class="ident">CopyInMessage::Message</span>(<span class="ident">FrontendMessage::CopyData</span>(<span class="ident">data</span>)))
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
+        <span class="kw">if </span>!this.buf.is_empty() {
+            <span class="macro">ready!</span>(this.sender.as_mut().poll_ready(cx)).map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
+            <span class="kw">let </span>data: Box&lt;<span class="kw">dyn </span>Buf + Send&gt; = Box::new(this.buf.split().freeze());
+            <span class="kw">let </span>data = CopyData::new(data).map_err(Error::encode)<span class="question-mark">?</span>;
+            this.sender
+                .as_mut()
+                .start_send(CopyInMessage::Message(FrontendMessage::CopyData(data)))
+                .map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
         }
 
-        <span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())
+        this.sender.poll_flush(cx).map_err(|<span class="kw">_</span>| Error::closed())
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_finish</span>(<span class="ident">cx</span>).<span class="ident">map_ok</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+    <span class="kw">fn </span>poll_close(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt; {
+        <span class="self">self</span>.poll_finish(cx).map_ok(|<span class="kw">_</span>| ())
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">copy_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">statement</span>: <span class="ident">Statement</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">pub async fn </span>copy_in&lt;T&gt;(client: <span class="kw-2">&amp;</span>InnerClient, statement: Statement) -&gt; <span class="prelude-ty">Result</span>&lt;CopyInSink&lt;T&gt;, Error&gt;
+<span class="kw">where
+    </span>T: Buf + <span class="lifetime">&#39;static </span>+ Send,
 {
-    <span class="macro">debug!</span>(<span class="string">&quot;executing copy in statement {}&quot;</span>, <span class="ident">statement</span>.<span class="ident">name</span>());
+    <span class="macro">debug!</span>(<span class="string">&quot;executing copy in statement {}&quot;</span>, statement.name());
 
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">query::encode</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">slice_iter</span>(<span class="kw-2">&amp;</span>[]))<span class="question-mark">?</span>;
+    <span class="kw">let </span>buf = query::encode(client, <span class="kw-2">&amp;</span>statement, slice_iter(<span class="kw-2">&amp;</span>[]))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">CopyInReceiver::new</span>(<span class="ident">receiver</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">RequestMessages::CopyIn</span>(<span class="ident">receiver</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>(<span class="kw-2">mut </span>sender, receiver) = mpsc::channel(<span class="number">1</span>);
+    <span class="kw">let </span>receiver = CopyInReceiver::new(receiver);
+    <span class="kw">let </span><span class="kw-2">mut </span>responses = client.send(RequestMessages::CopyIn(receiver))<span class="question-mark">?</span>;
 
-    <span class="ident">sender</span>
-        .<span class="ident">send</span>(<span class="ident">CopyInMessage::Message</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>)))
-        .<span class="kw">await</span>
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
+    sender
+        .send(CopyInMessage::Message(FrontendMessage::Raw(buf)))
+        .<span class="kw">await
+        </span>.map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
 
-    <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::BindComplete</span> =&gt; {}
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+    <span class="kw">match </span>responses.next().<span class="kw">await</span><span class="question-mark">? </span>{
+        Message::BindComplete =&gt; {}
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
     }
 
-    <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::CopyInResponse</span>(<span class="kw">_</span>) =&gt; {}
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+    <span class="kw">match </span>responses.next().<span class="kw">await</span><span class="question-mark">? </span>{
+        Message::CopyInResponse(<span class="kw">_</span>) =&gt; {}
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">CopyInSink</span> {
-        <span class="ident">sender</span>,
-        <span class="ident">responses</span>,
-        <span class="ident">buf</span>: <span class="ident">BytesMut::new</span>(),
-        <span class="ident">state</span>: <span class="ident">SinkState::Active</span>,
-        <span class="ident">_p</span>: <span class="ident">PhantomPinned</span>,
-        <span class="ident">_p2</span>: <span class="ident">PhantomData</span>,
+    <span class="prelude-val">Ok</span>(CopyInSink {
+        sender,
+        responses,
+        buf: BytesMut::new(),
+        state: SinkState::Active,
+        _p: PhantomPinned,
+        _p2: PhantomData,
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

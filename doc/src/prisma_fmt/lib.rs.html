@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_fmt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_fmt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -209,216 +209,216 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">actions</span>;
-<span class="kw">mod</span> <span class="ident">code_actions</span>;
-<span class="kw">mod</span> <span class="ident">get_config</span>;
-<span class="kw">mod</span> <span class="ident">lint</span>;
-<span class="kw">mod</span> <span class="ident">native</span>;
-<span class="kw">mod</span> <span class="ident">preview</span>;
-<span class="kw">mod</span> <span class="ident">text_document_completion</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>actions;
+<span class="kw">mod </span>code_actions;
+<span class="kw">mod </span>get_config;
+<span class="kw">mod </span>lint;
+<span class="kw">mod </span>native;
+<span class="kw">mod </span>preview;
+<span class="kw">mod </span>text_document_completion;
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">Position</span>, <span class="ident">Range</span>};
-<span class="kw">use</span> <span class="ident">psl::parser_database::ast</span>;
+<span class="kw">use </span>log::<span class="kw-2">*</span>;
+<span class="kw">use </span>lsp_types::{Position, Range};
+<span class="kw">use </span>psl::parser_database::ast;
 
-<span class="doccomment">/// The API is modelled on an LSP [completion</span>
-<span class="doccomment">/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).</span>
-<span class="doccomment">/// Input and output are both JSON, the request being a `CompletionParams` object and the response</span>
-<span class="doccomment">/// being a `CompletionList` object.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_document_completion</span>(<span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">params</span>) <span class="op">=</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">lsp_types::CompletionParams</span><span class="op">&gt;</span>(<span class="ident">params</span>) {
-        <span class="ident">params</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// The API is modelled on an LSP [completion
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
+/// Input and output are both JSON, the request being a `CompletionParams` object and the response
+/// being a `CompletionList` object.
+</span><span class="kw">pub fn </span>text_document_completion(schema: String, params: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span>params = <span class="kw">if let </span><span class="prelude-val">Ok</span>(params) = serde_json::from_str::&lt;lsp_types::CompletionParams&gt;(params) {
+        params
+    } <span class="kw">else </span>{
         <span class="macro">warn!</span>(<span class="string">&quot;Failed to parse params to text_document_completion() as CompletionParams.&quot;</span>);
-        <span class="kw">return</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">text_document_completion::empty_completion_list</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">return </span>serde_json::to_string(<span class="kw-2">&amp;</span>text_document_completion::empty_completion_list()).unwrap();
     };
 
-    <span class="kw">let</span> <span class="ident">completion_list</span> <span class="op">=</span> <span class="ident">text_document_completion::completion</span>(<span class="ident">schema</span>, <span class="ident">params</span>);
+    <span class="kw">let </span>completion_list = text_document_completion::completion(schema, params);
 
-    <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">completion_list</span>).<span class="ident">unwrap</span>()
+    serde_json::to_string(<span class="kw-2">&amp;</span>completion_list).unwrap()
 }
 
-<span class="doccomment">/// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code_actions</span>(<span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">params</span>) <span class="op">=</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">lsp_types::CodeActionParams</span><span class="op">&gt;</span>(<span class="ident">params</span>) {
-        <span class="ident">params</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
+</span><span class="kw">pub fn </span>code_actions(schema: String, params: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span>params = <span class="kw">if let </span><span class="prelude-val">Ok</span>(params) = serde_json::from_str::&lt;lsp_types::CodeActionParams&gt;(params) {
+        params
+    } <span class="kw">else </span>{
         <span class="macro">warn!</span>(<span class="string">&quot;Failed to parse params to text_document_completion() as CompletionParams.&quot;</span>);
-        <span class="kw">return</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">code_actions::empty_code_actions</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">return </span>serde_json::to_string(<span class="kw-2">&amp;</span>code_actions::empty_code_actions()).unwrap();
     };
 
-    <span class="kw">let</span> <span class="ident">actions</span> <span class="op">=</span> <span class="ident">code_actions::available_actions</span>(<span class="ident">schema</span>, <span class="ident">params</span>);
-    <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">actions</span>).<span class="ident">unwrap</span>()
+    <span class="kw">let </span>actions = code_actions::available_actions(schema, params);
+    serde_json::to_string(<span class="kw-2">&amp;</span>actions).unwrap()
 }
 
-<span class="doccomment">/// The two parameters are:</span>
-<span class="doccomment">/// - The Prisma schema to reformat, as a string.</span>
-<span class="doccomment">/// - An LSP</span>
-<span class="doccomment">/// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The function returns the formatted schema, as a string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">lsp_types::DocumentFormattingParams</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">serde_json::from_str</span>(<span class="ident">params</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">params</span>) =&gt; <span class="ident">params</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="macro">warn!</span>(<span class="string">&quot;Error parsing DocumentFormattingParams params: {}&quot;</span>, <span class="ident">err</span>);
-            <span class="kw">return</span> <span class="ident">schema</span>.<span class="ident">to_owned</span>();
+<span class="doccomment">/// The two parameters are:
+/// - The Prisma schema to reformat, as a string.
+/// - An LSP
+/// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
+///
+/// The function returns the formatted schema, as a string.
+///
+/// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
+</span><span class="kw">pub fn </span>format(schema: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span>params: lsp_types::DocumentFormattingParams = <span class="kw">match </span>serde_json::from_str(params) {
+        <span class="prelude-val">Ok</span>(params) =&gt; params,
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="macro">warn!</span>(<span class="string">&quot;Error parsing DocumentFormattingParams params: {}&quot;</span>, err);
+            <span class="kw">return </span>schema.to_owned();
         }
     };
 
-    <span class="ident">psl::reformat</span>(<span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">options</span>.<span class="ident">tab_size</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">schema</span>.<span class="ident">to_owned</span>())
+    psl::reformat(schema, params.options.tab_size <span class="kw">as </span>usize).unwrap_or_else(|| schema.to_owned())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lint</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">lint::run</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)
+<span class="kw">pub fn </span>lint(schema: String) -&gt; String {
+    lint::run(<span class="kw-2">&amp;</span>schema)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_types</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">native::run</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)
+<span class="kw">pub fn </span>native_types(schema: String) -&gt; String {
+    native::run(<span class="kw-2">&amp;</span>schema)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>() -&gt; <span class="ident">String</span> {
-    <span class="ident">preview::run</span>()
+<span class="kw">pub fn </span>preview_features() -&gt; String {
+    preview::run()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">actions::run</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)
+<span class="kw">pub fn </span>referential_actions(schema: String) -&gt; String {
+    actions::run(<span class="kw-2">&amp;</span>schema)
 }
 
-<span class="doccomment">/// This is the same command as get_config()</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Params is a JSON string with the following shape:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// interface GetConfigParams {</span>
-<span class="doccomment">///   prismaSchema: string</span>
-<span class="doccomment">///   ignoreEnvVarErrors?: bool</span>
-<span class="doccomment">///   env?: { [key: string]: string }</span>
-<span class="doccomment">///   datasourceOverrides?: { [key: string]: string }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Params example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///   &quot;prismaSchema&quot;: &lt;the prisma schema&gt;,</span>
-<span class="doccomment">///   &quot;env&quot;: {</span>
-<span class="doccomment">///     &quot;DBURL&quot;: &quot;postgresql://example.com/mydb&quot;</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The response is a JSON string with the following shape:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// type GetConfigSuccessResponse = any // same as QE getConfig</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// interface GetConfigErrorResponse {</span>
-<span class="doccomment">///   error: {</span>
-<span class="doccomment">///     error_code?: string</span>
-<span class="doccomment">///     message: string</span>
-<span class="doccomment">///   }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="ident">get_config_params</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="ident">get_config::get_config</span>(<span class="kw-2">&amp;</span><span class="ident">get_config_params</span>)
+<span class="doccomment">/// This is the same command as get_config()
+///
+/// Params is a JSON string with the following shape:
+///
+/// ```ignore
+/// interface GetConfigParams {
+///   prismaSchema: string
+///   ignoreEnvVarErrors?: bool
+///   env?: { [key: string]: string }
+///   datasourceOverrides?: { [key: string]: string }
+/// }
+/// ```
+/// Params example:
+///
+/// ```ignore
+/// {
+///   &quot;prismaSchema&quot;: &lt;the prisma schema&gt;,
+///   &quot;env&quot;: {
+///     &quot;DBURL&quot;: &quot;postgresql://example.com/mydb&quot;
+///   }
+/// }
+/// ```
+///
+/// The response is a JSON string with the following shape:
+///
+/// ```ignore
+/// type GetConfigSuccessResponse = any // same as QE getConfig
+///
+/// interface GetConfigErrorResponse {
+///   error: {
+///     error_code?: string
+///     message: string
+///   }
+/// }
+///
+/// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
+///
+/// ```
+</span><span class="kw">pub fn </span>get_config(get_config_params: String) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
+    get_config::get_config(<span class="kw-2">&amp;</span>get_config_params)
 }
 
-<span class="doccomment">/// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte</span>
-<span class="doccomment">/// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if</span>
-<span class="doccomment">/// the position has a line past the end of the document, or a character position past the end of</span>
-<span class="doccomment">/// the line.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">position_to_offset</span>(<span class="ident">position</span>: <span class="kw-2">&amp;</span><span class="ident">Position</span>, <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_offset</span> <span class="op">=</span> <span class="ident">position</span>.<span class="ident">line</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">character_offset</span> <span class="op">=</span> <span class="ident">position</span>.<span class="ident">character</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">document</span>.<span class="ident">chars</span>();
+<span class="doccomment">/// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
+/// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
+/// the position has a line past the end of the document, or a character position past the end of
+/// the line.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>position_to_offset(position: <span class="kw-2">&amp;</span>Position, document: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>offset = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>line_offset = position.line;
+    <span class="kw">let </span><span class="kw-2">mut </span>character_offset = position.character;
+    <span class="kw">let </span><span class="kw-2">mut </span>chars = document.chars();
 
-    <span class="kw">while</span> <span class="ident">line_offset</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+    <span class="kw">while </span>line_offset &gt; <span class="number">0 </span>{
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>chars.next() {
                 <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) =&gt; {
-                    <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    offset += <span class="number">1</span>;
                     <span class="kw">break</span>;
                 }
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    offset += <span class="number">1</span>;
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             }
         }
 
-        <span class="ident">line_offset</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        line_offset -= <span class="number">1</span>;
     }
 
-    <span class="kw">while</span> <span class="ident">character_offset</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    <span class="kw">while </span>character_offset &gt; <span class="number">0 </span>{
+        <span class="kw">match </span>chars.next() {
+            <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) | <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">character_offset</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                offset += <span class="number">1</span>;
+                character_offset -= <span class="number">1</span>;
             }
         }
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">offset</span>)
+    <span class="prelude-val">Some</span>(offset)
 }
 
-<span class="doccomment">/// Converts an LSP range to a span.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">range_to_span</span>(<span class="ident">range</span>: <span class="ident">Range</span>, <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ast::Span</span> {
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">position_to_offset</span>(<span class="kw-2">&amp;</span><span class="ident">range</span>.<span class="ident">start</span>, <span class="ident">document</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">position_to_offset</span>(<span class="kw-2">&amp;</span><span class="ident">range</span>.<span class="ident">end</span>, <span class="ident">document</span>).<span class="ident">unwrap</span>();
+<span class="doccomment">/// Converts an LSP range to a span.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>range_to_span(range: Range, document: <span class="kw-2">&amp;</span>str) -&gt; ast::Span {
+    <span class="kw">let </span>start = position_to_offset(<span class="kw-2">&amp;</span>range.start, document).unwrap();
+    <span class="kw">let </span>end = position_to_offset(<span class="kw-2">&amp;</span>range.end, document).unwrap();
 
-    <span class="ident">ast::Span::new</span>(<span class="ident">start</span>, <span class="ident">end</span>)
+    ast::Span::new(start, end)
 }
 
-<span class="doccomment">/// Gives the LSP position right after the given span.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">position_after_span</span>(<span class="ident">span</span>: <span class="ident">ast::Span</span>, <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Position</span> {
-    <span class="ident">offset_to_position</span>(<span class="ident">span</span>.<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">document</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Gives the LSP position right after the given span.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>position_after_span(span: ast::Span, document: <span class="kw-2">&amp;</span>str) -&gt; Position {
+    offset_to_position(span.end - <span class="number">1</span>, document).unwrap()
 }
 
-<span class="doccomment">/// Converts a byte offset to an LSP position, if the given offset</span>
-<span class="doccomment">/// does not overflow the document.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">offset_to_position</span>(<span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Position</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">Position::default</span>();
+<span class="doccomment">/// Converts a byte offset to an LSP position, if the given offset
+/// does not overflow the document.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>offset_to_position(offset: usize, document: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Position&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>position = Position::default();
 
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">chr</span>) <span class="kw">in</span> <span class="ident">document</span>.<span class="ident">chars</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">match</span> <span class="ident">chr</span> {
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">offset</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
+    <span class="kw">for </span>(i, chr) <span class="kw">in </span>document.chars().enumerate() {
+        <span class="kw">match </span>chr {
+            <span class="kw">_ if </span>i == offset =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(position);
             }
-            <span class="string">&#39;\n&#39;</span> =&gt; {
-                <span class="ident">position</span>.<span class="ident">character</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="ident">position</span>.<span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="string">&#39;\n&#39; </span>=&gt; {
+                position.character = <span class="number">0</span>;
+                position.line += <span class="number">1</span>;
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">position</span>.<span class="ident">character</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">_ </span>=&gt; {
+                position.character += <span class="number">1</span>;
             }
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">lsp_types::Position</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>lsp_types::Position;
 
-    <span class="comment">// On Windows, a newline is actually two characters.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">position_to_offset_with_crlf</span>() {
-        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="string">&quot;\r\nmodel Test {\r\n    id Int @id\r\n}&quot;</span>;
-        <span class="comment">// Let&#39;s put the cursor on the &quot;i&quot; in &quot;id Int&quot;.</span>
-        <span class="kw">let</span> <span class="ident">expected_offset</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">chars</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;i&#39;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">found_offset</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::position_to_offset</span>(<span class="kw-2">&amp;</span><span class="ident">Position</span> { <span class="ident">line</span>: <span class="number">2</span>, <span class="ident">character</span>: <span class="number">4</span> }, <span class="ident">schema</span>).<span class="ident">unwrap</span>();
+    <span class="comment">// On Windows, a newline is actually two characters.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>position_to_offset_with_crlf() {
+        <span class="kw">let </span>schema = <span class="string">&quot;\r\nmodel Test {\r\n    id Int @id\r\n}&quot;</span>;
+        <span class="comment">// Let&#39;s put the cursor on the &quot;i&quot; in &quot;id Int&quot;.
+        </span><span class="kw">let </span>expected_offset = schema.chars().position(|c| c == <span class="string">&#39;i&#39;</span>).unwrap();
+        <span class="kw">let </span>found_offset = <span class="kw">super</span>::position_to_offset(<span class="kw-2">&amp;</span>Position { line: <span class="number">2</span>, character: <span class="number">4 </span>}, schema).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">found_offset</span>, <span class="ident">expected_offset</span>);
+        <span class="macro">assert_eq!</span>(found_offset, expected_offset);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

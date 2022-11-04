@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/orderby.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>orderby.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/orderby.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>orderby.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -339,346 +339,346 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::join::JoinStage</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">OrderByHop</span>, <span class="ident">OrderByToManyAggregation</span>, <span class="ident">SortOrder</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::join::JoinStage;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>mongodb::bson::{doc, Document};
+<span class="kw">use </span>prisma_models::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
+<span class="kw">use </span>std::iter;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrderByData</span> {
-    <span class="doccomment">/// All collection join stages required to make this orderBy&#39;s data available for sorting.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JoinStage</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OrderByData {
+    <span class="doccomment">/// All collection join stages required to make this orderBy&#39;s data available for sorting.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) join: <span class="prelude-ty">Option</span>&lt;JoinStage&gt;,
 
-    <span class="doccomment">/// The path prefix of the scalar or aggregate we&#39;re ordering by.</span>
-    <span class="doccomment">/// Can be multiple hops over relations and composites.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">prefix</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderByPrefix</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The path prefix of the scalar or aggregate we&#39;re ordering by.
+    /// Can be multiple hops over relations and composites.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) prefix: <span class="prelude-ty">Option</span>&lt;OrderByPrefix&gt;,
 
-    <span class="doccomment">/// The base order object from the query core this data is based on.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">order_by</span>: <span class="ident">OrderBy</span>,
+    <span class="doccomment">/// The base order object from the query core this data is based on.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) order_by: OrderBy,
 }
 
-<span class="kw">impl</span> <span class="ident">OrderByData</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">order_bys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">order_bys</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">ordering</span>)<span class="op">|</span> <span class="ident">OrderByData::compute</span>(<span class="ident">ordering</span>, <span class="ident">index</span>))
-            .<span class="ident">collect</span>()
+<span class="kw">impl </span>OrderByData {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_list(order_bys: Vec&lt;OrderBy&gt;) -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        order_bys
+            .into_iter()
+            .enumerate()
+            .map(|(index, ordering)| OrderByData::compute(ordering, index))
+            .collect()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compute</span>(<span class="ident">order_by</span>: <span class="ident">OrderBy</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::compute_prefix</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">order_by</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compute(order_by: OrderBy, index: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>prefix = <span class="self">Self</span>::compute_prefix(index, <span class="kw-2">&amp;</span>order_by);
 
-        <span class="comment">// Determine if we need to compute join stages.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">order_by</span>.<span class="ident">contains_relation_hops</span>() {
-            <span class="self">Self</span> {
-                <span class="ident">join</span>: <span class="prelude-val">None</span>,
-                <span class="ident">prefix</span>,
-                <span class="ident">order_by</span>,
+        <span class="comment">// Determine if we need to compute join stages.
+        </span><span class="kw">if </span>!order_by.contains_relation_hops() {
+            <span class="self">Self </span>{
+                join: <span class="prelude-val">None</span>,
+                prefix,
+                order_by,
             }
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">unwrap</span>(); <span class="comment">// Safe because relation hops always produce a prefix.</span>
-            <span class="kw">let</span> <span class="ident">stages</span> <span class="op">=</span> <span class="ident">order_by</span>
-                .<span class="ident">path</span>()
-                .<span class="ident">unwrap</span>() <span class="comment">// Safe because relation hops always have a path.</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-                    <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">JoinStage::new</span>(<span class="ident">rf</span>.<span class="ident">clone</span>())),
-                    <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// We don&#39;t need to join if we&#39;re looking at composites - they&#39;re already present on the document.</span>
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>prefix = prefix.unwrap(); <span class="comment">// Safe because relation hops always produce a prefix.
+            </span><span class="kw">let </span>stages = order_by
+                .path()
+                .unwrap() <span class="comment">// Safe because relation hops always have a path.
+                </span>.iter()
+                .filter_map(|hop| <span class="kw">match </span>hop {
+                    OrderByHop::Relation(rf) =&gt; <span class="prelude-val">Some</span>(JoinStage::new(rf.clone())),
+                    OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// We don&#39;t need to join if we&#39;re looking at composites - they&#39;re already present on the document.
+                </span>})
+                .collect_vec();
+
+            <span class="comment">// We fold from right to left because the right hand side needs to be always contained
+            // in the left hand side here (JoinStage&lt;A, JoinStage&lt;B, JoinStage&lt;C&gt;&gt;&gt;).
+            </span><span class="kw">let </span><span class="kw-2">mut </span>folded_stages = stages
+                .into_iter()
+                .rev()
+                .reduce(|right, <span class="kw-2">mut </span>left| {
+                    left.push_nested(right);
+                    left
                 })
-                .<span class="ident">collect_vec</span>();
+                .unwrap();
 
-            <span class="comment">// We fold from right to left because the right hand side needs to be always contained</span>
-            <span class="comment">// in the left hand side here (JoinStage&lt;A, JoinStage&lt;B, JoinStage&lt;C&gt;&gt;&gt;).</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">folded_stages</span> <span class="op">=</span> <span class="ident">stages</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">rev</span>()
-                .<span class="ident">reduce</span>(<span class="op">|</span><span class="ident">right</span>, <span class="kw-2">mut</span> <span class="ident">left</span><span class="op">|</span> {
-                    <span class="ident">left</span>.<span class="ident">push_nested</span>(<span class="ident">right</span>);
-                    <span class="ident">left</span>
-                })
-                .<span class="ident">unwrap</span>();
+            folded_stages.set_alias(prefix.first().unwrap().to_string());
 
-            <span class="ident">folded_stages</span>.<span class="ident">set_alias</span>(<span class="ident">prefix</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>());
-
-            <span class="self">Self</span> {
-                <span class="ident">join</span>: <span class="prelude-val">Some</span>(<span class="ident">folded_stages</span>),
-                <span class="ident">prefix</span>: <span class="prelude-val">Some</span>(<span class="ident">prefix</span>),
-                <span class="ident">order_by</span>,
+            <span class="self">Self </span>{
+                join: <span class="prelude-val">Some</span>(folded_stages),
+                prefix: <span class="prelude-val">Some</span>(prefix),
+                order_by,
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">compute_prefix</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderBy</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderByPrefix</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">order_by</span>.<span class="ident">path</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">path</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">path</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-                        <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">OrderByHop::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
+    <span class="kw">fn </span>compute_prefix(index: usize, order_by: <span class="kw-2">&amp;</span>OrderBy) -&gt; <span class="prelude-ty">Option</span>&lt;OrderByPrefix&gt; {
+        <span class="kw">match </span>order_by.path() {
+            <span class="prelude-val">Some</span>(path) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>parts = path
+                    .iter()
+                    .map(|hop| <span class="kw">match </span>hop {
+                        OrderByHop::Relation(rf) =&gt; rf.relation().name.clone(),
+                        OrderByHop::Composite(cf) =&gt; cf.db_name().to_owned(),
                     })
-                    .<span class="ident">collect_vec</span>();
+                    .collect_vec();
 
-                <span class="kw">if</span> <span class="ident">parts</span>.<span class="ident">is_empty</span>() {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">clone_to</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">order_by</span>.<span class="ident">contains_relation_hops</span>() {
-                        <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;orderby_{}_{}&quot;</span>, <span class="ident">parts</span>[<span class="number">0</span>], <span class="ident">index</span>);
-                        <span class="ident">parts</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">alias</span>;
+                <span class="kw">if </span>parts.is_empty() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="kw">let </span>clone_to = <span class="kw">if </span>order_by.contains_relation_hops() {
+                        <span class="kw">let </span>alias = <span class="macro">format!</span>(<span class="string">&quot;orderby_{}_{}&quot;</span>, parts[<span class="number">0</span>], index);
+                        parts[<span class="number">0</span>] = alias;
 
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">is_empty</span>() {
-                        <span class="comment">// Case for composite-only path.</span>
-                        <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;orderby_{}_{}&quot;</span>, <span class="ident">parts</span>[<span class="number">0</span>], <span class="ident">index</span>))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    };
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else if </span>!path.is_empty() {
+                        <span class="comment">// Case for composite-only path.
+                        </span><span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;orderby_{}_{}&quot;</span>, parts[<span class="number">0</span>], index))
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>};
 
-                    <span class="prelude-val">Some</span>(<span class="ident">OrderByPrefix::new</span>(<span class="ident">parts</span>, <span class="ident">clone_to</span>))
+                    <span class="prelude-val">Some</span>(OrderByPrefix::new(parts, clone_to))
                 }
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The Mongo binding name of this orderBy, required for cursor conditions.</span>
-    <span class="doccomment">/// For a relation field, this is only the first item of the path (e.g. orderby_TestModel_1)</span>
-    <span class="doccomment">/// Returns 2 forms, one for the left one and one for the right one. The left one is a unique,</span>
-    <span class="doccomment">/// valid name for a variable binding.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binding_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="ident">String</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">prefix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix</span> {
-            <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>();
+    <span class="doccomment">/// The Mongo binding name of this orderBy, required for cursor conditions.
+    /// For a relation field, this is only the first item of the path (e.g. orderby_TestModel_1)
+    /// Returns 2 forms, one for the left one and one for the right one. The left one is a unique,
+    /// valid name for a variable binding.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>binding_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, String) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>prefix) = <span class="self">self</span>.prefix {
+            <span class="kw">let </span>first = prefix.first().unwrap().to_string();
 
-            (<span class="ident">first</span>.<span class="ident">clone</span>(), <span class="ident">first</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// TODO: Order by relevance won&#39;t work here</span>
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">field</span>().<span class="ident">expect</span>(<span class="string">&quot;a field on which to order by is expected&quot;</span>);
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+            (first.clone(), first)
+        } <span class="kw">else </span>{
+            <span class="comment">// TODO: Order by relevance won&#39;t work here
+            </span><span class="kw">let </span>field = <span class="self">self</span>.order_by.field().expect(<span class="string">&quot;a field on which to order by is expected&quot;</span>);
+            <span class="kw">let </span>right = field.db_name().to_owned();
+            <span class="kw">let </span><span class="kw-2">mut </span>left = field.name.clone();
 
-            <span class="comment">// Issue: https://github.com/prisma/prisma/issues/14001</span>
-            <span class="comment">// Here we can assume the field name is ASCII, because it is the _client_ field name,</span>
-            <span class="comment">// not the mapped name.</span>
-            <span class="ident">left</span>[..<span class="number">1</span>].<span class="ident">make_ascii_lowercase</span>();
+            <span class="comment">// Issue: https://github.com/prisma/prisma/issues/14001
+            // Here we can assume the field name is ASCII, because it is the _client_ field name,
+            // not the mapped name.
+            </span>left[..<span class="number">1</span>].make_ascii_lowercase();
 
-            (<span class="ident">left</span>, <span class="ident">right</span>)
+            (left, right)
         }
     }
 
-    <span class="doccomment">/// The name of the scalar the ordering (ultimately) refers to.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scalar_field_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">// TODO: Order by relevance won&#39;t work here</span>
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">field</span>().<span class="ident">expect</span>(<span class="string">&quot;a field on which to order by is expected&quot;</span>);
+    <span class="doccomment">/// The name of the scalar the ordering (ultimately) refers to.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scalar_field_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="comment">// TODO: Order by relevance won&#39;t work here
+        </span><span class="kw">let </span>field = <span class="self">self</span>.order_by.field().expect(<span class="string">&quot;a field on which to order by is expected&quot;</span>);
 
-        <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>()
+        field.db_name().to_string()
     }
 
-    <span class="doccomment">/// Computes the full query path that would be required to traverse from the top-most</span>
-    <span class="doccomment">/// document all the way to the scalar to order through all hops.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">full_reference_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">use_bindings</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="macro">matches!</span>(
-            <span class="self">self</span>.<span class="ident">order_by</span>,
-            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">OrderBy::ToManyAggregation</span>(<span class="kw">_</span>)
+    <span class="doccomment">/// Computes the full query path that would be required to traverse from the top-most
+    /// document all the way to the scalar to order through all hops.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>full_reference_path(<span class="kw-2">&amp;</span><span class="self">self</span>, use_bindings: bool) -&gt; String {
+        <span class="kw">if </span><span class="macro">matches!</span>(
+            <span class="self">self</span>.order_by,
+            OrderBy::ScalarAggregation(<span class="kw">_</span>) | OrderBy::ToManyAggregation(<span class="kw">_</span>)
         ) {
-            <span class="comment">// Order by aggregates are always referenced by their join prefix and not a specific field name.</span>
-            <span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">prefix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">prefix</span> {
-            <span class="ident">iter::once</span>(<span class="ident">prefix</span>.<span class="ident">to_string</span>())
-                .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="self">self</span>.<span class="ident">scalar_field_name</span>()))
-                .<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">use_bindings</span> {
-            <span class="self">self</span>.<span class="ident">binding_names</span>().<span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">prefix</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="ident">ToString::to_string</span>)
-                .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="self">self</span>.<span class="ident">scalar_field_name</span>()))
-                .<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>)
+            <span class="comment">// Order by aggregates are always referenced by their join prefix and not a specific field name.
+            </span><span class="self">self</span>.prefix.as_ref().unwrap().to_string()
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>prefix) = <span class="self">self</span>.prefix {
+            iter::once(prefix.to_string())
+                .chain(iter::once(<span class="self">self</span>.scalar_field_name()))
+                .join(<span class="string">&quot;.&quot;</span>)
+        } <span class="kw">else if </span>use_bindings {
+            <span class="self">self</span>.binding_names().<span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.prefix
+                .as_ref()
+                .into_iter()
+                .map(ToString::to_string)
+                .chain(iter::once(<span class="self">self</span>.scalar_field_name()))
+                .join(<span class="string">&quot;.&quot;</span>)
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SortOrder</span> {
-        <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">sort_order</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SortOrder {
+        <span class="self">self</span>.order_by.sort_order()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrderByPrefix</span> {
-    <span class="doccomment">/// Instructs the query to clone the target (e.g. a scalar field) to the given clone alias instead of</span>
-    <span class="doccomment">/// folding the field piece by piece as the joins do. Only used for composite-only cases,</span>
-    <span class="doccomment">/// e.g. count number of `model.to_one_com.to_many_com`, where we would override the composite on the document,</span>
-    <span class="doccomment">/// leaving us without means to also query it for other purposes (like orderBy count + read the composite).</span>
-    <span class="ident">clone_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OrderByPrefix {
+    <span class="doccomment">/// Instructs the query to clone the target (e.g. a scalar field) to the given clone alias instead of
+    /// folding the field piece by piece as the joins do. Only used for composite-only cases,
+    /// e.g. count number of `model.to_one_com.to_many_com`, where we would override the composite on the document,
+    /// leaving us without means to also query it for other purposes (like orderBy count + read the composite).
+    </span>clone_to: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Parts of the path, stringified.</span>
-    <span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Parts of the path, stringified.
+    </span>parts: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">OrderByPrefix</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">parts</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>)
+<span class="kw">impl </span>ToString <span class="kw">for </span>OrderByPrefix {
+    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.parts.join(<span class="string">&quot;.&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">OrderByPrefix</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">clone_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">parts</span>, <span class="ident">clone_to</span> }
+<span class="kw">impl </span>OrderByPrefix {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(parts: Vec&lt;String&gt;, clone_to: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ parts, clone_to }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">parts</span>.<span class="ident">get</span>(<span class="number">0</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.parts.get(<span class="number">0</span>)
     }
 }
 
-<span class="doccomment">/// Builder for `sort` mongo documents.</span>
-<span class="doccomment">/// Building of orderBy needs to be deferred until all other args are complete</span>
-<span class="doccomment">/// to have all information necessary to build the correct sort arguments.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrderByBuilder</span> {
-    <span class="ident">order_bys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByData</span><span class="op">&gt;</span>,
-    <span class="ident">reverse</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Builder for `sort` mongo documents.
+/// Building of orderBy needs to be deferred until all other args are complete
+/// to have all information necessary to build the correct sort arguments.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OrderByBuilder {
+    order_bys: Vec&lt;OrderByData&gt;,
+    reverse: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">OrderByBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">order_bys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">order_bys</span> <span class="op">=</span> <span class="ident">order_bys</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">ordering</span>)<span class="op">|</span> <span class="ident">OrderByData::compute</span>(<span class="ident">ordering</span>, <span class="ident">index</span>))
-            .<span class="ident">collect</span>();
+<span class="kw">impl </span>OrderByBuilder {
+    <span class="kw">pub fn </span>new(order_bys: Vec&lt;OrderBy&gt;, reverse: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>order_bys = order_bys
+            .into_iter()
+            .enumerate()
+            .map(|(index, ordering)| OrderByData::compute(ordering, index))
+            .collect();
 
-        <span class="self">Self</span> { <span class="ident">order_bys</span>, <span class="ident">reverse</span> }
+        <span class="self">Self </span>{ order_bys, reverse }
     }
 
-    <span class="doccomment">/// Builds and renders a Mongo sort document.</span>
-    <span class="doccomment">/// `is_group_by` signals that the ordering is for a grouping,</span>
-    <span class="doccomment">/// requiring a prefix to refer to the correct document nesting.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">is_group_by</span>: <span class="ident">bool</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JoinStage</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_bys</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[]);
+    <span class="doccomment">/// Builds and renders a Mongo sort document.
+    /// `is_group_by` signals that the ordering is for a grouping,
+    /// requiring a prefix to refer to the correct document nesting.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(<span class="self">self</span>, is_group_by: bool) -&gt; (<span class="prelude-ty">Option</span>&lt;Document&gt;, Vec&lt;Document&gt;, Vec&lt;JoinStage&gt;) {
+        <span class="kw">if </span><span class="self">self</span>.order_bys.is_empty() {
+            <span class="kw">return </span>(<span class="prelude-val">None</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[]);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">order_doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">order_aggregate_proj_doc</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joins</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>order_doc = Document::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>order_aggregate_proj_doc: Vec&lt;Document&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>joins = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="ident">data</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">order_bys</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">let</span> <span class="ident">is_to_many_aggregation</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">order_by</span>, <span class="ident">OrderBy::ToManyAggregation</span>(<span class="kw">_</span>));
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_group_by</span> {
-                <span class="comment">// Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">order_by_aggr</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">order_by</span> {
-                    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_by_aggr</span>.<span class="ident">sort_aggregation</span> {
-                        <span class="ident">prisma_models::SortAggregation::Count</span> =&gt; <span class="string">&quot;count&quot;</span>,
-                        <span class="ident">prisma_models::SortAggregation::Avg</span> =&gt; <span class="string">&quot;avg&quot;</span>,
-                        <span class="ident">prisma_models::SortAggregation::Sum</span> =&gt; <span class="string">&quot;sum&quot;</span>,
-                        <span class="ident">prisma_models::SortAggregation::Min</span> =&gt; <span class="string">&quot;min&quot;</span>,
-                        <span class="ident">prisma_models::SortAggregation::Max</span> =&gt; <span class="string">&quot;max&quot;</span>,
+        <span class="kw">for </span>data <span class="kw">in </span><span class="self">self</span>.order_bys.into_iter() {
+            <span class="kw">let </span>is_to_many_aggregation = <span class="macro">matches!</span>(<span class="kw-2">&amp;</span>data.order_by, OrderBy::ToManyAggregation(<span class="kw">_</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>field_name = <span class="kw">if </span>is_group_by {
+                <span class="comment">// Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.
+                </span><span class="kw">if let </span>OrderBy::ScalarAggregation(order_by_aggr) = <span class="kw-2">&amp;</span>data.order_by {
+                    <span class="kw">let </span>prefix = <span class="kw">match </span>order_by_aggr.sort_aggregation {
+                        prisma_models::SortAggregation::Count =&gt; <span class="string">&quot;count&quot;</span>,
+                        prisma_models::SortAggregation::Avg =&gt; <span class="string">&quot;avg&quot;</span>,
+                        prisma_models::SortAggregation::Sum =&gt; <span class="string">&quot;sum&quot;</span>,
+                        prisma_models::SortAggregation::Min =&gt; <span class="string">&quot;min&quot;</span>,
+                        prisma_models::SortAggregation::Max =&gt; <span class="string">&quot;max&quot;</span>,
                     };
 
-                    <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">prefix</span>, <span class="ident">data</span>.<span class="ident">scalar_field_name</span>())
-                } <span class="kw">else</span> {
-                    <span class="comment">// Explanation: All group by fields go into the _id key of the result document.</span>
-                    <span class="comment">// As it is the only point where the flat scalars are contained for the group,</span>
-                    <span class="comment">// we need to refer to the object.</span>
-                    <span class="macro">format!</span>(<span class="string">&quot;_id.{}&quot;</span>, <span class="ident">data</span>.<span class="ident">scalar_field_name</span>())
+                    <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, prefix, data.scalar_field_name())
+                } <span class="kw">else </span>{
+                    <span class="comment">// Explanation: All group by fields go into the _id key of the result document.
+                    // As it is the only point where the flat scalars are contained for the group,
+                    // we need to refer to the object.
+                    </span><span class="macro">format!</span>(<span class="string">&quot;_id.{}&quot;</span>, data.scalar_field_name())
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_to_many_aggregation</span> {
-                <span class="comment">// Since Order by to-many aggregate with middle to-one path will be unwinded,</span>
-                <span class="comment">// we need to refer to it with its top-level join alias</span>
-                <span class="ident">data</span>.<span class="ident">binding_names</span>().<span class="number">0</span>
-            } <span class="kw">else</span> {
-                <span class="ident">data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">false</span>)
+            } <span class="kw">else if </span>is_to_many_aggregation {
+                <span class="comment">// Since Order by to-many aggregate with middle to-one path will be unwinded,
+                // we need to refer to it with its top-level join alias
+                </span>data.binding_names().<span class="number">0
+            </span>} <span class="kw">else </span>{
+                data.full_reference_path(<span class="bool-val">false</span>)
             };
 
-            <span class="comment">// Unwind order by aggregate to-one middle joins into the top level join</span>
-            <span class="comment">// to prevent nested join result which break the stages that come after</span>
-            <span class="comment">// See `unwind_aggregate_joins` for more explanation</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">order_by_aggregate</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">order_by</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">order_by_aggregate</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">match</span> <span class="ident">order_by_aggregate</span>.<span class="ident">sort_aggregation</span> {
-                        <span class="ident">prisma_models::SortAggregation::Count</span> =&gt; {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">clone_to</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">prefix</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">clone_to</span>.<span class="ident">clone</span>()) {
-                                <span class="ident">order_aggregate_proj_doc</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$addFields&quot;</span>: { <span class="ident">clone_to</span>.<span class="ident">clone</span>(): { <span class="string">&quot;$size&quot;</span>: { <span class="string">&quot;$ifNull&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">false</span>)), []] } } } });
-                                <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">clone_to</span>; <span class="comment">// Todo: Just a hack right now, this whole function needs love.</span>
-                            } <span class="kw">else</span> {
-                                <span class="ident">order_aggregate_proj_doc</span>.<span class="ident">extend</span>(<span class="ident">unwind_aggregate_joins</span>(
-                                    <span class="ident">field_name</span>.<span class="ident">clone</span>().<span class="ident">as_str</span>(),
-                                    <span class="ident">order_by_aggregate</span>,
-                                    <span class="kw-2">&amp;</span><span class="ident">data</span>,
+            <span class="comment">// Unwind order by aggregate to-one middle joins into the top level join
+            // to prevent nested join result which break the stages that come after
+            // See `unwind_aggregate_joins` for more explanation
+            </span><span class="kw">if let </span>OrderBy::ToManyAggregation(order_by_aggregate) = <span class="kw-2">&amp;</span>data.order_by {
+                <span class="kw">if </span>!order_by_aggregate.path.is_empty() {
+                    <span class="kw">match </span>order_by_aggregate.sort_aggregation {
+                        prisma_models::SortAggregation::Count =&gt; {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
+                                order_aggregate_proj_doc.push(<span class="macro">doc! </span>{ <span class="string">&quot;$addFields&quot;</span>: { clone_to.clone(): { <span class="string">&quot;$size&quot;</span>: { <span class="string">&quot;$ifNull&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, data.full_reference_path(<span class="bool-val">false</span>)), []] } } } });
+                                field_name = clone_to; <span class="comment">// Todo: Just a hack right now, this whole function needs love.
+                            </span>} <span class="kw">else </span>{
+                                order_aggregate_proj_doc.extend(unwind_aggregate_joins(
+                                    field_name.clone().as_str(),
+                                    order_by_aggregate,
+                                    <span class="kw-2">&amp;</span>data,
                                 ));
 
-                                <span class="ident">order_aggregate_proj_doc</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$addFields&quot;</span>: { <span class="ident">field_name</span>.<span class="ident">clone</span>(): { <span class="string">&quot;$size&quot;</span>: { <span class="string">&quot;$ifNull&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">field_name</span>), []] } } } });
+                                order_aggregate_proj_doc.push(<span class="macro">doc! </span>{ <span class="string">&quot;$addFields&quot;</span>: { field_name.clone(): { <span class="string">&quot;$size&quot;</span>: { <span class="string">&quot;$ifNull&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, field_name), []] } } } });
                             }
                         }
-                        <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Order by aggregate only supports COUNT&quot;</span>),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Order by aggregate only supports COUNT&quot;</span>),
                     }
                 }
             }
 
-            <span class="comment">// Mongo: -1 -&gt; DESC, 1 -&gt; ASC</span>
-            <span class="kw">match</span> (<span class="ident">data</span>.<span class="ident">sort_order</span>(), <span class="self">self</span>.<span class="ident">reverse</span>) {
-                (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">order_doc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>, <span class="op">-</span><span class="number">1</span>),
-                (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">order_doc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>, <span class="number">1</span>),
-                (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">order_doc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>, <span class="number">1</span>),
-                (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">order_doc</span>.<span class="ident">insert</span>(<span class="ident">field_name</span>, <span class="op">-</span><span class="number">1</span>),
+            <span class="comment">// Mongo: -1 -&gt; DESC, 1 -&gt; ASC
+            </span><span class="kw">match </span>(data.sort_order(), <span class="self">self</span>.reverse) {
+                (SortOrder::Ascending, <span class="bool-val">true</span>) =&gt; order_doc.insert(field_name, -<span class="number">1</span>),
+                (SortOrder::Descending, <span class="bool-val">true</span>) =&gt; order_doc.insert(field_name, <span class="number">1</span>),
+                (SortOrder::Ascending, <span class="bool-val">false</span>) =&gt; order_doc.insert(field_name, <span class="number">1</span>),
+                (SortOrder::Descending, <span class="bool-val">false</span>) =&gt; order_doc.insert(field_name, -<span class="number">1</span>),
             };
 
-            <span class="ident">joins</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">join</span>);
+            joins.extend(data.join);
         }
 
-        (<span class="prelude-val">Some</span>(<span class="ident">order_doc</span>), <span class="ident">order_aggregate_proj_doc</span>, <span class="ident">joins</span>)
+        (<span class="prelude-val">Some</span>(order_doc), order_aggregate_proj_doc, joins)
     }
 }
 
-<span class="doccomment">/// In order to enable computing aggregation on nested joins, we unwind &amp; replace the top-level</span>
-<span class="doccomment">/// join by the nested to-one joins so that we can apply a $size operation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: In theory, we do not need to unwind composites, they are already present as single object (to-one) or array (to-many), but we do it anyways here.</span>
-<span class="doccomment">/// Note: This is not necessary for `ScalarAggregations`. Todo [Dom] Why? It&#39;s not entirely clear...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Let&#39;s consider these relations:</span>
-<span class="doccomment">/// (one or many) A to-one B to-one C to-many D</span>
-<span class="doccomment">/// We&#39;ll get the following joins result: { orderby_AToB: [{ BToC: [{ CToD: [1, 2, 3] }] }] }</span>
-<span class="doccomment">/// This function will generate the following stages:</span>
-<span class="doccomment">/// 1. { $unwind: { path: &quot;$orderby_AToB&quot; } } -&gt; { orderby_AToB: { BToC: [{ CToD: [1, 2, 3] }] } }</span>
-<span class="doccomment">/// 2. { $addFields: { orderby_AToB: &quot;$orderby_AToB.BToC&quot; } } -&gt; [{ CToD: [1, 2, 3] }]</span>
-<span class="doccomment">/// 3. { $unwind: { path: &quot;$orderby_AToB&quot; } } -&gt;  { CToD: [1, 2, 3] }</span>
-<span class="doccomment">/// 4. { $addFields: { orderby_AToB: &quot;$orderby_AToB.CToD&quot; } } -&gt; [1, 2, 3]</span>
-<span class="kw">fn</span> <span class="ident">unwind_aggregate_joins</span>(
-    <span class="ident">join_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">order_by_aggregate</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
-    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-    <span class="ident">order_by_aggregate</span>
-        .<span class="ident">path</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">hop</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-            <span class="ident">OrderByHop::Composite</span>(<span class="ident">cf</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">OrderByHop::Relation</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">additional_stages</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="doccomment">/// In order to enable computing aggregation on nested joins, we unwind &amp; replace the top-level
+/// join by the nested to-one joins so that we can apply a $size operation.
+///
+/// Note: In theory, we do not need to unwind composites, they are already present as single object (to-one) or array (to-many), but we do it anyways here.
+/// Note: This is not necessary for `ScalarAggregations`. Todo [Dom] Why? It&#39;s not entirely clear...
+///
+/// Let&#39;s consider these relations:
+/// (one or many) A to-one B to-one C to-many D
+/// We&#39;ll get the following joins result: { orderby_AToB: [{ BToC: [{ CToD: [1, 2, 3] }] }] }
+/// This function will generate the following stages:
+/// 1. { $unwind: { path: &quot;$orderby_AToB&quot; } } -&gt; { orderby_AToB: { BToC: [{ CToD: [1, 2, 3] }] } }
+/// 2. { $addFields: { orderby_AToB: &quot;$orderby_AToB.BToC&quot; } } -&gt; [{ CToD: [1, 2, 3] }]
+/// 3. { $unwind: { path: &quot;$orderby_AToB&quot; } } -&gt;  { CToD: [1, 2, 3] }
+/// 4. { $addFields: { orderby_AToB: &quot;$orderby_AToB.CToD&quot; } } -&gt; [1, 2, 3]
+</span><span class="kw">fn </span>unwind_aggregate_joins(
+    join_name: <span class="kw-2">&amp;</span>str,
+    order_by_aggregate: <span class="kw-2">&amp;</span>OrderByToManyAggregation,
+    data: <span class="kw-2">&amp;</span>OrderByData,
+) -&gt; Vec&lt;Document&gt; {
+    order_by_aggregate
+        .path
+        .iter()
+        .enumerate()
+        .filter_map(|(i, hop)| <span class="kw">match </span>hop {
+            OrderByHop::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; <span class="prelude-val">None</span>,
+            OrderByHop::Relation(rf) <span class="kw">if </span>rf.is_list() =&gt; <span class="prelude-val">None</span>,
+            OrderByHop::Relation(<span class="kw">_</span>) | OrderByHop::Composite(<span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>additional_stages = <span class="macro">vec!</span>[];
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next_part</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">prefix</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">prefix</span><span class="op">|</span> <span class="ident">prefix</span>.<span class="ident">parts</span>.<span class="ident">get</span>(<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)) {
-                    <span class="ident">additional_stages</span>.<span class="ident">push</span>(<span class="macro">doc!</span> {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(next_part) = data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + <span class="number">1</span>)) {
+                    additional_stages.push(<span class="macro">doc! </span>{
                         <span class="string">&quot;$unwind&quot;</span>: {
-                            <span class="string">&quot;path&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">join_name</span>),
-                            <span class="string">&quot;preserveNullAndEmptyArrays&quot;</span>: <span class="bool-val">true</span>
-                        }
+                            <span class="string">&quot;path&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, join_name),
+                            <span class="string">&quot;preserveNullAndEmptyArrays&quot;</span>: <span class="bool-val">true
+                        </span>}
                     });
 
-                    <span class="ident">additional_stages</span>
-                        .<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$addFields&quot;</span>: { <span class="ident">join_name</span>: <span class="macro">format!</span>(<span class="string">&quot;${}.{}&quot;</span>, <span class="ident">join_name</span>, <span class="ident">next_part</span>) } });
+                    additional_stages
+                        .push(<span class="macro">doc! </span>{ <span class="string">&quot;$addFields&quot;</span>: { join_name: <span class="macro">format!</span>(<span class="string">&quot;${}.{}&quot;</span>, join_name, next_part) } });
                 }
 
-                <span class="prelude-val">Some</span>(<span class="ident">additional_stages</span>)
+                <span class="prelude-val">Some</span>(additional_stages)
             }
         })
-        .<span class="ident">flatten</span>()
-        .<span class="ident">collect_vec</span>()
+        .flatten()
+        .collect_vec()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

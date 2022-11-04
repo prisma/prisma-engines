@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-macro-support-0.2.83/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_macro_support/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_macro_support/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_macro_support/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-macro-support-0.2.83/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen_macro_support/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen_macro_support/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen_macro_support/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -103,110 +103,110 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This crate contains the part of the implementation of the `#[wasm_bindgen]` optsibute that is</span>
-<span class="doccomment">//! not in the shared backend crate.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This crate contains the part of the implementation of the `#[wasm_bindgen]` optsibute that is
+//! not in the shared backend crate.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/wasm-bindgen-macro-support/0.2&quot;</span>)]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/wasm-bindgen-macro-support/0.2&quot;</span>)]
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro2</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quote</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">syn</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wasm_bindgen_backend</span> <span class="kw">as</span> <span class="ident">backend</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wasm_bindgen_shared</span> <span class="kw">as</span> <span class="ident">shared</span>;
+</span><span class="kw">extern crate </span>proc_macro2;
+<span class="kw">extern crate </span>quote;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>syn;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>wasm_bindgen_backend <span class="kw">as </span>backend;
+<span class="kw">extern crate </span>wasm_bindgen_shared <span class="kw">as </span>shared;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::BindgenAttrs</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::MacroParse</span>;
-<span class="kw">use</span> <span class="ident">backend</span>::{<span class="ident">Diagnostic</span>, <span class="ident">TryToTokens</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote::ToTokens</span>;
-<span class="kw">use</span> <span class="ident">quote::TokenStreamExt</span>;
-<span class="kw">use</span> <span class="ident">syn::parse</span>::{<span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">SynResult</span>};
+<span class="kw">pub use </span><span class="kw">crate</span>::parser::BindgenAttrs;
+<span class="kw">use </span><span class="kw">crate</span>::parser::MacroParse;
+<span class="kw">use </span>backend::{Diagnostic, TryToTokens};
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::ToTokens;
+<span class="kw">use </span>quote::TokenStreamExt;
+<span class="kw">use </span>syn::parse::{Parse, ParseStream, <span class="prelude-ty">Result </span><span class="kw">as </span>SynResult};
 
-<span class="kw">mod</span> <span class="ident">parser</span>;
+<span class="kw">mod </span>parser;
 
-<span class="doccomment">/// Takes the parsed input from a `#[wasm_bindgen]` macro and returns the generated bindings</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="ident">parser::reset_attrs_used</span>();
-    <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">syn::parse2</span>::<span class="op">&lt;</span><span class="ident">syn::Item</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="ident">attr</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Takes the parsed input from a `#[wasm_bindgen]` macro and returns the generated bindings
+</span><span class="kw">pub fn </span>expand(attr: TokenStream, input: TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Diagnostic&gt; {
+    parser::reset_attrs_used();
+    <span class="kw">let </span>item = syn::parse2::&lt;syn::Item&gt;(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>opts = syn::parse2(attr)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">proc_macro2::TokenStream::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">program</span> <span class="op">=</span> <span class="ident">backend::ast::Program::default</span>();
-    <span class="ident">item</span>.<span class="ident">macro_parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">program</span>, (<span class="prelude-val">Some</span>(<span class="ident">opts</span>), <span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>))<span class="question-mark">?</span>;
-    <span class="ident">program</span>.<span class="ident">try_to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = proc_macro2::TokenStream::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>program = backend::ast::Program::default();
+    item.macro_parse(<span class="kw-2">&amp;mut </span>program, (<span class="prelude-val">Some</span>(opts), <span class="kw-2">&amp;mut </span>tokens))<span class="question-mark">?</span>;
+    program.try_to_tokens(<span class="kw-2">&amp;mut </span>tokens)<span class="question-mark">?</span>;
 
-    <span class="comment">// If we successfully got here then we should have used up all attributes</span>
-    <span class="comment">// and considered all of them to see if they were used. If one was forgotten</span>
-    <span class="comment">// that&#39;s a bug on our end, so sanity check here.</span>
-    <span class="ident">parser::check_unused_attrs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>);
+    <span class="comment">// If we successfully got here then we should have used up all attributes
+    // and considered all of them to see if they were used. If one was forgotten
+    // that&#39;s a bug on our end, so sanity check here.
+    </span>parser::check_unused_attrs(<span class="kw-2">&amp;mut </span>tokens);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>)
+    <span class="prelude-val">Ok</span>(tokens)
 }
 
-<span class="doccomment">/// Takes the parsed input from a `#[wasm_bindgen]` macro and returns the generated bindings</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand_class_marker</span>(
-    <span class="ident">attr</span>: <span class="ident">TokenStream</span>,
-    <span class="ident">input</span>: <span class="ident">TokenStream</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Diagnostic</span><span class="op">&gt;</span> {
-    <span class="ident">parser::reset_attrs_used</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">syn::parse2</span>::<span class="op">&lt;</span><span class="ident">syn::ImplItemMethod</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">opts</span>: <span class="ident">ClassMarker</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="ident">attr</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Takes the parsed input from a `#[wasm_bindgen]` macro and returns the generated bindings
+</span><span class="kw">pub fn </span>expand_class_marker(
+    attr: TokenStream,
+    input: TokenStream,
+) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Diagnostic&gt; {
+    parser::reset_attrs_used();
+    <span class="kw">let </span><span class="kw-2">mut </span>item = syn::parse2::&lt;syn::ImplItemMethod&gt;(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>opts: ClassMarker = syn::parse2(attr)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">program</span> <span class="op">=</span> <span class="ident">backend::ast::Program::default</span>();
-    <span class="ident">item</span>.<span class="ident">macro_parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">program</span>, (<span class="kw-2">&amp;</span><span class="ident">opts</span>.<span class="ident">class</span>, <span class="kw-2">&amp;</span><span class="ident">opts</span>.<span class="ident">js_class</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>program = backend::ast::Program::default();
+    item.macro_parse(<span class="kw-2">&amp;mut </span>program, (<span class="kw-2">&amp;</span>opts.class, <span class="kw-2">&amp;</span>opts.js_class))<span class="question-mark">?</span>;
 
-    <span class="comment">// This is where things are slightly different, we are being expanded in the</span>
-    <span class="comment">// context of an impl so we can&#39;t inject arbitrary item-like tokens into the</span>
-    <span class="comment">// output stream. If we were to do that then it wouldn&#39;t parse!</span>
-    <span class="comment">//</span>
-    <span class="comment">// Instead what we want to do is to generate the tokens for `program` into</span>
-    <span class="comment">// the header of the function. This&#39;ll inject some no_mangle functions and</span>
-    <span class="comment">// statics and such, and they should all be valid in the context of the</span>
-    <span class="comment">// start of a function.</span>
-    <span class="comment">//</span>
-    <span class="comment">// We manually implement `ToTokens for ImplItemMethod` here, injecting our</span>
-    <span class="comment">// program&#39;s tokens before the actual method&#39;s inner body tokens.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">proc_macro2::TokenStream::new</span>();
-    <span class="ident">tokens</span>.<span class="ident">append_all</span>(<span class="ident">item</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">style</span> {
-        <span class="ident">syn::AttrStyle::Outer</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="comment">// This is where things are slightly different, we are being expanded in the
+    // context of an impl so we can&#39;t inject arbitrary item-like tokens into the
+    // output stream. If we were to do that then it wouldn&#39;t parse!
+    //
+    // Instead what we want to do is to generate the tokens for `program` into
+    // the header of the function. This&#39;ll inject some no_mangle functions and
+    // statics and such, and they should all be valid in the context of the
+    // start of a function.
+    //
+    // We manually implement `ToTokens for ImplItemMethod` here, injecting our
+    // program&#39;s tokens before the actual method&#39;s inner body tokens.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>tokens = proc_macro2::TokenStream::new();
+    tokens.append_all(item.attrs.iter().filter(|attr| <span class="kw">match </span>attr.style {
+        syn::AttrStyle::Outer =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }));
-    <span class="ident">item</span>.<span class="ident">vis</span>.<span class="ident">to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>);
-    <span class="ident">item</span>.<span class="ident">sig</span>.<span class="ident">to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="ident">item</span>.<span class="ident">block</span>.<span class="ident">brace_token</span>.<span class="ident">surround</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>, <span class="op">|</span><span class="ident">tokens</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">program</span>.<span class="ident">try_to_tokens</span>(<span class="ident">tokens</span>) {
-            <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>);
+    item.vis.to_tokens(<span class="kw-2">&amp;mut </span>tokens);
+    item.sig.to_tokens(<span class="kw-2">&amp;mut </span>tokens);
+    <span class="kw">let </span><span class="kw-2">mut </span>err = <span class="prelude-val">None</span>;
+    item.block.brace_token.surround(<span class="kw-2">&amp;mut </span>tokens, |tokens| {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = program.try_to_tokens(tokens) {
+            err = <span class="prelude-val">Some</span>(e);
         }
-        <span class="ident">parser::check_unused_attrs</span>(<span class="ident">tokens</span>); <span class="comment">// same as above</span>
-        <span class="ident">tokens</span>.<span class="ident">append_all</span>(<span class="ident">item</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">style</span> {
-            <span class="ident">syn::AttrStyle::Inner</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        parser::check_unused_attrs(tokens); <span class="comment">// same as above
+        </span>tokens.append_all(item.attrs.iter().filter(|attr| <span class="kw">match </span>attr.style {
+            syn::AttrStyle::Inner(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }));
-        <span class="ident">tokens</span>.<span class="ident">append_all</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">block</span>.<span class="ident">stmts</span>);
+        tokens.append_all(<span class="kw-2">&amp;</span>item.block.stmts);
     });
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">err</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = err {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(err);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>)
+    <span class="prelude-val">Ok</span>(tokens)
 }
 
-<span class="kw">struct</span> <span class="ident">ClassMarker</span> {
-    <span class="ident">class</span>: <span class="ident">syn::Ident</span>,
-    <span class="ident">js_class</span>: <span class="ident">String</span>,
+<span class="kw">struct </span>ClassMarker {
+    class: syn::Ident,
+    js_class: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">ClassMarker</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="ident">SynResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">class</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">=</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">js_class</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">syn::LitStr</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">value</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">ClassMarker</span> { <span class="ident">class</span>, <span class="ident">js_class</span> })
+<span class="kw">impl </span>Parse <span class="kw">for </span>ClassMarker {
+    <span class="kw">fn </span>parse(input: ParseStream) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>class = input.parse::&lt;syn::Ident&gt;()<span class="question-mark">?</span>;
+        input.parse::&lt;<span class="macro">Token!</span>[=]&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>js_class = input.parse::&lt;syn::LitStr&gt;()<span class="question-mark">?</span>.value();
+        <span class="prelude-val">Ok</span>(ClassMarker { class, js_class })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_macro_support" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen_macro_support" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -73,80 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::service::Buffer</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
-<span class="kw">use</span> <span class="ident">tower_layer::Layer</span>;
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::service::Buffer;
+<span class="kw">use </span>std::{fmt, marker::PhantomData};
+<span class="kw">use </span>tower_layer::Layer;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="doccomment">/// Adds an mpsc buffer in front of an inner service.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The default Tokio executor is used to run the given service,</span>
-<span class="doccomment">/// which means that this layer can only be used on the Tokio runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the module documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="ident">bound</span>: <span class="ident">usize</span>,
-    <span class="ident">_p</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">Request</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Adds an mpsc buffer in front of an inner service.
+///
+/// The default Tokio executor is used to run the given service,
+/// which means that this layer can only be used on the Tokio runtime.
+///
+/// See the module documentation for more details.
+</span><span class="kw">pub struct </span>BufferLayer&lt;Request&gt; {
+    bound: usize,
+    _p: PhantomData&lt;<span class="kw">fn</span>(Request)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new [`BufferLayer`] with the provided `bound`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `bound` gives the maximal number of requests that can be queued for the service before</span>
-    <span class="doccomment">/// backpressure is applied to callers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # A note on choosing a `bound`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When [`Buffer`]&#39;s implementation of [`poll_ready`] returns [`Poll::Ready`], it reserves a</span>
-    <span class="doccomment">/// slot in the channel for the forthcoming [`call`]. However, if this call doesn&#39;t arrive,</span>
-    <span class="doccomment">/// this reserved slot may be held up for a long time. As a result, it&#39;s advisable to set</span>
-    <span class="doccomment">/// `bound` to be at least the maximum number of concurrent requests the [`Buffer`] will see.</span>
-    <span class="doccomment">/// If you do not, all the slots in the buffer may be held up by futures that have just called</span>
-    <span class="doccomment">/// [`poll_ready`] but will not issue a [`call`], which prevents other senders from issuing new</span>
-    <span class="doccomment">/// requests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Poll::Ready`]: std::task::Poll::Ready</span>
-    <span class="doccomment">/// [`call`]: crate::Service::call</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bound</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">BufferLayer</span> {
-            <span class="ident">bound</span>,
-            <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;Request&gt; BufferLayer&lt;Request&gt; {
+    <span class="doccomment">/// Creates a new [`BufferLayer`] with the provided `bound`.
+    ///
+    /// `bound` gives the maximal number of requests that can be queued for the service before
+    /// backpressure is applied to callers.
+    ///
+    /// # A note on choosing a `bound`
+    ///
+    /// When [`Buffer`]&#39;s implementation of [`poll_ready`] returns [`Poll::Ready`], it reserves a
+    /// slot in the channel for the forthcoming [`call`]. However, if this call doesn&#39;t arrive,
+    /// this reserved slot may be held up for a long time. As a result, it&#39;s advisable to set
+    /// `bound` to be at least the maximum number of concurrent requests the [`Buffer`] will see.
+    /// If you do not, all the slots in the buffer may be held up by futures that have just called
+    /// [`poll_ready`] but will not issue a [`call`], which prevents other senders from issuing new
+    /// requests.
+    ///
+    /// [`Poll::Ready`]: std::task::Poll::Ready
+    /// [`call`]: crate::Service::call
+    /// [`poll_ready`]: crate::Service::poll_ready
+    </span><span class="kw">pub fn </span>new(bound: usize) -&gt; <span class="self">Self </span>{
+        BufferLayer {
+            bound,
+            _p: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S::Future</span>: <span class="ident">Send</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
-    <span class="ident">Request</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;S, Request&gt; Layer&lt;S&gt; <span class="kw">for </span>BufferLayer&lt;Request&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&gt; + Send + <span class="lifetime">&#39;static</span>,
+    S::Future: Send,
+    S::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt; + Send + Sync,
+    Request: Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Request</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Service = Buffer&lt;S, Request&gt;;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="ident">Buffer::new</span>(<span class="ident">service</span>, <span class="self">self</span>.<span class="ident">bound</span>)
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; <span class="self">Self</span>::Service {
+        Buffer::new(service, <span class="self">self</span>.bound)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;BufferLayer&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;bound&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bound</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;Request&gt; fmt::Debug <span class="kw">for </span>BufferLayer&lt;Request&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;BufferLayer&quot;</span>)
+            .field(<span class="string">&quot;bound&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.bound)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">bound</span>: <span class="self">self</span>.<span class="ident">bound</span>,
-            <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;Request&gt; Clone <span class="kw">for </span>BufferLayer&lt;Request&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            bound: <span class="self">self</span>.bound,
+            _p: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;Request&gt; Copy <span class="kw">for </span>BufferLayer&lt;Request&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/stream/token.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/stream/token.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -252,259 +252,259 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds::codec::TokenSspi</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client::Connection</span>,
-    <span class="ident">tds::codec</span>::{
-        <span class="ident">TokenColMetaData</span>, <span class="ident">TokenDone</span>, <span class="ident">TokenEnvChange</span>, <span class="ident">TokenError</span>, <span class="ident">TokenFeatureExtAck</span>, <span class="ident">TokenInfo</span>,
-        <span class="ident">TokenLoginAck</span>, <span class="ident">TokenOrder</span>, <span class="ident">TokenReturnValue</span>, <span class="ident">TokenRow</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::tds::codec::TokenSspi;
+<span class="kw">use crate</span>::{
+    client::Connection,
+    tds::codec::{
+        TokenColMetaData, TokenDone, TokenEnvChange, TokenError, TokenFeatureExtAck, TokenInfo,
+        TokenLoginAck, TokenOrder, TokenReturnValue, TokenRow,
     },
-    <span class="ident">Error</span>, <span class="ident">SqlReadBytes</span>, <span class="ident">TokenType</span>,
+    Error, SqlReadBytes, TokenType,
 };
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">stream::BoxStream</span>, <span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">TryStreamExt</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">event</span>, <span class="ident">Level</span>};
+<span class="kw">use </span>futures::{stream::BoxStream, AsyncRead, AsyncWrite, TryStreamExt};
+<span class="kw">use </span>std::{convert::TryFrom, sync::Arc};
+<span class="kw">use </span>tracing::{event, Level};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReceivedToken</span> {
-    <span class="ident">NewResultset</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TokenColMetaData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Row</span>(<span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
-    <span class="ident">Done</span>(<span class="ident">TokenDone</span>),
-    <span class="ident">DoneInProc</span>(<span class="ident">TokenDone</span>),
-    <span class="ident">DoneProc</span>(<span class="ident">TokenDone</span>),
-    <span class="ident">ReturnStatus</span>(<span class="ident">u32</span>),
-    <span class="ident">ReturnValue</span>(<span class="ident">TokenReturnValue</span>),
-    <span class="ident">Order</span>(<span class="ident">TokenOrder</span>),
-    <span class="ident">EnvChange</span>(<span class="ident">TokenEnvChange</span>),
-    <span class="ident">Info</span>(<span class="ident">TokenInfo</span>),
-    <span class="ident">LoginAck</span>(<span class="ident">TokenLoginAck</span>),
-    <span class="ident">Sspi</span>(<span class="ident">TokenSspi</span>),
-    <span class="ident">FeatureExtAck</span>(<span class="ident">TokenFeatureExtAck</span>),
-    <span class="ident">Error</span>(<span class="ident">TokenError</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ReceivedToken {
+    NewResultset(Arc&lt;TokenColMetaData&lt;<span class="lifetime">&#39;static</span>&gt;&gt;),
+    Row(TokenRow&lt;<span class="lifetime">&#39;static</span>&gt;),
+    Done(TokenDone),
+    DoneInProc(TokenDone),
+    DoneProc(TokenDone),
+    ReturnStatus(u32),
+    ReturnValue(TokenReturnValue),
+    Order(TokenOrder),
+    EnvChange(TokenEnvChange),
+    Info(TokenInfo),
+    LoginAck(TokenLoginAck),
+    Sspi(TokenSspi),
+    FeatureExtAck(TokenFeatureExtAck),
+    Error(TokenError),
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">last_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TokenStream&lt;<span class="lifetime">&#39;a</span>, S: AsyncRead + AsyncWrite + Unpin + Send&gt; {
+    conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Connection&lt;S&gt;,
+    last_error: <span class="prelude-ty">Option</span>&lt;Error&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">TokenStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S&gt; TokenStream&lt;<span class="lifetime">&#39;a</span>, S&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin + Send,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">conn</span>,
-            <span class="ident">last_error</span>: <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Connection&lt;S&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            conn,
+            last_error: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_unfold</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">routing</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>flush_done(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;TokenDone&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = <span class="self">self</span>.try_unfold();
+        <span class="kw">let </span><span class="kw-2">mut </span>last_error = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>routing = <span class="prelude-val">None</span>;
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Error</span>(<span class="ident">error</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">last_error</span>.<span class="ident">is_none</span>() {
-                        <span class="ident">last_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>);
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>stream.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(ReceivedToken::Error(error)) =&gt; {
+                    <span class="kw">if </span>last_error.is_none() {
+                        last_error = <span class="prelude-val">Some</span>(error);
                     }
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Done</span>(<span class="ident">token</span>)) =&gt; <span class="kw">match</span> (<span class="ident">last_error</span>, <span class="ident">routing</span>) {
-                    (<span class="prelude-val">Some</span>(<span class="ident">error</span>), <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Server</span>(<span class="ident">error</span>)),
-                    (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">routing</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">routing</span>),
-                    (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
+                <span class="prelude-val">Some</span>(ReceivedToken::Done(token)) =&gt; <span class="kw">match </span>(last_error, routing) {
+                    (<span class="prelude-val">Some</span>(error), <span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Server(error)),
+                    (<span class="kw">_</span>, <span class="prelude-val">Some</span>(routing)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(routing),
+                    (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(token),
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::EnvChange</span>(<span class="ident">TokenEnvChange::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> })) =&gt; {
-                    <span class="ident">routing</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Error::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> });
+                <span class="prelude-val">Some</span>(ReceivedToken::EnvChange(TokenEnvChange::Routing { host, port })) =&gt; {
+                    routing = <span class="prelude-val">Some</span>(Error::Routing { host, port });
                 }
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got DONE token.&quot;</span>.<span class="ident">into</span>())),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Protocol(<span class="string">&quot;Never got DONE token.&quot;</span>.into())),
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_unfold</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="attribute">#[cfg(any(windows, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>flush_sspi(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;TokenSspi&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = <span class="self">self</span>.try_unfold();
+        <span class="kw">let </span><span class="kw-2">mut </span>last_error = <span class="prelude-val">None</span>;
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Error</span>(<span class="ident">error</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">last_error</span>.<span class="ident">is_none</span>() {
-                        <span class="ident">last_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>);
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>stream.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(ReceivedToken::Error(error)) =&gt; {
+                    <span class="kw">if </span>last_error.is_none() {
+                        last_error = <span class="prelude-val">Some</span>(error);
                     }
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Sspi</span>(<span class="ident">token</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
+                <span class="prelude-val">Some</span>(ReceivedToken::Sspi(token)) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(token),
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">last_error</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Server</span>(<span class="ident">err</span>)),
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got SSPI token.&quot;</span>.<span class="ident">into</span>())),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>last_error {
+                    <span class="prelude-val">Some</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Server(err)),
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Protocol(<span class="string">&quot;Never got SSPI token.&quot;</span>.into())),
                 },
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_col_metadata</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">TokenColMetaData::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>);
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_last_meta</span>(<span class="ident">meta</span>.<span class="ident">clone</span>());
+    <span class="kw">async fn </span>get_col_metadata(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>meta = Arc::new(TokenColMetaData::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>);
+        <span class="self">self</span>.conn.context_mut().set_last_meta(meta.clone());
 
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="question-mark">?</span><span class="ident">meta</span>);
+        <span class="macro">event!</span>(Level::TRACE, <span class="question-mark">?</span>meta);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">meta</span>))
+        <span class="prelude-val">Ok</span>(ReceivedToken::NewResultset(meta))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenRow::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>get_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>return_value = TokenRow::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Row</span>(<span class="ident">return_value</span>))
+        <span class="macro">event!</span>(Level::TRACE, message = <span class="question-mark">?</span>return_value);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Row(return_value))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_nbc_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenRow::decode_nbc</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>get_nbc_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>return_value = TokenRow::decode_nbc(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Row</span>(<span class="ident">return_value</span>))
+        <span class="macro">event!</span>(Level::TRACE, message = <span class="question-mark">?</span>return_value);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Row(return_value))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenReturnValue::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::ReturnValue</span>(<span class="ident">return_value</span>))
+    <span class="kw">async fn </span>get_return_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>return_value = TokenReturnValue::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, message = <span class="question-mark">?</span>return_value);
+        <span class="prelude-val">Ok</span>(ReceivedToken::ReturnValue(return_value))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::ReturnStatus</span>(<span class="ident">status</span>))
+    <span class="kw">async fn </span>get_return_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>status = <span class="self">self</span>.conn.read_u32_le().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ReceivedToken::ReturnStatus(status))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">TokenError::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>get_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>err = TokenError::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_error</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">last_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Error::Server</span>(<span class="ident">err</span>.<span class="ident">clone</span>()));
+        <span class="kw">if </span><span class="self">self</span>.last_error.is_none() {
+            <span class="self">self</span>.last_error = <span class="prelude-val">Some</span>(Error::Server(err.clone()));
         }
 
-        <span class="macro">event!</span>(<span class="ident">Level::ERROR</span>, <span class="ident">message</span> <span class="op">=</span> <span class="op">%</span><span class="ident">err</span>.<span class="ident">message</span>, <span class="ident">code</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">code</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Error</span>(<span class="ident">err</span>))
+        <span class="macro">event!</span>(Level::ERROR, message = %err.message, code = err.code);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Error(err))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_order</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">order</span> <span class="op">=</span> <span class="ident">TokenOrder::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">order</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Order</span>(<span class="ident">order</span>))
+    <span class="kw">async fn </span>get_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>order = TokenOrder::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, message = <span class="question-mark">?</span>order);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Order(order))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Done</span>(<span class="ident">done</span>))
+    <span class="kw">async fn </span>get_done_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>done = TokenDone::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, <span class="string">&quot;{}&quot;</span>, done);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Done(done))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_proc_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::DoneProc</span>(<span class="ident">done</span>))
+    <span class="kw">async fn </span>get_done_proc_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>done = TokenDone::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, <span class="string">&quot;{}&quot;</span>, done);
+        <span class="prelude-val">Ok</span>(ReceivedToken::DoneProc(done))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_in_proc_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::DoneInProc</span>(<span class="ident">done</span>))
+    <span class="kw">async fn </span>get_done_in_proc_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>done = TokenDone::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, <span class="string">&quot;{}&quot;</span>, done);
+        <span class="prelude-val">Ok</span>(ReceivedToken::DoneInProc(done))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_env_change</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="ident">TokenEnvChange::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>get_env_change(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>change = TokenEnvChange::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">change</span> {
-            <span class="ident">TokenEnvChange::PacketSize</span>(<span class="ident">new_size</span>, <span class="kw">_</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_packet_size</span>(<span class="ident">new_size</span>);
+        <span class="kw">match </span>change {
+            TokenEnvChange::PacketSize(new_size, <span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.conn.context_mut().set_packet_size(new_size);
             }
-            <span class="ident">TokenEnvChange::BeginTransaction</span>(<span class="ident">desc</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_transaction_descriptor</span>(<span class="ident">desc</span>);
+            TokenEnvChange::BeginTransaction(desc) =&gt; {
+                <span class="self">self</span>.conn.context_mut().set_transaction_descriptor(desc);
             }
-            <span class="ident">TokenEnvChange::CommitTransaction</span>
-            <span class="op">|</span> <span class="ident">TokenEnvChange::RollbackTransaction</span>
-            <span class="op">|</span> <span class="ident">TokenEnvChange::DefectTransaction</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_transaction_descriptor</span>([<span class="number">0</span>; <span class="number">8</span>]);
+            TokenEnvChange::CommitTransaction
+            | TokenEnvChange::RollbackTransaction
+            | TokenEnvChange::DefectTransaction =&gt; {
+                <span class="self">self</span>.conn.context_mut().set_transaction_descriptor([<span class="number">0</span>; <span class="number">8</span>]);
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">change</span>);
+        <span class="macro">event!</span>(Level::INFO, <span class="string">&quot;{}&quot;</span>, change);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::EnvChange</span>(<span class="ident">change</span>))
+        <span class="prelude-val">Ok</span>(ReceivedToken::EnvChange(change))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_info</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">TokenInfo::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">info</span>.<span class="ident">message</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Info</span>(<span class="ident">info</span>))
+    <span class="kw">async fn </span>get_info(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>info = TokenInfo::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::INFO, <span class="string">&quot;{}&quot;</span>, info.message);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Info(info))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_login_ack</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ack</span> <span class="op">=</span> <span class="ident">TokenLoginAck::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{} version {}&quot;</span>, <span class="ident">ack</span>.<span class="ident">prog_name</span>, <span class="ident">ack</span>.<span class="ident">version</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::LoginAck</span>(<span class="ident">ack</span>))
+    <span class="kw">async fn </span>get_login_ack(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>ack = TokenLoginAck::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::INFO, <span class="string">&quot;{} version {}&quot;</span>, ack.prog_name, ack.version);
+        <span class="prelude-val">Ok</span>(ReceivedToken::LoginAck(ack))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_feature_ext_ack</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ack</span> <span class="op">=</span> <span class="ident">TokenFeatureExtAck::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>get_feature_ext_ack(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>ack = TokenFeatureExtAck::decode(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(
-            <span class="ident">Level::INFO</span>,
+            Level::INFO,
             <span class="string">&quot;FeatureExtAck with {} features&quot;</span>,
-            <span class="ident">ack</span>.<span class="ident">features</span>.<span class="ident">len</span>()
+            ack.features.len()
         );
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::FeatureExtAck</span>(<span class="ident">ack</span>))
+        <span class="prelude-val">Ok</span>(ReceivedToken::FeatureExtAck(ack))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sspi</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sspi</span> <span class="op">=</span> <span class="ident">TokenSspi::decode_async</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;SSPI response&quot;</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Sspi</span>(<span class="ident">sspi</span>))
+    <span class="kw">async fn </span>get_sspi(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ReceivedToken&gt; {
+        <span class="kw">let </span>sspi = TokenSspi::decode_async(<span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">event!</span>(Level::TRACE, <span class="string">&quot;SSPI response&quot;</span>);
+        <span class="prelude-val">Ok</span>(ReceivedToken::Sspi(sspi))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_unfold</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">futures::stream::try_unfold</span>(<span class="self">self</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">this</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">conn</span>.<span class="ident">is_eof</span>() {
-                <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">last_error</span> {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">error</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+    <span class="kw">pub fn </span>try_unfold(<span class="self">self</span>) -&gt; BoxStream&lt;<span class="lifetime">&#39;a</span>, <span class="kw">crate</span>::Result&lt;ReceivedToken&gt;&gt; {
+        <span class="kw">let </span>stream = futures::stream::try_unfold(<span class="self">self</span>, |<span class="kw-2">mut </span>this| <span class="kw">async move </span>{
+            <span class="kw">if </span>this.conn.is_eof() {
+                <span class="kw">match </span>this.last_error {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">Some</span>(error) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(error),
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">ty_byte</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">conn</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>ty_byte = this.conn.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">TokenType::try_from</span>(<span class="ident">ty_byte</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Protocol</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid token type {:x}&quot;</span>, <span class="ident">ty_byte</span>).<span class="ident">into</span>()))<span class="question-mark">?</span>;
+            <span class="kw">let </span>ty = TokenType::try_from(ty_byte)
+                .map_err(|<span class="kw">_</span>| Error::Protocol(<span class="macro">format!</span>(<span class="string">&quot;invalid token type {:x}&quot;</span>, ty_byte).into()))<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">TokenType::ReturnStatus</span> =&gt; <span class="ident">this</span>.<span class="ident">get_return_status</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::ColMetaData</span> =&gt; <span class="ident">this</span>.<span class="ident">get_col_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Row</span> =&gt; <span class="ident">this</span>.<span class="ident">get_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::NbcRow</span> =&gt; <span class="ident">this</span>.<span class="ident">get_nbc_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Done</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::DoneProc</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::DoneInProc</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_in_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::ReturnValue</span> =&gt; <span class="ident">this</span>.<span class="ident">get_return_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Error</span> =&gt; <span class="ident">this</span>.<span class="ident">get_error</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Order</span> =&gt; <span class="ident">this</span>.<span class="ident">get_order</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::EnvChange</span> =&gt; <span class="ident">this</span>.<span class="ident">get_env_change</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Info</span> =&gt; <span class="ident">this</span>.<span class="ident">get_info</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::LoginAck</span> =&gt; <span class="ident">this</span>.<span class="ident">get_login_ack</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Sspi</span> =&gt; <span class="ident">this</span>.<span class="ident">get_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::FeatureExtAck</span> =&gt; <span class="ident">this</span>.<span class="ident">get_feature_ext_ack</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Token {:?} unimplemented!&quot;</span>, <span class="ident">ty</span>),
+            <span class="kw">let </span>token = <span class="kw">match </span>ty {
+                TokenType::ReturnStatus =&gt; this.get_return_status().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::ColMetaData =&gt; this.get_col_metadata().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Row =&gt; this.get_row().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::NbcRow =&gt; this.get_nbc_row().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Done =&gt; this.get_done_value().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::DoneProc =&gt; this.get_done_proc_value().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::DoneInProc =&gt; this.get_done_in_proc_value().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::ReturnValue =&gt; this.get_return_value().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Error =&gt; this.get_error().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Order =&gt; this.get_order().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::EnvChange =&gt; this.get_env_change().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Info =&gt; this.get_info().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::LoginAck =&gt; this.get_login_ack().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::Sspi =&gt; this.get_sspi().<span class="kw">await</span><span class="question-mark">?</span>,
+                TokenType::FeatureExtAck =&gt; this.get_feature_ext_ack().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Token {:?} unimplemented!&quot;</span>, ty),
             };
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">token</span>, <span class="ident">this</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((token, this)))
         });
 
-        <span class="ident">Box::pin</span>(<span class="ident">stream</span>)
+        Box::pin(stream)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

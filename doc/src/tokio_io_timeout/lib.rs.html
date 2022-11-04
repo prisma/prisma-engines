@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-io-timeout-1.2.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_io_timeout/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_io_timeout/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_io_timeout/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-io-timeout-1.2.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_io_timeout/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_io_timeout/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_io_timeout/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -626,633 +626,633 @@
 <span id="626">626</span>
 <span id="627">627</span>
 <span id="628">628</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Tokio wrappers which apply timeouts to IO operations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These timeouts are analogous to the read and write timeouts on traditional blocking sockets. A timeout countdown is</span>
-<span class="doccomment">//! initiated when a read/write operation returns [`Poll::Pending`]. If a read/write does not return successfully before</span>
-<span class="doccomment">//! the countdown expires, an [`io::Error`] with a kind of [`TimedOut`](io::ErrorKind::TimedOut) is returned.</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio-io-timeout/1&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Tokio wrappers which apply timeouts to IO operations.
+//!
+//! These timeouts are analogous to the read and write timeouts on traditional blocking sockets. A timeout countdown is
+//! initiated when a read/write operation returns [`Poll::Pending`]. If a read/write does not return successfully before
+//! the countdown expires, an [`io::Error`] with a kind of [`TimedOut`](io::ErrorKind::TimedOut) is returned.
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/tokio-io-timeout/1&quot;</span>)]
+#![warn(missing_docs)]
 
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::io::SeekFrom</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncSeek</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep_until</span>, <span class="ident">Instant</span>, <span class="ident">Sleep</span>};
+</span><span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::io::SeekFrom;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncSeek, AsyncWrite, ReadBuf};
+<span class="kw">use </span>tokio::time::{sleep_until, Instant, Sleep};
 
-<span class="macro">pin_project!</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">TimeoutState</span> {
-        <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">cur</span>: <span class="ident">Sleep</span>,
-        <span class="ident">active</span>: <span class="ident">bool</span>,
+<span class="macro">pin_project! </span>{
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">struct </span>TimeoutState {
+        timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+        <span class="attribute">#[pin]
+        </span>cur: Sleep,
+        active: bool,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TimeoutState</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">TimeoutState</span> {
-        <span class="ident">TimeoutState</span> {
-            <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">cur</span>: <span class="ident">sleep_until</span>(<span class="ident">Instant::now</span>()),
-            <span class="ident">active</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>TimeoutState {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new() -&gt; TimeoutState {
+        TimeoutState {
+            timeout: <span class="prelude-val">None</span>,
+            cur: sleep_until(Instant::now()),
+            active: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.timeout
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="comment">// since this takes &amp;mut self, we can&#39;t yet be active</span>
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="comment">// since this takes &amp;mut self, we can&#39;t yet be active
+        </span><span class="self">self</span>.timeout = timeout;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_timeout_pinned</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
-        <span class="self">self</span>.<span class="ident">reset</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_timeout_pinned(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="kw-2">*</span><span class="self">self</span>.as_mut().project().timeout = timeout;
+        <span class="self">self</span>.reset();
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reset(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">active</span> {
-            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">active</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">this</span>.<span class="ident">cur</span>.<span class="ident">reset</span>(<span class="ident">Instant::now</span>());
+        <span class="kw">if </span><span class="kw-2">*</span>this.active {
+            <span class="kw-2">*</span>this.active = <span class="bool-val">false</span>;
+            this.cur.reset(Instant::now());
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_check</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_check(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">timeout</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) =&gt; <span class="kw-2">*</span><span class="ident">timeout</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+        <span class="kw">let </span>timeout = <span class="kw">match </span>this.timeout {
+            <span class="prelude-val">Some</span>(timeout) =&gt; <span class="kw-2">*</span>timeout,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">active</span> {
-            <span class="ident">this</span>.<span class="ident">cur</span>.<span class="ident">as_mut</span>().<span class="ident">reset</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">timeout</span>);
-            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">active</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>!<span class="kw-2">*</span>this.active {
+            this.cur.as_mut().reset(Instant::now() + timeout);
+            <span class="kw-2">*</span>this.active = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">cur</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(()) =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">io::ErrorKind::TimedOut</span>)),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">match </span>this.cur.poll(cx) {
+            Poll::Ready(()) =&gt; <span class="prelude-val">Err</span>(io::Error::from(io::ErrorKind::TimedOut)),
+            Poll::Pending =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// An `AsyncRead`er which applies a timeout to read operations.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">reader</span>: <span class="ident">R</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">state</span>: <span class="ident">TimeoutState</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// An `AsyncRead`er which applies a timeout to read operations.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>TimeoutReader&lt;R&gt; {
+        <span class="attribute">#[pin]
+        </span>reader: R,
+        <span class="attribute">#[pin]
+        </span>state: TimeoutState,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">AsyncRead</span>,
+<span class="kw">impl</span>&lt;R&gt; TimeoutReader&lt;R&gt;
+<span class="kw">where
+    </span>R: AsyncRead,
 {
-    <span class="doccomment">/// Returns a new `TimeoutReader` wrapping the specified reader.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There is initially no timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">TimeoutReader</span> {
-            <span class="ident">reader</span>,
-            <span class="ident">state</span>: <span class="ident">TimeoutState::new</span>(),
-        }
-    }
-
-    <span class="doccomment">/// Returns the current read timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">timeout</span>()
-    }
-
-    <span class="doccomment">/// Sets the read timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can only be used before the reader is pinned; use [`set_timeout_pinned`](Self::set_timeout_pinned)</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_timeout</span>(<span class="ident">timeout</span>);
-    }
-
-    <span class="doccomment">/// Sets the read timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will reset any pending timeout. Use [`set_timeout`](Self::set_timeout) instead if the reader is not yet</span>
-    <span class="doccomment">/// pinned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout_pinned</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">state</span>.<span class="ident">set_timeout_pinned</span>(<span class="ident">timeout</span>);
-    }
-
-    <span class="doccomment">/// Returns a shared reference to the inner reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reader</span>
-    }
-
-    <span class="doccomment">/// Returns a mutable reference to the inner reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">R</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">reader</span>
-    }
-
-    <span class="doccomment">/// Returns a pinned mutable reference to the inner reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>
-    }
-
-    <span class="doccomment">/// Consumes the `TimeoutReader`, returning the inner reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">R</span> {
-        <span class="self">self</span>.<span class="ident">reader</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">AsyncRead</span>,
-{
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">reader</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
-        <span class="kw">match</span> <span class="ident">r</span> {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">poll_check</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">reset</span>(),
-        }
-        <span class="ident">r</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">AsyncWrite</span>,
-{
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_write_vectored</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">io::IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="ident">bufs</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_write_vectored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">reader</span>.<span class="ident">is_write_vectored</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AsyncSeek</span> <span class="kw">for</span> <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">AsyncSeek</span>,
-{
-    <span class="kw">fn</span> <span class="ident">start_seek</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">SeekFrom</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">start_seek</span>(<span class="ident">position</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">poll_complete</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">reader</span>.<span class="ident">poll_complete</span>(<span class="ident">cx</span>)
-    }
-}
-
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// An `AsyncWrite`er which applies a timeout to write operations.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">writer</span>: <span class="ident">W</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">state</span>: <span class="ident">TimeoutState</span>,
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">W</span>: <span class="ident">AsyncWrite</span>,
-{
-    <span class="doccomment">/// Returns a new `TimeoutReader` wrapping the specified reader.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There is initially no timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="ident">W</span>) -&gt; <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-        <span class="ident">TimeoutWriter</span> {
-            <span class="ident">writer</span>,
-            <span class="ident">state</span>: <span class="ident">TimeoutState::new</span>(),
+    <span class="doccomment">/// Returns a new `TimeoutReader` wrapping the specified reader.
+    ///
+    /// There is initially no timeout.
+    </span><span class="kw">pub fn </span>new(reader: R) -&gt; TimeoutReader&lt;R&gt; {
+        TimeoutReader {
+            reader,
+            state: TimeoutState::new(),
         }
     }
 
-    <span class="doccomment">/// Returns the current write timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">timeout</span>()
+    <span class="doccomment">/// Returns the current read timeout.
+    </span><span class="kw">pub fn </span>timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.state.timeout()
     }
 
-    <span class="doccomment">/// Sets the write timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can only be used before the writer is pinned; use [`set_timeout_pinned`](Self::set_timeout_pinned)</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_timeout</span>(<span class="ident">timeout</span>);
+    <span class="doccomment">/// Sets the read timeout.
+    ///
+    /// This can only be used before the reader is pinned; use [`set_timeout_pinned`](Self::set_timeout_pinned)
+    /// otherwise.
+    </span><span class="kw">pub fn </span>set_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.state.set_timeout(timeout);
     }
 
-    <span class="doccomment">/// Sets the write timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will reset any pending timeout. Use [`set_timeout`](Self::set_timeout) instead if the reader is not yet</span>
-    <span class="doccomment">/// pinned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout_pinned</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">state</span>.<span class="ident">set_timeout_pinned</span>(<span class="ident">timeout</span>);
+    <span class="doccomment">/// Sets the read timeout.
+    ///
+    /// This will reset any pending timeout. Use [`set_timeout`](Self::set_timeout) instead if the reader is not yet
+    /// pinned.
+    </span><span class="kw">pub fn </span>set_timeout_pinned(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.project().state.set_timeout_pinned(timeout);
     }
 
-    <span class="doccomment">/// Returns a shared reference to the inner writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">W</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">writer</span>
+    <span class="doccomment">/// Returns a shared reference to the inner reader.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>R {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.reader
     }
 
-    <span class="doccomment">/// Returns a mutable reference to the inner writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">W</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">writer</span>
+    <span class="doccomment">/// Returns a mutable reference to the inner reader.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>R {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.reader
     }
 
-    <span class="doccomment">/// Returns a pinned mutable reference to the inner writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">W</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">writer</span>
+    <span class="doccomment">/// Returns a pinned mutable reference to the inner reader.
+    </span><span class="kw">pub fn </span>get_pin_mut(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; Pin&lt;<span class="kw-2">&amp;mut </span>R&gt; {
+        <span class="self">self</span>.project().reader
     }
 
-    <span class="doccomment">/// Consumes the `TimeoutWriter`, returning the inner writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">W</span> {
-        <span class="self">self</span>.<span class="ident">writer</span>
+    <span class="doccomment">/// Consumes the `TimeoutReader`, returning the inner reader.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; R {
+        <span class="self">self</span>.reader
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">W</span>: <span class="ident">AsyncWrite</span>,
+<span class="kw">impl</span>&lt;R&gt; AsyncRead <span class="kw">for </span>TimeoutReader&lt;R&gt;
+<span class="kw">where
+    </span>R: AsyncRead,
 {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">writer</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
-        <span class="kw">match</span> <span class="ident">r</span> {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">poll_check</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">reset</span>(),
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>r = this.reader.poll_read(cx, buf);
+        <span class="kw">match </span>r {
+            Poll::Pending =&gt; this.state.poll_check(cx)<span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; this.state.reset(),
         }
-        <span class="ident">r</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">writer</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>);
-        <span class="kw">match</span> <span class="ident">r</span> {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">poll_check</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">reset</span>(),
-        }
-        <span class="ident">r</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">writer</span>.<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>);
-        <span class="kw">match</span> <span class="ident">r</span> {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">poll_check</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">reset</span>(),
-        }
-        <span class="ident">r</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_write_vectored</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">io::IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">writer</span>.<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="ident">bufs</span>);
-        <span class="kw">match</span> <span class="ident">r</span> {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">poll_check</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">this</span>.<span class="ident">state</span>.<span class="ident">reset</span>(),
-        }
-        <span class="ident">r</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_write_vectored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">is_write_vectored</span>()
+        r
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">W</span>: <span class="ident">AsyncRead</span>,
+<span class="kw">impl</span>&lt;R&gt; AsyncWrite <span class="kw">for </span>TimeoutReader&lt;R&gt;
+<span class="kw">where
+    </span>R: AsyncWrite,
 {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">writer</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize, io::Error&gt;&gt; {
+        <span class="self">self</span>.project().reader.poll_write(cx, buf)
+    }
+
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().reader.poll_flush(cx)
+    }
+
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().reader.poll_shutdown(cx)
+    }
+
+    <span class="kw">fn </span>poll_write_vectored(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        bufs: <span class="kw-2">&amp;</span>[io::IoSlice&lt;<span class="lifetime">&#39;_</span>&gt;],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="self">self</span>.project().reader.poll_write_vectored(cx, bufs)
+    }
+
+    <span class="kw">fn </span>is_write_vectored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.reader.is_write_vectored()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">AsyncSeek</span> <span class="kw">for</span> <span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">W</span>: <span class="ident">AsyncSeek</span>,
+<span class="kw">impl</span>&lt;R&gt; AsyncSeek <span class="kw">for </span>TimeoutReader&lt;R&gt;
+<span class="kw">where
+    </span>R: AsyncSeek,
 {
-    <span class="kw">fn</span> <span class="ident">start_seek</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">SeekFrom</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">writer</span>.<span class="ident">start_seek</span>(<span class="ident">position</span>)
+    <span class="kw">fn </span>start_seek(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, position: SeekFrom) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.project().reader.start_seek(position)
     }
-    <span class="kw">fn</span> <span class="ident">poll_complete</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">writer</span>.<span class="ident">poll_complete</span>(<span class="ident">cx</span>)
-    }
-}
-
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A stream which applies read and write timeouts to an inner stream.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeoutStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="ident">TimeoutReader</span><span class="op">&lt;</span><span class="ident">TimeoutWriter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn </span>poll_complete(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="self">self</span>.project().reader.poll_complete(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">TimeoutStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// An `AsyncWrite`er which applies a timeout to write operations.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>TimeoutWriter&lt;W&gt; {
+        <span class="attribute">#[pin]
+        </span>writer: W,
+        <span class="attribute">#[pin]
+        </span>state: TimeoutState,
+    }
+}
+
+<span class="kw">impl</span>&lt;W&gt; TimeoutWriter&lt;W&gt;
+<span class="kw">where
+    </span>W: AsyncWrite,
 {
-    <span class="doccomment">/// Returns a new `TimeoutStream` wrapping the specified stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There is initially no read or write timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="ident">TimeoutStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">TimeoutWriter::new</span>(<span class="ident">stream</span>);
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TimeoutReader::new</span>(<span class="ident">writer</span>);
-        <span class="ident">TimeoutStream</span> { <span class="ident">stream</span> }
-    }
-
-    <span class="doccomment">/// Returns the current read timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">timeout</span>()
-    }
-
-    <span class="doccomment">/// Sets the read timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can only be used before the stream is pinned; use</span>
-    <span class="doccomment">/// [`set_read_timeout_pinned`](Self::set_read_timeout_pinned) otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_read_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">set_timeout</span>(<span class="ident">timeout</span>)
-    }
-
-    <span class="doccomment">/// Sets the read timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will reset any pending read timeout. Use [`set_read_timeout`](Self::set_read_timeout) instead if the stream</span>
-    <span class="doccomment">/// has not yet been pinned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_read_timeout_pinned</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">set_timeout_pinned</span>(<span class="ident">timeout</span>)
-    }
-
-    <span class="doccomment">/// Returns the current write timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">get_ref</span>().<span class="ident">timeout</span>()
-    }
-
-    <span class="doccomment">/// Sets the write timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can only be used before the stream is pinned; use</span>
-    <span class="doccomment">/// [`set_write_timeout_pinned`](Self::set_write_timeout_pinned) otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_write_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">get_mut</span>().<span class="ident">set_timeout</span>(<span class="ident">timeout</span>)
-    }
-
-    <span class="doccomment">/// Sets the write timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will reset any pending write timeout. Use [`set_write_timeout`](Self::set_write_timeout) instead if the</span>
-    <span class="doccomment">/// stream has not yet been pinned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_write_timeout_pinned</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">project</span>()
-            .<span class="ident">stream</span>
-            .<span class="ident">get_pin_mut</span>()
-            .<span class="ident">set_timeout_pinned</span>(<span class="ident">timeout</span>)
-    }
-
-    <span class="doccomment">/// Returns a shared reference to the inner stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">S</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">get_ref</span>().<span class="ident">get_ref</span>()
-    }
-
-    <span class="doccomment">/// Returns a mutable reference to the inner stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">S</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">get_mut</span>().<span class="ident">get_mut</span>()
-    }
-
-    <span class="doccomment">/// Returns a pinned mutable reference to the inner stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">get_pin_mut</span>().<span class="ident">get_pin_mut</span>()
-    }
-
-    <span class="doccomment">/// Consumes the stream, returning the inner stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">S</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">into_inner</span>().<span class="ident">into_inner</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TimeoutStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-{
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">TimeoutStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-{
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_write_vectored</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">io::IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">stream</span>.<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="ident">bufs</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_write_vectored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_write_vectored</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::io::Write</span>;
-    <span class="kw">use</span> <span class="ident">std::net::TcpListener</span>;
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
-    <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncReadExt</span>, <span class="ident">AsyncWriteExt</span>};
-    <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
-    <span class="kw">use</span> <span class="ident">tokio::pin</span>;
-
-    <span class="macro">pin_project!</span> {
-        <span class="kw">struct</span> <span class="ident">DelayStream</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">sleep</span>: <span class="ident">Sleep</span>,
+    <span class="doccomment">/// Returns a new `TimeoutReader` wrapping the specified reader.
+    ///
+    /// There is initially no timeout.
+    </span><span class="kw">pub fn </span>new(writer: W) -&gt; TimeoutWriter&lt;W&gt; {
+        TimeoutWriter {
+            writer,
+            state: TimeoutState::new(),
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">DelayStream</span> {
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">until</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">DelayStream</span> {
-                <span class="ident">sleep</span>: <span class="ident">sleep_until</span>(<span class="ident">until</span>),
+    <span class="doccomment">/// Returns the current write timeout.
+    </span><span class="kw">pub fn </span>timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.state.timeout()
+    }
+
+    <span class="doccomment">/// Sets the write timeout.
+    ///
+    /// This can only be used before the writer is pinned; use [`set_timeout_pinned`](Self::set_timeout_pinned)
+    /// otherwise.
+    </span><span class="kw">pub fn </span>set_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.state.set_timeout(timeout);
+    }
+
+    <span class="doccomment">/// Sets the write timeout.
+    ///
+    /// This will reset any pending timeout. Use [`set_timeout`](Self::set_timeout) instead if the reader is not yet
+    /// pinned.
+    </span><span class="kw">pub fn </span>set_timeout_pinned(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.project().state.set_timeout_pinned(timeout);
+    }
+
+    <span class="doccomment">/// Returns a shared reference to the inner writer.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>W {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.writer
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the inner writer.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>W {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.writer
+    }
+
+    <span class="doccomment">/// Returns a pinned mutable reference to the inner writer.
+    </span><span class="kw">pub fn </span>get_pin_mut(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; Pin&lt;<span class="kw-2">&amp;mut </span>W&gt; {
+        <span class="self">self</span>.project().writer
+    }
+
+    <span class="doccomment">/// Consumes the `TimeoutWriter`, returning the inner writer.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; W {
+        <span class="self">self</span>.writer
+    }
+}
+
+<span class="kw">impl</span>&lt;W&gt; AsyncWrite <span class="kw">for </span>TimeoutWriter&lt;W&gt;
+<span class="kw">where
+    </span>W: AsyncWrite,
+{
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize, io::Error&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>r = this.writer.poll_write(cx, buf);
+        <span class="kw">match </span>r {
+            Poll::Pending =&gt; this.state.poll_check(cx)<span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; this.state.reset(),
+        }
+        r
+    }
+
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>r = this.writer.poll_flush(cx);
+        <span class="kw">match </span>r {
+            Poll::Pending =&gt; this.state.poll_check(cx)<span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; this.state.reset(),
+        }
+        r
+    }
+
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>r = this.writer.poll_shutdown(cx);
+        <span class="kw">match </span>r {
+            Poll::Pending =&gt; this.state.poll_check(cx)<span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; this.state.reset(),
+        }
+        r
+    }
+
+    <span class="kw">fn </span>poll_write_vectored(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        bufs: <span class="kw-2">&amp;</span>[io::IoSlice&lt;<span class="lifetime">&#39;_</span>&gt;],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>r = this.writer.poll_write_vectored(cx, bufs);
+        <span class="kw">match </span>r {
+            Poll::Pending =&gt; this.state.poll_check(cx)<span class="question-mark">?</span>,
+            <span class="kw">_ </span>=&gt; this.state.reset(),
+        }
+        r
+    }
+
+    <span class="kw">fn </span>is_write_vectored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.writer.is_write_vectored()
+    }
+}
+
+<span class="kw">impl</span>&lt;W&gt; AsyncRead <span class="kw">for </span>TimeoutWriter&lt;W&gt;
+<span class="kw">where
+    </span>W: AsyncRead,
+{
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().writer.poll_read(cx, buf)
+    }
+}
+
+<span class="kw">impl</span>&lt;W&gt; AsyncSeek <span class="kw">for </span>TimeoutWriter&lt;W&gt;
+<span class="kw">where
+    </span>W: AsyncSeek,
+{
+    <span class="kw">fn </span>start_seek(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, position: SeekFrom) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.project().writer.start_seek(position)
+    }
+    <span class="kw">fn </span>poll_complete(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="self">self</span>.project().writer.poll_complete(cx)
+    }
+}
+
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A stream which applies read and write timeouts to an inner stream.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>TimeoutStream&lt;S&gt; {
+        <span class="attribute">#[pin]
+        </span>stream: TimeoutReader&lt;TimeoutWriter&lt;S&gt;&gt;
+    }
+}
+
+<span class="kw">impl</span>&lt;S&gt; TimeoutStream&lt;S&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite,
+{
+    <span class="doccomment">/// Returns a new `TimeoutStream` wrapping the specified stream.
+    ///
+    /// There is initially no read or write timeout.
+    </span><span class="kw">pub fn </span>new(stream: S) -&gt; TimeoutStream&lt;S&gt; {
+        <span class="kw">let </span>writer = TimeoutWriter::new(stream);
+        <span class="kw">let </span>stream = TimeoutReader::new(writer);
+        TimeoutStream { stream }
+    }
+
+    <span class="doccomment">/// Returns the current read timeout.
+    </span><span class="kw">pub fn </span>read_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.stream.timeout()
+    }
+
+    <span class="doccomment">/// Sets the read timeout.
+    ///
+    /// This can only be used before the stream is pinned; use
+    /// [`set_read_timeout_pinned`](Self::set_read_timeout_pinned) otherwise.
+    </span><span class="kw">pub fn </span>set_read_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.stream.set_timeout(timeout)
+    }
+
+    <span class="doccomment">/// Sets the read timeout.
+    ///
+    /// This will reset any pending read timeout. Use [`set_read_timeout`](Self::set_read_timeout) instead if the stream
+    /// has not yet been pinned.
+    </span><span class="kw">pub fn </span>set_read_timeout_pinned(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.project().stream.set_timeout_pinned(timeout)
+    }
+
+    <span class="doccomment">/// Returns the current write timeout.
+    </span><span class="kw">pub fn </span>write_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.stream.get_ref().timeout()
+    }
+
+    <span class="doccomment">/// Sets the write timeout.
+    ///
+    /// This can only be used before the stream is pinned; use
+    /// [`set_write_timeout_pinned`](Self::set_write_timeout_pinned) otherwise.
+    </span><span class="kw">pub fn </span>set_write_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.stream.get_mut().set_timeout(timeout)
+    }
+
+    <span class="doccomment">/// Sets the write timeout.
+    ///
+    /// This will reset any pending write timeout. Use [`set_write_timeout`](Self::set_write_timeout) instead if the
+    /// stream has not yet been pinned.
+    </span><span class="kw">pub fn </span>set_write_timeout_pinned(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) {
+        <span class="self">self</span>.project()
+            .stream
+            .get_pin_mut()
+            .set_timeout_pinned(timeout)
+    }
+
+    <span class="doccomment">/// Returns a shared reference to the inner stream.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>S {
+        <span class="self">self</span>.stream.get_ref().get_ref()
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the inner stream.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>S {
+        <span class="self">self</span>.stream.get_mut().get_mut()
+    }
+
+    <span class="doccomment">/// Returns a pinned mutable reference to the inner stream.
+    </span><span class="kw">pub fn </span>get_pin_mut(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; Pin&lt;<span class="kw-2">&amp;mut </span>S&gt; {
+        <span class="self">self</span>.project().stream.get_pin_mut().get_pin_mut()
+    }
+
+    <span class="doccomment">/// Consumes the stream, returning the inner stream.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; S {
+        <span class="self">self</span>.stream.into_inner().into_inner()
+    }
+}
+
+<span class="kw">impl</span>&lt;S&gt; AsyncRead <span class="kw">for </span>TimeoutStream&lt;S&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite,
+{
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().stream.poll_read(cx, buf)
+    }
+}
+
+<span class="kw">impl</span>&lt;S&gt; AsyncWrite <span class="kw">for </span>TimeoutStream&lt;S&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite,
+{
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize, io::Error&gt;&gt; {
+        <span class="self">self</span>.project().stream.poll_write(cx, buf)
+    }
+
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().stream.poll_flush(cx)
+    }
+
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="self">self</span>.project().stream.poll_shutdown(cx)
+    }
+
+    <span class="kw">fn </span>poll_write_vectored(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        bufs: <span class="kw-2">&amp;</span>[io::IoSlice&lt;<span class="lifetime">&#39;_</span>&gt;],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="self">self</span>.project().stream.poll_write_vectored(cx, bufs)
+    }
+
+    <span class="kw">fn </span>is_write_vectored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.stream.is_write_vectored()
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::io::Write;
+    <span class="kw">use </span>std::net::TcpListener;
+    <span class="kw">use </span>std::thread;
+    <span class="kw">use </span>tokio::io::{AsyncReadExt, AsyncWriteExt};
+    <span class="kw">use </span>tokio::net::TcpStream;
+    <span class="kw">use </span>tokio::pin;
+
+    <span class="macro">pin_project! </span>{
+        <span class="kw">struct </span>DelayStream {
+            <span class="attribute">#[pin]
+            </span>sleep: Sleep,
+        }
+    }
+
+    <span class="kw">impl </span>DelayStream {
+        <span class="kw">fn </span>new(until: Instant) -&gt; <span class="self">Self </span>{
+            DelayStream {
+                sleep: sleep_until(until),
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">DelayStream</span> {
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-            <span class="ident">_buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">sleep</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(()) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Pending</span>,
+    <span class="kw">impl </span>AsyncRead <span class="kw">for </span>DelayStream {
+        <span class="kw">fn </span>poll_read(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context,
+            _buf: <span class="kw-2">&amp;mut </span>ReadBuf,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+            <span class="kw">match </span><span class="self">self</span>.project().sleep.poll(cx) {
+                Poll::Ready(()) =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
+                Poll::Pending =&gt; Poll::Pending,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">DelayStream</span> {
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">sleep</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(()) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">len</span>())),
-                <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Pending</span>,
+    <span class="kw">impl </span>AsyncWrite <span class="kw">for </span>DelayStream {
+        <span class="kw">fn </span>poll_write(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize, io::Error&gt;&gt; {
+            <span class="kw">match </span><span class="self">self</span>.project().sleep.poll(cx) {
+                Poll::Ready(()) =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(buf.len())),
+                Poll::Pending =&gt; Poll::Pending,
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_timeout</span>() {
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">DelayStream::new</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">TimeoutReader::new</span>(<span class="ident">reader</span>);
-        <span class="ident">reader</span>.<span class="ident">set_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)));
-        <span class="macro">pin!</span>(<span class="ident">reader</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_timeout() {
+        <span class="kw">let </span>reader = DelayStream::new(Instant::now() + Duration::from_millis(<span class="number">500</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = TimeoutReader::new(reader);
+        reader.set_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">100</span>)));
+        <span class="macro">pin!</span>(reader);
 
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>().<span class="ident">kind</span>(), <span class="ident">io::ErrorKind::TimedOut</span>);
+        <span class="kw">let </span>r = reader.read(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>]).<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(r.err().unwrap().kind(), io::ErrorKind::TimedOut);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_ok</span>() {
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">DelayStream::new</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">TimeoutReader::new</span>(<span class="ident">reader</span>);
-        <span class="ident">reader</span>.<span class="ident">set_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">500</span>)));
-        <span class="macro">pin!</span>(<span class="ident">reader</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_ok() {
+        <span class="kw">let </span>reader = DelayStream::new(Instant::now() + Duration::from_millis(<span class="number">100</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = TimeoutReader::new(reader);
+        reader.set_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">500</span>)));
+        <span class="macro">pin!</span>(reader);
 
-        <span class="ident">reader</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        reader.read(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>]).<span class="kw">await</span>.unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_timeout</span>() {
-        <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">DelayStream::new</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">TimeoutWriter::new</span>(<span class="ident">writer</span>);
-        <span class="ident">writer</span>.<span class="ident">set_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)));
-        <span class="macro">pin!</span>(<span class="ident">writer</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>write_timeout() {
+        <span class="kw">let </span>writer = DelayStream::new(Instant::now() + Duration::from_millis(<span class="number">500</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = TimeoutWriter::new(writer);
+        writer.set_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">100</span>)));
+        <span class="macro">pin!</span>(writer);
 
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">writer</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>]).<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>().<span class="ident">kind</span>(), <span class="ident">io::ErrorKind::TimedOut</span>);
+        <span class="kw">let </span>r = writer.write(<span class="kw-2">&amp;</span>[<span class="number">0</span>]).<span class="kw">await</span>;
+        <span class="macro">assert_eq!</span>(r.err().unwrap().kind(), io::ErrorKind::TimedOut);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_ok</span>() {
-        <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">DelayStream::new</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">TimeoutWriter::new</span>(<span class="ident">writer</span>);
-        <span class="ident">writer</span>.<span class="ident">set_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">500</span>)));
-        <span class="macro">pin!</span>(<span class="ident">writer</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>write_ok() {
+        <span class="kw">let </span>writer = DelayStream::new(Instant::now() + Duration::from_millis(<span class="number">100</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = TimeoutWriter::new(writer);
+        writer.set_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">500</span>)));
+        <span class="macro">pin!</span>(writer);
 
-        <span class="ident">writer</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        writer.write(<span class="kw-2">&amp;</span>[<span class="number">0</span>]).<span class="kw">await</span>.unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tcp_read</span>() {
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener::bind</span>(<span class="string">&quot;127.0.0.1:0&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">local_addr</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>tcp_read() {
+        <span class="kw">let </span>listener = TcpListener::bind(<span class="string">&quot;127.0.0.1:0&quot;</span>).unwrap();
+        <span class="kw">let </span>addr = listener.local_addr().unwrap();
 
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">accept</span>().<span class="ident">unwrap</span>().<span class="number">0</span>;
-            <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">10</span>));
-            <span class="ident">socket</span>.<span class="ident">write_all</span>(<span class="string">b&quot;f&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">500</span>));
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">write_all</span>(<span class="string">b&quot;f&quot;</span>); <span class="comment">// this may hit an eof</span>
-        });
+        thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>socket = listener.accept().unwrap().<span class="number">0</span>;
+            thread::sleep(Duration::from_millis(<span class="number">10</span>));
+            socket.write_all(<span class="string">b&quot;f&quot;</span>).unwrap();
+            thread::sleep(Duration::from_millis(<span class="number">500</span>));
+            <span class="kw">let _ </span>= socket.write_all(<span class="string">b&quot;f&quot;</span>); <span class="comment">// this may hit an eof
+        </span>});
 
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">TimeoutStream::new</span>(<span class="ident">s</span>);
-        <span class="ident">s</span>.<span class="ident">set_read_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>)));
-        <span class="macro">pin!</span>(<span class="ident">s</span>);
-        <span class="ident">s</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="kw">await</span>;
+        <span class="kw">let </span>s = TcpStream::connect(<span class="kw-2">&amp;</span>addr).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>s = TimeoutStream::new(s);
+        s.set_read_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">100</span>)));
+        <span class="macro">pin!</span>(s);
+        s.read(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>]).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>r = s.read(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>]).<span class="kw">await</span>;
 
-        <span class="kw">match</span> <span class="ident">r</span> {
+        <span class="kw">match </span>r {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unexpected success&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::TimedOut</span> =&gt; (),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) <span class="kw">if </span>e.kind() == io::ErrorKind::TimedOut =&gt; (),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;{:?}&quot;</span>, e),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_io_timeout" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_io_timeout" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

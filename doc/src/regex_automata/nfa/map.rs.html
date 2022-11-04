@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -280,287 +280,287 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
-</pre><pre class="rust"><code><span class="comment">// This module contains a couple simple and purpose built hash maps. The key</span>
-<span class="comment">// trade off they make is that they serve as caches rather than true maps. That</span>
-<span class="comment">// is, inserting a new entry may cause eviction of another entry. This gives</span>
-<span class="comment">// us two things. First, there&#39;s less overhead associated with inserts and</span>
-<span class="comment">// lookups. Secondly, it lets us control our memory usage.</span>
-<span class="comment">//</span>
-<span class="comment">// These maps are used in some fairly hot code when generating NFA states for</span>
-<span class="comment">// large Unicode character classes.</span>
-<span class="comment">//</span>
-<span class="comment">// Instead of exposing a rich hashmap entry API, we just permit the caller</span>
-<span class="comment">// to produce a hash of the key directly. The hash can then be reused for both</span>
-<span class="comment">// lookups and insertions at the cost of leaking things a bit. But these are</span>
-<span class="comment">// for internal use only, so it&#39;s fine.</span>
-<span class="comment">//</span>
-<span class="comment">// The Utf8BoundedMap is used for Daciuk&#39;s algorithm for constructing a</span>
-<span class="comment">// (almost) minimal DFA for large Unicode character classes in linear time.</span>
-<span class="comment">// (Daciuk&#39;s algorithm is always used when compiling forward NFAs. For reverse</span>
-<span class="comment">// NFAs, it&#39;s only used when the compiler is configured to &#39;shrink&#39; the NFA,</span>
-<span class="comment">// since there&#39;s a bit more expense in the reverse direction.)</span>
-<span class="comment">//</span>
-<span class="comment">// The Utf8SuffixMap is used when compiling large Unicode character classes for</span>
-<span class="comment">// reverse NFAs when &#39;shrink&#39; is disabled. Specifically, it augments the naive</span>
-<span class="comment">// construction of UTF-8 automata by caching common suffixes. This doesn&#39;t</span>
-<span class="comment">// get the same space savings as Daciuk&#39;s algorithm, but it&#39;s basically as</span>
-<span class="comment">// fast as the naive approach and typically winds up using less memory (since</span>
-<span class="comment">// it generates smaller NFAs) despite the presence of the cache.</span>
-<span class="comment">//</span>
-<span class="comment">// These maps effectively represent caching mechanisms for CState::Sparse and</span>
-<span class="comment">// CState::Range, respectively. The former represents a single NFA state with</span>
-<span class="comment">// many transitions of equivalent priority while the latter represents a single</span>
-<span class="comment">// NFA state with a single transition. (Neither state ever has or is an</span>
-<span class="comment">// epsilon transition.) Thus, they have different key types. It&#39;s likely we</span>
-<span class="comment">// could make one generic map, but the machinery didn&#39;t seem worth it. They</span>
-<span class="comment">// are simple enough.</span>
+</pre><pre class="rust"><code><span class="comment">// This module contains a couple simple and purpose built hash maps. The key
+// trade off they make is that they serve as caches rather than true maps. That
+// is, inserting a new entry may cause eviction of another entry. This gives
+// us two things. First, there&#39;s less overhead associated with inserts and
+// lookups. Secondly, it lets us control our memory usage.
+//
+// These maps are used in some fairly hot code when generating NFA states for
+// large Unicode character classes.
+//
+// Instead of exposing a rich hashmap entry API, we just permit the caller
+// to produce a hash of the key directly. The hash can then be reused for both
+// lookups and insertions at the cost of leaking things a bit. But these are
+// for internal use only, so it&#39;s fine.
+//
+// The Utf8BoundedMap is used for Daciuk&#39;s algorithm for constructing a
+// (almost) minimal DFA for large Unicode character classes in linear time.
+// (Daciuk&#39;s algorithm is always used when compiling forward NFAs. For reverse
+// NFAs, it&#39;s only used when the compiler is configured to &#39;shrink&#39; the NFA,
+// since there&#39;s a bit more expense in the reverse direction.)
+//
+// The Utf8SuffixMap is used when compiling large Unicode character classes for
+// reverse NFAs when &#39;shrink&#39; is disabled. Specifically, it augments the naive
+// construction of UTF-8 automata by caching common suffixes. This doesn&#39;t
+// get the same space savings as Daciuk&#39;s algorithm, but it&#39;s basically as
+// fast as the naive approach and typically winds up using less memory (since
+// it generates smaller NFAs) despite the presence of the cache.
+//
+// These maps effectively represent caching mechanisms for CState::Sparse and
+// CState::Range, respectively. The former represents a single NFA state with
+// many transitions of equivalent priority while the latter represents a single
+// NFA state with a single transition. (Neither state ever has or is an
+// epsilon transition.) Thus, they have different key types. It&#39;s likely we
+// could make one generic map, but the machinery didn&#39;t seem worth it. They
+// are simple enough.
 
-<span class="kw">use</span> <span class="ident">nfa</span>::{<span class="ident">StateID</span>, <span class="ident">Transition</span>};
+</span><span class="kw">use </span>nfa::{StateID, Transition};
 
-<span class="comment">// Basic FNV-1a hash constants as described in:</span>
-<span class="comment">// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function</span>
-<span class="kw">const</span> <span class="ident">PRIME</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1099511628211</span>;
-<span class="kw">const</span> <span class="ident">INIT</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">14695981039346656037</span>;
+<span class="comment">// Basic FNV-1a hash constants as described in:
+// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+</span><span class="kw">const </span>PRIME: u64 = <span class="number">1099511628211</span>;
+<span class="kw">const </span>INIT: u64 = <span class="number">14695981039346656037</span>;
 
-<span class="doccomment">/// A bounded hash map where the key is a sequence of NFA transitions and the</span>
-<span class="doccomment">/// value is a pre-existing NFA state ID.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// std&#39;s hashmap can be used for this, however, this map has two important</span>
-<span class="doccomment">/// advantages. Firstly, it has lower overhead. Secondly, it permits us to</span>
-<span class="doccomment">/// control our memory usage by limited the number of slots. In general, the</span>
-<span class="doccomment">/// cost here is that this map acts as a cache. That is, inserting a new entry</span>
-<span class="doccomment">/// may remove an old entry. We are okay with this, since it does not impact</span>
-<span class="doccomment">/// correctness in the cases where it is used. The only effect that dropping</span>
-<span class="doccomment">/// states from the cache has is that the resulting NFA generated may be bigger</span>
-<span class="doccomment">/// than it otherwise would be.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This improves benchmarks that compile large Unicode character classes,</span>
-<span class="doccomment">/// since it makes the generation of (almost) minimal UTF-8 automaton faster.</span>
-<span class="doccomment">/// Specifically, one could observe the difference with std&#39;s hashmap via</span>
-<span class="doccomment">/// something like the following benchmark:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   hyperfine &quot;regex-automata-debug debug -acqr &#39;\w{40} ecurB&#39;&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// But to observe that difference, you&#39;d have to modify the code to use</span>
-<span class="doccomment">/// std&#39;s hashmap.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is quite possible that there is a better way to approach this problem.</span>
-<span class="doccomment">/// For example, if there happens to be a very common state that collides with</span>
-<span class="doccomment">/// a lot of less frequent states, then we could wind up with very poor caching</span>
-<span class="doccomment">/// behavior. Alas, the effectiveness of this cache has not been measured.</span>
-<span class="doccomment">/// Instead, ad hoc experiments suggest that it is &quot;good enough.&quot; Additional</span>
-<span class="doccomment">/// smarts (such as an LRU eviction policy) have to be weighed against the</span>
-<span class="doccomment">/// amount of extra time they cost.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Utf8BoundedMap</span> {
-    <span class="doccomment">/// The current version of this map. Only entries with matching versions</span>
-    <span class="doccomment">/// are considered during lookups. If an entry is found with a mismatched</span>
-    <span class="doccomment">/// version, then the map behaves as if the entry does not exist.</span>
-    <span class="ident">version</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// The total number of entries this map can store.</span>
-    <span class="ident">capacity</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The actual entries, keyed by hash. Collisions between different states</span>
-    <span class="doccomment">/// result in the old state being dropped.</span>
-    <span class="ident">map</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Utf8BoundedEntry</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A bounded hash map where the key is a sequence of NFA transitions and the
+/// value is a pre-existing NFA state ID.
+///
+/// std&#39;s hashmap can be used for this, however, this map has two important
+/// advantages. Firstly, it has lower overhead. Secondly, it permits us to
+/// control our memory usage by limited the number of slots. In general, the
+/// cost here is that this map acts as a cache. That is, inserting a new entry
+/// may remove an old entry. We are okay with this, since it does not impact
+/// correctness in the cases where it is used. The only effect that dropping
+/// states from the cache has is that the resulting NFA generated may be bigger
+/// than it otherwise would be.
+///
+/// This improves benchmarks that compile large Unicode character classes,
+/// since it makes the generation of (almost) minimal UTF-8 automaton faster.
+/// Specifically, one could observe the difference with std&#39;s hashmap via
+/// something like the following benchmark:
+///
+///   hyperfine &quot;regex-automata-debug debug -acqr &#39;\w{40} ecurB&#39;&quot;
+///
+/// But to observe that difference, you&#39;d have to modify the code to use
+/// std&#39;s hashmap.
+///
+/// It is quite possible that there is a better way to approach this problem.
+/// For example, if there happens to be a very common state that collides with
+/// a lot of less frequent states, then we could wind up with very poor caching
+/// behavior. Alas, the effectiveness of this cache has not been measured.
+/// Instead, ad hoc experiments suggest that it is &quot;good enough.&quot; Additional
+/// smarts (such as an LRU eviction policy) have to be weighed against the
+/// amount of extra time they cost.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Utf8BoundedMap {
+    <span class="doccomment">/// The current version of this map. Only entries with matching versions
+    /// are considered during lookups. If an entry is found with a mismatched
+    /// version, then the map behaves as if the entry does not exist.
+    </span>version: u16,
+    <span class="doccomment">/// The total number of entries this map can store.
+    </span>capacity: usize,
+    <span class="doccomment">/// The actual entries, keyed by hash. Collisions between different states
+    /// result in the old state being dropped.
+    </span>map: Vec&lt;Utf8BoundedEntry&gt;,
 }
 
-<span class="doccomment">/// An entry in this map.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Utf8BoundedEntry</span> {
-    <span class="doccomment">/// The version of the map used to produce this entry. If this entry&#39;s</span>
-    <span class="doccomment">/// version does not match the current version of the map, then the map</span>
-    <span class="doccomment">/// should behave as if this entry does not exist.</span>
-    <span class="ident">version</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// The key, which is a sorted sequence of non-overlapping NFA transitions.</span>
-    <span class="ident">key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The state ID corresponding to the state containing the transitions in</span>
-    <span class="doccomment">/// this entry.</span>
-    <span class="ident">val</span>: <span class="ident">StateID</span>,
+<span class="doccomment">/// An entry in this map.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">struct </span>Utf8BoundedEntry {
+    <span class="doccomment">/// The version of the map used to produce this entry. If this entry&#39;s
+    /// version does not match the current version of the map, then the map
+    /// should behave as if this entry does not exist.
+    </span>version: u16,
+    <span class="doccomment">/// The key, which is a sorted sequence of non-overlapping NFA transitions.
+    </span>key: Vec&lt;Transition&gt;,
+    <span class="doccomment">/// The state ID corresponding to the state containing the transitions in
+    /// this entry.
+    </span>val: StateID,
 }
 
-<span class="kw">impl</span> <span class="ident">Utf8BoundedMap</span> {
-    <span class="doccomment">/// Create a new bounded map with the given capacity. The map will never</span>
-    <span class="doccomment">/// grow beyond the given size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this does not allocate. Instead, callers must call `clear`</span>
-    <span class="doccomment">/// before using this map. `clear` will allocate space if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This avoids the need to pay for the allocation of this map when</span>
-    <span class="doccomment">/// compiling regexes that lack large Unicode character classes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Utf8BoundedMap</span> {
-        <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="ident">Utf8BoundedMap</span> { <span class="ident">version</span>: <span class="number">0</span>, <span class="ident">capacity</span>, <span class="ident">map</span>: <span class="macro">vec!</span>[] }
+<span class="kw">impl </span>Utf8BoundedMap {
+    <span class="doccomment">/// Create a new bounded map with the given capacity. The map will never
+    /// grow beyond the given size.
+    ///
+    /// Note that this does not allocate. Instead, callers must call `clear`
+    /// before using this map. `clear` will allocate space if necessary.
+    ///
+    /// This avoids the need to pay for the allocation of this map when
+    /// compiling regexes that lack large Unicode character classes.
+    </span><span class="kw">pub fn </span>new(capacity: usize) -&gt; Utf8BoundedMap {
+        <span class="macro">assert!</span>(capacity &gt; <span class="number">0</span>);
+        Utf8BoundedMap { version: <span class="number">0</span>, capacity, map: <span class="macro">vec!</span>[] }
     }
 
-    <span class="doccomment">/// Clear this map of all entries, but permit the reuse of allocation</span>
-    <span class="doccomment">/// if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This must be called before the map can be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Utf8BoundedEntry::default</span>(); <span class="self">self</span>.<span class="ident">capacity</span>];
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Utf8BoundedEntry::default</span>(); <span class="self">self</span>.<span class="ident">capacity</span>];
+    <span class="doccomment">/// Clear this map of all entries, but permit the reuse of allocation
+    /// if possible.
+    ///
+    /// This must be called before the map can be used.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.map.is_empty() {
+            <span class="self">self</span>.map = <span class="macro">vec!</span>[Utf8BoundedEntry::default(); <span class="self">self</span>.capacity];
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.version = <span class="self">self</span>.version.wrapping_add(<span class="number">1</span>);
+            <span class="kw">if </span><span class="self">self</span>.version == <span class="number">0 </span>{
+                <span class="self">self</span>.map = <span class="macro">vec!</span>[Utf8BoundedEntry::default(); <span class="self">self</span>.capacity];
             }
         }
     }
 
-    <span class="doccomment">/// Return a hash of the given transitions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">Transition</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">INIT</span>;
-        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">key</span> {
-            <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">t</span>.<span class="ident">start</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
-            <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">t</span>.<span class="ident">end</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
-            <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">t</span>.<span class="ident">next</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
+    <span class="doccomment">/// Return a hash of the given transitions.
+    </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[Transition]) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = INIT;
+        <span class="kw">for </span>t <span class="kw">in </span>key {
+            h = (h ^ (t.start <span class="kw">as </span>u64)).wrapping_mul(PRIME);
+            h = (h ^ (t.end <span class="kw">as </span>u64)).wrapping_mul(PRIME);
+            h = (h ^ (t.next <span class="kw">as </span>u64)).wrapping_mul(PRIME);
         }
-        (<span class="ident">h</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>()
+        (h <span class="kw">as </span>usize) % <span class="self">self</span>.map.len()
     }
 
-    <span class="doccomment">/// Retrieve the cached state ID corresponding to the given key. The hash</span>
-    <span class="doccomment">/// given must have been computed with `hash` using the same key value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is no cached state with the given transitions, then None is</span>
-    <span class="doccomment">/// returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">Transition</span>], <span class="ident">hash</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StateID</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>[<span class="ident">hash</span>];
-        <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Retrieve the cached state ID corresponding to the given key. The hash
+    /// given must have been computed with `hash` using the same key value.
+    ///
+    /// If there is no cached state with the given transitions, then None is
+    /// returned.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[Transition], hash: usize) -&gt; <span class="prelude-ty">Option</span>&lt;StateID&gt; {
+        <span class="kw">let </span>entry = <span class="kw-2">&amp;</span><span class="self">self</span>.map[hash];
+        <span class="kw">if </span>entry.version != <span class="self">self</span>.version {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="comment">// There may be a hash collision, so we need to confirm real equality.</span>
-        <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">key</span> <span class="op">!</span><span class="op">=</span> <span class="ident">key</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="comment">// There may be a hash collision, so we need to confirm real equality.
+        </span><span class="kw">if </span>entry.key != key {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">entry</span>.<span class="ident">val</span>)
+        <span class="prelude-val">Some</span>(entry.val)
     }
 
-    <span class="doccomment">/// Add a cached state to this map with the given key. Callers should</span>
-    <span class="doccomment">/// ensure that `state_id` points to a state that contains precisely the</span>
-    <span class="doccomment">/// NFA transitions given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `hash` must have been computed using the `hash` method with the same</span>
-    <span class="doccomment">/// key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>,
-        <span class="ident">hash</span>: <span class="ident">usize</span>,
-        <span class="ident">state_id</span>: <span class="ident">StateID</span>,
+    <span class="doccomment">/// Add a cached state to this map with the given key. Callers should
+    /// ensure that `state_id` points to a state that contains precisely the
+    /// NFA transitions given.
+    ///
+    /// `hash` must have been computed using the `hash` method with the same
+    /// key.
+    </span><span class="kw">pub fn </span>set(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: Vec&lt;Transition&gt;,
+        hash: usize,
+        state_id: StateID,
     ) {
-        <span class="self">self</span>.<span class="ident">map</span>[<span class="ident">hash</span>] <span class="op">=</span>
-            <span class="ident">Utf8BoundedEntry</span> { <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>, <span class="ident">key</span>, <span class="ident">val</span>: <span class="ident">state_id</span> };
+        <span class="self">self</span>.map[hash] =
+            Utf8BoundedEntry { version: <span class="self">self</span>.version, key, val: state_id };
     }
 }
 
-<span class="doccomment">/// A cache of suffixes used to modestly compress UTF-8 automata for large</span>
-<span class="doccomment">/// Unicode character classes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Utf8SuffixMap</span> {
-    <span class="doccomment">/// The current version of this map. Only entries with matching versions</span>
-    <span class="doccomment">/// are considered during lookups. If an entry is found with a mismatched</span>
-    <span class="doccomment">/// version, then the map behaves as if the entry does not exist.</span>
-    <span class="ident">version</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// The total number of entries this map can store.</span>
-    <span class="ident">capacity</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The actual entries, keyed by hash. Collisions between different states</span>
-    <span class="doccomment">/// result in the old state being dropped.</span>
-    <span class="ident">map</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Utf8SuffixEntry</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A cache of suffixes used to modestly compress UTF-8 automata for large
+/// Unicode character classes.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Utf8SuffixMap {
+    <span class="doccomment">/// The current version of this map. Only entries with matching versions
+    /// are considered during lookups. If an entry is found with a mismatched
+    /// version, then the map behaves as if the entry does not exist.
+    </span>version: u16,
+    <span class="doccomment">/// The total number of entries this map can store.
+    </span>capacity: usize,
+    <span class="doccomment">/// The actual entries, keyed by hash. Collisions between different states
+    /// result in the old state being dropped.
+    </span>map: Vec&lt;Utf8SuffixEntry&gt;,
 }
 
-<span class="doccomment">/// A key that uniquely identifies an NFA state. It is a triple that represents</span>
-<span class="doccomment">/// a transition from one state for a particular byte range.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Utf8SuffixKey</span> {
-    <span class="kw">pub</span> <span class="ident">from</span>: <span class="ident">StateID</span>,
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">u8</span>,
-    <span class="kw">pub</span> <span class="ident">end</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// A key that uniquely identifies an NFA state. It is a triple that represents
+/// a transition from one state for a particular byte range.
+</span><span class="attribute">#[derive(Clone, Debug, Default, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Utf8SuffixKey {
+    <span class="kw">pub </span>from: StateID,
+    <span class="kw">pub </span>start: u8,
+    <span class="kw">pub </span>end: u8,
 }
 
-<span class="doccomment">/// An entry in this map.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Utf8SuffixEntry</span> {
-    <span class="doccomment">/// The version of the map used to produce this entry. If this entry&#39;s</span>
-    <span class="doccomment">/// version does not match the current version of the map, then the map</span>
-    <span class="doccomment">/// should behave as if this entry does not exist.</span>
-    <span class="ident">version</span>: <span class="ident">u16</span>,
-    <span class="doccomment">/// The key, which consists of a transition in a particular state.</span>
-    <span class="ident">key</span>: <span class="ident">Utf8SuffixKey</span>,
-    <span class="doccomment">/// The identifier that the transition in the key maps to.</span>
-    <span class="ident">val</span>: <span class="ident">StateID</span>,
+<span class="doccomment">/// An entry in this map.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">struct </span>Utf8SuffixEntry {
+    <span class="doccomment">/// The version of the map used to produce this entry. If this entry&#39;s
+    /// version does not match the current version of the map, then the map
+    /// should behave as if this entry does not exist.
+    </span>version: u16,
+    <span class="doccomment">/// The key, which consists of a transition in a particular state.
+    </span>key: Utf8SuffixKey,
+    <span class="doccomment">/// The identifier that the transition in the key maps to.
+    </span>val: StateID,
 }
 
-<span class="kw">impl</span> <span class="ident">Utf8SuffixMap</span> {
-    <span class="doccomment">/// Create a new bounded map with the given capacity. The map will never</span>
-    <span class="doccomment">/// grow beyond the given size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this does not allocate. Instead, callers must call `clear`</span>
-    <span class="doccomment">/// before using this map. `clear` will allocate space if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This avoids the need to pay for the allocation of this map when</span>
-    <span class="doccomment">/// compiling regexes that lack large Unicode character classes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Utf8SuffixMap</span> {
-        <span class="macro">assert!</span>(<span class="ident">capacity</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="ident">Utf8SuffixMap</span> { <span class="ident">version</span>: <span class="number">0</span>, <span class="ident">capacity</span>, <span class="ident">map</span>: <span class="macro">vec!</span>[] }
+<span class="kw">impl </span>Utf8SuffixMap {
+    <span class="doccomment">/// Create a new bounded map with the given capacity. The map will never
+    /// grow beyond the given size.
+    ///
+    /// Note that this does not allocate. Instead, callers must call `clear`
+    /// before using this map. `clear` will allocate space if necessary.
+    ///
+    /// This avoids the need to pay for the allocation of this map when
+    /// compiling regexes that lack large Unicode character classes.
+    </span><span class="kw">pub fn </span>new(capacity: usize) -&gt; Utf8SuffixMap {
+        <span class="macro">assert!</span>(capacity &gt; <span class="number">0</span>);
+        Utf8SuffixMap { version: <span class="number">0</span>, capacity, map: <span class="macro">vec!</span>[] }
     }
 
-    <span class="doccomment">/// Clear this map of all entries, but permit the reuse of allocation</span>
-    <span class="doccomment">/// if possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This must be called before the map can be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Utf8SuffixEntry::default</span>(); <span class="self">self</span>.<span class="ident">capacity</span>];
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Utf8SuffixEntry::default</span>(); <span class="self">self</span>.<span class="ident">capacity</span>];
+    <span class="doccomment">/// Clear this map of all entries, but permit the reuse of allocation
+    /// if possible.
+    ///
+    /// This must be called before the map can be used.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.map.is_empty() {
+            <span class="self">self</span>.map = <span class="macro">vec!</span>[Utf8SuffixEntry::default(); <span class="self">self</span>.capacity];
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.version = <span class="self">self</span>.version.wrapping_add(<span class="number">1</span>);
+            <span class="kw">if </span><span class="self">self</span>.version == <span class="number">0 </span>{
+                <span class="self">self</span>.map = <span class="macro">vec!</span>[Utf8SuffixEntry::default(); <span class="self">self</span>.capacity];
             }
         }
     }
 
-    <span class="doccomment">/// Return a hash of the given transition.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8SuffixKey</span>) -&gt; <span class="ident">usize</span> {
-        <span class="comment">// Basic FNV-1a hash as described:</span>
-        <span class="comment">// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function</span>
-        <span class="kw">const</span> <span class="ident">PRIME</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1099511628211</span>;
-        <span class="kw">const</span> <span class="ident">INIT</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">14695981039346656037</span>;
+    <span class="doccomment">/// Return a hash of the given transition.
+    </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Utf8SuffixKey) -&gt; usize {
+        <span class="comment">// Basic FNV-1a hash as described:
+        // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+        </span><span class="kw">const </span>PRIME: u64 = <span class="number">1099511628211</span>;
+        <span class="kw">const </span>INIT: u64 = <span class="number">14695981039346656037</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">INIT</span>;
-        <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">key</span>.<span class="ident">from</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
-        <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">key</span>.<span class="ident">start</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
-        <span class="ident">h</span> <span class="op">=</span> (<span class="ident">h</span> <span class="op">^</span> (<span class="ident">key</span>.<span class="ident">end</span> <span class="kw">as</span> <span class="ident">u64</span>)).<span class="ident">wrapping_mul</span>(<span class="ident">PRIME</span>);
-        (<span class="ident">h</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>()
+        <span class="kw">let </span><span class="kw-2">mut </span>h = INIT;
+        h = (h ^ (key.from <span class="kw">as </span>u64)).wrapping_mul(PRIME);
+        h = (h ^ (key.start <span class="kw">as </span>u64)).wrapping_mul(PRIME);
+        h = (h ^ (key.end <span class="kw">as </span>u64)).wrapping_mul(PRIME);
+        (h <span class="kw">as </span>usize) % <span class="self">self</span>.map.len()
     }
 
-    <span class="doccomment">/// Retrieve the cached state ID corresponding to the given key. The hash</span>
-    <span class="doccomment">/// given must have been computed with `hash` using the same key value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is no cached state with the given key, then None is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Utf8SuffixKey</span>,
-        <span class="ident">hash</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StateID</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>[<span class="ident">hash</span>];
-        <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Retrieve the cached state ID corresponding to the given key. The hash
+    /// given must have been computed with `hash` using the same key value.
+    ///
+    /// If there is no cached state with the given key, then None is returned.
+    </span><span class="kw">pub fn </span>get(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        key: <span class="kw-2">&amp;</span>Utf8SuffixKey,
+        hash: usize,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;StateID&gt; {
+        <span class="kw">let </span>entry = <span class="kw-2">&amp;</span><span class="self">self</span>.map[hash];
+        <span class="kw">if </span>entry.version != <span class="self">self</span>.version {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">if</span> <span class="ident">key</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">entry</span>.<span class="ident">key</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>key != <span class="kw-2">&amp;</span>entry.key {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">entry</span>.<span class="ident">val</span>)
+        <span class="prelude-val">Some</span>(entry.val)
     }
 
-    <span class="doccomment">/// Add a cached state to this map with the given key. Callers should</span>
-    <span class="doccomment">/// ensure that `state_id` points to a state that contains precisely the</span>
-    <span class="doccomment">/// NFA transition given.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `hash` must have been computed using the `hash` method with the same</span>
-    <span class="doccomment">/// key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Utf8SuffixKey</span>, <span class="ident">hash</span>: <span class="ident">usize</span>, <span class="ident">state_id</span>: <span class="ident">StateID</span>) {
-        <span class="self">self</span>.<span class="ident">map</span>[<span class="ident">hash</span>] <span class="op">=</span>
-            <span class="ident">Utf8SuffixEntry</span> { <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>, <span class="ident">key</span>, <span class="ident">val</span>: <span class="ident">state_id</span> };
+    <span class="doccomment">/// Add a cached state to this map with the given key. Callers should
+    /// ensure that `state_id` points to a state that contains precisely the
+    /// NFA transition given.
+    ///
+    /// `hash` must have been computed using the `hash` method with the same
+    /// key.
+    </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Utf8SuffixKey, hash: usize, state_id: StateID) {
+        <span class="self">self</span>.map[hash] =
+            Utf8SuffixEntry { version: <span class="self">self</span>.version, key, val: state_id };
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

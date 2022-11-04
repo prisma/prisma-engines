@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/textwrap-0.11.0/src/splitting.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>splitting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../textwrap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/textwrap-0.11.0/src/splitting.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>splitting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../textwrap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -137,144 +137,144 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Word splitting functionality.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To wrap text into lines, long words sometimes need to be split</span>
-<span class="doccomment">//! across lines. The [`WordSplitter`] trait defines this</span>
-<span class="doccomment">//! functionality. [`HyphenSplitter`] is the default implementation of</span>
-<span class="doccomment">//! this treat: it will simply split words on existing hyphens.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Word splitting functionality.
+//!
+//! To wrap text into lines, long words sometimes need to be split
+//! across lines. The [`WordSplitter`] trait defines this
+//! functionality. [`HyphenSplitter`] is the default implementation of
+//! this treat: it will simply split words on existing hyphens.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">hyphenation</span>::{<span class="ident">Hyphenator</span>, <span class="ident">Standard</span>};
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+</span><span class="kw">use </span>hyphenation::{Hyphenator, Standard};
 
-<span class="doccomment">/// An interface for splitting words.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When the [`wrap_iter`] method will try to fit text into a line, it</span>
-<span class="doccomment">/// will eventually find a word that it too large the current text</span>
-<span class="doccomment">/// width. It will then call the currently configured `WordSplitter` to</span>
-<span class="doccomment">/// have it attempt to split the word into smaller parts. This trait</span>
-<span class="doccomment">/// describes that functionality via the [`split`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the `textwrap` crate has been compiled with the `hyphenation`</span>
-<span class="doccomment">/// feature enabled, you will find an implementation of `WordSplitter`</span>
-<span class="doccomment">/// by the `hyphenation::language::Corpus` struct. Use this struct for</span>
-<span class="doccomment">/// language-aware hyphenation. See the [`hyphenation` documentation]</span>
-<span class="doccomment">/// for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap_iter`]: ../struct.Wrapper.html#method.wrap_iter</span>
-<span class="doccomment">/// [`split`]: #tymethod.split</span>
-<span class="doccomment">/// [`hyphenation` documentation]: https://docs.rs/hyphenation/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WordSplitter</span> {
-    <span class="doccomment">/// Return all possible splits of word. Each split is a triple</span>
-    <span class="doccomment">/// with a head, a hyphen, and a tail where `head + &amp;hyphen +</span>
-    <span class="doccomment">/// &amp;tail == word`. The hyphen can be empty if there is already a</span>
-    <span class="doccomment">/// hyphen in the head.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The splits should go from smallest to longest and should</span>
-    <span class="doccomment">/// include no split at all. So the word &quot;technology&quot; could be</span>
-    <span class="doccomment">/// split into</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// vec![(&quot;tech&quot;, &quot;-&quot;, &quot;nology&quot;),</span>
-    <span class="doccomment">///      (&quot;technol&quot;, &quot;-&quot;, &quot;ogy&quot;),</span>
-    <span class="doccomment">///      (&quot;technolo&quot;, &quot;-&quot;, &quot;gy&quot;),</span>
-    <span class="doccomment">///      (&quot;technology&quot;, &quot;&quot;, &quot;&quot;)];</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>)<span class="op">&gt;</span>;
+<span class="doccomment">/// An interface for splitting words.
+///
+/// When the [`wrap_iter`] method will try to fit text into a line, it
+/// will eventually find a word that it too large the current text
+/// width. It will then call the currently configured `WordSplitter` to
+/// have it attempt to split the word into smaller parts. This trait
+/// describes that functionality via the [`split`] method.
+///
+/// If the `textwrap` crate has been compiled with the `hyphenation`
+/// feature enabled, you will find an implementation of `WordSplitter`
+/// by the `hyphenation::language::Corpus` struct. Use this struct for
+/// language-aware hyphenation. See the [`hyphenation` documentation]
+/// for details.
+///
+/// [`wrap_iter`]: ../struct.Wrapper.html#method.wrap_iter
+/// [`split`]: #tymethod.split
+/// [`hyphenation` documentation]: https://docs.rs/hyphenation/
+</span><span class="kw">pub trait </span>WordSplitter {
+    <span class="doccomment">/// Return all possible splits of word. Each split is a triple
+    /// with a head, a hyphen, and a tail where `head + &amp;hyphen +
+    /// &amp;tail == word`. The hyphen can be empty if there is already a
+    /// hyphen in the head.
+    ///
+    /// The splits should go from smallest to longest and should
+    /// include no split at all. So the word &quot;technology&quot; could be
+    /// split into
+    ///
+    /// ```no_run
+    /// vec![(&quot;tech&quot;, &quot;-&quot;, &quot;nology&quot;),
+    ///      (&quot;technol&quot;, &quot;-&quot;, &quot;ogy&quot;),
+    ///      (&quot;technolo&quot;, &quot;-&quot;, &quot;gy&quot;),
+    ///      (&quot;technology&quot;, &quot;&quot;, &quot;&quot;)];
+    /// ```
+    </span><span class="kw">fn </span>split&lt;<span class="lifetime">&#39;w</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, word: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str)&gt;;
 }
 
-<span class="doccomment">/// Use this as a [`Wrapper.splitter`] to avoid any kind of</span>
-<span class="doccomment">/// hyphenation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use textwrap::{Wrapper, NoHyphenation};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let wrapper = Wrapper::with_splitter(8, NoHyphenation);</span>
-<span class="doccomment">/// assert_eq!(wrapper.wrap(&quot;foo bar-baz&quot;), vec![&quot;foo&quot;, &quot;bar-baz&quot;]);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Wrapper.splitter`]: ../struct.Wrapper.html#structfield.splitter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoHyphenation</span>;
+<span class="doccomment">/// Use this as a [`Wrapper.splitter`] to avoid any kind of
+/// hyphenation:
+///
+/// ```
+/// use textwrap::{Wrapper, NoHyphenation};
+///
+/// let wrapper = Wrapper::with_splitter(8, NoHyphenation);
+/// assert_eq!(wrapper.wrap(&quot;foo bar-baz&quot;), vec![&quot;foo&quot;, &quot;bar-baz&quot;]);
+/// ```
+///
+/// [`Wrapper.splitter`]: ../struct.Wrapper.html#structfield.splitter
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>NoHyphenation;
 
-<span class="doccomment">/// `NoHyphenation` implements `WordSplitter` by not splitting the</span>
-<span class="doccomment">/// word at all.</span>
-<span class="kw">impl</span> <span class="ident">WordSplitter</span> <span class="kw">for</span> <span class="ident">NoHyphenation</span> {
-    <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
-        <span class="macro">vec!</span>[(<span class="ident">word</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)]
+<span class="doccomment">/// `NoHyphenation` implements `WordSplitter` by not splitting the
+/// word at all.
+</span><span class="kw">impl </span>WordSplitter <span class="kw">for </span>NoHyphenation {
+    <span class="kw">fn </span>split&lt;<span class="lifetime">&#39;w</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, word: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str)&gt; {
+        <span class="macro">vec!</span>[(word, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)]
     }
 }
 
-<span class="doccomment">/// Simple and default way to split words: splitting on existing</span>
-<span class="doccomment">/// hyphens only.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You probably don&#39;t need to use this type since it&#39;s already used</span>
-<span class="doccomment">/// by default by `Wrapper::new`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HyphenSplitter</span>;
+<span class="doccomment">/// Simple and default way to split words: splitting on existing
+/// hyphens only.
+///
+/// You probably don&#39;t need to use this type since it&#39;s already used
+/// by default by `Wrapper::new`.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>HyphenSplitter;
 
-<span class="doccomment">/// `HyphenSplitter` is the default `WordSplitter` used by</span>
-<span class="doccomment">/// `Wrapper::new`. It will split words on any existing hyphens in the</span>
-<span class="doccomment">/// word.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It will only use hyphens that are surrounded by alphanumeric</span>
-<span class="doccomment">/// characters, which prevents a word like &quot;--foo-bar&quot; from being</span>
-<span class="doccomment">/// split on the first or second hyphen.</span>
-<span class="kw">impl</span> <span class="ident">WordSplitter</span> <span class="kw">for</span> <span class="ident">HyphenSplitter</span> {
-    <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">triples</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="comment">// Split on hyphens, smallest split first. We only use hyphens</span>
-        <span class="comment">// that are surrounded by alphanumeric characters. This is to</span>
-        <span class="comment">// avoid splitting on repeated hyphens, such as those found in</span>
-        <span class="comment">// --foo-bar.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">char_indices</span> <span class="op">=</span> <span class="ident">word</span>.<span class="ident">char_indices</span>();
-        <span class="comment">// Early return if the word is empty.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prev</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">char_indices</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[(<span class="ident">word</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)],
-            <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">ch</span>)) =&gt; <span class="ident">ch</span>,
+<span class="doccomment">/// `HyphenSplitter` is the default `WordSplitter` used by
+/// `Wrapper::new`. It will split words on any existing hyphens in the
+/// word.
+///
+/// It will only use hyphens that are surrounded by alphanumeric
+/// characters, which prevents a word like &quot;--foo-bar&quot; from being
+/// split on the first or second hyphen.
+</span><span class="kw">impl </span>WordSplitter <span class="kw">for </span>HyphenSplitter {
+    <span class="kw">fn </span>split&lt;<span class="lifetime">&#39;w</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, word: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>triples = Vec::new();
+        <span class="comment">// Split on hyphens, smallest split first. We only use hyphens
+        // that are surrounded by alphanumeric characters. This is to
+        // avoid splitting on repeated hyphens, such as those found in
+        // --foo-bar.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>char_indices = word.char_indices();
+        <span class="comment">// Early return if the word is empty.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>prev = <span class="kw">match </span>char_indices.next() {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="macro">vec!</span>[(word, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)],
+            <span class="prelude-val">Some</span>((<span class="kw">_</span>, ch)) =&gt; ch,
         };
 
-        <span class="comment">// Find current word, or return early if the word only has a</span>
-        <span class="comment">// single character.</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">idx</span>, <span class="kw-2">mut</span> <span class="ident">cur</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">char_indices</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[(<span class="ident">word</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)],
-            <span class="prelude-val">Some</span>((<span class="ident">idx</span>, <span class="ident">cur</span>)) =&gt; (<span class="ident">idx</span>, <span class="ident">cur</span>),
+        <span class="comment">// Find current word, or return early if the word only has a
+        // single character.
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>idx, <span class="kw-2">mut </span>cur) = <span class="kw">match </span>char_indices.next() {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="macro">vec!</span>[(word, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)],
+            <span class="prelude-val">Some</span>((idx, cur)) =&gt; (idx, cur),
         };
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">next</span>) <span class="kw">in</span> <span class="ident">char_indices</span> {
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">is_alphanumeric</span>() <span class="op">&amp;&amp;</span> <span class="ident">cur</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">next</span>.<span class="ident">is_alphanumeric</span>() {
-                <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">word</span>.<span class="ident">split_at</span>(<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>);
-                <span class="ident">triples</span>.<span class="ident">push</span>((<span class="ident">head</span>, <span class="string">&quot;&quot;</span>, <span class="ident">tail</span>));
+        <span class="kw">for </span>(i, next) <span class="kw">in </span>char_indices {
+            <span class="kw">if </span>prev.is_alphanumeric() &amp;&amp; cur == <span class="string">&#39;-&#39; </span>&amp;&amp; next.is_alphanumeric() {
+                <span class="kw">let </span>(head, tail) = word.split_at(idx + <span class="number">1</span>);
+                triples.push((head, <span class="string">&quot;&quot;</span>, tail));
             }
-            <span class="ident">prev</span> <span class="op">=</span> <span class="ident">cur</span>;
-            <span class="ident">idx</span> <span class="op">=</span> <span class="ident">i</span>;
-            <span class="ident">cur</span> <span class="op">=</span> <span class="ident">next</span>;
+            prev = cur;
+            idx = i;
+            cur = next;
         }
 
-        <span class="comment">// Finally option is no split at all.</span>
-        <span class="ident">triples</span>.<span class="ident">push</span>((<span class="ident">word</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
+        <span class="comment">// Finally option is no split at all.
+        </span>triples.push((word, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
 
-        <span class="ident">triples</span>
+        triples
     }
 }
 
-<span class="doccomment">/// A hyphenation dictionary can be used to do language-specific</span>
-<span class="doccomment">/// hyphenation using patterns from the hyphenation crate.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">WordSplitter</span> <span class="kw">for</span> <span class="ident">Standard</span> {
-    <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
-        <span class="comment">// Find splits based on language dictionary.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">triples</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">hyphenate</span>(<span class="ident">word</span>).<span class="ident">breaks</span> {
-            <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">word</span>.<span class="ident">split_at</span>(<span class="ident">n</span>);
-            <span class="kw">let</span> <span class="ident">hyphen</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">ends_with</span>(<span class="string">&#39;-&#39;</span>) { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;-&quot;</span> };
-            <span class="ident">triples</span>.<span class="ident">push</span>((<span class="ident">head</span>, <span class="ident">hyphen</span>, <span class="ident">tail</span>));
+<span class="doccomment">/// A hyphenation dictionary can be used to do language-specific
+/// hyphenation using patterns from the hyphenation crate.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+</span><span class="kw">impl </span>WordSplitter <span class="kw">for </span>Standard {
+    <span class="kw">fn </span>split&lt;<span class="lifetime">&#39;w</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, word: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>str)&gt; {
+        <span class="comment">// Find splits based on language dictionary.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>triples = Vec::new();
+        <span class="kw">for </span>n <span class="kw">in </span><span class="self">self</span>.hyphenate(word).breaks {
+            <span class="kw">let </span>(head, tail) = word.split_at(n);
+            <span class="kw">let </span>hyphen = <span class="kw">if </span>head.ends_with(<span class="string">&#39;-&#39;</span>) { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;-&quot; </span>};
+            triples.push((head, hyphen, tail));
         }
-        <span class="comment">// Finally option is no split at all.</span>
-        <span class="ident">triples</span>.<span class="ident">push</span>((<span class="ident">word</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
+        <span class="comment">// Finally option is no split at all.
+        </span>triples.push((word, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>));
 
-        <span class="ident">triples</span>
+        triples
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="textwrap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="textwrap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

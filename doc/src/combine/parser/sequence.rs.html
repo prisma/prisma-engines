@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/sequence.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sequence.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/sequence.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sequence.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -714,721 +714,721 @@
 <span id="714">714</span>
 <span id="715">715</span>
 <span id="716">716</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Combinators which take multiple parsers and applies them one after another.</span>
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Combinators which take multiple parsers and applies them one after another.
+</span><span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident">combinator</span>::{<span class="ident">ignore</span>, <span class="ident">Ignore</span>, <span class="ident">Map</span>};
-<span class="kw">use</span> <span class="ident">error::FastResult</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">ParseError</span>, <span class="ident">StreamError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">parser::ParseMode</span>;
-<span class="kw">use</span> {<span class="ident">ErrorOffset</span>, <span class="ident">Parser</span>, <span class="ident">Stream</span>, <span class="ident">StreamOnce</span>};
+<span class="kw">use </span>combinator::{ignore, Ignore, Map};
+<span class="kw">use </span>error::FastResult::<span class="kw-2">*</span>;
+<span class="kw">use </span>error::{ConsumedResult, ParseError, StreamError, Tracked};
+<span class="kw">use </span>parser::ParseMode;
+<span class="kw">use </span>{ErrorOffset, Parser, Stream, StreamOnce};
 
-<span class="macro">macro_rules!</span> <span class="ident">dispatch_on</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">expr</span>;) =&gt; {
+<span class="macro">macro_rules! </span>dispatch_on {
+    (<span class="macro-nonterminal">$i</span>: expr, <span class="macro-nonterminal">$f</span>: expr;) =&gt; {
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>: <span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; { {
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>);
-        <span class="kw">if</span> <span class="ident">b</span> {
-            <span class="macro">dispatch_on!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">+</span> <span class="number">1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>);
+    (<span class="macro-nonterminal">$i</span>: expr, <span class="macro-nonterminal">$f</span>: expr; <span class="macro-nonterminal">$first</span>: ident $(, <span class="macro-nonterminal">$id</span>: ident)<span class="kw-2">*</span>) =&gt; { {
+        <span class="kw">let </span>b = <span class="macro-nonterminal">$f</span>(<span class="macro-nonterminal">$i</span>, <span class="macro-nonterminal">$first</span>);
+        <span class="kw">if </span>b {
+            <span class="macro">dispatch_on!</span>(<span class="macro-nonterminal">$i </span>+ <span class="number">1</span>, <span class="macro-nonterminal">$f</span>; $(<span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>);
         }
     } }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">count</span> {
-    () =&gt; { <span class="number">0</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">ident</span>) =&gt; { <span class="number">1</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">ident</span>),<span class="op">+</span>) =&gt; { <span class="number">1</span> <span class="op">+</span> <span class="macro">count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>),<span class="kw-2">*</span>) };
+<span class="macro">macro_rules! </span>count {
+    () =&gt; { <span class="number">0 </span>};
+    (<span class="macro-nonterminal">$f</span>: ident) =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$f</span>: ident, $(<span class="macro-nonterminal">$rest</span>: ident),+) =&gt; { <span class="number">1 </span>+ <span class="macro">count!</span>($(<span class="macro-nonterminal">$rest</span>),<span class="kw-2">*</span>) };
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">U</span>,
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub struct </span>SequenceState&lt;T, U&gt; {
+    <span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;T&gt;,
+    <span class="kw">pub </span>state: U,
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParserSequenceState</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::Output</span>, <span class="op">&lt;</span><span class="ident">P</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::PartialState</span><span class="op">&gt;</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub type </span>ParserSequenceState&lt;P&gt; = SequenceState&lt;&lt;P <span class="kw">as </span>Parser&gt;::Output, &lt;P <span class="kw">as </span>Parser&gt;::PartialState&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SequenceState</span> {
-            <span class="ident">value</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="ident">U::default</span>(),
+<span class="kw">impl</span>&lt;T, U: Default&gt; Default <span class="kw">for </span>SequenceState&lt;T, U&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        SequenceState {
+            value: <span class="prelude-val">None</span>,
+            state: U::default(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T, U&gt; SequenceState&lt;T, U&gt;
+<span class="kw">where
+    </span>U: Default,
 {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unwrap_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">::unreachable::unreachable</span>(),
+    <span class="kw">unsafe fn </span>unwrap_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; T {
+        <span class="kw">match </span><span class="self">self</span>.value.take() {
+            <span class="prelude-val">Some</span>(t) =&gt; t,
+            <span class="prelude-val">None </span>=&gt; ::unreachable::unreachable(),
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">last_ident</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">ident</span>),<span class="op">+</span>) =&gt; { <span class="macro">last_ident!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>),<span class="op">+</span>) };
+<span class="macro">macro_rules! </span>last_ident {
+    (<span class="macro-nonterminal">$id</span>: ident) =&gt; { <span class="macro-nonterminal">$id </span>};
+    (<span class="macro-nonterminal">$id</span>: ident, $(<span class="macro-nonterminal">$rest</span>: ident),+) =&gt; { <span class="macro">last_ident!</span>($(<span class="macro-nonterminal">$rest</span>),+) };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ident</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>: <span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> )<span class="op">*</span> <span class="op">&gt;</span> {
-            <span class="kw">pub</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>,
+<span class="macro">macro_rules! </span>tuple_parser {
+    (<span class="macro-nonterminal">$partial_state</span>: ident; <span class="macro-nonterminal">$h</span>: ident $(, <span class="macro-nonterminal">$id</span>: ident)<span class="kw-2">*</span>) =&gt; {
+        <span class="attribute">#[allow(non_snake_case)]
+        #[derive(Default)]
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$partial_state </span>&lt; <span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id </span>)* &gt; {
+            <span class="kw">pub </span><span class="macro-nonterminal">$h</span>: <span class="macro-nonterminal">$h</span>,
             $(
-                <span class="kw">pub</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>,
-            )<span class="op">*</span>
-            <span class="ident">offset</span>: <span class="ident">u8</span>,
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span> <span class="op">&lt;</span>( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="op">*</span> )<span class="op">&gt;</span>,
+                <span class="kw">pub </span><span class="macro-nonterminal">$id</span>: <span class="macro-nonterminal">$id</span>,
+            )*
+            offset: u8,
+            _marker: PhantomData &lt;( <span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id</span>)* )&gt;,
         }
 
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="kw-2">*</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">Input</span>: <span class="ident">Stream</span>,
-              <span class="ident">Input::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input::Item</span>, <span class="ident">Input::Range</span>, <span class="ident">Input::Position</span><span class="op">&gt;</span>,
-              <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="ident">Input</span><span class="op">&gt;</span>,
-              $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="ident">Input</span><span class="op">&gt;</span>),<span class="op">*</span>
+        <span class="attribute">#[allow(non_snake_case)]
+        </span><span class="kw">impl</span>&lt;Input, <span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id</span>)<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">$partial_state</span>&lt;<span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id</span>)<span class="kw-2">*</span>&gt;
+        <span class="kw">where </span>Input: Stream,
+              Input::Error: ParseError&lt;Input::Item, Input::Range, Input::Position&gt;,
+              <span class="macro-nonterminal">$h</span>: Parser&lt;Input=Input&gt;,
+              $(<span class="macro-nonterminal">$id</span>: Parser&lt;Input=Input&gt;),*
         {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">add_errors</span>(
-                <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Input</span>,
-                <span class="kw-2">mut</span> <span class="ident">err</span>: <span class="ident">Tracked</span><span class="op">&lt;</span><span class="ident">Input::Error</span><span class="op">&gt;</span>,
-                <span class="ident">first_empty_parser</span>: <span class="ident">usize</span>,
-                <span class="ident">offset</span>: <span class="ident">u8</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>: <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> : <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> )<span class="op">*</span>
-            ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h::Output</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id::Output</span>),<span class="kw-2">*</span>), <span class="ident">Input</span><span class="op">&gt;</span>
+            <span class="attribute">#[allow(dead_code)]
+            </span><span class="kw">fn </span>add_errors(
+                input: <span class="kw-2">&amp;mut </span>Input,
+                <span class="kw-2">mut </span>err: Tracked&lt;Input::Error&gt;,
+                first_empty_parser: usize,
+                offset: u8,
+                <span class="macro-nonterminal">$h</span>: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id </span>: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$id </span>)*
+            ) -&gt; ConsumedResult&lt;(<span class="macro-nonterminal">$h::Output</span>, $(<span class="macro-nonterminal">$id::Output</span>),<span class="kw-2">*</span>), Input&gt;
             {
-                <span class="kw">let</span> <span class="ident">inner_offset</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">offset</span>;
-                <span class="ident">err</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="ident">offset</span>);
-                <span class="kw">if</span> <span class="ident">first_empty_parser</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons</span>() {
-                        <span class="ident">err</span>.<span class="ident">error</span>.<span class="ident">add</span>(<span class="ident">StreamError::unexpected_token</span>(<span class="ident">t</span>));
+                <span class="kw">let </span>inner_offset = err.offset;
+                err.offset = ErrorOffset(offset);
+                <span class="kw">if </span>first_empty_parser != <span class="number">0 </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(t) = input.uncons() {
+                        err.error.add(StreamError::unexpected_token(t));
                     }
-                    <span class="macro">dispatch_on!</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">i</span>, <span class="kw-2">mut</span> <span class="ident">p</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">first_empty_parser</span> {
-                            <span class="ident">Parser::add_consumed_expected_error</span>(<span class="kw-2">&amp;mut</span> <span class="ident">p</span>, <span class="kw-2">&amp;mut</span> <span class="ident">err</span>);
+                    <span class="macro">dispatch_on!</span>(<span class="number">0</span>, |i, <span class="kw-2">mut </span>p| {
+                        <span class="kw">if </span>i + <span class="number">1 </span>== first_empty_parser {
+                            Parser::add_consumed_expected_error(<span class="kw-2">&amp;mut </span>p, <span class="kw-2">&amp;mut </span>err);
                         }
-                        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">first_empty_parser</span> {
-                            <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
-                                <span class="comment">// We reached the last parser we need to add errors to (and the</span>
-                                <span class="comment">// parser that actually returned the error), use the returned</span>
-                                <span class="comment">// offset for that parser.</span>
-                                <span class="ident">err</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">inner_offset</span>;
+                        <span class="kw">if </span>i &gt;= first_empty_parser {
+                            <span class="kw">if </span>err.offset &lt;= ErrorOffset(<span class="number">1</span>) {
+                                <span class="comment">// We reached the last parser we need to add errors to (and the
+                                // parser that actually returned the error), use the returned
+                                // offset for that parser.
+                                </span>err.offset = inner_offset;
                             }
-                            <span class="ident">Parser::add_error</span>(<span class="kw-2">&amp;mut</span> <span class="ident">p</span>, <span class="kw-2">&amp;mut</span> <span class="ident">err</span>);
-                            <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
-                                <span class="kw">return</span> <span class="bool-val">false</span>;
+                            Parser::add_error(<span class="kw-2">&amp;mut </span>p, <span class="kw-2">&amp;mut </span>err);
+                            <span class="kw">if </span>err.offset &lt;= ErrorOffset(<span class="number">1</span>) {
+                                <span class="kw">return </span><span class="bool-val">false</span>;
                             }
                         }
-                        <span class="ident">err</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(
-                            <span class="ident">err</span>.<span class="ident">offset</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="ident">Parser::parser_count</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="number">0</span>)
+                        err.offset = ErrorOffset(
+                            err.offset.<span class="number">0</span>.saturating_sub(Parser::parser_count(<span class="kw-2">&amp;</span>p).<span class="number">0</span>)
                         );
-                        <span class="bool-val">true</span>
-                    }; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="kw-2">*</span>);
-                    <span class="ident">ConsumedErr</span>(<span class="ident">err</span>.<span class="ident">error</span>)
-            } <span class="kw">else</span> {
-                    <span class="ident">EmptyErr</span>(<span class="ident">err</span>)
+                        <span class="bool-val">true
+                    </span>}; <span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id</span>)<span class="kw-2">*</span>);
+                    ConsumedErr(err.error)
+            } <span class="kw">else </span>{
+                    EmptyErr(err)
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="kw">impl</span> <span class="op">&lt;</span><span class="ident">Input</span>: <span class="ident">Stream</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>:, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>)
-            <span class="kw">where</span> <span class="ident">Input</span>: <span class="ident">Stream</span>,
-                  <span class="ident">Input::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input::Item</span>, <span class="ident">Input::Range</span>, <span class="ident">Input::Position</span><span class="op">&gt;</span>,
-                  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="ident">Input</span><span class="op">&gt;</span>,
-                  $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="ident">Input</span><span class="op">&gt;</span>),<span class="op">*</span>
+        <span class="attribute">#[allow(non_snake_case)]
+        </span><span class="kw">impl </span>&lt;Input: Stream, <span class="macro-nonterminal">$h</span>:, $(<span class="macro-nonterminal">$id</span>:),<span class="kw-2">*</span>&gt; Parser <span class="kw">for </span>(<span class="macro-nonterminal">$h</span>, $(<span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>)
+            <span class="kw">where </span>Input: Stream,
+                  Input::Error: ParseError&lt;Input::Item, Input::Range, Input::Position&gt;,
+                  <span class="macro-nonterminal">$h</span>: Parser&lt;Input=Input&gt;,
+                  $(<span class="macro-nonterminal">$id</span>: Parser&lt;Input=Input&gt;),*
         {
-            <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">Input</span>;
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h::Output</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id::Output</span>),<span class="kw-2">*</span>);
-            <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span><span class="op">&lt;</span>
-                <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">h::Output</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h::PartialState</span><span class="op">&gt;</span>
-                $(, <span class="ident">SequenceState</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">id::Output</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id::PartialState</span><span class="op">&gt;</span>)<span class="op">*</span>
-            <span class="op">&gt;</span>;
+            <span class="kw">type </span>Input = Input;
+            <span class="kw">type </span>Output = (<span class="macro-nonterminal">$h::Output</span>, $(<span class="macro-nonterminal">$id::Output</span>),<span class="kw-2">*</span>);
+            <span class="kw">type </span>PartialState = <span class="macro-nonterminal">$partial_state</span>&lt;
+                SequenceState&lt;<span class="macro-nonterminal">$h::Output</span>, <span class="macro-nonterminal">$h::PartialState</span>&gt;
+                $(, SequenceState&lt;<span class="macro-nonterminal">$id::Output</span>, <span class="macro-nonterminal">$id::PartialState</span>&gt;)*
+            &gt;;
 
             <span class="macro">parse_mode!</span>();
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                <span class="kw-2">mut</span> <span class="ident">mode</span>: <span class="ident">M</span>,
-                <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-                <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-            ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                <span class="kw-2">mut </span>mode: M,
+                input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+                state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+            ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+            <span class="kw">where
+                </span>M: ParseMode,
             {
-                <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_empty_parser</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_parser</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">let </span>(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$h</span>, $(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>) = <span class="kw-2">*</span><span class="self">self</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>first_empty_parser = <span class="number">0</span>;
+                <span class="attribute">#[allow(unused_mut)]
+                </span><span class="kw">let </span><span class="kw-2">mut </span>current_parser = <span class="number">0</span>;
 
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
-                <span class="macro">macro_rules!</span> <span class="ident">add_errors</span> {
-                    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>: <span class="ident">expr</span>) =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::add_errors</span>(
-                            <span class="ident">input</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>, <span class="ident">first_empty_parser</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="op">*</span>
+                <span class="attribute">#[allow(unused_macros)]
+                </span><span class="macro">macro_rules! </span>add_errors {
+                    (<span class="macro-nonterminal">$err</span>: ident, <span class="macro-nonterminal">$offset</span>: expr) =&gt; {
+                        <span class="macro-nonterminal">$partial_state::add_errors</span>(
+                            input, <span class="macro-nonterminal">$err</span>, first_empty_parser, <span class="macro-nonterminal">$offset</span>, <span class="macro-nonterminal">$h</span>, $(<span class="macro-nonterminal">$id</span>),*
                         )
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">value</span>.<span class="ident">is_none</span>() {
-                    <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">state</span>) {
-                        <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; {
-                            <span class="ident">first_empty_parser</span> <span class="op">=</span> <span class="ident">current_parser</span> <span class="op">+</span> <span class="number">1</span>;
-                            <span class="ident">x</span>
+                <span class="kw">if </span>mode.is_first() || state.<span class="macro-nonterminal">$h</span>.value.is_none() {
+                    <span class="kw">let </span>temp = <span class="kw">match </span><span class="macro-nonterminal">$h</span>.parse_mode(mode, input, <span class="kw-2">&amp;mut </span>state.<span class="macro-nonterminal">$h</span>.state) {
+                        ConsumedOk(x) =&gt; {
+                            first_empty_parser = current_parser + <span class="number">1</span>;
+                            x
                         }
-                        <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-                        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
-                        <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; {
-                            <span class="ident">x</span>
+                        EmptyErr(err) =&gt; <span class="kw">return </span>EmptyErr(err),
+                        ConsumedErr(err) =&gt; <span class="kw">return </span>ConsumedErr(err),
+                        EmptyOk(x) =&gt; {
+                            x
                         }
                     };
-                    <span class="ident">state</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">parser_count</span>().<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="number">1</span>);
-                    <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">temp</span>);
+                    state.offset = <span class="macro-nonterminal">$h</span>.parser_count().<span class="number">0</span>.saturating_add(<span class="number">1</span>);
+                    state.<span class="macro-nonterminal">$h</span>.value = <span class="prelude-val">Some</span>(temp);
 
-                    <span class="comment">// Once we have successfully parsed the partial input we may resume parsing in</span>
-                    <span class="comment">// &quot;first mode&quot;</span>
-                    <span class="ident">mode</span>.<span class="ident">set_first</span>();
+                    <span class="comment">// Once we have successfully parsed the partial input we may resume parsing in
+                    // &quot;first mode&quot;
+                    </span>mode.set_first();
                 }
 
                 $(
-                    <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">value</span>.<span class="ident">is_none</span>() {
-                        <span class="ident">current_parser</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
-                        <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">state</span>) {
-                            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; {
-                                <span class="ident">first_empty_parser</span> <span class="op">=</span> <span class="ident">current_parser</span> <span class="op">+</span> <span class="number">1</span>;
-                                <span class="ident">x</span>
+                    <span class="kw">if </span>mode.is_first() || state.<span class="macro-nonterminal">$id</span>.value.is_none() {
+                        current_parser += <span class="number">1</span>;
+                        <span class="kw">let </span>before = input.checkpoint();
+                        <span class="kw">let </span>temp = <span class="kw">match </span><span class="macro-nonterminal">$id</span>.parse_mode(mode, input, <span class="kw-2">&amp;mut </span>state.<span class="macro-nonterminal">$id</span>.state) {
+                            ConsumedOk(x) =&gt; {
+                                first_empty_parser = current_parser + <span class="number">1</span>;
+                                x
                             }
-                            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; {
-                                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-                                <span class="kw">return</span> <span class="macro">add_errors!</span>(<span class="ident">err</span>, <span class="ident">state</span>.<span class="ident">offset</span>)
+                            EmptyErr(err) =&gt; {
+                                input.reset(before);
+                                <span class="kw">return </span><span class="macro">add_errors!</span>(err, state.offset)
                             }
-                            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
-                            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; {
-                                <span class="ident">x</span>
+                            ConsumedErr(err) =&gt; <span class="kw">return </span>ConsumedErr(err),
+                            EmptyOk(x) =&gt; {
+                                x
                             }
                         };
-                        <span class="ident">state</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">offset</span>.<span class="ident">saturating_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">parser_count</span>().<span class="number">0</span>);
-                        <span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">temp</span>);
+                        state.offset = state.offset.saturating_add(<span class="macro-nonterminal">$id</span>.parser_count().<span class="number">0</span>);
+                        state.<span class="macro-nonterminal">$id</span>.value = <span class="prelude-val">Some</span>(temp);
 
-                        <span class="comment">// Once we have successfully parsed the partial input we may resume parsing in</span>
-                        <span class="comment">// &quot;first mode&quot;</span>
-                        <span class="ident">mode</span>.<span class="ident">set_first</span>();
+                        <span class="comment">// Once we have successfully parsed the partial input we may resume parsing in
+                        // &quot;first mode&quot;
+                        </span>mode.set_first();
                     }
-                )<span class="op">*</span>
+                )*
 
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">unwrap_value</span>(), $(<span class="ident">state</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">unwrap_value</span>()),<span class="kw-2">*</span>) };
-                <span class="kw">if</span> <span class="ident">first_empty_parser</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">ConsumedOk</span>(<span class="ident">value</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyOk</span>(<span class="ident">value</span>)
+                <span class="kw">let </span>value = <span class="kw">unsafe </span>{ (state.<span class="macro-nonterminal">$h</span>.unwrap_value(), $(state.<span class="macro-nonterminal">$id</span>.unwrap_value()),<span class="kw-2">*</span>) };
+                <span class="kw">if </span>first_empty_parser != <span class="number">0 </span>{
+                    ConsumedOk(value)
+                } <span class="kw">else </span>{
+                    EmptyOk(value)
                 }
             }
 
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorOffset</span> {
-                <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="kw-2">ref</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-                <span class="ident">ErrorOffset</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">parser_count</span>().<span class="number">0</span> $( <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">parser_count</span>().<span class="number">0</span>)<span class="kw-2">*</span>)
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">fn </span>parser_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ErrorOffset {
+                <span class="kw">let </span>(<span class="kw-2">ref </span><span class="macro-nonterminal">$h</span>, $(<span class="kw-2">ref </span><span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>) = <span class="kw-2">*</span><span class="self">self</span>;
+                ErrorOffset(<span class="macro-nonterminal">$h</span>.parser_count().<span class="number">0 </span>$( + <span class="macro-nonterminal">$id</span>.parser_count().<span class="number">0</span>)<span class="kw-2">*</span>)
             }
 
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-                <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-                <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">errors</span>.<span class="ident">offset</span>;
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
-                <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
-                    <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(
-                        <span class="ident">errors</span>.<span class="ident">offset</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>)
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+                <span class="kw">let </span>(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$h</span>, $(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>) = <span class="kw-2">*</span><span class="self">self</span>;
+                <span class="kw">let </span>prev = errors.offset;
+                <span class="macro-nonterminal">$h</span>.add_error(errors);
+                <span class="kw">if </span>errors.offset &lt;= ErrorOffset(<span class="number">1</span>) {
+                    errors.offset = ErrorOffset(
+                        errors.offset.<span class="number">0</span>.saturating_sub(<span class="number">1</span>)
                     );
                     <span class="kw">return</span>;
                 }
-                <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">==</span> <span class="ident">prev</span> {
-                    <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="ident">errors</span>.<span class="ident">offset</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>.<span class="ident">parser_count</span>().<span class="number">0</span>));
+                <span class="kw">if </span>errors.offset == prev {
+                    errors.offset = ErrorOffset(errors.offset.<span class="number">0</span>.saturating_sub(<span class="macro-nonterminal">$h</span>.parser_count().<span class="number">0</span>));
                 }
 
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                <span class="kw">const</span> <span class="ident">LAST</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro">count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>);
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>, <span class="ident">unused_variables</span>)]</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="attribute">#[allow(dead_code)]
+                </span><span class="kw">const </span>LAST: usize = <span class="macro">count!</span>($(<span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>);
+                <span class="attribute">#[allow(unused_mut, unused_variables)]
+                </span><span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
                 $(
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">errors</span>.<span class="ident">offset</span>;
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
-                    <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
-                        <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(
-                            <span class="ident">errors</span>.<span class="ident">offset</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>)
+                    i += <span class="number">1</span>;
+                    <span class="kw">let </span>prev = errors.offset;
+                    <span class="macro-nonterminal">$id</span>.add_error(errors);
+                    <span class="kw">if </span>errors.offset &lt;= ErrorOffset(<span class="number">1</span>) {
+                        errors.offset = ErrorOffset(
+                            errors.offset.<span class="number">0</span>.saturating_sub(<span class="number">1</span>)
                         );
                         <span class="kw">return</span>;
                     }
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">LAST</span> <span class="op">&amp;&amp;</span> <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">==</span> <span class="ident">prev</span> {
-                        <span class="ident">errors</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">ErrorOffset</span>(
-                            <span class="ident">errors</span>.<span class="ident">offset</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">parser_count</span>().<span class="number">0</span>)
+                    <span class="kw">if </span>i != LAST &amp;&amp; errors.offset == prev {
+                        errors.offset = ErrorOffset(
+                            errors.offset.<span class="number">0</span>.saturating_sub(<span class="macro-nonterminal">$id</span>.parser_count().<span class="number">0</span>)
                         );
                     }
-                )<span class="op">*</span>
+                )*
             }
 
-            <span class="kw">fn</span> <span class="ident">add_consumed_expected_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-                <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span>, $(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="kw-2">*</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-                <span class="macro">last_ident!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="kw-2">*</span>).<span class="ident">add_consumed_expected_error</span>(<span class="ident">errors</span>)
+            <span class="kw">fn </span>add_consumed_expected_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+                <span class="attribute">#[allow(unused_variables)]
+                </span><span class="kw">let </span>(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$h</span>, $(<span class="kw-2">ref mut </span><span class="macro-nonterminal">$id</span>),<span class="kw-2">*</span>) = <span class="kw-2">*</span><span class="self">self</span>;
+                <span class="macro">last_ident!</span>(<span class="macro-nonterminal">$h </span>$(, <span class="macro-nonterminal">$id</span>)<span class="kw-2">*</span>).add_consumed_expected_error(errors)
             }
         }
     }
 }
 
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState1</span>; <span class="ident">A</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState2</span>; <span class="ident">A</span>, <span class="ident">B</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState3</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState4</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState5</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState6</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState7</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState8</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState9</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState10</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState11</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span>);
-<span class="macro">tuple_parser!</span>(<span class="ident">PartialState12</span>; <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span>, <span class="ident">L</span>);
+<span class="macro">tuple_parser!</span>(PartialState1; A);
+<span class="macro">tuple_parser!</span>(PartialState2; A, B);
+<span class="macro">tuple_parser!</span>(PartialState3; A, B, C);
+<span class="macro">tuple_parser!</span>(PartialState4; A, B, C, D);
+<span class="macro">tuple_parser!</span>(PartialState5; A, B, C, D, E);
+<span class="macro">tuple_parser!</span>(PartialState6; A, B, C, D, E, F);
+<span class="macro">tuple_parser!</span>(PartialState7; A, B, C, D, E, F, G);
+<span class="macro">tuple_parser!</span>(PartialState8; A, B, C, D, E, F, G, H);
+<span class="macro">tuple_parser!</span>(PartialState9; A, B, C, D, E, F, G, H, I);
+<span class="macro">tuple_parser!</span>(PartialState10; A, B, C, D, E, F, G, H, I, J);
+<span class="macro">tuple_parser!</span>(PartialState11; A, B, C, D, E, F, G, H, I, J, K);
+<span class="macro">tuple_parser!</span>(PartialState12; A, B, C, D, E, F, G, H, I, J, K, L);
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">seq_parser_expr</span> {
-    (; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> )
+<span class="attribute">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>seq_parser_expr {
+    (; $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        ( $(<span class="macro-nonterminal">$tt</span>)* )
     };
-    ( (<span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>, )
+    ( (<span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>, )
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>, )
     };
-    ( (<span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>, )
+    ( (<span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        ( $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_expr!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_expr!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>,)
     };
-    ( (<span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>, )
+    ( (<span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        ( $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_expr!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_expr!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_parser</span>,)
     };
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">seq_parser_pattern</span> {
-    (; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-       ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> )
+<span class="attribute">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>seq_parser_pattern {
+    (; $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+       ( $(<span class="macro-nonterminal">$tt</span>)* )
     };
-    ( (<span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="kw">_</span>, )
+    ( (<span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; $(<span class="macro-nonterminal">$tt</span>)* <span class="kw">_</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>, )
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>, )
     };
-    ( ( <span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="kw">_</span>, )
+    ( ( <span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="kw">_</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>,)
     };
-    ( ( <span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="kw">_</span>, )
+    ( ( <span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="kw">_</span>, )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, ); $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_pattern!</span>(; $(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>,)
     };
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">seq_parser_impl</span> {
-    (; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> }
+<span class="attribute">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>seq_parser_impl {
+    (; <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$name </span>{ $(<span class="macro-nonterminal">$tt</span>)* }
     };
-    ( (<span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_impl!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> )
+    ( (<span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ ); <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_impl!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)* )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>: <span class="ident">tt</span>)<span class="op">+</span> );
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt;
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, $(<span class="macro-nonterminal">$remaining</span>: tt)+ );
+        <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt;
     {
-        <span class="macro">seq_parser_impl!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="op">+</span> ) ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>, )
+        <span class="macro">seq_parser_impl!</span>( ( $(<span class="macro-nonterminal">$remaining</span>)+ ) ; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>: <span class="macro-nonterminal">$first_field</span>, )
     };
-    ( ( <span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_impl!</span>( ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> )
+    ( ( <span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr ); <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_impl!</span>( ; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)* )
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span> ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr ); <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>: <span class="macro-nonterminal">$first_field</span>,)
     };
-    ( ( <span class="kw">_</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>)
+    ( ( <span class="kw">_ </span>: <span class="macro-nonterminal">$first_parser</span>: expr, ); <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)<span class="kw-2">*</span>)
     };
-    ( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_parser</span>: <span class="ident">expr</span>, ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first_field</span>,)
+    ( (<span class="macro-nonterminal">$first_field</span>: ident : <span class="macro-nonterminal">$first_parser</span>: expr, ); <span class="macro-nonterminal">$name</span>: ident $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">seq_parser_impl!</span>(; <span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$tt</span>)* <span class="macro-nonterminal">$first_field</span>: <span class="macro-nonterminal">$first_field</span>,)
     };
 }
 
-<span class="doccomment">/// Sequences multiple parsers and builds a struct out of them.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// #[macro_use]</span>
-<span class="doccomment">/// extern crate combine;</span>
-<span class="doccomment">/// use combine::{Parser, many, token};</span>
-<span class="doccomment">/// use combine::byte::{letter, spaces};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-<span class="doccomment">/// struct Field {</span>
-<span class="doccomment">///     name: Vec&lt;u8&gt;,</span>
-<span class="doccomment">///     value: Vec&lt;u8&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     let mut parser = struct_parser!{</span>
-<span class="doccomment">///         Field {</span>
-<span class="doccomment">///             name: many(letter()),</span>
-<span class="doccomment">///             // `_` fields are ignored when building the struct</span>
-<span class="doccomment">///             _: spaces(),</span>
-<span class="doccomment">///             _: token(b&#39;:&#39;),</span>
-<span class="doccomment">///             _: spaces(),</span>
-<span class="doccomment">///             value: many(letter()),</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     };</span>
-<span class="doccomment">///     assert_eq!(</span>
-<span class="doccomment">///         parser.parse(&amp;b&quot;test: data&quot;[..]),</span>
-<span class="doccomment">///         Ok((Field { name: b&quot;test&quot;[..].to_owned(), value: b&quot;data&quot;[..].to_owned() }, &amp;b&quot;&quot;[..]))</span>
-<span class="doccomment">///     );</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">struct_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>: <span class="ident">tt</span>)<span class="op">*</span> }) =&gt; {
-        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> ); )
-            .<span class="ident">map</span>(<span class="op">|</span><span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> ); )<span class="op">|</span>
-                <span class="macro">seq_parser_impl!</span>(( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="op">*</span> ); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> )
+<span class="doccomment">/// Sequences multiple parsers and builds a struct out of them.
+///
+/// ```
+/// #[macro_use]
+/// extern crate combine;
+/// use combine::{Parser, many, token};
+/// use combine::byte::{letter, spaces};
+///
+/// #[derive(Debug, PartialEq)]
+/// struct Field {
+///     name: Vec&lt;u8&gt;,
+///     value: Vec&lt;u8&gt;,
+/// }
+/// fn main() {
+///     let mut parser = struct_parser!{
+///         Field {
+///             name: many(letter()),
+///             // `_` fields are ignored when building the struct
+///             _: spaces(),
+///             _: token(b&#39;:&#39;),
+///             _: spaces(),
+///             value: many(letter()),
+///         }
+///     };
+///     assert_eq!(
+///         parser.parse(&amp;b&quot;test: data&quot;[..]),
+///         Ok((Field { name: b&quot;test&quot;[..].to_owned(), value: b&quot;data&quot;[..].to_owned() }, &amp;b&quot;&quot;[..]))
+///     );
+/// }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>struct_parser {
+    (<span class="macro-nonterminal">$name</span>: ident { $(<span class="macro-nonterminal">$tt</span>: tt)* }) =&gt; {
+        <span class="macro">seq_parser_expr!</span>( ( $(<span class="macro-nonterminal">$tt</span>)* ); )
+            .map(|<span class="macro">seq_parser_pattern!</span>( ( $(<span class="macro-nonterminal">$tt</span>)* ); )|
+                <span class="macro">seq_parser_impl!</span>(( $(<span class="macro-nonterminal">$tt</span>)* ); <span class="macro-nonterminal">$name </span>)
             )
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">With</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>((<span class="ident">Ignore</span><span class="op">&lt;</span><span class="ident">P1</span><span class="op">&gt;</span>, <span class="ident">P2</span>))
-<span class="kw">where</span>
-    <span class="ident">P1</span>: <span class="ident">Parser</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">With</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P1</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>With&lt;P1, P2&gt;((Ignore&lt;P1&gt;, P2))
+<span class="kw">where
+    </span>P1: Parser,
+    P2: Parser;
+<span class="kw">impl</span>&lt;I, P1, P2&gt; Parser <span class="kw">for </span>With&lt;P1, P2&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P1: Parser&lt;Input = I&gt;,
+    P2: Parser&lt;Input = I&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P2::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="op">&lt;</span>(<span class="ident">Ignore</span><span class="op">&lt;</span><span class="ident">P1</span><span class="op">&gt;</span>, <span class="ident">P2</span>) <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::PartialState</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = P2::Output;
+    <span class="kw">type </span>PartialState = &lt;(Ignore&lt;P1&gt;, P2) <span class="kw">as </span>Parser&gt;::PartialState;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_lazy</span>(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.parse_lazy(input).map(|(<span class="kw">_</span>, b)| b)
     }
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">b</span>)
+        <span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, state).map(|(<span class="kw">_</span>, b)| b)
     }
 
-    <span class="macro">forward_parser!</span>(<span class="ident">add_error</span> <span class="ident">add_consumed_expected_error</span> <span class="ident">parser_count</span>, <span class="number">0</span>);
+    <span class="macro">forward_parser!</span>(add_error add_consumed_expected_error parser_count, <span class="number">0</span>);
 }
 
-<span class="doccomment">/// Equivalent to [`p1.with(p2)`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p1.with(p2)`]: ../parser/trait.Parser.html#method.with</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>(<span class="ident">p1</span>: <span class="ident">P1</span>, <span class="ident">p2</span>: <span class="ident">P2</span>) -&gt; <span class="ident">With</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P1</span>: <span class="ident">Parser</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P1::Input</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Equivalent to [`p1.with(p2)`].
+///
+/// [`p1.with(p2)`]: ../parser/trait.Parser.html#method.with
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>with&lt;P1, P2&gt;(p1: P1, p2: P2) -&gt; With&lt;P1, P2&gt;
+<span class="kw">where
+    </span>P1: Parser,
+    P2: Parser&lt;Input = P1::Input&gt;,
 {
-    <span class="ident">With</span>((<span class="ident">ignore</span>(<span class="ident">p1</span>), <span class="ident">p2</span>))
+    With((ignore(p1), p2))
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>((<span class="ident">P1</span>, <span class="ident">Ignore</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>))
-<span class="kw">where</span>
-    <span class="ident">P1</span>: <span class="ident">Parser</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P1</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Skip&lt;P1, P2&gt;((P1, Ignore&lt;P2&gt;))
+<span class="kw">where
+    </span>P1: Parser,
+    P2: Parser;
+<span class="kw">impl</span>&lt;I, P1, P2&gt; Parser <span class="kw">for </span>Skip&lt;P1, P2&gt;
+<span class="kw">where
+    </span>I: Stream,
+    P1: Parser&lt;Input = I&gt;,
+    P2: Parser&lt;Input = I&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P1::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="op">&lt;</span>(<span class="ident">P1</span>, <span class="ident">Ignore</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>) <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::PartialState</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = P1::Output;
+    <span class="kw">type </span>PartialState = &lt;(P1, Ignore&lt;P2&gt;) <span class="kw">as </span>Parser&gt;::PartialState;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">a</span>)
+        <span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, state).map(|(a, <span class="kw">_</span>)| a)
     }
 
-    <span class="macro">forward_parser!</span>(<span class="ident">add_error</span> <span class="ident">add_consumed_expected_error</span> <span class="ident">parser_count</span>, <span class="number">0</span>);
+    <span class="macro">forward_parser!</span>(add_error add_consumed_expected_error parser_count, <span class="number">0</span>);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>(<span class="ident">p1</span>: <span class="ident">P1</span>, <span class="ident">p2</span>: <span class="ident">P2</span>) -&gt; <span class="ident">Skip</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P1</span>: <span class="ident">Parser</span>,
-    <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P1::Input</span><span class="op">&gt;</span>,
+<span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>skip&lt;P1, P2&gt;(p1: P1, p2: P2) -&gt; Skip&lt;P1, P2&gt;
+<span class="kw">where
+    </span>P1: Parser,
+    P2: Parser&lt;Input = P1::Input&gt;,
 {
-    <span class="ident">Skip</span>((<span class="ident">p1</span>, <span class="ident">ignore</span>(<span class="ident">p2</span>)))
+    Skip((p1, ignore(p2)))
 }
 
-<span class="macro">impl_parser!</span> {
-    <span class="ident">Between</span>(<span class="ident">L</span>, <span class="ident">R</span>, <span class="ident">P</span>),
-    <span class="ident">Map</span><span class="op">&lt;</span>(<span class="ident">L</span>, <span class="ident">P</span>, <span class="ident">R</span>), <span class="kw">fn</span> ((<span class="ident">L::Output</span>, <span class="ident">P::Output</span>, <span class="ident">R::Output</span>)) -&gt; <span class="ident">P::Output</span><span class="op">&gt;</span>
+<span class="macro">impl_parser! </span>{
+    Between(L, R, P),
+    Map&lt;(L, P, R), <span class="kw">fn </span>((L::Output, P::Output, R::Output)) -&gt; P::Output&gt;
 }
 
-<span class="doccomment">/// Parses `open` followed by `parser` followed by `close`.</span>
-<span class="doccomment">/// Returns the value of `parser`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::parser::char::string;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = between(token(&#39;[&#39;), token(&#39;]&#39;), string(&quot;rust&quot;))</span>
-<span class="doccomment">///     .parse(&quot;[rust]&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&quot;rust&quot;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">between</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">L</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">open</span>: <span class="ident">L</span>, <span class="ident">close</span>: <span class="ident">R</span>, <span class="ident">parser</span>: <span class="ident">P</span>) -&gt; <span class="ident">Between</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">R</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">L</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">R</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses `open` followed by `parser` followed by `close`.
+/// Returns the value of `parser`.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::parser::char::string;
+/// # fn main() {
+/// let result = between(token(&#39;[&#39;), token(&#39;]&#39;), string(&quot;rust&quot;))
+///     .parse(&quot;[rust]&quot;)
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(&quot;rust&quot;));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>between&lt;I, L, R, P&gt;(open: L, close: R, parser: P) -&gt; Between&lt;L, R, P&gt;
+<span class="kw">where
+    </span>I: Stream,
+    L: Parser&lt;Input = I&gt;,
+    R: Parser&lt;Input = I&gt;,
+    P: Parser&lt;Input = I&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">middle</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span><span class="op">&gt;</span>((<span class="kw">_</span>, <span class="ident">x</span>, <span class="kw">_</span>): (<span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">V</span>)) -&gt; <span class="ident">U</span> {
-        <span class="ident">x</span>
+    <span class="kw">fn </span>middle&lt;T, U, V&gt;((<span class="kw">_</span>, x, <span class="kw">_</span>): (T, U, V)) -&gt; U {
+        x
     }
-    <span class="ident">Between</span>((<span class="ident">open</span>, <span class="ident">parser</span>, <span class="ident">close</span>).<span class="ident">map</span>(<span class="ident">middle</span>))
+    Between((open, parser, close).map(middle))
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Then</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">P</span>, <span class="ident">F</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Then</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">P::Output</span>) -&gt; <span class="ident">N</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Then&lt;P, F&gt;(P, F);
+<span class="kw">impl</span>&lt;P, N, F&gt; Parser <span class="kw">for </span>Then&lt;P, F&gt;
+<span class="kw">where
+    </span>F: FnMut(P::Output) -&gt; N,
+    P: Parser,
+    N: Parser&lt;Input = P::Input&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">N::Input</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">N::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="ident">P::PartialState</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">N</span>)<span class="op">&gt;</span>, <span class="ident">N::PartialState</span>);
+    <span class="kw">type </span>Input = N::Input;
+    <span class="kw">type </span>Output = N::Output;
+    <span class="kw">type </span>PartialState = (P::PartialState, <span class="prelude-ty">Option</span>&lt;(bool, N)&gt;, N::PartialState);
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">p_state</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">n_parser_cache</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">n_state</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
+        <span class="kw">let </span>(<span class="kw-2">ref mut </span>p_state, <span class="kw-2">ref mut </span>n_parser_cache, <span class="kw-2">ref mut </span>n_state) = <span class="kw-2">*</span>state;
 
-        <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n_parser_cache</span>.<span class="ident">is_none</span>() {
-            <span class="macro">debug_assert!</span>(<span class="ident">n_parser_cache</span>.<span class="ident">is_none</span>());
+        <span class="kw">if </span>mode.is_first() || n_parser_cache.is_none() {
+            <span class="macro">debug_assert!</span>(n_parser_cache.is_none());
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">p_state</span>) {
-                <span class="ident">EmptyOk</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, (<span class="self">self</span>.<span class="number">1</span>)(<span class="ident">value</span>)));
+            <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, p_state) {
+                EmptyOk(value) =&gt; {
+                    <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, (<span class="self">self</span>.<span class="number">1</span>)(value)));
                 }
-                <span class="ident">ConsumedOk</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="bool-val">true</span>, (<span class="self">self</span>.<span class="number">1</span>)(<span class="ident">value</span>)));
+                ConsumedOk(value) =&gt; {
+                    <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">Some</span>((<span class="bool-val">true</span>, (<span class="self">self</span>.<span class="number">1</span>)(value)));
                 }
-                <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-                <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
+                EmptyErr(err) =&gt; <span class="kw">return </span>EmptyErr(err),
+                ConsumedErr(err) =&gt; <span class="kw">return </span>ConsumedErr(err),
             }
-            <span class="ident">mode</span>.<span class="ident">set_first</span>();
+            mode.set_first();
         }
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">n_parser_cache</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="number">1</span>
-            .<span class="ident">parse_consumed_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">n_state</span>);
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">consumed</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n_parser_cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">if</span> <span class="ident">consumed</span> {
-                    <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyOk</span>(<span class="ident">x</span>)
+        <span class="kw">let </span>result = n_parser_cache
+            .as_mut()
+            .unwrap()
+            .<span class="number">1
+            </span>.parse_consumed_mode(mode, input, n_state);
+        <span class="kw">match </span>result {
+            EmptyOk(x) =&gt; {
+                <span class="kw">let </span>(consumed, <span class="kw">_</span>) = <span class="kw-2">*</span>n_parser_cache.as_ref().unwrap();
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                <span class="kw">if </span>consumed {
+                    ConsumedOk(x)
+                } <span class="kw">else </span>{
+                    EmptyOk(x)
                 }
             }
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
+            ConsumedOk(x) =&gt; {
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                ConsumedOk(x)
             }
-            <span class="ident">EmptyErr</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">consumed</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n_parser_cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">if</span> <span class="ident">consumed</span> {
-                    <span class="ident">ConsumedErr</span>(<span class="ident">x</span>.<span class="ident">error</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyErr</span>(<span class="ident">x</span>)
+            EmptyErr(x) =&gt; {
+                <span class="kw">let </span>(consumed, <span class="kw">_</span>) = <span class="kw-2">*</span>n_parser_cache.as_ref().unwrap();
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                <span class="kw">if </span>consumed {
+                    ConsumedErr(x.error)
+                } <span class="kw">else </span>{
+                    EmptyErr(x)
                 }
             }
-            <span class="ident">ConsumedErr</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">x</span>),
+            ConsumedErr(x) =&gt; ConsumedErr(x),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.add_error(errors);
     }
 }
 
-<span class="doccomment">/// Equivalent to [`p.then(f)`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p.then(f)`]: ../parser/trait.Parser.html#method.then</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Then</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">P::Output</span>) -&gt; <span class="ident">N</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Equivalent to [`p.then(f)`].
+///
+/// [`p.then(f)`]: ../parser/trait.Parser.html#method.then
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>then&lt;P, F, N&gt;(p: P, f: F) -&gt; Then&lt;P, F&gt;
+<span class="kw">where
+    </span>F: FnMut(P::Output) -&gt; N,
+    P: Parser,
+    N: Parser&lt;Input = P::Input&gt;,
 {
-    <span class="ident">Then</span>(<span class="ident">p</span>, <span class="ident">f</span>)
+    Then(p, f)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThenPartial</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">P</span>, <span class="ident">F</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">ThenPartial</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">P::Output</span>) -&gt; <span class="ident">N</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>ThenPartial&lt;P, F&gt;(P, F);
+<span class="kw">impl</span>&lt;P, N, F&gt; Parser <span class="kw">for </span>ThenPartial&lt;P, F&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;mut </span>P::Output) -&gt; N,
+    P: Parser,
+    N: Parser&lt;Input = P::Input&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">N::Input</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">N::Output</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="ident">P::PartialState</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">P::Output</span>)<span class="op">&gt;</span>, <span class="ident">N::PartialState</span>);
+    <span class="kw">type </span>Input = N::Input;
+    <span class="kw">type </span>Output = N::Output;
+    <span class="kw">type </span>PartialState = (P::PartialState, <span class="prelude-ty">Option</span>&lt;(bool, P::Output)&gt;, N::PartialState);
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">p_state</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">n_parser_cache</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">n_state</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
+        <span class="kw">let </span>(<span class="kw-2">ref mut </span>p_state, <span class="kw-2">ref mut </span>n_parser_cache, <span class="kw-2">ref mut </span>n_state) = <span class="kw-2">*</span>state;
 
-        <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">n_parser_cache</span>.<span class="ident">is_none</span>() {
-            <span class="macro">debug_assert!</span>(<span class="ident">n_parser_cache</span>.<span class="ident">is_none</span>());
+        <span class="kw">if </span>mode.is_first() || n_parser_cache.is_none() {
+            <span class="macro">debug_assert!</span>(n_parser_cache.is_none());
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">p_state</span>) {
-                <span class="ident">EmptyOk</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, <span class="ident">value</span>));
+            <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, p_state) {
+                EmptyOk(value) =&gt; {
+                    <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, value));
                 }
-                <span class="ident">ConsumedOk</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="bool-val">true</span>, <span class="ident">value</span>));
+                ConsumedOk(value) =&gt; {
+                    <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">Some</span>((<span class="bool-val">true</span>, value));
                 }
-                <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-                <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
+                EmptyErr(err) =&gt; <span class="kw">return </span>EmptyErr(err),
+                ConsumedErr(err) =&gt; <span class="kw">return </span>ConsumedErr(err),
             }
-            <span class="ident">mode</span>.<span class="ident">set_first</span>();
+            mode.set_first();
         }
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> (<span class="self">self</span>.<span class="number">1</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">n_parser_cache</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="number">1</span>)
-            .<span class="ident">parse_consumed_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">n_state</span>);
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">consumed</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n_parser_cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">if</span> <span class="ident">consumed</span> {
-                    <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyOk</span>(<span class="ident">x</span>)
+        <span class="kw">let </span>result = (<span class="self">self</span>.<span class="number">1</span>)(<span class="kw-2">&amp;mut </span>n_parser_cache.as_mut().unwrap().<span class="number">1</span>)
+            .parse_consumed_mode(mode, input, n_state);
+        <span class="kw">match </span>result {
+            EmptyOk(x) =&gt; {
+                <span class="kw">let </span>(consumed, <span class="kw">_</span>) = <span class="kw-2">*</span>n_parser_cache.as_ref().unwrap();
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                <span class="kw">if </span>consumed {
+                    ConsumedOk(x)
+                } <span class="kw">else </span>{
+                    EmptyOk(x)
                 }
             }
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
+            ConsumedOk(x) =&gt; {
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                ConsumedOk(x)
             }
-            <span class="ident">EmptyErr</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">consumed</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n_parser_cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-                <span class="kw-2">*</span><span class="ident">n_parser_cache</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">if</span> <span class="ident">consumed</span> {
-                    <span class="ident">ConsumedErr</span>(<span class="ident">x</span>.<span class="ident">error</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyErr</span>(<span class="ident">x</span>)
+            EmptyErr(x) =&gt; {
+                <span class="kw">let </span>(consumed, <span class="kw">_</span>) = <span class="kw-2">*</span>n_parser_cache.as_ref().unwrap();
+                <span class="kw-2">*</span>n_parser_cache = <span class="prelude-val">None</span>;
+                <span class="kw">if </span>consumed {
+                    ConsumedErr(x.error)
+                } <span class="kw">else </span>{
+                    EmptyErr(x)
                 }
             }
-            <span class="ident">ConsumedErr</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">x</span>),
+            ConsumedErr(x) =&gt; ConsumedErr(x),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>);
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.add_error(errors);
     }
 }
 
-<span class="doccomment">/// Equivalent to [`p.then_partial(f)`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`p.then_partial(f)`]: ../parser/trait.Parser.html#method.then_partial</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">then_partial</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span>, <span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ThenPartial</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">P::Output</span>) -&gt; <span class="ident">N</span>,
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Equivalent to [`p.then_partial(f)`].
+///
+/// [`p.then_partial(f)`]: ../parser/trait.Parser.html#method.then_partial
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>then_partial&lt;P, F, N&gt;(p: P, f: F) -&gt; ThenPartial&lt;P, F&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;mut </span>P::Output) -&gt; N,
+    P: Parser,
+    N: Parser&lt;Input = P::Input&gt;,
 {
-    <span class="ident">ThenPartial</span>(<span class="ident">p</span>, <span class="ident">f</span>)
+    ThenPartial(p, f)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">parser::item::any</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>parser::item::any;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sequence_single_parser</span>() {
-        <span class="macro">assert!</span>((<span class="ident">any</span>(),).<span class="ident">easy_parse</span>(<span class="string">&quot;a&quot;</span>).<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sequence_single_parser() {
+        <span class="macro">assert!</span>((any(),).easy_parse(<span class="string">&quot;a&quot;</span>).is_ok());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
