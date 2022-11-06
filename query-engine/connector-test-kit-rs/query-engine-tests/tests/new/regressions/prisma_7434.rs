@@ -1,10 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(
-    schema(autoinc_id),
-    capabilities(CreateMany, AutoIncrement),
-    exclude(CockroachDb, TiDB)
-)]
+#[test_suite(schema(autoinc_id), capabilities(CreateMany, AutoIncrement), exclude(CockroachDb))]
 mod not_in_batching {
     use query_engine_tests::Runner;
 
