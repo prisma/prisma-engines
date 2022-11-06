@@ -425,8 +425,7 @@ mod interactive_tx {
 mod itx_isolation {
     use query_engine_tests::*;
 
-    // All (SQL) connectors support serializable.
-    // TiDB support snapshot isolation, but didn't support serializable isolation.
+    // All (SQL) connectors except TiDB support serializable.
     #[connector_test(exclude(MongoDb, TiDB))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
@@ -449,9 +448,9 @@ mod itx_isolation {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test(exclude(MongoDb, TiDB))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.start_tx(5000, 5000, Some("rEpEaTaBlErEaD".to_owned())).await?;
+        let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
 
         let res = runner.commit_tx(tx_id).await?;
@@ -500,6 +499,40 @@ mod itx_isolation {
                 "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
             )),
         };
+
+        Ok(())
+    }
+
+    // TiDB supports repeatable read isolation level, but doesn't support serializable isolation level.
+    #[connector_test(only(TiDB))]
+    async fn tidb_basic_repeatable_read(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("RepeatableRead".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
+        runner.clear_active_tx();
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(only(TiDB))]
+    async fn tidb_casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, Some("rEpEaTaBlErEaD".to_owned())).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
 
         Ok(())
     }
