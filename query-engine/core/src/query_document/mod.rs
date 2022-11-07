@@ -30,7 +30,11 @@ pub use query_value::*;
 pub use selection::*;
 pub use transformers::*;
 
-use schema_builder::constants::args;
+use crate::resolve_compound_field;
+use indexmap::IndexMap;
+use prisma_models::ModelRef;
+use schema::QuerySchemaRef;
+use schema_builder::constants::*;
 
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 
@@ -60,29 +64,74 @@ impl BatchDocument {
         Self::Multi(operations, transaction)
     }
 
-    fn can_compact(&self) -> bool {
+    /// Returns true if the operation contains any filters to prevents us from compacting the batch.
+    /// Some filters can prevent us (or make it very hard) from mapping the findMany result back to the original findUnique queries.
+    ///
+    /// Those filters are:
+    /// - non scalar filters (ie: relation filters, boolean operators...)
+    /// - any scalar filters that is not `EQUALS`
+    fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+        let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
+        let field = schema.find_query_field(op.name()).unwrap();
+        let model = field.model().unwrap();
+
+        where_obj.iter().any(|(key, val)| match val {
+            // If it's a compound, then it's still considered as scalar
+            QueryValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
+            // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
+            val => match model.fields().find_from_scalar(&key) {
+                Ok(_) => match val {
+                    // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
+                    QueryValue::Object(obj) => !obj.contains_key(filters::EQUALS),
+                    _ => false,
+                },
+                Err(_) => true,
+            },
+        })
+    }
+
+    fn can_compact(&self, schema: &QuerySchemaRef) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_unique() => rest.iter().all(|op| {
-                    op.is_find_unique()
-                        && first.name() == op.name()
-                        && first.nested_selections().len() == op.nested_selections().len()
-                        && first
-                            .nested_selections()
-                            .iter()
-                            .all(|fop| op.nested_selections().contains(fop))
-                }),
+                Some((first, rest)) if first.is_find_unique() => {
+                    // If any of the operation has an "invalid" compact filter (see documentation of `invalid_compact_filter`),
+                    // we do not compact the queries.
+                    let has_invalid_compact_filter =
+                        operations.iter().any(|op| Self::invalid_compact_filter(op, schema));
+
+                    if has_invalid_compact_filter {
+                        return false;
+                    }
+
+                    rest.iter().all(|op| {
+                        op.is_find_unique()
+                            && first.name() == op.name()
+                            && first.nested_selections().len() == op.nested_selections().len()
+                            && first
+                                .nested_selections()
+                                .iter()
+                                .all(|fop| op.nested_selections().contains(fop))
+                    })
+                }
                 _ => false,
             },
             Self::Compact(_) => false,
         }
     }
 
-    pub fn compact(self) -> Self {
+    pub fn compact(self, schema: &QuerySchemaRef) -> Self {
         match self {
-            Self::Multi(operations, _) if self.can_compact() => Self::Compact(CompactedDocument::from(operations)),
+            Self::Multi(operations, _) if self.can_compact(schema) => {
+                Self::Compact(CompactedDocument::from_operations(operations, schema))
+            }
             _ => self,
         }
+    }
+
+    /// Returns `true` if the batch document is [`Compact`].
+    #[must_use]
+    pub fn is_compact(&self) -> bool {
+        matches!(self, Self::Compact(..))
     }
 }
 
@@ -118,11 +167,11 @@ impl CompactedDocument {
     pub fn plural_name(&self) -> String {
         format!("findMany{}", self.name)
     }
-}
 
-/// Here be the dragons. Ay caramba!
-impl From<Vec<Operation>> for CompactedDocument {
-    fn from(ops: Vec<Operation>) -> Self {
+    /// Here be the dragons. Ay caramba!
+    pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchemaRef) -> Self {
+        let field = schema.find_query_field(ops.first().unwrap().name()).unwrap();
+        let model = field.model().unwrap();
         // Unpack all read queries (an enum) into a collection of selections.
         // We already took care earlier that all operations here must be reads.
         let selections: Vec<Selection> = ops
@@ -144,24 +193,20 @@ impl From<Vec<Operation>> for CompactedDocument {
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            let selection_set = selections.iter().fold(SelectionSet::new(), |acc, selection| {
+            let selection_set = selections.iter().fold(SelectionSet::new(), |mut acc, selection| {
                 // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                let obj = selection.arguments()[0]
+                let where_obj = selection.arguments()[0]
                     .1
                     .clone()
                     .into_object()
                     .expect("Trying to compact a selection with non-object argument");
+                let filters = extract_filter(where_obj, model);
 
-                // A "funny" trick to detect a compound key.
-                match obj.values().next() {
-                    // This means our query has a nested object, meaning we have
-                    // a compound filter in a form of {"col1_col2": {"col1": .., "col2": ..}}
-                    Some(QueryValue::Object(obj)) => obj
-                        .iter()
-                        .fold(acc, |acc, (key, val)| acc.push(key.clone(), val.clone())),
-                    // ...or a singular argument in a form of {"col1": ..}
-                    _ => obj.into_iter().fold(acc, |acc, (key, val)| acc.push(key, val)),
+                for (field, filter) in filters {
+                    acc = acc.push(field, filter);
                 }
+
+                acc
             });
 
             // We must select all unique fields in the query so we can
@@ -198,33 +243,20 @@ impl From<Vec<Operation>> for CompactedDocument {
         let arguments: Vec<Vec<(String, QueryValue)>> = selections
             .into_iter()
             .map(|mut sel| {
-                let mut obj: Vec<(String, QueryValue)> = sel
-                    .pop_argument()
-                    .unwrap()
-                    .1
-                    .into_object()
-                    .unwrap()
-                    .into_iter()
-                    .collect();
+                let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
 
-                // The trick again to detect if we have a compound key or not. (sigh)
-                match obj.pop() {
-                    Some((_, QueryValue::Object(obj))) => obj.into_iter().collect(),
-                    Some(pair) => {
-                        obj.push(pair);
-                        obj
-                    }
-                    None => unreachable!("No arguments!"),
-                }
+                extract_filter(where_obj, model)
             })
             .collect();
 
-        // The trick again to detect if we have a compound key or not. (sigh)
         // Gets the argument keys for later mapping.
-        let keys = match arguments[0].get(0) {
-            Some((_, QueryValue::Object(obj))) => obj.iter().map(|(k, _)| k.to_string()).collect(),
-            _ => arguments[0].iter().map(|(k, _)| k.to_string()).collect(),
-        };
+        let keys: Vec<_> = arguments[0]
+            .iter()
+            .flat_map(|pair| match pair {
+                (_, QueryValue::Object(obj)) => obj.keys().map(ToOwned::to_owned).collect(),
+                (key, _) => vec![key.to_owned()],
+            })
+            .collect();
 
         Self {
             name,
@@ -234,4 +266,34 @@ impl From<Vec<Operation>> for CompactedDocument {
             operation: Operation::Read(selection),
         }
     }
+}
+
+/// Takes in a unique filter, extract the scalar filters and return a simple list of field/filter.
+/// This list is used to build a findMany query from multiple findUnique queries.
+/// Therefore, compound unique filters are walked and each individual field is added. eg:
+/// { field1_field2: { field1: 1, field2: 2 } } -> [(field1, 1), (field2, 2)]
+/// This is because findMany filters don't have the special compound unique syntax.
+///
+/// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
+/// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
+/// This is a limitation that _could_ technically be lifted but that's not worth it for now.
+fn extract_filter(where_obj: IndexMap<String, QueryValue>, model: &ModelRef) -> Vec<(String, QueryValue)> {
+    where_obj
+        .into_iter()
+        .flat_map(|(key, val)| match val {
+            // This means our query has a compound field in the form of: {co1_col2: { col1_col2: { col1: <val>, col2: <val> } }}
+            QueryValue::Object(obj) if resolve_compound_field(&key, model).is_some() => obj.into_iter().collect(),
+            // This means our query has a scalar filter in the form of {col1: { equals: <val> }}
+            QueryValue::Object(obj) => {
+                // This is safe because it's been validated before in the `.can_compact` method.
+                let equal_val = obj.get(filters::EQUALS).expect("we only support scalar equals filters");
+
+                vec![(key, equal_val.clone())]
+            }
+            // ...or a singular argument in a form of {col1: <val>}
+            x => {
+                vec![(key, x)]
+            }
+        })
+        .collect()
 }

@@ -5,7 +5,7 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
-use query_core::TxId;
+use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine_metrics::MetricRegistry;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
@@ -53,6 +53,9 @@ pub trait RunnerInterface: Sized {
     fn clear_active_tx(&mut self);
 
     fn get_metrics(&self) -> MetricRegistry;
+
+    /// The query schema used for the test.
+    fn query_schema(&self) -> &QuerySchemaRef;
 }
 
 enum RunnerType {
@@ -213,5 +216,13 @@ impl Runner {
 
     pub async fn get_logs(&mut self) -> Vec<String> {
         self.log_capture.get_logs().await
+    }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        match &self.inner {
+            RunnerType::Direct(r) => r.query_schema(),
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.query_schema(),
+        }
     }
 }
