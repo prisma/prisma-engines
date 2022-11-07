@@ -454,8 +454,9 @@ impl<'a> EnumWalker<'a> {
     }
 
     /// The values of the enum
-    pub fn values(self) -> &'a [String] {
-        &self.get().values
+    pub fn values(self) -> impl ExactSizeIterator<Item = &'a str> {
+        range_for_key(&self.schema.enum_variants, self.id, |variant| variant.enum_id)
+            .map(move |idx| self.schema.enum_variants[idx].variant_name.as_str())
     }
 }
 

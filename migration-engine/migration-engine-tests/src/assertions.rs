@@ -171,11 +171,11 @@ pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 impl<'a> EnumAssertion<'a> {
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
-            self.0.values() == expected_values,
+            self.0.values().len() == expected_values.len() && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
             "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
             self.0.name(),
             expected_values,
-            self.0.values(),
+            self.0.values().collect::<Vec<_>>(),
         );
         self
     }

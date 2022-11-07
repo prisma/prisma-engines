@@ -581,8 +581,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             "enum" => {
                 let enum_name = format!("{}_{}", table, column_name);
                 let enum_id = sql_schema.push_enum(Default::default(), enum_name);
-                let mut enm = &mut sql_schema.enums[enum_id.0 as usize];
-                enm.values = Self::extract_enum_values(&full_data_type);
+                push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), None)
             }
             "json" => (ColumnTypeFamily::Json, Some(MySqlType::Json)),
@@ -648,12 +647,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
-    }
-
-    fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
-        let len = &full_data_type.len() - 1;
-        let vals = &full_data_type[5..len];
-        vals.split(',').map(unquote_string).collect()
     }
 
     // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
@@ -789,4 +782,13 @@ async fn push_foreign_keys(
     }
 
     Ok(())
+}
+
+fn push_enum_variants(full_data_type: &str, enum_id: EnumId, sql_schema: &mut SqlSchema) {
+    let len = &full_data_type.len() - 1;
+    // full_data_type for enum columns follows the pattern "enum('a','b')"
+    let vals = &full_data_type[5..len];
+    for variant in vals.split(',').map(unquote_string) {
+        sql_schema.push_enum_variant(enum_id, variant);
+    }
 }
