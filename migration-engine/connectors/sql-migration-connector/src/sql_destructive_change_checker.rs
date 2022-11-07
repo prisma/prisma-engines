@@ -87,11 +87,13 @@ impl SqlMigrationConnector {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
                 table: column.table().name().to_owned(),
                 column: column.name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
             }
         } else {
             UnexecutableStepCheck::AddedRequiredFieldToTable {
                 column: column.name().to_owned(),
                 table: column.table().name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
             }
         };
 
@@ -207,6 +209,7 @@ impl SqlMigrationConnector {
                                     UnexecutableStepCheck::MadeOptionalFieldRequired {
                                         table: columns.previous.table().name().to_owned(),
                                         column: columns.previous.name().to_owned(),
+                                        namespace: columns.previous.table().namespace().map(str::to_owned),
                                     },
                                     step_index,
                                 );

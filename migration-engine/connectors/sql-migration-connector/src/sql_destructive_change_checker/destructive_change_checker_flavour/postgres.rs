@@ -33,6 +33,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )
@@ -43,6 +44,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
                     table: columns.previous.table().name().to_owned(),
                     column: columns.previous.name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )
@@ -97,6 +99,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )
@@ -105,6 +108,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )

@@ -5,33 +5,52 @@ use super::{
 
 #[derive(Debug)]
 pub(crate) enum UnexecutableStepCheck {
-    AddedRequiredFieldToTable { table: String, column: String },
-    AddedRequiredFieldToTableWithPrismaLevelDefault { table: String, column: String },
-    MadeOptionalFieldRequired { table: String, column: String },
-    MadeScalarFieldIntoArrayField { table: String, column: String },
-    DropAndRecreateRequiredColumn { table: String, column: String },
+    AddedRequiredFieldToTable {
+        table: String,
+        column: String,
+        namespace: Option<String>,
+    },
+    AddedRequiredFieldToTableWithPrismaLevelDefault {
+        table: String,
+        column: String,
+        namespace: Option<String>,
+    },
+    MadeOptionalFieldRequired {
+        table: String,
+        column: String,
+        namespace: Option<String>,
+    },
+    MadeScalarFieldIntoArrayField {
+        table: String,
+        column: String,
+        namespace: Option<String>,
+    },
+    DropAndRecreateRequiredColumn {
+        table: String,
+        column: String,
+        namespace: Option<String>,
+    },
 }
 
 impl Check for UnexecutableStepCheck {
     fn needed_table_row_count(&self) -> Option<Table> {
         match self {
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column: _ }
-            | UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
-            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _ }
-            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ }
-            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _ } => {
-                Some(Table::new(table.clone(), None))
-            } // TODO(MultiSchema): test this is fine
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column: _, namespace }
+            | UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _, namespace }
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _, namespace }
+            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _, namespace }
+            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _, namespace } => {
+                Some(Table::new(table.clone(), namespace.clone()))
+            }
         }
     }
 
     fn needed_column_value_count(&self) -> Option<Column> {
         match self {
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
-            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
-                Some(Column::new(table.clone(), None, column.clone()))
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column, namespace }
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column, namespace } => {
+                Some(Column::new(table.clone(), namespace.clone(), column.clone()))
             }
-            // TODO(MultiSchema): test this is fine
             UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
             | UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { .. }
             | UnexecutableStepCheck::DropAndRecreateRequiredColumn { .. } => None,
@@ -40,7 +59,7 @@ impl Check for UnexecutableStepCheck {
 
     fn evaluate<'a>(&self, database_checks: &DatabaseInspectionResults) -> Option<String> {
         match self {
-            UnexecutableStepCheck::AddedRequiredFieldToTable { table, column } => {
+            UnexecutableStepCheck::AddedRequiredFieldToTable { table, column, namespace: _ } => {
                 let message = |details| {
                     format!(
                         "Added the required column `{column}` to the `{table}` table without a default value. {details}",
@@ -62,7 +81,7 @@ impl Check for UnexecutableStepCheck {
 
                 Some(message)
             }
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column } => {
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column, namespace: _ } => {
                 let message = |details| {
                     format!(
                         "The required column `{column}` was added to the `{table}` table with a prisma-level default value. {details} Please add this column as optional, then populate it before making it required.",
@@ -84,9 +103,8 @@ impl Check for UnexecutableStepCheck {
 
                 Some(message)
             }
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } => {
-                // TODO(MultiSchema): test this is fine
-                match database_checks.get_row_and_non_null_value_count(&Column::new(table.clone(), None, column.clone())) {
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column, namespace } => {
+                match database_checks.get_row_and_non_null_value_count(&Column::new(table.clone(), namespace.clone(), column.clone())) {
                     (Some(0), _) => None,
                     (Some(row_count), Some(value_count)) => {
                         let null_value_count = row_count - value_count;
@@ -109,7 +127,7 @@ impl Check for UnexecutableStepCheck {
                     )),
                 }
             }
-            UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
+            UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column, namespace: _ } => {
                 let message = |details| {
                     format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details)
                 };
@@ -131,9 +149,8 @@ impl Check for UnexecutableStepCheck {
                     ))),
                 }
             }
-            UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column } => {
-                // TODO(MultiSchema): test this is fine
-                match database_checks.get_row_count(&Table::new(table.clone(), None)) {
+            UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column, namespace } => {
+                match database_checks.get_row_count(&Table::new(table.clone(), namespace.clone())) {
                     None => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.", column = column, table = table)),
                     Some(0) => None,
                     Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.", column = column, table = table)),

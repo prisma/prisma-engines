@@ -320,7 +320,10 @@ impl SqlRenderer for PostgresFlavour {
         } else {
             let alter_table = format!(
                 "ALTER TABLE {} {}",
-                self.quote(tables.previous.name()),
+                TableName::new(
+                    tables.previous.namespace().map(|ns| self.quote(ns)),
+                    self.quote(tables.previous.name())
+                ),
                 lines.join(",\n")
             );
 

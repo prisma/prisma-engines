@@ -41,6 +41,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             );
@@ -101,6 +102,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )
@@ -109,6 +111,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 UnexecutableStepCheck::DropAndRecreateRequiredColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                 },
                 step_index,
             )
