@@ -38,11 +38,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         // empty or the column has no existing NULLs.
         if changes.arity_changed() && columns.next.arity().is_required() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             );
 
@@ -99,20 +99,20 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::AddedRequiredFieldToTable(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         } else {

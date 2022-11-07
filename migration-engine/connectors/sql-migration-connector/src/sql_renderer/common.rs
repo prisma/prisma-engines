@@ -7,9 +7,9 @@ pub(super) const SQL_INDENTATION: &str = "    ";
 pub(crate) struct TableName<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
 
 impl<T> TableName<T> {
-  pub(crate) fn new(namespace: Option<Quoted<T>>, name: Quoted<T>) -> Self {
-      TableName(namespace, name)
-  }
+    pub(crate) fn new(namespace: Option<Quoted<T>>, name: Quoted<T>) -> Self {
+        TableName(namespace, name)
+    }
 }
 
 impl<T> Display for TableName<T>

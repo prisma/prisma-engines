@@ -42,11 +42,11 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    table: columns.previous.table().name().to_owned(),
-                    column: columns.previous.name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             );
         }

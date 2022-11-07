@@ -30,22 +30,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
         if changes.arity_changed() && columns.previous.arity().is_nullable() && columns.next.arity().is_required() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         }
 
         if changes.arity_changed() && !columns.previous.arity().is_list() && columns.next.arity().is_list() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                    table: columns.previous.table().name().to_owned(),
-                    column: columns.previous.name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::MadeScalarFieldIntoArrayField(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         }
@@ -96,20 +96,20 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::AddedRequiredFieldToTable(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                    namespace: columns.previous.table().namespace().map(str::to_owned),
-                },
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column::new(
+                    columns.previous.table().name().to_owned(),
+                    columns.previous.table().namespace().map(str::to_owned),
+                    columns.previous.name().to_owned(),
+                )),
                 step_index,
             )
         } else {

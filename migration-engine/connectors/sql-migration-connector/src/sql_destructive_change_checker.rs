@@ -35,6 +35,8 @@ use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
+use self::check::Column;
+
 impl SqlMigrationConnector {
     fn check_table_drop(
         &self,
@@ -84,17 +86,17 @@ impl SqlMigrationConnector {
         }
 
         let typed_unexecutable = if has_virtual_default {
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
-                table: column.table().name().to_owned(),
-                column: column.name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
-            }
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(Column::new(
+                column.table().name().to_owned(),
+                column.table().namespace().map(str::to_owned),
+                column.name().to_owned(),
+            ))
         } else {
-            UnexecutableStepCheck::AddedRequiredFieldToTable {
-                column: column.name().to_owned(),
-                table: column.table().name().to_owned(),
-                namespace: column.table().namespace().map(str::to_owned),
-            }
+            UnexecutableStepCheck::AddedRequiredFieldToTable(Column::new(
+                column.table().name().to_owned(),
+                column.table().namespace().map(str::to_owned),
+                column.name().to_owned(),
+            ))
         };
 
         plan.push_unexecutable(typed_unexecutable, step_index);
@@ -206,11 +208,11 @@ impl SqlMigrationConnector {
                                 && columns.next.default().is_none()
                             {
                                 plan.push_unexecutable(
-                                    UnexecutableStepCheck::MadeOptionalFieldRequired {
-                                        table: columns.previous.table().name().to_owned(),
-                                        column: columns.previous.name().to_owned(),
-                                        namespace: columns.previous.table().namespace().map(str::to_owned),
-                                    },
+                                    UnexecutableStepCheck::MadeOptionalFieldRequired(Column::new(
+                                        columns.previous.table().name().to_owned(),
+                                        columns.previous.table().namespace().map(str::to_owned),
+                                        columns.previous.name().to_owned(),
+                                    )),
                                     step_index,
                                 );
                             }
