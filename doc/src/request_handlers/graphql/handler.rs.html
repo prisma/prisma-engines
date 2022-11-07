@@ -212,11 +212,11 @@
     }
 
     <span class="kw">pub async fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>, body: GraphQlBody, tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;, trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; PrismaResponse {
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Incoming GraphQL query: {:?}&quot;</span>, body);
+        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Incoming GraphQL query: {:?}&quot;</span>, <span class="kw-2">&amp;</span>body);
 
         <span class="kw">match </span>body.into_doc() {
             <span class="prelude-val">Ok</span>(QueryDocument::Single(query)) =&gt; <span class="self">self</span>.handle_single(query, tx_id, trace_id).<span class="kw">await</span>,
-            <span class="prelude-val">Ok</span>(QueryDocument::Multi(batch)) =&gt; <span class="kw">match </span>batch.compact() {
+            <span class="prelude-val">Ok</span>(QueryDocument::Multi(batch)) =&gt; <span class="kw">match </span>batch.compact(<span class="self">self</span>.query_schema) {
                 BatchDocument::Multi(batch, transaction) =&gt; {
                     <span class="self">self</span>.handle_batch(batch, transaction, tx_id, trace_id).<span class="kw">await
                 </span>}

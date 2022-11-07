@@ -235,6 +235,68 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -267,7 +329,11 @@
 <span class="kw">pub use </span>selection::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>transformers::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>schema_builder::constants::args;
+<span class="kw">use </span><span class="kw">crate</span>::resolve_compound_field;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>schema::QuerySchemaRef;
+<span class="kw">use </span>schema_builder::constants::<span class="kw-2">*</span>;
 
 <span class="kw">pub type </span>QueryParserResult&lt;T&gt; = std::result::Result&lt;T, QueryParserError&gt;;
 
@@ -297,29 +363,74 @@
         <span class="self">Self</span>::Multi(operations, transaction)
     }
 
-    <span class="kw">fn </span>can_compact(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// Returns true if the operation contains any filters to prevents us from compacting the batch.
+    /// Some filters can prevent us (or make it very hard) from mapping the findMany result back to the original findUnique queries.
+    ///
+    /// Those filters are:
+    /// - non scalar filters (ie: relation filters, boolean operators...)
+    /// - any scalar filters that is not `EQUALS`
+    </span><span class="kw">fn </span>invalid_compact_filter(op: <span class="kw-2">&amp;</span>Operation, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
+        <span class="kw">let </span>where_obj = op.as_read().unwrap().arguments()[<span class="number">0</span>].<span class="number">1</span>.clone().into_object().unwrap();
+        <span class="kw">let </span>field = schema.find_query_field(op.name()).unwrap();
+        <span class="kw">let </span>model = field.model().unwrap();
+
+        where_obj.iter().any(|(key, val)| <span class="kw">match </span>val {
+            <span class="comment">// If it&#39;s a compound, then it&#39;s still considered as scalar
+            </span>QueryValue::Object(<span class="kw">_</span>) <span class="kw">if </span>resolve_compound_field(key, model).is_some() =&gt; <span class="bool-val">false</span>,
+            <span class="comment">// Otherwise, we just look for a scalar field inside the model. If it&#39;s not one, then we break.
+            </span>val =&gt; <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>key) {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">match </span>val {
+                    <span class="comment">// Consider scalar _only_ if the filter object contains &quot;equals&quot;. eg: `{ scalar_field: { equals: 1 } }`
+                    </span>QueryValue::Object(obj) =&gt; !obj.contains_key(filters::EQUALS),
+                    <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+                },
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            },
+        })
+    }
+
+    <span class="kw">fn </span>can_compact(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Multi(operations, <span class="kw">_</span>) =&gt; <span class="kw">match </span>operations.split_first() {
-                <span class="prelude-val">Some</span>((first, rest)) <span class="kw">if </span>first.is_find_unique() =&gt; rest.iter().all(|op| {
-                    op.is_find_unique()
-                        &amp;&amp; first.name() == op.name()
-                        &amp;&amp; first.nested_selections().len() == op.nested_selections().len()
-                        &amp;&amp; first
-                            .nested_selections()
-                            .iter()
-                            .all(|fop| op.nested_selections().contains(fop))
-                }),
+                <span class="prelude-val">Some</span>((first, rest)) <span class="kw">if </span>first.is_find_unique() =&gt; {
+                    <span class="comment">// If any of the operation has an &quot;invalid&quot; compact filter (see documentation of `invalid_compact_filter`),
+                    // we do not compact the queries.
+                    </span><span class="kw">let </span>has_invalid_compact_filter =
+                        operations.iter().any(|op| <span class="self">Self</span>::invalid_compact_filter(op, schema));
+
+                    <span class="kw">if </span>has_invalid_compact_filter {
+                        <span class="kw">return </span><span class="bool-val">false</span>;
+                    }
+
+                    rest.iter().all(|op| {
+                        op.is_find_unique()
+                            &amp;&amp; first.name() == op.name()
+                            &amp;&amp; first.nested_selections().len() == op.nested_selections().len()
+                            &amp;&amp; first
+                                .nested_selections()
+                                .iter()
+                                .all(|fop| op.nested_selections().contains(fop))
+                    })
+                }
                 <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
             },
             <span class="self">Self</span>::Compact(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub fn </span>compact(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>compact(<span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Multi(operations, <span class="kw">_</span>) <span class="kw">if </span><span class="self">self</span>.can_compact() =&gt; <span class="self">Self</span>::Compact(CompactedDocument::from(operations)),
+            <span class="self">Self</span>::Multi(operations, <span class="kw">_</span>) <span class="kw">if </span><span class="self">self</span>.can_compact(schema) =&gt; {
+                <span class="self">Self</span>::Compact(CompactedDocument::from_operations(operations, schema))
+            }
             <span class="kw">_ </span>=&gt; <span class="self">self</span>,
         }
+    }
+
+    <span class="doccomment">/// Returns `true` if the batch document is [`Compact`].
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>is_compact(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Compact(..))
     }
 }
 
@@ -355,11 +466,11 @@
     <span class="kw">pub fn </span>plural_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="macro">format!</span>(<span class="string">&quot;findMany{}&quot;</span>, <span class="self">self</span>.name)
     }
-}
 
-<span class="doccomment">/// Here be the dragons. Ay caramba!
-</span><span class="kw">impl </span>From&lt;Vec&lt;Operation&gt;&gt; <span class="kw">for </span>CompactedDocument {
-    <span class="kw">fn </span>from(ops: Vec&lt;Operation&gt;) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Here be the dragons. Ay caramba!
+    </span><span class="kw">pub fn </span>from_operations(ops: Vec&lt;Operation&gt;, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>field = schema.find_query_field(ops.first().unwrap().name()).unwrap();
+        <span class="kw">let </span>model = field.model().unwrap();
         <span class="comment">// Unpack all read queries (an enum) into a collection of selections.
         // We already took care earlier that all operations here must be reads.
         </span><span class="kw">let </span>selections: Vec&lt;Selection&gt; = ops
@@ -381,24 +492,20 @@
 
             <span class="comment">// The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            </span><span class="kw">let </span>selection_set = selections.iter().fold(SelectionSet::new(), |acc, selection| {
+            </span><span class="kw">let </span>selection_set = selections.iter().fold(SelectionSet::new(), |<span class="kw-2">mut </span>acc, selection| {
                 <span class="comment">// findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                </span><span class="kw">let </span>obj = selection.arguments()[<span class="number">0</span>]
+                </span><span class="kw">let </span>where_obj = selection.arguments()[<span class="number">0</span>]
                     .<span class="number">1
                     </span>.clone()
                     .into_object()
                     .expect(<span class="string">&quot;Trying to compact a selection with non-object argument&quot;</span>);
+                <span class="kw">let </span>filters = extract_filter(where_obj, model);
 
-                <span class="comment">// A &quot;funny&quot; trick to detect a compound key.
-                </span><span class="kw">match </span>obj.values().next() {
-                    <span class="comment">// This means our query has a nested object, meaning we have
-                    // a compound filter in a form of {&quot;col1_col2&quot;: {&quot;col1&quot;: .., &quot;col2&quot;: ..}}
-                    </span><span class="prelude-val">Some</span>(QueryValue::Object(obj)) =&gt; obj
-                        .iter()
-                        .fold(acc, |acc, (key, val)| acc.push(key.clone(), val.clone())),
-                    <span class="comment">// ...or a singular argument in a form of {&quot;col1&quot;: ..}
-                    </span><span class="kw">_ </span>=&gt; obj.into_iter().fold(acc, |acc, (key, val)| acc.push(key, val)),
+                <span class="kw">for </span>(field, filter) <span class="kw">in </span>filters {
+                    acc = acc.push(field, filter);
                 }
+
+                acc
             });
 
             <span class="comment">// We must select all unique fields in the query so we can
@@ -435,33 +542,20 @@
         </span><span class="kw">let </span>arguments: Vec&lt;Vec&lt;(String, QueryValue)&gt;&gt; = selections
             .into_iter()
             .map(|<span class="kw-2">mut </span>sel| {
-                <span class="kw">let </span><span class="kw-2">mut </span>obj: Vec&lt;(String, QueryValue)&gt; = sel
-                    .pop_argument()
-                    .unwrap()
-                    .<span class="number">1
-                    </span>.into_object()
-                    .unwrap()
-                    .into_iter()
-                    .collect();
+                <span class="kw">let </span>where_obj = sel.pop_argument().unwrap().<span class="number">1</span>.into_object().unwrap();
 
-                <span class="comment">// The trick again to detect if we have a compound key or not. (sigh)
-                </span><span class="kw">match </span>obj.pop() {
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, QueryValue::Object(obj))) =&gt; obj.into_iter().collect(),
-                    <span class="prelude-val">Some</span>(pair) =&gt; {
-                        obj.push(pair);
-                        obj
-                    }
-                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No arguments!&quot;</span>),
-                }
+                extract_filter(where_obj, model)
             })
             .collect();
 
-        <span class="comment">// The trick again to detect if we have a compound key or not. (sigh)
-        // Gets the argument keys for later mapping.
-        </span><span class="kw">let </span>keys = <span class="kw">match </span>arguments[<span class="number">0</span>].get(<span class="number">0</span>) {
-            <span class="prelude-val">Some</span>((<span class="kw">_</span>, QueryValue::Object(obj))) =&gt; obj.iter().map(|(k, <span class="kw">_</span>)| k.to_string()).collect(),
-            <span class="kw">_ </span>=&gt; arguments[<span class="number">0</span>].iter().map(|(k, <span class="kw">_</span>)| k.to_string()).collect(),
-        };
+        <span class="comment">// Gets the argument keys for later mapping.
+        </span><span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = arguments[<span class="number">0</span>]
+            .iter()
+            .flat_map(|pair| <span class="kw">match </span>pair {
+                (<span class="kw">_</span>, QueryValue::Object(obj)) =&gt; obj.keys().map(ToOwned::to_owned).collect(),
+                (key, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[key.to_owned()],
+            })
+            .collect();
 
         <span class="self">Self </span>{
             name,
@@ -471,6 +565,36 @@
             operation: Operation::Read(selection),
         }
     }
+}
+
+<span class="doccomment">/// Takes in a unique filter, extract the scalar filters and return a simple list of field/filter.
+/// This list is used to build a findMany query from multiple findUnique queries.
+/// Therefore, compound unique filters are walked and each individual field is added. eg:
+/// { field1_field2: { field1: 1, field2: 2 } } -&gt; [(field1, 1), (field2, 2)]
+/// This is because findMany filters don&#39;t have the special compound unique syntax.
+///
+/// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
+/// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
+/// This is a limitation that _could_ technically be lifted but that&#39;s not worth it for now.
+</span><span class="kw">fn </span>extract_filter(where_obj: IndexMap&lt;String, QueryValue&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;(String, QueryValue)&gt; {
+    where_obj
+        .into_iter()
+        .flat_map(|(key, val)| <span class="kw">match </span>val {
+            <span class="comment">// This means our query has a compound field in the form of: {co1_col2: { col1_col2: { col1: &lt;val&gt;, col2: &lt;val&gt; } }}
+            </span>QueryValue::Object(obj) <span class="kw">if </span>resolve_compound_field(<span class="kw-2">&amp;</span>key, model).is_some() =&gt; obj.into_iter().collect(),
+            <span class="comment">// This means our query has a scalar filter in the form of {col1: { equals: &lt;val&gt; }}
+            </span>QueryValue::Object(obj) =&gt; {
+                <span class="comment">// This is safe because it&#39;s been validated before in the `.can_compact` method.
+                </span><span class="kw">let </span>equal_val = obj.get(filters::EQUALS).expect(<span class="string">&quot;we only support scalar equals filters&quot;</span>);
+
+                <span class="macro">vec!</span>[(key, equal_val.clone())]
+            }
+            <span class="comment">// ...or a singular argument in a form of {col1: &lt;val&gt;}
+            </span>x =&gt; {
+                <span class="macro">vec!</span>[(key, x)]
+            }
+        })
+        .collect()
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

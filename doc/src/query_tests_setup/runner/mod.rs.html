@@ -215,6 +215,17 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>binary;
 <span class="kw">mod </span>direct;
 <span class="kw">mod </span>node_api;
@@ -222,7 +233,7 @@
 <span class="kw">pub use </span>binary::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>direct::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>node_api::<span class="kw-2">*</span>;
-<span class="kw">use </span>query_core::TxId;
+<span class="kw">use </span>query_core::{schema::QuerySchemaRef, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 
 <span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
@@ -270,6 +281,9 @@
     </span><span class="kw">fn </span>clear_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
     <span class="kw">fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry;
+
+    <span class="doccomment">/// The query schema used for the test.
+    </span><span class="kw">fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef;
 }
 
 <span class="kw">enum </span>RunnerType {
@@ -431,6 +445,14 @@
     <span class="kw">pub async fn </span>get_logs(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
         <span class="self">self</span>.log_capture.get_logs().<span class="kw">await
     </span>}
+
+    <span class="kw">pub fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.query_schema(),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.query_schema(),
+        }
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

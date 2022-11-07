@@ -176,6 +176,19 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Prisma Response IR (Intermediate Representation).
 //!
 //! This module takes care of processing query execution results
@@ -311,6 +324,19 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Value(pv) =&gt; <span class="prelude-val">Some</span>(pv),
             <span class="self">Self</span>::Ref(r) =&gt; Arc::try_unwrap(r).ok().and_then(|r| r.into_value()),
+            <span class="self">Self</span>::List(list) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>values = <span class="macro">vec!</span>[];
+
+                <span class="kw">for </span>item <span class="kw">in </span>list {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(pv) = item.into_value() {
+                        values.push(pv)
+                    } <span class="kw">else </span>{
+                        <span class="kw">return </span><span class="prelude-val">None</span>;
+                    }
+                }
+
+                <span class="prelude-val">Some</span>(PrismaValue::List(values))
+            }
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

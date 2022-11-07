@@ -119,6 +119,10 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 <span class="kw">use </span>query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
@@ -238,6 +242,10 @@
 
     <span class="kw">fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
         <span class="self">self</span>.metrics.clone()
+    }
+
+    <span class="kw">fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema
     }
 }
 </code></pre></div>

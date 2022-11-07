@@ -219,9 +219,13 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 <span class="kw">use </span>hyper::{Body, Method, Request, Response};
-<span class="kw">use </span>query_core::TxId;
+<span class="kw">use </span>query_core::{schema::QuerySchemaRef, TxId};
 <span class="kw">use </span>query_engine::opt::PrismaOpt;
 <span class="kw">use </span>query_engine::server::{routes, setup, State};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
@@ -404,6 +408,10 @@
 
     <span class="kw">fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
         <span class="self">self</span>.state.get_metrics()
+    }
+
+    <span class="kw">fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
+        <span class="self">self</span>.state.query_schema()
     }
 }
 

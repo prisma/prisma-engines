@@ -134,7 +134,7 @@
 
 <span class="kw">impl </span>GraphQlBody {
     <span class="doccomment">/// Convert a `GraphQlBody` into a `QueryDocument`.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_doc(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;QueryDocument&gt; {
+    </span><span class="kw">pub fn </span>into_doc(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;QueryDocument&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             GraphQlBody::Single(body) =&gt; {
                 <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(<span class="kw-2">&amp;</span>body.query, body.operation_name)<span class="question-mark">?</span>;

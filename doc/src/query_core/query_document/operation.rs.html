@@ -51,6 +51,14 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Selection;
 
 <span class="attribute">#[derive(Debug, Clone)]
@@ -79,6 +87,14 @@
             <span class="self">Self</span>::Write(sel) =&gt; <span class="prelude-val">Some</span>(sel),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="kw">pub fn </span>as_read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Selection&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Read(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
