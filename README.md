@@ -183,6 +183,17 @@ For more information about the introspection engine, check the [crate README
 Prisma format can format prisma schema files. It also comes as a WASM module via
 a node package. You can read more [here](./prisma-fmt-wasm/README.md).
 
+## Debugging
+
+When trying to debug code, here's a few things that might be useful:
+- use the language server; being able to go to definition and reason about code
+    can make things a lot easier,
+- add `dbg!()` statements to validate code paths, inspect variables, etc.,
+- you can control the amount of logs you see, and where they come from using the
+    `RUST_LOG` environment variable; see [the documentation](https://docs.rs/env_logger/0.9.1/env_logger/#enabling-logging),
+- you can use the `test-cli` to test migration and introspection without having
+    to go through the `prisma` npm package.
+
 ## Testing
 
 There are two test suites for the engines: Unit tests and
