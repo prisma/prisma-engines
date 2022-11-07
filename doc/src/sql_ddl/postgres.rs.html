@@ -511,6 +511,8 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::common::{IndexColumn, IteratorJoin};
 <span class="kw">use </span>std::{borrow::Cow, fmt::Display};
 
@@ -764,8 +766,10 @@
 
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub enum </span>PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Simple(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
-    WithSchema(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    <span class="doccomment">/// Simple identifier without a schema(namespace).
+    </span>Simple(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    <span class="doccomment">/// Identifier with a schema(namespace). The first field is the schema.
+    </span>WithSchema(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;_</span>&gt; {

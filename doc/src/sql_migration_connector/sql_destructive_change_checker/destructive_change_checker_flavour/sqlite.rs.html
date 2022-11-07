@@ -94,12 +94,17 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{SqlFlavour, SqliteFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
-        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        check::{Column, Table},
+        destructive_check_plan::DestructiveCheckPlan,
+        unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
@@ -150,6 +155,7 @@
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: <span class="prelude-val">None</span>,
                         column: columns.previous.name().to_owned(),
                         previous_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.previous.column_type_family()),
                         next_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.next.column_type_family()),
@@ -171,20 +177,20 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;check_drop_and_recreate_column on SQLite&quot;</span>);
     }
 
-    <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+    <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Table) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM \&quot;{}\&quot;&quot;</span>, table_name);
+            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM \&quot;{}\&quot;&quot;</span>, table.table);
             <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">super</span>::extract_table_rows_count(table_name, result_set)
+            <span class="kw">super</span>::extract_table_rows_count(table, result_set)
         })
     }
 
-    <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
-        (table, column): (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
-    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+    <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, column: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Column) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM \&quot;{}\&quot; WHERE \&quot;{}\&quot; IS NOT NULL&quot;</span>, table, column);
+            <span class="kw">let </span>query = <span class="macro">format!</span>(
+                <span class="string">&quot;SELECT COUNT(*) FROM \&quot;{}\&quot; WHERE \&quot;{}\&quot; IS NOT NULL&quot;</span>,
+                column.table, column.column
+            );
             <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">super</span>::extract_column_values_count(result_set)
         })

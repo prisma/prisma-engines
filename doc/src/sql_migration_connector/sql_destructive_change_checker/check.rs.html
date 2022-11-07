@@ -25,19 +25,91 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::database_inspection_results::DatabaseInspectionResults;
+
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Table {
+    <span class="kw">pub </span>table: String,
+    <span class="kw">pub </span>namespace: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="kw">impl </span>Table {
+    <span class="kw">pub fn </span>new(table: String, namespace: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ table, namespace }
+    }
+
+    <span class="kw">pub fn </span>from_column(column: <span class="kw-2">&amp;</span>Column) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            table: column.table.clone(),
+            namespace: column.namespace.clone(),
+        }
+    }
+}
+
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Column {
+    <span class="kw">pub </span>table: String,
+    <span class="kw">pub </span>namespace: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>column: String,
+}
+
+<span class="kw">impl </span>Column {
+    <span class="kw">pub fn </span>new(table: String, namespace: <span class="prelude-ty">Option</span>&lt;String&gt;, column: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            table,
+            namespace,
+            column,
+        }
+    }
+}
 
 <span class="doccomment">/// This trait should be implemented by warning and unexecutable migration types. It lets them
 /// describe what data they need from the current state of the database to be as accurate and
 /// informative as possible.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait </span>Check {
     <span class="doccomment">/// Indicates that the row count for the table with the returned name should be inspected.
-    </span><span class="kw">fn </span>needed_table_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    </span><span class="kw">fn </span>needed_table_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Table&gt; {
         <span class="prelude-val">None
     </span>}
 
     <span class="doccomment">/// Indicates that the the number of non-null values should be inspected for the returned table and column.
-    </span><span class="kw">fn </span>needed_column_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
+    </span><span class="kw">fn </span>needed_column_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Column&gt; {
         <span class="prelude-val">None
     </span>}
 

@@ -31,37 +31,39 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
+<span id="34">34</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+
+<span class="kw">use </span><span class="kw">super</span>::check::{Column, Table};
 
 <span class="doccomment">/// The information about the current state of the database gathered by the destructive change checker.
 </span><span class="attribute">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>DatabaseInspectionResults {
     <span class="doccomment">/// HashMap from table name to row count.
-    </span>row_counts: HashMap&lt;String, i64&gt;,
+    </span>row_counts: HashMap&lt;Table, i64&gt;,
     <span class="doccomment">/// HashMap from (table name, column name) to non-null values count.
-    </span>value_counts: HashMap&lt;(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;), i64&gt;,
+    </span>value_counts: HashMap&lt;Column, i64&gt;,
 }
 
 <span class="kw">impl </span>DatabaseInspectionResults {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>, table: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>, table: <span class="kw-2">&amp;</span>Table) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
         <span class="self">self</span>.row_counts.get(table).copied()
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_row_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: String, row_count: i64) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_row_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: Table, row_count: i64) {
         <span class="self">self</span>.row_counts.insert(table, row_count);
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_row_and_non_null_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>, table: <span class="kw-2">&amp;</span>str, column: <span class="kw-2">&amp;</span>str) -&gt; (<span class="prelude-ty">Option</span>&lt;i64&gt;, <span class="prelude-ty">Option</span>&lt;i64&gt;) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_row_and_non_null_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>, column: <span class="kw-2">&amp;</span>Column) -&gt; (<span class="prelude-ty">Option</span>&lt;i64&gt;, <span class="prelude-ty">Option</span>&lt;i64&gt;) {
+        <span class="kw">let </span>table = Table::from_column(column);
         (
-            <span class="self">self</span>.row_counts.get(table).copied(),
-            <span class="self">self</span>.value_counts
-                .get(<span class="kw-2">&amp;</span>(Cow::Borrowed(table), Cow::Borrowed(column)))
-                .copied(),
+            <span class="self">self</span>.row_counts.get(<span class="kw-2">&amp;</span>table).copied(),
+            <span class="self">self</span>.value_counts.get(column).copied(),
         )
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_value_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, column: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, count: i64) {
-        <span class="self">self</span>.value_counts.insert((table, column), count);
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_value_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column: Column, count: i64) {
+        <span class="self">self</span>.value_counts.insert(column, count);
     }
 }
 </code></pre></div>

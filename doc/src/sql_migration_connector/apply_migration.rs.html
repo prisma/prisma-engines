@@ -183,6 +183,10 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     pair::Pair,
     sql_migration::{SqlMigration, SqlMigrationStep},
@@ -323,7 +327,11 @@
 
             <span class="macro">vec!</span>[renderer.render_create_table(table)]
         }
-        SqlMigrationStep::DropTable { table_id } =&gt; renderer.render_drop_table(schemas.previous.walk(<span class="kw-2">*</span>table_id).name()),
+        SqlMigrationStep::DropTable { table_id } =&gt; {
+            <span class="kw">let </span>table = schemas.previous.walk(<span class="kw-2">*</span>table_id);
+
+            renderer.render_drop_table(table.namespace(), table.name())
+        }
         SqlMigrationStep::RedefineIndex { index } =&gt; renderer.render_drop_and_recreate_index(schemas.walk(<span class="kw-2">*</span>index)),
         SqlMigrationStep::AddForeignKey { foreign_key_id } =&gt; {
             <span class="kw">let </span>foreign_key = schemas.next.walk(<span class="kw-2">*</span>foreign_key_id);

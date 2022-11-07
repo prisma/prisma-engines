@@ -508,7 +508,7 @@
         ]
     }
 
-    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
         <span class="comment">// Turning off the pragma is safe, because schema validation would forbid foreign keys
         // to a non-existent model. There appears to be no other way to deal with cyclic
         // dependencies in the dropping order of tables in the presence of foreign key

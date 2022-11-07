@@ -79,7 +79,10 @@
 <span class="kw">mod </span>postgres;
 <span class="kw">mod </span>sqlite;
 
-<span class="kw">use </span><span class="kw">super</span>::DestructiveCheckPlan;
+<span class="kw">use super</span>::{
+    check::{Column, Table},
+    DestructiveCheckPlan,
+};
 <span class="kw">use crate</span>::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
 <span class="kw">use </span>migration_connector::{BoxFuture, ConnectorError, ConnectorResult};
 <span class="kw">use </span>sql_schema_describer::walkers::ColumnWalker;
@@ -104,12 +107,9 @@
         step_index: usize,
     );
 
-    <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt;;
+    <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Table) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt;;
 
-    <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
-        table_and_column: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
-    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt;;
+    <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, column: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Column) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt;;
 }
 
 <span class="doccomment">/// Display a column type for warnings/errors.
@@ -123,13 +123,13 @@
     }
 }
 
-<span class="kw">fn </span>extract_table_rows_count(table_name: <span class="kw-2">&amp;</span>str, result_set: quaint::prelude::ResultSet) -&gt; ConnectorResult&lt;i64&gt; {
+<span class="kw">fn </span>extract_table_rows_count(table: <span class="kw-2">&amp;</span>Table, result_set: quaint::prelude::ResultSet) -&gt; ConnectorResult&lt;i64&gt; {
     result_set
         .first()
         .ok_or_else(|| {
             ConnectorError::from_msg(<span class="macro">format!</span>(
                 <span class="string">&quot;No row was returned when checking for existing rows in the `{}` table.&quot;</span>,
-                table_name
+                table.table
             ))
         })<span class="question-mark">?
         </span>.at(<span class="number">0</span>)
@@ -137,7 +137,7 @@
         .ok_or_else(|| {
             ConnectorError::from_msg(<span class="macro">format!</span>(
                 <span class="string">&quot;No count was returned when checking for existing rows in the `{}` table.&quot;</span>,
-                table_name
+                table.table
             ))
         })
 }

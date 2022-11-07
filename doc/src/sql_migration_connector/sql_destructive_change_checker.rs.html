@@ -282,6 +282,19 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL implementation of DestructiveChangeChecker is responsible for
 //! informing users about potentially destructive or impossible changes that
 //! their attempted migrations contain.
@@ -320,10 +333,17 @@
 <span class="kw">use </span>warning_check::SqlMigrationWarningCheck;
 
 <span class="kw">impl </span>SqlMigrationConnector {
-    <span class="kw">fn </span>check_table_drop(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str, plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan, step_index: usize) {
+    <span class="kw">fn </span>check_table_drop(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        table_name: <span class="kw-2">&amp;</span>str,
+        namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan,
+        step_index: usize,
+    ) {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyTableDrop {
                 table: table_name.to_owned(),
+                namespace: namespace.map(str::to_owned),
             },
             step_index,
         );
@@ -334,6 +354,7 @@
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyColumnDrop {
                 table: column.table().name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             },
             step_index,
@@ -413,6 +434,7 @@
                             TableChange::DropPrimaryKey { .. } =&gt; plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
+                                    namespace: tables.previous.namespace().map(str::to_owned),
                                 },
                                 step_index,
                             ),
@@ -435,6 +457,7 @@
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
+                                    namespace: tables.previous.namespace().map(str::to_owned),
                                 },
                                 step_index,
                             )
@@ -492,6 +515,7 @@
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
                                             table: columns.previous.table().name().to_owned(),
+                                            namespace: columns.previous.table().namespace().map(str::to_owned),
                                             column: columns.previous.name().to_owned(),
                                             previous_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.previous.column_type_family()),
                                             next_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.next.column_type_family()),
@@ -502,6 +526,7 @@
                                 <span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable) =&gt; plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
                                         table: columns.previous.table().name().to_owned(),
+                                        namespace: columns.previous.table().namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                         previous_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.previous.column_type_family()),
                                         next_type: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, columns.next.column_type_family()),
@@ -513,7 +538,8 @@
                     }
                 }
                 SqlMigrationStep::DropTable { table_id } =&gt; {
-                    <span class="self">self</span>.check_table_drop(schemas.previous.walk(<span class="kw-2">*</span>table_id).name(), <span class="kw-2">&amp;mut </span>plan, step_index);
+                    <span class="kw">let </span>table = schemas.previous.walk(<span class="kw-2">*</span>table_id);
+                    <span class="self">self</span>.check_table_drop(table.name(), table.namespace(), <span class="kw-2">&amp;mut </span>plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
                     table_id: (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>),

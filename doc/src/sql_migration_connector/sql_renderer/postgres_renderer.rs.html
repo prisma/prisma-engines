@@ -1125,6 +1125,12 @@
 <span id="1125">1125</span>
 <span id="1126">1126</span>
 <span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1137,7 +1143,10 @@
 };
 <span class="kw">use </span>psl::builtin_connectors::{CockroachType, PostgresType};
 <span class="kw">use </span>psl::dml::PrismaValue;
-<span class="kw">use </span>sql_ddl::{postgres <span class="kw">as </span>ddl, IndexColumn, SortOrder};
+<span class="kw">use </span>sql_ddl::{
+    postgres::{<span class="self">self </span><span class="kw">as </span>ddl, PostgresIdentifier},
+    IndexColumn, SortOrder,
+};
 <span class="kw">use </span>sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
     walkers::<span class="kw-2">*</span>,
@@ -1569,11 +1578,14 @@
         .to_string()
     }
 
-    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_display(<span class="kw-2">&amp;</span>ddl::DropTable {
-                    table_name: table_name.into(),
+                    table_name: <span class="kw">match </span>namespace {
+                        <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), table_name.into()),
+                        <span class="prelude-val">None </span>=&gt; table_name.into(),
+                    },
                     cascade: <span class="bool-val">false</span>,
                 })
             })
