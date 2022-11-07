@@ -303,7 +303,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&sql_ddl::mysql::DropTable {

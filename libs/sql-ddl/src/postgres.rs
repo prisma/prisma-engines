@@ -251,7 +251,9 @@ impl Display for ForeignKeyAction {
 
 #[derive(Debug)]
 pub enum PostgresIdentifier<'a> {
+    /// Simple identifier without a schema(namespace).
     Simple(Cow<'a, str>),
+    /// Identifier with a schema(namespace). The first field is the schema.
     WithSchema(Cow<'a, str>, Cow<'a, str>),
 }
 

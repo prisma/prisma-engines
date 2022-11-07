@@ -10,7 +10,10 @@ use crate::{
 };
 use psl::builtin_connectors::{CockroachType, PostgresType};
 use psl::dml::PrismaValue;
-use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
+use sql_ddl::{
+    postgres::{self as ddl, PostgresIdentifier},
+    IndexColumn, SortOrder,
+};
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
     walkers::*,
@@ -442,11 +445,14 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropTable {
-                    table_name: table_name.into(),
+                    table_name: match namespace {
+                        Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), table_name.into()),
+                        None => table_name.into(),
+                    },
                     cascade: false,
                 })
             })

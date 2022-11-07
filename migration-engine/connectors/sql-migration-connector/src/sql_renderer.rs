@@ -79,8 +79,12 @@ pub(crate) trait SqlRenderer {
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String;
 
     /// Render a `DropTable` step.
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(table_name))]
+    fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
+        let name = match namespace {
+            Some(namespace) => format!("{}.{}", self.quote(namespace), self.quote(table_name)),
+            None => format!("{}", self.quote(table_name)),
+        };
+        vec![format!("DROP TABLE {}", name)]
     }
 
     /// Render a `RedefineTables` step.
