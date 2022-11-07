@@ -59,10 +59,7 @@ published on our fabulous repo page.
     shell.
 - **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
 
-Note for nix users: it should be enough to `direnv allow`. Note that
-`rust-analyzer` is missing, so you'll have to already have that in scope if you
-want to use it.
-
+Note for nix users: it should be enough to `direnv allow`.
 **How to build:**
 
 To build all engines, simply execute `cargo build` on the repository root. This
@@ -194,7 +191,9 @@ integration tests.
 - **Unit tests**: They test internal
   functionality of individual crates and components.
 
-  You can find them across the whole codebase, usually in `./tests` folders at the root of modules.
+  You can find them across the whole codebase, usually in `./tests` folders at
+  the root of modules. These tests can be executed via `cargo test`. Note that
+  some of them will require the `TEST_DATABASE_URL` enviornment variable set up.
 
 - **Integration tests**: They run GraphQL queries against isolated
   instances of the Query Engine and asserts that the responses are correct.
@@ -206,7 +205,7 @@ integration tests.
 **Prerequisites:**
 
 - Installed Rust toolchain.
-- Installed Docker and Docker-Compose.
+- Installed Docker.
 - Installed `direnv`, then `direnv allow` on the repository root.
   - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
