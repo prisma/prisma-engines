@@ -91,7 +91,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 /// Builds a find first item field for given model that throws a NotFoundError in case the item does
 /// not exist
 fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, model, true);
+    let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
     let field_name = format!("findFirst{}OrThrow", model.name);
 
     field(
