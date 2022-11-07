@@ -188,6 +188,7 @@ pub enum RelAggregationResult {
 }
 
 impl RelAggregationSelection {
+    // HACK: this should disappear
     pub fn db_alias(&self) -> String {
         match self {
             RelAggregationSelection::Count(rf, _) => {
@@ -232,31 +233,29 @@ pub struct NestedRead {
 }
 
 impl NestedRead {
-    pub fn db_alias(&self, i: usize) -> String {
+    // HACK: this should disappear
+    pub fn db_alias(&self, i: usize, depth: usize) -> String {
         let selected_field = self.selected_fields.inner().get(i).unwrap();
 
-        // format!(
-        //     "__prisma_nested_read__{}_{}",
-        //     self.parent_field.relation_name,
-        //     selected_field.db_name()
-        // )
-        format!(
-            "{}.{}",
-            &self.parent_field.related_model().name,
-            selected_field.db_name()
-        )
+        format!("{}.{}.{}", &self.parent_field.name, selected_field.prisma_name(), depth)
     }
 
-    pub fn db_aliases(&self) -> Vec<String> {
-        let mut aliases = self
-            .selected_fields
-            .selections()
-            .enumerate()
-            .map(|(i, _)| self.db_alias(i))
-            .collect_vec();
+    // HACK: this should disappear
+    pub fn db_aliases(nested_reads: &[NestedRead], depth: usize) -> Vec<String> {
+        let mut aliases = vec![];
 
-        for read in &self.nested {
-            aliases.extend(read.db_aliases());
+        for read in nested_reads {
+            let top_aliases = read
+                .selected_fields
+                .selections()
+                .enumerate()
+                .map(|(i, _)| read.db_alias(i, depth))
+                .collect_vec();
+
+            let nested_aliases = NestedRead::db_aliases(&read.nested, depth + 1);
+
+            aliases.extend(top_aliases);
+            aliases.extend(nested_aliases);
         }
 
         aliases

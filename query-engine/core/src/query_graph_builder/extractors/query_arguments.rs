@@ -136,12 +136,7 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::scalar_aggregation(
-                            sf.clone(),
-                            vec![],
-                            sort_order,
-                            sort_aggr,
-                        )))
+                        Ok(Some(OrderBy::scalar_aggregation(sf.clone(), sort_order, sort_aggr)))
                     } else {
                         Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order, nulls_order)))
                     }

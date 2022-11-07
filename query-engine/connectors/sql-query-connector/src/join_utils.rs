@@ -1,8 +1,194 @@
-use crate::{filter_conversion::AliasedCondition, model_extensions::*};
-use connector_interface::{Filter, RelationCondition, RelationFilter};
+use crate::{
+    filter_conversion::{Alias, AliasMode, AliasedCondition},
+    model_extensions::*,
+};
+use connector_interface::{Filter, NestedRead};
+use itertools::Itertools;
 use prisma_models::*;
 use quaint::prelude::*;
 use std::collections::HashMap;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum JoinType {
+    Normal,
+    Aggregation,
+}
+
+type InnerJoins = HashMap<(RelationFieldRef, JoinType), (Vec<AliasedJoin>, JoinsMap)>;
+
+#[derive(Debug, Clone, Default)]
+pub struct JoinsMap {
+    inner: InnerJoins,
+}
+
+impl JoinsMap {
+    pub fn new(nested_reads: &[NestedRead], order_bys: &[OrderBy]) -> Self {
+        let internal_joins = InternalJoins::new(nested_reads, order_bys);
+        let mut builder = JoinBuilder::default();
+
+        Self::build(&mut builder, internal_joins, None)
+    }
+
+    pub fn last(&self, relations: &[RelationFieldRef], join_type: JoinType) -> Option<&AliasedJoin> {
+        if relations.is_empty() {
+            return None;
+        }
+
+        // unwrap safe because we know the `relations` array is not empty
+        let (first, rest) = relations.split_first().unwrap();
+        let first_join = self.get(first, join_type);
+
+        let res = rest
+            .iter()
+            .fold(first_join, |acc, rf| {
+                if let Some((_, nested)) = acc {
+                    nested.get(rf, join_type)
+                } else {
+                    panic!("could not find join for relation {:?}", rf);
+                }
+            })
+            .and_then(|(joins, _)| joins.last());
+
+        res
+    }
+
+    pub fn all(&self, relations: &[RelationFieldRef], join_type: JoinType) -> Option<Vec<&AliasedJoin>> {
+        if relations.is_empty() {
+            return None;
+        }
+
+        let mut res = vec![];
+        let mut joins_map = self;
+
+        for rf in relations {
+            if let Some((joins, nested_map)) = joins_map.get(rf, join_type) {
+                res.extend(joins);
+                joins_map = nested_map;
+            } else {
+                panic!("could not find join for relation {:?}", rf);
+            }
+        }
+
+        Some(res)
+    }
+
+    pub fn to_vec(self) -> Vec<AliasedJoin> {
+        let mut all_joins = vec![];
+
+        for (joins, nested) in self.inner.into_values() {
+            all_joins.extend(joins);
+            all_joins.extend(nested.to_vec());
+        }
+
+        all_joins
+    }
+
+    fn get(&self, rf: &RelationFieldRef, join_type: JoinType) -> Option<&(Vec<AliasedJoin>, JoinsMap)> {
+        self.inner.get(&(rf.clone(), join_type))
+    }
+
+    fn build(builder: &mut JoinBuilder, joins_data: InternalJoins, previous_join: Option<&AliasedJoin>) -> Self {
+        let mut map: InnerJoins = HashMap::new();
+
+        for ((rf, join_type), (filter, nested_joins)) in joins_data.inner.into_iter() {
+            match join_type {
+                JoinType::Normal => {
+                    let computed_joins = builder.compute_join(&rf, filter.as_ref(), previous_join);
+                    let nested_joins = Self::build(builder, nested_joins, computed_joins.last());
+
+                    map.insert((rf, join_type.clone()), (computed_joins, nested_joins));
+                }
+                JoinType::Aggregation => todo!(),
+            }
+        }
+
+        Self { inner: map }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+struct InternalJoins {
+    inner: HashMap<(RelationFieldRef, JoinType), (Option<Filter>, InternalJoins)>,
+}
+
+impl InternalJoins {
+    pub fn new(nested_reads: &[NestedRead], order_bys: &[OrderBy]) -> InternalJoins {
+        let joins = Self::from_nested_reads(nested_reads);
+        let joins = Self::extend_with_order_bys(joins, order_bys);
+
+        joins
+    }
+
+    fn from_nested_reads(nested_reads: &[NestedRead]) -> InternalJoins {
+        let map: HashMap<(RelationFieldRef, JoinType), (Option<Filter>, InternalJoins)> = nested_reads
+            .iter()
+            .map(|read| {
+                let filter = read.args.filter.clone();
+
+                (
+                    (read.parent_field.clone(), JoinType::Normal),
+                    (filter, Self::from_nested_reads(&read.nested)),
+                )
+            })
+            .collect();
+
+        InternalJoins { inner: map }
+    }
+
+    fn extend_with_order_bys(mut joins: InternalJoins, order_bys: &[OrderBy]) -> InternalJoins {
+        for o in order_bys {
+            match o {
+                OrderBy::Scalar(o) => {
+                    let path = o
+                        .path
+                        .iter()
+                        .filter_map(|hop| hop.as_relation_hop().cloned())
+                        .collect_vec();
+
+                    path.iter().fold(&mut joins, |acc, next| {
+                        let rf = next.clone();
+
+                        let (_, nested_joins) = acc
+                            .inner
+                            .entry((rf, JoinType::Normal))
+                            .or_insert_with(|| (None, InternalJoins::default()));
+
+                        nested_joins
+                    });
+                }
+                OrderBy::ToManyAggregation(o) => {
+                    let path: Vec<_> = o
+                        .path
+                        .iter()
+                        .filter_map(|hop| hop.as_relation_hop().cloned())
+                        .collect_vec();
+
+                    let (last, rest) = path.split_last().unwrap();
+
+                    let inner_joins = rest.iter().fold(&mut joins, |acc, next| {
+                        let rf = next.clone();
+
+                        let (_, nested_joins) = acc
+                            .inner
+                            .entry((rf, JoinType::Aggregation))
+                            .or_insert_with(|| (None, InternalJoins::default()));
+
+                        nested_joins
+                    });
+
+                    inner_joins
+                        .inner
+                        .entry((last.clone(), JoinType::Aggregation))
+                        .or_insert_with(|| (None, InternalJoins::default()));
+                }
+                OrderBy::ScalarAggregation(_) => (),
+                OrderBy::Relevance(_) => (),
+            }
+        }
+
+        joins
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct AliasedJoin {
@@ -14,10 +200,7 @@ pub struct AliasedJoin {
 
 #[derive(Debug, Default)]
 pub struct JoinBuilder {
-    count: usize,
-    cache: HashMap<RelationFieldRef, AliasedJoin>,
-    m2m_cache: HashMap<RelationFieldRef, Vec<AliasedJoin>>,
-    aggr_cache: HashMap<RelationFieldRef, (String, AliasedJoin)>,
+    counter: usize,
 }
 
 impl JoinBuilder {
@@ -28,9 +211,9 @@ impl JoinBuilder {
         filter: Option<Filter>,
         previous_join: Option<&AliasedJoin>,
     ) -> (String, AliasedJoin) {
-        if let Some(entry) = self.aggr_cache.get(rf) {
-            return entry.clone();
-        }
+        // if let Some(entry) = self.aggr_cache.get(rf) {
+        //     return entry.clone();
+        // }
 
         let join_alias = self.join_alias();
         let aggregator_alias = self.aggregator_alias();
@@ -55,8 +238,8 @@ impl JoinBuilder {
             )
         };
 
-        self.aggr_cache
-            .insert(rf.clone(), (aggregator_alias.clone(), join.clone()));
+        // self.aggr_cache
+        //     .insert(rf.clone(), (aggregator_alias.clone(), join.clone()));
 
         (aggregator_alias, join)
     }
@@ -70,7 +253,9 @@ impl JoinBuilder {
         if rf.relation().is_many_to_many() {
             self.compute_m2m_join(rf, filter, previous_join)
         } else {
-            vec![self.compute_one2m_join(rf, filter, previous_join)]
+            let join = self.compute_one2m_join(rf, filter, previous_join);
+
+            vec![join]
         }
     }
 
@@ -80,27 +265,21 @@ impl JoinBuilder {
         filter: Option<&Filter>,
         previous_join: Option<&AliasedJoin>,
     ) -> AliasedJoin {
-        if let Some(entry) = self.cache.get(rf) {
-            return entry.clone();
-        }
+        // if let Some(entry) = self.one2m_cache.get(rf) {
+        //     return (entry.clone(), true);
+        // }
 
-        dbg!(&filter);
-        let conditions: ConditionTree = filter
-            .map(|f| {
-                Filter::Relation(RelationFilter {
-                    field: rf.clone(),
-                    condition: RelationCondition::EveryRelatedRecord,
-                    nested_filter: Box::new(f.clone()),
-                })
-            })
-            .map(|f| {
-                dbg!(&f);
+        let join_alias = self.join_alias();
 
-                f.aliased_condition_from(None, false)
+        let filter: ConditionTree = filter
+            .map(|f| {
+                let mut alias = Alias::default().flip(AliasMode::Join);
+                alias.set_counter(self.counter - 1);
+
+                f.aliased_condition_from(Some(alias), false)
             })
             .unwrap_or(ConditionTree::NoCondition);
 
-        let join_alias = self.join_alias();
         let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
             (rf.scalar_fields(), rf.referenced_fields())
         } else {
@@ -131,10 +310,10 @@ impl JoinBuilder {
             data: related_model
                 .as_table()
                 .alias(join_alias)
-                .on(ConditionTree::And(on_conditions)),
+                .on(ConditionTree::And(on_conditions).and(filter)),
         };
 
-        self.cache.insert(rf.clone(), join.clone());
+        // self.one2m_cache.insert(rf.clone(), join.clone());
 
         join
     }
@@ -143,11 +322,11 @@ impl JoinBuilder {
         &mut self,
         rf: &RelationFieldRef,
         filter: Option<&Filter>,
-        previous_join: Option<&AliasedJoin>,
+        _previous_join: Option<&AliasedJoin>,
     ) -> Vec<AliasedJoin> {
-        if let Some(entry) = self.m2m_cache.get(rf) {
-            return entry.clone();
-        }
+        // if let Some(entry) = self.m2m_cache.get(rf) {
+        //     return (entry.clone(), true);
+        // }
 
         // First join - parent to m2m join
         let join_alias = self.join_alias();
@@ -176,6 +355,14 @@ impl JoinBuilder {
 
         // Second join - m2m to child join
         let join_alias_2 = self.join_alias();
+        let filter: ConditionTree = filter
+            .map(|f| {
+                let mut alias = Alias::default().flip(AliasMode::Join);
+                alias.set_counter(self.counter - 1);
+
+                f.aliased_condition_from(Some(alias), false)
+            })
+            .unwrap_or(ConditionTree::NoCondition);
         let child_ids: ModelProjection = rf.related_model().primary_identifier().into();
         let left_join_conditions: Vec<Expression> = child_ids
             .into_iter()
@@ -196,26 +383,26 @@ impl JoinBuilder {
                 .related_model()
                 .as_table()
                 .alias(join_alias_2.clone())
-                .on(ConditionTree::And(left_join_conditions)),
+                .on(ConditionTree::And(left_join_conditions).and(filter)),
         };
 
         let joins = vec![parent_to_m2m_join, m2m_to_child_join];
 
-        self.m2m_cache.insert(rf.clone(), joins.clone());
+        // self.m2m_cache.insert(rf.clone(), joins.clone());
 
         joins
     }
 
     fn join_alias(&mut self) -> String {
-        let alias = format!("j{}", self.count);
-        self.count += 1;
+        let alias = format!("j{}", self.counter);
+        self.counter += 1;
 
         alias
     }
 
     fn aggregator_alias(&mut self) -> String {
-        let alias = format!("aggr{}", self.count);
-        self.count += 1;
+        let alias = format!("aggr{}", self.counter);
+        self.counter += 1;
 
         alias
     }

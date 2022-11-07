@@ -69,7 +69,7 @@ pub async fn get_many_records(
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
-    let mut nested_read_field_names: Vec<_> = nested_reads.iter().flat_map(|read| read.db_aliases()).collect();
+    let mut nested_read_field_names = NestedRead::db_aliases(nested_reads, 0);
 
     field_names.append(&mut aggr_field_names);
     field_names.append(&mut nested_read_field_names);

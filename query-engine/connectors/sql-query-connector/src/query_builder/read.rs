@@ -1,5 +1,5 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, join_utils::JoinBuilder, model_extensions::*,
+    cursor_condition, filter_conversion::AliasedCondition, join_utils::JoinsMap, model_extensions::*,
     nested_aggregations, nested_read, ordering, sql_trace::SqlTraceComment,
 };
 use connector_interface::{filter::Filter, AggregationSelection, NestedRead, QueryArguments, RelAggregationSelection};
@@ -55,14 +55,18 @@ impl SelectDefinition for Select<'static> {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct QueryBuilderContext {
-    join_builder: JoinBuilder,
+#[derive(Debug)]
+pub struct QueryBuilderContext<'a> {
+    joins: &'a JoinsMap,
 }
 
-impl QueryBuilderContext {
-    pub fn join_builder(&mut self) -> &mut JoinBuilder {
-        &mut self.join_builder
+impl<'a> QueryBuilderContext<'a> {
+    pub fn new(joins: &'a JoinsMap) -> Self {
+        Self { joins }
+    }
+
+    pub fn joins(&self) -> &JoinsMap {
+        &self.joins
     }
 }
 
@@ -74,9 +78,11 @@ impl SelectDefinition for QueryArguments {
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let mut ctx = QueryBuilderContext::default();
-        let nested_read_joins = nested_read::build_joins(&mut ctx, nested_reads, None);
-        let order_by_definitions = ordering::build(&mut ctx, &self, nested_reads);
+        let joins = JoinsMap::new(nested_reads, &self.order_by);
+        let mut ctx = QueryBuilderContext::new(&joins);
+
+        let nested_read_columns = nested_read::build_columns(&mut ctx, nested_reads, vec![], 0);
+        let order_by_definitions = ordering::build(&mut ctx, &self);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
         let aggregation_joins = nested_aggregations::build(&mut ctx, aggr_selections);
 
@@ -94,23 +100,11 @@ impl SelectDefinition for QueryArguments {
             (filter, cursor) => ConditionTree::and(filter, cursor),
         };
 
-        // Add joins necessary to the nested reads
-        let joined_table = nested_read_joins
-            .joins
+        // Add joins necessary to nested reads & order bys
+        let joined_table = joins
+            .to_vec()
             .into_iter()
             .fold(model.as_table(), |acc, join| acc.left_join(join.data));
-
-        // Add joins necessary to the ordering
-        let joined_table = order_by_definitions
-            .iter()
-            .flat_map(|j| &j.joins)
-            .fold(joined_table, |acc, join| acc.left_join(join.clone().data));
-
-        // Add joins necessary to the nested aggregations
-        let joined_table = aggregation_joins
-            .joins
-            .into_iter()
-            .fold(joined_table, |acc, join| acc.left_join(join.data));
 
         let select_ast = Select::from_table(joined_table)
             .so_that(conditions)
@@ -131,7 +125,7 @@ impl SelectDefinition for QueryArguments {
         let additional_selection_set = aggregation_joins
             .columns
             .into_iter()
-            .chain(nested_read_joins.columns)
+            .chain(nested_read_columns)
             .collect_vec();
 
         match limit {

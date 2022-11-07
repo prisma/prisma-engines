@@ -17,23 +17,18 @@ pub struct OrderByDefinition {
 }
 
 /// Builds all expressions for an `ORDER BY` clause based on the query arguments.
-pub fn build(
-    ctx: &mut QueryBuilderContext,
-    query_arguments: &QueryArguments,
-    nested_reads: &[NestedRead],
-) -> Vec<OrderByDefinition> {
+pub fn build(ctx: &mut QueryBuilderContext, query_arguments: &QueryArguments) -> Vec<OrderByDefinition> {
     let needs_reversed_order = query_arguments.needs_reversed_order();
-    let nested_order_bys = process_nested_order_bys(nested_reads);
+    // TODO: Put that back
+    // let nested_order_bys = process_nested_order_bys(nested_reads);
 
     query_arguments
         .order_by
         .iter()
-        .map(|o| (o, None))
-        .chain(nested_order_bys)
-        .map(|(order_by, parent)| match order_by {
-            OrderBy::Scalar(order_by) => build_order_scalar(ctx, order_by, parent, needs_reversed_order),
+        .map(|(order_by)| match order_by {
+            OrderBy::Scalar(order_by) => build_order_scalar(ctx, order_by, needs_reversed_order),
             OrderBy::ScalarAggregation(order_by) => build_order_aggr_scalar(order_by, needs_reversed_order),
-            OrderBy::ToManyAggregation(order_by) => build_order_aggr_rel(ctx, order_by, parent, needs_reversed_order),
+            OrderBy::ToManyAggregation(order_by) => build_order_aggr_rel(ctx, order_by, needs_reversed_order),
             OrderBy::Relevance(order_by) => build_order_relevance(order_by, needs_reversed_order),
         })
         .collect_vec()
@@ -42,10 +37,9 @@ pub fn build(
 fn build_order_scalar(
     ctx: &mut QueryBuilderContext,
     order_by: &OrderByScalar,
-    parent: Option<&RelationFieldRef>,
     needs_reversed_order: bool,
 ) -> OrderByDefinition {
-    let (joins, order_column) = compute_joins_scalar(ctx, order_by, parent);
+    let order_column = compute_scalar_column(ctx, order_by);
 
     let order: Option<Order> = Some(into_order(
         &order_by.sort_order,
@@ -57,7 +51,7 @@ fn build_order_scalar(
     OrderByDefinition {
         order_column: order_column.into(),
         order_definition,
-        joins,
+        joins: vec![],
     }
 }
 
@@ -95,114 +89,66 @@ fn build_order_aggr_scalar(order_by: &OrderByScalarAggregation, needs_reversed_o
 fn build_order_aggr_rel(
     ctx: &mut QueryBuilderContext,
     order_by: &OrderByToManyAggregation,
-    parent: Option<&RelationFieldRef>,
     needs_reversed_order: bool,
 ) -> OrderByDefinition {
-    let order: Option<Order> = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
-    let (joins, order_column) = compute_joins_aggregation(ctx, order_by, parent);
-    let order_definition: OrderDefinition = match order_by.sort_aggregation {
-        SortAggregation::Count => {
-            let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
+    todo!()
+    // let order: Option<Order> = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
+    // let (joins, order_column) = compute_aggregation_column(ctx, order_by, parent);
+    // let order_definition: OrderDefinition = match order_by.sort_aggregation {
+    //     SortAggregation::Count => {
+    //         let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
 
-            // We coalesce the order by expr to 0 so that if there's no relation,
-            // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
-            (coalesce(exprs).into(), order)
-        }
-        _ => unreachable!("Order by relation aggregation other than count are not supported"),
-    };
+    //         // We coalesce the order by expr to 0 so that if there's no relation,
+    //         // `COALESCE(NULL, 0)` will return `0`, thus preserving the order
+    //         (coalesce(exprs).into(), order)
+    //     }
+    //     _ => unreachable!("Order by relation aggregation other than count are not supported"),
+    // };
 
-    OrderByDefinition {
-        order_column: order_column.into(),
-        order_definition,
-        joins,
-    }
+    // OrderByDefinition {
+    //     order_column: order_column.into(),
+    //     order_definition,
+    // }
 }
 
-fn compute_joins_aggregation(
-    ctx: &mut QueryBuilderContext,
-    order_by: &OrderByToManyAggregation,
-    parent: Option<&RelationFieldRef>,
-) -> (Vec<AliasedJoin>, Column<'static>) {
-    let (last_hop, rest_hops) = order_by
+fn compute_aggregation_column(ctx: &mut QueryBuilderContext, order_by: &OrderByToManyAggregation) -> Column<'static> {
+    let path = order_by
         .path
-        .split_last()
-        .expect("An order by relation aggregation has to have at least one hop");
+        .iter()
+        .filter_map(|hop| hop.as_relation_hop().cloned())
+        .collect_vec();
+    let join = ctx.joins().last(&path, JoinType::Aggregation).unwrap();
 
-    let parent_join = parent.map(|p| ctx.join_builder().compute_join(p, None, None).last().cloned().unwrap());
-
-    // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
-    let mut joins = vec![];
-    for (i, hop) in rest_hops.iter().enumerate() {
-        let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-
-        let inner_joins = ctx
-            .join_builder()
-            .compute_join(hop.as_relation_hop().unwrap(), None, previous_join);
-
-        joins.extend(inner_joins);
-    }
-
-    let aggregation_type = match order_by.sort_aggregation {
-        SortAggregation::Count => AggregationType::Count,
-        _ => unreachable!("Order by relation aggregation other than count are not supported"),
-    };
-
-    let previous_join = joins.last().or(parent_join.as_ref());
-
-    // We perform the aggregation on the last join
-    let (aggr_alias, last_aggr_join) = ctx.join_builder().compute_aggr_join(
-        last_hop.as_relation_hop().unwrap(),
-        aggregation_type,
-        None,
-        previous_join,
-    );
-
+    todo!()
     // This is the final column identifier to be used for the scalar field to order by.
     // `{last_join_alias}.{ORDER_AGGREGATOR_ALIAS}`
-    let order_by_column = Column::from((last_aggr_join.alias.to_owned(), aggr_alias));
+    // let order_by_column = Column::from((join.alias.to_owned(), aggr_alias));
 
-    joins.push(last_aggr_join);
+    // joins.push(last_aggr_join);
 
-    (joins, order_by_column)
+    // (joins, order_by_column)
 }
 
-pub fn compute_joins_scalar(
-    ctx: &mut QueryBuilderContext,
-    order_by: &OrderByScalar,
-    parent: Option<&RelationFieldRef>,
-) -> (Vec<AliasedJoin>, Column<'static>) {
-    let mut joins = vec![];
-
-    for (i, hop) in order_by.path.iter().enumerate() {
-        let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-        let inner_joins = ctx
-            .join_builder()
-            .compute_join(hop.as_relation_hop().unwrap(), None, previous_join);
-
-        joins.extend(inner_joins);
-    }
+pub fn compute_scalar_column(ctx: &mut QueryBuilderContext, order_by: &OrderByScalar) -> Column<'static> {
+    let path = order_by
+        .path
+        .iter()
+        .filter_map(|hop| hop.as_relation_hop().cloned())
+        .collect_vec();
+    let join = ctx.joins().last(&path, JoinType::Normal);
 
     // This is the final column identifier to be used for the scalar field to order by.
     // - If we order by a scalar field on the base model, we simply use the model's scalar field. eg:
     //   `{modelTable}.{field}`
     // - If we order by some relations, we use the alias used for the last join, e.g.
     //   `{join_alias}.{field}`
-    let order_by_column = if let Some(last_join) = joins.last() {
+    let order_by_column = if let Some(last_join) = join {
         Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
-    } else if let Some(parent) = parent {
-        let join = ctx
-            .join_builder()
-            .compute_join(parent, None, None)
-            .last()
-            .cloned()
-            .unwrap();
-
-        Column::from((join.alias.to_owned(), order_by.field.db_name().to_owned()))
     } else {
         order_by.field.as_column()
     };
 
-    (joins, order_by_column)
+    order_by_column
 }
 
 pub fn into_order(prisma_order: &SortOrder, nulls_order: Option<&NullsOrder>, reverse: bool) -> Order {

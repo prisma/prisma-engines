@@ -153,9 +153,7 @@ fn read_many(
             .map(|field| (field.prisma_name().to_owned(), field.clone()))
             .collect();
 
-        // dbg!(&scalars.field_names);
-
-        let nested = process_nested_reads(&query.nested, &field_names, &mut scalars)?;
+        let nested = process_nested_reads(&query.nested, &field_names, &mut scalars, 0)?;
 
         // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
@@ -252,16 +250,15 @@ fn process_nested_reads(
     reads: &[ReadQuery],
     parent_selection: &HashMap<String, SelectedField>,
     scalars: &mut ManyRecords,
+    depth: usize,
 ) -> crate::Result<Vec<QueryResult>> {
     let mut query_results = vec![];
 
-    // TODO: Find out how to clean-up joins without result (aka null)
-    // TODO: Solution: We should find whether the unique criterias are set or not
     for read in reads {
-        query_results.push(process_nested_read(read, parent_selection, scalars)?);
+        query_results.push(process_nested_read(read, parent_selection, scalars, depth)?);
     }
 
-    // TODO: Should be unique by <the value of a unique field(s)>
+    // TODO: Should be unique by <primary identifier>
     scalars.records = scalars.records.clone().into_iter().unique().collect_vec();
 
     Ok(query_results)
@@ -271,6 +268,7 @@ fn process_nested_read(
     nested_read: &ReadQuery,
     parent_selection: &HashMap<String, SelectedField>,
     scalars: &mut ManyRecords,
+    depth: usize,
 ) -> crate::Result<QueryResult> {
     // dbg!(&scalars);
     let read = nested_read.as_related_records_query().unwrap();
@@ -280,13 +278,13 @@ fn process_nested_read(
         .selected_fields
         .selections()
         .enumerate()
-        .map(|(i, field)| (read.db_alias(i), field.clone()))
+        .map(|(i, field)| (read.db_alias(i, depth), field.clone()))
         .collect();
 
     // dbg!(&child_field_names);
 
     // Go depth-first so that the parent data of relations isn't extracted yet.
-    let nested = process_nested_reads(&read.nested, &child_field_names, scalars)?;
+    let nested = process_nested_reads(&read.nested, &child_field_names, scalars, depth + 1)?;
 
     let rf = &read.parent_field;
 

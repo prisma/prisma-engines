@@ -55,6 +55,10 @@ impl Alias {
             AliasMode::Join => format!("j{}", self.counter),
         }
     }
+
+    pub fn set_counter(&mut self, counter: usize) {
+        self.counter = counter;
+    }
 }
 
 #[derive(Clone)]
@@ -308,6 +312,10 @@ impl AliasedCondition for RelationFilter {
 
         let condition = self.condition;
         let sub_select = self.aliased_sel(state.alias().map(|a| a.inc(AliasMode::Table)));
+
+        //
+
+        // WHERE "p".id IN (SELECT id, from Comment WHERE body= "hello" INNER JOIN "t0")
 
         let comparison = match condition {
             RelationCondition::AtLeastOneRelatedRecord => Row::from(columns).in_selection(sub_select),

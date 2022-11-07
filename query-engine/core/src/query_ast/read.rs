@@ -136,39 +136,11 @@ pub struct RelatedRecordsQuery {
 }
 
 impl RelatedRecordsQuery {
-    pub fn db_alias(&self, i: usize) -> String {
+    // HACK: this should disappear
+    pub fn db_alias(&self, i: usize, depth: usize) -> String {
         let selected_field = self.selected_fields.inner().get(i).unwrap();
 
-        // format!(
-        //     "__prisma_nested_read__{}_{}",
-        //     self.parent_field.relation_name,
-        //     selected_field.db_name()
-        // )
-        format!(
-            "{}.{}",
-            &self.parent_field.related_model().name,
-            selected_field.db_name()
-        )
-    }
-
-    pub fn db_aliases(&self) -> Vec<String> {
-        let mut aliases = self
-            .selected_fields
-            .selections()
-            .enumerate()
-            .map(|(i, _)| self.db_alias(i))
-            .collect_vec();
-
-        for read in &self.nested {
-            match read {
-                ReadQuery::RelatedRecordsQuery(rrq) => {
-                    aliases.extend(rrq.db_aliases());
-                }
-                _ => unreachable!(),
-            }
-        }
-
-        aliases
+        format!("{}.{}.{}", &self.parent_field.name, selected_field.prisma_name(), depth)
     }
 
     pub fn type_identifier_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
