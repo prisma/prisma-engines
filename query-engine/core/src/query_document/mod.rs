@@ -64,13 +64,13 @@ impl BatchDocument {
         Self::Multi(operations, transaction)
     }
 
-    /// Returns true if the operation contains any invalid filters to compact the batch.
-    /// They are invalid because they would prevent us from mapping the findMany result back to the original findUnique queries.
+    /// Returns true if the operation contains any filters to prevents us from compacting the batch.
+    /// Some filters can prevent us (or make it very hard) from mapping the findMany result back to the original findUnique queries.
     ///
-    /// Invalid filters are:
+    /// Those filters are:
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
-    fn operation_contain_invalid_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+    fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
         let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
         let field = schema.find_query_field(op.name()).unwrap();
         let model = field.model().unwrap();
@@ -94,7 +94,16 @@ impl BatchDocument {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
                 Some((first, rest)) if first.is_find_unique() => {
-                    let has_identical_selection_sets = rest.iter().all(|op| {
+                    // If any of the operation has an "invalid" compact filter (see documentation of `invalid_compact_filter`),
+                    // we do not compact the queries.
+                    let has_invalid_compact_filter =
+                        operations.iter().any(|op| Self::invalid_compact_filter(op, schema));
+
+                    if has_invalid_compact_filter {
+                        return false;
+                    }
+
+                    rest.iter().all(|op| {
                         op.is_find_unique()
                             && first.name() == op.name()
                             && first.nested_selections().len() == op.nested_selections().len()
@@ -102,15 +111,7 @@ impl BatchDocument {
                                 .nested_selections()
                                 .iter()
                                 .all(|fop| op.nested_selections().contains(fop))
-                    });
-
-                    // If any of the operation has an "invalid" filter (see documentation of `operation_contain_invalid_filter`),
-                    // we do not compact the queries.
-                    let has_invalid_filters = operations
-                        .iter()
-                        .any(|op| Self::operation_contain_invalid_filter(op, schema));
-
-                    has_identical_selection_sets && !has_invalid_filters
+                    })
                 }
                 _ => false,
             },
@@ -269,12 +270,12 @@ impl CompactedDocument {
 
 /// Takes in a unique filter, extract the scalar filters and return a simple list of field/filter.
 /// This list is used to build a findMany query from multiple findUnique queries.
-/// Therefore, compound unique filters walked and each individual field is added. eg:
+/// Therefore, compound unique filters are walked and each individual field is added. eg:
 /// { field1_field2: { field1: 1, field2: 2 } } -> [(field1, 1), (field2, 2)]
 /// This is because findMany filters don't have the special compound unique syntax.
 ///
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
-/// Because of that, we only extract EQUALS filters or else we would have to manually implement other filters.
+/// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that's not worth it for now.
 fn extract_filter(where_obj: IndexMap<String, QueryValue>, model: &ModelRef) -> Vec<(String, QueryValue)> {
     where_obj
