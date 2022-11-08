@@ -97,6 +97,7 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{SqlFlavour, SqliteFlavour},
@@ -141,10 +142,11 @@
             &amp;&amp; columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                     column: columns.previous.name().to_owned(),
-                },
+                }),
                 step_index,
             );
         }

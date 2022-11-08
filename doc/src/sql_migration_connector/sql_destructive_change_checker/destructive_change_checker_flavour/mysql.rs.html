@@ -180,6 +180,9 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{MysqlFlavour, SqlFlavour},
@@ -220,10 +223,11 @@
         // empty or the column has no existing NULLs.
         </span><span class="kw">if </span>changes.arity_changed() &amp;&amp; columns.next.arity().is_required() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             );
 
@@ -280,18 +284,20 @@
             &amp;&amp; columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } <span class="kw">else if </span>columns.next.arity().is_required() &amp;&amp; columns.next.default().is_none() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } <span class="kw">else </span>{

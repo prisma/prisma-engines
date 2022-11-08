@@ -136,6 +136,35 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     check::{Check, Column, Table},
     database_inspection_results::DatabaseInspectionResults,
@@ -194,7 +223,10 @@
                 table,
                 column: <span class="kw">_</span>,
                 namespace,
-            } =&gt; <span class="prelude-val">Some</span>(Table::new(table.clone(), namespace.clone())),
+            } =&gt; <span class="prelude-val">Some</span>(Table {
+                table: table.clone(),
+                namespace: namespace.clone(),
+            }),
             SqlMigrationWarningCheck::NonEmptyColumnDrop { .. } | SqlMigrationWarningCheck::RiskyCast { .. } =&gt; <span class="prelude-val">None</span>,
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
@@ -217,7 +249,11 @@
                 table,
                 column,
                 namespace,
-            } =&gt; <span class="prelude-val">Some</span>(Column::new(table.clone(), namespace.clone(), column.clone())),
+            } =&gt; <span class="prelude-val">Some</span>(Column {
+                table: table.clone(),
+                namespace: namespace.clone(),
+                column: column.clone(),
+            }),
 
             SqlMigrationWarningCheck::NonEmptyTableDrop { .. } | SqlMigrationWarningCheck::PrimaryKeyChange { .. } =&gt; {
                 <span class="prelude-val">None
@@ -229,7 +265,10 @@
     <span class="kw">fn </span>evaluate(<span class="kw-2">&amp;</span><span class="self">self</span>, database_check_results: <span class="kw-2">&amp;</span>DatabaseInspectionResults) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             SqlMigrationWarningCheck::DropAndRecreateColumn { table, column, namespace } =&gt; {
-                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(table.clone(), namespace.clone(), column.clone())) {
+                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column{
+                        table: table.clone(),
+                        namespace: namespace.clone(),
+                        column: column.clone()}) {
                 (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>,
                 (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The `{}` column on the `{}` table would be dropped and recreated. This will lead to data loss if there is data in the column.&quot;</span>, column, table)),
@@ -237,18 +276,29 @@
 
             }
         },
-            SqlMigrationWarningCheck::NonEmptyTableDrop { table, namespace } =&gt; <span class="kw">match </span>database_check_results.get_row_count(<span class="kw-2">&amp;</span>Table::new(table.clone(), namespace.clone())) {
+            SqlMigrationWarningCheck::NonEmptyTableDrop { table, namespace } =&gt;
+                <span class="kw">match </span>database_check_results.get_row_count(<span class="kw-2">&amp;</span>Table{
+                    table: table.clone(),
+                    namespace: namespace.clone()}) {
                 <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// dropping the table is safe if it&#39;s empty
                 </span><span class="prelude-val">Some</span>(rows_count) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{table_name}` table, which is not empty ({rows_count} rows).&quot;</span>, table_name = table, rows_count = rows_count)),
                 <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.&quot;</span>, table)),
             },
-            SqlMigrationWarningCheck::NonEmptyColumnDrop { table, column, namespace } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(table.clone(), namespace.clone(), column.clone())) {
+            SqlMigrationWarningCheck::NonEmptyColumnDrop { table, column, namespace } =&gt;
+                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column{
+                    table: table.clone(),
+                    namespace: namespace.clone(),
+                    column: column.clone()}) {
                 (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column on an empty table
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column if it only contains null values
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {value_count} non-null values.&quot;</span>, column_name = column, table_name = table, value_count = value_count)),
                 (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table. All the data in the column will be lost.&quot;</span>, column_name = column, table_name = table)),
             },
-            SqlMigrationWarningCheck::RiskyCast { table, column, previous_type, next_type, namespace } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(table.clone(), namespace.clone(), column.clone())) {
+            SqlMigrationWarningCheck::RiskyCast { table, column, previous_type, next_type, namespace } =&gt;
+                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column{
+                    table: table.clone(),
+                    namespace: namespace.clone(),
+                    column: column.clone()}) {
                 (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`.&quot;</span>, column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
@@ -257,18 +307,26 @@
             },
 
             <span class="comment">// todo this seems to not be reached when only a table is dropped and recreated
-            </span>SqlMigrationWarningCheck::NotCastable { table, column, previous_type, next_type, namespace } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(table.clone(), namespace.clone(), column.clone())) {
+            </span>SqlMigrationWarningCheck::NotCastable { table, column, previous_type, next_type, namespace } =&gt;
+                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column{
+                    table: table.clone(),
+                    namespace: namespace.clone(),
+                    column: column.clone()}) {
                 (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values
                 </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
                 (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
 
             },
-            SqlMigrationWarningCheck::PrimaryKeyChange { table, namespace } =&gt; <span class="kw">match </span>database_check_results.get_row_count(<span class="kw-2">&amp;</span>Table::new(table.clone(), namespace.clone())) {
+            SqlMigrationWarningCheck::PrimaryKeyChange { table, namespace } =&gt;
+                <span class="kw">match </span>database_check_results.get_row_count(<span class="kw-2">&amp;</span>Table{
+                        table: table.clone(),
+                        namespace: namespace.clone()}) {
                 <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>,
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The primary key for the `{table}` table will be changed. If it partially fails, the table could be left without primary key constraint.&quot;</span>, table = table)),
             },
-            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;A unique constraint covering the columns `[{columns}]` on the table `{table}` will be added. If there are existing duplicate values, this will fail.&quot;</span>, table = table, columns = columns.join(<span class="string">&quot;,&quot;</span>))),
+            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =&gt;
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;A unique constraint covering the columns `[{columns}]` on the table `{table}` will be added. If there are existing duplicate values, this will fail.&quot;</span>, table = table, columns = columns.join(<span class="string">&quot;,&quot;</span>))),
             SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The values [{values}] on the enum `{enm}` will be removed. If these variants are still used in the database, this will fail.&quot;</span>, enm = enm, values = values.join(<span class="string">&quot;,&quot;</span>))),
 
         }

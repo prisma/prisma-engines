@@ -131,17 +131,6 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     check::{Check, Column, Table},
     database_inspection_results::DatabaseInspectionResults,
@@ -149,34 +138,29 @@
 
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>UnexecutableStepCheck {
-    AddedRequiredFieldToTable { table: String, column: String },
-    AddedRequiredFieldToTableWithPrismaLevelDefault { table: String, column: String },
-    MadeOptionalFieldRequired { table: String, column: String },
-    MadeScalarFieldIntoArrayField { table: String, column: String },
-    DropAndRecreateRequiredColumn { table: String, column: String },
+    AddedRequiredFieldToTable(Column),
+    AddedRequiredFieldToTableWithPrismaLevelDefault(Column),
+    MadeOptionalFieldRequired(Column),
+    MadeScalarFieldIntoArrayField(Column),
+    DropAndRecreateRequiredColumn(Column),
 }
 
 <span class="kw">impl </span>Check <span class="kw">for </span>UnexecutableStepCheck {
     <span class="kw">fn </span>needed_table_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Table&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column: <span class="kw">_ </span>}
-            | UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: <span class="kw">_ </span>}
-            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: <span class="kw">_ </span>}
-            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: <span class="kw">_ </span>}
-            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: <span class="kw">_ </span>} =&gt; {
-                <span class="prelude-val">Some</span>(Table::new(table.clone(), <span class="prelude-val">None</span>))
-            } <span class="comment">// TODO(MultiSchema): test this is fine
-        </span>}
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(column)
+            | UnexecutableStepCheck::MadeOptionalFieldRequired(column)
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField(column)
+            | UnexecutableStepCheck::AddedRequiredFieldToTable(column)
+            | UnexecutableStepCheck::DropAndRecreateRequiredColumn(column) =&gt; <span class="prelude-val">Some</span>(Table::from_column(column)),
+        }
     }
 
     <span class="kw">fn </span>needed_column_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Column&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
-            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } =&gt; {
-                <span class="prelude-val">Some</span>(Column::new(table.clone(), <span class="prelude-val">None</span>, column.clone()))
-            }
-            <span class="comment">// TODO(MultiSchema): test this is fine
-            </span>UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
+            UnexecutableStepCheck::MadeOptionalFieldRequired(column)
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField(column) =&gt; <span class="prelude-val">Some</span>(column.clone()),
+            UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
             | UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { .. }
             | UnexecutableStepCheck::DropAndRecreateRequiredColumn { .. } =&gt; <span class="prelude-val">None</span>,
         }
@@ -184,18 +168,17 @@
 
     <span class="kw">fn </span>evaluate&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, database_checks: <span class="kw-2">&amp;</span>DatabaseInspectionResults) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            UnexecutableStepCheck::AddedRequiredFieldToTable { table, column } =&gt; {
+            UnexecutableStepCheck::AddedRequiredFieldToTable(column) =&gt; {
                 <span class="kw">let </span>message = |details| {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Added the required column `{column}` to the `{table}` table without a default value. {details}&quot;</span>,
-                        table = table,
-                        column = column,
+                        table = column.table,
+                        column = column.column,
                         details = details,
                     )
                 };
 
-                <span class="comment">// TODO(MultiSchema): test this is fine
-                </span><span class="kw">let </span>message = <span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::new(table.clone(), <span class="prelude-val">None</span>)) {
+                <span class="kw">let </span>message = <span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::from_column(column)) {
                     <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>, <span class="comment">// Adding a required column is possible if there is no data
                     </span><span class="prelude-val">Some</span>(row_count) =&gt; message(<span class="macro">format_args!</span>(
                         <span class="string">&quot;There are {row_count} rows in this table, it is not possible to execute this step.&quot;</span>,
@@ -206,18 +189,17 @@
 
                 <span class="prelude-val">Some</span>(message)
             }
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault { table, column } =&gt; {
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(column) =&gt; {
                 <span class="kw">let </span>message = |details| {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;The required column `{column}` was added to the `{table}` table with a prisma-level default value. {details} Please add this column as optional, then populate it before making it required.&quot;</span>,
-                        table = table,
-                        column = column,
+                        table = column.table,
+                        column = column.column,
                         details = details,
                     )
                 };
 
-                <span class="comment">// TODO(MultiSchema): test this is fine
-                </span><span class="kw">let </span>message = <span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::new(table.clone(), <span class="prelude-val">None</span>)) {
+                <span class="kw">let </span>message = <span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::from_column(column)) {
                     <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>, <span class="comment">// Adding a required column is possible if there is no data
                     </span><span class="prelude-val">Some</span>(row_count) =&gt; message(<span class="macro">format_args!</span>(
                         <span class="string">&quot;There are {row_count} rows in this table, it is not possible to execute this step.&quot;</span>,
@@ -228,9 +210,8 @@
 
                 <span class="prelude-val">Some</span>(message)
             }
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } =&gt; {
-                <span class="comment">// TODO(MultiSchema): test this is fine
-                </span><span class="kw">match </span>database_checks.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(table.clone(), <span class="prelude-val">None</span>, column.clone())) {
+            UnexecutableStepCheck::MadeOptionalFieldRequired(column) =&gt; {
+                <span class="kw">match </span>database_checks.get_row_and_non_null_value_count(column) {
                     (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     (<span class="prelude-val">Some</span>(row_count), <span class="prelude-val">Some</span>(value_count)) =&gt; {
                         <span class="kw">let </span>null_value_count = row_count - value_count;
@@ -241,29 +222,27 @@
 
                         <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
                             <span class="string">&quot;Made the column `{column}` on table `{table}` required, but there are {null_value_count} existing NULL values.&quot;</span>,
-                            column = column,
-                            table = table,
+                            column = column.column,
+                            table = column.table,
                             null_value_count = null_value_count,
                         ))
                     },
                     (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;Made the column `{column}` on table `{table}` required. This step will fail if there are existing NULL values in that column.&quot;</span>,
-                        column = column,
-                        table = table
+                        column = column.column,
+                        table = column.table
                     )),
                 }
             }
-            UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } =&gt; {
+            UnexecutableStepCheck::MadeScalarFieldIntoArrayField(column) =&gt; {
                 <span class="kw">let </span>message = |details| {
-                    <span class="macro">format!</span>(<span class="string">&quot;Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}&quot;</span>, column = column, table = table, details = details)
+                    <span class="macro">format!</span>(<span class="string">&quot;Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}&quot;</span>,
+                            column = column.column,
+                            table = column.table,
+                            details = details)
                 };
 
-                <span class="comment">// TODO(MultiSchema): test this is fine
-                </span><span class="kw">match </span>database_checks.get_row_and_non_null_value_count(<span class="kw-2">&amp;</span>Column::new(
-                    table.clone(),
-                    <span class="prelude-val">None</span>,
-                    column.clone(),
-                )) {
+                <span class="kw">match </span>database_checks.get_row_and_non_null_value_count(column) {
                     (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>,
                     (<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(message(<span class="macro">format_args!</span>(
@@ -275,12 +254,11 @@
                     </span>))),
                 }
             }
-            UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column } =&gt; {
-                <span class="comment">// TODO(MultiSchema): test this is fine
-                </span><span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::new(table.clone(), <span class="prelude-val">None</span>)) {
-                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.&quot;</span>, column = column, table = table)),
+            UnexecutableStepCheck::DropAndRecreateRequiredColumn(column) =&gt; {
+                <span class="kw">match </span>database_checks.get_row_count(<span class="kw-2">&amp;</span>Table::from_column(column)) {
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.&quot;</span>, column = column.column, table = column.table)),
                     <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.&quot;</span>, column = column, table = table)),
+                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.&quot;</span>, column = column.column, table = column.table)),
                 }
             }
         }

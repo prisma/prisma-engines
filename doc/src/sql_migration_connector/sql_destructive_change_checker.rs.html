@@ -295,6 +295,11 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL implementation of DestructiveChangeChecker is responsible for
 //! informing users about potentially destructive or impossible changes that
 //! their attempted migrations contain.
@@ -331,6 +336,8 @@
 <span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 <span class="kw">use </span>unexecutable_step_check::UnexecutableStepCheck;
 <span class="kw">use </span>warning_check::SqlMigrationWarningCheck;
+
+<span class="kw">use </span><span class="self">self</span>::check::Column;
 
 <span class="kw">impl </span>SqlMigrationConnector {
     <span class="kw">fn </span>check_table_drop(
@@ -381,15 +388,17 @@
         }
 
         <span class="kw">let </span>typed_unexecutable = <span class="kw">if </span>has_virtual_default {
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(Column {
                 table: column.table().name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
                 column: column.name().to_owned(),
-            }
+            })
         } <span class="kw">else </span>{
-            UnexecutableStepCheck::AddedRequiredFieldToTable {
-                column: column.name().to_owned(),
+            UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                 table: column.table().name().to_owned(),
-            }
+                namespace: column.table().namespace().map(str::to_owned),
+                column: column.name().to_owned(),
+            })
         };
 
         plan.push_unexecutable(typed_unexecutable, step_index);
@@ -501,10 +510,11 @@
                                 &amp;&amp; columns.next.default().is_none()
                             {
                                 plan.push_unexecutable(
-                                    UnexecutableStepCheck::MadeOptionalFieldRequired {
+                                    UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                                         table: columns.previous.table().name().to_owned(),
+                                        namespace: columns.previous.table().namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
-                                    },
+                                    }),
                                     step_index,
                                 );
                             }

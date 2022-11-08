@@ -176,6 +176,12 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, <span class="kw-2">*</span>};
 <span class="kw">use </span>std::fmt::{Display, Write <span class="kw">as _</span>};
 
@@ -183,6 +189,12 @@
 
 <span class="doccomment">/// A table name with an optional schema prefix.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableName&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, <span class="kw">pub</span>(<span class="kw">crate</span>) Quoted&lt;T&gt;);
+
+<span class="kw">impl</span>&lt;T&gt; TableName&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(namespace: <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, name: Quoted&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        TableName(namespace, name)
+    }
+}
 
 <span class="kw">impl</span>&lt;T&gt; Display <span class="kw">for </span>TableName&lt;T&gt;
 <span class="kw">where
