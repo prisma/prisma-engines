@@ -7,10 +7,6 @@ pub struct Table {
 }
 
 impl Table {
-    pub fn new(table: String, namespace: Option<String>) -> Self {
-        Self { table, namespace }
-    }
-
     pub fn from_column(column: &Column) -> Self {
         Self {
             table: column.table.clone(),
@@ -24,16 +20,6 @@ pub struct Column {
     pub table: String,
     pub namespace: Option<String>,
     pub column: String,
-}
-
-impl Column {
-    pub fn new(table: String, namespace: Option<String>, column: String) -> Self {
-        Self {
-            table,
-            namespace,
-            column,
-        }
-    }
 }
 
 /// This trait should be implemented by warning and unexecutable migration types. It lets them
