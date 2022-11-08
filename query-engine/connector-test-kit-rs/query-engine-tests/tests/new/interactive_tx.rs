@@ -504,6 +504,7 @@ mod itx_isolation {
     }
 
     // TiDB supports repeatable read isolation level, but doesn't support serializable isolation level.
+    // Link: https://docs.pingcap.com/tidb/stable/transaction-isolation-levels#tidb-transaction-isolation-levels
     #[connector_test(only(TiDB))]
     async fn tidb_basic_repeatable_read(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("RepeatableRead".to_owned())).await?;
