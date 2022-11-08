@@ -273,7 +273,9 @@ fn multi_schema_drop_and_recreate_not_null_column_with_null_value(api: TestApi) 
     api.schema_push(second)
         .send()
         .assert_warnings(&[])
-        .assert_unexecutable(&["Made the column `name` on table `Second` required, but there are 1 existing NULL values.".to_owned()])
+        .assert_unexecutable(&[
+            "Made the column `name` on table `Second` required, but there are 1 existing NULL values.".to_owned(),
+        ])
         .assert_no_steps();
 
     let mut vec_namespaces = vec![String::from("one"), String::from("two")];
