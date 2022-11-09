@@ -71,6 +71,10 @@ impl BatchDocument {
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
     fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+        if !op.is_find_unique() {
+            return true;
+        }
+
         let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
         let field = schema.find_query_field(op.name()).unwrap();
         let model = field.model().unwrap();
