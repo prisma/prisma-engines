@@ -34,7 +34,7 @@ mod compound_batch {
 
         // With non unique filters
         let queries = vec![
-            r#"query { findUniqueArtist(where: { firstName_lastName: { firstName:"Musti", lastName:"Naukio", non_unique: 0 }}) { firstName lastName non_unique }}"#.to_string()
+            r#"query { findUniqueArtist(where: { firstName_lastName: { firstName:"Musti", lastName:"Naukio" }, non_unique: 0}) { firstName lastName non_unique }}"#.to_string()
         ];
         let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
@@ -62,9 +62,9 @@ mod compound_batch {
 
         // With non unique filters
         let queries = vec![
-            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio", non_unique: 0}}) {firstName lastName}}"#.to_string(),
-            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio", non_unique: 1}}) {firstName lastName}}"#.to_string(),
-            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti", non_unique: null}}) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, non_unique: 0}) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, non_unique: 1}) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}, non_unique: null}) {firstName lastName}}"#.to_string(),
         ];
         let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
@@ -305,6 +305,13 @@ mod compound_batch {
         ]).await?;
         assert!(doc.is_compact() == false);
 
+        // NO COMPACT: One of the query is not a findUnique
+        let doc = compact_batch(&runner, vec![
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: 1 }) {firstName lastName}}"#.to_string(),
+            r#"query {findManyArtist {firstName lastName}}"#.to_string(),
+        ]).await?;
+        assert!(doc.is_compact() == false);
+
         Ok(())
     }
 
@@ -338,10 +345,13 @@ mod compound_batch {
     }
 
     async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<BatchDocument> {
-        // Ensure queries are valid
+        // Ensure individual queries are valid. Helps to debug tests when writing them.
         for q in queries.iter() {
             run_query!(runner, q.to_string());
         }
+
+        // Ensure batched queries are valid
+        runner.batch(queries.clone(), false, None).await?.assert_success();
 
         let doc = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
