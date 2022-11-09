@@ -446,8 +446,8 @@ impl SqlRenderer for PostgresFlavour {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = match foreign_key.table().namespace() {
-              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
-              None => foreign_key.table().name().into(),
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
+                None => foreign_key.table().name().into(),
             },
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
@@ -456,8 +456,8 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         ddl::DropIndex {
             index_name: match index.table().namespace() {
-              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
-              None => index.name().into(),
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
+                None => index.name().into(),
             },
         }
         .to_string()
@@ -480,8 +480,8 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         ddl::DropView {
             view_name: match view.namespace() {
-              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
-              None => view.name().into(),
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
+                None => view.name().into(),
             },
         }
         .to_string()
@@ -916,8 +916,11 @@ fn render_postgres_alter_enum(
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
                     enum_name = match schemas.walk(alter_enum.id).previous.namespace() {
-                      Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), schemas.walk(alter_enum.id).previous.name().into()),
-                      None => schemas.walk(alter_enum.id).previous.name().into(),
+                        Some(namespace) => PostgresIdentifier::WithSchema(
+                            namespace.into(),
+                            schemas.walk(alter_enum.id).previous.name().into()
+                        ),
+                        None => schemas.walk(alter_enum.id).previous.name().into(),
                     },
                     value = Quoted::postgres_string(created_value)
                 )

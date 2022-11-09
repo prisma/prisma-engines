@@ -1,4 +1,7 @@
-use migration_core::{migration_connector::{MigrationConnector, Namespaces}, CoreResult};
+use migration_core::{
+    migration_connector::{MigrationConnector, Namespaces},
+    CoreResult,
+};
 
 #[must_use = "This struct does nothing on its own. See Reset::send()"]
 pub struct Reset<'a> {
