@@ -254,6 +254,60 @@ mod native_upsert {
         Ok(())
     }
 
+    pub fn relations() -> String {
+        let schema = indoc! {
+            "
+          model User {
+            #id(id, Int, @id)
+            first_name String
+            last_name  String
+            email      String    @unique
+            birthday   DateTime?
+            location Location?
+          }
+
+          model Location {
+            #id(id, Int, @id)
+          
+            userId Int @unique
+            user User @relation(fields: [userId], references: [id])
+          }
+        "
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(relations))]
+    async fn should_not_if_has_nested_select(mut runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            upsertOneUser(
+              where: {email: "email1"}
+              create: {
+                id: 1,
+                first_name: "first",
+                last_name: "last",
+                email: "email1",
+              }
+              update: {
+                email: "email1-updated",
+              }
+            ){
+              id,
+              email,
+              location {
+                id
+              }
+            }
+          }"#),
+          @r###"{"data":{"upsertOneUser":{"id":1,"email":"email1","location":null}}}"###
+        );
+
+        assert_not_used_native_upsert(&mut runner).await;
+        Ok(())
+    }
+
     pub fn compound_id() -> String {
         let schema = indoc! {
             "model TestModel {
