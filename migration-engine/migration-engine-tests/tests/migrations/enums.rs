@@ -538,7 +538,6 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
 
-// change the default instead of dropping it
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn alter_enum_and_change_default_must_work(api: TestApi) {
     let plain_dm = r#"
@@ -585,6 +584,38 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
         })
     });
 
-    // api.reset().send_sync();
-    // Repeat the test above with migrations, so we can see the SQL
+    // we repeat the same tests with migrations, so we can observe the generated SQL statements.
+    api.reset().send_sync();
+    api.assert_schema().assert_tables_count(0);
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                COMMIT;
+
+                -- AlterTable
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+            "#]];
+            migration.expect_contents(expected_script)
+        });
 }
