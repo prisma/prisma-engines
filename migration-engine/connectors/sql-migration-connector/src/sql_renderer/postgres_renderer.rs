@@ -454,9 +454,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
-        // TODO(PR): I guess namespace should be here somewhere
         ddl::DropIndex {
-            index_name: index.name().into(),
+            index_name: match index.table().namespace() {
+              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
+              None => index.name().into(),
+            },
         }
         .to_string()
     }
