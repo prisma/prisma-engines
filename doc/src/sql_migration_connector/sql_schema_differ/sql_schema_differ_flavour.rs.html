@@ -162,12 +162,6 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{differ_database::DifferDatabase, ColumnTypeChange};
 <span class="kw">use crate</span>::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 <span class="kw">use </span>sql_schema_describer::{
@@ -212,13 +206,7 @@
     }
 
     <span class="doccomment">/// Return whether a column&#39;s type needs to be migrated, and how.
-    </span><span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
-        <span class="kw">if </span>differ.previous.column_type_family() != differ.next.column_type_family() {
-            <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
+    </span><span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;;
 
     <span class="doccomment">/// Push enum-related steps.
     </span><span class="kw">fn </span>push_enum_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, _db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
