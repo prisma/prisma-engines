@@ -443,15 +443,18 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
-        // TODO(PR): I guess namespace should be here somewhere
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote(foreign_key.table().name()),
+            table = match foreign_key.table().namespace() {
+              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
+              None => foreign_key.table().name().into(),
+            },
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
+        // TODO(PR): I guess namespace should be here somewhere
         ddl::DropIndex {
             index_name: index.name().into(),
         }
