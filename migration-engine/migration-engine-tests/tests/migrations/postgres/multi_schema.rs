@@ -446,3 +446,59 @@ fn multi_schema_remove_field_array(api: TestApi) {
         .assert_has_table("First")
         .assert_has_table("Second");
 }
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("one", "two")
+)]
+fn multi_schema_rename_index(api: TestApi) {
+    let base = indoc! {r#"
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          schemas    = ["one", "two"]
+        }
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+        model First {
+          id Int @id
+          @@schema("one")
+        }
+    "#};
+    let first = base.to_owned()
+        + indoc! {r#"
+        model Second {
+          id Int @id
+          name String
+          @@index(fields: [name], map: "index_name")
+          @@schema("two")
+        }
+    "#};
+    let second = base.to_owned()
+        + indoc! {r#"
+        model Second {
+          id Int @id
+          name String
+          @@index(fields: [name], map: "new_index_name")
+          @@schema("two")
+        }
+    "#};
+
+    api.schema_push(first).send().assert_green().assert_has_executed_steps();
+    api.schema_push(second)
+        .send()
+        .assert_warnings(&[])
+        .assert_unexecutable(&[])
+        .assert_has_executed_steps();
+
+    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
+    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
+
+    api.assert_schema_with_namespaces(namespaces)
+        .assert_has_table("First")
+        .assert_has_table("Second");
+}

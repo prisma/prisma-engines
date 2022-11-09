@@ -222,8 +222,13 @@ impl SqlRenderer for PostgresFlavour {
     fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
+                let previous_table = indexes.previous.table();
+                let index_previous_name = match previous_table.namespace() {
+                    Some(ns) => format!("{}.{}", self.quote(ns), self.quote(indexes.previous.name())),
+                    None => format!("{}", self.quote(indexes.previous.name())),
+                };
                 stmt.push_str("ALTER INDEX ");
-                stmt.push_display(&Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(&index_previous_name);
                 stmt.push_str(" RENAME TO ");
                 stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
             })
