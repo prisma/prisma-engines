@@ -1060,11 +1060,11 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>assert_values(<span class="self">self</span>, expected_values: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="number">0</span>.values() == expected_values,
+            <span class="self">self</span>.<span class="number">0</span>.values().len() == expected_values.len() &amp;&amp; <span class="self">self</span>.<span class="number">0</span>.values().zip(expected_values).all(|(a, b)| a == <span class="kw-2">*</span>b),
             <span class="string">&quot;Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n&quot;</span>,
             <span class="self">self</span>.<span class="number">0</span>.name(),
             expected_values,
-            <span class="self">self</span>.<span class="number">0</span>.values(),
+            <span class="self">self</span>.<span class="number">0</span>.values().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
         );
         <span class="self">self
     </span>}

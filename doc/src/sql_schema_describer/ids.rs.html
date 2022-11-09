@@ -35,6 +35,10 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// The identifier for a table in a SqlSchema.
@@ -44,6 +48,10 @@
 <span class="doccomment">/// The identifier for an enum in a SqlSchema.
 </span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>EnumId(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
+
+<span class="doccomment">/// The identifier for an enum variant in a SqlSchema.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>EnumVariantId(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
 
 <span class="doccomment">/// The identifier for a column in a SqlSchema.
 </span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]

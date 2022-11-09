@@ -1367,8 +1367,15 @@
 <span id="1367">1367</span>
 <span id="1368">1368</span>
 <span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
-<span class="kw">use crate</span>::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
+<span class="kw">use crate</span>::{
+    flavour::MysqlFlavour,
+    pair::Pair,
+    sql_schema_differ::{all_match, ColumnTypeChange},
+};
 <span class="kw">use </span>psl::builtin_connectors::MySqlType;
 <span class="kw">use </span>sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
@@ -1409,14 +1416,13 @@
             differ.next.column_type_family_as_enum(),
         ) {
             (<span class="prelude-val">Some</span>(previous_enum), <span class="prelude-val">Some</span>(next_enum)) =&gt; {
-                <span class="kw">if </span>previous_enum.values() == next_enum.values() {
+                <span class="kw">if </span>all_match(<span class="kw-2">&amp;mut </span>previous_enum.values(), <span class="kw-2">&amp;mut </span>next_enum.values()) {
                     <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
                 <span class="kw">return if </span>previous_enum
                     .values()
-                    .iter()
-                    .all(|previous_value| next_enum.values().iter().any(|next_value| previous_value == next_value))
+                    .all(|previous_value| next_enum.values().any(|next_value| previous_value == next_value))
                 {
                     <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast)
                 } <span class="kw">else </span>{

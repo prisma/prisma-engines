@@ -534,6 +534,8 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>column;
 <span class="kw">mod </span>differ_database;
 <span class="kw">mod </span>enums;
@@ -848,9 +850,7 @@
         <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if </span>previous.column_names().len() == next.column_names().len()
-        &amp;&amp; previous.column_names().zip(next.column_names()).all(|(p, n)| p == n)
-    {
+    <span class="kw">if </span>all_match(<span class="kw-2">&amp;mut </span>previous.column_names(), <span class="kw-2">&amp;mut </span>next.column_names()) {
         <span class="kw">return</span>;
     }
 
@@ -1069,6 +1069,10 @@
     }
 
     table.column(<span class="string">&quot;A&quot;</span>).is_some() &amp;&amp; table.column(<span class="string">&quot;B&quot;</span>).is_some()
+}
+
+<span class="kw">fn </span>all_match&lt;T: PartialEq&gt;(a: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ExactSizeIterator&lt;Item = T&gt;, b: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ExactSizeIterator&lt;Item = T&gt;) -&gt; bool {
+    a.len() == b.len() &amp;&amp; a.zip(b).all(|(a, b)| a == b)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

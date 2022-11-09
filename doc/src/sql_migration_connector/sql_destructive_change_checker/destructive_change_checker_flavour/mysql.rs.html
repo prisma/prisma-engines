@@ -177,12 +177,6 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{MysqlFlavour, SqlFlavour},
@@ -343,14 +337,8 @@
     ) {
         <span class="kw">let </span>removed_values: Vec&lt;String&gt; = previous_enum
             .values()
-            .iter()
-            .filter(|previous_value| {
-                !next_enum
-                    .values()
-                    .iter()
-                    .any(|next_value| previous_value.as_str() == next_value.as_str())
-            })
-            .cloned()
+            .filter(|previous_value| !next_enum.values().any(|next_value| <span class="kw-2">*</span>previous_value == next_value))
+            .map(ToOwned::to_owned)
             .collect();
 
         <span class="kw">if </span>!removed_values.is_empty() {

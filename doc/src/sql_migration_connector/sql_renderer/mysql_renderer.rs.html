@@ -516,11 +516,6 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, IteratorJoin, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::MysqlFlavour,
@@ -909,12 +904,7 @@
 
 <span class="kw">fn </span>render_column_type(column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
     <span class="kw">if let </span>ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
-        <span class="kw">let </span>variants: String = column
-            .walk(<span class="kw-2">*</span>enum_id)
-            .values()
-            .iter()
-            .map(Quoted::mysql_string)
-            .join(<span class="string">&quot;, &quot;</span>);
+        <span class="kw">let </span>variants: String = column.walk(<span class="kw-2">*</span>enum_id).values().map(Quoted::mysql_string).join(<span class="string">&quot;, &quot;</span>);
 
         <span class="kw">return </span><span class="macro">format!</span>(<span class="string">&quot;ENUM({})&quot;</span>, variants).into();
     }

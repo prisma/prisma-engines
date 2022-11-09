@@ -763,6 +763,12 @@
 <span id="763">763</span>
 <span id="764">764</span>
 <span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attribute">#![deny(rust_2018_idioms, unsafe_code)]
@@ -826,6 +832,7 @@
     </span>tables: Vec&lt;Table&gt;,
     <span class="doccomment">/// The schema&#39;s enums.
     </span>enums: Vec&lt;Enum&gt;,
+    enum_variants: Vec&lt;EnumVariant&gt;,
     <span class="doccomment">/// The schema&#39;s columns.
     </span>columns: Vec&lt;(TableId, Column)&gt;,
     <span class="doccomment">/// All foreign keys.
@@ -932,14 +939,15 @@
         <span class="self">self</span>.enums.push(Enum {
             namespace_id,
             name: enum_name,
-            values: Vec::new(),
         });
         id
     }
 
     <span class="doccomment">/// Add a variant to an enum.
-    </span><span class="kw">pub fn </span>push_enum_variant(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enum_id: EnumId, variant: String) {
-        <span class="self">self</span>.enums[enum_id.<span class="number">0 </span><span class="kw">as </span>usize].values.push(variant)
+    </span><span class="kw">pub fn </span>push_enum_variant(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enum_id: EnumId, variant_name: String) -&gt; EnumVariantId {
+        <span class="kw">let </span>id = EnumVariantId(<span class="self">self</span>.enum_variants.len() <span class="kw">as </span>u32);
+        <span class="self">self</span>.enum_variants.push(EnumVariant { enum_id, variant_name });
+        id
     }
 
     <span class="doccomment">/// Add a fulltext index to the schema.
@@ -1376,13 +1384,17 @@
 }
 
 <span class="doccomment">/// A SQL enum.
-</span><span class="attribute">#[derive(Serialize, Deserialize, PartialEq, Debug)]
+</span><span class="attribute">#[derive(Serialize, Deserialize, Debug)]
 </span><span class="kw">struct </span>Enum {
     <span class="doccomment">/// The namespace the enum type belongs to, if applicable.
     </span>namespace_id: NamespaceId,
     name: String,
-    <span class="doccomment">/// Possible enum values.
-    </span>values: Vec&lt;String&gt;,
+}
+
+<span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+</span><span class="kw">struct </span>EnumVariant {
+    enum_id: EnumId,
+    variant_name: String,
 }
 
 <span class="doccomment">/// An SQL view.

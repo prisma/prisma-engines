@@ -31,18 +31,6 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
 </pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer::walkers::EnumWalker;
 
 <span class="kw">use </span><span class="kw">crate</span>::pair::Pair;
@@ -53,35 +41,23 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumDiffer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_values&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; + <span class="lifetime">&#39;b </span>{
-        <span class="self">self</span>.enums
-            .next
-            .values()
-            .iter()
-            .filter(<span class="kw">move </span>|next_value| {
-                !<span class="self">self
-                    </span>.enums
-                    .previous
-                    .values()
-                    .iter()
-                    .any(|previous_value| values_match(previous_value, next_value))
-            })
-            .map(String::as_str)
+        <span class="self">self</span>.enums.next.values().filter(<span class="kw">move </span>|next_value| {
+            !<span class="self">self
+                </span>.enums
+                .previous
+                .values()
+                .any(|previous_value| values_match(previous_value, next_value))
+        })
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_values&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; + <span class="lifetime">&#39;b </span>{
-        <span class="self">self</span>.enums
-            .previous
-            .values()
-            .iter()
-            .filter(<span class="kw">move </span>|previous_value| {
-                !<span class="self">self
-                    </span>.enums
-                    .next
-                    .values()
-                    .iter()
-                    .any(|next_value| values_match(previous_value, next_value))
-            })
-            .map(String::as_str)
+        <span class="self">self</span>.enums.previous.values().filter(<span class="kw">move </span>|previous_value| {
+            !<span class="self">self
+                </span>.enums
+                .next
+                .values()
+                .any(|next_value| values_match(previous_value, next_value))
+        })
     }
 }
 

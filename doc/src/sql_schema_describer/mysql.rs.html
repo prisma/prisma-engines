@@ -790,6 +790,8 @@
 <span id="790">790</span>
 <span id="791">791</span>
 <span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1373,8 +1375,7 @@
             <span class="string">&quot;enum&quot; </span>=&gt; {
                 <span class="kw">let </span>enum_name = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, table, column_name);
                 <span class="kw">let </span>enum_id = sql_schema.push_enum(Default::default(), enum_name);
-                <span class="kw">let </span><span class="kw-2">mut </span>enm = <span class="kw-2">&amp;mut </span>sql_schema.enums[enum_id.<span class="number">0 </span><span class="kw">as </span>usize];
-                enm.values = <span class="self">Self</span>::extract_enum_values(<span class="kw-2">&amp;</span>full_data_type);
+                push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), <span class="prelude-val">None</span>)
             }
             <span class="string">&quot;json&quot; </span>=&gt; (ColumnTypeFamily::Json, <span class="prelude-val">Some</span>(MySqlType::Json)),
@@ -1440,12 +1441,6 @@
         <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;.*\(([1-9])\)&quot;#</span>).unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(<span class="number">1</span>).map(|precision| precision.as_str().parse::&lt;u32&gt;().unwrap()))
-    }
-
-    <span class="kw">fn </span>extract_enum_values(full_data_type: &amp;&amp;str) -&gt; Vec&lt;String&gt; {
-        <span class="kw">let </span>len = <span class="kw-2">&amp;</span>full_data_type.len() - <span class="number">1</span>;
-        <span class="kw">let </span>vals = <span class="kw-2">&amp;</span>full_data_type[<span class="number">5</span>..len];
-        vals.split(<span class="string">&#39;,&#39;</span>).map(unquote_string).collect()
     }
 
     <span class="comment">// See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
@@ -1581,6 +1576,15 @@
     }
 
     <span class="prelude-val">Ok</span>(())
+}
+
+<span class="kw">fn </span>push_enum_variants(full_data_type: <span class="kw-2">&amp;</span>str, enum_id: EnumId, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) {
+    <span class="kw">let </span>len = <span class="kw-2">&amp;</span>full_data_type.len() - <span class="number">1</span>;
+    <span class="comment">// full_data_type for enum columns follows the pattern &quot;enum(&#39;a&#39;,&#39;b&#39;)&quot;
+    </span><span class="kw">let </span>vals = <span class="kw-2">&amp;</span>full_data_type[<span class="number">5</span>..len];
+    <span class="kw">for </span>variant <span class="kw">in </span>vals.split(<span class="string">&#39;,&#39;</span>).map(unquote_string) {
+        sql_schema.push_enum_variant(enum_id, variant);
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1480,7 +1480,7 @@
                     Quoted::postgres_ident(enm.name()),
                 ));
                 stmt.push_str(<span class="string">&quot; AS ENUM (&quot;</span>);
-                <span class="kw">let </span><span class="kw-2">mut </span>values = enm.values().iter().peekable();
+                <span class="kw">let </span><span class="kw-2">mut </span>values = enm.values().peekable();
                 <span class="kw">while let </span><span class="prelude-val">Some</span>(value) = values.next() {
                     stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_string(value));
                     <span class="kw">if </span>values.peek().is_some() {
@@ -2064,7 +2064,7 @@
         <span class="kw">let </span>create_new_enum = <span class="macro">format!</span>(
             <span class="string">&quot;CREATE TYPE {enum_name} AS ENUM ({variants})&quot;</span>,
             enum_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_name),
-            variants = enums.next.values().iter().map(Quoted::postgres_string).join(<span class="string">&quot;, &quot;</span>)
+            variants = enums.next.values().map(Quoted::postgres_string).join(<span class="string">&quot;, &quot;</span>)
         );
 
         stmts.push(create_new_enum);
@@ -2191,7 +2191,7 @@
                 .and_then(|v| v.as_enum_value())
                 .map(|value| (col, value))
         })
-        .filter(|(<span class="kw">_</span>, value)| !enums.next.values().iter().any(|v| v == value));
+        .filter(|(<span class="kw">_</span>, value)| !enums.next.values().any(|v| v == <span class="kw-2">*</span>value));
 
     <span class="kw">for </span>(col, <span class="kw">_</span>) <span class="kw">in </span>defaults_to_drop {
         renderer.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {

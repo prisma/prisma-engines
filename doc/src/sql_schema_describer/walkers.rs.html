@@ -481,6 +481,7 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
+<span id="484">484</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.
 
 </span><span class="attribute">#![deny(missing_docs)]
@@ -937,8 +938,9 @@
     }
 
     <span class="doccomment">/// The values of the enum
-    </span><span class="kw">pub fn </span>values(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[String] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.get().values
+    </span><span class="kw">pub fn </span>values(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.enum_variants, <span class="self">self</span>.id, |variant| variant.enum_id)
+            .map(<span class="kw">move </span>|idx| <span class="self">self</span>.schema.enum_variants[idx].variant_name.as_str())
     }
 }
 

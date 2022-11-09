@@ -1392,12 +1392,6 @@
 <span id="1392">1392</span>
 <span id="1393">1393</span>
 <span id="1394">1394</span>
-<span id="1395">1395</span>
-<span id="1396">1396</span>
-<span id="1397">1397</span>
-<span id="1398">1398</span>
-<span id="1399">1399</span>
-<span id="1400">1400</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2601,30 +2595,24 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>enum_values: BTreeMap&lt;(String, String), Vec&lt;String&gt;&gt; = BTreeMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>enum_values: BTreeMap&lt;(NamespaceId, String), Vec&lt;String&gt;&gt; = BTreeMap::new();
 
         <span class="kw">for </span>row <span class="kw">in </span>rows.into_iter() {
-            <span class="macro">trace!</span>(<span class="string">&quot;Got enum row: {:?}&quot;</span>, row);
             <span class="kw">let </span>name = row.get_expect_string(<span class="string">&quot;name&quot;</span>);
             <span class="kw">let </span>value = row.get_expect_string(<span class="string">&quot;value&quot;</span>);
             <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
-
-            <span class="kw">let </span>values = enum_values.entry((name, namespace)).or_insert_with(Vec::new);
+            <span class="kw">let </span>namespace_id = sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap();
+            <span class="kw">let </span>values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
             values.push(value);
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>enums: Vec&lt;Enum&gt; = enum_values
-            .into_iter()
-            .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),
-                name,
-                values,
-            })
-            .collect();
+        <span class="kw">for </span>((namespace_id, enum_name), variants) <span class="kw">in </span>enum_values {
+            <span class="kw">let </span>enum_id = sql_schema.push_enum(namespace_id, enum_name);
+            <span class="kw">for </span>variant <span class="kw">in </span>variants {
+                sql_schema.push_enum_variant(enum_id, variant);
+            }
+        }
 
-        enums.sort_by(|a, b| Ord::cmp(<span class="kw-2">&amp;</span>a.name, <span class="kw-2">&amp;</span>b.name));
-
-        sql_schema.enums = enums;
         <span class="prelude-val">Ok</span>(())
     }
 }
