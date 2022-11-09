@@ -1006,26 +1006,24 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
 
     // Reinstall dropped defaults that need to be reinstalled
     {
-        for (prev_colidx, next_colidx) in alter_enum
+        for (columns, next_default) in alter_enum
             .previous_usages_as_default
             .iter()
-            .filter_map(|(prev, next)| next.map(|next| (prev, next)))
+            .filter_map(|(prev, next)| next.map(|next| schemas.walk(Pair::new(*prev, next))))
+            .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
-            let columns = schemas.walk(Pair::new(*prev_colidx, next_colidx));
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
-            let default_str = columns
-                    .next
-                    .default()
-                    .and_then(|default| default.as_value())
-                    .and_then(|value| value.as_enum_value())
-                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
+
+            // TODO: for the current test, data_type is empty. This is a bug.
+            let data_type = &columns.next.column_type().full_data_type;
+            let default_str = render_default(next_default, &data_type);
 
             let set_default = format!(
-                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
+                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}",
                 table_name = Quoted::postgres_ident(&table_name),
                 column_name = Quoted::postgres_ident(&column_name),
-                default = escape_string_literal(default_str),
+                default = default_str,
             );
 
             stmts.push(set_default);

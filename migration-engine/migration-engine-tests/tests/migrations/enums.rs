@@ -1,4 +1,7 @@
+use std::borrow::Cow;
+
 use migration_engine_tests::test_api::*;
+use prisma_value::PrismaValue;
 
 const BASIC_ENUM_DM: &str = r#"
 model Cat {
@@ -533,4 +536,55 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+// change the default instead of dropping it
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_and_change_default_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    api.schema_push(plain_dm).send().assert_green();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([SLEEPY])
+        }
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    // recall: schema_push doesn't run if it has warnings. You need to specify "force(true)"
+    api.schema_push(custom_dm).force(true).send().assert_warnings(&[Cow::from(
+        "The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.",
+    )]);
+    api.schema_push(custom_dm).send().assert_green().assert_no_steps();
+
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("moods", |col| {
+            col.assert_default_value(&PrismaValue::List(vec![PrismaValue::Enum("SLEEPY".to_string())]))
+        })
+    });
+
+    // api.reset().send_sync();
+    // Repeat the test above with migrations, so we can see the SQL
 }
