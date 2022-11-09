@@ -104,10 +104,20 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
-                    values: [
-                        "a",
-                        "b",
-                    ],
+                },
+            ],
+            enum_variants: [
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "a",
+                },
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "b",
                 },
             ],
             columns: [
@@ -916,10 +926,20 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
-                    values: [
-                        "a",
-                        "b",
-                    ],
+                },
+            ],
+            enum_variants: [
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "a",
+                },
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "b",
                 },
             ],
             columns: [
@@ -1731,10 +1751,20 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
-                    values: [
-                        "a",
-                        "b",
-                    ],
+                },
+            ],
+            enum_variants: [
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "a",
+                },
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "b",
                 },
             ],
             columns: [
@@ -2606,6 +2636,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -2781,6 +2812,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -2845,6 +2877,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -2936,6 +2969,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -3016,9 +3050,14 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         0,
                     ),
                     name: "game_enum_col",
-                    values: [
-                        "x-small",
-                    ],
+                },
+            ],
+            enum_variants: [
+                EnumVariant {
+                    enum_id: EnumId(
+                        0,
+                    ),
+                    variant_name: "x-small",
                 },
             ],
             columns: [

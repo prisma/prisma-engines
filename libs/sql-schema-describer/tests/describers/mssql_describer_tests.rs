@@ -137,6 +137,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(

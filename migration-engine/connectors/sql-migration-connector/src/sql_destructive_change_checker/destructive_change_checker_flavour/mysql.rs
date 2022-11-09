@@ -158,14 +158,8 @@ fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveC
     ) {
         let removed_values: Vec<String> = previous_enum
             .values()
-            .iter()
-            .filter(|previous_value| {
-                !next_enum
-                    .values()
-                    .iter()
-                    .any(|next_value| previous_value.as_str() == next_value.as_str())
-            })
-            .cloned()
+            .filter(|previous_value| !next_enum.values().any(|next_value| *previous_value == next_value))
+            .map(ToOwned::to_owned)
             .collect();
 
         if !removed_values.is_empty() {

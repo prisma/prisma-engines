@@ -344,7 +344,7 @@ impl SqlRenderer for PostgresFlavour {
                     Quoted::postgres_ident(enm.name()),
                 ));
                 stmt.push_str(" AS ENUM (");
-                let mut values = enm.values().iter().peekable();
+                let mut values = enm.values().peekable();
                 while let Some(value) = values.next() {
                     stmt.push_display(&Quoted::postgres_string(value));
                     if values.peek().is_some() {
@@ -928,7 +928,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
         let create_new_enum = format!(
             "CREATE TYPE {enum_name} AS ENUM ({variants})",
             enum_name = Quoted::postgres_ident(&tmp_name),
-            variants = enums.next.values().iter().map(Quoted::postgres_string).join(", ")
+            variants = enums.next.values().map(Quoted::postgres_string).join(", ")
         );
 
         stmts.push(create_new_enum);
@@ -1055,7 +1055,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>
                 .and_then(|v| v.as_enum_value())
                 .map(|value| (col, value))
         })
-        .filter(|(_, value)| !enums.next.values().iter().any(|v| v == value));
+        .filter(|(_, value)| !enums.next.values().any(|v| v == *value));
 
     for (col, _) in defaults_to_drop {
         renderer.render_statement(&mut |stmt| {

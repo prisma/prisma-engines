@@ -61,6 +61,7 @@ pub struct SqlSchema {
     tables: Vec<Table>,
     /// The schema's enums.
     enums: Vec<Enum>,
+    enum_variants: Vec<EnumVariant>,
     /// The schema's columns.
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
@@ -167,14 +168,15 @@ impl SqlSchema {
         self.enums.push(Enum {
             namespace_id,
             name: enum_name,
-            values: Vec::new(),
         });
         id
     }
 
     /// Add a variant to an enum.
-    pub fn push_enum_variant(&mut self, enum_id: EnumId, variant: String) {
-        self.enums[enum_id.0 as usize].values.push(variant)
+    pub fn push_enum_variant(&mut self, enum_id: EnumId, variant_name: String) -> EnumVariantId {
+        let id = EnumVariantId(self.enum_variants.len() as u32);
+        self.enum_variants.push(EnumVariant { enum_id, variant_name });
+        id
     }
 
     /// Add a fulltext index to the schema.
@@ -611,13 +613,17 @@ struct ForeignKeyColumn {
 }
 
 /// A SQL enum.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Enum {
     /// The namespace the enum type belongs to, if applicable.
     namespace_id: NamespaceId,
     name: String,
-    /// Possible enum values.
-    values: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct EnumVariant {
+    enum_id: EnumId,
+    variant_name: String,
 }
 
 /// An SQL view.
