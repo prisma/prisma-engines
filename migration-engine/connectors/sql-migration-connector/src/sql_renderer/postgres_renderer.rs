@@ -495,6 +495,8 @@ impl SqlRenderer for PostgresFlavour {
             let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
             result.push(self.render_create_table_as(
                 tables.next,
+                // TODO(MultiSchema): This only matters for CockroachDB, which is not currently
+                // supported by MultiSchema.
                 TableName(None, Quoted::postgres_ident(&temporary_table_name)),
             ));
 
@@ -913,7 +915,10 @@ fn render_postgres_alter_enum(
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.walk(alter_enum.id).previous.name()),
+                    enum_name = match schemas.walk(alter_enum.id).previous.namespace() {
+                      Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), schemas.walk(alter_enum.id).previous.name().into()),
+                      None => schemas.walk(alter_enum.id).previous.name().into(),
+                    },
                     value = Quoted::postgres_string(created_value)
                 )
             })
