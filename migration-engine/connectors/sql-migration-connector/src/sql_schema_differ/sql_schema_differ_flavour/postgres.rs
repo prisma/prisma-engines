@@ -54,7 +54,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // Handle the enum cases first.
-        match columns.map(|col| col.column_type_family().as_enum()).into_tuple() {
+        match columns
+            .map(|col| col.column_type_family_as_enum().map(|e| e.name()))
+            .into_tuple()
+        {
             (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
             (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
             (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
