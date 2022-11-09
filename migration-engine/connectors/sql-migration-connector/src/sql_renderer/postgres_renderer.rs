@@ -196,7 +196,8 @@ impl SqlRenderer for PostgresFlavour {
                 render_cockroach_alter_enum(alter_enum, schemas, step);
             })
         } else {
-            render_postgres_alter_enum(alter_enum, schemas)
+            let flavour = self;
+            render_postgres_alter_enum(alter_enum, schemas, flavour)
         }
     }
 
@@ -883,7 +884,11 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
     }
 }
 
-fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String> {
+fn render_postgres_alter_enum(
+    alter_enum: &AlterEnum,
+    schemas: Pair<&SqlSchema>,
+    flavour: &PostgresFlavour,
+) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
         let mut stmts: Vec<String> = alter_enum
             .created_variants
@@ -1014,9 +1019,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
         {
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
-
-            // TODO: for the current test, data_type is empty. This is a bug.
-            let data_type = &columns.next.column_type().full_data_type;
+            let data_type = render_column_type(columns.next, flavour);
             let default_str = render_default(next_default, &data_type);
 
             let set_default = format!(
