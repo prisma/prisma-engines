@@ -55,7 +55,7 @@ fn soft_resets_work_on_cockroachdb(mut api: TestApi) {
 
     api.raw_cmd(initial);
     api.assert_schema().assert_tables_count(1).assert_has_table("Cat");
-    api.reset().soft(true).send_sync();
+    api.reset().soft(true).send_sync(None);
     api.assert_schema().assert_tables_count(0);
 }
 

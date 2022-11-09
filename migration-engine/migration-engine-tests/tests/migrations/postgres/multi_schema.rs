@@ -720,3 +720,39 @@ fn multi_schema_drop_index(api: TestApi) {
         .assert_has_table("First")
         .assert_has_table("Second");
 }
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("one", "two")
+)]
+fn multi_schema_drop_view(api: TestApi) {
+    let base = indoc! {r#"
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          schemas    = ["one", "two"]
+        }
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+        model First {
+          id Int @id
+          name String
+          @@schema("one")
+        }
+    "#};
+    let first = base.to_owned();
+
+    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
+    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
+
+    api.schema_push(first).send().assert_green().assert_has_executed_steps();
+    api.raw_cmd("CREATE VIEW \"two\".\"Test\" (id, name) as SELECT id, name FROM \"one\".\"First\"");
+    api.reset().soft(true).send_sync(namespaces.clone());
+
+
+    api.assert_schema_with_namespaces(namespaces).assert_views_count(0);
+}

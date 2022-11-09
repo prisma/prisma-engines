@@ -1,4 +1,4 @@
-use migration_core::{migration_connector::MigrationConnector, CoreResult};
+use migration_core::{migration_connector::{MigrationConnector, Namespaces}, CoreResult};
 
 #[must_use = "This struct does nothing on its own. See Reset::send()"]
 pub struct Reset<'a> {
@@ -16,17 +16,16 @@ impl<'a> Reset<'a> {
         self
     }
 
-    pub async fn send(self) -> CoreResult<ResetAssertion> {
-        // TODO(MultiSchema): should we somehow send Namespaces here?
-        self.api.reset(self.soft, None).await?;
+    pub async fn send(self, namespaces: Option<Namespaces>) -> CoreResult<ResetAssertion> {
+        self.api.reset(self.soft, namespaces).await?;
 
         Ok(ResetAssertion {})
     }
 
     /// Execute the command and expect it to succeed.
     #[track_caller]
-    pub fn send_sync(self) -> ResetAssertion {
-        test_setup::runtime::run_with_thread_local_runtime(self.send()).unwrap()
+    pub fn send_sync(self, namespaces: Option<Namespaces>) -> ResetAssertion {
+        test_setup::runtime::run_with_thread_local_runtime(self.send(namespaces)).unwrap()
     }
 }
 

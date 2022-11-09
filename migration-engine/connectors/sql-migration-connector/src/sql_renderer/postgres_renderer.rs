@@ -479,7 +479,10 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         ddl::DropView {
-            view_name: view.name().into(),
+            view_name: match view.namespace() {
+              Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
+              None => view.name().into(),
+            },
         }
         .to_string()
     }

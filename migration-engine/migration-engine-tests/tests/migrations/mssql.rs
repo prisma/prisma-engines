@@ -17,7 +17,7 @@ fn reset_clears_udts(api: TestApi) {
     );
     assert_eq!(1, schemas.len());
 
-    api.reset().send_sync();
+    api.reset().send_sync(None);
 
     let schemas = api.query_raw(
         &format!(
