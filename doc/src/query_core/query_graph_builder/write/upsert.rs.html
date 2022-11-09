@@ -251,11 +251,28 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ParsedField, ParsedInputMap, ParsedInputValue,
+    ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 <span class="kw">use </span>connector::IntoFilter;
 <span class="kw">use </span>prisma_models::ModelRef;
@@ -313,12 +330,14 @@
     <span class="kw">let </span>where_argument = field.where_arg()<span class="question-mark">?</span>.unwrap();
     <span class="kw">let </span>create_argument = field.create_arg()<span class="question-mark">?</span>.unwrap();
     <span class="kw">let </span>update_argument = field.update_arg()<span class="question-mark">?</span>.unwrap();
+    <span class="kw">let </span>selection = <span class="kw-2">&amp;</span>field.nested_fields;
 
     <span class="kw">let </span>can_use_native_upsert = can_use_connector_native_upsert(
         <span class="kw-2">&amp;</span>model,
         <span class="kw-2">&amp;</span>where_argument,
         <span class="kw-2">&amp;</span>create_argument,
         <span class="kw-2">&amp;</span>update_argument,
+        selection,
         connector_ctx,
     );
 
@@ -457,8 +476,11 @@
     where_field: <span class="kw-2">&amp;</span>ParsedInputMap,
     create_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
     update_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
+    selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&gt;,
     connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
 ) -&gt; bool {
+    <span class="kw">let </span>has_nested_selects = has_nested_selects(selection);
+
     <span class="kw">let </span>has_nested_create = create_argument
         .iter()
         .any(|(field_name, <span class="kw">_</span>)| model.fields().find_from_relation_fields(<span class="kw-2">&amp;</span>field_name).is_ok());
@@ -484,6 +506,7 @@
         &amp;&amp; !has_nested_create
         &amp;&amp; !has_nested_update
         &amp;&amp; !empty_update
+        &amp;&amp; !has_nested_selects
         &amp;&amp; where_values_same_as_create
 }
 
@@ -492,6 +515,17 @@
         <span class="prelude-val">Ok</span>(field) =&gt; field.unique(),
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; resolve_compound_field(field_name, model).is_some(),
     }
+}
+
+<span class="kw">fn </span>has_nested_selects(selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&gt;) -&gt; bool {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(parsed_object) = selection {
+        parsed_object
+            .fields
+            .iter()
+            .any(|field| field.parsed_field.nested_fields.is_some())
+    } <span class="kw">else </span>{
+        <span class="bool-val">false
+    </span>}
 }
 
 <span class="doccomment">/// Make sure the unique fields defined in the where clause have the same values
