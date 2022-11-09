@@ -433,13 +433,17 @@ impl SqlRenderer for PostgresFlavour {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropType {
-                    type_name: dropped_enum.name().into(),
+                    type_name: match dropped_enum.namespace() {
+                        Some(ns) => PostgresIdentifier::WithSchema(ns.into(), dropped_enum.name().into()),
+                        None => dropped_enum.name().into(),
+                    },
                 })
             })
         })
     }
 
     fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
+        // TODO(PR): I guess namespace should be here somewhere
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
             table = self.quote(foreign_key.table().name()),
@@ -1007,7 +1011,10 @@ fn render_postgres_alter_enum(
     // Drop old enum
     {
         let sql = ddl::DropType {
-            type_name: tmp_old_name.as_str().into(),
+            type_name: match enums.previous.namespace() {
+                Some(ns) => PostgresIdentifier::WithSchema(ns.into(), tmp_old_name.as_str().into()),
+                None => tmp_old_name.as_str().into(),
+            },
         }
         .to_string();
 
