@@ -1,4 +1,7 @@
+use std::borrow::Cow;
+
 use migration_engine_tests::test_api::*;
+use prisma_value::PrismaValue;
 
 const BASIC_ENUM_DM: &str = r#"
 model Cat {
@@ -533,4 +536,86 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_and_change_default_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    api.schema_push(plain_dm).send().assert_green();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([SLEEPY])
+        }
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    // recall: schema_push doesn't run if it has warnings. You need to specify "force(true)"
+    api.schema_push(custom_dm).force(true).send().assert_warnings(&[Cow::from(
+        "The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.",
+    )]);
+    api.schema_push(custom_dm).send().assert_green().assert_no_steps();
+
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("moods", |col| {
+            col.assert_default_value(&PrismaValue::List(vec![PrismaValue::Enum("SLEEPY".to_string())]))
+        })
+    });
+
+    // we repeat the same tests with migrations, so we can observe the generated SQL statements.
+    api.reset().send_sync();
+    api.assert_schema().assert_tables_count(0);
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", &plain_dm, &dir).send_sync();
+
+    api.create_migration("custom", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                COMMIT;
+
+                -- AlterTable
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+            "#]];
+            migration.expect_contents(expected_script)
+        });
 }

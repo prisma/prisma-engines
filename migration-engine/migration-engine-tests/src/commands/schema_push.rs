@@ -76,6 +76,7 @@ impl SchemaPushAssertion {
         self.assert_no_warning().assert_executable()
     }
 
+    #[track_caller]
     pub fn assert_no_warning(self) -> Self {
         assert!(
             self.result.warnings.is_empty(),
