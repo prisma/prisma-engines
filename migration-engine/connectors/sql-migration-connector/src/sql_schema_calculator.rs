@@ -390,8 +390,6 @@ fn push_column_for_model_enum_scalar_field(
         table_id,
         sql::Column {
             name: field.database_name().to_owned(),
-
-            // TODO: replace "pure" with "with_full_data_type"
             tpe: sql::ColumnType::pure(
                 sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
                 column_arity(field.ast_field().arity),
