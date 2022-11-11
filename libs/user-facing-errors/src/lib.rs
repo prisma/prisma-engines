@@ -68,6 +68,9 @@ pub struct Error {
     is_panic: bool,
     #[serde(flatten)]
     inner: ErrorType,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    batch_request_idx: Option<usize>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -100,6 +103,7 @@ impl Error {
                 backtrace: Some(format!("{:?}", backtrace::Backtrace::new())),
             }),
             is_panic: false,
+            batch_request_idx: None,
         }
     }
 
@@ -110,6 +114,7 @@ impl Error {
                 backtrace: None,
             }),
             is_panic: false,
+            batch_request_idx: None,
         }
     }
 
@@ -135,6 +140,7 @@ impl Error {
                 backtrace,
             }),
             is_panic: true,
+            batch_request_idx: None,
         }
     }
 
@@ -143,6 +149,7 @@ impl Error {
         Error {
             inner: ErrorType::Known(err),
             is_panic: false,
+            batch_request_idx: None,
         }
     }
 
@@ -155,6 +162,7 @@ impl Error {
                 backtrace: None,
             }),
             is_panic: true,
+            batch_request_idx: None,
         }
     }
 
@@ -172,6 +180,10 @@ impl Error {
             err @ ErrorType::Unknown(_) => panic!("Expected known error, got {:?}", err),
         }
     }
+
+    pub fn set_batch_request_idx(&mut self, batch_request_idx: usize) {
+        self.batch_request_idx = Some(batch_request_idx)
+    }
 }
 
 pub fn new_backtrace() -> backtrace::Backtrace {
@@ -183,6 +195,7 @@ impl From<UnknownError> for Error {
         Error {
             inner: ErrorType::Unknown(unknown_error),
             is_panic: false,
+            batch_request_idx: None,
         }
     }
 }
@@ -192,6 +205,7 @@ impl From<KnownError> for Error {
         Error {
             is_panic: false,
             inner: ErrorType::Known(known_error),
+            batch_request_idx: None,
         }
     }
 }
