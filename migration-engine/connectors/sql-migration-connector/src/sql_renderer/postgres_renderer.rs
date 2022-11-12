@@ -222,8 +222,13 @@ impl SqlRenderer for PostgresFlavour {
     fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
+                let previous_table = indexes.previous.table();
+                let index_previous_name = match previous_table.namespace() {
+                    Some(ns) => format!("{}.{}", self.quote(ns), self.quote(indexes.previous.name())),
+                    None => self.quote(indexes.previous.name()).to_string(),
+                };
                 stmt.push_str("ALTER INDEX ");
-                stmt.push_display(&Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(&index_previous_name);
                 stmt.push_str(" RENAME TO ");
                 stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
             })
@@ -428,7 +433,10 @@ impl SqlRenderer for PostgresFlavour {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropType {
-                    type_name: dropped_enum.name().into(),
+                    type_name: match dropped_enum.namespace() {
+                        Some(ns) => PostgresIdentifier::WithSchema(ns.into(), dropped_enum.name().into()),
+                        None => dropped_enum.name().into(),
+                    },
                 })
             })
         })
@@ -437,14 +445,20 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote(foreign_key.table().name()),
+            table = match foreign_key.table().namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
+                None => foreign_key.table().name().into(),
+            },
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         ddl::DropIndex {
-            index_name: index.name().into(),
+            index_name: match index.table().namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
+                None => index.name().into(),
+            },
         }
         .to_string()
     }
@@ -465,7 +479,10 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         ddl::DropView {
-            view_name: view.name().into(),
+            view_name: match view.namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
+                None => view.name().into(),
+            },
         }
         .to_string()
     }
@@ -478,6 +495,8 @@ impl SqlRenderer for PostgresFlavour {
             let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
             result.push(self.render_create_table_as(
                 tables.next,
+                // TODO(MultiSchema): This only matters for CockroachDB, which is not currently
+                // supported by MultiSchema.
                 TableName(None, Quoted::postgres_ident(&temporary_table_name)),
             ));
 
@@ -896,7 +915,13 @@ fn render_postgres_alter_enum(
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.walk(alter_enum.id).previous.name()),
+                    enum_name = match schemas.walk(alter_enum.id).previous.namespace() {
+                        Some(namespace) => PostgresIdentifier::WithSchema(
+                            namespace.into(),
+                            schemas.walk(alter_enum.id).previous.name().into()
+                        ),
+                        None => schemas.walk(alter_enum.id).previous.name().into(),
+                    },
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -1002,7 +1027,10 @@ fn render_postgres_alter_enum(
     // Drop old enum
     {
         let sql = ddl::DropType {
-            type_name: tmp_old_name.as_str().into(),
+            type_name: match enums.previous.namespace() {
+                Some(ns) => PostgresIdentifier::WithSchema(ns.into(), tmp_old_name.as_str().into()),
+                None => tmp_old_name.as_str().into(),
+            },
         }
         .to_string();
 

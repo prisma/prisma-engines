@@ -173,6 +173,14 @@ impl<'a> ViewWalker<'a> {
         self.view().definition.as_deref()
     }
 
+    /// The namespace of the view
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.view().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
     fn view(self) -> &'a View {
         &self.schema.views[self.id.0 as usize]
     }
