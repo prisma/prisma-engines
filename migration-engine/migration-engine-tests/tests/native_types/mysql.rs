@@ -692,6 +692,22 @@ fn type_is_unsupported_mysql_5_6(ty: &str) -> bool {
     type_is_unsupported_mariadb(ty)
 }
 
+fn type_cast_is_unsupported_tidb(from_type: &str, to_type: &str) -> bool {
+    (from_type == "Binary(8)" && to_type == "Bit(64)")
+        || (from_type == "Binary(8)" && to_type == "Char(64)")
+        || (from_type == "Binary(8)" && to_type == "VarChar(20)")
+        || (from_type == "Binary(8)" && to_type == "LongText")
+        || (from_type == "Binary(8)" && to_type == "MediumText")
+        || (from_type == "Binary(8)" && to_type == "TinyText")
+        || (from_type == "Binary(8)" && to_type == "Text")
+        || (from_type == "Char(10)" && to_type == "Blob")
+        || (from_type == "Char(10)" && to_type == "LongBlob")
+        || (from_type == "Char(10)" && to_type == "MediumBlob")
+        || (from_type == "Char(10)" && to_type == "TinyBlob")
+        || (from_type == "Date" && to_type == "Bit(64)")
+        || (from_type == "Year" && to_type == "Bit(64)")
+}
+
 fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mariadb() {
         return Cow::Owned(
@@ -716,7 +732,7 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     cases.into()
 }
 
-fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'static, [&'static str]> {
+fn filter_to_types(api: &TestApi, from_type: &&str, to_types: &'static [&'static str]) -> Cow<'static, [&'static str]> {
     if api.is_mariadb() {
         return Cow::Owned(
             to_types
@@ -737,10 +753,21 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
         );
     }
 
+    if api.is_tidb() {
+        let fty = from_type;
+        return Cow::Owned(
+            to_types
+                .iter()
+                .cloned()
+                .filter(|ty| !type_cast_is_unsupported_tidb(fty, ty))
+                .collect(),
+        );
+    }
+
     to_types.into()
 }
 
-#[test_connector(tags(Mysql), exclude(TiDB))]
+#[test_connector(tags(Mysql))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
     let connector = psl::builtin_connectors::MYSQL;
     let mut dm1 = String::with_capacity(256);
@@ -752,7 +779,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         let span = tracing::info_span!("SafeCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(&api, to_types);
+        let to_types = filter_to_types(&api, from_type, to_types);
 
         tracing::info!("initial migration");
 
@@ -785,7 +812,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Mysql), exclude(TiDB))]
+#[test_connector(tags(Mysql))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = psl::builtin_connectors::MYSQL;
     let mut dm1 = String::with_capacity(256);
@@ -798,7 +825,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         let span = tracing::info_span!("RiskyCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(&api, to_types);
+        let to_types = filter_to_types(&api, from_type, to_types);
 
         tracing::info!("initial migration");
 
@@ -860,7 +887,7 @@ fn impossible_casts_with_existing_data_should_warn(api: TestApi) {
         let span = tracing::info_span!("ImpossibleCasts", from = %from_type, to = ?to_types);
         let _span = span.enter();
 
-        let to_types = filter_to_types(&api, to_types);
+        let to_types = filter_to_types(&api, from_type, to_types);
 
         tracing::info!("initial migration");
 
