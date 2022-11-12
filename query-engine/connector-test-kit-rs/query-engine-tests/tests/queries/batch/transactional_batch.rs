@@ -4,7 +4,6 @@ use query_engine_tests::*;
 mod transactional {
     use indoc::indoc;
     use query_engine_tests::run_query;
-    use query_tests_setup::Runner;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -101,7 +100,19 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb, TiDB))]
+    // TiDB supports repeatable read isolation level, but doesn't support serializable isolation level.
+    #[connector_test(only(TiDB))]
+    async fn valid_isolation_level_tidb(runner: Runner) -> TestResult<()> {
+        let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];
+
+        let batch_results = runner.batch(queries, true, Some("RepeatableRead".into())).await?;
+
+        insta::assert_snapshot!(batch_results.to_string(), @r###"{"batchResult":[{"data":{"createOneModelB":{"id":1}}}]}"###);
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(MongoDb))]
     async fn invalid_isolation_level(runner: Runner) -> TestResult<()> {
         let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];
 
