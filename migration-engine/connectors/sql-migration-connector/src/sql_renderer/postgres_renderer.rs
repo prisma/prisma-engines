@@ -225,7 +225,7 @@ impl SqlRenderer for PostgresFlavour {
                 let previous_table = indexes.previous.table();
                 let index_previous_name = match previous_table.namespace() {
                     Some(ns) => format!("{}.{}", self.quote(ns), self.quote(indexes.previous.name())),
-                    None => format!("{}", self.quote(indexes.previous.name())),
+                    None => self.quote(indexes.previous.name()).to_string(),
                 };
                 stmt.push_str("ALTER INDEX ");
                 stmt.push_str(&index_previous_name);
