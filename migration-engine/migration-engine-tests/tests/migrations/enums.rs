@@ -585,7 +585,7 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
     });
 
     // we repeat the same tests with migrations, so we can observe the generated SQL statements.
-    api.reset().send_sync();
+    api.reset().send_sync(None);
     api.assert_schema().assert_tables_count(0);
 
     let dir = api.create_migrations_directory();
