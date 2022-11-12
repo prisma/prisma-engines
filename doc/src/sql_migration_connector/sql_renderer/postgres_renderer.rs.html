@@ -1134,6 +1134,35 @@
 <span id="1134">1134</span>
 <span id="1135">1135</span>
 <span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1332,7 +1361,8 @@
                 render_cockroach_alter_enum(alter_enum, schemas, step);
             })
         } <span class="kw">else </span>{
-            render_postgres_alter_enum(alter_enum, schemas)
+            <span class="kw">let </span>flavour = <span class="self">self</span>;
+            render_postgres_alter_enum(alter_enum, schemas, flavour)
         }
     }
 
@@ -1357,8 +1387,13 @@
     <span class="kw">fn </span>render_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                <span class="kw">let </span>previous_table = indexes.previous.table();
+                <span class="kw">let </span>index_previous_name = <span class="kw">match </span>previous_table.namespace() {
+                    <span class="prelude-val">Some</span>(ns) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.quote(ns), <span class="self">self</span>.quote(indexes.previous.name())),
+                    <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.quote(indexes.previous.name()).to_string(),
+                };
                 stmt.push_str(<span class="string">&quot;ALTER INDEX &quot;</span>);
-                stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(<span class="kw-2">&amp;</span>index_previous_name);
                 stmt.push_str(<span class="string">&quot; RENAME TO &quot;</span>);
                 stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_ident(indexes.next.name()));
             })
@@ -1563,7 +1598,10 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_display(<span class="kw-2">&amp;</span>ddl::DropType {
-                    type_name: dropped_enum.name().into(),
+                    type_name: <span class="kw">match </span>dropped_enum.namespace() {
+                        <span class="prelude-val">Some</span>(ns) =&gt; PostgresIdentifier::WithSchema(ns.into(), dropped_enum.name().into()),
+                        <span class="prelude-val">None </span>=&gt; dropped_enum.name().into(),
+                    },
                 })
             })
         })
@@ -1572,14 +1610,20 @@
     <span class="kw">fn </span>render_drop_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {table} DROP CONSTRAINT {constraint_name}&quot;</span>,
-            table = <span class="self">self</span>.quote(foreign_key.table().name()),
+            table = <span class="kw">match </span>foreign_key.table().namespace() {
+                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
+                <span class="prelude-val">None </span>=&gt; foreign_key.table().name().into(),
+            },
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
     <span class="kw">fn </span>render_drop_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         ddl::DropIndex {
-            index_name: index.name().into(),
+            index_name: <span class="kw">match </span>index.table().namespace() {
+                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
+                <span class="prelude-val">None </span>=&gt; index.name().into(),
+            },
         }
         .to_string()
     }
@@ -1600,7 +1644,10 @@
 
     <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         ddl::DropView {
-            view_name: view.name().into(),
+            view_name: <span class="kw">match </span>view.namespace() {
+                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
+                <span class="prelude-val">None </span>=&gt; view.name().into(),
+            },
         }
         .to_string()
     }
@@ -1613,7 +1660,9 @@
             <span class="kw">let </span>temporary_table_name = <span class="macro">format!</span>(<span class="string">&quot;_prisma_new_{}&quot;</span>, <span class="kw-2">&amp;</span>tables.next.name());
             result.push(<span class="self">self</span>.render_create_table_as(
                 tables.next,
-                TableName(<span class="prelude-val">None</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
+                <span class="comment">// TODO(MultiSchema): This only matters for CockroachDB, which is not currently
+                // supported by MultiSchema.
+                </span>TableName(<span class="prelude-val">None</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
             ));
 
             <span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = redefine_table
@@ -2019,7 +2068,11 @@
     }
 }
 
-<span class="kw">fn </span>render_postgres_alter_enum(alter_enum: <span class="kw-2">&amp;</span>AlterEnum, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+<span class="kw">fn </span>render_postgres_alter_enum(
+    alter_enum: <span class="kw-2">&amp;</span>AlterEnum,
+    schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
+    flavour: <span class="kw-2">&amp;</span>PostgresFlavour,
+) -&gt; Vec&lt;String&gt; {
     <span class="kw">if </span>alter_enum.dropped_variants.is_empty() {
         <span class="kw">let </span><span class="kw-2">mut </span>stmts: Vec&lt;String&gt; = alter_enum
             .created_variants
@@ -2027,7 +2080,13 @@
             .map(|created_value| {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;ALTER TYPE {enum_name} ADD VALUE {value}&quot;</span>,
-                    enum_name = Quoted::postgres_ident(schemas.walk(alter_enum.id).previous.name()),
+                    enum_name = <span class="kw">match </span>schemas.walk(alter_enum.id).previous.namespace() {
+                        <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(
+                            namespace.into(),
+                            schemas.walk(alter_enum.id).previous.name().into()
+                        ),
+                        <span class="prelude-val">None </span>=&gt; schemas.walk(alter_enum.id).previous.name().into(),
+                    },
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -2133,7 +2192,10 @@
     <span class="comment">// Drop old enum
     </span>{
         <span class="kw">let </span>sql = ddl::DropType {
-            type_name: tmp_old_name.as_str().into(),
+            type_name: <span class="kw">match </span>enums.previous.namespace() {
+                <span class="prelude-val">Some</span>(ns) =&gt; PostgresIdentifier::WithSchema(ns.into(), tmp_old_name.as_str().into()),
+                <span class="prelude-val">None </span>=&gt; tmp_old_name.as_str().into(),
+            },
         }
         .to_string();
 
@@ -2142,26 +2204,22 @@
 
     <span class="comment">// Reinstall dropped defaults that need to be reinstalled
     </span>{
-        <span class="kw">for </span>(prev_colidx, next_colidx) <span class="kw">in </span>alter_enum
+        <span class="kw">for </span>(columns, next_default) <span class="kw">in </span>alter_enum
             .previous_usages_as_default
             .iter()
-            .filter_map(|(prev, next)| next.map(|next| (prev, next)))
+            .filter_map(|(prev, next)| next.map(|next| schemas.walk(Pair::new(<span class="kw-2">*</span>prev, next))))
+            .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
-            <span class="kw">let </span>columns = schemas.walk(Pair::new(<span class="kw-2">*</span>prev_colidx, next_colidx));
             <span class="kw">let </span>table_name = columns.previous.table().name();
             <span class="kw">let </span>column_name = columns.previous.name();
-            <span class="kw">let </span>default_str = columns
-                    .next
-                    .default()
-                    .and_then(|default| default.as_value())
-                    .and_then(|value| value.as_enum_value())
-                    .expect(<span class="string">&quot;We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.&quot;</span>);
+            <span class="kw">let </span>data_type = render_column_type(columns.next, flavour);
+            <span class="kw">let </span>default_str = render_default(next_default, <span class="kw-2">&amp;</span>data_type);
 
             <span class="kw">let </span>set_default = <span class="macro">format!</span>(
-                <span class="string">&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT &#39;{default}&#39;&quot;</span>,
+                <span class="string">&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}&quot;</span>,
                 table_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>table_name),
                 column_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>column_name),
-                default = escape_string_literal(default_str),
+                default = default_str,
             );
 
             stmts.push(set_default);

@@ -159,6 +159,7 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust"><code><span class="kw">use </span>migration_core::{
     commands::schema_push, json_rpc::types::<span class="kw-2">*</span>, migration_connector::MigrationConnector, CoreError, CoreResult,
 };
@@ -237,7 +238,8 @@
         <span class="self">self</span>.assert_no_warning().assert_executable()
     }
 
-    <span class="kw">pub fn </span>assert_no_warning(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_no_warning(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
             <span class="self">self</span>.result.warnings.is_empty(),
             <span class="string">&quot;Assertion failed. Expected no warning, got {:?}&quot;</span>,

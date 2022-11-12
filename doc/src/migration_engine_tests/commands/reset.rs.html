@@ -37,7 +37,12 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
-</pre><pre class="rust"><code><span class="kw">use </span>migration_core::{migration_connector::MigrationConnector, CoreResult};
+<span id="40">40</span>
+<span id="41">41</span>
+</pre><pre class="rust"><code><span class="kw">use </span>migration_core::{
+    migration_connector::{MigrationConnector, Namespaces},
+    CoreResult,
+};
 
 <span class="attribute">#[must_use = <span class="string">&quot;This struct does nothing on its own. See Reset::send()&quot;</span>]
 </span><span class="kw">pub struct </span>Reset&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -55,17 +60,16 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub async fn </span>send(<span class="self">self</span>) -&gt; CoreResult&lt;ResetAssertion&gt; {
-        <span class="comment">// TODO(MultiSchema): should we somehow send Namespaces here?
-        </span><span class="self">self</span>.api.reset(<span class="self">self</span>.soft, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>send(<span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; CoreResult&lt;ResetAssertion&gt; {
+        <span class="self">self</span>.api.reset(<span class="self">self</span>.soft, namespaces).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(ResetAssertion {})
     }
 
     <span class="doccomment">/// Execute the command and expect it to succeed.
     </span><span class="attribute">#[track_caller]
-    </span><span class="kw">pub fn </span>send_sync(<span class="self">self</span>) -&gt; ResetAssertion {
-        test_setup::runtime::run_with_thread_local_runtime(<span class="self">self</span>.send()).unwrap()
+    </span><span class="kw">pub fn </span>send_sync(<span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; ResetAssertion {
+        test_setup::runtime::run_with_thread_local_runtime(<span class="self">self</span>.send(namespaces)).unwrap()
     }
 }
 
