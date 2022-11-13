@@ -779,6 +779,8 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 }
 
 // exclude: there is a cockroach-specific test. It's unexecutable there.
+// Ignore TiDB: TiDB Does not support modifying the Reorg-Data types on the primary key columns but
+// supports modifying the Meta-Only types. (https://docs.pingcap.com/tidb/dev/sql-statement-modify-column#mysql-compatibility)
 #[test_connector(preview_features("referentialIntegrity"), exclude(CockroachDb, TiDB))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
