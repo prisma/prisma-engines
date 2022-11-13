@@ -126,7 +126,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test(only(MongoDb, TiDB))]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -323,7 +323,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test(only(MongoDb, TiDB))]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
