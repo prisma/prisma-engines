@@ -52,15 +52,27 @@ mod transactional {
         ];
 
         let batch_results = runner.batch(queries, true, None).await?;
-        insta::assert_snapshot!(
-            batch_results.to_string(),
-            @r###"{"errors":[{"error":"Error in batch request 1: Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed on the fields: (`id`)\", meta: Object {\"target\": Array [String(\"id\")]}, error_code: \"P2002\" }), kind: UniqueConstraintViolation { constraint: Fields([\"id\"]) } })","user_facing_error":{"is_panic":false,"message":"Unique constraint failed on the fields: (`id`)","meta":{"target":["id"]},"error_code":"P2002","batch_request_idx":1}}]}"###
-        );
+        batch_results.assert_failure(2002, None);
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"{ findManyModelA { id } }"#),
             @r###"{"data":{"findManyModelA":[]}}"###
         );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn batch_request_idx(runner: Runner) -> TestResult<()> {
+        let queries = vec![
+            r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
+            r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, true, None).await?;
+        let batch_request_idx = batch_results.errors().get(0).unwrap().batch_request_idx();
+
+        assert_eq!(batch_request_idx, Some(1usize));
 
         Ok(())
     }

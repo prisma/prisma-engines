@@ -96,6 +96,10 @@ impl Error {
         }
     }
 
+    pub fn batch_request_idx(&self) -> Option<usize> {
+        self.batch_request_idx
+    }
+
     pub fn new_non_panic_with_current_backtrace(message: String) -> Self {
         Error {
             inner: ErrorType::Unknown(UnknownError {
