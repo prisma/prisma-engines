@@ -1,6 +1,7 @@
 mod migration_assertions;
 mod quaint_result_set_ext;
 
+use colored::Colorize;
 pub use migration_assertions::*;
 pub use quaint_result_set_ext::*;
 
@@ -24,12 +25,27 @@ pub trait SqlSchemaExt {
 
 pub struct SchemaAssertion {
     schema: SqlSchema,
+    context: Option<String>,
+    description: Option<String>,
     tags: BitFlags<Tags>,
 }
 
 impl SchemaAssertion {
     pub fn new(schema: SqlSchema, tags: BitFlags<Tags>) -> Self {
-        Self { schema, tags }
+        Self {
+            schema,
+            context: None,
+            description: None,
+            tags,
+        }
+    }
+
+    pub fn add_context(&mut self, context: String) {
+        self.context = Some(context)
+    }
+
+    pub fn add_description(&mut self, description: String) {
+        self.description = Some(description)
     }
 
     pub fn into_schema(self) -> SqlSchema {
@@ -51,15 +67,43 @@ impl SchemaAssertion {
     fn find_table<'a>(&'a self, table_name: &str) -> TableWalker<'a> {
         match self.find_table_option(table_name) {
             Some(table) => table,
-            None => panic!(
-                "assert_has_table failed. Table {} not found. Tables in database: {:?}",
-                table_name,
-                self.schema
-                    .table_walkers()
-                    .map(|table| table.name())
-                    .collect::<Vec<_>>()
-            ),
+            None => self.assert_error(table_name, true),
         }
+    }
+
+    // TODO: How can I instead return 'Void'?
+    fn assert_error<'a>(&'a self, table_name: &str, positive: bool) -> TableWalker<'a> {
+        let method = if positive {
+            "assert_table"
+        } else {
+            "assert_has_no_table"
+        };
+        let result = if positive { "was not found" } else { "was found" };
+        println!(
+            "{}{}{}",
+            match &self.context {
+                Some(ctx) => format!("\nTest failure with context <{}>", ctx.red()).bold(),
+                None => "\n\tTest failure".bold(),
+            },
+            format!(
+                "\n  {} has failed because table {} {}",
+                method.bold(),
+                table_name.red(),
+                result.bold(),
+            ),
+            format!("\n  Tables in database:").italic()
+        );
+        self.schema
+            .table_walkers()
+            .map(|table| table.name())
+            .for_each(|t| println!("\t - {}", t.green()));
+
+        match &self.description {
+            Some(desc) => println!("{}: {}", "Description".bold(), desc.italic(),),
+            None => (),
+        }
+        std::panic::set_hook(Box::new(|_| {}));
+        panic!();
     }
 
     #[track_caller]
@@ -86,7 +130,7 @@ impl SchemaAssertion {
     #[track_caller]
     pub fn assert_has_no_table(self, table_name: &str) -> Self {
         self.find_table_option(table_name)
-            .and_then::<(), _>(|_| panic!("assert_has_no_table failed. Table {} was found.", table_name));
+            .map(|_| self.assert_error(table_name, false));
         self
     }
 
@@ -110,6 +154,7 @@ impl SchemaAssertion {
         });
 
         if has_matching_enum {
+            // TODO: prettify this
             panic!("Expected no enum named {}, found one", enum_name);
         }
 
@@ -122,6 +167,7 @@ impl SchemaAssertion {
     {
         let r#enum = match self.schema.find_enum(enum_name) {
             Some(enm) => self.schema.walk(enm),
+            // TODO: prettify this
             None => panic!("Assertion failed. Enum `{}` not found", enum_name),
         };
 
@@ -148,6 +194,7 @@ impl SchemaAssertion {
     pub fn assert_views_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.view_walkers().count();
 
+        // TODO: prettify this
         assert_eq!(
             actual_count, expected_count,
             "Assertion failed. Expected the schema to have {expected_count} views, found {actual_count}. ({table_names:?})",

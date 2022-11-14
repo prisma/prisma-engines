@@ -1,45 +1,31 @@
+use std::borrow::Cow;
+
 use indoc::indoc;
 use migration_core::migration_connector::Namespaces;
 use migration_engine_tests::test_api::*;
+use test_setup::TestApiArgs;
 
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_basic(api: TestApi) {
-    let dm = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
+struct Schema {
+    common: String,
+    first: String,
+    second: Option<String>,
+}
 
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+enum SchemaPush<'a> {
+    PushAnd(bool, &'a SchemaPush<'a>),
+    PushCustomAnd(&'a [&'a str], &'a [&'a str], bool, bool, &'a SchemaPush<'a>),
+    RawCmdAnd(&'a str, &'a SchemaPush<'a>),
+    Reset(bool, &'a SchemaPush<'a>),
+    Done,
+}
 
-        model First {
-          id Int @id
-          @@schema("one")
-        }
-
-        model Second {
-          id Int @id
-          @@schema("two")
-        }
-    "#};
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
+struct TestData<'a> {
+    name: &'a str,
+    description: &'a str,
+    schema: Schema,
+    namespaces: &'a [&'a str],
+    schema_push: SchemaPush<'a>,
+    assertion: Box<dyn FnMut(SchemaAssertion) -> ()>,
 }
 
 #[test_connector(
@@ -48,8 +34,9 @@ fn multi_schema_basic(api: TestApi) {
     preview_features("multiSchema"),
     namespaces("one", "two")
 )]
-fn multi_schema_idempotent(api: TestApi) {
-    let dm = indoc! {r#"
+fn multi_schema_tests(_api: TestApi) {
+    let namespaces = ["one", "two"];
+    let base_schema = indoc! {r#"
         datasource db {
           provider   = "postgresql"
           url        = env("TEST_DATABASE_URL")
@@ -60,7 +47,15 @@ fn multi_schema_idempotent(api: TestApi) {
           provider        = "prisma-client-js"
           previewFeatures = ["multiSchema"]
         }
+    "#};
 
+    let mut tests: Vec<TestData> = vec![
+        TestData {
+            name: "basic",
+            description: "Test single migration on two custom namespaces with a table each.",
+            schema: Schema {
+                common: base_schema.into(),
+                first: indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -70,31 +65,22 @@ fn multi_schema_idempotent(api: TestApi) {
           id Int @id
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(dm).send().assert_green().assert_has_executed_steps();
-    api.schema_push(dm).send().assert_green().assert_no_steps();
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_add_table(api: TestApi) {
-    let first = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
-
+    "#}
+                .into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::Done),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table("First").assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "idempotence",
+            description: "Test idempotence test with two namespaces and a table each",
+            schema: Schema {
+                common: base_schema.into(),
+                first: indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -104,529 +90,372 @@ fn multi_schema_add_table(api: TestApi) {
           id Int @id
           @@schema("two")
         }
-    "#};
-    let second = first.to_owned()
-        + indoc! {r#"
+    "#}
+                .into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true,
+                           &SchemaPush::PushCustomAnd(&[], &[], true, false,
+                             &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table("First").assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "add table",
+            description: "Test adding a new table to one of the namespaces",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        }
 
+        model Second {
+          id Int @id
+          @@schema("two")
+        }
+    "#}),
+                first: "".into(),
+                second: Some(
+                    indoc! {r#"
         model Third {
           id Int @id
           @@schema("one")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_green()
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second")
-        .assert_has_table("Third");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_remove_table(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                "#}
+                    .into(),
+                ),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second")
+                    .assert_has_table("Third");
+            }),
+        },
+        TestData {
+            name: "remove table",
+            description: "Test removing a table to one of the namespaces",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           @@schema("two")
         }
-    "#};
-    let second = base;
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_no_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_and_recreate_not_null_column_with_not_null_value(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}
+                .into(),
+                second: Some(" ".into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_no_table("Second");
+            }),
+        },
+        TestData {
+            name: "recreate not null column with non-null values",
+            description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a non-NULL value",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String?
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some(indoc!{r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.raw_cmd("INSERT INTO \"two\".\"Second\" VALUES(1, 'some value');");
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_and_recreate_not_null_column_with_null_value(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true,
+                           &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, 'some value');",
+                             &SchemaPush::PushAnd(false, &SchemaPush::Done))),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "recreate not null column with null values",
+            description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a NULL value",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String?
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some(indoc!{r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.raw_cmd("INSERT INTO \"two\".\"Second\" VALUES(1, NULL);");
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[
-            "Made the column `name` on table `Second` required, but there are 1 existing NULL values.".to_owned(),
-        ])
-        .assert_no_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_add_required_field_to_table(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true,
+                           &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, NULL);",
+                             &SchemaPush::PushCustomAnd(&[], &["Made the column `name` on table `Second` required, but there are 1 existing NULL values."], false, false,
+                               &SchemaPush::Done))),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "add required field",
+            description: "Test adding a required field to a table with no records",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_make_field_array(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "change field type to array",
+            description: "Test changing a field type to array.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String[]
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_remove_field_array(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "change field type from array",
+            description: "Test changing a field type from array.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String[]
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_rename_index(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "rename index",
+            description: "Test renaming an index.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+
+    "#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@index(fields: [name], map: "index_name")
           @@schema("two")
         }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+                    "#}
+                .into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@index(fields: [name], map: "new_index_name")
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_add_unique(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "add unique to column",
+            description: "Test adding the unique flag to a column.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+        }"#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+        } "#}.into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String @unique
           @@schema("two")
         }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .force(true)
-        .send()
-        .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Second` will be added. If there are existing duplicate values, this will fail.".into()])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_enum(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+                    "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true,
+                           &SchemaPush::PushCustomAnd(&["A unique constraint covering the columns `[name]` on the table `Second` will be added. If there are existing duplicate values, this will fail."], &[], false, false,
+                             &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "drop enum",
+            description: "Test removing an enum from a namespace.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
         }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+    "#}),
+                first: indoc! {r#"
         enum Second {
           One
           Two
           @@schema("two")
-        }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
-        "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_no_enum("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_foreign_key(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+        } "#}.into(),
+                second: Some( indoc! {r#""#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_no_enum("Second");
+            }),
+        },
+        TestData {
+            name: "drop foreign key",
+            description: "Test removing a foreign key from a namespace.",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
         model First {
           id Int @id
           seconds Second[]
@@ -637,10 +466,8 @@ fn multi_schema_drop_foreign_key(api: TestApi) {
           first_id Int
           first First? @relation(fields: [first_id], references: [id])
           @@schema("one")
-        }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+        }"#}.into(),
+                second: Some( indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -648,160 +475,169 @@ fn multi_schema_drop_foreign_key(api: TestApi) {
         model Second {
           id Int @id
           @@schema("one")
-        }
-        "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_index(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "drop index",
+            description: "Test removing an index from a namespace.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+        }"#}),
+                first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@index(fields: [name], map: "index_name")
           @@schema("two")
-        }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+        }"#}.into(),
+                second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-    "#};
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_has_table("First")
-        .assert_has_table("Second");
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_drop_view(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table("First")
+                    .assert_has_table("Second");
+            }),
+        },
+        TestData {
+            name: "drop view",
+            description: "Test removing a view via reset from a namespace.",
+            schema: Schema {
+                common: (base_schema.to_owned()
+                    + indoc! {r#"
         model First {
           id Int @id
           name String
           @@schema("one")
-        }
-    "#};
-    let first = base.to_owned();
-
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
-    let namespaces = Namespaces::from_vec(&mut vec_namespaces);
-
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.raw_cmd("CREATE VIEW \"two\".\"Test\" (id, name) as SELECT id, name FROM \"one\".\"First\"");
-    api.reset().soft(true).send_sync(namespaces.clone());
-
-    api.assert_schema_with_namespaces(namespaces).assert_views_count(0);
-}
-
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
-fn multi_schema_alter_enum(api: TestApi) {
-    let base = indoc! {r#"
-        datasource db {
-          provider   = "postgresql"
-          url        = env("TEST_DATABASE_URL")
-          schemas    = ["one", "two"]
-        }
-        generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["multiSchema"]
-        }
-    "#};
-    let first = base.to_owned()
-        + indoc! {r#"
+        }"#}),
+                first: indoc! {r#""#}.into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true,
+                           &SchemaPush::RawCmdAnd("CREATE VIEW \"two\".\"Test\" (id, name) as SELECT id, name FROM \"one\".\"First\"",
+                             &SchemaPush::Reset(true,
+                               &SchemaPush::Done))),
+            assertion: Box::new(|assert| {
+                assert.assert_views_count(0);
+            }),
+        },
+        TestData {
+            name: "alter view",
+            description: "Test adding a variant to an enum in a namespace.",
+            schema: Schema {
+                common: base_schema.to_string(),
+                first: indoc! {r#"
       enum SomeEnum {
         First
         Second
         @@schema("one")
-      }
-    "#};
-    let second = base.to_owned()
-        + indoc! {r#"
+      }"#}.into(),
+                second: Some(indoc! {r#"
       enum SomeEnum {
         First
         Second
         Third
         @@schema("one")
-      }
-    "#};
+      }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
+            }),
+        },
+    ];
 
-    let mut vec_namespaces = vec![String::from("one"), String::from("two")];
+    // traverse is always the answer
+    tests.iter_mut().for_each(|mut t| {
+        run_test(&mut t);
+    });
+}
+
+fn run_test(test: &mut TestData) {
+    let api_args = TestApiArgs::new("test", &["multiSchema"], &["one", "two"]);
+    let mut api = TestApi::new(api_args);
+
+    let mut vec_namespaces = test.namespaces.iter().map(|s| s.to_string()).collect();
     let namespaces = Namespaces::from_vec(&mut vec_namespaces);
 
-    api.schema_push(first).send().assert_green().assert_has_executed_steps();
-    api.schema_push(second)
-        .send()
-        .assert_warnings(&[])
-        .assert_unexecutable(&[])
-        .assert_has_executed_steps();
+    run_schema_step(&mut api, test, namespaces.clone(), &test.schema_push);
 
-    api.assert_schema_with_namespaces(namespaces)
-        .assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
+    let mut assertion = api.assert_schema_with_namespaces(namespaces);
+    assertion.add_context(test.name.to_string());
+    assertion.add_description(test.description.to_string());
+
+    (test.assertion)(assertion);
+}
+
+fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namespaces>, step: &SchemaPush) {
+    let first = test.schema.common.to_owned() + test.schema.first.as_str();
+    match step {
+        SchemaPush::PushAnd(is_first, next) => {
+            let schema = if *is_first {
+                first
+            } else {
+                match &test.schema.second {
+                    Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
+                    None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
+                }
+            };
+            api.schema_push(schema)
+                .send()
+                .assert_green()
+                .assert_has_executed_steps();
+            run_schema_step(api, test, namespaces, next);
+        }
+        SchemaPush::PushCustomAnd(warnings, unexecutable, is_first, has_steps, next) => {
+            let schema = if *is_first {
+                first
+            } else {
+                match &test.schema.second {
+                    Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
+                    None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
+                }
+            };
+            let warnings: Vec<Cow<str>> = warnings.iter().map(|s| (*s).into()).collect();
+            let unexecutables: Vec<String> = unexecutable.iter().map(|s| String::from(*s)).collect();
+            let assert = api
+                .schema_push(schema)
+                .send()
+                .assert_warnings(warnings.as_slice())
+                .assert_unexecutable(unexecutables.as_slice());
+            if *has_steps {
+                assert.assert_has_executed_steps();
+            } else {
+                assert.assert_no_steps();
+            }
+            run_schema_step(api, test, namespaces, next);
+        }
+        SchemaPush::RawCmdAnd(cmd, next) => {
+            api.raw_cmd(cmd);
+            run_schema_step(api, test, namespaces, next);
+        }
+        SchemaPush::Reset(soft, next) => {
+            api.reset().soft(*soft).send_sync(namespaces.clone());
+            run_schema_step(api, test, namespaces, next);
+        }
+        SchemaPush::Done => {}
+    };
 }
