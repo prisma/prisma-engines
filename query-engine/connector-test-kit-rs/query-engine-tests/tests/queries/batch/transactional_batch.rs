@@ -52,7 +52,10 @@ mod transactional {
         ];
 
         let batch_results = runner.batch(queries, true, None).await?;
-        batch_results.assert_failure(2002, None);
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"errors":[{"error":"Error in batch request 1: Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed on the fields: (`id`)\", meta: Object {\"target\": Array [String(\"id\")]}, error_code: \"P2002\" }), kind: UniqueConstraintViolation { constraint: Fields([\"id\"]) } })","user_facing_error":{"is_panic":false,"message":"Unique constraint failed on the fields: (`id`)","meta":{"target":["id"]},"error_code":"P2002","batch_request_idx":1}}]}"###
+        );
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"{ findManyModelA { id } }"#),
