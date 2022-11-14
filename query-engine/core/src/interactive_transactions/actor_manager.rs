@@ -9,7 +9,7 @@ use tokio::{
         RwLock,
     },
     task::JoinHandle,
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 use super::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, OpenTx, TransactionError, TxId};
@@ -21,12 +21,17 @@ pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var(
 
 static CHANNEL_SIZE: usize = 100;
 
+pub struct ClosedTx {
+    pub start_time: Instant,
+    pub timeout: Duration,
+}
+
 pub struct TransactionActorManager {
     /// Map of active ITx clients
     pub clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    pub closed_txs: Arc<RwLock<LruCache<TxId, ()>>>,
+    pub closed_txs: Arc<RwLock<LruCache<TxId, ClosedTx>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
     send_done: Sender<TxId>,
     /// Handle to the task in charge of clearing actors.
@@ -49,8 +54,8 @@ impl Default for TransactionActorManager {
 
 impl TransactionActorManager {
     pub fn new() -> Self {
-        let clients: Arc<RwLock<HashMap<TxId, ITXClient>>> = Arc::new(RwLock::new(HashMap::new()));
-        let closed_txs: Arc<RwLock<LruCache<TxId, ()>>> = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
+        let clients = Arc::new(RwLock::new(HashMap::new()));
+        let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
 
         let (send_done, rx) = channel::<TxId>(CHANNEL_SIZE);
         let handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);

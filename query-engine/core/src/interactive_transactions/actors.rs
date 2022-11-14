@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, OpenTx, Operation, ResponseData,
-    TxId,
+    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, ClosedTx, OpenTx, Operation,
+    ResponseData, TxId,
 };
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
@@ -11,7 +11,7 @@ use tokio::{
         oneshot, RwLock,
     },
     task::JoinHandle,
-    time::{self, Duration},
+    time::{self, Duration, Instant},
 };
 use tracing::Span;
 use tracing_futures::Instrument;
@@ -144,6 +144,8 @@ impl ITXServer {
 pub struct ITXClient {
     send: Sender<TxOpRequest>,
     tx_id: TxId,
+    timeout: Duration,
+    start_time: Instant,
 }
 
 impl ITXClient {
@@ -256,6 +258,8 @@ pub fn spawn_itx_actor(
     let client = ITXClient {
         send: tx_to_server,
         tx_id: tx_id.clone(),
+        start_time: Instant::now(),
+        timeout,
     };
 
     let mut server = ITXServer::new(
@@ -351,7 +355,7 @@ pub fn spawn_itx_actor(
 */
 pub fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
-    closed_txs: Arc<RwLock<lru::LruCache<TxId, ()>>>,
+    closed_txs: Arc<RwLock<lru::LruCache<TxId, ClosedTx>>>,
     mut rx: Receiver<TxId>,
 ) -> JoinHandle<()> {
     tokio::task::spawn(async move {
@@ -359,11 +363,19 @@ pub fn spawn_client_list_clear_actor(
             if let Some(id) = rx.recv().await {
                 trace!("removing {} from client list", id);
 
-                let mut clients_guard = clients.write().await;
-                clients_guard.remove(&id);
-                drop(clients_guard);
+                let closed_tx = {
+                    let mut clients_guard = clients.write().await;
+                    let client = clients_guard.remove(&id);
+                    client.map(
+                        |ITXClient {
+                             start_time, timeout, ..
+                         }| ClosedTx { start_time, timeout },
+                    )
+                };
 
-                closed_txs.write().await.put(id, ());
+                if let Some(closed_tx) = closed_tx {
+                    closed_txs.write().await.put(id, closed_tx);
+                }
             }
         }
     })
