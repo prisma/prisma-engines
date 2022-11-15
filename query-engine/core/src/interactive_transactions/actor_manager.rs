@@ -81,18 +81,26 @@ impl TransactionActorManager {
             Ok(client.clone())
         } else if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
             Err(TransactionError::Closed {
-                reason: {
-                    let mut message = format!("A {from_operation} cannot be executed on a closed transaction");
-                    if let Some(closed_tx) = closed_tx {
-                        match closed_tx {
-                            ClosedTx::Committed => message.push_str(" that has already been committed"),
-                            ClosedTx::RolledBack => message.push_str(" that has already been rolled back"),
-                            ClosedTx::Expired { start_time, timeout } => {
-                                message.push_str(&format!(" that has already expired. The timeout for this transaction was {} ms, however {} ms have passed since the start of the transaction. Consider increasing the interactive transaction timeout", timeout.as_millis(), start_time.elapsed().as_millis()))
-                            }
-                        }
+                reason: match closed_tx {
+                    Some(ClosedTx::Committed) => {
+                        format!("A {from_operation} cannot be executed on a committed transaction")
                     }
-                    message
+                    Some(ClosedTx::RolledBack) => {
+                        format!("A {from_operation} cannot be executed on a transaction that was rolled back")
+                    }
+                    Some(ClosedTx::Expired { start_time, timeout }) => {
+                        format!(
+                            "A {from_operation} cannot be executed on an expired transaction. \
+                             The timeout for this transaction was {} ms, however {} ms have passed since the start \
+                             of the transaction. Consider increasing the interactive transaction timeout",
+                            timeout.as_millis(),
+                            start_time.elapsed().as_millis(),
+                        )
+                    }
+                    None => {
+                        error!("[{tx_id}] no details about closed transaction");
+                        format!("A {from_operation} cannot be executed on a closed transaction")
+                    }
                 },
             }
             .into())
