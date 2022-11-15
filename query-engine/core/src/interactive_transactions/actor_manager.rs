@@ -33,7 +33,7 @@ pub struct TransactionActorManager {
     /// return better error messages if operations are performed on closed transactions.
     pub closed_txs: Arc<RwLock<LruCache<TxId, ClosedTx>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
-    send_done: Sender<TxId>,
+    send_done: Sender<(TxId, ClosedTx)>,
     /// Handle to the task in charge of clearing actors.
     /// Used to abort the task when the TransactionActorManager is dropped.
     bg_reader_clear: JoinHandle<()>,
@@ -57,7 +57,7 @@ impl TransactionActorManager {
         let clients = Arc::new(RwLock::new(HashMap::new()));
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
 
-        let (send_done, rx) = channel::<TxId>(CHANNEL_SIZE);
+        let (send_done, rx) = channel::<(TxId, ClosedTx)>(CHANNEL_SIZE);
         let handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);
 
         Self {
