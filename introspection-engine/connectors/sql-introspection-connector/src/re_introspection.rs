@@ -1,30 +1,11 @@
-use crate::{
-    calculate_datamodel::CalculateDatamodelContext, introspection_helpers::compare_options_none_last, warnings::*,
-};
+use crate::{calculate_datamodel::CalculateDatamodelContext, warnings::*};
 use introspection_connector::Warning;
-use psl::dml::{Datamodel, WithName};
+use psl::dml::Datamodel;
 
 pub(crate) fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &mut CalculateDatamodelContext) {
     let warnings = &mut ctx.warnings;
     merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
     merge_custom_index_names(old_data_model, new_data_model, warnings);
-    keep_index_ordering(old_data_model, new_data_model);
-}
-
-fn keep_index_ordering(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
-    for old_model in old_data_model.models() {
-        let new_model = match new_data_model.models_mut().find(|m| m.name == *old_model.name()) {
-            Some(m) => m,
-            None => continue,
-        };
-
-        new_model.indices.sort_by(|idx_a, idx_b| {
-            let idx_a_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_a.db_name);
-            let idx_b_idx = old_model.indices.iter().position(|idx| idx.db_name == idx_b.db_name);
-
-            compare_options_none_last(idx_a_idx, idx_b_idx)
-        });
-    }
 }
 
 //custom compound index `name` from pre-3.0 datamodels

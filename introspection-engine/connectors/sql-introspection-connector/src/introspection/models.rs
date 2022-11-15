@@ -61,11 +61,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
             )));
         }
 
-        for index in table.indexes() {
-            if let Some(index) = calculate_index(index, ctx) {
-                model.add_index(index);
-            }
-        }
+        super::indexes::calculate_model_indexes(table, existing_model, &mut model, ctx);
 
         if let Some(pk) = table.primary_key() {
             let clustered = primary_key_is_clustered(pk.id, ctx);

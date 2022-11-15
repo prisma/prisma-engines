@@ -1,6 +1,7 @@
 pub(crate) mod inline_relations;
 
 mod enums;
+mod indexes;
 mod m2m_relations;
 mod models;
 mod postgres;
