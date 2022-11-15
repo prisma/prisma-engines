@@ -62,7 +62,6 @@ impl Display for TxId {
 
 pub enum CachedTx {
     Open(OpenTx),
-    Aborted,
     Committed,
     RolledBack,
     Expired,
@@ -72,7 +71,6 @@ impl Display for CachedTx {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CachedTx::Open(_) => write!(f, "Open"),
-            CachedTx::Aborted => write!(f, "Aborted"),
             CachedTx::Committed => write!(f, "Committed"),
             CachedTx::RolledBack => write!(f, "Rolled back"),
             CachedTx::Expired => write!(f, "Expired"),
