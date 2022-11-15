@@ -3,6 +3,7 @@ use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
+use psl_core::parser_database::IndexType;
 use std::{borrow::Cow, fmt};
 
 /// Represents a model in a prisma schema.
@@ -306,19 +307,6 @@ impl PrimaryKeyField {
             sort_order: None,
             length: None,
         }
-    }
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum IndexType {
-    Unique,
-    Normal,
-    Fulltext,
-}
-
-impl IndexType {
-    pub fn is_fulltext(self) -> bool {
-        matches!(self, IndexType::Fulltext)
     }
 }
 

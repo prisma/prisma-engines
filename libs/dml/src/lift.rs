@@ -370,12 +370,6 @@ impl<'a> LiftAstToDml<'a> {
                     })
                     .collect();
 
-                let tpe = match idx.index_type() {
-                    db::IndexType::Unique => IndexType::Unique,
-                    db::IndexType::Normal => IndexType::Normal,
-                    db::IndexType::Fulltext => IndexType::Fulltext,
-                };
-
                 let algorithm = idx.algorithm().map(|using| match using {
                     IndexAlgorithm::BTree => model::IndexAlgorithm::BTree,
                     IndexAlgorithm::Hash => model::IndexAlgorithm::Hash,
@@ -389,7 +383,7 @@ impl<'a> LiftAstToDml<'a> {
                     name: idx.name().map(String::from),
                     db_name: Some(idx.constraint_name(self.connector).into_owned()),
                     fields,
-                    tpe,
+                    tpe: idx.index_type(),
                     algorithm,
                     defined_on_field: idx.is_defined_on_field(),
                     // By default an index that is not a primary key is always non-clustered in any database.
