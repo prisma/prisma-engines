@@ -195,6 +195,24 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust"><code><span class="attribute">#![deny(unsafe_code, warnings, rust_2018_idioms)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -265,6 +283,9 @@
     is_panic: bool,
     <span class="attribute">#[serde(flatten)]
     </span>inner: ErrorType,
+
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>batch_request_idx: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
 <span class="attribute">#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -290,6 +311,10 @@
         }
     }
 
+    <span class="kw">pub fn </span>batch_request_idx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.batch_request_idx
+    }
+
     <span class="kw">pub fn </span>new_non_panic_with_current_backtrace(message: String) -&gt; <span class="self">Self </span>{
         Error {
             inner: ErrorType::Unknown(UnknownError {
@@ -297,6 +322,7 @@
                 backtrace: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, backtrace::Backtrace::new())),
             }),
             is_panic: <span class="bool-val">false</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 
@@ -307,6 +333,7 @@
                 backtrace: <span class="prelude-val">None</span>,
             }),
             is_panic: <span class="bool-val">false</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 
@@ -332,6 +359,7 @@
                 backtrace,
             }),
             is_panic: <span class="bool-val">true</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 
@@ -340,6 +368,7 @@
         Error {
             inner: ErrorType::Known(err),
             is_panic: <span class="bool-val">false</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 
@@ -352,6 +381,7 @@
                 backtrace: <span class="prelude-val">None</span>,
             }),
             is_panic: <span class="bool-val">true</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 
@@ -369,6 +399,10 @@
             err @ ErrorType::Unknown(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected known error, got {:?}&quot;</span>, err),
         }
     }
+
+    <span class="kw">pub fn </span>set_batch_request_idx(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch_request_idx: usize) {
+        <span class="self">self</span>.batch_request_idx = <span class="prelude-val">Some</span>(batch_request_idx)
+    }
 }
 
 <span class="kw">pub fn </span>new_backtrace() -&gt; backtrace::Backtrace {
@@ -380,6 +414,7 @@
         Error {
             inner: ErrorType::Unknown(unknown_error),
             is_panic: <span class="bool-val">false</span>,
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -389,6 +424,7 @@
         Error {
             is_panic: <span class="bool-val">false</span>,
             inner: ErrorType::Known(known_error),
+            batch_request_idx: <span class="prelude-val">None</span>,
         }
     }
 }

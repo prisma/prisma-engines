@@ -161,6 +161,15 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
@@ -207,16 +216,25 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>results = Vec::with_capacity(queries.len());
 
-    <span class="kw">for </span>(query_graph, serializer) <span class="kw">in </span>queries {
+    <span class="kw">for </span>(i, (query_graph, serializer)) <span class="kw">in </span>queries.into_iter().enumerate() {
         <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
         <span class="kw">let </span>operation_timer = Instant::now();
         <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
         <span class="kw">let </span>result = QueryPipeline::new(query_graph, interpreter, serializer)
             .execute(trace_id.clone())
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+            .<span class="kw">await</span>;
 
         <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
-        results.push(<span class="prelude-val">Ok</span>(result));
+
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(result) =&gt; results.push(<span class="prelude-val">Ok</span>(result)),
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::CoreError::BatchError {
+                    request_idx: i,
+                    error: Box::new(error),
+                });
+            }
+        }
     }
 
     <span class="prelude-val">Ok</span>(results)

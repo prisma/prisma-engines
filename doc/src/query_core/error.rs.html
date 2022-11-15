@@ -273,6 +273,15 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
     RelationViolation, TransactionError,
@@ -345,6 +354,9 @@
 
     <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
     </span>FieldConversionError(<span class="attribute">#[from] </span>FieldConversionError),
+
+    <span class="attribute">#[error(<span class="string">&quot;Error in batch request {request_idx}: {error}&quot;</span>)]
+    </span>BatchError { request_idx: usize, error: Box&lt;CoreError&gt; },
 }
 
 <span class="kw">impl </span>CoreError {
@@ -542,6 +554,12 @@
                     details: err.to_string(),
                 })
                 .into()
+            }
+
+            CoreError::BatchError { request_idx, error } =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>inner_error = user_facing_errors::Error::from(<span class="kw-2">*</span>error);
+                inner_error.set_batch_request_idx(request_idx);
+                inner_error
             }
 
             <span class="kw">_ </span>=&gt; user_facing_errors::Error::from_dyn_error(<span class="kw-2">&amp;</span>err),
