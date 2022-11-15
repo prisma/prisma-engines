@@ -88,7 +88,7 @@ impl TransactionActorManager {
                             ClosedTx::Committed => message.push_str(" that has already been committed"),
                             ClosedTx::RolledBack => message.push_str(" that has already been rolled back"),
                             ClosedTx::Expired { start_time, timeout } => {
-                                message.push_str(&format!(" that has already expired. The timeout for this transaction was {} ms, however {} ms have passed since the start of the transaction", timeout.as_millis(), start_time.elapsed().as_millis()))
+                                message.push_str(&format!(" that has already expired. The timeout for this transaction was {} ms, however {} ms have passed since the start of the transaction. Consider increasing the interactive transaction timeout", timeout.as_millis(), start_time.elapsed().as_millis()))
                             }
                         }
                     }
