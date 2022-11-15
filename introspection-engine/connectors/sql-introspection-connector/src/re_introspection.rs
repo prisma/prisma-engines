@@ -2,13 +2,12 @@ use crate::{
     calculate_datamodel::CalculateDatamodelContext, introspection_helpers::compare_options_none_last, warnings::*,
 };
 use introspection_connector::Warning;
-use psl::dml::{Datamodel, DefaultValue, ValueGenerator, WithName};
+use psl::dml::{Datamodel, WithName};
 
 pub(crate) fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &mut CalculateDatamodelContext) {
     let warnings = &mut ctx.warnings;
     merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
     merge_custom_index_names(old_data_model, new_data_model, warnings);
-    merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     keep_index_ordering(old_data_model, new_data_model);
 }
 
@@ -104,60 +103,5 @@ fn merge_custom_index_names(old_data_model: &Datamodel, new_data_model: &mut Dat
     if !changed_index_names.is_empty() {
         let index: Vec<_> = changed_index_names.iter().map(|c| c.0.clone()).collect();
         warnings.push(warning_enriched_with_custom_index_names(&index));
-    }
-}
-
-// Prisma Level Only concepts
-// @default(cuid) / @default(uuid) / @updatedAt
-fn merge_prisma_level_defaults(
-    old_data_model: &Datamodel,
-    new_data_model: &mut Datamodel,
-    warnings: &mut Vec<Warning>,
-) {
-    let mut re_introspected_prisma_level_cuids = vec![];
-    let mut re_introspected_prisma_level_uuids = vec![];
-
-    for model in new_data_model.models() {
-        for field in model.scalar_fields() {
-            let old_model = match old_data_model.find_model(&model.name) {
-                Some(old_model) => old_model,
-                None => continue,
-            };
-
-            let old_field = match old_model.find_scalar_field(&field.name) {
-                Some(mike) => mike, // oldfield
-                None => continue,
-            };
-
-            if field.default_value.is_none() && field.field_type.is_string() {
-                if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_cuid())) {
-                    re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
-                }
-
-                if old_field.default_value == Some(DefaultValue::new_expression(ValueGenerator::new_uuid())) {
-                    re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
-                }
-            }
-        }
-    }
-
-    for cuid in &re_introspected_prisma_level_cuids {
-        new_data_model
-            .find_scalar_field_mut(&cuid.model, &cuid.field)
-            .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_cuid()));
-    }
-
-    for uuid in &re_introspected_prisma_level_uuids {
-        new_data_model
-            .find_scalar_field_mut(&uuid.model, &uuid.field)
-            .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_uuid()));
-    }
-
-    if !re_introspected_prisma_level_cuids.is_empty() {
-        warnings.push(warning_enriched_with_cuid(&re_introspected_prisma_level_cuids));
-    }
-
-    if !re_introspected_prisma_level_uuids.is_empty() {
-        warnings.push(warning_enriched_with_uuid(&re_introspected_prisma_level_uuids));
     }
 }
