@@ -116,7 +116,6 @@ fn merge_prisma_level_defaults(
 ) {
     let mut re_introspected_prisma_level_cuids = vec![];
     let mut re_introspected_prisma_level_uuids = vec![];
-    let mut re_introspected_updated_at = vec![];
 
     for model in new_data_model.models() {
         for field in model.scalar_fields() {
@@ -139,10 +138,6 @@ fn merge_prisma_level_defaults(
                     re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
                 }
             }
-
-            if field.field_type.is_datetime() && old_field.is_updated_at {
-                re_introspected_updated_at.push(ModelAndField::new(&model.name, &field.name));
-            }
         }
     }
 
@@ -158,21 +153,11 @@ fn merge_prisma_level_defaults(
             .default_value = Some(DefaultValue::new_expression(ValueGenerator::new_uuid()));
     }
 
-    for updated_at in &re_introspected_updated_at {
-        new_data_model
-            .find_scalar_field_mut(&updated_at.model, &updated_at.field)
-            .is_updated_at = true;
-    }
-
     if !re_introspected_prisma_level_cuids.is_empty() {
         warnings.push(warning_enriched_with_cuid(&re_introspected_prisma_level_cuids));
     }
 
     if !re_introspected_prisma_level_uuids.is_empty() {
         warnings.push(warning_enriched_with_uuid(&re_introspected_prisma_level_uuids));
-    }
-
-    if !re_introspected_updated_at.is_empty() {
-        warnings.push(warning_enriched_with_updated_at(&re_introspected_updated_at));
     }
 }

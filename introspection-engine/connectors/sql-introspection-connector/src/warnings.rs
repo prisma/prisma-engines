@@ -176,16 +176,6 @@ pub(crate) fn warning_enriched_with_uuid(affected: &[ModelAndField]) -> Warning 
     }
 }
 
-pub(crate) fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 13,
-        message:
-            "These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
 //todo maybe we can get rid of this alltogether due to @@ignore
 //but maybe we should have warnings for ignored fields and models
 pub(crate) fn warning_models_without_columns(affected: &[Model]) -> Warning {
