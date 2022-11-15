@@ -192,6 +192,25 @@ mod compound_batch {
         Ok(())
     }
 
+    #[connector_test]
+    async fn two_equal_queries(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        let queries = vec![
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"} }) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{lastName:"Naukio",firstName:"Musti"} }) {firstName lastName}}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}}]}"###
+        );
+
+        Ok(())
+    }
+
     fn should_batch_schema() -> String {
         let schema = indoc! {
             r#"model Artist {
