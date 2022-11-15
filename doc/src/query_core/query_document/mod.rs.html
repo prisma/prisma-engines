@@ -301,6 +301,8 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -338,6 +340,7 @@
 <span class="kw">use </span>prisma_models::ModelRef;
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>schema_builder::constants::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub type </span>QueryParserResult&lt;T&gt; = std::result::Result&lt;T, QueryParserError&gt;;
 
@@ -459,7 +462,7 @@
 
 <span class="attribute">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CompactedDocument {
-    <span class="kw">pub </span>arguments: Vec&lt;Vec&lt;(String, QueryValue)&gt;&gt;,
+    <span class="kw">pub </span>arguments: Vec&lt;HashMap&lt;String, QueryValue&gt;&gt;,
     <span class="kw">pub </span>nested_selection: Vec&lt;String&gt;,
     <span class="kw">pub </span>operation: Operation,
     <span class="kw">pub </span>keys: Vec&lt;String&gt;,
@@ -545,14 +548,15 @@
         <span class="comment">// Saving the stub of the query name for later use.
         </span><span class="kw">let </span>name = selections[<span class="number">0</span>].name().replacen(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="number">1</span>);
 
-        <span class="comment">// Convert the selections into a vector of arguments. This defines the
+        <span class="comment">// Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
-        </span><span class="kw">let </span>arguments: Vec&lt;Vec&lt;(String, QueryValue)&gt;&gt; = selections
+        </span><span class="kw">let </span>arguments: Vec&lt;HashMap&lt;String, QueryValue&gt;&gt; = selections
             .into_iter()
             .map(|<span class="kw-2">mut </span>sel| {
                 <span class="kw">let </span>where_obj = sel.pop_argument().unwrap().<span class="number">1</span>.into_object().unwrap();
+                <span class="kw">let </span>filter_map: HashMap&lt;String, QueryValue&gt; = extract_filter(where_obj, model).into_iter().collect();
 
-                extract_filter(where_obj, model)
+                filter_map
             })
             .collect();
 
