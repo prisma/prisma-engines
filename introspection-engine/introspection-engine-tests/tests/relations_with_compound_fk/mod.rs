@@ -135,8 +135,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           age          Int
           partner_id   Int
           partner_age  Int
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_pid_page_fkey")
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_pid_page_fkey")
+          other_Person Person[]
 
           @@unique([id, age], map: "post_user_unique")
         }
@@ -173,8 +173,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int?
           partner_age  Int?
-          Person       Person?  @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_fkey")
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person?  @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction, map: "Person_fkey")
+          other_Person Person[]
 
           @@unique([id, age], map: "post_user_unique")
         }

@@ -217,8 +217,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           age          Int
           partner_id   Int
           partner_age  Int
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
@@ -251,8 +251,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int?
           partner_age  Int?
-          Person       Person?  @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person?  @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
@@ -285,8 +285,8 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }

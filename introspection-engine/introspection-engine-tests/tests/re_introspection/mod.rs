@@ -1319,13 +1319,13 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     let final_dm = expect![[r#"
         model B {
           id        Int @id @default(autoincrement())
-          custom_A  A[]
+          custom_A  A[] @relation("AToB")
           special_A A[] @relation("AToB2")
         }
 
         model A {
           id        Int @id @default(autoincrement())
-          custom_B  B[]
+          custom_B  B[] @relation("AToB")
           special_B B[] @relation("AToB2")
         }
 

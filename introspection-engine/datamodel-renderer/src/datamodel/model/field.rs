@@ -1,13 +1,12 @@
-use std::{borrow::Cow, collections::HashMap, fmt};
-
-use psl::{dml, RelationNames};
-
 use crate::{
-    datamodel::{attributes::FieldAttribute, DefaultValue, FieldType},
+    datamodel::{
+        attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
+        IdFieldDefinition, Relation,
+    },
     value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
 };
-
-use super::{index_field_input::IndexFieldOptions, IdFieldDefinition, Relation};
+use psl::dml;
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 /// A field in a model block.
 #[derive(Debug)]
@@ -303,7 +302,7 @@ impl<'a> ModelField<'a> {
     /// make much sense to call this from outside of the module.
     pub(super) fn from_dml(
         datasource: &'a psl::Datasource,
-        dml_model: &dml::Model,
+        _dml_model: &dml::Model,
         dml_field: &'a dml::Field,
         uniques: &HashMap<&'a str, IndexFieldOptions<'a>>,
         id: Option<IdFieldDefinition<'a>>,
@@ -393,18 +392,7 @@ impl<'a> ModelField<'a> {
                 }
 
                 let dml_info = &rf.relation_info;
-
-                let default_name =
-                    RelationNames::name_for_unambiguous_relation(&dml_info.referenced_model, &dml_model.name);
-
-                let is_self_relation = dml_model.name == dml_info.referenced_model;
-
-                // :( :(
-                let relation_name = if dml_info.name != default_name || is_self_relation {
-                    dml_info.name.as_str()
-                } else {
-                    ""
-                };
+                let relation_name = dml_info.name.as_str();
 
                 // :(
                 if !relation_name.is_empty() || (!dml_info.fields.is_empty() || !dml_info.references.is_empty()) {

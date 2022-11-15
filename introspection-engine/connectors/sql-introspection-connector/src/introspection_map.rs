@@ -6,6 +6,7 @@ use std::collections::HashMap;
 /// This container is responsible for matching schema items (enums, models and tables, columns and
 /// fields, foreign keys and relations...) between a SQL schema from a database and a Prisma
 /// schema.
+#[derive(Default)]
 pub(crate) struct IntrospectionMap {
     pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
     pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
@@ -16,20 +17,18 @@ pub(crate) struct IntrospectionMap {
 
 impl IntrospectionMap {
     pub(crate) fn new(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema) -> Self {
-        let existing_models = match_existing_models(sql_schema, prisma_schema);
-
-        IntrospectionMap {
-            existing_enums: match_enums(sql_schema, prisma_schema),
-            existing_scalar_fields: match_existing_scalar_fields(&existing_models, sql_schema, prisma_schema),
-            existing_inline_relations: match_existing_inline_relations(&existing_models, sql_schema, prisma_schema),
-            existing_m2m_relations: match_existing_m2m_relations(sql_schema, prisma_schema),
-            existing_models,
-        }
+        let mut map = Default::default();
+        match_existing_models(sql_schema, prisma_schema, &mut map);
+        match_enums(sql_schema, prisma_schema, &mut map);
+        match_existing_scalar_fields(sql_schema, prisma_schema, &mut map);
+        match_existing_inline_relations(sql_schema, prisma_schema, &mut map);
+        match_existing_m2m_relations(sql_schema, prisma_schema, &mut map);
+        map
     }
 }
 
-fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema) -> HashMap<sql::EnumId, ast::EnumId> {
-    if prisma_schema.connector.is_provider("mysql") {
+fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
+    map.existing_enums = if prisma_schema.connector.is_provider("mysql") {
         sql_schema
             .walk_columns()
             .filter_map(|col| col.column_type_family_as_enum().map(|enm| (col, enm)))
@@ -64,11 +63,8 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
     }
 }
 
-fn match_existing_models(
-    schema: &sql::SqlSchema,
-    prisma_schema: &psl::ValidatedSchema,
-) -> HashMap<sql::TableId, ast::ModelId> {
-    prisma_schema
+fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
+    map.existing_models = prisma_schema
         .db
         .walk_models()
         .filter_map(|model| {
@@ -80,14 +76,14 @@ fn match_existing_models(
 }
 
 fn match_existing_scalar_fields(
-    existing_models: &HashMap<sql::TableId, ast::ModelId>,
-    schema: &sql::SqlSchema,
+    sql_schema: &sql::SqlSchema,
     prisma_schema: &psl::ValidatedSchema,
-) -> HashMap<sql::ColumnId, (ast::ModelId, ast::FieldId)> {
-    schema
+    map: &mut IntrospectionMap,
+) {
+    map.existing_scalar_fields = sql_schema
         .walk_columns()
         .filter_map(|col| {
-            let model_id = existing_models.get(&col.table().id)?;
+            let model_id = map.existing_models.get(&col.table().id)?;
             let field_id = prisma_schema
                 .db
                 .walk(*model_id)
@@ -99,15 +95,15 @@ fn match_existing_scalar_fields(
         .collect()
 }
 
-fn match_existing_inline_relations(
-    existing_models: &HashMap<sql::TableId, ast::ModelId>,
-    schema: &sql::SqlSchema,
-    prisma_schema: &psl::ValidatedSchema,
-) -> HashMap<sql::ForeignKeyId, parser_database::RelationId> {
-    schema
+fn match_existing_inline_relations<'a>(
+    sql_schema: &'a sql::SqlSchema,
+    prisma_schema: &'a psl::ValidatedSchema,
+    map: &mut IntrospectionMap,
+) {
+    map.existing_inline_relations = sql_schema
         .walk_foreign_keys()
         .filter_map(|fk| {
-            let referencing_model = *existing_models.get(&fk.table().id)?;
+            let referencing_model = *map.existing_models.get(&fk.table().id)?;
             prisma_schema
                 .db
                 .walk(referencing_model)
@@ -131,10 +127,11 @@ fn match_existing_inline_relations(
 }
 
 fn match_existing_m2m_relations(
-    schema: &sql::SqlSchema,
+    sql_schema: &sql::SqlSchema,
     prisma_schema: &psl::ValidatedSchema,
-) -> HashMap<sql::TableId, parser_database::ManyToManyRelationId> {
-    schema
+    map: &mut IntrospectionMap,
+) {
+    map.existing_m2m_relations = sql_schema
         .table_walkers()
         .filter(|t| is_prisma_join_table(*t))
         .filter_map(|table| {
