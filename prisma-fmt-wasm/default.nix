@@ -1,14 +1,8 @@
-{ crane, nixpkgs, rust-overlay, system, src }:
+args@{ pkgs, system, src, ... }:
 
 let
-  overlays = [
-    rust-overlay.overlays.default
-    (self: super:
-      let toolchain = super.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml; in
-      { cargo = toolchain; rustc = toolchain; })
-  ];
-  pkgs = import nixpkgs { inherit system overlays; };
-  craneLib = crane.mkLib pkgs;
+  toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+  craneLib = args.craneLib.overrideToolchain toolchain;
 
   inherit (pkgs) jq nodejs coreutils rustPlatform wasm-bindgen-cli;
   inherit (builtins) readFile replaceStrings;
