@@ -897,9 +897,7 @@ impl<'a> ToSql for Value<'a> {
                 #[cfg(feature = "uuid")]
                 (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
                 #[cfg(feature = "chrono")]
-                (Value::DateTime(value), &PostgresType::DATE) => {
-                    value.map(|value| value.date().naive_utc().to_sql(ty, out))
-                }
+                (Value::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
                 #[cfg(feature = "chrono")]
                 (Value::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
                 #[cfg(feature = "chrono")]

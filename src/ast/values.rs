@@ -980,7 +980,7 @@ mod tests {
     #[test]
     #[cfg(feature = "chrono")]
     fn display_format_for_date() {
-        let date = NaiveDate::from_ymd(2022, 8, 11);
+        let date = NaiveDate::from_ymd_opt(2022, 8, 11).unwrap();
         let pv = Value::date(date);
 
         assert_eq!(format!("{}", pv), "\"2022-08-11\"");

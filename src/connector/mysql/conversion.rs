@@ -287,9 +287,9 @@ impl TakeRow for my::Row {
                         return Err(Error::builder(kind).build());
                     }
 
-                    let time = NaiveTime::from_hms_micro(hour.into(), min.into(), sec.into(), micro);
+                    let time = NaiveTime::from_hms_micro_opt(hour.into(), min.into(), sec.into(), micro).unwrap();
 
-                    let date = NaiveDate::from_ymd(year.into(), month.into(), day.into());
+                    let date = NaiveDate::from_ymd_opt(year.into(), month.into(), day.into()).unwrap();
                     let dt = NaiveDateTime::new(date, time);
 
                     Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
@@ -306,7 +306,8 @@ impl TakeRow for my::Row {
                         return Err(Error::builder(kind).build());
                     }
 
-                    let time = NaiveTime::from_hms_micro(hours.into(), minutes.into(), seconds.into(), micros);
+                    let time =
+                        NaiveTime::from_hms_micro_opt(hours.into(), minutes.into(), seconds.into(), micros).unwrap();
                     Value::time(time)
                 }
                 my::Value::NULL => match column {

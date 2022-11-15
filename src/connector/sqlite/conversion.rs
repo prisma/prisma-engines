@@ -173,12 +173,12 @@ impl<'a> GetRow for SqliteRow<'a> {
                         }
                         #[cfg(feature = "chrono")]
                         c if c.is_date() => {
-                            let dt = chrono::NaiveDateTime::from_timestamp(i / 1000, 0);
+                            let dt = chrono::NaiveDateTime::from_timestamp_opt(i / 1000, 0).unwrap();
                             Value::date(dt.date())
                         }
                         #[cfg(feature = "chrono")]
                         c if c.is_datetime() => {
-                            let dt = chrono::Utc.timestamp_millis(i);
+                            let dt = chrono::Utc.timestamp_millis_opt(i).unwrap();
                             Value::datetime(dt)
                         }
                         c if c.is_int32() => {
@@ -287,18 +287,17 @@ impl<'a> ToSql for Value<'a> {
             #[cfg(feature = "chrono")]
             Value::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
             #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| {
-                let dt = date.and_hms(0, 0, 0);
-                ToSqlOutput::from(dt.timestamp_millis())
-            }),
+            Value::Date(date) => date
+                .and_then(|date| date.and_hms_opt(0, 0, 0))
+                .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
             #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| {
-                use chrono::{NaiveDate, Timelike};
-
-                let dt = NaiveDate::from_ymd(1970, 1, 1).and_hms(time.hour(), time.minute(), time.second());
-
-                ToSqlOutput::from(dt.timestamp_millis())
-            }),
+            Value::Time(time) => time
+                .and_then(|time| chrono::NaiveDate::from_ymd_opt(1970, 1, 1).map(|d| (d, time)))
+                .and_then(|(date, time)| {
+                    use chrono::Timelike;
+                    date.and_hms_opt(time.hour(), time.minute(), time.second())
+                })
+                .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
         };
 
         match value {

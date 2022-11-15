@@ -84,7 +84,7 @@ hex = "0.4"
 
 either = { version = "1.6", optional = true }
 base64 = { version = "0.12.3", optional = true }
-chrono = { version = "0.4", optional = true }
+chrono = { version = "0.4", optional = true, default-features = false }
 lru-cache = { version = "0.1", optional = true }
 serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip"] }
 native-tls = { version = "0.2", optional = true }
