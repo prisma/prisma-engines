@@ -1,7 +1,10 @@
 use crate::CoreError;
 use connector::{Connection, ConnectionLike, Transaction};
 use std::fmt::Display;
-use tokio::task::JoinHandle;
+use tokio::{
+    task::JoinHandle,
+    time::{Duration, Instant},
+};
 
 mod actor_manager;
 mod actors;
@@ -99,6 +102,15 @@ impl CachedTx {
             Err(CoreError::from(TransactionError::Closed { reason }))
         }
     }
+
+    pub fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
+        match self {
+            CachedTx::Open(_) => None,
+            CachedTx::Committed => Some(ClosedTx::Committed),
+            CachedTx::RolledBack => Some(ClosedTx::RolledBack),
+            CachedTx::Expired => Some(ClosedTx::Expired { start_time, timeout }),
+        }
+    }
 }
 
 pub struct OpenTx {
@@ -137,4 +149,10 @@ impl Into<CachedTx> for OpenTx {
     fn into(self) -> CachedTx {
         CachedTx::Open(self)
     }
+}
+
+pub enum ClosedTx {
+    Committed,
+    RolledBack,
+    Expired { start_time: Instant, timeout: Duration },
 }

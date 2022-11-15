@@ -1,4 +1,4 @@
-use crate::{Operation, ResponseData};
+use crate::{ClosedTx, Operation, ResponseData};
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
@@ -9,7 +9,7 @@ use tokio::{
         RwLock,
     },
     task::JoinHandle,
-    time::{Duration, Instant},
+    time::Duration,
 };
 
 use super::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, OpenTx, TransactionError, TxId};
@@ -21,19 +21,14 @@ pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var(
 
 static CHANNEL_SIZE: usize = 100;
 
-pub struct ClosedTx {
-    pub start_time: Instant,
-    pub timeout: Duration,
-}
-
 pub struct TransactionActorManager {
     /// Map of active ITx clients
     pub clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    pub closed_txs: Arc<RwLock<LruCache<TxId, ClosedTx>>>,
+    pub closed_txs: Arc<RwLock<LruCache<TxId, Option<ClosedTx>>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
-    send_done: Sender<(TxId, ClosedTx)>,
+    send_done: Sender<(TxId, Option<ClosedTx>)>,
     /// Handle to the task in charge of clearing actors.
     /// Used to abort the task when the TransactionActorManager is dropped.
     bg_reader_clear: JoinHandle<()>,
@@ -57,7 +52,7 @@ impl TransactionActorManager {
         let clients = Arc::new(RwLock::new(HashMap::new()));
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
 
-        let (send_done, rx) = channel::<(TxId, ClosedTx)>(CHANNEL_SIZE);
+        let (send_done, rx) = channel(CHANNEL_SIZE);
         let handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);
 
         Self {

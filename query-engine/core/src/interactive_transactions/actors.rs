@@ -249,7 +249,7 @@ pub fn spawn_itx_actor(
     value: OpenTx,
     timeout: Duration,
     channel_size: usize,
-    send_done: Sender<(TxId, ClosedTx)>,
+    send_done: Sender<(TxId, Option<ClosedTx>)>,
 ) -> ITXClient {
     let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
 
@@ -301,10 +301,7 @@ pub fn spawn_itx_actor(
             let _ = send_done
                 .send((
                     server.id.clone(),
-                    ClosedTx {
-                        start_time,
-                        timeout: server.timeout,
-                    },
+                    server.cached_tx.to_closed(start_time, server.timeout),
                 ))
                 .await;
 
@@ -360,8 +357,8 @@ pub fn spawn_itx_actor(
 */
 pub fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
-    closed_txs: Arc<RwLock<lru::LruCache<TxId, ClosedTx>>>,
-    mut rx: Receiver<(TxId, ClosedTx)>,
+    closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
+    mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
     tokio::task::spawn(async move {
         loop {
