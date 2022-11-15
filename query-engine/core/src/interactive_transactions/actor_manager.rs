@@ -91,7 +91,7 @@ impl TransactionActorManager {
                     Some(ClosedTx::Expired { start_time, timeout }) => {
                         format!(
                             "A {from_operation} cannot be executed on an expired transaction. \
-                             The timeout for this transaction was {} ms, however {} ms have passed since the start \
+                             The timeout for this transaction was {} ms, however {} ms passed since the start \
                              of the transaction. Consider increasing the interactive transaction timeout",
                             timeout.as_millis(),
                             start_time.elapsed().as_millis(),
