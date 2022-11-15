@@ -101,7 +101,6 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
-<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context;
 <span class="kw">use </span>psl::dml;
 <span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, postgres::PostgresSchemaExt};
@@ -170,16 +169,15 @@
             column,
         )),
         (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) =&gt; {
-            <span class="kw">let </span>variant_name = ctx
-                .existing_enum(<span class="kw-2">*</span>enum_id)
-                .into_iter()
-                .flat_map(|enm| enm.values())
-                .find(|value| value.mapped_name() == <span class="prelude-val">Some</span>(variant))
-                .map(|value| value.name())
-                .unwrap_or(variant);
-
+            <span class="kw">let </span>variant = ctx
+                .schema
+                .walk(<span class="kw-2">*</span>enum_id)
+                .variants()
+                .find(|v| v.name() == variant)
+                .unwrap();
+            <span class="kw">let </span>variant_name = ctx.enum_variant_name(variant.id).prisma_name();
             <span class="prelude-val">Some</span>(set_default(
-                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.to_owned())),
+                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.into_owned())),
                 column,
             ))
         }

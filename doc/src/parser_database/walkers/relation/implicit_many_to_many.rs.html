@@ -44,9 +44,20 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     relations::{ManyToManyRelationId, Relation, RelationAttributes},
-    walkers::{ModelWalker, RelationFieldWalker, RelationName, Walker},
+    walkers::{ModelWalker, RelationFieldWalker, RelationName, RelationWalker, Walker},
 };
 
 <span class="doccomment">/// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
@@ -57,6 +68,12 @@
     <span class="doccomment">/// Gets the relation attributes from the AST.
     </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>Relation {
         <span class="kw-2">&amp;</span><span class="self">self</span>.db.relations[<span class="self">self</span>.id.<span class="number">0</span>]
+    }
+
+    <span class="doccomment">/// Is this a many-to-many self-relation?
+    </span><span class="kw">pub fn </span>is_self_relation(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>rel = <span class="self">self</span>.get();
+        rel.model_a == rel.model_b
     }
 
     <span class="doccomment">/// The model which comes first in the alphabetical order.
@@ -83,6 +100,11 @@
             RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b } =&gt; <span class="self">self</span>.model_b().relation_field(field_b),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
+    }
+
+    <span class="doccomment">/// Traverse this relation as a generic relation.
+    </span><span class="kw">pub fn </span>as_relation(<span class="self">self</span>) -&gt; RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// The name of the relation.

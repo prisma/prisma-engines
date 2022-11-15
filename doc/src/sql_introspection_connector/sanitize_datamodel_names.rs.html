@@ -147,353 +147,153 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
-<span class="kw">use </span>once_cell::sync::Lazy;
-<span class="kw">use </span>psl::{
-    dml::{
-        Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField, PrismaValue,
-        ValueGenerator, WithDatabaseName, WithName,
-    },
-    is_reserved_type_name,
-};
-<span class="kw">use </span>quaint::prelude::SqlFamily;
+</pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>regex::Regex;
-
-<span class="kw">static </span>EMPTY_ENUM_PLACEHOLDER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">static </span>RE_START: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;^[^a-zA-Z]+&quot;</span>).unwrap());
 <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;[^_a-zA-Z0-9]&quot;</span>).unwrap());
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sanitize_datamodel_names(ctx: <span class="kw-2">&amp;</span>Context, datamodel: <span class="kw-2">&amp;mut </span>Datamodel) {
-    <span class="kw">let </span>enum_renames = sanitize_models(ctx, datamodel);
-    sanitize_enums(<span class="kw-2">&amp;</span>enum_renames, datamodel);
+<span class="kw">fn </span>needs_sanitation(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    RE_START.is_match(s) || RE.is_match(s)
 }
 
-<span class="comment">// if after opionated renames we have duplicated names, e.g. a database with
-// tables `a` and `_a`, the tables in the data model (`a` and `a`) would
-// cause really weird errors
-</span><span class="kw">pub fn </span>sanitization_leads_to_duplicate_names(datamodel: <span class="kw-2">&amp;</span>Datamodel) -&gt; bool {
-    <span class="kw">for </span>model <span class="kw">in </span>datamodel.models() {
-        <span class="kw">let </span>sanitized = sanitize_string(<span class="kw-2">&amp;</span>model.name);
-
-        <span class="kw">let </span>dups = datamodel
-            .models()
-            .filter(|m| sanitize_string(m.name()) == sanitized)
-            .count();
-
-        <span class="kw">if </span>dups &gt; <span class="number">1 </span>{
-            <span class="kw">return </span><span class="bool-val">true</span>;
-        }
-    }
-
-    <span class="bool-val">false
-</span>}
-
-<span class="comment">// Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
-</span><span class="kw">fn </span>sanitize_models(ctx: <span class="kw-2">&amp;</span>Context, datamodel: <span class="kw-2">&amp;mut </span>Datamodel) -&gt; HashMap&lt;String, (String, <span class="prelude-ty">Option</span>&lt;String&gt;)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>enum_renames = HashMap::new();
-    <span class="kw">let </span>sql_family = ctx.sql_family();
-
-    <span class="kw">for </span>model <span class="kw">in </span>datamodel.models_mut() {
-        rename_reserved(model);
-        sanitize_name(model);
-
-        <span class="kw">let </span>model_name = model.name().to_owned();
-        <span class="kw">let </span>model_db_name = model.database_name().map(|s| s.to_owned());
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = <span class="kw-2">&amp;mut </span>model.primary_key {
-            sanitize_pk_field_names(<span class="kw-2">&amp;mut </span>pk.fields);
-        }
-
-        <span class="kw">for </span>field <span class="kw">in </span>model.fields_mut() {
-            sanitize_name(field);
-
-            <span class="kw">match </span>field {
-                Field::RelationField(rf) =&gt; {
-                    <span class="kw">let </span>info = <span class="kw-2">&amp;mut </span>rf.relation_info;
-
-                    info.name = sanitize_string(<span class="kw-2">&amp;</span>info.name);
-                    info.referenced_model = sanitize_string(<span class="kw-2">&amp;</span>reformat_reserved_string(<span class="kw-2">&amp;</span>info.referenced_model));
-
-                    info.references = sanitize_strings(<span class="kw-2">&amp;</span>info.references);
-                    info.fields = sanitize_strings(<span class="kw-2">&amp;</span>info.fields);
-                }
-
-                Field::ScalarField(sf) =&gt; {
-                    <span class="kw">if let </span>FieldType::Enum(enum_name) = <span class="kw-2">&amp;</span>sf.field_type {
-                        <span class="comment">// Enums in MySQL are defined on the column and do not have a separate name.
-                        // Introspection generates an enum name for MySQL as `&lt;model_name&gt;_&lt;field_type&gt;`.
-                        // If the sanitization changes the enum name, we need to make sure it&#39;s changed everywhere.
-                        </span><span class="kw">let </span>(sanitized_enum_name, db_name) = <span class="kw">if let </span>SqlFamily::Mysql = sql_family {
-                            <span class="kw">if </span>model_db_name.is_none() &amp;&amp; sf.database_name.is_none() {
-                                (enum_name.to_owned(), <span class="prelude-val">None</span>)
-                            } <span class="kw">else </span>{
-                                (<span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, model_name, sf.name()), <span class="prelude-val">Some</span>(enum_name.to_owned()))
-                            }
-                        } <span class="kw">else </span>{
-                            <span class="kw">let </span>sanitized = sanitize_string(enum_name);
-
-                            <span class="kw">if </span><span class="kw-2">&amp;</span>sanitized != enum_name {
-                                (sanitized, <span class="prelude-val">Some</span>(enum_name.to_owned()))
-                            } <span class="kw">else </span>{
-                                (sanitized, <span class="prelude-val">None</span>)
-                            }
-                        };
-
-                        <span class="kw">if </span>db_name.is_some() {
-                            enum_renames.insert(enum_name.to_owned(), (sanitized_enum_name.clone(), db_name));
-                        }
-
-                        sf.field_type = FieldType::Enum(sanitized_enum_name);
-
-                        <span class="comment">// If the field also has an associated default enum value, we need to sanitize that enum value.
-                        // The actual enum value renames _in the enum itself_ are done at a later stage.
-                        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(DefaultKind::Single(PrismaValue::Enum(value))) =
-                            sf.default_value.as_mut().map(|dv| dv.mut_kind())
-                        {
-                            <span class="kw">let </span>new_default = <span class="kw">if </span>value.is_empty() {
-                                DefaultValue::new_single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))
-                            } <span class="kw">else </span>{
-                                <span class="kw">let </span>sanitized_value = sanitize_string(value);
-
-                                <span class="kw">match </span>sanitized_value {
-                                    x <span class="kw">if </span>x.is_empty() =&gt; {
-                                        DefaultValue::new_expression(ValueGenerator::new_dbgenerated(value.clone()))
-                                    }
-                                    <span class="kw">_ </span>=&gt; DefaultValue::new_single(PrismaValue::Enum(sanitized_value)),
-                                }
-                            };
-
-                            sf.default_value.replace(new_default);
-                        };
-                    }
-                }
-                Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            }
-        }
-
-        <span class="kw">for </span>index <span class="kw">in </span><span class="kw-2">&amp;mut </span>model.indices {
-            sanitize_index_field_names(<span class="kw-2">&amp;mut </span>index.fields);
-        }
-    }
-
-    enum_renames
-}
-
-<span class="kw">fn </span>sanitize_enums(enum_renames: <span class="kw-2">&amp;</span>HashMap&lt;String, (String, <span class="prelude-ty">Option</span>&lt;String&gt;)&gt;, datamodel: <span class="kw-2">&amp;mut </span>Datamodel) {
-    <span class="kw">for </span>enm <span class="kw">in </span>datamodel.enums_mut() {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((sanitized_name, db_name)) = enum_renames.get(<span class="kw-2">&amp;</span>enm.name) {
-            <span class="kw">if </span>enm.database_name().is_none() {
-                enm.set_database_name(db_name.clone());
-            }
-
-            enm.set_name(sanitized_name);
-        } <span class="kw">else </span>{
-            sanitize_name(enm);
-        }
-
-        <span class="kw">for </span>enum_value <span class="kw">in </span>enm.values_mut() {
-            <span class="kw">if </span>enum_value.name.is_empty() {
-                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
-                enum_value.database_name = <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>.to_string());
-            } <span class="kw">else </span>{
-                sanitize_name(enum_value);
-            }
-        }
-    }
-}
-
-<span class="kw">fn </span>sanitize_pk_field_names(fields: <span class="kw-2">&amp;mut </span>[PrimaryKeyField]) {
-    fields
-        .iter_mut()
-        .map(|<span class="kw-2">mut </span>field| field.name = sanitize_string(<span class="kw-2">&amp;</span>field.name))
-        .collect()
-}
-
-<span class="kw">fn </span>sanitize_index_field_names(fields: <span class="kw-2">&amp;mut </span>[IndexField]) {
-    fields
-        .iter_mut()
-        .map(|field| {
-            <span class="kw">let </span>path = field
-                .path
-                .first()
-                .cloned()
-                .map(|(f, <span class="kw">_</span>)| (sanitize_string(<span class="kw-2">&amp;</span>f), <span class="prelude-val">None</span>))
-                .unwrap();
-
-            field.path = <span class="macro">vec!</span>[path];
-        })
-        .collect()
-}
-
-<span class="kw">fn </span>sanitize_strings(strings: <span class="kw-2">&amp;</span>[String]) -&gt; Vec&lt;String&gt; {
-    strings.iter().map(|f| sanitize_string(f)).collect()
-}
-
-<span class="doccomment">/// We agreed on a simple sanitization logic. Any remaining conflicts will produce a datamodel with
-/// name conflicts. Our validation will catch that and ask the user to disambiguate manually.
-</span><span class="kw">fn </span>sanitize_name&lt;T&gt;(renameable: <span class="kw-2">&amp;mut </span>T)
-<span class="kw">where
-    </span>T: WithDatabaseName + WithName,
-{
-    <span class="kw">let </span>name = renameable.name().clone();
-    <span class="kw">let </span>db_name = renameable.database_name().map(|s| s.to_owned());
-    <span class="kw">let </span>sanitized = sanitize_string(name.as_str());
-
-    <span class="kw">if </span>sanitized != name {
-        <span class="comment">// Only set the db name if there&#39;s none already set (or else this would invalidate the model).
-        </span><span class="kw">if </span>db_name.is_none() {
-            renameable.set_database_name(<span class="prelude-val">Some</span>(name));
-        }
-
-        renameable.set_name(<span class="kw-2">&amp;</span>sanitized);
-    };
-}
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
-    <span class="kw">let </span>needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
-
-    <span class="kw">if </span>needs_sanitation {
-        <span class="kw">let </span>start_cleaned: String = RE_START.replace_all(s, <span class="string">&quot;&quot;</span>).parse().unwrap();
-        <span class="kw">let </span>sanitized: String = RE.replace_all(start_cleaned.as_str(), <span class="string">&quot;_&quot;</span>).parse().unwrap();
-
-        sanitized
+<span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">if </span>needs_sanitation(s) {
+        <span class="kw">let </span>start_cleaned = RE_START.replace_all(s, <span class="string">&quot;&quot;</span>);
+        RE.replace_all(start_cleaned.as_ref(), <span class="string">&quot;_&quot;</span>).into_owned()
     } <span class="kw">else </span>{
         s.to_owned()
     }
 }
 
-<span class="kw">fn </span>rename_reserved(model: <span class="kw-2">&amp;mut </span>Model) {
-    <span class="kw">let </span>name = reformat_reserved_string(model.name());
+<span class="doccomment">/// Names that correspond to _types_ in the generated client. Concretely, enums, models and
+/// composite types.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    FromPsl {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        mapped_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    },
+    FromSql {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+    RenamedReserved {
+        mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+    RenamedSanitized {
+        mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+}
 
-    <span class="kw">if </span><span class="kw-2">&amp;</span>name != model.name() {
-        <span class="kw">let </span>comment = <span class="macro">format!</span>(
-            <span class="string">&quot;This model has been renamed to &#39;{}&#39; during introspection, because the original name &#39;{}&#39; is reserved.&quot;</span>,
-            name, model.name,
-        );
-
-        <span class="kw">match </span>model.documentation {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) =&gt; model.documentation = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, docs, comment)),
-            <span class="prelude-val">None </span>=&gt; model.documentation = <span class="prelude-val">Some</span>(comment),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>name {
+            <span class="kw">_ if </span>psl::is_reserved_type_name(name) =&gt; ModelName::RenamedReserved { mapped_name: name },
+            <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
+                ModelName::RenamedSanitized { mapped_name: name }
+            }
+            name =&gt; ModelName::FromSql { name },
         }
+    }
 
-        <span class="comment">// Only set @@map if there&#39;s no @@map already set.
-        </span><span class="kw">if </span>model.database_name.is_none() {
-            model.database_name = <span class="prelude-val">Some</span>(model.name.clone());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ModelName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
+            ModelName::FromSql { name } =&gt; Cow::Borrowed(name),
+            ModelName::RenamedReserved { mapped_name } =&gt; Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;Renamed{mapped_name}&quot;</span>)),
+            ModelName::RenamedSanitized { mapped_name } =&gt; {
+                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+            }
         }
-
-        model.name = name;
     }
 }
 
-<span class="doccomment">/// Reformats a reserved string as &quot;Renamed{}&quot;
-</span><span class="kw">fn </span>reformat_reserved_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
-    <span class="kw">if </span>is_reserved_type_name(s) {
-        <span class="macro">format!</span>(<span class="string">&quot;Renamed{}&quot;</span>, s)
-    } <span class="kw">else </span>{
-        s.to_owned()
+<span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    FromPsl {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        mapped_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    },
+    FromSql {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+    RenamedSanitized {
+        mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>name {
+            <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
+                IntrospectedName::RenamedSanitized { mapped_name: name }
+            }
+            name =&gt; IntrospectedName::FromSql { name },
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            IntrospectedName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
+            IntrospectedName::FromSql { name } =&gt; Cow::Borrowed(name),
+            IntrospectedName::RenamedSanitized { mapped_name } =&gt; {
+                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+            }
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            IntrospectedName::FromPsl { name: <span class="kw">_</span>, mapped_name } =&gt; <span class="kw-2">*</span>mapped_name,
+            IntrospectedName::FromSql { name: <span class="kw">_ </span>} =&gt; <span class="prelude-val">None</span>,
+            IntrospectedName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+        }
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Empty,
+    RenamedSanitized {
+        mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+    FromSql {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    },
+    FromPsl {
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        mapped_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    },
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>name {
+            <span class="string">&quot;&quot; </span>=&gt; EnumVariantName::Empty,
+            <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
+                EnumVariantName::RenamedSanitized { mapped_name: name }
+            }
+            name =&gt; EnumVariantName::FromSql { name },
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            EnumVariantName::Empty =&gt; Cow::Borrowed(<span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>),
+            EnumVariantName::RenamedSanitized { mapped_name } =&gt; {
+                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+            }
+            EnumVariantName::FromSql { name } | EnumVariantName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            EnumVariantName::Empty =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>),
+            EnumVariantName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+            EnumVariantName::FromSql { name: <span class="kw">_ </span>} =&gt; <span class="prelude-val">None</span>,
+            EnumVariantName::FromPsl { name: <span class="kw">_</span>, mapped_name } =&gt; <span class="kw-2">*</span>mapped_name,
+        }
     }
 }
 </code></pre></div>

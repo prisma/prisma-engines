@@ -502,28 +502,15 @@
 <span id="502">502</span>
 <span id="503">503</span>
 <span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, collections::HashMap, fmt};
-
-<span class="kw">use </span>psl::{dml, RelationNames};
-
-<span class="kw">use crate</span>::{
-    datamodel::{attributes::FieldAttribute, DefaultValue, FieldType},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    datamodel::{
+        attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
+        IdFieldDefinition, Relation,
+    },
     value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
 };
-
-<span class="kw">use super</span>::{index_field_input::IndexFieldOptions, IdFieldDefinition, Relation};
+<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap, fmt};
 
 <span class="doccomment">/// A field in a model block.
 </span><span class="attribute">#[derive(Debug)]
@@ -819,7 +806,7 @@
     /// make much sense to call this from outside of the module.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_dml(
         datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource,
-        dml_model: <span class="kw-2">&amp;</span>dml::Model,
+        _dml_model: <span class="kw-2">&amp;</span>dml::Model,
         dml_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Field,
         uniques: <span class="kw-2">&amp;</span>HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, IndexFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
         id: <span class="prelude-ty">Option</span>&lt;IdFieldDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -909,18 +896,7 @@
                 }
 
                 <span class="kw">let </span>dml_info = <span class="kw-2">&amp;</span>rf.relation_info;
-
-                <span class="kw">let </span>default_name =
-                    RelationNames::name_for_unambiguous_relation(<span class="kw-2">&amp;</span>dml_info.referenced_model, <span class="kw-2">&amp;</span>dml_model.name);
-
-                <span class="kw">let </span>is_self_relation = dml_model.name == dml_info.referenced_model;
-
-                <span class="comment">// :( :(
-                </span><span class="kw">let </span>relation_name = <span class="kw">if </span>dml_info.name != default_name || is_self_relation {
-                    dml_info.name.as_str()
-                } <span class="kw">else </span>{
-                    <span class="string">&quot;&quot;
-                </span>};
+                <span class="kw">let </span>relation_name = dml_info.name.as_str();
 
                 <span class="comment">// :(
                 </span><span class="kw">if </span>!relation_name.is_empty() || (!dml_info.fields.is_empty() || !dml_info.references.is_empty()) {

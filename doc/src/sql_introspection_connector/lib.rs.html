@@ -192,6 +192,9 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::vec_init_then_push)]
 #![allow(clippy::ptr_arg)] </span><span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
@@ -212,14 +215,17 @@
 
 <span class="kw">pub use </span>error::<span class="kw-2">*</span>;
 
+<span class="kw">use </span><span class="self">self</span>::sanitize_datamodel_names::<span class="kw-2">*</span>;
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 <span class="kw">use </span>psl::PreviewFeature;
-<span class="kw">use </span>quaint::prelude::SqlFamily;
-<span class="kw">use </span>quaint::{prelude::ConnectionInfo, single::Quaint};
+<span class="kw">use </span>quaint::{
+    prelude::{ConnectionInfo, SqlFamily},
+    single::Quaint,
+};
 <span class="kw">use </span>schema_describer_loading::load_describer;
 <span class="kw">use </span>sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 <span class="kw">use </span>std::future::Future;
