@@ -228,8 +228,20 @@ mod singular_batch {
         create_test_data(&runner).await?;
 
         let queries = vec![
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}}]}"###
+        );
+
+        // With non unique filters
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { Name: "ArtistWithoutAlbums", ArtistId: 1 }) { Name }}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;
