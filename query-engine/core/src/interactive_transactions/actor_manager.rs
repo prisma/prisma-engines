@@ -79,9 +79,21 @@ impl TransactionActorManager {
     async fn get_client(&self, tx_id: &TxId, from_operation: &str) -> crate::Result<ITXClient> {
         if let Some(client) = self.clients.read().await.get(tx_id) {
             Ok(client.clone())
-        } else if self.closed_txs.read().await.contains(tx_id) {
+        } else if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
             Err(TransactionError::Closed {
-                reason: format!("A {from_operation} cannot be executed on a closed transaction."),
+                reason: {
+                    let mut message = format!("A {from_operation} cannot be executed on a closed transaction");
+                    if let Some(closed_tx) = closed_tx {
+                        match closed_tx {
+                            ClosedTx::Committed => message.push_str(" that has already been committed"),
+                            ClosedTx::RolledBack => message.push_str(" that has already been rolled back"),
+                            ClosedTx::Expired { start_time, timeout } => {
+                                message.push_str(&format!(" that has already expired. The timeout for this transaction was {} ms, however {} ms have passed since the start of the transaction", timeout.as_millis(), start_time.elapsed().as_millis()))
+                            }
+                        }
+                    }
+                    message
+                },
             }
             .into())
         } else {
