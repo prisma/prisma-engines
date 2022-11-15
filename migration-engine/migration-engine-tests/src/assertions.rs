@@ -79,12 +79,9 @@ impl SchemaAssertion {
             "assert_has_no_table"
         };
         let result = if positive { "was not found" } else { "was found" };
+        self.print_context();
         println!(
-            "{}{}{}",
-            match &self.context {
-                Some(ctx) => format!("\nTest failure with context <{}>", ctx.red()).bold(),
-                None => "\n\tTest failure".bold(),
-            },
+            "{}{}",
             format!(
                 "\n  {} has failed because table {} {}",
                 method.bold(),
@@ -98,10 +95,6 @@ impl SchemaAssertion {
             .map(|table| table.name())
             .for_each(|t| println!("\t - {}", t.green()));
 
-        match &self.description {
-            Some(desc) => println!("{}: {}", "Description".bold(), desc.italic(),),
-            None => (),
-        }
         std::panic::set_hook(Box::new(|_| {}));
         panic!();
     }
@@ -144,6 +137,17 @@ impl SchemaAssertion {
         self
     }
 
+    fn print_context(&self) {
+        match &self.context {
+            Some(context) => println!("Test failure with context <{}>", context.red()),
+            None => {}
+        }
+        match &self.description {
+            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
+            None => {}
+        }
+    }
+
     pub fn assert_has_no_enum(self, enum_name: &str) -> Self {
         let has_matching_enum = self.schema.enum_walkers().any(|enm| {
             if self.tags.contains(Tags::LowerCasesTableNames) {
@@ -154,8 +158,10 @@ impl SchemaAssertion {
         });
 
         if has_matching_enum {
-            // TODO: prettify this
-            panic!("Expected no enum named {}, found one", enum_name);
+            self.print_context();
+            println!("Found unexpected enum {}", enum_name.red());
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
         }
 
         self
@@ -167,8 +173,12 @@ impl SchemaAssertion {
     {
         let r#enum = match self.schema.find_enum(enum_name) {
             Some(enm) => self.schema.walk(enm),
-            // TODO: prettify this
-            None => panic!("Assertion failed. Enum `{}` not found", enum_name),
+            None => {
+                self.print_context();
+                println!("Enum {} was {}", enum_name.red(), "not found".bold());
+                std::panic::set_hook(Box::new(|_| {}));
+                panic!();
+            }
         };
 
         enum_assertions(EnumAssertion(r#enum));
@@ -179,13 +189,22 @@ impl SchemaAssertion {
     pub fn assert_tables_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.tables_count();
 
-        assert_eq!(
-            actual_count, expected_count,
-            "Assertion failed. Expected the schema to have {expected_count} tables, found {actual_count}. ({table_names:?})",
-            expected_count = expected_count,
-            actual_count = actual_count,
-            table_names = self.schema.table_walkers().map(|t| t.name()).collect::<Vec<&str>>(),
-        );
+        if actual_count != expected_count {
+            self.print_context();
+            println!(
+                "The schema was expected to have {} tables, but we {} were found.",
+                format!("{}", expected_count).green(),
+                format!("{}", actual_count).red()
+            );
+
+            println!("Tables in the database:");
+            self.schema
+                .table_walkers()
+                .map(|table| table.name())
+                .for_each(|t| println!("\t - {}", t.bold()));
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
 
         self
     }
@@ -194,14 +213,22 @@ impl SchemaAssertion {
     pub fn assert_views_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.view_walkers().count();
 
-        // TODO: prettify this
-        assert_eq!(
-            actual_count, expected_count,
-            "Assertion failed. Expected the schema to have {expected_count} views, found {actual_count}. ({table_names:?})",
-            expected_count = expected_count,
-            actual_count = actual_count,
-            table_names = self.schema.view_walkers().map(|t| t.name()).collect::<Vec<&str>>(),
-        );
+        if actual_count != expected_count {
+            self.print_context();
+            println!(
+                "The schema was expected to have {} views, but we {} were found.",
+                format!("{}", expected_count).green(),
+                format!("{}", actual_count).red()
+            );
+
+            println!("Tables in the database:");
+            self.schema
+                .view_walkers()
+                .map(|view| view.name())
+                .for_each(|t| println!("\t - {}", t.bold()));
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
 
         self
     }

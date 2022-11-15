@@ -11,21 +11,22 @@ struct Schema {
     second: Option<String>,
 }
 
-enum SchemaPush<'a> {
-    PushAnd(bool, &'a SchemaPush<'a>),
-    PushCustomAnd(&'a [&'a str], &'a [&'a str], bool, bool, &'a SchemaPush<'a>),
-    RawCmdAnd(&'a str, &'a SchemaPush<'a>),
-    Reset(bool, &'a SchemaPush<'a>),
+enum SchemaPush {
+    PushAnd(bool, &'static SchemaPush),
+    PushCustomAnd(&'static [&'static str], &'static [&'static str], bool, bool, &'static SchemaPush),
+    RawCmdAnd(&'static str, &'static SchemaPush),
+    Reset(bool, &'static SchemaPush),
     Done,
 }
 
-struct TestData<'a> {
-    name: &'a str,
-    description: &'a str,
+struct TestData {
+    name: &'static str,
+    description: &'static str,
     schema: Schema,
-    namespaces: &'a [&'a str],
-    schema_push: SchemaPush<'a>,
-    assertion: Box<dyn FnMut(SchemaAssertion) -> ()>,
+    namespaces: &'static [&'static str],
+    schema_push: SchemaPush,
+    assertion: Box<dyn Fn(SchemaAssertion) -> ()>,
+    skip: Option<String>,
 }
 
 #[test_connector(
@@ -35,7 +36,7 @@ struct TestData<'a> {
     namespaces("one", "two")
 )]
 fn multi_schema_tests(_api: TestApi) {
-    let namespaces = ["one", "two"];
+    let namespaces : &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "postgresql"
@@ -46,10 +47,9 @@ fn multi_schema_tests(_api: TestApi) {
         generator js {
           provider        = "prisma-client-js"
           previewFeatures = ["multiSchema"]
-        }
-    "#};
+        } "#};
 
-    let mut tests: Vec<TestData> = vec![
+    let mut tests = [
         TestData {
             name: "basic",
             description: "Test single migration on two custom namespaces with a table each.",
@@ -64,9 +64,7 @@ fn multi_schema_tests(_api: TestApi) {
         model Second {
           id Int @id
           @@schema("two")
-        }
-    "#}
-                .into(),
+        } "#}.into(),
                 second: None,
             },
             namespaces: &namespaces,
@@ -74,6 +72,7 @@ fn multi_schema_tests(_api: TestApi) {
             assertion: Box::new(|assert| {
                 assert.assert_has_table("First").assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "idempotence",
@@ -89,9 +88,7 @@ fn multi_schema_tests(_api: TestApi) {
         model Second {
           id Int @id
           @@schema("two")
-        }
-    "#}
-                .into(),
+        }"#}.into(),
                 second: None,
             },
             namespaces: &namespaces,
@@ -101,13 +98,13 @@ fn multi_schema_tests(_api: TestApi) {
             assertion: Box::new(|assert| {
                 assert.assert_has_table("First").assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "add table",
             description: "Test adding a new table to one of the namespaces",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -116,17 +113,14 @@ fn multi_schema_tests(_api: TestApi) {
         model Second {
           id Int @id
           @@schema("two")
-        }
-    "#}),
+        }"#}),
                 first: "".into(),
                 second: Some(
                     indoc! {r#"
         model Third {
           id Int @id
           @@schema("one")
-        }
-                "#}
-                    .into(),
+        } "#}.into(),
                 ),
             },
             namespaces: &namespaces,
@@ -137,26 +131,22 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("Second")
                     .assert_has_table("Third");
             }),
+            skip: None,
         },
         TestData {
             name: "remove table",
             description: "Test removing a table to one of the namespaces",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        } "#}.into(),
                 second: Some(" ".into()),
             },
             namespaces: &namespaces,
@@ -166,34 +156,29 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_no_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "recreate not null column with non-null values",
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a non-NULL value",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           name String?
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some(indoc!{r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true,
@@ -204,34 +189,29 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "recreate not null column with null values",
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a NULL value",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           name String?
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some(indoc!{r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true,
@@ -243,33 +223,28 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "add required field",
             description: "Test adding a required field to a table with no records",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
@@ -278,34 +253,29 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "change field type to array",
             description: "Test changing a field type to array.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String[]
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
@@ -314,34 +284,29 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "change field type from array",
             description: "Test changing a field type from array.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           name String[]
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
@@ -350,36 +315,31 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "rename index",
             description: "Test renaming an index.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
-        }
-
-    "#}),
+        }"#}),
                 first: indoc! {r#"
         model Second {
           id Int @id
           name String
           @@index(fields: [name], map: "index_name")
           @@schema("two")
-        }
-                    "#}
-                .into(),
+        }"#}.into(),
                 second: Some( indoc! {r#"
         model Second {
           id Int @id
           name String
           @@index(fields: [name], map: "new_index_name")
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
@@ -388,13 +348,13 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "add unique to column",
             description: "Test adding the unique flag to a column.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -410,8 +370,7 @@ fn multi_schema_tests(_api: TestApi) {
           id Int @id
           name String @unique
           @@schema("two")
-        }
-                    "#}.into()),
+        }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(true,
@@ -422,13 +381,13 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "drop enum",
             description: "Test removing an enum from a namespace.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -449,6 +408,7 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_no_enum("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "drop foreign key",
@@ -484,13 +444,13 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "drop index",
             description: "Test removing an index from a namespace.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           @@schema("one")
@@ -516,13 +476,13 @@ fn multi_schema_tests(_api: TestApi) {
                     .assert_has_table("First")
                     .assert_has_table("Second");
             }),
+            skip: None,
         },
         TestData {
             name: "drop view",
             description: "Test removing a view via reset from a namespace.",
             schema: Schema {
-                common: (base_schema.to_owned()
-                    + indoc! {r#"
+                common: (base_schema.to_owned() + indoc! {r#"
         model First {
           id Int @id
           name String
@@ -539,6 +499,7 @@ fn multi_schema_tests(_api: TestApi) {
             assertion: Box::new(|assert| {
                 assert.assert_views_count(0);
             }),
+            skip: None,
         },
         TestData {
             name: "alter view",
@@ -564,11 +525,37 @@ fn multi_schema_tests(_api: TestApi) {
             assertion: Box::new(|assert| {
                 assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
             }),
+            skip: None,
+        },
+        TestData {
+            name: "move enum across namespaces",
+            description: "Test moving an enum to a different namespace.",
+            schema: Schema {
+                common: base_schema.to_string(),
+                first: indoc! {r#"
+      enum SomeEnum {
+        First
+        Second
+        @@schema("one")
+      }"#}.into(),
+                second: Some(indoc! {r#"
+      enum SomeEnum {
+        First
+        Second
+        @@schema("two")
+      }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
+            }),
+            skip: Some("TODO".into()),
         },
     ];
 
-    // traverse is always the answer
-    tests.iter_mut().for_each(|mut t| {
+    // traverse_ is always the answer
+    tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|mut t| {
         run_test(&mut t);
     });
 }
@@ -586,7 +573,7 @@ fn run_test(test: &mut TestData) {
     assertion.add_context(test.name.to_string());
     assertion.add_description(test.description.to_string());
 
-    (test.assertion)(assertion);
+    (test.assertion)(assertion)
 }
 
 fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namespaces>, step: &SchemaPush) {
@@ -603,6 +590,8 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
             };
             api.schema_push(schema)
                 .send()
+                .with_context(String::from(test.name))
+                .with_description(String::from(test.description))
                 .assert_green()
                 .assert_has_executed_steps();
             run_schema_step(api, test, namespaces, next);
@@ -621,6 +610,8 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
             let assert = api
                 .schema_push(schema)
                 .send()
+                .with_context(String::from(test.name))
+                .with_description(String::from(test.description))
                 .assert_warnings(warnings.as_slice())
                 .assert_unexecutable(unexecutables.as_slice());
             if *has_steps {
@@ -641,3 +632,4 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
         SchemaPush::Done => {}
     };
 }
+

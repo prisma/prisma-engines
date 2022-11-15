@@ -1,3 +1,4 @@
+use colored::Colorize;
 use migration_core::{
     commands::schema_push, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
 };
@@ -43,7 +44,11 @@ impl<'a> SchemaPush<'a> {
 
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 
-        Ok(SchemaPushAssertion { result: output })
+        Ok(SchemaPushAssertion {
+            result: output,
+            context: None,
+            description: None,
+        })
     }
 
     /// Execute the command and expect it to succeed.
@@ -61,6 +66,8 @@ impl<'a> SchemaPush<'a> {
 
 pub struct SchemaPushAssertion {
     pub(super) result: SchemaPushOutput,
+    pub(super) context: Option<String>,
+    pub(super) description: Option<String>,
 }
 
 impl Debug for SchemaPushAssertion {
@@ -70,6 +77,27 @@ impl Debug for SchemaPushAssertion {
 }
 
 impl SchemaPushAssertion {
+    pub fn with_context(mut self, context: String) -> Self {
+        self.context = Some(context);
+        self
+    }
+
+    pub fn with_description(mut self, description: String) -> Self {
+        self.description = Some(description);
+        self
+    }
+
+    pub fn print_context(&self) {
+        match &self.context {
+            Some(context) => println!("Test failure with context <{}>", context.red()),
+            None => {}
+        }
+        match &self.description {
+            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
+            None => {}
+        }
+    }
+
     /// Asserts that the command produced no warning and no unexecutable migration message.
     #[track_caller]
     pub fn assert_green(self) -> Self {
@@ -78,29 +106,69 @@ impl SchemaPushAssertion {
 
     #[track_caller]
     pub fn assert_no_warning(self) -> Self {
-        assert!(
-            self.result.warnings.is_empty(),
-            "Assertion failed. Expected no warning, got {:?}",
-            self.result.warnings
-        );
+        if !self.result.warnings.is_empty() {
+            self.print_context();
+            println!(
+                "Expected {} warnings but got {}.",
+                "no".bold(),
+                format!("{}", self.result.warnings.len()).red()
+            );
+            println!("\nWarnings that were {}:", "not expected".bold());
+            self.result.warnings.iter().for_each(|found| {
+                println!("\t - {}", found.red());
+            });
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
 
         self
     }
 
     pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> Self {
-        assert!(
-            self.result.warnings.len() == warnings.len(),
-            "Expected {} warnings, got {}.\n{:#?}",
-            warnings.len(),
-            self.result.warnings.len(),
-            self.result.warnings
-        );
+        let mut good = Vec::new();
+        let mut expected_and_not_found = Vec::new();
+        let mut found_and_not_expected: Vec<Cow<'_, str>> = Vec::new();
 
-        for (idx, warning) in warnings.iter().enumerate() {
-            assert_eq!(
-                Some(warning.as_ref()),
-                self.result.warnings.get(idx).map(String::as_str)
+        warnings.iter().for_each(|expected| {
+            if self.result.warnings.iter().any(|found| found == expected) {
+                good.push(expected);
+            } else {
+                expected_and_not_found.push(expected);
+            }
+        });
+
+        self.result.warnings.iter().for_each(|found| {
+            if good.iter().any(|g| *g == (*found).as_str()) {
+            } else {
+                found_and_not_expected.push(found.into());
+            }
+        });
+        if expected_and_not_found.len() != 0 || found_and_not_expected.len() != 0 {
+            self.print_context();
+            println!(
+                "Expected {} warnings but got {}.",
+                format!("{}", warnings.len()).green(),
+                format!("{}", self.result.warnings.len()).red()
             );
+
+            println!("\nExpected warnings that were {}:", "not found".bold());
+            expected_and_not_found.iter().for_each(|expected| {
+                println!("\t - {}", expected.red());
+            });
+
+            println!("\nFound warnings that were {}:", "not expected".bold());
+            found_and_not_expected.iter().for_each(|found| {
+                println!("\t - {}", found.yellow());
+            });
+
+            println!("\nWarnings that were {}:", "found and expected".bold());
+            good.iter().for_each(|good| {
+                println!("\t - {}", good);
+            });
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
         }
 
         self
@@ -108,48 +176,98 @@ impl SchemaPushAssertion {
 
     #[track_caller]
     pub fn assert_no_steps(self) -> Self {
-        assert!(
-            self.result.executed_steps == 0,
-            "Assertion failed. Executed steps should be zero, but found {}",
-            self.result.executed_steps,
-        );
+        if self.result.executed_steps != 0 {
+            self.print_context();
+            println!(
+                "\nTest failure {}: expected {} but got {} steps.",
+                "assert_has_executed_steps".bold(),
+                "0".green(),
+                format!("{}", self.result.executed_steps).red(),
+            );
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
+
         self
     }
 
     pub fn assert_has_executed_steps(self) -> Self {
-        assert!(
-            self.result.executed_steps != 0,
-            "Assertion failed. Executed steps should be not zero.",
-        );
+        if self.result.executed_steps == 0 {
+            self.print_context();
+            println!(
+                "\nTest failure {}: expected {} but got {} steps.",
+                "assert_has_executed_steps".bold(),
+                ">0".green(),
+                "0".red(),
+            );
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
+
         self
     }
 
     #[track_caller]
     pub fn assert_executable(self) -> Self {
-        assert!(
-            self.result.unexecutable.is_empty(),
-            "Expected an executable migration, got following: {:?}",
-            self.result.unexecutable
-        );
+        if !self.result.unexecutable.is_empty() {
+            println!("\nExpected no unexecutable errors in {}", "assert_executable".bold());
+            self.result.unexecutable.iter().for_each(|unexecutable| {
+                println!("\t - {}", unexecutable.red());
+            });
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
+        }
 
         self
     }
 
     pub fn assert_unexecutable(self, expected_messages: &[String]) -> Self {
-        assert_eq!(
-            self.result.unexecutable.len(),
-            expected_messages.len(),
-            "Expected {} unexecutable step errors, got {}.\n({:#?})",
-            expected_messages.len(),
-            self.result.unexecutable.len(),
-            self.result.unexecutable,
-        );
+        let mut good = Vec::new();
+        let mut expected_and_not_found = Vec::new();
+        let mut found_and_not_expected: Vec<Cow<'_, str>> = Vec::new();
 
-        for (expected, actual) in expected_messages
-            .iter()
-            .zip(self.result.unexecutable.iter().map(String::as_str))
-        {
-            assert_eq!(actual, expected);
+        expected_messages.iter().for_each(|expected| {
+            if self.result.unexecutable.iter().any(|found| found == expected) {
+                good.push(expected);
+            } else {
+                expected_and_not_found.push(expected);
+            }
+        });
+
+        self.result.unexecutable.iter().for_each(|found| {
+            if good.iter().any(|g| *g == (*found).as_str()) {
+            } else {
+                found_and_not_expected.push(found.into());
+            }
+        });
+        if expected_and_not_found.len() != 0 || found_and_not_expected.len() != 0 {
+            self.print_context();
+            println!(
+                "Expected {} errors but got {}.",
+                format!("{}", expected_messages.len()).green(),
+                format!("{}", self.result.unexecutable.len()).red()
+            );
+
+            println!("\nExpected errors that were {}:", "not found".bold());
+            expected_and_not_found.iter().for_each(|expected| {
+                println!("\t - {}", expected.red());
+            });
+
+            println!("\nFound errors that were {}:", "not expected".bold());
+            found_and_not_expected.iter().for_each(|found| {
+                println!("\t - {}", found.yellow());
+            });
+
+            println!("\nErrors that were {}:", "found and expected".bold());
+            good.iter().for_each(|good| {
+                println!("\t - {}", good);
+            });
+
+            std::panic::set_hook(Box::new(|_| {}));
+            panic!();
         }
 
         self
