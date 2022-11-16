@@ -53,7 +53,7 @@ rec {
 
   checks = {
     prismaFmtWasmE2E = pkgs.runCommand "prismaFmtWasmE2E"
-      { prisma_fmt_wasm = packages.prisma-fmt-wasm; node = "${nodejs}/bin/node"; }
+      { PRISMA_FMT_WASM = packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
       (readFile ./scripts/check.sh);
   };
 }
