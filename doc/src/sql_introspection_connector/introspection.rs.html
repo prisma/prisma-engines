@@ -92,12 +92,10 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
 <span class="kw">mod </span>enums;
+<span class="kw">mod </span>indexes;
 <span class="kw">mod </span>m2m_relations;
 <span class="kw">mod </span>models;
 <span class="kw">mod </span>postgres;
@@ -106,7 +104,7 @@
 
 <span class="kw">use crate</span>::{
     calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, commenting_out_guardrails::commenting_out_guardrails,
-    prisma_1_defaults::add_prisma_1_id_defaults, re_introspection::enrich, version_checker, SqlError,
+    prisma_1_defaults::add_prisma_1_id_defaults, version_checker, SqlError,
 };
 <span class="kw">use </span>datamodel_renderer <span class="kw">as </span>render;
 <span class="kw">use </span>introspection_connector::Version;
@@ -125,10 +123,6 @@
         inline_relations::introspect_inline_relations(<span class="kw-2">&amp;</span>relation_names, <span class="kw-2">&amp;mut </span>datamodel, ctx);
     } <span class="kw">else </span>{
         prisma_relation_mode::reintrospect_relations(<span class="kw-2">&amp;mut </span>datamodel, ctx);
-    }
-
-    <span class="kw">if </span>!ctx.previous_datamodel.is_empty() {
-        enrich(ctx.previous_datamodel, <span class="kw-2">&amp;mut </span>datamodel, ctx);
     }
 
     <span class="comment">// commenting out models, fields, enums, enum values

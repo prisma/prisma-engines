@@ -150,24 +150,17 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
 <span class="kw">use </span>introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
-<span class="kw">use </span>psl::{
-    builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Connector, dml::Datamodel, parser_database::walkers, Configuration,
-};
+<span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Connector, parser_database::walkers, Configuration};
 <span class="kw">use </span>quaint::prelude::SqlFamily;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
     <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) previous_datamodel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Datamodel,
     <span class="kw">pub</span>(<span class="kw">crate</span>) schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
     <span class="kw">pub</span>(<span class="kw">crate</span>) sql_family: SqlFamily,
     <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;Warning&gt;,
@@ -293,7 +286,6 @@
     <span class="kw">let </span><span class="kw-2">mut </span>context = CalculateDatamodelContext {
         config: ctx.configuration(),
         render_config: ctx.render_config,
-        previous_datamodel: <span class="kw-2">&amp;</span>ctx.previous_data_model,
         schema,
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),

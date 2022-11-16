@@ -173,23 +173,6 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
 </pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::Warning;
 <span class="kw">use </span>serde::Serialize;
 
@@ -228,15 +211,6 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndIndex {
     <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) index_db_name: String,
-}
-
-<span class="kw">impl </span>ModelAndIndex {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span>str, index_db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        ModelAndIndex {
-            model: model.to_owned(),
-            index_db_name: index_db_name.to_owned(),
-        }
-    }
 }
 
 <span class="attribute">#[derive(Serialize, Debug)]
@@ -354,14 +328,6 @@
     Warning {
         code: <span class="number">14</span>,
         message: <span class="string">&quot;The following models were commented out as we could not retrieve columns for them. Please check your privileges.&quot;</span>.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_custom_index_names(affected: <span class="kw-2">&amp;</span>[ModelAndIndex]) -&gt; Warning {
-    Warning {
-        code: <span class="number">17</span>,
-        message: <span class="string">&quot;These Indices were enriched with custom index names taken from the previous Prisma schema.&quot;</span>.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

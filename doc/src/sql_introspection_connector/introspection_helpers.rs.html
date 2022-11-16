@@ -440,6 +440,14 @@
 <span id="440">440</span>
 <span id="441">441</span>
 <span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
 <span class="kw">use </span>psl::{
     datamodel_connector::constraint_names::ConstraintNames,
@@ -447,7 +455,7 @@
         FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
         SortOrder,
     },
-    parser_database <span class="kw">as </span>db,
+    parser_database::{<span class="self">self </span><span class="kw">as </span>db, walkers},
     schema_ast::ast::WithDocumentation,
     PreviewFeature,
 };
@@ -583,16 +591,12 @@
 
 <span class="comment">//calculators
 
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_index(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;IndexDefinition&gt; {
-    <span class="kw">let </span>tpe = <span class="kw">match </span>index.index_type() {
-        IndexType::Unique =&gt; psl::dml::IndexType::Unique,
-        IndexType::Normal =&gt; psl::dml::IndexType::Normal,
-        IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
-            psl::dml::IndexType::Fulltext
-        }
-        IndexType::Fulltext =&gt; psl::dml::IndexType::Normal,
-        IndexType::PrimaryKey =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
-    };
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_index(
+    index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    existing_index: <span class="prelude-ty">Option</span>&lt;walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;IndexDefinition&gt; {
+    <span class="kw">let </span>tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>default_constraint_name = <span class="kw">match </span>index.index_type() {
         IndexType::Unique =&gt; {
@@ -612,7 +616,7 @@
     };
 
     <span class="prelude-val">Some</span>(IndexDefinition {
-        name: <span class="prelude-val">None</span>,
+        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
         db_name,
         fields: index
             .columns()
@@ -880,6 +884,18 @@
         sql::postgres::SQLOperatorClassKind::UuidMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxOps),
         sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxMultiOps),
         sql::postgres::SQLOperatorClassKind::Raw(c) =&gt; <span class="prelude-val">Some</span>(OperatorClass::Raw(c.to_string().into())),
+    }
+}
+
+<span class="kw">fn </span>sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;psl::parser_database::IndexType&gt; {
+    <span class="kw">match </span>sql {
+        IndexType::Unique =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Unique),
+        IndexType::Normal =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Normal),
+        IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
+            <span class="prelude-val">Some</span>(psl::dml::IndexType::Fulltext)
+        }
+        IndexType::Fulltext =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Normal),
+        IndexType::PrimaryKey =&gt; <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>

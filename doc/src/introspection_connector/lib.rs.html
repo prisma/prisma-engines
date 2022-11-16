@@ -170,20 +170,12 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 
 <span class="kw">pub use </span>error::{ConnectorError, ErrorKind};
 
 <span class="kw">use </span>enumflags2::BitFlags;
-<span class="kw">use </span>psl::{dml::Datamodel, Datasource, PreviewFeature};
+<span class="kw">use </span>psl::{Datasource, PreviewFeature};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::Value;
 
@@ -246,7 +238,6 @@
 }
 
 <span class="kw">pub struct </span>IntrospectionContext {
-    <span class="kw">pub </span>previous_data_model: Datamodel,
     <span class="doccomment">/// This should always be true. TODO: change everything where it&#39;s
     /// set to false to take the config into account.
     </span><span class="kw">pub </span>render_config: bool,
@@ -256,9 +247,11 @@
 
 <span class="kw">impl </span>IntrospectionContext {
     <span class="kw">pub fn </span>new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>ctx = <span class="self">Self</span>::new_naive(previous_schema, composite_type_depth);
-        ctx.previous_data_model = psl::lift(<span class="kw-2">&amp;</span>ctx.previous_schema);
-        ctx
+        IntrospectionContext {
+            previous_schema,
+            composite_type_depth,
+            render_config: <span class="bool-val">true</span>,
+        }
     }
 
     <span class="doccomment">/// Take the previous schema _but ignore all the datamodel part_, keeping just the
@@ -278,16 +271,7 @@
 
         <span class="kw">let </span>previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        <span class="self">Self</span>::new_naive(previous_schema_config_only, composite_type_depth)
-    }
-
-    <span class="kw">fn </span>new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -&gt; <span class="self">Self </span>{
-        IntrospectionContext {
-            previous_data_model: psl::dml::Datamodel::new(),
-            previous_schema,
-            composite_type_depth,
-            render_config: <span class="bool-val">true</span>,
-        }
+        <span class="self">Self</span>::new(previous_schema_config_only, composite_type_depth)
     }
 
     <span class="kw">pub fn </span>previous_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>psl::ValidatedSchema {
