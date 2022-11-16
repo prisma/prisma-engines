@@ -91,18 +91,21 @@ fn prisma_m2m_relation_name<'a>(
     ctx: &super::Context<'a>,
 ) -> RelationName<'a> {
     let ids = table_ids_for_m2m_relation_table(table);
+    let is_self_relation = ids[0] == ids[1];
+
     let (relation_name, field_name_suffix) = if ambiguous_relations.contains(&ids) {
         // the table names of prisma m2m tables starts with an underscore
         (Cow::Borrowed(&table.name()[1..]), table.name())
     } else {
         let default_name = ids.map(|id| ctx.table_prisma_name(id).prisma_name()).join("To");
         let found_name = &table.name()[1..];
-        // TODO: test this
-        let relation_name = if found_name == default_name { "" } else { found_name };
+        let relation_name = if found_name == default_name && !is_self_relation {
+            ""
+        } else {
+            found_name
+        };
         (Cow::Borrowed(relation_name), "")
     };
-
-    let is_self_relation = ids[0] == ids[1];
 
     [
         relation_name,
@@ -124,13 +127,19 @@ fn inline_relation_name<'a>(
     ambiguous_relations: &HashSet<[sql::TableId; 2]>,
     ctx: &mut super::Context<'a>,
 ) -> RelationName<'a> {
+    let is_self_relation = fk.is_self_relation();
     let referencing_model_name = ctx.table_prisma_name(fk.table().id).prisma_name();
     let referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
-    let self_relation_prefix = if fk.is_self_relation() { "other_" } else { "" };
+    let self_relation_prefix = if is_self_relation { "other_" } else { "" };
 
     if !ambiguous_relations.contains(&sorted_table_ids(fk.table().id, fk.referenced_table().id)) {
+        let relation_name = if is_self_relation {
+            Cow::Owned(format!("{referencing_model_name}To{referenced_model_name}"))
+        } else {
+            Cow::Borrowed("")
+        };
         [
-            Cow::Borrowed(""),
+            relation_name,
             referenced_model_name,
             Cow::Owned(format!("{self_relation_prefix}{referencing_model_name}")),
         ]
