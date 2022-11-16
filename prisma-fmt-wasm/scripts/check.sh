@@ -6,8 +6,8 @@ set -euo pipefail
 
 echo -n '1. The final wasm file is not empty: '
 
-EXPECTED_FINAL_WASM_FILE_PATH="$prisma_fmt_wasm/src/prisma_fmt_build_bg.wasm";
-WASM_FILE_SIZE=`wc -c $EXPECTED_FINAL_WASM_FILE_PATH | sed 's/ .*$//'`
+EXPECTED_FINAL_WASM_FILE_PATH="$PRISMA_FMT_WASM/src/prisma_fmt_build_bg.wasm";
+WASM_FILE_SIZE=$(wc -c "$EXPECTED_FINAL_WASM_FILE_PATH" | sed 's/ .*$//')
 
 if [[ $WASM_FILE_SIZE == '0' ]]; then
     echo "Check phase failed: expected a non empty EXPECTED_FINAL_WASM_FILE_PAT"
@@ -20,7 +20,7 @@ echo 'ok.'
 
 echo '2. We can call the module directly and get back a valid result.'
 
-REFORMATTED_MEOW=`$node -e "const prismaFmt = require('$prisma_fmt_wasm'); console.log(prismaFmt.format('meow', '{}'))"`
+REFORMATTED_MEOW=$($NODE -e "const prismaFmt = require('$PRISMA_FMT_WASM'); console.log(prismaFmt.format('meow', '{}'))")
 
 echo "REFORMATTED_MEOW=$REFORMATTED_MEOW"
 
@@ -32,4 +32,4 @@ fi
 echo ' ok.'
 
 # Signal to nix that the check is a success.
-mkdir -p $out
+mkdir -p "$out"
