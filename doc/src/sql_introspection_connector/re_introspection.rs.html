@@ -161,21 +161,6 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     calculate_datamodel::CalculateDatamodelContext, introspection_helpers::compare_options_none_last, warnings::<span class="kw-2">*</span>,
 };
@@ -294,7 +279,6 @@
 ) {
     <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_cuids = <span class="macro">vec!</span>[];
     <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_uuids = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_updated_at = <span class="macro">vec!</span>[];
 
     <span class="kw">for </span>model <span class="kw">in </span>new_data_model.models() {
         <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
@@ -317,10 +301,6 @@
                     re_introspected_prisma_level_uuids.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
                 }
             }
-
-            <span class="kw">if </span>field.field_type.is_datetime() &amp;&amp; old_field.is_updated_at {
-                re_introspected_updated_at.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
-            }
         }
     }
 
@@ -336,22 +316,12 @@
             .default_value = <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_uuid()));
     }
 
-    <span class="kw">for </span>updated_at <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_updated_at {
-        new_data_model
-            .find_scalar_field_mut(<span class="kw-2">&amp;</span>updated_at.model, <span class="kw-2">&amp;</span>updated_at.field)
-            .is_updated_at = <span class="bool-val">true</span>;
-    }
-
     <span class="kw">if </span>!re_introspected_prisma_level_cuids.is_empty() {
         warnings.push(warning_enriched_with_cuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_cuids));
     }
 
     <span class="kw">if </span>!re_introspected_prisma_level_uuids.is_empty() {
         warnings.push(warning_enriched_with_uuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_uuids));
-    }
-
-    <span class="kw">if </span>!re_introspected_updated_at.is_empty() {
-        warnings.push(warning_enriched_with_updated_at(<span class="kw-2">&amp;</span>re_introspected_updated_at));
     }
 }
 </code></pre></div>
