@@ -5,7 +5,7 @@ use psl::{
         FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
         SortOrder,
     },
-    parser_database as db,
+    parser_database::{self as db, walkers},
     schema_ast::ast::WithDocumentation,
     PreviewFeature,
 };
@@ -141,16 +141,12 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 
 //calculators
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexDefinition> {
-    let tpe = match index.index_type() {
-        IndexType::Unique => psl::dml::IndexType::Unique,
-        IndexType::Normal => psl::dml::IndexType::Normal,
-        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
-            psl::dml::IndexType::Fulltext
-        }
-        IndexType::Fulltext => psl::dml::IndexType::Normal,
-        IndexType::PrimaryKey => return None,
-    };
+pub(crate) fn calculate_index(
+    index: sql::walkers::IndexWalker<'_>,
+    existing_index: Option<walkers::IndexWalker<'_>>,
+    ctx: &Context<'_>,
+) -> Option<IndexDefinition> {
+    let tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)?;
 
     let default_constraint_name = match index.index_type() {
         IndexType::Unique => {
@@ -170,7 +166,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     };
 
     Some(IndexDefinition {
-        name: None,
+        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
         db_name,
         fields: index
             .columns()
@@ -438,5 +434,17 @@ fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Con
         sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
         sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
         sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+    }
+}
+
+fn sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: &Context) -> Option<psl::parser_database::IndexType> {
+    match sql {
+        IndexType::Unique => Some(psl::dml::IndexType::Unique),
+        IndexType::Normal => Some(psl::dml::IndexType::Normal),
+        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
+            Some(psl::dml::IndexType::Fulltext)
+        }
+        IndexType::Fulltext => Some(psl::dml::IndexType::Normal),
+        IndexType::PrimaryKey => None,
     }
 }

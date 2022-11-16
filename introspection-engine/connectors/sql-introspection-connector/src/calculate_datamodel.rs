@@ -2,16 +2,13 @@ use crate::{
     introspection::introspect, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
 use introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
-use psl::{
-    builtin_connectors::*, datamodel_connector::Connector, dml::Datamodel, parser_database::walkers, Configuration,
-};
+use psl::{builtin_connectors::*, datamodel_connector::Connector, parser_database::walkers, Configuration};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
 
 pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) config: &'a Configuration,
     pub(crate) render_config: bool,
-    pub(crate) previous_datamodel: &'a Datamodel,
     pub(crate) schema: &'a sql::SqlSchema,
     pub(crate) sql_family: SqlFamily,
     pub(crate) warnings: &'a mut Vec<Warning>,
@@ -137,7 +134,6 @@ pub fn calculate_datamodel(
     let mut context = CalculateDatamodelContext {
         config: ctx.configuration(),
         render_config: ctx.render_config,
-        previous_datamodel: &ctx.previous_data_model,
         schema,
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),
