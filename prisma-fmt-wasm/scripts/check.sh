@@ -32,4 +32,5 @@ fi
 echo ' ok.'
 
 # Signal to nix that the check is a success.
+# shellcheck disable=SC2154
 mkdir -p "$out"
