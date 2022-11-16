@@ -10,6 +10,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
     let mut reintrospected_id_names = Vec::new();
     let mut models_without_identifiers = Vec::new();
     let mut models_without_columns = Vec::new();
+    let mut unsupported_types = Vec::new();
 
     for table in ctx
         .schema
@@ -70,6 +71,14 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         }
 
         for column in table.columns() {
+            if let sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
+                unsupported_types.push(warnings::ModelAndFieldAndType {
+                    model: model.name.clone(),
+                    field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+                    tpe: tpe.to_owned(),
+                })
+            }
+
             model.add_field(dml::Field::ScalarField(calculate_scalar_field(
                 column,
                 &mut remapped_fields,
@@ -147,6 +156,11 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
     if !models_without_identifiers.is_empty() {
         ctx.warnings
             .push(warnings::warning_models_without_identifier(&models_without_identifiers))
+    }
+
+    if !unsupported_types.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_unsupported_types(&unsupported_types));
     }
 
     if !remapped_models.is_empty() {

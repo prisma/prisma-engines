@@ -1,9 +1,8 @@
 use crate::warnings::{
-    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_unsupported_types, EnumAndValue,
-    ModelAndField, ModelAndFieldAndType,
+    warning_enum_values_with_empty_names, warning_fields_with_empty_names, EnumAndValue, ModelAndField,
 };
 use introspection_connector::Warning;
-use psl::dml::{Datamodel, FieldType};
+use psl::dml::Datamodel;
 
 pub(crate) fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut warnings = vec![];
@@ -11,14 +10,9 @@ pub(crate) fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warnin
     // order matters...
     let fields_with_empty_names = fields_with_empty_names(datamodel);
     let enum_values_with_empty_names = empty_enum_values(datamodel);
-    let unsupported_types = unsupported_types(datamodel);
 
     if !fields_with_empty_names.is_empty() {
         warnings.push(warning_fields_with_empty_names(&fields_with_empty_names))
-    }
-
-    if !unsupported_types.is_empty() {
-        warnings.push(warning_unsupported_types(&unsupported_types))
     }
 
     if !enum_values_with_empty_names.is_empty() {
@@ -74,28 +68,4 @@ fn empty_enum_values(datamodel: &mut Datamodel) -> Vec<EnumAndValue> {
     }
 
     enum_values_with_empty_names
-}
-
-// fields with unsupported as datatype
-fn unsupported_types(datamodel: &mut Datamodel) -> Vec<ModelAndFieldAndType> {
-    let mut unsupported_types = vec![];
-
-    for model in datamodel.models_mut() {
-        let model_name = model.name.clone();
-
-        for field in model.scalar_fields_mut() {
-            let r#type = match &field.field_type {
-                FieldType::Unsupported(r#type) => r#type,
-                _ => continue,
-            };
-
-            unsupported_types.push(ModelAndFieldAndType {
-                model: model_name.clone(),
-                field: field.name.clone(),
-                tpe: r#type.clone(),
-            })
-        }
-    }
-
-    unsupported_types
 }
