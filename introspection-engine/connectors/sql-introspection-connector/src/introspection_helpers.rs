@@ -228,7 +228,7 @@ pub(crate) fn calculate_scalar_field(
         ColumnArity::List => FieldArity::List,
     };
 
-    let mut default_value = crate::defaults::calculate_default(column, ctx);
+    let mut default_value = crate::defaults::calculate_default(column, existing_field, ctx);
 
     let default_default_value =
         ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
