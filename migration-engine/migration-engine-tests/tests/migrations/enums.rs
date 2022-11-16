@@ -589,9 +589,9 @@ fn alter_enum_and_change_default_must_work(api: TestApi) {
     api.assert_schema().assert_tables_count(0);
 
     let dir = api.create_migrations_directory();
-    api.create_migration("plain", &plain_dm, &dir).send_sync();
+    api.create_migration("plain", plain_dm, &dir).send_sync();
 
-    api.create_migration("custom", &custom_dm, &dir)
+    api.create_migration("custom", custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("custom", move |migration| {
