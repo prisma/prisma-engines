@@ -71,67 +71,6 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
 }
 
 #[test]
-#[ignore]
-fn back_relations_must_be_added_when_attribute_is_present_with_only_one_argument() {
-    let input = indoc! {r#"
-        model User {
-          id Int @id
-          post Post @relation(fields: [postId])
-        }
-
-        model Post {
-          id Int @id
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model User {
-          id     Int  @id
-          post   Post @relation(fields: [postId], references: [id])
-          postId Int?
-        }
-
-        model Post {
-          id   Int    @id
-          User User[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-#[ignore]
-fn back_relations_must_be_added_when_attribute_is_present_with_both_arguments() {
-    let input = indoc! {r#"
-        model User {
-          id Int @id
-          post Post @relation(fields: [postId], references: [id])
-        }
-
-        model Post {
-          id Int @id
-        }
-        "#
-    };
-
-    let expected = expect![[r#"
-        model User {
-          id     Int  @id
-          post   Post @relation(fields: [postId], references: [id])
-          postId Int?
-        }
-
-        model Post {
-          id   Int    @id
-          User User[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
 fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_both_relation_fields_present() {
     let input = indoc! {r#"
         model User {
