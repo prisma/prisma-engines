@@ -3,7 +3,7 @@ mod error;
 pub use error::{ConnectorError, ErrorKind};
 
 use enumflags2::BitFlags;
-use psl::{dml::Datamodel, Datasource, PreviewFeature};
+use psl::{Datasource, PreviewFeature};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -66,7 +66,6 @@ pub struct IntrospectionResultOutput {
 }
 
 pub struct IntrospectionContext {
-    pub previous_data_model: Datamodel,
     /// This should always be true. TODO: change everything where it's
     /// set to false to take the config into account.
     pub render_config: bool,
@@ -76,9 +75,11 @@ pub struct IntrospectionContext {
 
 impl IntrospectionContext {
     pub fn new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
-        let mut ctx = Self::new_naive(previous_schema, composite_type_depth);
-        ctx.previous_data_model = psl::lift(&ctx.previous_schema);
-        ctx
+        IntrospectionContext {
+            previous_schema,
+            composite_type_depth,
+            render_config: true,
+        }
     }
 
     /// Take the previous schema _but ignore all the datamodel part_, keeping just the
@@ -98,16 +99,7 @@ impl IntrospectionContext {
 
         let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        Self::new_naive(previous_schema_config_only, composite_type_depth)
-    }
-
-    fn new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
-        IntrospectionContext {
-            previous_data_model: psl::dml::Datamodel::new(),
-            previous_schema,
-            composite_type_depth,
-            render_config: true,
-        }
+        Self::new(previous_schema_config_only, composite_type_depth)
     }
 
     pub fn previous_schema(&self) -> &psl::ValidatedSchema {

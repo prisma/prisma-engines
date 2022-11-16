@@ -5,7 +5,7 @@ use psl::{
         FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
         SortOrder,
     },
-    parser_database as db,
+    parser_database::{self as db, walkers},
     schema_ast::ast::WithDocumentation,
     PreviewFeature,
 };
@@ -141,7 +141,11 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 
 //calculators
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Context<'_>) -> Option<IndexDefinition> {
+pub(crate) fn calculate_index(
+    index: sql::walkers::IndexWalker<'_>,
+    existing_index: Option<walkers::IndexWalker<'_>>,
+    ctx: &Context<'_>,
+) -> Option<IndexDefinition> {
     let tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)?;
 
     let default_constraint_name = match index.index_type() {
@@ -162,7 +166,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     };
 
     Some(IndexDefinition {
-        name: None,
+        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
         db_name,
         fields: index
             .columns()

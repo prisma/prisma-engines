@@ -10,7 +10,7 @@ mod relation_names;
 
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context, commenting_out_guardrails::commenting_out_guardrails,
-    prisma_1_defaults::add_prisma_1_id_defaults, re_introspection::enrich, version_checker, SqlError,
+    prisma_1_defaults::add_prisma_1_id_defaults, version_checker, SqlError,
 };
 use datamodel_renderer as render;
 use introspection_connector::Version;
@@ -29,10 +29,6 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
         inline_relations::introspect_inline_relations(&relation_names, &mut datamodel, ctx);
     } else {
         prisma_relation_mode::reintrospect_relations(&mut datamodel, ctx);
-    }
-
-    if !ctx.previous_datamodel.is_empty() {
-        enrich(ctx.previous_datamodel, &mut datamodel, ctx);
     }
 
     // commenting out models, fields, enums, enum values
