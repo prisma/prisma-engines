@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 echo 'Creating out dir...'
+# shellcheck disable=SC2154
 mkdir -p "$out"/src;
 
 echo 'Copying package.json...'
@@ -16,4 +17,3 @@ wasm-bindgen \
   --target nodejs \
   --out-dir "$out"/src \
   target/wasm32-unknown-unknown/release/prisma_fmt_build.wasm;
-  
