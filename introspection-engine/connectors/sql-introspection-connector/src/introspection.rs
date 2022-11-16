@@ -32,7 +32,7 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
     }
 
     // commenting out models, fields, enums, enum values
-    ctx.warnings.append(&mut commenting_out_guardrails(&mut datamodel, ctx));
+    ctx.warnings.append(&mut commenting_out_guardrails(&mut datamodel));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_checker::check_prisma_version(ctx);

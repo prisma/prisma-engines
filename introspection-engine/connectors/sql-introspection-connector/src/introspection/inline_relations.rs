@@ -162,7 +162,13 @@ fn calculate_backrelation_field(
         FieldArity::List
     };
 
-    psl::dml::RelationField::new(&field_name, arity, arity, relation_info)
+    let mut field = psl::dml::RelationField::new(&field_name, arity, arity, relation_info);
+
+    if !super::models::table_has_usable_identifier(fk.table()) {
+        field.is_ignored = true;
+    }
+
+    field
 }
 
 fn relation_mapped_name(fk: sql::ForeignKeyWalker<'_>, connector: &dyn Connector) -> Option<String> {
