@@ -38,24 +38,31 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
             color color[] NOT NULL
         );
     "#;
+
     api.raw_cmd(sql).await;
-    let dm = indoc! {
-        r#"
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
         model Book {
-            id      Int     @id @default(autoincrement())
-            color   color[]
+          id    Int     @id @default(autoincrement())
+          color color[]
         }
 
         enum color {
-            black
-            white
+          black
+          white
         }
-        "#,
-    };
+    "#]];
 
-    let result = api.introspect().await?;
-
-    api.assert_eq_datamodels(dm, &result);
+    api.expect_datamodel(&expected).await;
 
     Ok(())
 }

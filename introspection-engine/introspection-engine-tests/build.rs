@@ -14,7 +14,7 @@ fn main() {
 
     for sql_file in &all_sql_files {
         let test_name = sql_file.trim_start_matches('/').trim_end_matches(".sql");
-        let test_name = test_name.replace(&['/', '\\'], "_");
+        let test_name = test_name.replace(['/', '\\'], "_");
         let file_path = sql_file.trim_start_matches('/');
         writeln!(
             out_file,

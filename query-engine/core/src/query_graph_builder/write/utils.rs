@@ -44,6 +44,7 @@ where
         nested: vec![],
         selection_order: vec![],
         aggregation_selections: vec![],
+        options: QueryOptions::none(),
     });
 
     Query::Read(read_query)

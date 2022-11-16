@@ -10,7 +10,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-                t.add_constraint("sqlite_autoindex_User_1", types::unique_constraint(&["id", "age"]));
+                t.add_constraint("sqlite_autoindex_User_1", types::unique_constraint(["id", "age"]));
             });
 
             migration.create_table("Post", |t| {
@@ -217,8 +217,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           age          Int
           partner_id   Int
           partner_age  Int
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
@@ -251,8 +251,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int?
           partner_age  Int?
-          Person       Person?  @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person?  @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
@@ -285,8 +285,8 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "sqlite_autoindex_Person_1")
         }
@@ -306,7 +306,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                 t.add_column("age", types::integer());
 
                 t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
@@ -318,7 +318,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                     "Post_fk",
                     types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;

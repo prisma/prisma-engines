@@ -16,6 +16,7 @@ pub use composite::*;
 pub use into_filter::*;
 pub use json::*;
 pub use list::*;
+use prisma_models::ScalarFieldRef;
 pub use relation::*;
 pub use scalar::*;
 
@@ -204,6 +205,42 @@ impl Filter {
 
     pub fn is_empty(&self) -> bool {
         self == &Filter::Empty
+    }
+
+    pub fn scalars(&self) -> Vec<ScalarFieldRef> {
+        let mut scalars: Vec<ScalarFieldRef> = Vec::new();
+
+        let filter_check = |_sf: &ScalarFilter| true;
+        Self::filter_and_collect_scalars(self, filter_check, &mut scalars);
+        scalars
+    }
+
+    pub fn unique_scalars(&self) -> Vec<ScalarFieldRef> {
+        let mut uniques: Vec<ScalarFieldRef> = Vec::new();
+
+        let filter_check = |sf: &ScalarFilter| sf.is_unique();
+        Self::filter_and_collect_scalars(self, filter_check, &mut uniques);
+        uniques
+    }
+
+    fn filter_and_collect_scalars(
+        filter: &Filter,
+        filter_check: fn(&ScalarFilter) -> bool,
+        scalars: &mut Vec<ScalarFieldRef>,
+    ) {
+        match filter {
+            Filter::And(inner) => inner
+                .iter()
+                .for_each(|f| Self::filter_and_collect_scalars(f, filter_check, scalars)),
+            Filter::Scalar(sf) => {
+                if filter_check(sf) {
+                    if let Some(field) = sf.scalar_ref() {
+                        scalars.push(field.to_owned())
+                    }
+                }
+            }
+            _ => (),
+        }
     }
 }
 

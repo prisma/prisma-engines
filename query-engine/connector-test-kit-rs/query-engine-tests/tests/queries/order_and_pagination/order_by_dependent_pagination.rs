@@ -362,11 +362,7 @@ mod order_by_dependent_pag {
         };
 
         let model_c = match c_id {
-            Some(id) => format!(
-                "c: {{ create: {{ id: {} \n {} }} }}",
-                id,
-                inline.unwrap_or_else(|| "".to_string())
-            ),
+            Some(id) => format!("c: {{ create: {{ id: {} \n {} }} }}", id, inline.unwrap_or_default()),
             None => "".to_string(),
         };
 

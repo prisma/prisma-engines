@@ -1,0 +1,32 @@
+// tags=mysql
+
+datasource mydb {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model MyTable {
+    id Int @id
+    k Kind? @default(error)
+    r Result @default(succeeded)
+}
+
+enum Result {
+  succeeded
+  failed
+}
+
+enum Kind {
+  info
+  warning
+  error
+}
+// Expected Migration:
+// -- CreateTable
+// CREATE TABLE `MyTable` (
+//     `id` INTEGER NOT NULL,
+//     `k` ENUM('info', 'warning', 'error') NULL DEFAULT 'error',
+//     `r` ENUM('succeeded', 'failed') NOT NULL DEFAULT 'succeeded',
+// 
+//     PRIMARY KEY (`id`)
+// ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

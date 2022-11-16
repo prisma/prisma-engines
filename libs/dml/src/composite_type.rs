@@ -98,4 +98,8 @@ impl CompositeTypeFieldType {
             None
         }
     }
+
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
 }

@@ -45,6 +45,9 @@ pub type TableWalker<'a> = Walker<'a, TableId>;
 /// Traverse an enum.
 pub type EnumWalker<'a> = Walker<'a, EnumId>;
 
+/// Traverse an enum variant.
+pub type EnumVariantWalker<'a> = Walker<'a, EnumVariantId>;
+
 /// Traverse an index.
 pub type IndexWalker<'a> = Walker<'a, IndexId>;
 
@@ -94,17 +97,7 @@ impl<'a> ColumnWalker<'a> {
 
     /// Extract an `Enum` column type family, or `None` if the family is something else.
     pub fn column_type_family_as_enum(self) -> Option<EnumWalker<'a>> {
-        self.column_type_family().as_enum().map(|enum_name| {
-            let idx = self
-                .schema
-                .enums
-                .iter()
-                .position(|enm| enm.name == enum_name)
-                .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
-                .unwrap();
-
-            self.walk(EnumId(idx as u32))
-        })
+        self.column_type_family().as_enum().map(|enum_id| self.walk(enum_id))
     }
 
     /// The column name.
@@ -181,6 +174,14 @@ impl<'a> ViewWalker<'a> {
     /// The SQL definition of the view
     pub fn definition(self) -> Option<&'a str> {
         self.view().definition.as_deref()
+    }
+
+    /// The namespace of the view
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.view().namespace_id.0 as usize)
+            .map(|s| s.as_str())
     }
 
     fn view(self) -> &'a View {
@@ -463,9 +464,32 @@ impl<'a> EnumWalker<'a> {
         &self.get().name
     }
 
-    /// The values of the enum
-    pub fn values(self) -> &'a [String] {
-        &self.get().values
+    /// The variants of the enum
+    pub fn variants(self) -> impl ExactSizeIterator<Item = EnumVariantWalker<'a>> {
+        range_for_key(&self.schema.enum_variants, self.id, |variant| variant.enum_id)
+            .map(move |idx| self.walk(EnumVariantId(idx as u32)))
+    }
+
+    /// The names of the variants of the enum
+    pub fn values(self) -> impl ExactSizeIterator<Item = &'a str> {
+        range_for_key(&self.schema.enum_variants, self.id, |variant| variant.enum_id)
+            .map(move |idx| self.schema.enum_variants[idx].variant_name.as_str())
+    }
+}
+
+impl<'a> EnumVariantWalker<'a> {
+    fn get(self) -> &'a super::EnumVariant {
+        &self.schema.enum_variants[self.id.0 as usize]
+    }
+
+    /// The parent enum.
+    pub fn r#enum(self) -> EnumWalker<'a> {
+        self.walk(self.get().enum_id)
+    }
+
+    /// The variant itself.
+    pub fn name(self) -> &'a str {
+        &self.get().variant_name
     }
 }
 

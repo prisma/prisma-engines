@@ -1,5 +1,5 @@
 use super::catch;
-use crate::{database::operations::*, sql_info::SqlInfo, SqlError};
+use crate::{database::operations::*, operations::upsert::native_upsert, sql_info::SqlInfo, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -216,6 +216,17 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::delete_records(&self.inner, model, record_filter, trace_id).await
+        })
+        .await
+    }
+
+    async fn native_upsert_record(
+        &mut self,
+        upsert: connector_interface::NativeUpsert,
+        trace_id: Option<String>,
+    ) -> connector::Result<SingleRecord> {
+        catch(self.connection_info.clone(), async move {
+            native_upsert(&self.inner, upsert, trace_id).await
         })
         .await
     }

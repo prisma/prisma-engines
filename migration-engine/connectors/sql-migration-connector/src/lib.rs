@@ -16,6 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
+use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
@@ -78,8 +79,11 @@ impl SqlMigrationConnector {
     }
 
     /// Made public for tests.
-    pub fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
-        self.flavour.describe_schema()
+    pub fn describe_schema(
+        &mut self,
+        namespaces: Option<Namespaces>,
+    ) -> BoxFuture<'_, ConnectorResult<sql::SqlSchema>> {
+        self.flavour.describe_schema(namespaces)
     }
 
     /// For tests
@@ -113,6 +117,7 @@ impl SqlMigrationConnector {
         &mut self,
         target: DiffTarget<'_>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
@@ -124,10 +129,10 @@ impl SqlMigrationConnector {
             }
             DiffTarget::Migrations(migrations) => self
                 .flavour
-                .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
+                .sql_schema_from_migration_history(migrations, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from),
-            DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
+            DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
@@ -140,6 +145,10 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
         self.flavour.set_params(params)
+    }
+
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
+        self.flavour.set_preview_features(preview_features)
     }
 
     fn connection_string(&self) -> Option<&str> {
@@ -191,9 +200,10 @@ impl MigrationConnector for SqlMigrationConnector {
         &'a mut self,
         diff_target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
         Box::pin(async move {
-            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string)
+            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
                 .await
                 .map(From::from)
         })
@@ -204,17 +214,17 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     #[tracing::instrument(skip(self, from, to))]
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
         let steps = sql_schema_differ::calculate_steps(Pair::new(&previous, &next), self.flavour.as_ref());
         tracing::debug!(?steps, "Inferred migration steps.");
 
-        Ok(Migration::new(SqlMigration {
+        Migration::new(SqlMigration {
             before: previous.describer_schema,
             after: next.describer_schema,
             steps,
-        }))
+        })
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -224,9 +234,10 @@ impl MigrationConnector for SqlMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let sql_schema = self.flavour.describe_schema().await?;
+            let sql_schema = self.flavour.describe_schema(namespaces).await?;
             let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
@@ -249,10 +260,10 @@ impl MigrationConnector for SqlMigrationConnector {
         apply_migration::render_script(migration, diagnostics, self.flavour())
     }
 
-    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
             if soft || self.flavour.reset().await.is_err() {
-                best_effort_reset(self.flavour.as_mut()).await?;
+                best_effort_reset(self.flavour.as_mut(), namespaces).await?;
             }
 
             Ok(())
@@ -284,11 +295,25 @@ impl MigrationConnector for SqlMigrationConnector {
     fn validate_migrations<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         Box::pin(async move {
-            self.flavour.sql_schema_from_migration_history(migrations, None).await?;
+            self.flavour
+                .sql_schema_from_migration_history(migrations, None, namespaces)
+                .await?;
             Ok(())
         })
+    }
+
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces> {
+        let sql_schema: &SqlDatabaseSchema = schema.downcast_ref();
+        Namespaces::from_vec(
+            &mut sql_schema
+                .describer_schema
+                .walk_namespaces()
+                .map(|nw| String::from(nw.name()))
+                .collect::<Vec<String>>(),
+        )
     }
 }
 
@@ -299,16 +324,22 @@ fn new_shadow_database_name() -> String {
 /// Try to reset the database to an empty state. This should only be used
 /// when we don't have the permissions to do a full reset.
 #[tracing::instrument(skip(flavour))]
-async fn best_effort_reset(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> ConnectorResult<()> {
-    best_effort_reset_impl(flavour)
+async fn best_effort_reset(
+    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    namespaces: Option<Namespaces>,
+) -> ConnectorResult<()> {
+    best_effort_reset_impl(flavour, namespaces)
         .await
         .map_err(|err| err.into_soft_reset_failed_error())
 }
 
-async fn best_effort_reset_impl(flavour: &mut (dyn SqlFlavour + Send + Sync)) -> ConnectorResult<()> {
+async fn best_effort_reset_impl(
+    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    namespaces: Option<Namespaces>,
+) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
-    let source_schema = flavour.describe_schema().await?;
+    let source_schema = flavour.describe_schema(namespaces).await?;
     let target_schema = flavour.empty_database_schema();
     let mut steps = Vec::new();
 

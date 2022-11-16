@@ -10,7 +10,7 @@ model table {
     id String @id
     hereBeDragons String @default(dbgenerated())
 }
-
+// Expected Migration:
 // -- CreateTable
 // CREATE TABLE "table" (
 //     "id" TEXT NOT NULL,

@@ -19,6 +19,7 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     let _ = std::mem::replace(ctx.relations, relations);
 }
 
+/// Identifier for a single relation in a Prisma schema.
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
 pub struct RelationId(u32);
 
@@ -26,6 +27,10 @@ impl RelationId {
     const MAX: RelationId = RelationId(u32::MAX);
     const MIN: RelationId = RelationId(u32::MIN);
 }
+
+/// Identifier for a single implicit many-to-many relation in a Prisma schema.
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+pub struct ManyToManyRelationId(pub(crate) RelationId);
 
 /// Storage for the relations in a schema.
 ///

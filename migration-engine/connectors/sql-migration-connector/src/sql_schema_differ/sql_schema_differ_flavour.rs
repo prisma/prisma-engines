@@ -42,13 +42,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether a column's type needs to be migrated, and how.
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
-        if differ.previous.column_type_family() != differ.next.column_type_family() {
-            Some(ColumnTypeChange::RiskyCast)
-        } else {
-            None
-        }
-    }
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange>;
 
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}

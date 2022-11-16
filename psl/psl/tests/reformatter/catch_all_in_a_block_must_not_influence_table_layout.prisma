@@ -1,0 +1,6 @@
+model Post {
+  id   Int @id
+  this is an invalid line
+  anotherField String
+}
+

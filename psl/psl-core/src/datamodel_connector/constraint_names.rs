@@ -46,27 +46,21 @@ impl ConstraintNames {
         format!("{}{}", table_name, suffix)
     }
 
-    pub fn unique_index_name(
-        table_name: &str,
-        column_names: &[Vec<(&str, Option<&str>)>],
-        connector: &dyn Connector,
-    ) -> String {
+    pub fn unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         const UNIQUE_SUFFIX: &str = "_key";
+
         Self::index_name_impl(table_name, column_names, UNIQUE_SUFFIX, connector)
     }
 
-    pub fn non_unique_index_name(
-        table_name: &str,
-        column_names: &[Vec<(&str, Option<&str>)>],
-        connector: &dyn Connector,
-    ) -> String {
+    pub fn non_unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         const INDEX_SUFFIX: &str = "_idx";
+
         Self::index_name_impl(table_name, column_names, INDEX_SUFFIX, connector)
     }
 
     fn index_name_impl(
         table_name: &str,
-        column_names: &[Vec<(&str, Option<&str>)>],
+        column_names: &[&str],
         suffix: &'static str,
         connector: &dyn Connector,
     ) -> String {
@@ -76,15 +70,7 @@ impl ConstraintNames {
 
         out.push_str(table_name);
         out.push('_');
-
-        let colnames = column_names
-            .iter()
-            .flatten()
-            .map(|(i, _)| *i)
-            .collect::<Vec<_>>()
-            .join("_");
-
-        out.push_str(&colnames);
+        out.push_str(&column_names.join("_"));
 
         if out.len() >= limit - suffix.len() {
             let split = floor_char_boundary(&out, limit - suffix.len());

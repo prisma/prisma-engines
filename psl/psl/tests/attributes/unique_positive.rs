@@ -1,5 +1,4 @@
 use crate::{common::*, with_header, Provider};
-use psl::render_datamodel_to_string;
 
 #[test]
 fn basic_unique_index_must_work() {
@@ -279,22 +278,6 @@ fn single_field_unique_indexes_on_enum_fields_must_work() {
         algorithm: None,
         clustered: None,
     });
-}
-
-#[test]
-fn unique_attributes_must_serialize_to_valid_dml() {
-    let dml = r#"
-        model User {
-            id        Int    @id
-            firstName String
-            lastName  String
-
-            @@unique([firstName,lastName], name: "customName")
-        }
-    "#;
-    let schema = parse(dml);
-
-    assert_valid(&render_datamodel_to_string(&schema, None));
 }
 
 #[test]

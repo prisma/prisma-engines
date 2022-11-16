@@ -3,7 +3,9 @@ use crate::{
     flavour::{MysqlFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
-        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        check::{Column, Table},
+        destructive_check_plan::DestructiveCheckPlan,
+        unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
@@ -36,10 +38,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         // empty or the column has no existing NULLs.
         if changes.arity_changed() && columns.next.arity().is_required() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             );
 
@@ -59,6 +62,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: None,
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -70,6 +74,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: None,
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -94,18 +99,20 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } else {
@@ -114,26 +121,29 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous.name().to_owned(),
                     table: columns.previous.table().name().to_owned(),
+                    namespace: None,
                 },
                 step_index,
             )
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
-            let query = format!("SELECT COUNT(*) FROM `{}`", table_name);
+            // TODO(MultiSchema): replace this when implementing MySQL.
+            let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
             let result_set = self.query_raw(&query, &[]).await?;
-            super::extract_table_rows_count(table_name, result_set)
+            super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(
-        &'a mut self,
-        (table, column): (&'a str, &'a str),
-    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
-            let query = format!("SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL", table, column);
+            // TODO(MultiSchema): replace this when implementing MySQL.
+            let query = format!(
+                "SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL",
+                column.table, column.column
+            );
             let result_set = self.query_raw(&query, &[]).await?;
             super::extract_column_values_count(result_set)
         })
@@ -148,14 +158,8 @@ fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveC
     ) {
         let removed_values: Vec<String> = previous_enum
             .values()
-            .iter()
-            .filter(|previous_value| {
-                !next_enum
-                    .values()
-                    .iter()
-                    .any(|next_value| previous_value.as_str() == next_value.as_str())
-            })
-            .cloned()
+            .filter(|previous_value| !next_enum.values().any(|next_value| *previous_value == next_value))
+            .map(ToOwned::to_owned)
             .collect();
 
         if !removed_values.is_empty() {

@@ -75,7 +75,7 @@ impl<'a> Statistics<'a> {
         add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
-            data_model.add_model(model);
+            data_model.models.push(model);
         }
 
         for (_, mut composite_type) in types.into_iter() {

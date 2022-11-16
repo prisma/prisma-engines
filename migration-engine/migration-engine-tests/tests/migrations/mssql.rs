@@ -17,7 +17,7 @@ fn reset_clears_udts(api: TestApi) {
     );
     assert_eq!(1, schemas.len());
 
-    api.reset().send_sync();
+    api.reset().send_sync(None);
 
     let schemas = api.query_raw(
         &format!(
@@ -84,7 +84,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         BEGIN CATCH
 
         IF @@TRANCOUNT > 0
-        BEGIN 
+        BEGIN
             ROLLBACK TRAN;
         END;
         THROW
@@ -176,6 +176,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Database,
         DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        None,
     );
     let expected = expect![[r#"
         BEGIN TRY

@@ -13,6 +13,24 @@ mod max_integer {
         schema.to_string()
     }
 
+    const I8_OVERFLOW_MAX: i64 = (i8::MAX as i64) + 1;
+    const I8_OVERFLOW_MIN: i64 = (i8::MIN as i64) - 1;
+
+    const I16_OVERFLOW_MAX: i64 = (i16::MAX as i64) + 1;
+    const I16_OVERFLOW_MIN: i64 = (i16::MIN as i64) - 1;
+
+    const I24_OVERFLOW_MAX: i64 = 8388607 + 1;
+    const I24_OVERFLOW_MIN: i64 = -8388608 - 1;
+
+    const I32_OVERFLOW_MAX: i64 = (i32::MAX as i64) + 1;
+    const I32_OVERFLOW_MIN: i64 = (i32::MIN as i64) - 1;
+
+    const U8_OVERFLOW_MAX: i64 = (u8::MAX as i64) + 1;
+    const U16_OVERFLOW_MAX: i64 = (u16::MAX as i64) + 1;
+    const U24_OVERFLOW_MAX: i64 = 16777215 + 1;
+    const U32_OVERFLOW_MAX: i64 = (u32::MAX as i64) + 1;
+    const OVERFLOW_MIN: i8 = -1;
+
     #[connector_test]
     async fn transform_gql_parser_too_large(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -71,6 +89,668 @@ mod max_integer {
             "mutation { createOneTest(data: { id: 1, int: 1e100 }) { id int } }",
             2009,
             "Unable to fit float value (or large JS integer serialized in exponent notation) '10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' into a 64 Bit signed integer for field 'int'. If you're trying to store large integers, consider using `BigInt`"
+        );
+
+        Ok(())
+    }
+
+    // All connectors error differently based on their database driver.
+    // We just assert that a basic overflowing int errors without checking specifically for the message.
+    // Specific messages are asserted down below for native types.
+    // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
+    // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
+    #[connector_test(exclude(MongoDb, MySql(5.6)))]
+    async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
+                I32_OVERFLOW_MAX
+            ),
+            0
+        );
+
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
+                I32_OVERFLOW_MIN
+            ),
+            0
+        );
+
+        Ok(())
+    }
+
+    fn overflow_pg() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                id Int @id @default(autoincrement())
+                int Int? @test.Integer
+                smallint Int? @test.SmallInt
+                oid Int? @test.Oid
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(overflow_pg), only(Postgres))]
+    async fn unfitted_int_should_fail_pg(runner: Runner) -> TestResult<()> {
+        // int
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."
+        );
+
+        // smallint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."
+        );
+
+        //oid
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(overflow_pg), only(Postgres))]
+    async fn fitted_int_should_work_pg(runner: Runner) -> TestResult<()> {
+        // int
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id int }} }}", i32::MAX)),
+          @r###"{"data":{"createOneTest":{"id":1,"int":2147483647}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ id int }} }}", i32::MIN)),
+          @r###"{"data":{"createOneTest":{"id":2,"int":-2147483648}}}"###
+        );
+
+        // smallint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id smallint }} }}", i16::MAX)),
+          @r###"{"data":{"createOneTest":{"id":3,"smallint":32767}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id smallint }} }}", i16::MIN)),
+          @r###"{"data":{"createOneTest":{"id":4,"smallint":-32768}}}"###
+        );
+
+        // oid
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id oid }} }}", u32::MAX)),
+          @r###"{"data":{"createOneTest":{"id":5,"oid":4294967295}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ oid: {} }}) {{ id oid }} }}", u32::MIN)),
+          @r###"{"data":{"createOneTest":{"id":6,"oid":0}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn overflow_mysql() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                id        Int @id @default(autoincrement())
+                tinyint   Int? @test.TinyInt
+                smallint  Int? @test.SmallInt
+                mediumint Int? @test.MediumInt
+                int       Int? @test.Int
+                year      Int? @test.Year
+
+                unsigned_tinyint   Int? @test.UnsignedTinyInt
+                unsigned_smallint  Int? @test.UnsignedSmallInt
+                unsigned_mediumint Int? @test.UnsignedMediumInt
+                unsigned_int       Int? @test.UnsignedInt
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(overflow_mysql), only(MySql(5.7, 8, "mariadb")))]
+    async fn unfitted_int_should_fail_mysql(runner: Runner) -> TestResult<()> {
+        // tinyint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                I8_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'tinyint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                I8_OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'tinyint'"
+        );
+
+        // smallint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'smallint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'smallint'"
+        );
+
+        // mediumint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
+                I24_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'mediumint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
+                I24_OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'mediumint'"
+        );
+
+        // int
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'int'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'int'"
+        );
+
+        // year
+        // Type year is stored as an 8-bit unsigned integer but the actual boundaries are 1901-2155.
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", 2156),
+            2020,
+            "Value out of range for the type. Out of range value for column 'year'"
+        );
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ id }} }}", 1900),
+            2020,
+            "Value out of range for the type. Out of range value for column 'year'"
+        );
+
+        // unsigned tinyint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
+                U8_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_tinyint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_tinyint'"
+        );
+
+        // unsigned smallint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
+                U16_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_smallint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_smallint'"
+        );
+
+        // unsigned mediumint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
+                U24_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_mediumint'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_mediumint'"
+        );
+
+        // unsigned int
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_int'"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            2020,
+            "Value out of range for the type. Out of range value for column 'unsigned_int'"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(overflow_mysql), only(MySql))]
+    async fn fitted_int_should_work_mysql(runner: Runner) -> TestResult<()> {
+        // tinyint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", i8::MAX)),
+          @r###"{"data":{"createOneTest":{"tinyint":127}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", i8::MIN)),
+          @r###"{"data":{"createOneTest":{"tinyint":-128}}}"###
+        );
+
+        // smallint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ smallint }} }}", i16::MAX)),
+          @r###"{"data":{"createOneTest":{"smallint":32767}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ smallint }} }}", i16::MIN)),
+          @r###"{"data":{"createOneTest":{"smallint":-32768}}}"###
+        );
+
+        // mediumint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ mediumint }} }}", (I24_OVERFLOW_MAX - 1))),
+          @r###"{"data":{"createOneTest":{"mediumint":8388607}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ mediumint }} }}", (I24_OVERFLOW_MIN + 1))),
+          @r###"{"data":{"createOneTest":{"mediumint":-8388608}}}"###
+        );
+
+        // int
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MAX)),
+          @r###"{"data":{"createOneTest":{"int":2147483647}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MIN)),
+          @r###"{"data":{"createOneTest":{"int":-2147483648}}}"###
+        );
+
+        // year
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ year }} }}", 2155)),
+          @r###"{"data":{"createOneTest":{"year":2155}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ year: {} }}) {{ year }} }}", 1901)),
+          @r###"{"data":{"createOneTest":{"year":1901}}}"###
+        );
+
+        // unsigned_tinyint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ unsigned_tinyint }} }}", u8::MAX)),
+          @r###"{"data":{"createOneTest":{"unsigned_tinyint":255}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ unsigned_tinyint }} }}", u8::MIN)),
+          @r###"{"data":{"createOneTest":{"unsigned_tinyint":0}}}"###
+        );
+
+        // unsigned_smallint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ unsigned_smallint }} }}", u16::MAX)),
+          @r###"{"data":{"createOneTest":{"unsigned_smallint":65535}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ unsigned_smallint }} }}", u16::MIN)),
+          @r###"{"data":{"createOneTest":{"unsigned_smallint":0}}}"###
+        );
+
+        // unsigned_mediumint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ unsigned_mediumint }} }}", U24_OVERFLOW_MAX - 1)),
+          @r###"{"data":{"createOneTest":{"unsigned_mediumint":16777215}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ unsigned_mediumint }} }}", OVERFLOW_MIN + 1)),
+          @r###"{"data":{"createOneTest":{"unsigned_mediumint":0}}}"###
+        );
+
+        // unsigned int
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ unsigned_int }} }}", u32::MAX)),
+          @r###"{"data":{"createOneTest":{"unsigned_int":4294967295}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ unsigned_int }} }}", u32::MIN)),
+          @r###"{"data":{"createOneTest":{"unsigned_int":0}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn overflow_mssql() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                id Int @id @default(autoincrement())
+                tinyint Int? @test.TinyInt
+                smallint Int? @test.SmallInt
+                int Int? @test.Int
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(overflow_mssql), only(SqlServer))]
+    async fn unfitted_int_should_fail_mssql(runner: Runner) -> TestResult<()> {
+        // tinyint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                U8_OVERFLOW_MAX
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type tinyint"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type tinyint"
+        );
+
+        // smallint
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type smallint"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type smallint."
+        );
+
+        // int
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type int"
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
+            None,
+            "Arithmetic overflow error converting expression to data type int"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(overflow_mssql), only(SqlServer))]
+    async fn fitted_int_should_work_mssql(runner: Runner) -> TestResult<()> {
+        // tinyint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", u8::MAX)),
+          @r###"{"data":{"createOneTest":{"tinyint":255}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ tinyint }} }}", u8::MIN)),
+          @r###"{"data":{"createOneTest":{"tinyint":0}}}"###
+        );
+
+        // smallint
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ smallint }} }}", i16::MAX)),
+          @r###"{"data":{"createOneTest":{"smallint":32767}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ smallint: {} }}) {{ smallint }} }}", i16::MIN)),
+          @r###"{"data":{"createOneTest":{"smallint":-32768}}}"###
+        );
+
+        // int
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MAX)),
+          @r###"{"data":{"createOneTest":{"int":2147483647}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ int: {} }}) {{ int }} }}", i32::MIN)),
+          @r###"{"data":{"createOneTest":{"int":-2147483648}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn overflow_cockroach() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                id Int @id
+                int2 Int? @test.Int2
+                int4 Int? @test.Int4
+                oid  Int? @test.Oid
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(overflow_cockroach), only(CockroachDb))]
+    async fn unfitted_int_should_fail_cockroach(runner: Runner) -> TestResult<()> {
+        // int4
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
+                I32_OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."
+        );
+
+        // int2
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
+                I16_OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."
+        );
+
+        //oid
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
+                U32_OVERFLOW_MAX
+            ),
+            None,
+            "Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."
+        );
+        assert_error!(
+            runner,
+            format!(
+                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
+                OVERFLOW_MIN
+            ),
+            None,
+            "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(overflow_cockroach), only(CockroachDb))]
+    async fn fitted_int_should_work_cockroach(runner: Runner) -> TestResult<()> {
+        // int2
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id int2 }} }}", i16::MAX)),
+          @r###"{"data":{"createOneTest":{"id":1,"int2":32767}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 2, int2: {} }}) {{ id int2 }} }}", i16::MIN)),
+          @r###"{"data":{"createOneTest":{"id":2,"int2":-32768}}}"###
+        );
+
+        // int4
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 3, int4: {} }}) {{ id int4 }} }}", i32::MAX)),
+          @r###"{"data":{"createOneTest":{"id":3,"int4":2147483647}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 4, int4: {} }}) {{ id int4 }} }}", i32::MIN)),
+          @r###"{"data":{"createOneTest":{"id":4,"int4":-2147483648}}}"###
+        );
+
+        // oid
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 5, oid: {} }}) {{ id oid }} }}", u32::MAX)),
+          @r###"{"data":{"createOneTest":{"id":5,"oid":4294967295}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, format!("mutation {{ createOneTest(data: {{ id: 6, oid: {} }}) {{ id oid }} }}", u32::MIN)),
+          @r###"{"data":{"createOneTest":{"id":6,"oid":0}}}"###
         );
 
         Ok(())

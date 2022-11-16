@@ -1,0 +1,10 @@
+model SomeUser {
+  id      Int      @id
+  profile Profile?
+}
+
+model Profile {
+  id      Int       @id
+  user    SomeUser? @relation(fields: [user_id], references: [id], onUpdate: SetNull, onDelete: SetNull)
+  user_id Int?      @unique
+}

@@ -161,7 +161,7 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), ["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));

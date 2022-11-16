@@ -60,7 +60,8 @@ pub struct SqlSchema {
     /// The schema's tables.
     tables: Vec<Table>,
     /// The schema's enums.
-    pub enums: Vec<Enum>,
+    enums: Vec<Enum>,
+    enum_variants: Vec<EnumVariant>,
     /// The schema's columns.
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
@@ -109,9 +110,17 @@ impl SqlSchema {
         self.views.iter().find(|v| v.name == name)
     }
 
-    /// Get an enum.
-    pub fn get_enum(&self, name: &str) -> Option<&Enum> {
-        self.enums.iter().find(|x| x.name == name)
+    /// Try to find an enum by name.
+    pub fn find_enum(&self, name: &str) -> Option<EnumId> {
+        self.enums.iter().position(|e| e.name == name).map(|i| EnumId(i as u32))
+    }
+
+    /// Try to find a table by name.
+    pub fn find_table(&self, name: &str) -> Option<TableId> {
+        self.tables
+            .iter()
+            .position(|t| t.name == name)
+            .map(|i| TableId(i as u32))
     }
 
     /// Get a procedure.
@@ -124,10 +133,12 @@ impl SqlSchema {
         self.user_defined_types.iter().find(|x| x.name == name)
     }
 
-    /// Get a namespaceId by name
-    pub fn get_namespace_id(&self, name: &str) -> NamespaceId {
-        let id = self.namespaces.iter().position(|ns| ns == name).unwrap();
-        NamespaceId(id as u32)
+    /// Find a namespace by name.
+    pub fn get_namespace_id(&self, name: &str) -> Option<NamespaceId> {
+        self.namespaces
+            .binary_search_by(|ns_name| ns_name.as_str().cmp(name))
+            .ok()
+            .map(|pos| NamespaceId(pos as u32))
     }
 
     /// The total number of indexes in the schema.
@@ -148,6 +159,23 @@ impl SqlSchema {
     pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
         let id = ColumnId(self.columns.len() as u32);
         self.columns.push((table_id, column));
+        id
+    }
+
+    /// Add an enum to the schema.
+    pub fn push_enum(&mut self, namespace_id: NamespaceId, enum_name: String) -> EnumId {
+        let id = EnumId(self.enums.len() as u32);
+        self.enums.push(Enum {
+            namespace_id,
+            name: enum_name,
+        });
+        id
+    }
+
+    /// Add a variant to an enum.
+    pub fn push_enum_variant(&mut self, enum_id: EnumId, variant_name: String) -> EnumVariantId {
+        let id = EnumVariantId(self.enum_variants.len() as u32);
+        self.enum_variants.push(EnumVariant { enum_id, variant_name });
         id
     }
 
@@ -251,13 +279,6 @@ impl SqlSchema {
         Some(self.walk(NamespaceId(namespace_idx as u32)))
     }
 
-    pub fn namespace_walkers(&self) -> impl Iterator<Item = NamespaceWalker<'_>> {
-        (0..self.namespaces.len()).map(move |namespace_index| NamespaceWalker {
-            schema: self,
-            id: NamespaceId(namespace_index as u32),
-        })
-    }
-
     pub fn tables_count(&self) -> usize {
         self.tables.len()
     }
@@ -277,14 +298,11 @@ impl SqlSchema {
         Some(self.walk(TableId(table_idx as u32)))
     }
 
-    pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker {
-            schema: self,
-            id: TableId(table_index as u32),
-        })
+    pub fn table_walkers(&self) -> impl ExactSizeIterator<Item = TableWalker<'_>> {
+        (0..self.tables.len()).map(move |table_index| self.walk(TableId(table_index as u32)))
     }
 
-    pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
+    pub fn view_walkers(&self) -> impl ExactSizeIterator<Item = ViewWalker<'_>> {
         (0..self.views.len()).map(move |view_index| self.walk(ViewId(view_index as u32)))
     }
 
@@ -293,10 +311,7 @@ impl SqlSchema {
     }
 
     pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
-        (0..self.enums.len()).map(move |enum_index| EnumWalker {
-            schema: self,
-            id: EnumId(enum_index as u32),
-        })
+        (0..self.enums.len()).map(move |enum_index| self.walk(EnumId(enum_index as u32)))
     }
 
     pub fn walk_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_>> {
@@ -481,15 +496,15 @@ pub enum ColumnTypeFamily {
     /// UUID types.
     Uuid,
     ///Enum
-    Enum(String),
+    Enum(EnumId),
     /// Unsupported
     Unsupported(String),
 }
 
 impl ColumnTypeFamily {
-    pub fn as_enum(&self) -> Option<&str> {
+    pub fn as_enum(&self) -> Option<EnumId> {
         match self {
-            ColumnTypeFamily::Enum(name) => Some(name),
+            ColumnTypeFamily::Enum(id) => Some(*id),
             _ => None,
         }
     }
@@ -598,14 +613,17 @@ struct ForeignKeyColumn {
 }
 
 /// A SQL enum.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub struct Enum {
+#[derive(Serialize, Deserialize, Debug)]
+struct Enum {
     /// The namespace the enum type belongs to, if applicable.
-    pub namespace_id: NamespaceId,
-    /// Enum name.
-    pub name: String,
-    /// Possible enum values.
-    pub values: Vec<String>,
+    namespace_id: NamespaceId,
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct EnumVariant {
+    enum_id: EnumId,
+    variant_name: String,
 }
 
 /// An SQL view.

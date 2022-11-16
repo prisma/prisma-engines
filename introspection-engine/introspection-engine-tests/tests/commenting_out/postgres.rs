@@ -176,27 +176,36 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", move |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("number Integer Default 1");
-                t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
-                t.inject_custom("point Point DEFAULT Point(0, 0)");
-            });
-        })
-        .await?;
+    let setup = indoc! {r#"
+        CREATE TABLE "Blog" (
+          id SERIAL PRIMARY KEY,
+          number INT DEFAULT 1,
+          bigger_number INT DEFAULT sqrt(4),
+          point POINT DEFAULT Point(0, 0)
+        )
+    "#};
 
-    let dm = indoc! {r##"
-        model Blog {
-          id                Int    @id @default(autoincrement())
-          number            Int?   @default(1)
-          bigger_number     Int?   @default(dbgenerated("sqrt((4)::double precision)"))
-          point             Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
         }
-    "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Blog {
+          id            Int                   @id @default(autoincrement())
+          number        Int?                  @default(1)
+          bigger_number Int?                  @default(dbgenerated("sqrt((4)::double precision)"))
+          point         Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
 
     Ok(())
 }
@@ -227,9 +236,8 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        // We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+        /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
         // model Test {
-        // 
         // }
     "#]];
     api.expect_datamodel(&expected).await;

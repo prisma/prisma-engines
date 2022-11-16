@@ -10,7 +10,7 @@ use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_core::{
     commands::diff,
     migration_connector::{
-        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
     },
 };
 use psl::{parser_database::SourceFile, PreviewFeature};
@@ -224,7 +224,13 @@ impl TestApi {
     /// Assert facts about the database schema
     #[track_caller]
     pub fn assert_schema(&mut self) -> SchemaAssertion {
-        let schema: SqlSchema = tok(self.connector.describe_schema()).unwrap();
+        let schema: SqlSchema = tok(self.connector.describe_schema(None)).unwrap();
+        SchemaAssertion::new(schema, self.root.args.tags())
+    }
+
+    #[track_caller]
+    pub fn assert_schema_with_namespaces(&mut self, namespaces: Option<Namespaces>) -> SchemaAssertion {
+        let schema: SqlSchema = tok(self.connector.describe_schema(namespaces)).unwrap();
         SchemaAssertion::new(schema, self.root.args.tags())
     }
 
@@ -238,10 +244,18 @@ impl TestApi {
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
-    pub fn connector_diff(&mut self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
-        let from = tok(self.connector.database_schema_from_diff_target(from, None)).unwrap();
-        let to = tok(self.connector.database_schema_from_diff_target(to, None)).unwrap();
-        let migration = self.connector.diff(from, to).unwrap();
+    pub fn connector_diff(
+        &mut self,
+        from: DiffTarget<'_>,
+        to: DiffTarget<'_>,
+        namespaces: Option<Namespaces>,
+    ) -> String {
+        let from = tok(self
+            .connector
+            .database_schema_from_diff_target(from, None, namespaces.clone()))
+        .unwrap();
+        let to = tok(self.connector.database_schema_from_diff_target(to, None, namespaces)).unwrap();
+        let migration = self.connector.diff(from, to);
         self.connector.render_script(&migration, &Default::default()).unwrap()
     }
 
@@ -286,10 +300,11 @@ impl TestApi {
     }
 
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
-        // let dir = tempfile::tempdir().unwrap();
-        // let schema_path = dir.path().join("schema.prisma");
-        // std::fs::write(&schema_path, schema).unwrap();
-        let found = self.connector_diff(DiffTarget::Empty, DiffTarget::Datamodel(SourceFile::new_static(schema)));
+        let found = self.connector_diff(
+            DiffTarget::Empty,
+            DiffTarget::Datamodel(SourceFile::new_static(schema)),
+            None,
+        );
         sql.assert_eq(&found);
     }
 

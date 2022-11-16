@@ -132,7 +132,7 @@ pub async fn get_related_m2m_record_ids<'conn>(
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
         .build();
 
-    let cursor = metrics(|| coll.find_with_session(filter, Some(find_options), session)).await?;
+    let cursor = observing(None, || coll.find_with_session(filter, Some(find_options), session)).await?;
     let docs = vacuum_cursor(cursor, session).await?;
     let parent_id_meta = output_meta::from_scalar_field(&id_field);
     let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();

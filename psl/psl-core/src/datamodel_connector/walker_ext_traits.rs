@@ -22,7 +22,8 @@ impl<'db> IndexWalkerExt<'db> for IndexWalker<'db> {
 
         let field_db_names = self
             .scalar_field_attributes()
-            .map(|f| f.as_mapped_path_to_indexed_field())
+            .flat_map(|f| f.as_mapped_path_to_indexed_field())
+            .map(|(i, _)| i)
             .collect::<Vec<_>>();
 
         if self.is_unique() {

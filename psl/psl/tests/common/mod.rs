@@ -458,11 +458,6 @@ pub(crate) fn assert_valid(schema: &str) {
     }
 }
 
-pub(crate) fn rerender(schema: &str) -> String {
-    let schema = psl::parse_schema(schema).unwrap();
-    psl::render_datamodel_to_string(&psl::lift(&schema), Some(&schema.configuration))
-}
-
 pub(crate) const SQLITE_SOURCE: &str = r#"
     datasource db {
         provider = "sqlite"

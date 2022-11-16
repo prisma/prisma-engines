@@ -2,8 +2,9 @@ use super::*;
 use crate::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
-    logger, output_meta,
+    output_meta,
     query_builder::MongoReadQueryBuilder,
+    query_strings::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -63,11 +64,12 @@ pub async fn create_record<'conn>(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    logger::log_insert_one(coll.name(), &doc);
-
-    let insert_result = metrics(|| coll.insert_one_with_session(doc, None, session))
-        .instrument(span)
-        .await?;
+    let query_builder = InsertOne::new(&doc, coll.name());
+    let insert_result = observing(Some(&query_builder), || {
+        coll.insert_one_with_session(&doc, None, session)
+    })
+    .instrument(span)
+    .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SelectionResult::from((id_field, id_value)))
@@ -117,9 +119,12 @@ pub async fn create_records<'conn>(
     let ordered = !skip_duplicates;
     let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
-    logger::log_insert_many(coll.name(), &docs, ordered);
-
-    let insert = metrics(|| coll.insert_many_with_session(docs, options, session)).instrument(span);
+    let query_string_builder = InsertMany::new(&docs, ordered, coll.name());
+    let docs_iter = docs.iter();
+    let insert = observing(Some(&query_string_builder), || {
+        coll.insert_many_with_session(docs_iter, options, session)
+    })
+    .instrument(span);
 
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
@@ -198,10 +203,12 @@ pub async fn update_records<'conn>(
     }
 
     if !update_docs.is_empty() {
-        logger::log_update_many_vec(coll.name(), &filter, &update_docs);
-        let res = metrics(|| coll.update_many_with_session(filter, update_docs, None, session))
-            .instrument(span)
-            .await?;
+        let query_string_builder = UpdateMany::new(&filter, &update_docs, coll.name());
+        let res = observing(Some(&query_string_builder), || {
+            coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
+        })
+        .instrument(span)
+        .await?;
 
         if update_type == UpdateType::Many && res.modified_count == 0 {
             return Ok(Vec::new());
@@ -255,10 +262,12 @@ pub async fn delete_records<'conn>(
     );
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
-    logger::log_delete_many(coll.name(), &filter);
-    let delete_result = metrics(|| coll.delete_many_with_session(filter, None, session))
-        .instrument(span)
-        .await?;
+    let query_string_builder = DeleteMany::new(&filter, coll.name());
+    let delete_result = observing(Some(&query_string_builder), || {
+        coll.delete_many_with_session(filter.clone(), None, session)
+    })
+    .instrument(span)
+    .await?;
 
     Ok(delete_result.deleted_count as usize)
 }
@@ -336,19 +345,24 @@ pub async fn m2m_connect<'conn>(
 
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
-    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
-    // First update the parent and add all child IDs to the m:n scalar field.
-    metrics(|| parent_coll.update_one_with_session(parent_filter, parent_update, None, session)).await?;
+    let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+
+    observing(Some(&query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+    })
+    .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
-    // this needs work
-    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
-
-    metrics(|| child_coll.update_many_with_session(child_filter, child_update, None, session)).await?;
+    let child_updates = vec![child_update.clone()];
+    let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    observing(Some(&query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
+    })
+    .await?;
 
     Ok(())
 }
@@ -389,17 +403,24 @@ pub async fn m2m_disconnect<'conn>(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
-    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
-    metrics(|| parent_coll.update_one_with_session(parent_filter, parent_update, None, session)).await?;
+    let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
+    observing(Some(&query_string_builder), || {
+        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+    })
+    .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
-    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
 
-    metrics(|| child_coll.update_many_with_session(child_filter, child_update, None, session)).await?;
+    let child_updates = vec![child_update.clone()];
+    let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
+    observing(Some(&query_string_builder), || {
+        child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
+    })
+    .await?;
 
     Ok(())
 }
@@ -433,7 +454,7 @@ pub async fn query_raw<'conn>(
     async {
         let json_result = match mongo_command {
             MongoCommand::Raw { cmd } => {
-                let mut result = metrics(|| database.run_command_with_session(cmd, None, session)).await?;
+                let mut result = observing(None, || database.run_command_with_session(cmd, None, session)).await?;
 
                 // Removes unnecessary properties from raw response
                 // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand

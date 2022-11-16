@@ -12,7 +12,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                 t.add_column("age", types::integer());
 
                 t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
@@ -24,7 +24,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                     "Post_fk",
                     types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -216,8 +216,8 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
-          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
-          other_Person Person[] @relation("PersonToPerson")
+          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], onDelete: NoAction, onUpdate: NoAction)
+          other_Person Person[]
 
           @@unique([id, age], map: "post_user_unique")
         }

@@ -81,7 +81,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Post", |t| {
@@ -97,14 +97,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
                     "post_userid2_fk",
                     types::foreign_constraint(&["user_id2"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
-                t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
-                t.add_constraint("Post_user_id2_key", types::unique_constraint(&["user_id2"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
+                t.add_constraint("Post_user_id_key", types::unique_constraint(["user_id"]));
+                t.add_constraint("Post_user_id2_key", types::unique_constraint(["user_id2"]));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]))
             });
         })
         .await?;
@@ -160,7 +160,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Post", |t| {
@@ -171,12 +171,12 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
                     "Post_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]))
             });
         })
         .await?;

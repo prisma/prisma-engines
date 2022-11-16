@@ -51,7 +51,7 @@ impl TestApi {
             };
             let mut conn = SqlMigrationConnector::new_mysql();
             conn.set_params(params).unwrap();
-            tok(conn.reset(false)).unwrap();
+            tok(conn.reset(false, None)).unwrap();
 
             (
                 tok(Quaint::new(args.database_url())).unwrap(),
@@ -298,7 +298,7 @@ impl EngineTestApi {
 
     /// Assert facts about the database schema
     pub fn assert_schema(&mut self) -> SchemaAssertion {
-        SchemaAssertion::new(tok(self.connector.describe_schema()).unwrap(), self.tags)
+        SchemaAssertion::new(tok(self.connector.describe_schema(None)).unwrap(), self.tags)
     }
 
     /// Plan a `reset` command

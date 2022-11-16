@@ -84,6 +84,10 @@ impl FieldType {
         matches!(self, Self::Enum(this) if this == name)
     }
 
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
+
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
             FieldType::Scalar(st, _) => Some(*st),
@@ -577,5 +581,15 @@ impl WithDatabaseName for CompositeField {
     }
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl From<psl_core::parser_database::ast::FieldArity> for FieldArity {
+    fn from(arity: psl_core::parser_database::ast::FieldArity) -> Self {
+        match arity {
+            schema_ast::ast::FieldArity::Required => FieldArity::Required,
+            schema_ast::ast::FieldArity::Optional => FieldArity::Optional,
+            schema_ast::ast::FieldArity::List => FieldArity::List,
+        }
     }
 }

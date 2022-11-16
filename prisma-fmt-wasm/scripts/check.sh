@@ -20,12 +20,12 @@ echo 'ok.'
 
 echo '2. We can call the module directly and get back a valid result.'
 
-VERSION_FROM_MODULE=`$node -e "const prismaFmt = require('$prisma_fmt_wasm'); console.log(prismaFmt.version())"`
+REFORMATTED_MEOW=`$node -e "const prismaFmt = require('$prisma_fmt_wasm'); console.log(prismaFmt.format('meow', '{}'))"`
 
-echo "VERSION_FROM_MODULE=$VERSION_FROM_MODULE"
+echo "REFORMATTED_MEOW=$REFORMATTED_MEOW"
 
-if [[ $VERSION_FROM_MODULE != 'wasm' ]]; then
-    echo "Check phase failed: expected the module version to be 'wasm', but got $VERSION_FROM_MODULE"
+if [[ $REFORMATTED_MEOW != 'meow' ]]; then
+    echo "Check phase failed: expected the module version to be 'wasm', but got '$REFORMATTED_MEOW'"
     exit 1
 fi
 

@@ -154,6 +154,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 relations::field_arity(relation, ctx);
                 relations::referencing_scalar_field_types(relation, ctx);
                 relations::has_a_unique_constraint_name(&names, relation, ctx);
+                relations::required_relation_cannot_use_set_null(relation, ctx);
 
                 if relation.is_one_to_one() {
                     relations::one_to_one::both_sides_are_defined(relation, ctx);
@@ -170,6 +171,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                     relations::one_to_many::referential_actions(relation, ctx);
                 }
             }
+
             RefinedRelationWalker::ImplicitManyToMany(relation) => {
                 use relations::many_to_many::implicit;
 
@@ -178,6 +180,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 implicit::validate_no_referential_actions(relation, ctx);
                 implicit::cannot_define_references_argument(relation, ctx);
             }
+
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
                 use relations::many_to_many::embedded;
 

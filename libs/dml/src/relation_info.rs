@@ -1,4 +1,5 @@
 use enumflags2::bitflags;
+use psl_core::parser_database as db;
 use std::fmt;
 
 /// Holds information about a relation field.
@@ -70,14 +71,32 @@ pub enum ReferentialAction {
     SetDefault,
 }
 
+impl From<db::ReferentialAction> for ReferentialAction {
+    fn from(ra: db::ReferentialAction) -> Self {
+        match ra {
+            db::ReferentialAction::Cascade => ReferentialAction::Cascade,
+            db::ReferentialAction::SetNull => ReferentialAction::SetNull,
+            db::ReferentialAction::SetDefault => ReferentialAction::SetDefault,
+            db::ReferentialAction::Restrict => ReferentialAction::Restrict,
+            db::ReferentialAction::NoAction => ReferentialAction::NoAction,
+        }
+    }
+}
+
+impl AsRef<str> for ReferentialAction {
+    fn as_ref(&self) -> &str {
+        match self {
+            ReferentialAction::Cascade => "Cascade",
+            ReferentialAction::Restrict => "Restrict",
+            ReferentialAction::NoAction => "NoAction",
+            ReferentialAction::SetNull => "SetNull",
+            ReferentialAction::SetDefault => "SetDefault",
+        }
+    }
+}
+
 impl fmt::Display for ReferentialAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ReferentialAction::Cascade => write!(f, "Cascade"),
-            ReferentialAction::Restrict => write!(f, "Restrict"),
-            ReferentialAction::NoAction => write!(f, "NoAction"),
-            ReferentialAction::SetNull => write!(f, "SetNull"),
-            ReferentialAction::SetDefault => write!(f, "SetDefault"),
-        }
+        f.write_str(self.as_ref())
     }
 }

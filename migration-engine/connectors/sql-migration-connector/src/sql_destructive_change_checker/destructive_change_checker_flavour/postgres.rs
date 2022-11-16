@@ -3,7 +3,9 @@ use crate::{
     flavour::{PostgresFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
-        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        check::{Column, Table},
+        destructive_check_plan::DestructiveCheckPlan,
+        unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
@@ -28,20 +30,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
         if changes.arity_changed() && columns.previous.arity().is_nullable() && columns.next.arity().is_required() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         }
 
         if changes.arity_changed() && !columns.previous.arity().is_list() && columns.next.arity().is_list() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
+                UnexecutableStepCheck::MadeScalarFieldIntoArrayField(Column {
                     table: columns.previous.table().name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
                     column: columns.previous.name().to_owned(),
-                },
+                }),
                 step_index,
             )
         }
@@ -55,6 +59,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: columns.previous.table().namespace().map(String::from),
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -66,6 +71,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 plan.push_warning(
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous.table().name().to_owned(),
+                        namespace: columns.previous.table().namespace().map(String::from),
                         column: columns.previous.name().to_owned(),
                         previous_type,
                         next_type,
@@ -90,18 +96,20 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(
-                UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } else if columns.next.arity().is_required() && columns.next.default().is_none() {
             plan.push_unexecutable(
-                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                    column: columns.previous.name().to_owned(),
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn(Column {
                     table: columns.previous.table().name().to_owned(),
-                },
+                    namespace: columns.previous.table().namespace().map(str::to_owned),
+                    column: columns.previous.name().to_owned(),
+                }),
                 step_index,
             )
         } else {
@@ -109,6 +117,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous.name().to_owned(),
+                    namespace: columns.previous.table().namespace().map(String::from),
                     table: columns.previous.table().name().to_owned(),
                 },
                 step_index,
@@ -116,20 +125,25 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
-            let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
+            let from = match &table.namespace {
+                Some(namespace) => format!("\"{}\".\"{}\"", namespace, table.table),
+                None => format!("\"{}\"", table.table),
+            };
+            let query = format!("SELECT COUNT(*) FROM {}", from);
             let result_set = self.query_raw(&query, &[]).await?;
-            super::extract_table_rows_count(table_name, result_set)
+            super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(
-        &'a mut self,
-        (table, column): (&'a str, &'a str),
-    ) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
-            let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
+            let from = match &column.namespace {
+                Some(namespace) => format!("\"{}\".\"{}\"", namespace, column.table),
+                None => format!("\"{}\"", column.table),
+            };
+            let query = format!("SELECT COUNT(*) FROM {} WHERE \"{}\" IS NOT NULL", from, column.column);
             let result_set = self.query_raw(&query, &[]).await?;
             super::extract_column_values_count(result_set)
         })

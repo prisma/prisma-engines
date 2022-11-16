@@ -93,10 +93,10 @@ async fn warning_is_given_for_copied_relations(api: &TestApi) -> TestResult {
             "message": "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.",
             "affected": [
               {
-                "model": "A"
+                "model": "B"
               },
               {
-                "model": "B"
+                "model": "A"
               }
             ]
           }
@@ -171,14 +171,14 @@ async fn relations_field_order_is_kept(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          bs B[]
           id Int @id @default(autoincrement())
+          bs B[]
         }
 
         model B {
           id  Int @id @default(autoincrement())
-          a   A   @relation(fields: [aId], references: [id])
           aId Int
+          a   A   @relation(fields: [aId], references: [id])
         }
     "#]];
 
@@ -219,14 +219,14 @@ async fn relations_field_order_is_kept_if_having_new_fields(api: &TestApi) -> Te
     let expected = expect![[r#"
         model A {
           new String @db.VarChar(255)
-          bs  B[]
           id  Int    @id @default(autoincrement())
+          bs  B[]
         }
 
         model B {
           id  Int @id @default(autoincrement())
-          a   A   @relation(fields: [aId], references: [id])
           aId Int
+          a   A   @relation(fields: [aId], references: [id])
         }
     "#]];
 
@@ -266,14 +266,14 @@ async fn relations_field_order_is_kept_if_removing_fields(api: &TestApi) -> Test
 
     let expected = expect![[r#"
         model A {
-          bs B[]
           id Int @id @default(autoincrement())
+          bs B[]
         }
 
         model B {
           id  Int @id @default(autoincrement())
-          a   A   @relation(fields: [aId], references: [id])
           aId Int
+          a   A   @relation(fields: [aId], references: [id])
         }
     "#]];
 
@@ -390,7 +390,7 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
 
         CREATE TABLE `B` (
             id  INT AUTO_INCREMENT PRIMARY KEY,
-            aId INT NOT NULL
+            aId INT NULL
         );
     "#};
 
@@ -403,9 +403,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: Restrict)
         }
     "#};
 
@@ -416,9 +416,9 @@ async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
         }
 
         model B {
-          id  Int @id @default(autoincrement())
-          aId Int
-          a   A   @relation(fields: [aId], references: [id], onDelete: SetNull)
+          id  Int  @id @default(autoincrement())
+          aId Int?
+          a   A?   @relation(fields: [aId], references: [id], onDelete: Restrict)
         }
     "#]];
 
