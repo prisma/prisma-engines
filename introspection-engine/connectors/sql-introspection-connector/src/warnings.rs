@@ -156,26 +156,6 @@ pub(crate) fn warning_enriched_with_map_on_enum_value(affected: &[EnumAndValue])
     }
 }
 
-pub(crate) fn warning_enriched_with_cuid(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 11,
-        message:
-            "These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-pub(crate) fn warning_enriched_with_uuid(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 12,
-        message:
-            "These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
 //todo maybe we can get rid of this alltogether due to @@ignore
 //but maybe we should have warnings for ignored fields and models
 pub(crate) fn warning_models_without_columns(affected: &[Model]) -> Warning {
