@@ -42,7 +42,6 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
 }
 
 #[test]
-#[ignore]
 fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
     let input = indoc! {r#"
         model User {
@@ -59,7 +58,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
         model User {
           id     Int  @id
           post   Post @relation(fields: [postId], references: [id])
-          postId Int?
+          postId Int
         }
 
         model Post {
