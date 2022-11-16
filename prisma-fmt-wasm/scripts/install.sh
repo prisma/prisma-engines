@@ -1,6 +1,9 @@
+#!/usr/bin/env bash
+
 set -euxo pipefail
 
 echo 'Creating out dir...'
+# shellcheck disable=SC2154
 mkdir -p "$out"/src;
 
 echo 'Copying package.json...'

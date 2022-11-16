@@ -18,10 +18,10 @@ if ! type "engineer" > /dev/null; then
     chmod +x engineer
 
     # Execute passed command and clean up
-    ./engineer $@
+    ./engineer "$@"
     rm -rf ./engineer
 else
     # Already installed on the system
     set -e
-    engineer $@
+    engineer "$@"
 fi
