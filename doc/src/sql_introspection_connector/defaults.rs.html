@@ -101,11 +101,27 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context;
-<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>psl::{dml, parser_database::walkers};
 <span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, postgres::PostgresSchemaExt};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_default(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_default(
+    column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    existing_field: <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt; {
     <span class="kw">match </span>(column.default().map(|d| d.kind()), <span class="kw-2">&amp;</span>column.column_type_family()) {
         (<span class="prelude-val">Some</span>(sql::DefaultKind::Sequence(name)), <span class="kw">_</span>) <span class="kw">if </span>ctx.is_cockroach() =&gt; {
             <span class="kw">use </span>dml::PrismaValue;
@@ -187,6 +203,14 @@
         (<span class="prelude-val">Some</span>(sql::DefaultKind::UniqueRowid), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
+
+        <span class="comment">// Prisma-level defaults.
+        </span>(<span class="prelude-val">None</span>, sql::ColumnTypeFamily::String) =&gt; <span class="kw">match </span>existing_field.and_then(|f| f.default_value()) {
+            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_cuid() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())),
+            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_uuid() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        },
+
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }

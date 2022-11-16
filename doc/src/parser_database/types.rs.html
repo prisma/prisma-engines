@@ -1346,11 +1346,6 @@
 <span id="1346">1346</span>
 <span id="1347">1347</span>
 <span id="1348">1348</span>
-<span id="1349">1349</span>
-<span id="1350">1350</span>
-<span id="1351">1351</span>
-<span id="1352">1352</span>
-<span id="1353">1353</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -1708,20 +1703,15 @@
 }
 
 <span class="doccomment">/// The different types of indexes supported in the Prisma Schema Language.
-</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq)]
 </span><span class="kw">pub enum </span>IndexType {
     <span class="doccomment">/// @@index
+    </span><span class="attribute">#[default]
     </span>Normal,
     <span class="doccomment">/// @(@)unique
     </span>Unique,
     <span class="doccomment">/// @(@)fulltext
     </span>Fulltext,
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>IndexType {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Normal
-    }
 }
 
 <span class="attribute">#[derive(Debug, Default)]

@@ -679,12 +679,6 @@
 <span id="679">679</span>
 <span id="680">680</span>
 <span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="self">self </span><span class="kw">as </span>dml, <span class="kw-2">*</span>};
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl_core::{
@@ -1057,12 +1051,6 @@
                     })
                     .collect();
 
-                <span class="kw">let </span>tpe = <span class="kw">match </span>idx.index_type() {
-                    db::IndexType::Unique =&gt; IndexType::Unique,
-                    db::IndexType::Normal =&gt; IndexType::Normal,
-                    db::IndexType::Fulltext =&gt; IndexType::Fulltext,
-                };
-
                 <span class="kw">let </span>algorithm = idx.algorithm().map(|using| <span class="kw">match </span>using {
                     IndexAlgorithm::BTree =&gt; model::IndexAlgorithm::BTree,
                     IndexAlgorithm::Hash =&gt; model::IndexAlgorithm::Hash,
@@ -1076,7 +1064,7 @@
                     name: idx.name().map(String::from),
                     db_name: <span class="prelude-val">Some</span>(idx.constraint_name(<span class="self">self</span>.connector).into_owned()),
                     fields,
-                    tpe,
+                    tpe: idx.index_type(),
                     algorithm,
                     defined_on_field: idx.is_defined_on_field(),
                     <span class="comment">// By default an index that is not a primary key is always non-clustered in any database.

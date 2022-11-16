@@ -669,23 +669,12 @@
 <span id="669">669</span>
 <span id="670">670</span>
 <span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
-<span id="679">679</span>
-<span id="680">680</span>
-<span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::default_value::DefaultKind;
 <span class="kw">use </span><span class="kw">crate</span>::field::{Field, FieldType, RelationField, ScalarField};
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
 <span class="kw">use </span><span class="kw">crate</span>::traits::{Ignorable, WithDatabaseName, WithName};
 <span class="kw">use </span>indoc::formatdoc;
+<span class="kw">use </span>psl_core::parser_database::IndexType;
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="doccomment">/// Represents a model in a prisma schema.
@@ -989,19 +978,6 @@
             sort_order: <span class="prelude-val">None</span>,
             length: <span class="prelude-val">None</span>,
         }
-    }
-}
-
-<span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
-</span><span class="kw">pub enum </span>IndexType {
-    Unique,
-    Normal,
-    Fulltext,
-}
-
-<span class="kw">impl </span>IndexType {
-    <span class="kw">pub fn </span>is_fulltext(<span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>, IndexType::Fulltext)
     }
 }
 

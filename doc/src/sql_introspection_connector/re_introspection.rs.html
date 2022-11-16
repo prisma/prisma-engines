@@ -105,73 +105,16 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     calculate_datamodel::CalculateDatamodelContext, introspection_helpers::compare_options_none_last, warnings::<span class="kw-2">*</span>,
 };
 <span class="kw">use </span>introspection_connector::Warning;
-<span class="kw">use </span>psl::dml::{Datamodel, DefaultValue, ValueGenerator, WithName};
+<span class="kw">use </span>psl::dml::{Datamodel, WithName};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enrich(old_data_model: <span class="kw-2">&amp;</span>Datamodel, new_data_model: <span class="kw-2">&amp;mut </span>Datamodel, ctx: <span class="kw-2">&amp;mut </span>CalculateDatamodelContext) {
     <span class="kw">let </span>warnings = <span class="kw-2">&amp;mut </span>ctx.warnings;
     merge_pre_3_0_index_names(old_data_model, new_data_model, warnings);
     merge_custom_index_names(old_data_model, new_data_model, warnings);
-    merge_prisma_level_defaults(old_data_model, new_data_model, warnings);
     keep_index_ordering(old_data_model, new_data_model);
 }
 
@@ -267,61 +210,6 @@
     <span class="kw">if </span>!changed_index_names.is_empty() {
         <span class="kw">let </span>index: Vec&lt;<span class="kw">_</span>&gt; = changed_index_names.iter().map(|c| c.<span class="number">0</span>.clone()).collect();
         warnings.push(warning_enriched_with_custom_index_names(<span class="kw-2">&amp;</span>index));
-    }
-}
-
-<span class="comment">// Prisma Level Only concepts
-// @default(cuid) / @default(uuid) / @updatedAt
-</span><span class="kw">fn </span>merge_prisma_level_defaults(
-    old_data_model: <span class="kw-2">&amp;</span>Datamodel,
-    new_data_model: <span class="kw-2">&amp;mut </span>Datamodel,
-    warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;,
-) {
-    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_cuids = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>re_introspected_prisma_level_uuids = <span class="macro">vec!</span>[];
-
-    <span class="kw">for </span>model <span class="kw">in </span>new_data_model.models() {
-        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
-            <span class="kw">let </span>old_model = <span class="kw">match </span>old_data_model.find_model(<span class="kw-2">&amp;</span>model.name) {
-                <span class="prelude-val">Some</span>(old_model) =&gt; old_model,
-                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
-            };
-
-            <span class="kw">let </span>old_field = <span class="kw">match </span>old_model.find_scalar_field(<span class="kw-2">&amp;</span>field.name) {
-                <span class="prelude-val">Some</span>(mike) =&gt; mike, <span class="comment">// oldfield
-                </span><span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
-            };
-
-            <span class="kw">if </span>field.default_value.is_none() &amp;&amp; field.field_type.is_string() {
-                <span class="kw">if </span>old_field.default_value == <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_cuid())) {
-                    re_introspected_prisma_level_cuids.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
-                }
-
-                <span class="kw">if </span>old_field.default_value == <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_uuid())) {
-                    re_introspected_prisma_level_uuids.push(ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>field.name));
-                }
-            }
-        }
-    }
-
-    <span class="kw">for </span>cuid <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_prisma_level_cuids {
-        new_data_model
-            .find_scalar_field_mut(<span class="kw-2">&amp;</span>cuid.model, <span class="kw-2">&amp;</span>cuid.field)
-            .default_value = <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_cuid()));
-    }
-
-    <span class="kw">for </span>uuid <span class="kw">in </span><span class="kw-2">&amp;</span>re_introspected_prisma_level_uuids {
-        new_data_model
-            .find_scalar_field_mut(<span class="kw-2">&amp;</span>uuid.model, <span class="kw-2">&amp;</span>uuid.field)
-            .default_value = <span class="prelude-val">Some</span>(DefaultValue::new_expression(ValueGenerator::new_uuid()));
-    }
-
-    <span class="kw">if </span>!re_introspected_prisma_level_cuids.is_empty() {
-        warnings.push(warning_enriched_with_cuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_cuids));
-    }
-
-    <span class="kw">if </span>!re_introspected_prisma_level_uuids.is_empty() {
-        warnings.push(warning_enriched_with_uuid(<span class="kw-2">&amp;</span>re_introspected_prisma_level_uuids));
     }
 }
 </code></pre></div>

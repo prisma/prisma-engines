@@ -36,6 +36,7 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains the models representing the Datamodel part of a Prisma schema.
 //! It contains the main data structures that the engines can build upon.
 
@@ -59,6 +60,7 @@
     relation_info::<span class="kw-2">*</span>, scalars::<span class="kw-2">*</span>, traits::<span class="kw-2">*</span>,
 };
 <span class="kw">pub use </span>prisma_value::{<span class="self">self</span>, PrismaValue};
+<span class="kw">pub use </span>psl_core::parser_database::IndexType;
 
 <span class="kw">use </span>psl_core::ValidatedSchema;
 

@@ -190,26 +190,6 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
 </pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::Warning;
 <span class="kw">use </span>serde::Serialize;
 
@@ -364,26 +344,6 @@
         code: <span class="number">10</span>,
         message: <span class="string">&quot;These enum values were enriched with `@map` information taken from the previous Prisma schema.&quot;
             </span>.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_cuid(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
-    Warning {
-        code: <span class="number">11</span>,
-        message:
-            <span class="string">&quot;These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema.&quot;
-                </span>.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_enriched_with_uuid(affected: <span class="kw-2">&amp;</span>[ModelAndField]) -&gt; Warning {
-    Warning {
-        code: <span class="number">12</span>,
-        message:
-            <span class="string">&quot;These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema.&quot;
-                </span>.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

@@ -670,7 +670,7 @@
         ColumnArity::List =&gt; FieldArity::List,
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>default_value = <span class="kw">crate</span>::defaults::calculate_default(column, ctx);
+    <span class="kw">let </span><span class="kw-2">mut </span>default_value = <span class="kw">crate</span>::defaults::calculate_default(column, existing_field, ctx);
 
     <span class="kw">let </span>default_default_value =
         ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
