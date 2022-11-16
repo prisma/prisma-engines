@@ -268,35 +268,6 @@ fn must_add_relation_attribute_to_an_existing_field() {
 }
 
 #[test]
-fn forward_relation_fields_must_be_added() {
-    let input = indoc! {r#"
-        model PostableEntity {
-          id String @id
-        }
-
-        model Post {
-          id        String   @id
-          postableEntities PostableEntity[]
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model PostableEntity {
-          id     String  @id
-          Post   Post?   @relation(fields: [postId], references: [id])
-          postId String?
-        }
-
-        model Post {
-          id               String           @id
-          postableEntities PostableEntity[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
 fn must_add_back_relation_fields_for_given_list_field() {
     let input = indoc! {r#"
         model User {
