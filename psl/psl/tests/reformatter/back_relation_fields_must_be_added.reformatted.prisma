@@ -1,0 +1,17 @@
+model Blog {
+  id    Int     @id
+  posts Post[]
+  Post2 Post2[]
+}
+
+model Post {
+  id     Int   @id
+  Blog   Blog? @relation(fields: [blogId], references: [id])
+  blogId Int?
+}
+
+model Post2 {
+  id     Int  @id
+  blogId Int
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}
