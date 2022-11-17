@@ -10,7 +10,7 @@ mod relation_names;
 
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context, commenting_out_guardrails::commenting_out_guardrails,
-    prisma_1_defaults::add_prisma_1_id_defaults, version_checker, SqlError,
+    version_checker, SqlError,
 };
 use datamodel_renderer as render;
 use introspection_connector::Version;
@@ -19,6 +19,8 @@ use sql_schema_describer::SqlSchema;
 
 pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), SqlError> {
     let mut datamodel = dml::Datamodel::new();
+    // Try to identify whether the schema was created by a previous Prisma version.
+    let version = version_checker::check_prisma_version(ctx);
 
     enums::introspect_enums(&mut datamodel, ctx);
     models::introspect_models(&mut datamodel, ctx);
@@ -33,12 +35,6 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
 
     // commenting out models, fields, enums, enum values
     ctx.warnings.append(&mut commenting_out_guardrails(&mut datamodel));
-
-    // try to identify whether the schema was created by a previous Prisma version
-    let version = version_checker::check_prisma_version(ctx);
-
-    // if based on a previous Prisma version add id default opinionations
-    add_prisma_1_id_defaults(&version, &mut datamodel, ctx.schema, ctx);
 
     m2m_relations::introspect_m2m_relations(&relation_names, &mut datamodel, ctx);
 
@@ -71,6 +67,8 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
         config,
         render::Datamodel::from_dml(&ctx.config.datasources[0], &datamodel),
     );
+
+    ctx.finalize_warnings();
 
     Ok((version, psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
 }

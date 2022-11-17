@@ -1,7 +1,8 @@
 use crate::{
-    introspection::introspect, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
+    introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
+    SqlIntrospectionResult,
 };
-use introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
+use introspection_connector::{IntrospectionContext, IntrospectionResult, Version, Warning};
 use psl::{builtin_connectors::*, datamodel_connector::Connector, parser_database::walkers, Configuration};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
@@ -13,6 +14,9 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) sql_family: SqlFamily,
     pub(crate) warnings: &'a mut Vec<Warning>,
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
+    pub(crate) version: Version,
+    pub(crate) prisma_1_uuid_defaults: Vec<warnings::ModelAndField>,
+    pub(crate) prisma_1_cuid_defaults: Vec<warnings::ModelAndField>,
     introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
@@ -122,6 +126,26 @@ impl<'a> CalculateDatamodelContext<'a> {
             // Failing that, potentially sanitize the table name.
             .unwrap_or_else(|| ModelName::new_from_sql(self.schema.walk(id).name()))
     }
+
+    pub(crate) fn finalize_warnings(&mut self) {
+        fn maybe_warn<T>(elems: &[T], warning: impl Fn(&[T]) -> Warning, warnings: &mut Vec<Warning>) {
+            if !elems.is_empty() {
+                warnings.push(warning(elems))
+            }
+        }
+
+        maybe_warn(
+            &self.prisma_1_uuid_defaults,
+            warnings::warning_default_uuid_warning,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.prisma_1_cuid_defaults,
+            warnings::warning_default_cuid_warning,
+            &mut self.warnings,
+        );
+    }
 }
 
 /// Calculate a data model from a database schema.
@@ -139,7 +163,12 @@ pub fn calculate_datamodel(
         previous_schema: ctx.previous_schema(),
         warnings: &mut warnings,
         introspection_map: crate::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema()),
+        version: Version::NonPrisma,
+        prisma_1_uuid_defaults: Vec::new(),
+        prisma_1_cuid_defaults: Vec::new(),
     };
+
+    context.version = crate::version_checker::check_prisma_version(&context);
 
     let (version, data_model, is_empty) = introspect(&mut context)?;
 

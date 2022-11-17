@@ -1,11 +1,16 @@
-use crate::calculate_datamodel::CalculateDatamodelContext as Context;
-use psl::{dml, parser_database::walkers};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
+use introspection_connector::Version;
+use psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    dml,
+    parser_database::walkers,
+};
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 pub(crate) fn calculate_default(
     column: sql::ColumnWalker<'_>,
     existing_field: Option<walkers::ScalarFieldWalker<'_>>,
-    ctx: &Context<'_>,
+    ctx: &mut Context<'_>,
 ) -> Option<dml::DefaultValue> {
     match (column.default().map(|d| d.kind()), &column.column_type_family()) {
         (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
@@ -91,8 +96,9 @@ pub(crate) fn calculate_default(
 
         // Prisma-level defaults.
         (None, sql::ColumnTypeFamily::String) => match existing_field.and_then(|f| f.default_value()) {
-            Some(value) if value.is_cuid() => Some(dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())),
-            Some(value) if value.is_uuid() => Some(dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())),
+            Some(value) if value.is_cuid() => Some(default_cuid()),
+            Some(value) if value.is_uuid() => Some(default_uuid()),
+            None if matches!(ctx.version, Version::Prisma1 | Version::Prisma11) => maybe_prisma1_default(column, ctx),
             _ => None,
         },
 
@@ -112,4 +118,43 @@ fn set_default(mut default: dml::DefaultValue, column: sql::ColumnWalker<'_>) ->
 
 fn is_sequence(column: sql::ColumnWalker<'_>) -> bool {
     column.is_single_primary_key() && matches!(&column.default(), Some(d) if d.is_sequence())
+}
+
+fn maybe_prisma1_default(column: sql::ColumnWalker<'_>, ctx: &mut Context<'_>) -> Option<dml::DefaultValue> {
+    let model_and_field = || crate::warnings::ModelAndField {
+        model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
+        field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+    };
+
+    if ctx.sql_family().is_postgres() {
+        let native_type: &PostgresType = column.column_type().native_type.as_ref()?.downcast_ref();
+
+        if native_type == &PostgresType::VarChar(Some(25)) {
+            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            return Some(default_cuid());
+        } else if native_type == &PostgresType::VarChar(Some(36)) {
+            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            return Some(default_uuid());
+        }
+    } else if ctx.sql_family().is_mysql() {
+        let native_type: &MySqlType = column.column_type().native_type.as_ref()?.downcast_ref();
+
+        if native_type == &MySqlType::Char(25) {
+            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            return Some(default_cuid());
+        } else if native_type == &MySqlType::Char(36) {
+            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            return Some(default_uuid());
+        }
+    };
+
+    None
+}
+
+fn default_cuid() -> dml::DefaultValue {
+    dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())
+}
+
+fn default_uuid() -> dml::DefaultValue {
+    dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())
 }
