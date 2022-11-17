@@ -137,13 +137,13 @@ impl<'a> CalculateDatamodelContext<'a> {
         maybe_warn(
             &self.prisma_1_uuid_defaults,
             warnings::warning_default_uuid_warning,
-            &mut self.warnings,
+            self.warnings,
         );
 
         maybe_warn(
             &self.prisma_1_cuid_defaults,
             warnings::warning_default_cuid_warning,
-            &mut self.warnings,
+            self.warnings,
         );
     }
 }
@@ -170,12 +170,12 @@ pub fn calculate_datamodel(
 
     context.version = crate::version_checker::check_prisma_version(&context);
 
-    let (version, data_model, is_empty) = introspect(&mut context)?;
+    let (data_model, is_empty) = introspect(&mut context)?;
 
     Ok(IntrospectionResult {
         data_model,
         is_empty,
+        version: context.version,
         warnings,
-        version,
     })
 }

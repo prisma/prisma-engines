@@ -10,17 +10,14 @@ mod relation_names;
 
 use crate::{
     calculate_datamodel::CalculateDatamodelContext as Context, commenting_out_guardrails::commenting_out_guardrails,
-    version_checker, SqlError,
+    SqlError,
 };
 use datamodel_renderer as render;
-use introspection_connector::Version;
 use psl::{dml, Configuration};
 use sql_schema_describer::SqlSchema;
 
-pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), SqlError> {
+pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> {
     let mut datamodel = dml::Datamodel::new();
-    // Try to identify whether the schema was created by a previous Prisma version.
-    let version = version_checker::check_prisma_version(ctx);
 
     enums::introspect_enums(&mut datamodel, ctx);
     models::introspect_models(&mut datamodel, ctx);
@@ -70,7 +67,7 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(Version, String, bool), S
 
     ctx.finalize_warnings();
 
-    Ok((version, psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
+    Ok((psl::reformat(&rendered, 2).unwrap(), datamodel.is_empty()))
 }
 
 fn render_configuration<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {

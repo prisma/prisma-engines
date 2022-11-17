@@ -12,7 +12,6 @@ use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
     ForeignKeyAction,
 };
-use tracing::debug;
 
 #[derive(Debug)]
 struct VersionChecker {
@@ -96,8 +95,6 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
             version_checker.uses_on_delete(foreign_key);
         }
     }
-
-    debug!("{:?}", &version_checker);
 
     match version_checker.sql_family {
         _ if ctx.schema.is_empty() => Version::NonPrisma,
