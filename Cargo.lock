@@ -1989,6 +1989,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
+ "colored",
  "connection-string",
  "enumflags2",
  "expect-test",
