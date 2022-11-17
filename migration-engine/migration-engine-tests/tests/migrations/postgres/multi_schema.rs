@@ -5,30 +5,85 @@ use migration_core::migration_connector::Namespaces;
 use migration_engine_tests::test_api::*;
 use test_setup::TestApiArgs;
 
+/// Which schema to use during a `SchemaPush`. See `Schema` for more details.
+enum WithSchema {
+    First,
+    Second,
+}
+
+/// Number of executed steps. See `CustomPushStep`.
+enum ExecutedSteps {
+    NonZero,
+    Zero,
+}
+
+/// Represents the schemas we use during a `SchemaPush`.
+///
+/// Currently, the tests here have at most two schema push steps with different schemas, and at
+/// least one.
+///
+/// In the case of `WithSchema::First`, the schema used would be the concatenation of `common` and
+/// `first.
+///
+/// In the case of `WithSchema::Second`, the schema used would be the concatenation of `common` and
+/// `second`.
 struct Schema {
     common: String,
     first: String,
     second: Option<String>,
 }
 
+/// Used for `PushCustomAnd` for naming and disambiguation, represents a schema push step with
+/// custom warnings, errors, etc.
+struct CustomPushStep {
+    warnings: &'static [&'static str],
+    errors: &'static [&'static str],
+    with_schema: WithSchema,
+    executed_steps: ExecutedSteps,
+    next: &'static SchemaPush,
+}
+
+/// This encapsulates setting up the database for the test, using a schema. It also potentially
+/// runs multiple sequential updates.
+///
+/// This is essentially an ordered (linked) list of steps. Each step has a continuation except
+/// `Done`, which is the list terminator.
+///
+/// There is currently a single way to interpret, via `run_schema_step`.
 enum SchemaPush {
-    PushAnd(bool, &'static SchemaPush),
-    PushCustomAnd(&'static [&'static str], &'static [&'static str], bool, bool, &'static SchemaPush),
+    /// Push the first or second schema and expect there are execution steps and no
+    /// warnings/errors.
+    PushAnd(WithSchema, &'static SchemaPush),
+    /// Push with custom properties (warnings, errors, etc.).
+    PushCustomAnd(CustomPushStep),
+    /// Run a raw SQL command.
     RawCmdAnd(&'static str, &'static SchemaPush),
+    /// Perform a (soft) reset.
     Reset(bool, &'static SchemaPush),
+    /// List terminator.
     Done,
 }
 
+/// Represents a single test to be executed.
 struct TestData {
+    /// Name of the test.
     name: &'static str,
+    /// Description of the test; should add some context and more details.
     description: &'static str,
+    /// The schemas used in `SchemaPush`.
     schema: Schema,
+    /// Namespaces that will be checked and must exist after running the push.
     namespaces: &'static [&'static str],
+    /// Database setup through schema pushing, see `SchemaPush`.
     schema_push: SchemaPush,
+    /// The assertion about tables, enums, etc.
     assertion: Box<dyn Fn(SchemaAssertion) -> ()>,
+    /// Should we skip this test? None for yes, Some("reason") otherwise.
     skip: Option<String>,
 }
 
+// This is the only "top" level test in this module. It defines a list of tests and executes them.
+// If you want to look at the tests, see the `tests` variable below.
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
@@ -36,7 +91,7 @@ struct TestData {
     namespaces("one", "two")
 )]
 fn multi_schema_tests(_api: TestApi) {
-    let namespaces : &'static [&'static str] = &["one", "two"];
+    let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
         datasource db {
           provider   = "postgresql"
@@ -68,7 +123,7 @@ fn multi_schema_tests(_api: TestApi) {
                 second: None,
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::Done),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
                 assert.assert_has_table("First").assert_has_table("Second");
             }),
@@ -92,9 +147,14 @@ fn multi_schema_tests(_api: TestApi) {
                 second: None,
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true,
-                           &SchemaPush::PushCustomAnd(&[], &[], true, false,
-                             &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                           warnings: &[],
+                           errors: &[],
+                           with_schema: WithSchema::First,
+                           executed_steps: ExecutedSteps::Zero,
+                           next: &SchemaPush::Done,
+                           })),
             assertion: Box::new(|assert| {
                 assert.assert_has_table("First").assert_has_table("Second");
             }),
@@ -124,7 +184,7 @@ fn multi_schema_tests(_api: TestApi) {
                 ),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -150,7 +210,7 @@ fn multi_schema_tests(_api: TestApi) {
                 second: Some(" ".into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -181,9 +241,9 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, 'some value');",
-                             &SchemaPush::PushAnd(false, &SchemaPush::Done))),
+                             &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done))),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -214,10 +274,15 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, NULL);",
-                             &SchemaPush::PushCustomAnd(&[], &["Made the column `name` on table `Second` required, but there are 1 existing NULL values."], false, false,
-                               &SchemaPush::Done))),
+                             &SchemaPush::PushCustomAnd(CustomPushStep {
+                                 warnings: &[],
+                                 errors: &["Made the column `name` on table `Second` required, but there are 1 existing NULL values."],
+                                 with_schema: WithSchema::Second,
+                                 executed_steps: ExecutedSteps::Zero,
+                                 next: &SchemaPush::Done,
+                             }))),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -247,7 +312,7 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -278,7 +343,7 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -309,7 +374,7 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -342,7 +407,7 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -373,9 +438,14 @@ fn multi_schema_tests(_api: TestApi) {
         }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true,
-                           &SchemaPush::PushCustomAnd(&["A unique constraint covering the columns `[name]` on the table `Second` will be added. If there are existing duplicate values, this will fail."], &[], false, false,
-                             &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["A unique constraint covering the columns `[name]` on the table `Second` will be added. If there are existing duplicate values, this will fail."] ,
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                               next: &SchemaPush::Done,
+                           })),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -402,7 +472,7 @@ fn multi_schema_tests(_api: TestApi) {
                 second: Some( indoc! {r#""#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -438,7 +508,7 @@ fn multi_schema_tests(_api: TestApi) {
         } "#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -470,7 +540,7 @@ fn multi_schema_tests(_api: TestApi) {
         } "#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -492,7 +562,7 @@ fn multi_schema_tests(_api: TestApi) {
                 second: None,
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("CREATE VIEW \"two\".\"Test\" (id, name) as SELECT id, name FROM \"one\".\"First\"",
                              &SchemaPush::Reset(true,
                                &SchemaPush::Done))),
@@ -521,7 +591,7 @@ fn multi_schema_tests(_api: TestApi) {
       }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
             }),
@@ -546,7 +616,7 @@ fn multi_schema_tests(_api: TestApi) {
       }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(true, &SchemaPush::PushAnd(false, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
             }),
@@ -560,6 +630,7 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
+// Run a single test: create a new TestApi context, run the schema pushing, execute assertions.
 fn run_test(test: &mut TestData) {
     let api_args = TestApiArgs::new("test", &["multiSchema"], &["one", "two"]);
     let mut api = TestApi::new(api_args);
@@ -576,17 +647,16 @@ fn run_test(test: &mut TestData) {
     (test.assertion)(assertion)
 }
 
+// Recursively run schema steps.
 fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namespaces>, step: &SchemaPush) {
-    let first = test.schema.common.to_owned() + test.schema.first.as_str();
     match step {
-        SchemaPush::PushAnd(is_first, next) => {
-            let schema = if *is_first {
-                first
-            } else {
-                match &test.schema.second {
+        SchemaPush::PushAnd(first_or_second, next) => {
+            let schema = match first_or_second {
+                WithSchema::First => test.schema.common.to_owned() + test.schema.first.as_str(),
+                WithSchema::Second => match &test.schema.second {
                     Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
                     None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
-                }
+                },
             };
             api.schema_push(schema)
                 .send()
@@ -594,42 +664,55 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
                 .with_description(String::from(test.description))
                 .assert_green()
                 .assert_has_executed_steps();
+
             run_schema_step(api, test, namespaces, next);
         }
-        SchemaPush::PushCustomAnd(warnings, unexecutable, is_first, has_steps, next) => {
-            let schema = if *is_first {
-                first
-            } else {
-                match &test.schema.second {
+
+        SchemaPush::PushCustomAnd(CustomPushStep {
+            warnings,
+            errors,
+            with_schema,
+            executed_steps,
+            next,
+        }) => {
+            let schema = match with_schema {
+                WithSchema::First => test.schema.common.to_owned() + test.schema.first.as_str(),
+                WithSchema::Second => match &test.schema.second {
                     Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
                     None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
-                }
+                },
             };
+
             let warnings: Vec<Cow<str>> = warnings.iter().map(|s| (*s).into()).collect();
-            let unexecutables: Vec<String> = unexecutable.iter().map(|s| String::from(*s)).collect();
+            let unexecutables: Vec<String> = errors.iter().map(|s| String::from(*s)).collect();
+
             let assert = api
                 .schema_push(schema)
+                .force(true)
                 .send()
                 .with_context(String::from(test.name))
                 .with_description(String::from(test.description))
                 .assert_warnings(warnings.as_slice())
                 .assert_unexecutable(unexecutables.as_slice());
-            if *has_steps {
-                assert.assert_has_executed_steps();
-            } else {
-                assert.assert_no_steps();
-            }
+
+            match executed_steps {
+                ExecutedSteps::NonZero => assert.assert_has_executed_steps(),
+                ExecutedSteps::Zero => assert.assert_no_steps(),
+            };
+
             run_schema_step(api, test, namespaces, next);
         }
+
         SchemaPush::RawCmdAnd(cmd, next) => {
             api.raw_cmd(cmd);
             run_schema_step(api, test, namespaces, next);
         }
+
         SchemaPush::Reset(soft, next) => {
             api.reset().soft(*soft).send_sync(namespaces.clone());
             run_schema_step(api, test, namespaces, next);
         }
+
         SchemaPush::Done => {}
     };
 }
-
