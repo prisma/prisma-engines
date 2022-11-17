@@ -423,9 +423,9 @@ async fn northwind(api: TestApi) {
           notes                String?
           reports_to           Int?                   @db.Int2
           photo_path           String?                @db.String(255)
-          employees            employees?             @relation(fields: [reports_to], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employees_employees")
+          employees            employees?             @relation("employeesToemployees", fields: [reports_to], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employees_employees")
           employee_territories employee_territories[]
-          other_employees      employees[]
+          other_employees      employees[]            @relation("employeesToemployees")
           orders               orders[]
         }
 
