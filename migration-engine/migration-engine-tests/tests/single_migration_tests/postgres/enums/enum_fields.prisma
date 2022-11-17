@@ -1,0 +1,51 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource mydb {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model MyTable {
+    id Int @id
+    a Activity @default(SLEEPING)
+    k Kind? @default(error)
+    r Result @default(succeeded)
+}
+
+enum Result {
+  succeeded
+  failed
+}
+
+enum Activity {
+  DANCING
+  SLEEPING
+  READING
+}
+
+enum Kind {
+  info
+  warning
+  error
+}
+
+// Expected Migration:
+// -- CreateEnum
+// CREATE TYPE "Result" AS ENUM ('succeeded', 'failed');
+// 
+// -- CreateEnum
+// CREATE TYPE "Activity" AS ENUM ('DANCING', 'SLEEPING', 'READING');
+// 
+// -- CreateEnum
+// CREATE TYPE "Kind" AS ENUM ('info', 'warning', 'error');
+// 
+// -- CreateTable
+// CREATE TABLE "MyTable" (
+//     "id" INTEGER NOT NULL,
+//     "a" "Activity" NOT NULL DEFAULT 'SLEEPING',
+//     "k" "Kind" DEFAULT 'error',
+//     "r" "Result" NOT NULL DEFAULT 'succeeded',
+// 
+//     CONSTRAINT "MyTable_pkey" PRIMARY KEY ("id")
+// );

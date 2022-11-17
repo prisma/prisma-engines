@@ -4,25 +4,29 @@ use either::Either;
 use psl::{
     builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
-    parser_database::{walkers::*, IndexAlgorithm, OperatorClass},
+    parser_database::{IndexAlgorithm, OperatorClass},
 };
 use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
-    fn calculate_enums(&self, ctx: &Context<'_>) -> Vec<sql::Enum> {
-        ctx.datamodel
-            .db
-            .walk_enums()
-            .map(|r#enum| sql::Enum {
-                namespace_id: r#enum
-                    .schema()
-                    .map(|(schema, _)| ctx.schemas[schema])
-                    .unwrap_or_default(),
-                name: r#enum.database_name().to_owned(),
-                values: r#enum.values().map(|val| val.database_name().to_owned()).collect(),
-            })
-            .collect()
+    fn calculate_enums(&self, ctx: &mut Context<'_>) {
+        for prisma_enum in ctx.datamodel.db.walk_enums() {
+            let sql_namespace_id: sql::NamespaceId = prisma_enum
+                .schema()
+                .and_then(|(name, _)| ctx.schemas.get(name).cloned())
+                .unwrap_or_default();
+            let sql_enum_id = ctx
+                .schema
+                .describer_schema
+                .push_enum(sql_namespace_id, prisma_enum.database_name().to_owned());
+            ctx.enum_ids.insert(prisma_enum.id, sql_enum_id);
+
+            for value in prisma_enum.values() {
+                let value_name = value.database_name().to_owned();
+                ctx.schema.describer_schema.push_enum_variant(sql_enum_id, value_name);
+            }
+        }
     }
 
     fn column_default_value_for_autoincrement(&self) -> Option<sql::DefaultValue> {
@@ -31,12 +35,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         } else {
             Some(sql::DefaultValue::sequence(""))
         }
-    }
-
-    fn enum_column_type(&self, field: ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {
-        let arity = super::super::column_arity(field.ast_field().arity);
-
-        sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity)
     }
 
     fn push_connector_data(&self, context: &mut super::super::Context<'_>) {

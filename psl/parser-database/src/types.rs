@@ -355,20 +355,15 @@ impl Default for IndexAlgorithm {
 }
 
 /// The different types of indexes supported in the Prisma Schema Language.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum IndexType {
     /// @@index
+    #[default]
     Normal,
     /// @(@)unique
     Unique,
     /// @(@)fulltext
     Fulltext,
-}
-
-impl Default for IndexType {
-    fn default() -> Self {
-        Self::Normal
-    }
 }
 
 #[derive(Debug, Default)]

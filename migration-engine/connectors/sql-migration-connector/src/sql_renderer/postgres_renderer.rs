@@ -10,7 +10,10 @@ use crate::{
 };
 use psl::builtin_connectors::{CockroachType, PostgresType};
 use psl::dml::PrismaValue;
-use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
+use sql_ddl::{
+    postgres::{self as ddl, PostgresIdentifier},
+    IndexColumn, SortOrder,
+};
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
     walkers::*,
@@ -193,7 +196,8 @@ impl SqlRenderer for PostgresFlavour {
                 render_cockroach_alter_enum(alter_enum, schemas, step);
             })
         } else {
-            render_postgres_alter_enum(alter_enum, schemas)
+            let flavour = self;
+            render_postgres_alter_enum(alter_enum, schemas, flavour)
         }
     }
 
@@ -218,8 +222,13 @@ impl SqlRenderer for PostgresFlavour {
     fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
+                let previous_table = indexes.previous.table();
+                let index_previous_name = match previous_table.namespace() {
+                    Some(ns) => format!("{}.{}", self.quote(ns), self.quote(indexes.previous.name())),
+                    None => self.quote(indexes.previous.name()).to_string(),
+                };
                 stmt.push_str("ALTER INDEX ");
-                stmt.push_display(&Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(&index_previous_name);
                 stmt.push_str(" RENAME TO ");
                 stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
             })
@@ -317,7 +326,10 @@ impl SqlRenderer for PostgresFlavour {
         } else {
             let alter_table = format!(
                 "ALTER TABLE {} {}",
-                self.quote(tables.previous.name()),
+                TableName::new(
+                    tables.previous.namespace().map(|ns| self.quote(ns)),
+                    self.quote(tables.previous.name())
+                ),
                 lines.join(",\n")
             );
 
@@ -338,7 +350,7 @@ impl SqlRenderer for PostgresFlavour {
                     Quoted::postgres_ident(enm.name()),
                 ));
                 stmt.push_str(" AS ENUM (");
-                let mut values = enm.values().iter().peekable();
+                let mut values = enm.values().peekable();
                 while let Some(value) = values.next() {
                     stmt.push_display(&Quoted::postgres_string(value));
                     if values.peek().is_some() {
@@ -421,7 +433,10 @@ impl SqlRenderer for PostgresFlavour {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropType {
-                    type_name: dropped_enum.name().into(),
+                    type_name: match dropped_enum.namespace() {
+                        Some(ns) => PostgresIdentifier::WithSchema(ns.into(), dropped_enum.name().into()),
+                        None => dropped_enum.name().into(),
+                    },
                 })
             })
         })
@@ -430,23 +445,32 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote(foreign_key.table().name()),
+            table = match foreign_key.table().namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
+                None => foreign_key.table().name().into(),
+            },
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
     fn render_drop_index(&self, index: IndexWalker<'_>) -> String {
         ddl::DropIndex {
-            index_name: index.name().into(),
+            index_name: match index.table().namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
+                None => index.name().into(),
+            },
         }
         .to_string()
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::DropTable {
-                    table_name: table_name.into(),
+                    table_name: match namespace {
+                        Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), table_name.into()),
+                        None => table_name.into(),
+                    },
                     cascade: false,
                 })
             })
@@ -455,7 +479,10 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
         ddl::DropView {
-            view_name: view.name().into(),
+            view_name: match view.namespace() {
+                Some(namespace) => PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
+                None => view.name().into(),
+            },
         }
         .to_string()
     }
@@ -468,6 +495,8 @@ impl SqlRenderer for PostgresFlavour {
             let temporary_table_name = format!("_prisma_new_{}", &tables.next.name());
             result.push(self.render_create_table_as(
                 tables.next,
+                // TODO(MultiSchema): This only matters for CockroachDB, which is not currently
+                // supported by MultiSchema.
                 TableName(None, Quoted::postgres_ident(&temporary_table_name)),
             ));
 
@@ -598,7 +627,7 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     };
 
     if t.arity.is_list() {
-        format!("{}[]", tpe.to_owned()).into()
+        format!("{tpe}[]").into()
     } else {
         tpe
     }
@@ -639,7 +668,7 @@ fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
     };
 
     if t.arity.is_list() {
-        format!("{}[]", tpe.to_owned()).into()
+        format!("{tpe}[]").into()
     } else {
         tpe
     }
@@ -874,7 +903,11 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
     }
 }
 
-fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String> {
+fn render_postgres_alter_enum(
+    alter_enum: &AlterEnum,
+    schemas: Pair<&SqlSchema>,
+    flavour: &PostgresFlavour,
+) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
         let mut stmts: Vec<String> = alter_enum
             .created_variants
@@ -882,7 +915,13 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = Quoted::postgres_ident(schemas.walk(alter_enum.id).previous.name()),
+                    enum_name = match schemas.walk(alter_enum.id).previous.namespace() {
+                        Some(namespace) => PostgresIdentifier::WithSchema(
+                            namespace.into(),
+                            schemas.walk(alter_enum.id).previous.name().into()
+                        ),
+                        None => schemas.walk(alter_enum.id).previous.name().into(),
+                    },
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -919,7 +958,7 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
         let create_new_enum = format!(
             "CREATE TYPE {enum_name} AS ENUM ({variants})",
             enum_name = Quoted::postgres_ident(&tmp_name),
-            variants = enums.next.values().iter().map(Quoted::postgres_string).join(", ")
+            variants = enums.next.values().map(Quoted::postgres_string).join(", ")
         );
 
         stmts.push(create_new_enum);
@@ -942,7 +981,9 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
 
     // Alter type of the current columns to new, with a cast
     {
-        let affected_columns = schemas.next.walk_columns().filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next.name()));
+        let affected_columns = schemas.next.walk_columns().filter(
+            |column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(id) if *id == enums.next.id),
+        );
 
         for column in affected_columns {
             let array = if column.arity().is_list() { "[]" } else { "" };
@@ -986,7 +1027,10 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
     // Drop old enum
     {
         let sql = ddl::DropType {
-            type_name: tmp_old_name.as_str().into(),
+            type_name: match enums.previous.namespace() {
+                Some(ns) => PostgresIdentifier::WithSchema(ns.into(), tmp_old_name.as_str().into()),
+                None => tmp_old_name.as_str().into(),
+            },
         }
         .to_string();
 
@@ -995,26 +1039,22 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>)
 
     // Reinstall dropped defaults that need to be reinstalled
     {
-        for (prev_colidx, next_colidx) in alter_enum
+        for (columns, next_default) in alter_enum
             .previous_usages_as_default
             .iter()
-            .filter_map(|(prev, next)| next.map(|next| (prev, next)))
+            .filter_map(|(prev, next)| next.map(|next| schemas.walk(Pair::new(*prev, next))))
+            .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
-            let columns = schemas.walk(Pair::new(*prev_colidx, next_colidx));
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
-            let default_str = columns
-                    .next
-                    .default()
-                    .and_then(|default| default.as_value())
-                    .and_then(|value| value.as_enum_value())
-                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
+            let data_type = render_column_type(columns.next, flavour);
+            let default_str = render_default(next_default, &data_type);
 
             let set_default = format!(
-                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
+                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}",
                 table_name = Quoted::postgres_ident(&table_name),
                 column_name = Quoted::postgres_ident(&column_name),
-                default = escape_string_literal(default_str),
+                default = default_str,
             );
 
             stmts.push(set_default);
@@ -1044,7 +1084,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>
                 .and_then(|v| v.as_enum_value())
                 .map(|value| (col, value))
         })
-        .filter(|(_, value)| !enums.next.values().iter().any(|v| v == value));
+        .filter(|(_, value)| !enums.next.values().any(|v| v == *value));
 
     for (col, _) in defaults_to_drop {
         renderer.render_statement(&mut |stmt| {

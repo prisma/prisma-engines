@@ -14,7 +14,7 @@ fn main() {
 
     for schema_path in &all_schemas {
         let test_name = schema_path.trim_start_matches('/').trim_end_matches(".prisma");
-        let test_name = test_name.replace(&['/', '\\'], "_");
+        let test_name = test_name.replace(['/', '\\'], "_");
         let file_path = schema_path.trim_start_matches('/');
         writeln!(
             out_file,

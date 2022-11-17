@@ -6,7 +6,7 @@ use crate::SqlFlavour;
 use connection_string::JdbcString;
 use indoc::formatdoc;
 use migration_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::SqlSchema;
@@ -82,7 +82,7 @@ impl SqlFlavour for MssqlFlavour {
         psl::builtin_connectors::MSSQL
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, connection| async move {
             connection.describe_schema(params).await
         })
@@ -355,10 +355,24 @@ impl SqlFlavour for MssqlFlavour {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        match &mut self.state {
+            super::State::Initial => {
+                if !preview_features.is_empty() {
+                    tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+                }
+            }
+            super::State::WithParams(params) | super::State::Connected(params, _) => {
+                params.connector_params.preview_features = preview_features
+            }
+        }
+    }
+
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
             self.state
@@ -389,7 +403,7 @@ impl SqlFlavour for MssqlFlavour {
                 shadow_database.ensure_connection_validity().await?;
 
                 if shadow_database.reset().await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database).await?;
+                    crate::best_effort_reset(&mut shadow_database, namespaces).await?;
                 }
 
                 match self.state.params().map(|p| p.url.schema()) {

@@ -331,7 +331,7 @@ impl SqlRenderer for MssqlFlavour {
             }
 
             // Drop the old, now empty table.
-            result.extend(self.render_drop_table(tables.previous.name()));
+            result.extend(self.render_drop_table(None, tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
             result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
@@ -394,7 +394,7 @@ impl SqlRenderer for MssqlFlavour {
         add_constraint
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
         vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 

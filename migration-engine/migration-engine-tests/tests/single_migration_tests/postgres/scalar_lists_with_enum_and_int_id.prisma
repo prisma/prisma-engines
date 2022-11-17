@@ -1,0 +1,30 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model A {
+    id Int @id
+    strings String[]
+    enums Status[]
+}
+
+enum Status {
+    OK
+    ERROR
+}
+// Expected Migration:
+// -- CreateEnum
+// CREATE TYPE "Status" AS ENUM ('OK', 'ERROR');
+// 
+// -- CreateTable
+// CREATE TABLE "A" (
+//     "id" INTEGER NOT NULL,
+//     "strings" TEXT[],
+//     "enums" "Status"[],
+// 
+//     CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+// );

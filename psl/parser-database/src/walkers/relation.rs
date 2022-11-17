@@ -17,12 +17,22 @@ impl<'db> RelationWalker<'db> {
     /// gathering 1:1 and 1:n relations.
     pub fn refine(self) -> RefinedRelationWalker<'db> {
         if self.get().is_implicit_many_to_many() {
-            RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker(self))
+            RefinedRelationWalker::ImplicitManyToMany(self.db.walk(ManyToManyRelationId(self.id)))
         } else if self.get().is_two_way_embedded_many_to_many() {
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(TwoWayEmbeddedManyToManyRelationWalker(self))
         } else {
             RefinedRelationWalker::Inline(InlineRelationWalker(self))
         }
+    }
+
+    /// The relation name in the schema.
+    ///
+    /// ```ignore
+    /// myField OtherModel @relation("thisModelToOtherModel", fields: [fkfield], references: [id])
+    /// //                           ^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.get().relation_name.map(|string_id| &self.db[string_id])
     }
 
     pub(crate) fn has_field(self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {

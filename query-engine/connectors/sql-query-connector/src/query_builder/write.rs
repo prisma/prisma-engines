@@ -100,10 +100,11 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: O
 
 pub fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
+    let table = model.as_table();
     let query = args
         .args
         .into_iter()
-        .fold(Update::table(model.as_table()), |acc, (field_name, val)| {
+        .fold(Update::table(table.clone()), |acc, (field_name, val)| {
             let DatasourceFieldName(name) = field_name;
             let field = scalar_fields
                 .iter()
@@ -124,22 +125,22 @@ pub fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trace_id: O
                     e.compare_raw("||", Value::array(vals)).into()
                 }
                 ScalarWriteOperation::Add(rhs) => {
-                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
                     e + field.value(rhs).into()
                 }
 
                 ScalarWriteOperation::Substract(rhs) => {
-                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
                     e - field.value(rhs).into()
                 }
 
                 ScalarWriteOperation::Multiply(rhs) => {
-                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
                     e * field.value(rhs).into()
                 }
 
                 ScalarWriteOperation::Divide(rhs) => {
-                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
                     e / field.value(rhs).into()
                 }
 

@@ -8,14 +8,17 @@ mod destructive_change_checker;
 mod diff;
 mod error;
 mod migration_persistence;
+mod namespaces;
 
 pub mod migrations_directory;
 
+pub use crate::namespaces::Namespaces;
 pub use connector_params::ConnectorParams;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
 pub use diff::DiffTarget;
+use enumflags2::BitFlags;
 pub use error::{ConnectorError, ConnectorResult};
 pub use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
@@ -57,6 +60,11 @@ impl DatabaseSchema {
     pub fn downcast<T: 'static>(self) -> Box<T> {
         self.0.downcast().unwrap()
     }
+
+    /// Should never be used in the core, only in connectors that know what they put there.
+    pub fn downcast_ref<T: 'static>(&self) -> &T {
+        self.0.downcast_ref().unwrap()
+    }
 }
 
 /// An abstract host for a migration connector. It exposes IO that is not directly performed by the
@@ -90,6 +98,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// connector.
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()>;
 
+    /// Accept a new set of enabled preview features.
+    fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
+
     // Connector methods
 
     /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
@@ -115,9 +126,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Send a command to the database directly.
     fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>>;
 
-    /// Create a migration by comparing two database schemas. See
-    /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
-    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration>;
+    /// Create a migration by comparing two database schemas.
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration;
 
     /// Drop the database referenced by Prisma schema that was used to initialize the connector.
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
@@ -150,7 +160,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     ///
     /// Set the `soft` parameter to `true` to force a soft-reset, that is to say a reset that does
     /// not drop the database.
-    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
@@ -185,21 +195,29 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Read a schema for diffing. The shadow database connection string is strictly optional, you
     /// don't need to pass it if a shadow database url was passed in params, or if it can be
     /// inferred from context, or if it isn't necessary for the task at hand.
+    /// When MultiSchema is enabled, the namespaces are required for diffing anything other than a
+    /// prisma schema, because that information is otherwise unavailable.
     fn database_schema_from_diff_target<'a>(
         &'a mut self,
         target: DiffTarget<'a>,
         shadow_database_connection_string: Option<String>,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// In-tro-spec-shon.
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a introspection_connector::IntrospectionContext,
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<introspection_connector::IntrospectionResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(
         &'a mut self,
         _migrations: &'a [MigrationDirectory],
+        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>>;
+
+    /// Extract the namespaces from a Sql database schema (it will return None for mongodb).
+    fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces>;
 }

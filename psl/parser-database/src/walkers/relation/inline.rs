@@ -26,12 +26,12 @@ impl<'db> InlineRelationWalker<'db> {
 
     /// The model which holds the relation arguments.
     pub fn referencing_model(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_a)
+        self.0.db.walk(self.get().model_a)
     }
 
     /// The model referenced and which hold the back-relation field.
     pub fn referenced_model(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_b)
+        self.0.db.walk(self.get().model_b)
     }
 
     /// If the relation is defined from both sides, convert to an explicit relation
@@ -111,12 +111,25 @@ impl<'db> InlineRelationWalker<'db> {
         }
     }
 
+    /// The unique identifier of the relation.
+    pub fn relation_id(self) -> crate::RelationId {
+        self.0.id
+    }
+
+    /// The relation name in the schema.
+    ///
+    /// ```ignore
+    /// myField OtherModel @relation("thisModelToOtherModel", fields: [fkfield], references: [id])
+    /// //                           ^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.0.explicit_relation_name()
+    }
+
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
     pub fn relation_name(self) -> RelationName<'db> {
-        self.get()
-            .relation_name
-            .map(|string_id| &self.0.db[string_id])
+        self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.referencing_model().name(), self.referenced_model().name()))
     }

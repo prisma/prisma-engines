@@ -1,10 +1,13 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection};
+use connector::{
+    self, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
+};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
 use std::collections::HashMap;
+use user_facing_errors::KnownError;
 
 pub fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
@@ -62,6 +65,8 @@ fn read_one(
                 .into())
             }
 
+            None if query.options.contains(QueryOption::ThrowOnEmpty) => record_not_found(),
+
             None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -88,50 +93,46 @@ fn read_many(
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let fut = async move {
-        let (scalars, aggregation_rows) = if query.args.requires_inmemory_processing() {
-            let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
-            let scalars = tx
-                .get_many_records(
-                    &query.model,
-                    query.args.clone(),
-                    &query.selected_fields,
-                    &query.aggregation_selections,
-                    trace_id,
-                )
-                .await?;
-            let scalars = processor.apply(scalars);
-            let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+    let processor = if query.args.requires_inmemory_processing() {
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
+    } else {
+        None
+    };
 
-            (scalars, aggregation_rows)
+    let fut = async move {
+        let scalars = tx
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields,
+                &query.aggregation_selections,
+                trace_id,
+            )
+            .await?;
+
+        let scalars = if let Some(p) = processor {
+            p.apply(scalars)
         } else {
-            let scalars = tx
-                .get_many_records(
-                    &query.model,
-                    query.args.clone(),
-                    &query.selected_fields,
-                    &query.aggregation_selections,
-                    trace_id,
-                )
-                .await?;
-            let (scalars, aggregation_rows) =
-                extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-            (scalars, aggregation_rows)
+            scalars
         };
 
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
-        Ok(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            scalars,
-            nested,
-            query_arguments: query.args,
-            model: query.model,
-            aggregation_rows,
+        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+            record_not_found()
+        } else {
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+            Ok(RecordSelection {
+                name: query.name,
+                fields: query.selection_order,
+                scalars,
+                nested,
+                query_arguments: query.args,
+                model: query.model,
+                aggregation_rows,
+            }
+            .into())
         }
-        .into())
     };
 
     fut.boxed()
@@ -165,7 +166,6 @@ fn read_related<'conn>(
             )
             .await?
         };
-
         let model = query.parent_field.related_model();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
@@ -287,4 +287,18 @@ pub fn extract_aggregation_rows_from_scalars(
     }
 
     (scalars, Some(aggregation_rows))
+}
+
+// Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error
+#[inline]
+fn record_not_found() -> InterpretationResult<QueryResult> {
+    Err(ConnectorError {
+        user_facing_error: Some(KnownError::new(
+            user_facing_errors::query_engine::RecordRequiredButNotFound {
+                cause: "Expected a record, found none.".to_owned(),
+            },
+        )),
+        kind: connector::error::ErrorKind::RecordDoesNotExist,
+    }
+    .into())
 }

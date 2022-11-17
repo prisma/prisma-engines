@@ -1,16 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-  "introspection-engine/connectors/introspection-connector",
-  "introspection-engine/connectors/sql-introspection-connector",
-  "introspection-engine/connectors/mongodb-introspection-connector",
+  "introspection-engine/connectors/*",
   "introspection-engine/core",
   "introspection-engine/datamodel-renderer",
   "introspection-engine/introspection-engine-tests",
   "migration-engine/cli",
-  "migration-engine/connectors/migration-connector",
-  "migration-engine/connectors/sql-migration-connector",
-  "migration-engine/connectors/mongodb-migration-connector",
+  "migration-engine/connectors/*",
   "migration-engine/core",
   "migration-engine/json-rpc-api-build",
   "migration-engine/migration-engine-tests",
@@ -57,9 +53,6 @@ features = [
   "sqlite",
   "uuid",
 ]
-
-[profile.dev]
-split-debuginfo = "unpacked"
 
 [profile.dev.package.backtrace]
 opt-level = 3

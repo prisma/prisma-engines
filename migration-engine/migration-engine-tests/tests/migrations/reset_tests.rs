@@ -15,7 +15,7 @@ fn reset_works(api: TestApi) {
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send_sync();
+    api.reset().send_sync(None);
 
     api.assert_schema().assert_tables_count(0);
 
@@ -46,7 +46,7 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send_sync();
+    api.reset().send_sync(None);
 
     api.assert_schema().assert_tables_count(0);
 
@@ -80,7 +80,7 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
 
     api.insert("Cat").value("id", 1).value("name", "Garfield").result_raw();
 
-    api.reset().send_sync();
+    api.reset().send_sync(None);
 
     api.assert_schema().assert_tables_count(0);
 

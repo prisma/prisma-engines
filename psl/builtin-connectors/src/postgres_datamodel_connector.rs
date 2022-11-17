@@ -58,6 +58,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::SupportsTxIsolationReadCommitted,
     ConnectorCapability::SupportsTxIsolationRepeatableRead,
     ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
 pub struct PostgresDatamodelConnector;

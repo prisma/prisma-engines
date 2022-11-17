@@ -1,6 +1,6 @@
 use expect_test::expect;
 use quaint::connector::rusqlite;
-use test_setup::runtime::run_with_tokio as tok;
+use test_setup::runtime::run_with_thread_local_runtime as tok;
 
 #[test]
 fn introspect_force_with_invalid_schema() {

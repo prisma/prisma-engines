@@ -440,9 +440,13 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         Ok(self.get_databases().await?)
     }
 
+    // TODO(MultiSchema): this going to provide wrong results with respect to MultiSchema,
+    // but this function does not seem to be called all that much. Should probably look into
+    // either updating or removing it.
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
-        sql_schema.push_namespace((*schema).into());
+
+        self.get_namespaces(&mut sql_schema, &[schema]).await?;
 
         let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
@@ -457,9 +461,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let mut sql_schema = SqlSchema::default();
         let mut pg_ext = PostgresSchemaExt::default();
 
-        for schema in schemas {
-            sql_schema.push_namespace((*schema).into());
-        }
+        self.get_namespaces(&mut sql_schema, schemas).await?;
 
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
         let table_names = self.get_table_names(&mut sql_schema).await?;
@@ -576,13 +578,32 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows.into_iter() {
             procedures.push(Procedure {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
         }
 
         sql_schema.procedures = procedures;
+
+        Ok(())
+    }
+
+    async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
+        let sql = include_str!("postgres/namespaces_query.sql");
+
+        let rows = self
+            .conn
+            .query_raw(sql, &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))])
+            .await?;
+
+        let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
+
+        for namespace in names {
+            sql_schema.push_namespace(namespace);
+        }
 
         Ok(())
     }
@@ -608,7 +629,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace));
+            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
             map.insert((namespace, cloned_name), id);
         }
 
@@ -651,7 +672,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in result_set.into_iter() {
             views.push(View {
-                namespace_id: sql_schema.get_namespace_id(&row.get_expect_string("namespace")),
+                namespace_id: sql_schema
+                    .get_namespace_id(&row.get_expect_string("namespace"))
+                    .unwrap(),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
@@ -734,9 +757,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     .circumstances
                     .contains(Circumstances::CockroachWithPostgresNativeTypes)
             {
-                get_column_type_cockroachdb(&col, &sql_schema.enums)
+                get_column_type_cockroachdb(&col, sql_schema)
             } else {
-                get_column_type_postgresql(&col, &sql_schema.enums)
+                get_column_type_postgresql(&col, sql_schema)
             };
             let default = col
                 .get("column_default")
@@ -1143,7 +1166,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
-            namespace_id: sql_schema.get_namespace_id(&seq.get_expect_string("namespace")),
+            namespace_id: sql_schema
+                .get_namespace_id(&seq.get_expect_string("namespace"))
+                .unwrap(),
             name: seq.get_expect_string("sequence_name"),
             start_value: seq.get_expect_i64("start_value"),
             min_value: seq.get_expect_i64("min_value"),
@@ -1176,35 +1201,29 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut enum_values: BTreeMap<(String, String), Vec<String>> = BTreeMap::new();
+        let mut enum_values: BTreeMap<(NamespaceId, String), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
-            trace!("Got enum row: {:?}", row);
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
             let namespace = row.get_expect_string("namespace");
-
-            let values = enum_values.entry((name, namespace)).or_insert_with(Vec::new);
+            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
+            let values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
             values.push(value);
         }
 
-        let mut enums: Vec<Enum> = enum_values
-            .into_iter()
-            .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(&namespace),
-                name,
-                values,
-            })
-            .collect();
+        for ((namespace_id, enum_name), variants) in enum_values {
+            let enum_id = sql_schema.push_enum(namespace_id, enum_name);
+            for variant in variants {
+                sql_schema.push_enum_variant(enum_id, variant);
+            }
+        }
 
-        enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
-
-        sql_schema.enums = enums;
         Ok(())
     }
 }
 
-fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1222,12 +1241,14 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
-    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+    let enum_id: Option<_> = match data_type.as_str() {
+        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
+        _ => schema.find_enum(&full_data_type),
+    };
 
     let (family, native_type) = match full_data_type.as_str() {
-        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
-        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
-            (Enum(name.trim_start_matches('_').to_owned()), None)
+        _ if (data_type == "USER-DEFINED" || data_type == "ARRAY") && enum_id.is_some() => {
+            (Enum(enum_id.unwrap()), None)
         }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
@@ -1278,8 +1299,7 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
-        name if enum_exists(name) => (Enum(name.to_owned()), None),
-        _ => unsupported_type(),
+        _ => enum_id.map(|id| (Enum(id), None)).unwrap_or_else(unsupported_type),
     };
 
     ColumnType {
@@ -1291,7 +1311,7 @@ fn get_column_type_postgresql(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 }
 
 // Separate from get_column_type_postgresql because of native types.
-fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
+fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1309,13 +1329,13 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
-    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+    let enum_id: Option<_> = match data_type.as_str() {
+        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
+        _ => schema.find_enum(&full_data_type),
+    };
 
     let (family, native_type) = match full_data_type.as_str() {
-        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
-        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
-            (Enum(name.trim_start_matches('_').to_owned()), None)
-        }
+        _ if data_type == "USER-DEFINED" || data_type == "ARRAY" && enum_id.is_some() => (Enum(enum_id.unwrap()), None),
         "int2" | "_int2" => (Int, Some(CockroachType::Int2)),
         "int4" | "_int4" => (Int, Some(CockroachType::Int4)),
         "int8" | "_int8" => (BigInt, Some(CockroachType::Int8)),
@@ -1362,8 +1382,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "lseg" | "_lseg" => unsupported_type(),
         "path" | "_path" => unsupported_type(),
         "polygon" | "_polygon" => unsupported_type(),
-        name if enum_exists(name) => (Enum(name.to_owned()), None),
-        _ => unsupported_type(),
+        _ => enum_id.map(|id| (Enum(id), None)).unwrap_or_else(unsupported_type),
     };
 
     ColumnType {

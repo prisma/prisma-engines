@@ -10,7 +10,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-                t.add_constraint("sqlite_autoindex_User_1", types::unique_constraint(&["id", "age"]));
+                t.add_constraint("sqlite_autoindex_User_1", types::unique_constraint(["id", "age"]));
             });
 
             migration.create_table("Post", |t| {
@@ -306,7 +306,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                 t.add_column("age", types::integer());
 
                 t.add_index("user_unique", types::index(vec!["id", "age"]).unique(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
@@ -318,7 +318,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
                     "Post_fk",
                     types::foreign_constraint(&["user_id", "user_age"], "User", &["id", "age"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;

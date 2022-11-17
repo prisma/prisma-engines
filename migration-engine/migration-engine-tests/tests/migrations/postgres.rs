@@ -1,10 +1,10 @@
 mod extensions;
+mod multi_schema;
 
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use psl::parser_database::SourceFile;
 use quaint::Value;
-use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
 #[test_connector(tags(Postgres))]
@@ -36,33 +36,6 @@ fn enums_can_be_dropped_on_postgres(api: TestApi) {
 
     api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema().assert_has_no_enum("CatMood");
-}
-
-#[test_connector(capabilities(ScalarLists))]
-fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
-    let dm1 = r#"
-        model A {
-            id Int @id
-            strings String[]
-            enums Status[]
-        }
-
-        enum Status {
-            OK
-            ERROR
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm1).send().assert_green();
-
-    api.assert_schema().assert_table("A", |table| {
-        table
-            .assert_column("strings", |col| col.assert_is_list().assert_type_is_string())
-            .assert_column("enums", |col| {
-                col.assert_type_family(ColumnTypeFamily::Enum("Status".into()))
-                    .assert_is_list()
-            })
-    });
 }
 
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
@@ -411,6 +384,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Database,
         DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        None,
     );
     let expected = expect![[r#"
         -- RenameForeignKey
@@ -447,7 +421,7 @@ fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
         .assert_green();
 
     {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), ["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
@@ -644,6 +618,7 @@ fn scalar_list_default_diffing(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
         DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+        None,
     );
 
     let expected_migration = expect![[r#"

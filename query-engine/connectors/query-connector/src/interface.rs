@@ -1,4 +1,4 @@
-use crate::{coerce_null_to_zero_value, Filter, QueryArguments, WriteArgs};
+use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
 use async_trait::async_trait;
 use dml::FieldArity;
 use prisma_models::*;
@@ -314,6 +314,14 @@ pub trait WriteOperations {
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> crate::Result<Option<SelectionResult>>;
+
+    /// Native upsert
+    /// Use the connectors native upsert to upsert the `Model`
+    async fn native_upsert_record(
+        &mut self,
+        upsert: NativeUpsert,
+        trace_id: Option<String>,
+    ) -> crate::Result<SingleRecord>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(

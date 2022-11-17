@@ -21,18 +21,24 @@ pub async fn create_migration(
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
-    let from = connector
-        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
-        .await?;
+    // We need to start with the 'to', which is the Schema, in order to grab the
+    // namespaces, in case we've got MultiSchema enabled.
     let to = connector
         .database_schema_from_diff_target(
             DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(
                 input.prisma_schema.into_boxed_str(),
             ))),
             None,
+            None,
         )
         .await?;
-    let migration = connector.diff(from, to)?;
+
+    let namespaces = connector.extract_namespaces(&to);
+    // We pass the namespaces here, because we want to describe all of these namespaces.
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None, namespaces)
+        .await?;
+    let migration = connector.diff(from, to);
 
     if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");

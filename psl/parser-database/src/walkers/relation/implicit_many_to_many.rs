@@ -1,29 +1,32 @@
 use crate::{
-    relations::{Relation, RelationAttributes},
-    walkers::{ModelWalker, RelationFieldWalker, RelationName},
+    relations::{ManyToManyRelationId, Relation, RelationAttributes},
+    walkers::{ModelWalker, RelationFieldWalker, RelationName, RelationWalker, Walker},
 };
-
-use super::RelationWalker;
 
 /// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
 /// or referential actions, which are all inferred by Prisma.
-#[derive(Copy, Clone)]
-pub struct ImplicitManyToManyRelationWalker<'db>(pub(crate) RelationWalker<'db>);
+pub type ImplicitManyToManyRelationWalker<'db> = Walker<'db, ManyToManyRelationId>;
 
 impl<'db> ImplicitManyToManyRelationWalker<'db> {
     /// Gets the relation attributes from the AST.
     fn get(&self) -> &'db Relation {
-        &self.0.db.relations[self.0.id]
+        &self.db.relations[self.id.0]
+    }
+
+    /// Is this a many-to-many self-relation?
+    pub fn is_self_relation(self) -> bool {
+        let rel = self.get();
+        rel.model_a == rel.model_b
     }
 
     /// The model which comes first in the alphabetical order.
     pub fn model_a(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_a)
+        self.db.walk(self.get().model_a)
     }
 
     /// The model which comes after model a in the alphabetical order.
     pub fn model_b(self) -> ModelWalker<'db> {
-        self.0.db.walk_model(self.get().model_b)
+        self.db.walk(self.get().model_b)
     }
 
     /// The field that defines the relation in model a.
@@ -40,6 +43,11 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.model_b().relation_field(field_b),
             _ => unreachable!(),
         }
+    }
+
+    /// Traverse this relation as a generic relation.
+    pub fn as_relation(self) -> RelationWalker<'db> {
+        self.db.walk(self.id.0)
     }
 
     /// The name of the relation.

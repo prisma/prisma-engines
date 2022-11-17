@@ -1,18 +1,32 @@
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError, SqlFamilyTrait};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
 use psl::{
+    datamodel_connector::constraint_names::ConstraintNames,
     dml::{
-        Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model, OperatorClass,
-        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
+        FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
+        SortOrder,
     },
-    PreviewFeature, RelationNames,
+    parser_database::{self as db, walkers},
+    schema_ast::ast::WithDocumentation,
+    PreviewFeature,
 };
-use sql::walkers::{ColumnWalker, ForeignKeyWalker, TableWalker};
+use sql::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::{
-    self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, ForeignKeyAction,
-    IndexType, SQLSortOrder, SqlSchema,
+    self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, IndexType,
+    SQLSortOrder, SqlSchema,
 };
-use std::collections::HashSet;
+use std::cmp;
 use tracing::debug;
+
+/// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
+/// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.
+pub(crate) fn compare_options_none_last<T: cmp::Ord>(a: Option<T>, b: Option<T>) -> cmp::Ordering {
+    match (a, b) {
+        (Some(a), Some(b)) => a.cmp(&b),
+        (Some(_), None) => cmp::Ordering::Less,
+        (None, Some(_)) => cmp::Ordering::Greater,
+        (None, None) => cmp::Ordering::Equal,
+    }
+}
 
 pub(crate) fn is_old_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_Migration"
@@ -59,6 +73,10 @@ pub(crate) fn has_created_at_and_updated_at(table: TableWalker<'_>) -> bool {
     });
 
     has_created_at && has_updated_at
+}
+
+pub(crate) fn is_prisma_join_table(t: TableWalker<'_>) -> bool {
+    is_prisma_1_point_0_join_table(t) || is_prisma_1_point_1_or_2_join_table(t)
 }
 
 pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
@@ -123,66 +141,48 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 
 //calculators
 
-pub fn calculate_many_to_many_field(
-    opposite_foreign_key: ForeignKeyWalker<'_>,
-    relation_name: String,
-    is_self_relation: bool,
-) -> RelationField {
-    let relation_info = RelationInfo {
-        name: relation_name,
-        fk_name: None,
-        fields: Vec::new(),
-        referenced_model: opposite_foreign_key.referenced_table_name().to_owned(),
-        references: Vec::new(),
-        on_delete: None,
-        on_update: None,
-    };
+pub(crate) fn calculate_index(
+    index: sql::walkers::IndexWalker<'_>,
+    existing_index: Option<walkers::IndexWalker<'_>>,
+    ctx: &Context<'_>,
+) -> Option<IndexDefinition> {
+    let tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)?;
 
-    let basename = opposite_foreign_key.referenced_table_name();
-
-    let name = match is_self_relation {
-        true => format!(
-            "{}_{}",
-            basename,
-            opposite_foreign_key.constrained_columns().next().unwrap().name()
-        ),
-        false => basename.to_owned(),
-    };
-
-    RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
-}
-
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexDefinition> {
-    let tpe = match index.index_type() {
-        IndexType::Unique => psl::dml::IndexType::Unique,
-        IndexType::Normal => psl::dml::IndexType::Normal,
-        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
-            psl::dml::IndexType::Fulltext
+    let default_constraint_name = match index.index_type() {
+        IndexType::Unique => {
+            let columns = index.column_names().collect::<Vec<_>>();
+            ConstraintNames::unique_index_name(index.table().name(), &columns, ctx.active_connector())
         }
-        IndexType::Fulltext => psl::dml::IndexType::Normal,
-        IndexType::PrimaryKey => return None,
+        _ => {
+            let columns = index.column_names().collect::<Vec<_>>();
+            ConstraintNames::non_unique_index_name(index.table().name(), &columns, ctx.active_connector())
+        }
     };
 
-    // We do not populate name in client by default. It increases datamodel noise, and we would
-    // need to sanitize it. Users can give their own names if they want and re-introspection will
-    // keep them. This is a change in introspection behaviour, but due to re-introspection previous
-    // datamodels and clients should keep working as before.
+    let db_name = if index.name() == default_constraint_name {
+        None
+    } else {
+        Some(index.name().to_owned())
+    };
 
     Some(IndexDefinition {
-        name: None,
-        db_name: Some(index.name().to_owned()),
+        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
+        db_name,
         fields: index
             .columns()
             .map(|c| {
-                let sort_order = c.sort_order().map(|sort| match sort {
-                    SQLSortOrder::Asc => SortOrder::Asc,
-                    SQLSortOrder::Desc => SortOrder::Desc,
+                let sort_order = c.sort_order().and_then(|sort| match sort {
+                    SQLSortOrder::Asc => None,
+                    SQLSortOrder::Desc => Some(SortOrder::Desc),
                 });
 
                 let operator_class = get_opclass(c.id, index.schema, ctx);
 
                 IndexField {
-                    path: vec![(c.as_column().name().to_owned(), None)],
+                    path: vec![(
+                        ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
+                        None,
+                    )],
                     sort_order,
                     length: c.length(),
                     operator_class,
@@ -196,167 +196,62 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     })
 }
 
-pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &Context) -> ScalarField {
-    debug!("Handling column {:?}", column);
+pub(crate) fn calculate_scalar_field(
+    column: ColumnWalker<'_>,
+    remapped_fields: &mut Vec<crate::warnings::ModelAndField>,
+    ctx: &mut Context<'_>,
+) -> ScalarField {
+    let existing_field = ctx.existing_scalar_field(column.id);
+    let (name, database_name) = {
+        let name = ctx.column_prisma_name(column.id);
+        (
+            name.prisma_name().into_owned(),
+            name.mapped_name().map(ToOwned::to_owned),
+        )
+    };
 
-    let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
+    if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
+        remapped_fields.push(crate::warnings::ModelAndField {
+            model: field.model().name().to_owned(),
+            field: field.name().to_owned(),
+        });
+    }
 
-    let is_id = column.is_single_primary_key();
     let arity = match column.column_type().arity {
-        _ if is_id && column.is_autoincrement() => FieldArity::Required,
+        _ if column.is_single_primary_key() && column.is_autoincrement() => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
     };
 
-    let default_value = crate::defaults::calculate_default(column, ctx);
+    let mut default_value = crate::defaults::calculate_default(column, existing_field, ctx);
 
-    ScalarField {
-        name: column.name().to_owned(),
-        arity,
-        field_type,
-        database_name: None,
-        default_value,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-        is_commented_out: false,
-        is_ignored: false,
-    }
-}
+    let default_default_value =
+        ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
 
-pub(crate) fn calculate_relation_field(
-    foreign_key: ForeignKeyWalker<'_>,
-    m2m_table_names: &[String],
-    duplicated_foreign_keys: &HashSet<sql::ForeignKeyId>,
-) -> RelationField {
-    debug!("Handling foreign key  {:?}", foreign_key);
-
-    let map_action = |action: ForeignKeyAction| match action {
-        ForeignKeyAction::NoAction => ReferentialAction::NoAction,
-        ForeignKeyAction::Restrict => ReferentialAction::Restrict,
-        ForeignKeyAction::Cascade => ReferentialAction::Cascade,
-        ForeignKeyAction::SetNull => ReferentialAction::SetNull,
-        ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
-    };
-
-    let relation_info = RelationInfo {
-        name: calculate_relation_name(foreign_key, m2m_table_names, duplicated_foreign_keys),
-        fk_name: foreign_key.constraint_name().map(String::from),
-        fields: foreign_key.constrained_columns().map(|c| c.name().to_owned()).collect(),
-        referenced_model: foreign_key.referenced_table().name().to_owned(),
-        references: foreign_key.referenced_columns().map(|c| c.name().to_owned()).collect(),
-        on_delete: Some(map_action(foreign_key.on_delete_action())),
-        on_update: Some(map_action(foreign_key.on_update_action())),
-    };
-
-    let arity = match foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
-        true => FieldArity::Optional,
-        false => FieldArity::Required,
-    };
-
-    let calculated_arity = match foreign_key.constrained_columns().any(|c| c.arity().is_required()) {
-        true => FieldArity::Required,
-        false => arity,
-    };
-
-    RelationField::new(
-        foreign_key.referenced_table().name(),
-        arity,
-        calculated_arity,
-        relation_info,
-    )
-}
-
-pub(crate) fn calculate_backrelation_field(
-    schema: &SqlSchema,
-    model: &Model,
-    other_model: &Model,
-    relation_field: &RelationField,
-    relation_info: &RelationInfo,
-) -> Result<RelationField, SqlError> {
-    match schema.table_walkers().find(|t| t.name() == model.name) {
-        None => Err(SqlError::SchemaInconsistent {
-            explanation: format!("Table {} not found.", &model.name),
-        }),
-        Some(table) => {
-            let new_relation_info = RelationInfo {
-                name: relation_info.name.clone(),
-                fk_name: None,
-                referenced_model: model.name.clone(),
-                fields: vec![],
-                references: vec![],
-                on_delete: None,
-                on_update: None,
-            };
-
-            // unique or id
-            let other_is_unique = table.indexes().any(|i| {
-                columns_match(
-                    &i.columns()
-                        .map(|c| c.as_column().name().to_string())
-                        .collect::<Vec<_>>(),
-                    &relation_info.fields,
-                ) && i.is_unique()
-            }) || columns_match(
-                &table
-                    .primary_key_columns()
-                    .into_iter()
-                    .flatten()
-                    .map(|c| c.as_column().name().to_owned())
-                    .collect::<Vec<_>>(),
-                &relation_info.fields,
-            );
-
-            let arity = match relation_field.arity {
-                FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,
-                FieldArity::Required | FieldArity::Optional => FieldArity::List,
-                FieldArity::List => FieldArity::Optional,
-            };
-
-            //if the backrelation name would be duplicate, probably due to being a selfrelation
-            let name = if model.name == other_model.name && relation_field.name == model.name {
-                format!("other_{}", model.name.clone())
-            } else {
-                model.name.clone()
-            };
-
-            Ok(RelationField::new(&name, arity, arity, new_relation_info))
+    if let Some(ref mut default_value) = default_value {
+        if default_value.db_name == Some(default_default_value) {
+            default_value.db_name = None;
         }
     }
-}
 
-// This is not called for prisma many to many relations. For them the name is just the name of the join table.
-fn calculate_relation_name(
-    fk: ForeignKeyWalker<'_>,
-    m2m_table_names: &[String],
-    duplicated_foreign_keys: &HashSet<sql::ForeignKeyId>,
-) -> String {
-    let referenced_model = fk.referenced_table().name();
-    let model_with_fk = fk.table().name();
-    let fk_column_name = fk.constrained_columns().map(|c| c.name()).collect::<Vec<_>>().join("_");
-    let name_is_ambiguous = {
-        let mut both_ids = [fk.referenced_table().id, fk.table().id];
-        both_ids.sort();
-        fk.schema.walk_foreign_keys().any(|other_fk| {
-            let mut other_ids = [other_fk.referenced_table().id, other_fk.table().id];
-            other_ids.sort();
-
-            other_fk.id != fk.id && both_ids == other_ids && !duplicated_foreign_keys.contains(&other_fk.id)
-        })
-    };
-
-    let unambiguous_name = RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model);
-
-    // this needs to know whether there are m2m relations and then use ambiguous name path
-    if name_is_ambiguous || m2m_table_names.contains(&unambiguous_name) {
-        RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
-    } else {
-        unambiguous_name
+    ScalarField {
+        name,
+        arity,
+        field_type: calculate_scalar_field_type_with_native_types(column, ctx),
+        database_name,
+        documentation: existing_field
+            .and_then(|f| f.ast_field().documentation())
+            .map(ToOwned::to_owned),
+        default_value,
+        is_generated: false,
+        is_commented_out: false,
+        is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(false),
+        is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(false),
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>, ctx: &Context) -> FieldType {
     debug!("Calculating field type for '{}'", column.name());
     let fdt = column.column_type().full_data_type.to_owned();
 
@@ -371,78 +266,52 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'
         ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None),
         ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
+        ColumnTypeFamily::Enum(id) => FieldType::Enum(ctx.enum_prisma_name(*id).prisma_name().into_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
 
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker<'_>, ctx: &Context) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name());
-    let scalar_type = calculate_scalar_field_type_for_native_type(column);
+    let scalar_type = calculate_scalar_field_type_for_native_type(column, ctx);
 
     match scalar_type {
         FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
             None => scalar_type,
-            Some(native_type) => FieldType::Scalar(
-                scal_type,
-                Some(psl::dml::NativeTypeInstance::new(
-                    native_type.clone(),
-                    ctx.active_connector(),
-                )),
-            ),
+            Some(native_type) => {
+                let is_default = ctx.active_connector().native_type_is_default_for_scalar_type(
+                    native_type,
+                    &dml_scalar_type_to_parser_database_scalar_type(scal_type),
+                );
+
+                if is_default {
+                    FieldType::Scalar(scal_type, None)
+                } else {
+                    let instance = psl::dml::NativeTypeInstance::new(native_type.clone(), ctx.active_connector());
+
+                    FieldType::Scalar(scal_type, Some(instance))
+                }
+            }
         },
         field_type => field_type,
     }
 }
 
+fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarType {
+    match st {
+        ScalarType::Int => db::ScalarType::Int,
+        ScalarType::BigInt => db::ScalarType::BigInt,
+        ScalarType::Float => db::ScalarType::Float,
+        ScalarType::Boolean => db::ScalarType::Boolean,
+        ScalarType::String => db::ScalarType::String,
+        ScalarType::DateTime => db::ScalarType::DateTime,
+        ScalarType::Json => db::ScalarType::Json,
+        ScalarType::Bytes => db::ScalarType::Bytes,
+        ScalarType::Decimal => db::ScalarType::Decimal,
+    }
+}
+
 // misc
-
-pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
-    let mut duplicated_relation_fields = vec![];
-
-    for model in datamodel.models() {
-        for field in model.relation_fields() {
-            if model.fields().filter(|f| field.name == f.name()).count() > 1 {
-                duplicated_relation_fields.push((
-                    model.name.clone(),
-                    field.name.clone(),
-                    field.relation_info.name.clone(),
-                ));
-            }
-        }
-    }
-
-    duplicated_relation_fields
-        .iter()
-        .for_each(|(model, field, relation_name)| {
-            let mut field = datamodel.find_model_mut(model).find_relation_field_mut(field);
-            //todo self vs normal relation?
-            field.name = format!("{}_{}", field.name, &relation_name);
-        });
-}
-/// Returns whether the elements of the two slices match, regardless of ordering.
-pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
-    a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
-}
-
-pub(crate) fn replace_relation_info_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
-    for old_name in target.iter_mut().filter(|v| v.as_str() == old_name) {
-        *old_name = new_name.to_owned();
-    }
-}
-
-pub(crate) fn replace_pk_field_names(target: &mut Vec<PrimaryKeyField>, old_name: &str, new_name: &str) {
-    for field in target.iter_mut().filter(|field| field.name == old_name) {
-        field.name = new_name.to_owned();
-    }
-}
-
-pub(crate) fn replace_index_field_names(target: &mut Vec<IndexField>, old_name: &str, new_name: &str) {
-    let field_matches = |f: &&mut IndexField| f.path.first().map(|p| p.0.as_str()) == Some(old_name);
-    for field in target.iter_mut().filter(field_matches) {
-        field.path = vec![(new_name.to_string(), None)];
-    }
-}
 
 fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexAlgorithm> {
     if !ctx.sql_family().is_postgres() {
@@ -451,14 +320,14 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Optio
 
     let data: &PostgresSchemaExt = index.schema.downcast_connector_data();
 
-    Some(match data.index_algorithm(index.id) {
-        sql::postgres::SqlIndexAlgorithm::BTree => IndexAlgorithm::BTree,
-        sql::postgres::SqlIndexAlgorithm::Hash => IndexAlgorithm::Hash,
-        sql::postgres::SqlIndexAlgorithm::Gist => IndexAlgorithm::Gist,
-        sql::postgres::SqlIndexAlgorithm::Gin => IndexAlgorithm::Gin,
-        sql::postgres::SqlIndexAlgorithm::SpGist => IndexAlgorithm::SpGist,
-        sql::postgres::SqlIndexAlgorithm::Brin => IndexAlgorithm::Brin,
-    })
+    match data.index_algorithm(index.id) {
+        sql::postgres::SqlIndexAlgorithm::BTree => None,
+        sql::postgres::SqlIndexAlgorithm::Hash => Some(IndexAlgorithm::Hash),
+        sql::postgres::SqlIndexAlgorithm::Gist => Some(IndexAlgorithm::Gist),
+        sql::postgres::SqlIndexAlgorithm::Gin => Some(IndexAlgorithm::Gin),
+        sql::postgres::SqlIndexAlgorithm::SpGist => Some(IndexAlgorithm::SpGist),
+        sql::postgres::SqlIndexAlgorithm::Brin => Some(IndexAlgorithm::Brin),
+    }
 }
 
 fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context) -> Option<bool> {
@@ -467,8 +336,13 @@ fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context)
     }
 
     let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+    let clustered = ext.index_is_clustered(index_id);
 
-    Some(ext.index_is_clustered(index_id))
+    if !clustered {
+        return None;
+    }
+
+    Some(clustered)
 }
 
 pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Option<bool> {
@@ -478,7 +352,13 @@ pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Opt
 
     let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
 
-    Some(ext.index_is_clustered(pkid))
+    let clustered = ext.index_is_clustered(pkid);
+
+    if clustered {
+        return None;
+    }
+
+    Some(clustered)
 }
 
 fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Context) -> Option<OperatorClass> {
@@ -554,5 +434,17 @@ fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Con
         sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
         sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
         sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+    }
+}
+
+fn sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: &Context) -> Option<psl::parser_database::IndexType> {
+    match sql {
+        IndexType::Unique => Some(psl::dml::IndexType::Unique),
+        IndexType::Normal => Some(psl::dml::IndexType::Normal),
+        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
+            Some(psl::dml::IndexType::Fulltext)
+        }
+        IndexType::Fulltext => Some(psl::dml::IndexType::Normal),
+        IndexType::PrimaryKey => None,
     }
 }

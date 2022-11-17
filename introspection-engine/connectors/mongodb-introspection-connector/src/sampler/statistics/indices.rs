@@ -3,7 +3,10 @@ use crate::sampler::field_type::FieldType;
 use convert_case::{Case, Casing};
 use introspection_connector::Warning;
 use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
-use psl::dml::{self, WithDatabaseName, WithName};
+use psl::{
+    datamodel_connector::constraint_names::ConstraintNames,
+    dml::{self, WithDatabaseName, WithName},
+};
 use std::collections::BTreeMap;
 
 /// Add described indices to the models.
@@ -64,14 +67,15 @@ pub(super) fn add_to_models(
                         path,
                         sort_order: match f.property {
                             IndexFieldProperty::Text => None,
-                            IndexFieldProperty::Ascending => Some(dml::SortOrder::Asc),
+                            IndexFieldProperty::Ascending if index.r#type().is_fulltext() => Some(dml::SortOrder::Asc),
+                            IndexFieldProperty::Ascending => None,
                             IndexFieldProperty::Descending => Some(dml::SortOrder::Desc),
                         },
                         length: None,
                         operator_class: None,
                     }
                 })
-                .collect();
+                .collect::<Vec<_>>();
 
             let tpe = match index.r#type() {
                 mongodb_schema_describer::IndexType::Normal => dml::IndexType::Normal,
@@ -79,11 +83,32 @@ pub(super) fn add_to_models(
                 mongodb_schema_describer::IndexType::Fulltext => dml::IndexType::Fulltext,
             };
 
+            // TOM WE NEED TO TALK ABOUT THIS!
+            let column_names = fields
+                .iter()
+                .flat_map(|f| f.path.iter().map(|p| p.0.as_str()))
+                .collect::<Vec<_>>();
+
+            let default_name = match tpe {
+                dml::IndexType::Unique => {
+                    ConstraintNames::unique_index_name(model_name, &column_names, psl::builtin_connectors::MONGODB)
+                }
+                _ => {
+                    ConstraintNames::non_unique_index_name(model_name, &column_names, psl::builtin_connectors::MONGODB)
+                }
+            };
+
+            let db_name = if index.name() == default_name {
+                None
+            } else {
+                Some(index.name().to_string())
+            };
+
             model.add_index(dml::IndexDefinition {
                 fields,
                 tpe,
                 defined_on_field,
-                db_name: Some(index.name().to_string()),
+                db_name,
                 name: None,
                 algorithm: None,
                 clustered: None,

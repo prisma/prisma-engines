@@ -39,8 +39,8 @@ mod regression {
             .assert_success();
 
         let queries = vec![
-            r#"query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"Michael",netWorth:"236600000.12409"}}) {firstName netWorth}}"#.to_string(),
-            r#"query {findUniqueArtist(where:{firstName_lastName_birth:{firstName:"George",netWorth:"-0.23660010012409"}}) {firstName netWorth}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_netWorth:{firstName:"Michael",netWorth:"236600000.12409"}}) {firstName netWorth}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_netWorth:{firstName:"George",netWorth:"-0.23660010012409"}}) {firstName netWorth}}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;

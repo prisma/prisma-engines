@@ -4,6 +4,7 @@
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
@@ -21,8 +22,8 @@
           overlays = [
             rust-overlay.overlays.default
             (self: super:
-              let toolchain = pkgs.rust-bin.stable.latest.default; in
-              { cargo = toolchain; rustc = toolchain; })
+              let toolchain = pkgs.rust-bin.stable.latest; in
+              { cargo = toolchain.minimal; rustc = toolchain.minimal; rustToolchain = toolchain; })
           ];
           pkgs = import nixpkgs { inherit system overlays; };
           craneLib = crane.mkLib pkgs;
@@ -76,7 +77,7 @@
 
           prisma-engines-deps = craneLib.buildDepsOnly prismaEnginesCommonArgs;
 
-          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit crane nixpkgs rust-overlay system src; };
+          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit craneLib pkgs system src; };
 
           inherit (pkgs) lib;
         in
@@ -87,7 +88,10 @@
 
           checks = prisma-fmt-wasm.checks;
 
-          devShells.default = pkgs.mkShell { inputsFrom = [ prisma-engines-deps ]; };
+          devShells.default = pkgs.mkShell {
+            packages = [ (pkgs.rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; }) ];
+            inputsFrom = [ prisma-engines-deps ];
+          };
         }
       );
 }

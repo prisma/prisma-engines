@@ -314,7 +314,7 @@ fn creating_a_migration_with_a_non_existent_migrations_directory_should_work(api
 
     let dir = api.create_migrations_directory();
 
-    std::fs::remove_dir_all(&dir.path()).unwrap();
+    std::fs::remove_dir_all(dir.path()).unwrap();
 
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()

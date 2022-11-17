@@ -420,9 +420,9 @@ fn diff_sqlite_migration_directories() {
     let base_dir_str_2 = base_dir_2.path().to_str().unwrap();
 
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
     let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, &"provider = \"sqlite\"").unwrap();
+    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
 
     let params = DiffParams {
         exit_code: None,
@@ -720,7 +720,7 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
 // Call diff, and expect it to error. Return the error.
 pub(crate) fn diff_error(params: DiffParams) -> String {
     let api = migration_core::migration_api(None, None).unwrap();
-    let result = test_setup::runtime::run_with_tokio(api.diff(params));
+    let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params));
     result.unwrap_err().to_string()
 }
 
@@ -728,7 +728,7 @@ pub(crate) fn diff_error(params: DiffParams) -> String {
 pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
     let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
-    let result = test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
+    let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{:?}", printed_messages);
     (result, printed_messages[0].clone())

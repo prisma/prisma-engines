@@ -7,7 +7,7 @@
 //! An example use case to render a datasource as a string:
 //!
 //! ```
-//! use datamodel_renderer::{Datasource, Env};
+//! use datamodel_renderer::{configuration::Datasource, value::Env};
 //! use indoc::{indoc, formatdoc};
 //!
 //! let datasource = Datasource::new(
@@ -65,12 +65,9 @@
 
 #![warn(missing_docs)]
 
-mod configuration;
-mod datasource;
-mod generator;
-mod value;
+pub mod configuration;
+pub mod datamodel;
+pub mod value;
 
 pub use configuration::Configuration;
-pub use datasource::Datasource;
-pub use generator::Generator;
-pub use value::{Array, Commented, Env, Function, FunctionParam, Text, Value};
+pub use datamodel::Datamodel;

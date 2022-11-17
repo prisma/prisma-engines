@@ -603,7 +603,7 @@ fn referential_integrity_without_preview_feature_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
-        The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
+        This option can only be set if the preview feature is enabled in a generator block.
 
         Example:
 
@@ -641,7 +641,7 @@ fn relation_mode_without_preview_feature_errors() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `ps`: 
-        The `relationMode` option can only be set if the preview feature is enabled in a generator block.
+        This option can only be set if the preview feature is enabled in a generator block.
 
         Example:
 
@@ -721,11 +721,11 @@ fn relation_mode_default() {
 }
 
 #[test]
-fn relation_mode_prisma_has_precedence_over_referential_integrity() {
+fn relation_mode_and_referential_integrity_cannot_cooccur() {
     let schema = indoc! {r#"
         datasource ps {
-          provider = "sqlserver"
-          url = "mysql://root:prisma@localhost:3306/mydb"
+          provider = "sqlite"
+          url = "sqlite"
           relationMode = "prisma"
           referentialIntegrity = "foreignKeys"
         }
@@ -735,9 +735,19 @@ fn relation_mode_prisma_has_precedence_over_referential_integrity() {
         }
     "#};
 
-    let config = parse_configuration(schema);
+    let config = parse_config(schema);
+    let error = config.unwrap_err();
 
-    assert_eq!(config.relation_mode(), Some(RelationMode::Prisma));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  relationMode = "prisma"
+        [1;94m 5 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
+        [1;94m 6 | [0m}
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error);
 }
 
 fn load_env_var(key: &str) -> Option<String> {

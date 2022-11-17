@@ -59,7 +59,7 @@ impl<'a> DifferDatabase<'a> {
         };
 
         // First insert all namespaces from the previous schema.
-        for namespace in schemas.previous.describer_schema.namespace_walkers() {
+        for namespace in schemas.previous.describer_schema.walk_namespaces() {
             let namespace_name = if flavour.lower_cases_table_names() {
                 namespace.name().to_ascii_lowercase().into()
             } else {
@@ -70,7 +70,7 @@ impl<'a> DifferDatabase<'a> {
         }
 
         // Then insert all namespaces from the next schema.
-        for namespace in schemas.next.describer_schema.namespace_walkers() {
+        for namespace in schemas.next.describer_schema.walk_namespaces() {
             let namespace_name = if flavour.lower_cases_table_names() {
                 namespace.name().to_ascii_lowercase().into()
             } else {

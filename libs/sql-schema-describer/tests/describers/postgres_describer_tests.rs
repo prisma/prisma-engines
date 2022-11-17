@@ -5,6 +5,61 @@ use pretty_assertions::assert_eq;
 use psl::dml::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
+#[test_connector(tags(Postgres))]
+fn postgres_skips_nonexisting_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two"]);
+
+    schema.assert_namespace("one").assert_not_namespace("two");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_ignored_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one"]);
+
+    schema.assert_namespace("one").assert_not_namespace("two");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_public_when_ignored_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA IF NOT EXISTS "public";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one"]);
+
+    schema.assert_namespace("one").assert_not_namespace("public");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_many_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+        CREATE SCHEMA "three";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two", "three"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_namespace("two")
+        .assert_namespace("three");
+}
+
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
@@ -87,6 +142,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1093,11 +1149,15 @@ fn postgres_enums_must_work(api: TestApi) {
         api.schema_name()
     ));
     let schema = api.describe();
-    let got_enum = schema.get_enum("mood").expect("get enum");
+    let got_enum = schema.walk(schema.find_enum("mood").expect("get enum"));
     let values = &["sad", "ok", "happy"];
 
-    assert_eq!(got_enum.name, "mood");
-    assert_eq!(got_enum.values, values);
+    assert_eq!(got_enum.name(), "mood");
+    let found_values = got_enum.values();
+    assert_eq!(found_values.len(), values.len());
+    for (a, b) in found_values.zip(values) {
+        assert_eq!(a, *b)
+    }
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -1217,6 +1277,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1376,6 +1437,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1725,6 +1787,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1944,6 +2007,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(

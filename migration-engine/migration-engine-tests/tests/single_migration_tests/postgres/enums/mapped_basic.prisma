@@ -1,0 +1,30 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource pg {
+    provider = "postgresql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model Avocado {
+  id String @id
+  status Ripeness
+}
+
+enum Ripeness {
+    NOT_RIPE_ENOUGH
+    TOO_RIPE
+
+    @@map("avocado_ripeness_status")
+}
+// Expected Migration:
+// -- CreateEnum
+// CREATE TYPE "avocado_ripeness_status" AS ENUM ('NOT_RIPE_ENOUGH', 'TOO_RIPE');
+// 
+// -- CreateTable
+// CREATE TABLE "Avocado" (
+//     "id" TEXT NOT NULL,
+//     "status" "avocado_ripeness_status" NOT NULL,
+// 
+//     CONSTRAINT "Avocado_pkey" PRIMARY KEY ("id")
+// );

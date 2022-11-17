@@ -55,7 +55,7 @@ fn soft_resets_work_on_cockroachdb(mut api: TestApi) {
 
     api.raw_cmd(initial);
     api.assert_schema().assert_tables_count(1).assert_has_table("Cat");
-    api.reset().soft(true).send_sync();
+    api.reset().soft(true).send_sync(None);
     api.assert_schema().assert_tables_count(0);
 }
 
@@ -860,7 +860,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), ["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));
@@ -1323,6 +1323,7 @@ fn schema_from_introspection_docs_works(api: TestApi) {
     let migration = api.connector_diff(
         DiffTarget::Database,
         DiffTarget::Datamodel(SourceFile::new_static(introspected_schema)),
+        None,
     );
 
     let expected = expect!["-- This is an empty migration."];

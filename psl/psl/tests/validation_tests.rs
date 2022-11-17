@@ -1,3 +1,5 @@
+mod panic_with_diff;
+
 use std::{fs, io::Write as _, path, sync::Arc};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/validation");
@@ -60,37 +62,7 @@ fn run_validation_test(test_file_path: &str) {
         return;
     }
 
-    panic_with_diff(&last_comment_contents, &errors)
-}
-
-fn panic_with_diff(expected: &str, found: &str) {
-    let chunks = dissimilar::diff(expected, found);
-    let diff = format_chunks(chunks);
-    panic!(
-        r#"
-Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot.
-
-===== EXPECTED ====
-{expected}
-====== FOUND ======
-{found}
-======= DIFF ======
-{diff}
-        "#
-    );
-}
-
-fn format_chunks(chunks: Vec<dissimilar::Chunk<'_>>) -> String {
-    let mut buf = String::new();
-    for chunk in chunks {
-        let formatted = match chunk {
-            dissimilar::Chunk::Equal(text) => text.into(),
-            dissimilar::Chunk::Delete(text) => format!("\x1b[41m{}\x1b[0m", text),
-            dissimilar::Chunk::Insert(text) => format!("\x1b[42m{}\x1b[0m", text),
-        };
-        buf.push_str(&formatted);
-    }
-    buf
+    panic_with_diff::panic_with_diff(&last_comment_contents, &errors)
 }
 
 include!(concat!(env!("OUT_DIR"), "/validation_tests.rs"));

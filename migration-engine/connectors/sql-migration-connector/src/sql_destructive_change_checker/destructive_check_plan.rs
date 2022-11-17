@@ -96,16 +96,16 @@ impl DestructiveCheckPlan {
         results: &mut DatabaseInspectionResults,
     ) -> ConnectorResult<()> {
         if let Some(table) = check.needed_table_row_count() {
-            if results.get_row_count(table).is_none() {
-                let count = flavour.count_rows_in_table(table).await?;
+            if results.get_row_count(&table).is_none() {
+                let count = flavour.count_rows_in_table(&table).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
-        if let Some((table, column)) = check.needed_column_value_count() {
-            if let (_, None) = results.get_row_and_non_null_value_count(table, column) {
-                let count = flavour.count_values_in_column((table, column)).await?;
-                results.set_value_count(table.to_owned().into(), column.to_owned().into(), count);
+        if let Some(column) = check.needed_column_value_count() {
+            if let (_, None) = results.get_row_and_non_null_value_count(&column) {
+                let count = flavour.count_values_in_column(&column).await?;
+                results.set_value_count(column, count);
             }
         }
 

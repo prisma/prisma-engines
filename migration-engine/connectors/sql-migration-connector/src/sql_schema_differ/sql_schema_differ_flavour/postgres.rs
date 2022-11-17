@@ -20,7 +20,7 @@ use sql_schema_describer::{
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
 static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
-    RegexSet::new(&[
+    RegexSet::new([
         // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
         "(?i)^spatial_ref_sys$",
         "(?i)^geometry_columns$",
@@ -33,7 +33,7 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 });
 
 // https://www.postgresql.org/docs/12/pgbuffercache.html
-static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
+static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn can_alter_primary_keys(&self) -> bool {
@@ -54,7 +54,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // Handle the enum cases first.
-        match columns.map(|col| col.column_type_family().as_enum()).into_tuple() {
+        match columns
+            .map(|col| col.column_type_family_as_enum().map(|e| e.name()))
+            .into_tuple()
+        {
             (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
             (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
             (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),

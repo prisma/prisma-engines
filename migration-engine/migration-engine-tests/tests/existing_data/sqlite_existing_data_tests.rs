@@ -13,7 +13,7 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Int32(None)));

@@ -100,13 +100,13 @@ impl Display for Column<'_> {
 #[derive(Debug)]
 pub struct DropIndex<'a> {
     /// The name of the index to be dropped.
-    pub index_name: Cow<'a, str>,
+    pub index_name: PostgresIdentifier<'a>,
 }
 
 impl Display for DropIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("DROP INDEX ")?;
-        Display::fmt(&PostgresIdentifier::from(self.index_name.as_ref()), f)
+        write!(f, "{}", self.index_name)
     }
 }
 
@@ -251,7 +251,9 @@ impl Display for ForeignKeyAction {
 
 #[derive(Debug)]
 pub enum PostgresIdentifier<'a> {
+    /// Simple identifier without a schema(namespace).
     Simple(Cow<'a, str>),
+    /// Identifier with a schema(namespace). The first field is the schema.
     WithSchema(Cow<'a, str>, Cow<'a, str>),
 }
 

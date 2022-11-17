@@ -1,3 +1,4 @@
+use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
@@ -81,13 +82,48 @@ async fn field_with_empty_name(api: &TestApi) -> TestResult {
 
     let expectation = expect![[r#"
         model A {
-          // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           //   Int @default(autoincrement()) @map(" ")
         }
     "#]];
 
     let introspected = api.introspect_dml().await?;
     expectation.assert_eq(&introspected);
+
+    Ok(())
+}
+
+#[test_connector(tags(Sqlite))]
+async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::integer().increments(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["last"]));
+            });
+        })
+        .await?;
+
+    let dm = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "sqlite"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 String @map("1")
+          last Int @id @default(autoincrement())
+        }
+    "#]];
+
+    api.expect_datamodel(&dm).await;
 
     Ok(())
 }

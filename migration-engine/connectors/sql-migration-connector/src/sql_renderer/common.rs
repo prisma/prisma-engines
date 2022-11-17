@@ -6,6 +6,12 @@ pub(super) const SQL_INDENTATION: &str = "    ";
 /// A table name with an optional schema prefix.
 pub(crate) struct TableName<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
 
+impl<T> TableName<T> {
+    pub(crate) fn new(namespace: Option<Quoted<T>>, name: Quoted<T>) -> Self {
+        TableName(namespace, name)
+    }
+}
+
 impl<T> Display for TableName<T>
 where
     T: Display,
