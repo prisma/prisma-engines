@@ -280,6 +280,15 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module is responsible for defining the relation names and the relation field names in an
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
@@ -373,18 +382,21 @@
     ctx: <span class="kw-2">&amp;</span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; RelationName&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>ids = table_ids_for_m2m_relation_table(table);
+    <span class="kw">let </span>is_self_relation = ids[<span class="number">0</span>] == ids[<span class="number">1</span>];
+
     <span class="kw">let </span>(relation_name, field_name_suffix) = <span class="kw">if </span>ambiguous_relations.contains(<span class="kw-2">&amp;</span>ids) {
         <span class="comment">// the table names of prisma m2m tables starts with an underscore
         </span>(Cow::Borrowed(<span class="kw-2">&amp;</span>table.name()[<span class="number">1</span>..]), table.name())
     } <span class="kw">else </span>{
         <span class="kw">let </span>default_name = ids.map(|id| ctx.table_prisma_name(id).prisma_name()).join(<span class="string">&quot;To&quot;</span>);
         <span class="kw">let </span>found_name = <span class="kw-2">&amp;</span>table.name()[<span class="number">1</span>..];
-        <span class="comment">// TODO: test this
-        </span><span class="kw">let </span>relation_name = <span class="kw">if </span>found_name == default_name { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ found_name };
+        <span class="kw">let </span>relation_name = <span class="kw">if </span>found_name == default_name &amp;&amp; !is_self_relation {
+            <span class="string">&quot;&quot;
+        </span>} <span class="kw">else </span>{
+            found_name
+        };
         (Cow::Borrowed(relation_name), <span class="string">&quot;&quot;</span>)
     };
-
-    <span class="kw">let </span>is_self_relation = ids[<span class="number">0</span>] == ids[<span class="number">1</span>];
 
     [
         relation_name,
@@ -406,13 +418,19 @@
     ambiguous_relations: <span class="kw-2">&amp;</span>HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt;,
     ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; RelationName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>is_self_relation = fk.is_self_relation();
     <span class="kw">let </span>referencing_model_name = ctx.table_prisma_name(fk.table().id).prisma_name();
     <span class="kw">let </span>referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
-    <span class="kw">let </span>self_relation_prefix = <span class="kw">if </span>fk.is_self_relation() { <span class="string">&quot;other_&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>self_relation_prefix = <span class="kw">if </span>is_self_relation { <span class="string">&quot;other_&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
     <span class="kw">if </span>!ambiguous_relations.contains(<span class="kw-2">&amp;</span>sorted_table_ids(fk.table().id, fk.referenced_table().id)) {
+        <span class="kw">let </span>relation_name = <span class="kw">if </span>is_self_relation {
+            Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{referencing_model_name}To{referenced_model_name}&quot;</span>))
+        } <span class="kw">else </span>{
+            Cow::Borrowed(<span class="string">&quot;&quot;</span>)
+        };
         [
-            Cow::Borrowed(<span class="string">&quot;&quot;</span>),
+            relation_name,
             referenced_model_name,
             Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{self_relation_prefix}{referencing_model_name}&quot;</span>)),
         ]
