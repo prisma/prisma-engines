@@ -1,4 +1,4 @@
-use super::relation_names::RelationNames;
+use super::{models::table_has_usable_identifier, relation_names::RelationNames};
 use crate::introspection_helpers::is_prisma_join_table;
 use psl::{
     datamodel_connector::{constraint_names::ConstraintNames, Connector},
@@ -162,7 +162,15 @@ fn calculate_backrelation_field(
         FieldArity::List
     };
 
-    psl::dml::RelationField::new(&field_name, arity, arity, relation_info)
+    let mut field = psl::dml::RelationField::new(&field_name, arity, arity, relation_info);
+
+    // We want to put an @ignore on the field iff the field's referenced table is ignored, and the
+    // parent table isn't, because otherwise the ignore would be redundant.
+    if !table_has_usable_identifier(fk.table()) && table_has_usable_identifier(fk.referenced_table()) {
+        field.is_ignored = true;
+    }
+
+    field
 }
 
 fn relation_mapped_name(fk: sql::ForeignKeyWalker<'_>, connector: &dyn Connector) -> Option<String> {
