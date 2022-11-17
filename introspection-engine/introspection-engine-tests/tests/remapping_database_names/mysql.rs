@@ -26,13 +26,13 @@ async fn remapping_enum_names(api: &TestApi) -> TestResult {
         }
 
         model Book {
-          id    Int         @id @default(autoincrement())
-          color Book_color? @map("1color")
+          id    Int          @id @default(autoincrement())
+          color Book_1color? @map("1color")
 
           @@map("123Book")
         }
 
-        enum Book_color {
+        enum Book_1color {
           black
 
           @@map("123Book_1color")

@@ -38,15 +38,6 @@ pub(crate) struct ModelAndIndex {
     pub(crate) index_db_name: String,
 }
 
-impl ModelAndIndex {
-    pub(crate) fn new(model: &str, index_db_name: &str) -> Self {
-        ModelAndIndex {
-            model: model.to_owned(),
-            index_db_name: index_db_name.to_owned(),
-        }
-    }
-}
-
 #[derive(Serialize, Debug)]
 pub(crate) struct ModelAndFieldAndType {
     pub(crate) model: String,
@@ -156,50 +147,12 @@ pub(crate) fn warning_enriched_with_map_on_enum_value(affected: &[EnumAndValue])
     }
 }
 
-pub(crate) fn warning_enriched_with_cuid(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 11,
-        message:
-            "These id fields were enriched with `@default(cuid())` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-pub(crate) fn warning_enriched_with_uuid(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 12,
-        message:
-            "These id fields were enriched with `@default(uuid())` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-pub(crate) fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 13,
-        message:
-            "These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
 //todo maybe we can get rid of this alltogether due to @@ignore
 //but maybe we should have warnings for ignored fields and models
 pub(crate) fn warning_models_without_columns(affected: &[Model]) -> Warning {
     Warning {
         code: 14,
         message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-pub(crate) fn warning_enriched_with_custom_index_names(affected: &[ModelAndIndex]) -> Warning {
-    Warning {
-        code: 17,
-        message: "These Indices were enriched with custom index names taken from the previous Prisma schema.".into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

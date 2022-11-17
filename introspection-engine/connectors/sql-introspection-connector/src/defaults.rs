@@ -1,8 +1,12 @@
 use crate::calculate_datamodel::CalculateDatamodelContext as Context;
-use psl::dml;
+use psl::{dml, parser_database::walkers};
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
-pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &Context) -> Option<dml::DefaultValue> {
+pub(crate) fn calculate_default(
+    column: sql::ColumnWalker<'_>,
+    existing_field: Option<walkers::ScalarFieldWalker<'_>>,
+    ctx: &Context<'_>,
+) -> Option<dml::DefaultValue> {
     match (column.default().map(|d| d.kind()), &column.column_type_family()) {
         (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
             use dml::PrismaValue;
@@ -66,16 +70,15 @@ pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &Context) ->
             column,
         )),
         (Some(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
-            let variant_name = ctx
-                .existing_enum(*enum_id)
-                .into_iter()
-                .flat_map(|enm| enm.values())
-                .find(|value| value.mapped_name() == Some(variant))
-                .map(|value| value.name())
-                .unwrap_or(variant);
-
+            let variant = ctx
+                .schema
+                .walk(*enum_id)
+                .variants()
+                .find(|v| v.name() == variant)
+                .unwrap();
+            let variant_name = ctx.enum_variant_name(variant.id).prisma_name();
             Some(set_default(
-                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.to_owned())),
+                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.into_owned())),
                 column,
             ))
         }
@@ -85,6 +88,14 @@ pub(crate) fn calculate_default(column: sql::ColumnWalker<'_>, ctx: &Context) ->
         (Some(sql::DefaultKind::UniqueRowid), _) => Some(dml::DefaultValue::new_expression(
             dml::ValueGenerator::new_autoincrement(),
         )),
+
+        // Prisma-level defaults.
+        (None, sql::ColumnTypeFamily::String) => match existing_field.and_then(|f| f.default_value()) {
+            Some(value) if value.is_cuid() => Some(dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())),
+            Some(value) if value.is_uuid() => Some(dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())),
+            _ => None,
+        },
+
         _ => None,
     }
 }

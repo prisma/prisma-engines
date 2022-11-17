@@ -1,15 +1,14 @@
-use crate::{introspection::introspect, SqlFamilyTrait, SqlIntrospectionResult};
-use introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
-use psl::{
-    builtin_connectors::*, datamodel_connector::Connector, dml::Datamodel, parser_database::walkers, Configuration,
+use crate::{
+    introspection::introspect, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
+use introspection_connector::{IntrospectionContext, IntrospectionResult, Warning};
+use psl::{builtin_connectors::*, datamodel_connector::Connector, parser_database::walkers, Configuration};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
 
 pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) config: &'a Configuration,
     pub(crate) render_config: bool,
-    pub(crate) previous_datamodel: &'a Datamodel,
     pub(crate) schema: &'a sql::SqlSchema,
     pub(crate) sql_family: SqlFamily,
     pub(crate) warnings: &'a mut Vec<Warning>,
@@ -47,10 +46,28 @@ impl<'a> CalculateDatamodelContext<'a> {
     /// Given a SQL enum from the database, this method returns the name it will be given in the
     /// introspected schema. If it matches a remapped enum in the Prisma schema, it is taken into
     /// account.
-    pub(crate) fn enum_prisma_name(&self, id: sql::EnumId) -> &'a str {
+    pub(crate) fn enum_prisma_name(&self, id: sql::EnumId) -> ModelName<'a> {
         self.existing_enum(id)
-            .map(|enm| enm.name())
-            .unwrap_or_else(|| self.schema.walk(id).name())
+            .map(|enm| ModelName::FromPsl {
+                name: enm.name(),
+                mapped_name: enm.mapped_name(),
+            })
+            .unwrap_or_else(|| ModelName::new_from_sql(self.schema.walk(id).name()))
+    }
+
+    /// Given a SQL enum variant from the database catalog, this method returns the name it will be
+    /// given in the introspected schema. If it matches a remapped enum value in the Prisma schema,
+    /// it is taken into account.
+    pub(crate) fn enum_variant_name(&self, id: sql::EnumVariantId) -> EnumVariantName<'a> {
+        let variant = self.schema.walk(id);
+        let variant_name = variant.name();
+        self.existing_enum(variant.r#enum().id)
+            .and_then(|enm| enm.values().find(|val| val.database_name() == variant_name))
+            .map(|enm_value| EnumVariantName::FromPsl {
+                name: enm_value.name(),
+                mapped_name: enm_value.mapped_name(),
+            })
+            .unwrap_or_else(|| EnumVariantName::new_from_sql(variant_name))
     }
 
     /// Given a foreign key from the database, this methods returns the existing relation in the
@@ -86,16 +103,24 @@ impl<'a> CalculateDatamodelContext<'a> {
             .map(|(model_id, field_id)| self.previous_schema.db.walk(*model_id).scalar_field(*field_id))
     }
 
-    pub(crate) fn column_prisma_name(&self, id: sql::ColumnId) -> &'a str {
+    pub(crate) fn column_prisma_name(&self, id: sql::ColumnId) -> crate::IntrospectedName<'a> {
         self.existing_scalar_field(id)
-            .map(|sf| sf.name())
-            .unwrap_or_else(|| self.schema.walk(id).name())
+            .map(|sf| IntrospectedName::FromPsl {
+                name: sf.name(),
+                mapped_name: sf.mapped_name(),
+            })
+            .unwrap_or_else(|| IntrospectedName::new_from_sql(self.schema.walk(id).name()))
     }
 
-    pub(crate) fn model_prisma_name(&self, id: sql::TableId) -> &'a str {
+    // Use the existing model name when available.
+    pub(crate) fn table_prisma_name(&self, id: sql::TableId) -> crate::ModelName<'a> {
         self.existing_model(id)
-            .map(|model| model.name())
-            .unwrap_or_else(|| self.schema.walk(id).name())
+            .map(|model| ModelName::FromPsl {
+                name: model.name(),
+                mapped_name: model.mapped_name(),
+            })
+            // Failing that, potentially sanitize the table name.
+            .unwrap_or_else(|| ModelName::new_from_sql(self.schema.walk(id).name()))
     }
 }
 
@@ -109,7 +134,6 @@ pub fn calculate_datamodel(
     let mut context = CalculateDatamodelContext {
         config: ctx.configuration(),
         render_config: ctx.render_config,
-        previous_datamodel: &ctx.previous_data_model,
         schema,
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),

@@ -77,7 +77,7 @@
 
           prisma-engines-deps = craneLib.buildDepsOnly prismaEnginesCommonArgs;
 
-          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit crane nixpkgs rust-overlay system src; };
+          prisma-fmt-wasm = import ./prisma-fmt-wasm { inherit craneLib pkgs system src; };
 
           inherit (pkgs) lib;
         in

@@ -1,6 +1,6 @@
 use crate::{
     relations::{ManyToManyRelationId, Relation, RelationAttributes},
-    walkers::{ModelWalker, RelationFieldWalker, RelationName, Walker},
+    walkers::{ModelWalker, RelationFieldWalker, RelationName, RelationWalker, Walker},
 };
 
 /// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
@@ -11,6 +11,12 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
     /// Gets the relation attributes from the AST.
     fn get(&self) -> &'db Relation {
         &self.db.relations[self.id.0]
+    }
+
+    /// Is this a many-to-many self-relation?
+    pub fn is_self_relation(self) -> bool {
+        let rel = self.get();
+        rel.model_a == rel.model_b
     }
 
     /// The model which comes first in the alphabetical order.
@@ -37,6 +43,11 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.model_b().relation_field(field_b),
             _ => unreachable!(),
         }
+    }
+
+    /// Traverse this relation as a generic relation.
+    pub fn as_relation(self) -> RelationWalker<'db> {
+        self.db.walk(self.id.0)
     }
 
     /// The name of the relation.

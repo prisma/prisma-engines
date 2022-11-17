@@ -2,10 +2,10 @@ use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamily
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
     dml::{
-        Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField,
-        ScalarType, SortOrder,
+        FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
+        SortOrder,
     },
-    parser_database as db,
+    parser_database::{self as db, walkers},
     schema_ast::ast::WithDocumentation,
     PreviewFeature,
 };
@@ -87,7 +87,6 @@ pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
 }
 
 pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: TableWalker<'_>) -> bool {
-    table.name();
     table.columns().len() == 2 && table.indexes().len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 
@@ -142,16 +141,12 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 
 //calculators
 
-pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexDefinition> {
-    let tpe = match index.index_type() {
-        IndexType::Unique => psl::dml::IndexType::Unique,
-        IndexType::Normal => psl::dml::IndexType::Normal,
-        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
-            psl::dml::IndexType::Fulltext
-        }
-        IndexType::Fulltext => psl::dml::IndexType::Normal,
-        IndexType::PrimaryKey => return None,
-    };
+pub(crate) fn calculate_index(
+    index: sql::walkers::IndexWalker<'_>,
+    existing_index: Option<walkers::IndexWalker<'_>>,
+    ctx: &Context<'_>,
+) -> Option<IndexDefinition> {
+    let tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)?;
 
     let default_constraint_name = match index.index_type() {
         IndexType::Unique => {
@@ -171,7 +166,7 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
     };
 
     Some(IndexDefinition {
-        name: None,
+        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
         db_name,
         fields: index
             .columns()
@@ -184,7 +179,10 @@ pub(crate) fn calculate_index(index: sql::walkers::IndexWalker<'_>, ctx: &Contex
                 let operator_class = get_opclass(c.id, index.schema, ctx);
 
                 IndexField {
-                    path: vec![(ctx.column_prisma_name(c.as_column().id).to_owned(), None)],
+                    path: vec![(
+                        ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
+                        None,
+                    )],
                     sort_order,
                     length: c.length(),
                     operator_class,
@@ -204,6 +202,13 @@ pub(crate) fn calculate_scalar_field(
     ctx: &mut Context<'_>,
 ) -> ScalarField {
     let existing_field = ctx.existing_scalar_field(column.id);
+    let (name, database_name) = {
+        let name = ctx.column_prisma_name(column.id);
+        (
+            name.prisma_name().into_owned(),
+            name.mapped_name().map(ToOwned::to_owned),
+        )
+    };
 
     if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
         remapped_fields.push(crate::warnings::ModelAndField {
@@ -219,7 +224,7 @@ pub(crate) fn calculate_scalar_field(
         ColumnArity::List => FieldArity::List,
     };
 
-    let mut default_value = crate::defaults::calculate_default(column, ctx);
+    let mut default_value = crate::defaults::calculate_default(column, existing_field, ctx);
 
     let default_default_value =
         ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
@@ -231,13 +236,10 @@ pub(crate) fn calculate_scalar_field(
     }
 
     ScalarField {
-        name: existing_field
-            .map(|f| f.name())
-            .unwrap_or_else(|| column.name())
-            .to_owned(),
+        name,
         arity,
         field_type: calculate_scalar_field_type_with_native_types(column, ctx),
-        database_name: existing_field.and_then(|f| f.mapped_name()).map(ToOwned::to_owned),
+        database_name,
         documentation: existing_field
             .and_then(|f| f.ast_field().documentation())
             .map(ToOwned::to_owned),
@@ -264,7 +266,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'
         ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None),
         ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None),
-        ColumnTypeFamily::Enum(id) => FieldType::Enum(ctx.enum_prisma_name(*id).to_owned()),
+        ColumnTypeFamily::Enum(id) => FieldType::Enum(ctx.enum_prisma_name(*id).prisma_name().into_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
@@ -310,30 +312,6 @@ fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarT
 }
 
 // misc
-
-pub(crate) fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
-    let mut duplicated_relation_fields = vec![];
-
-    for model in datamodel.models() {
-        for field in model.relation_fields() {
-            if model.fields().filter(|f| field.name == f.name()).count() > 1 {
-                duplicated_relation_fields.push((
-                    model.name.clone(),
-                    field.name.clone(),
-                    field.relation_info.name.clone(),
-                ));
-            }
-        }
-    }
-
-    duplicated_relation_fields
-        .iter()
-        .for_each(|(model, field, relation_name)| {
-            let mut field = datamodel.find_model_mut(model).find_relation_field_mut(field);
-            //todo self vs normal relation?
-            field.name = format!("{}_{}", field.name, &relation_name);
-        });
-}
 
 fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexAlgorithm> {
     if !ctx.sql_family().is_postgres() {
@@ -456,5 +434,17 @@ fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Con
         sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
         sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
         sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
+    }
+}
+
+fn sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: &Context) -> Option<psl::parser_database::IndexType> {
+    match sql {
+        IndexType::Unique => Some(psl::dml::IndexType::Unique),
+        IndexType::Normal => Some(psl::dml::IndexType::Normal),
+        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
+            Some(psl::dml::IndexType::Fulltext)
+        }
+        IndexType::Fulltext => Some(psl::dml::IndexType::Normal),
+        IndexType::PrimaryKey => None,
     }
 }

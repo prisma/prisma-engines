@@ -35,6 +35,7 @@ use indexmap::IndexMap;
 use prisma_models::ModelRef;
 use schema::QuerySchemaRef;
 use schema_builder::constants::*;
+use std::collections::HashMap;
 
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 
@@ -156,7 +157,7 @@ impl BatchDocumentTransaction {
 
 #[derive(Debug, Clone)]
 pub struct CompactedDocument {
-    pub arguments: Vec<Vec<(String, QueryValue)>>,
+    pub arguments: Vec<HashMap<String, QueryValue>>,
     pub nested_selection: Vec<String>,
     pub operation: Operation,
     pub keys: Vec<String>,
@@ -242,14 +243,15 @@ impl CompactedDocument {
         // Saving the stub of the query name for later use.
         let name = selections[0].name().replacen("findUnique", "", 1);
 
-        // Convert the selections into a vector of arguments. This defines the
+        // Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
-        let arguments: Vec<Vec<(String, QueryValue)>> = selections
+        let arguments: Vec<HashMap<String, QueryValue>> = selections
             .into_iter()
             .map(|mut sel| {
                 let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
+                let filter_map: HashMap<String, QueryValue> = extract_filter(where_obj, model).into_iter().collect();
 
-                extract_filter(where_obj, model)
+                filter_map
             })
             .collect();
 
