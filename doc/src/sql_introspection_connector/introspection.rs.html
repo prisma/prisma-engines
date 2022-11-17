@@ -126,7 +126,7 @@
     }
 
     <span class="comment">// commenting out models, fields, enums, enum values
-    </span>ctx.warnings.append(<span class="kw-2">&amp;mut </span>commenting_out_guardrails(<span class="kw-2">&amp;mut </span>datamodel, ctx));
+    </span>ctx.warnings.append(<span class="kw-2">&amp;mut </span>commenting_out_guardrails(<span class="kw-2">&amp;mut </span>datamodel));
 
     <span class="comment">// try to identify whether the schema was created by a previous Prisma version
     </span><span class="kw">let </span>version = version_checker::check_prisma_version(ctx);

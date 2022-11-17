@@ -173,7 +173,15 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::relation_names::RelationNames;
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+</pre><pre class="rust"><code><span class="kw">use super</span>::{models::table_has_usable_identifier, relation_names::RelationNames};
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
 <span class="kw">use </span>psl::{
     datamodel_connector::{constraint_names::ConstraintNames, Connector},
@@ -337,7 +345,15 @@
         FieldArity::List
     };
 
-    psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, arity, relation_info)
+    <span class="kw">let </span><span class="kw-2">mut </span>field = psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, arity, relation_info);
+
+    <span class="comment">// We want to put an @ignore on the field iff the field&#39;s referenced table is ignored, and the
+    // parent table isn&#39;t, because otherwise the ignore would be redundant.
+    </span><span class="kw">if </span>!table_has_usable_identifier(fk.table()) &amp;&amp; table_has_usable_identifier(fk.referenced_table()) {
+        field.is_ignored = <span class="bool-val">true</span>;
+    }
+
+    field
 }
 
 <span class="kw">fn </span>relation_mapped_name(fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
