@@ -1,132 +1,6 @@
 use crate::common::*;
 
 #[test]
-fn native_types_in_missing_back_relation_fields() {
-    let input = indoc! {r#"
-        datasource pg {
-          provider = "postgres"
-          url      = "postgres://meowmeowmeowmeowmeow"
-        }
-
-        model Blog {
-          id    Int     @id @pg.SmallInt
-          posts Post[]
-        }
-
-        model Post {
-          id Int   @id @pg.SmallInt
-        }
-
-        model Post2 {
-          id     Int  @id @pg.SmallInt
-          blogId Int  @pg.SmallInt
-          Blog   Blog @relation(fields: [blogId], references: [id])
-        }
-        "#
-    };
-
-    let expected = expect![[r#"
-        datasource pg {
-          provider = "postgres"
-          url      = "postgres://meowmeowmeowmeowmeow"
-        }
-
-        model Blog {
-          id    Int     @id @pg.SmallInt
-          posts Post[]
-          Post2 Post2[]
-        }
-
-        model Post {
-          id     Int   @id @pg.SmallInt
-          Blog   Blog? @relation(fields: [blogId], references: [id])
-          blogId Int?  @pg.SmallInt
-        }
-
-        model Post2 {
-          id     Int  @id @pg.SmallInt
-          blogId Int  @pg.SmallInt
-          Blog   Blog @relation(fields: [blogId], references: [id])
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-fn back_relation_fields_must_be_added() {
-    let input = indoc! {r#"
-        model Blog {
-          id    Int     @id
-          posts Post[]
-        }
-
-        model Post {
-          id Int   @id
-        }
-
-        model Post2 {
-          id     Int  @id
-          blogId Int
-          Blog   Blog @relation(fields: [blogId], references: [id])
-        }
-        "#
-    };
-
-    let expected = expect![[r#"
-        model Blog {
-          id    Int     @id
-          posts Post[]
-          Post2 Post2[]
-        }
-
-        model Post {
-          id     Int   @id
-          Blog   Blog? @relation(fields: [blogId], references: [id])
-          blogId Int?
-        }
-
-        model Post2 {
-          id     Int  @id
-          blogId Int
-          Blog   Blog @relation(fields: [blogId], references: [id])
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-fn back_relation_fields_and_attribute_must_be_added_even_when_attribute_is_missing() {
-    let input = indoc! {r#"
-        model User {
-          id Int @id
-          post Post
-        }
-
-        model Post {
-          id Int @id
-        }
-        "#
-    };
-
-    let expected = expect![[r#"
-        model User {
-          id     Int  @id
-          post   Post @relation(fields: [postId], references: [id])
-          postId Int
-        }
-
-        model Post {
-          id   Int    @id
-          User User[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
 fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_times() {
     let input = indoc! {r#"
         model User {
@@ -168,7 +42,6 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
 }
 
 #[test]
-#[ignore]
 fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
     let input = indoc! {r#"
         model User {
@@ -185,68 +58,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
         model User {
           id     Int  @id
           post   Post @relation(fields: [postId], references: [id])
-          postId Int?
-        }
-
-        model Post {
-          id   Int    @id
-          User User[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-#[ignore]
-fn back_relations_must_be_added_when_attribute_is_present_with_only_one_argument() {
-    let input = indoc! {r#"
-        model User {
-          id Int @id
-          post Post @relation(fields: [postId])
-        }
-
-        model Post {
-          id Int @id
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model User {
-          id     Int  @id
-          post   Post @relation(fields: [postId], references: [id])
-          postId Int?
-        }
-
-        model Post {
-          id   Int    @id
-          User User[]
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-#[ignore]
-fn back_relations_must_be_added_when_attribute_is_present_with_both_arguments() {
-    let input = indoc! {r#"
-        model User {
-          id Int @id
-          post Post @relation(fields: [postId], references: [id])
-        }
-
-        model Post {
-          id Int @id
-        }
-        "#
-    };
-
-    let expected = expect![[r#"
-        model User {
-          id     Int  @id
-          post   Post @relation(fields: [postId], references: [id])
-          postId Int?
+          postId Int
         }
 
         model Post {
@@ -449,35 +261,6 @@ fn must_add_relation_attribute_to_an_existing_field() {
           id     Int   @id
           Blog   Blog? @relation(fields: [blogId], references: [id])
           blogId Int?
-        }
-    "#]];
-
-    expected.assert_eq(&reformat(input));
-}
-
-#[test]
-fn forward_relation_fields_must_be_added() {
-    let input = indoc! {r#"
-        model PostableEntity {
-          id String @id
-        }
-
-        model Post {
-          id        String   @id
-          postableEntities PostableEntity[]
-        }
-    "#};
-
-    let expected = expect![[r#"
-        model PostableEntity {
-          id     String  @id
-          Post   Post?   @relation(fields: [postId], references: [id])
-          postId String?
-        }
-
-        model Post {
-          id               String           @id
-          postableEntities PostableEntity[]
         }
     "#]];
 

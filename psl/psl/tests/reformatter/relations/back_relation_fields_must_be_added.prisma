@@ -1,0 +1,14 @@
+model Blog {
+  id    Int     @id
+  posts Post[]
+}
+
+model Post {
+  id Int   @id
+}
+
+model Post2 {
+  id     Int  @id
+  blogId Int
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}
