@@ -4,7 +4,7 @@ use crate::introspection_helpers::{
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use introspection_connector::{Version, Warning};
+use introspection_connector::Version;
 use psl::builtin_connectors::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::ForeignKeyWalker;
@@ -98,15 +98,15 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
 
     match version_checker.sql_family {
         _ if ctx.schema.is_empty() => Version::NonPrisma,
-        SqlFamily::Sqlite if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
+        SqlFamily::Sqlite if version_checker.is_prisma_2() => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
-        SqlFamily::Mysql if version_checker.is_prisma_1(ctx.warnings) => Version::Prisma1,
-        SqlFamily::Mysql if version_checker.is_prisma_1_1(ctx.warnings) => Version::Prisma11,
+        SqlFamily::Mysql if version_checker.is_prisma_2() => Version::Prisma2,
+        SqlFamily::Mysql if version_checker.is_prisma_1() => Version::Prisma1,
+        SqlFamily::Mysql if version_checker.is_prisma_1_1() => Version::Prisma11,
         SqlFamily::Mysql => Version::NonPrisma,
-        SqlFamily::Postgres if version_checker.is_prisma_2(ctx.warnings) => Version::Prisma2,
-        SqlFamily::Postgres if version_checker.is_prisma_1(ctx.warnings) => Version::Prisma1,
-        SqlFamily::Postgres if version_checker.is_prisma_1_1(ctx.warnings) => Version::Prisma11,
+        SqlFamily::Postgres if version_checker.is_prisma_2() => Version::Prisma2,
+        SqlFamily::Postgres if version_checker.is_prisma_1() => Version::Prisma1,
+        SqlFamily::Postgres if version_checker.is_prisma_1_1() => Version::Prisma11,
         SqlFamily::Postgres => Version::NonPrisma,
         SqlFamily::Mssql => Version::NonPrisma,
     }
@@ -210,15 +210,11 @@ impl VersionChecker {
         }
     }
 
-    fn is_prisma_2(&self, warnings: &[Warning]) -> bool {
-        !self.has_relay_table
-            && !self.uses_on_delete
-            && !self.uses_non_prisma_types
-            && self.has_migration_table
-            && warnings.is_empty()
+    fn is_prisma_2(&self) -> bool {
+        !self.has_relay_table && !self.uses_on_delete && !self.uses_non_prisma_types && self.has_migration_table
     }
 
-    fn is_prisma_1_1(&self, warnings: &[Warning]) -> bool {
+    fn is_prisma_1_1(&self) -> bool {
         !self.has_migration_table
             && !self.has_relay_table
             && !self.uses_on_delete
@@ -226,10 +222,9 @@ impl VersionChecker {
             && !self.uses_non_prisma_types
             && !self.has_prisma_1_join_table
             && self.always_has_p1_or_p_1_1_compatible_id
-            && warnings.is_empty()
     }
 
-    fn is_prisma_1(&self, warnings: &[Warning]) -> bool {
+    fn is_prisma_1(&self) -> bool {
         !self.has_migration_table
             && !self.uses_on_delete
             && !self.uses_default_values
@@ -239,6 +234,5 @@ impl VersionChecker {
             && self.has_relay_table
             && self.always_has_created_at_updated_at
             && self.always_has_p1_or_p_1_1_compatible_id
-            && warnings.is_empty()
     }
 }

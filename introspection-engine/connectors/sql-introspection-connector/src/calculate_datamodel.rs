@@ -170,12 +170,19 @@ pub fn calculate_datamodel(
 
     context.version = crate::version_checker::check_prisma_version(&context);
 
-    let (data_model, is_empty) = introspect(&mut context)?;
+    let (schema_string, is_empty) = introspect(&mut context)?;
+
+    // Warning codes 5 and 6 are for Prisma 1 default reintrospection.
+    let version = if context.warnings.iter().any(|w| ![5, 6].contains(&w.code)) {
+        Version::NonPrisma
+    } else {
+        context.version
+    };
 
     Ok(IntrospectionResult {
-        data_model,
+        data_model: schema_string,
         is_empty,
-        version: context.version,
+        version,
         warnings,
     })
 }
