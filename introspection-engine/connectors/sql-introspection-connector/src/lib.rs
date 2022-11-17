@@ -9,7 +9,6 @@ mod error;
 mod introspection;
 mod introspection_helpers;
 mod introspection_map;
-mod prisma_1_defaults;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
 mod version_checker;

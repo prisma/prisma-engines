@@ -4,31 +4,13 @@ use super::attributes::{BlockAttribute, FieldAttribute};
 use crate::value::{Constant, ConstantNameValidationError, Documentation, Function};
 use std::{borrow::Cow, fmt};
 
-static ENUM_EMPTY_VALUE: &str = "EMPTY_ENUM_VALUE";
 static ENUM_EMPTY_NAME: &str = "ENUM_EMPTY_NAME";
-
-#[derive(Debug)]
-enum EnumVariantKind<'a> {
-    Valid(Constant<Cow<'a, str>>),
-    CommentedOut(Constant<Cow<'a, str>>),
-}
-
-impl<'a> fmt::Display for EnumVariantKind<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            EnumVariantKind::Valid(s) => s.fmt(f),
-            EnumVariantKind::CommentedOut(c) => {
-                f.write_str("// ")?;
-                c.fmt(f)
-            }
-        }
-    }
-}
 
 /// A variant declaration in an enum block.
 #[derive(Debug)]
 pub struct EnumVariant<'a> {
-    kind: EnumVariantKind<'a>,
+    name: Cow<'a, str>,
+    comment_out: bool,
     map: Option<FieldAttribute<'a>>,
     documentation: Option<Documentation<'a>>,
 }
@@ -42,41 +24,11 @@ impl<'a> EnumVariant<'a> {
     ///   ^^^ value
     /// }
     /// ```
-    pub fn new(value: &'a str) -> Self {
-        let (kind, map) = match Constant::new(value) {
-            Ok(constant) => {
-                let kind = EnumVariantKind::Valid(constant);
-                (kind, None)
-            }
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::Valid(sanitized);
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::Valid(Constant::new_no_validate(Cow::Borrowed(ENUM_EMPTY_VALUE)));
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::CommentedOut(Constant::new_no_validate(Cow::Borrowed(value)));
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-        };
-
+    pub fn new(name: Cow<'a, str>) -> Self {
         Self {
-            kind,
-            map,
+            name,
+            comment_out: false,
+            map: None,
             documentation: None,
         }
     }
@@ -89,11 +41,12 @@ impl<'a> EnumVariant<'a> {
     ///             ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, value: &'a str) {
-        let mut map = Function::new("map");
-        map.push_param(value);
-
-        self.map = Some(FieldAttribute::new(map));
+    pub fn map(&mut self, value: Option<&'a str>) {
+        if let Some(value) = value {
+            let mut map = Function::new("map");
+            map.push_param(value);
+            self.map = Some(FieldAttribute::new(map));
+        }
     }
 
     /// Comments the variant out in the declaration.
@@ -104,12 +57,8 @@ impl<'a> EnumVariant<'a> {
     ///   ^^ adds this
     /// }
     /// ```
-    pub fn into_commented_out(mut self) -> Self {
-        if let EnumVariantKind::Valid(value) = self.kind {
-            self.kind = EnumVariantKind::CommentedOut(value);
-        }
-
-        self
+    pub fn comment_out(&mut self, comment_out: bool) {
+        self.comment_out = comment_out;
     }
 
     /// Documentation of a variant.
@@ -120,35 +69,24 @@ impl<'a> EnumVariant<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: Option<&'a str>) {
+        self.documentation = documentation.map(Documentation);
     }
 
     /// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
     fn from_dml(dml_variant: &'a dml::EnumValue) -> Self {
-        let mut variant = Self::new(&dml_variant.name);
-
-        if dml_variant.commented_out {
-            variant = variant.into_commented_out();
-        }
-
-        if let Some(ref map) = dml_variant.database_name {
-            variant.map(map);
-        }
-
-        if let Some(ref docs) = dml_variant.documentation {
-            variant.documentation(docs);
-        }
-
+        let mut variant = Self::new(Cow::Borrowed(&dml_variant.name));
+        variant.comment_out(dml_variant.commented_out);
+        variant.map(dml_variant.database_name.as_deref());
         variant
     }
 }
 
 impl<'a> From<&'a str> for EnumVariant<'a> {
     fn from(variant: &'a str) -> Self {
-        Self::new(variant)
+        Self::new(Cow::Borrowed(variant))
     }
 }
 
@@ -158,7 +96,11 @@ impl<'a> fmt::Display for EnumVariant<'a> {
             docs.fmt(f)?;
         }
 
-        self.kind.fmt(f)?;
+        if self.comment_out {
+            f.write_str("// ")?;
+        }
+
+        f.write_str(&self.name)?;
 
         if let Some(ref map) = self.map {
             f.write_str(" ")?;
@@ -348,15 +290,20 @@ mod tests {
         r#enum.documentation("Cat's foot, iron claw\nNeuro-surgeons scream for more\nAt paranoia's poison door...");
 
         r#enum.push_variant("Red");
-        r#enum.push_variant("1Green");
+        {
+            let mut green = EnumVariant::new("Green".into());
+            green.map(Some("1Green"));
+            r#enum.push_variant(green);
+        }
 
-        let mut variant = EnumVariant::new("-Blue");
-        variant.map("Yellow");
-        variant.documentation("Twenty-first century schizoid man!");
+        let mut variant = EnumVariant::new("Blue".into());
+        variant.map("Yellow".into());
+        variant.documentation(Some("Twenty-first century schizoid man!"));
 
         r#enum.push_variant(variant);
 
-        let variant = EnumVariant::new("Invalid").into_commented_out();
+        let mut variant = EnumVariant::new("Invalid".into());
+        variant.comment_out(true);
         r#enum.push_variant(variant);
         r#enum.push_variant("Black");
 

@@ -1,0 +1,9 @@
+model PostableEntity {
+  id String @id
+}
+
+model Post {
+  id        String   @id
+  postableEntities PostableEntity[]
+}
+

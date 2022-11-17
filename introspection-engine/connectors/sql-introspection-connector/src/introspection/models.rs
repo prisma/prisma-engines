@@ -4,10 +4,16 @@ use sql_schema_describer as sql;
 use std::collections::HashMap;
 
 pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
+    // The following local variables are for different types of warnings. We should refactor these
+    // to either be as-is inside the context, or find another mechanism, and abstract to avoid the
+    // repetition.
     let mut re_introspected_model_ignores = Vec::new();
     let mut remapped_models = Vec::new();
     let mut remapped_fields = Vec::new();
     let mut reintrospected_id_names = Vec::new();
+    let mut models_without_identifiers = Vec::new();
+    let mut models_without_columns = Vec::new();
+    let mut unsupported_types = Vec::new();
 
     for table in ctx
         .schema
@@ -43,6 +49,20 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
             }
         }
 
+        if table.columns().len() == 0 {
+            documentation.push_str(empty_table_comment(ctx));
+            model.is_commented_out = true;
+            models_without_columns.push(warnings::Model {
+                model: model.name.clone(),
+            });
+        } else if !table_has_usable_identifier(table) {
+            models_without_identifiers.push(warnings::Model {
+                model: model.name.clone(),
+            });
+            documentation.push_str("The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.");
+            model.is_ignored = true;
+        }
+
         if let Some(m) = existing_model.filter(|m| m.mapped_name().is_some()) {
             remapped_models.push(warnings::Model {
                 model: m.name().to_owned(),
@@ -54,6 +74,14 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         }
 
         for column in table.columns() {
+            if let sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
+                unsupported_types.push(warnings::ModelAndFieldAndType {
+                    model: model.name.clone(),
+                    field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+                    tpe: tpe.to_owned(),
+                })
+            }
+
             model.add_field(dml::Field::ScalarField(calculate_scalar_field(
                 column,
                 &mut remapped_fields,
@@ -123,6 +151,21 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         datamodel.models.push(model);
     }
 
+    if !models_without_columns.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_models_without_columns(&models_without_columns))
+    }
+
+    if !models_without_identifiers.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_models_without_identifier(&models_without_identifiers))
+    }
+
+    if !unsupported_types.is_empty() {
+        ctx.warnings
+            .push(warnings::warning_unsupported_types(&unsupported_types));
+    }
+
     if !remapped_models.is_empty() {
         ctx.warnings
             .push(warnings::warning_enriched_with_map_on_model(&remapped_models));
@@ -143,7 +186,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
     sort_models(datamodel, ctx)
 }
 
-fn sort_models(datamodel: &mut dml::Datamodel, ctx: &Context) {
+fn sort_models(datamodel: &mut dml::Datamodel, ctx: &Context<'_>) {
     let existing_models_by_database_name: HashMap<&str, _> = ctx
         .previous_schema
         .db
@@ -158,4 +201,27 @@ fn sort_models(datamodel: &mut dml::Datamodel, ctx: &Context) {
 
         compare_options_none_last(existing(a), existing(b))
     });
+}
+
+fn empty_table_comment(ctx: &mut Context<'_>) -> &'static str {
+    // On postgres this is allowed, on the other dbs, this could be a symptom of missing privileges.
+    if ctx.sql_family.is_postgres() {
+        "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges."
+    } else {
+        "We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges."
+    }
+}
+
+pub(super) fn table_has_usable_identifier(table: sql::TableWalker<'_>) -> bool {
+    table
+        .indexes()
+        .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .any(|idx| {
+            idx.columns().all(|c| {
+                !matches!(
+                    c.as_column().column_type().family,
+                    sql::ColumnTypeFamily::Unsupported(_)
+                ) && c.as_column().arity().is_required()
+            })
+        })
 }
