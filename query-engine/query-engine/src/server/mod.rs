@@ -76,7 +76,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
 
     let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
