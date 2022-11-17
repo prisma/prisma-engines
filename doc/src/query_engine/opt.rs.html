@@ -226,6 +226,11 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{error::PrismaError, PrismaResult};
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::{env, ffi::OsStr, fs::File, io::Read};
@@ -313,6 +318,11 @@
     <span class="doccomment">/// Enables the metrics endpoints
     </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;m&quot;</span>)]
     </span><span class="kw">pub </span>enable_metrics: bool,
+
+    <span class="comment">// Enable the metrics without having to enable the feature in the
+    // schema. Used by data proxy to count interactive transactions.
+    </span><span class="attribute">#[structopt(long)]
+    </span><span class="kw">pub </span>dataproxy_metric_override: bool,
 
     <span class="doccomment">/// Enable query logging [env: LOG_QUERIES=y]
     </span><span class="attribute">#[structopt(long, short = <span class="string">&quot;o&quot;</span>)]

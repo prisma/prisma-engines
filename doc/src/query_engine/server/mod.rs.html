@@ -543,7 +543,7 @@
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
-    <span class="kw">let </span>enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+    <span class="kw">let </span>enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
 
     <span class="kw">let </span>cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
