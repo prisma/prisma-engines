@@ -8,9 +8,13 @@ Run `cargo test` in the `psl` crate. There should be no setup required beyond th
 
 ### For test authors
 
-There are two entry points for PSL tests. The tests involving writing plain
-Rust tests, in `datamodel_tests.rs`, and the declarative validation tests, in
-`validation.rs`.
+There are three entry points for PSL tests:
+
+- the tests involving writing plain Rust tests, in [psl/tests/datamodel_tests.rs]
+- the declarative validation tests, in [psl/tests/validation_tests.rs]
+- the declarative reformatting tests, in [psl/tests/reformat_tests.rs].
+
+#### Validation tests
 
 For new tests where we only want to check that a given Prisma schema produces
 validation errors (or none at all), the validation test suite should be
@@ -30,6 +34,13 @@ the contents of that comment.
 Like in `expect_test` tests, the last comment can be left out at first, and
 updated like a snapshot test using the `UPDATE_EXPECT=1` env var.
 
+#### Reformatter tests
+
+These work similarly to the validation tests, with the same snapshot mechanism with the `UPDATE_EXPECT` env var.
+
+For each Prisma schema in the `reformatter`, directory, the test harness will assert that its contents match the file with the same name, but with the `reformatted.prisma` extension.
+
+The test harness also reformats _that_ file's contents in turn to check that the reformatting is idempotent.
 
 ## Style guidelines
 
