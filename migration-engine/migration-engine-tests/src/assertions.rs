@@ -71,8 +71,7 @@ impl SchemaAssertion {
         }
     }
 
-    // TODO: How can I instead return 'Void'?
-    fn assert_error<'a>(&'a self, table_name: &str, positive: bool) -> TableWalker<'a> {
+    fn assert_error(&self, table_name: &str, positive: bool) -> ! {
         let method = if positive {
             "assert_table"
         } else {
@@ -82,20 +81,19 @@ impl SchemaAssertion {
         self.print_context();
         println!(
             "{}{}",
-            format!(
+            format_args!(
                 "\n  {} has failed because table {} {}",
                 method.bold(),
                 table_name.red(),
                 result.bold(),
             ),
-            format!("\n  Tables in database:").italic()
+            "\n  Tables in database:".italic()
         );
         self.schema
             .table_walkers()
             .map(|table| table.name())
             .for_each(|t| println!("\t - {}", t.green()));
 
-        std::panic::set_hook(Box::new(|_| {}));
         panic!();
     }
 
@@ -122,8 +120,9 @@ impl SchemaAssertion {
 
     #[track_caller]
     pub fn assert_has_no_table(self, table_name: &str) -> Self {
-        self.find_table_option(table_name)
-            .map(|_| self.assert_error(table_name, false));
+        if self.find_table_option(table_name).is_some() {
+            self.assert_error(table_name, false);
+        }
         self
     }
 
@@ -160,7 +159,6 @@ impl SchemaAssertion {
         if has_matching_enum {
             self.print_context();
             println!("Found unexpected enum {}", enum_name.red());
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -176,7 +174,6 @@ impl SchemaAssertion {
             None => {
                 self.print_context();
                 println!("Enum {} was {}", enum_name.red(), "not found".bold());
-                std::panic::set_hook(Box::new(|_| {}));
                 panic!();
             }
         };
@@ -202,7 +199,6 @@ impl SchemaAssertion {
                 .table_walkers()
                 .map(|table| table.name())
                 .for_each(|t| println!("\t - {}", t.bold()));
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -226,7 +222,6 @@ impl SchemaAssertion {
                 .view_walkers()
                 .map(|view| view.name())
                 .for_each(|t| println!("\t - {}", t.bold()));
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 

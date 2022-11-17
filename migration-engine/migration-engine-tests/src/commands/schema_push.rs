@@ -118,7 +118,6 @@ impl SchemaPushAssertion {
                 println!("\t - {}", found.red());
             });
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -144,7 +143,7 @@ impl SchemaPushAssertion {
                 found_and_not_expected.push(found.into());
             }
         });
-        if expected_and_not_found.len() != 0 || found_and_not_expected.len() != 0 {
+        if !(expected_and_not_found.is_empty() && found_and_not_expected.is_empty()) {
             self.print_context();
             println!(
                 "Expected {} warnings but got {}.",
@@ -167,7 +166,6 @@ impl SchemaPushAssertion {
                 println!("\t - {}", good);
             });
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -185,7 +183,6 @@ impl SchemaPushAssertion {
                 format!("{}", self.result.executed_steps).red(),
             );
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -202,7 +199,6 @@ impl SchemaPushAssertion {
                 "0".red(),
             );
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -217,7 +213,6 @@ impl SchemaPushAssertion {
                 println!("\t - {}", unexecutable.red());
             });
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
@@ -243,7 +238,7 @@ impl SchemaPushAssertion {
                 found_and_not_expected.push(found.into());
             }
         });
-        if expected_and_not_found.len() != 0 || found_and_not_expected.len() != 0 {
+        if !(expected_and_not_found.is_empty() && found_and_not_expected.is_empty()) {
             self.print_context();
             println!(
                 "Expected {} errors but got {}.",
@@ -266,7 +261,6 @@ impl SchemaPushAssertion {
                 println!("\t - {}", good);
             });
 
-            std::panic::set_hook(Box::new(|_| {}));
             panic!();
         }
 
