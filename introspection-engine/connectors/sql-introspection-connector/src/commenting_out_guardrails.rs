@@ -1,48 +1,17 @@
-use crate::warnings::{
-    warning_enum_values_with_empty_names, warning_fields_with_empty_names, EnumAndValue, ModelAndField,
-};
+use crate::warnings::{warning_enum_values_with_empty_names, EnumAndValue};
 use introspection_connector::Warning;
 use psl::dml::Datamodel;
 
 pub(crate) fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut warnings = vec![];
 
-    // order matters...
-    let fields_with_empty_names = fields_with_empty_names(datamodel);
     let enum_values_with_empty_names = empty_enum_values(datamodel);
-
-    if !fields_with_empty_names.is_empty() {
-        warnings.push(warning_fields_with_empty_names(&fields_with_empty_names))
-    }
 
     if !enum_values_with_empty_names.is_empty() {
         warnings.push(warning_enum_values_with_empty_names(&enum_values_with_empty_names))
     }
 
     warnings
-}
-
-fn fields_with_empty_names(datamodel: &mut Datamodel) -> Vec<ModelAndField> {
-    let mut fields_with_empty_names = vec![];
-
-    for model in datamodel.models_mut() {
-        let model_name = model.name.clone();
-
-        for field in model.scalar_fields_mut() {
-            if field.name.is_empty() {
-                field.documentation = Some(
-                    "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
-                        .to_string(),
-                );
-                field.name = field.database_name.as_ref().unwrap().to_string();
-                field.is_commented_out = true;
-
-                fields_with_empty_names.push(ModelAndField::new(&model_name, &field.name))
-            }
-        }
-    }
-
-    fields_with_empty_names
 }
 
 fn empty_enum_values(datamodel: &mut Datamodel) -> Vec<EnumAndValue> {
