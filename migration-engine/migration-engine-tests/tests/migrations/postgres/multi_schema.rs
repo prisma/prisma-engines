@@ -40,7 +40,6 @@ struct CustomPushStep {
     errors: &'static [&'static str],
     with_schema: WithSchema,
     executed_steps: ExecutedSteps,
-    next: &'static SchemaPush,
 }
 
 /// This encapsulates setting up the database for the test, using a schema. It also potentially
@@ -55,7 +54,7 @@ enum SchemaPush {
     /// warnings/errors.
     PushAnd(WithSchema, &'static SchemaPush),
     /// Push with custom properties (warnings, errors, etc.).
-    PushCustomAnd(CustomPushStep),
+    PushCustomAnd(CustomPushStep, &'static SchemaPush),
     /// Run a raw SQL command.
     RawCmdAnd(&'static str, &'static SchemaPush),
     /// Perform a (soft) reset.
@@ -153,8 +152,8 @@ fn multi_schema_tests(_api: TestApi) {
                            errors: &[],
                            with_schema: WithSchema::First,
                            executed_steps: ExecutedSteps::Zero,
-                           next: &SchemaPush::Done,
-                           })),
+                           },
+                           &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_has_table("First").assert_has_table("Second");
             }),
@@ -281,8 +280,8 @@ fn multi_schema_tests(_api: TestApi) {
                                  errors: &["Made the column `name` on table `Second` required, but there are 1 existing NULL values."],
                                  with_schema: WithSchema::Second,
                                  executed_steps: ExecutedSteps::Zero,
-                                 next: &SchemaPush::Done,
-                             }))),
+                             },
+                             &SchemaPush::Done))),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -444,8 +443,7 @@ fn multi_schema_tests(_api: TestApi) {
                                errors: &[],
                                with_schema: WithSchema::Second,
                                executed_steps: ExecutedSteps::NonZero,
-                               next: &SchemaPush::Done,
-                           })),
+                           }, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
                     .assert_has_table("First")
@@ -668,13 +666,15 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
             run_schema_step(api, test, namespaces, next);
         }
 
-        SchemaPush::PushCustomAnd(CustomPushStep {
-            warnings,
-            errors,
-            with_schema,
-            executed_steps,
+        SchemaPush::PushCustomAnd(
+            CustomPushStep {
+                warnings,
+                errors,
+                with_schema,
+                executed_steps,
+            },
             next,
-        }) => {
+        ) => {
             let schema = match with_schema {
                 WithSchema::First => test.schema.common.to_owned() + test.schema.first.as_str(),
                 WithSchema::Second => match &test.schema.second {
