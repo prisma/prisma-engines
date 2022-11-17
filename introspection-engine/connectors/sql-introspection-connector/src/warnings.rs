@@ -50,10 +50,28 @@ pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     }
 }
 
+pub(crate) fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> Warning {
+    Warning {
+        code: 2,
+        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
+            .into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
 pub(crate) fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Warning {
     Warning {
         code: 3,
         message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_enum_values_with_empty_names(affected: &[EnumAndValue]) -> Warning {
+    Warning {
+        code: 4,
+        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
+            .into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

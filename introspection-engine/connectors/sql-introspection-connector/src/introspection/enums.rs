@@ -71,6 +71,10 @@ fn sql_enum_to_dml_enum(
 
         match variant_name {
             EnumVariantName::RenamedSanitized { mapped_name } if prisma_name.is_empty() => {
+                ctx.enum_values_with_empty_names.push(warnings::EnumAndValue {
+                    enm: enum_name.clone(),
+                    value: mapped_name.to_owned(),
+                });
                 prisma_name = mapped_name.to_owned();
                 dml_value.commented_out = true;
             }
