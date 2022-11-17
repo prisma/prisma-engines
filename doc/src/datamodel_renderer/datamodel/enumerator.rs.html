@@ -330,90 +330,19 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::dml;
 
 <span class="kw">use </span><span class="kw">super</span>::attributes::{BlockAttribute, FieldAttribute};
 <span class="kw">use </span><span class="kw">crate</span>::value::{Constant, ConstantNameValidationError, Documentation, Function};
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 
-<span class="kw">static </span>ENUM_EMPTY_VALUE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>;
 <span class="kw">static </span>ENUM_EMPTY_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;ENUM_EMPTY_NAME&quot;</span>;
-
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">enum </span>EnumVariantKind&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Valid(Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
-    CommentedOut(Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>EnumVariantKind&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="kw">match </span><span class="self">self </span>{
-            EnumVariantKind::Valid(s) =&gt; s.fmt(f),
-            EnumVariantKind::CommentedOut(c) =&gt; {
-                f.write_str(<span class="string">&quot;// &quot;</span>)<span class="question-mark">?</span>;
-                c.fmt(f)
-            }
-        }
-    }
-}
 
 <span class="doccomment">/// A variant declaration in an enum block.
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
-    kind: EnumVariantKind&lt;<span class="lifetime">&#39;a</span>&gt;,
+    name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    comment_out: bool,
     map: <span class="prelude-ty">Option</span>&lt;FieldAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
@@ -427,41 +356,11 @@
     ///   ^^^ value
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>(kind, map) = <span class="kw">match </span>Constant::new(value) {
-            <span class="prelude-val">Ok</span>(constant) =&gt; {
-                <span class="kw">let </span>kind = EnumVariantKind::Valid(constant);
-                (kind, <span class="prelude-val">None</span>)
-            }
-            <span class="prelude-val">Err</span>(ConstantNameValidationError::WasSanitized { sanitized }) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
-                fun.push_param(value);
-
-                <span class="kw">let </span>kind = EnumVariantKind::Valid(sanitized);
-
-                (kind, <span class="prelude-val">Some</span>(FieldAttribute::new(fun)))
-            }
-            <span class="prelude-val">Err</span>(ConstantNameValidationError::OriginalEmpty) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
-                fun.push_param(value);
-
-                <span class="kw">let </span>kind = EnumVariantKind::Valid(Constant::new_no_validate(Cow::Borrowed(ENUM_EMPTY_VALUE)));
-
-                (kind, <span class="prelude-val">Some</span>(FieldAttribute::new(fun)))
-            }
-            <span class="prelude-val">Err</span>(ConstantNameValidationError::SanitizedEmpty) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
-                fun.push_param(value);
-
-                <span class="kw">let </span>kind = EnumVariantKind::CommentedOut(Constant::new_no_validate(Cow::Borrowed(value)));
-
-                (kind, <span class="prelude-val">Some</span>(FieldAttribute::new(fun)))
-            }
-        };
-
+    </span><span class="kw">pub fn </span>new(name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            kind,
-            map,
+            name,
+            comment_out: <span class="bool-val">false</span>,
+            map: <span class="prelude-val">None</span>,
             documentation: <span class="prelude-val">None</span>,
         }
     }
@@ -474,11 +373,12 @@
     ///             ^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
-        map.push_param(value);
-
-        <span class="self">self</span>.map = <span class="prelude-val">Some</span>(FieldAttribute::new(map));
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = value {
+            <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+            map.push_param(value);
+            <span class="self">self</span>.map = <span class="prelude-val">Some</span>(FieldAttribute::new(map));
+        }
     }
 
     <span class="doccomment">/// Comments the variant out in the declaration.
@@ -489,13 +389,9 @@
     ///   ^^ adds this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>into_commented_out(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="kw">if let </span>EnumVariantKind::Valid(value) = <span class="self">self</span>.kind {
-            <span class="self">self</span>.kind = EnumVariantKind::CommentedOut(value);
-        }
-
-        <span class="self">self
-    </span>}
+    </span><span class="kw">pub fn </span>comment_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>, comment_out: bool) {
+        <span class="self">self</span>.comment_out = comment_out;
+    }
 
     <span class="doccomment">/// Documentation of a variant.
     ///
@@ -505,35 +401,24 @@
     ///   Bar
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) {
+        <span class="self">self</span>.documentation = documentation.map(Documentation);
     }
 
     <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
     </span><span class="kw">fn </span>from_dml(dml_variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::EnumValue) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>variant = <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>dml_variant.name);
-
-        <span class="kw">if </span>dml_variant.commented_out {
-            variant = variant.into_commented_out();
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_variant.database_name {
-            variant.map(map);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_variant.documentation {
-            variant.documentation(docs);
-        }
-
+        <span class="kw">let </span><span class="kw-2">mut </span>variant = <span class="self">Self</span>::new(Cow::Borrowed(<span class="kw-2">&amp;</span>dml_variant.name));
+        variant.comment_out(dml_variant.commented_out);
+        variant.map(dml_variant.database_name.as_deref());
         variant
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>from(variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(variant)
+        <span class="self">Self</span>::new(Cow::Borrowed(variant))
     }
 }
 
@@ -543,7 +428,11 @@
             docs.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.kind.fmt(f)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.comment_out {
+            f.write_str(<span class="string">&quot;// &quot;</span>)<span class="question-mark">?</span>;
+        }
+
+        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.name)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="self">self</span>.map {
             f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
@@ -733,15 +622,20 @@
         r#enum.documentation(<span class="string">&quot;Cat&#39;s foot, iron claw\nNeuro-surgeons scream for more\nAt paranoia&#39;s poison door...&quot;</span>);
 
         r#enum.push_variant(<span class="string">&quot;Red&quot;</span>);
-        r#enum.push_variant(<span class="string">&quot;1Green&quot;</span>);
+        {
+            <span class="kw">let </span><span class="kw-2">mut </span>green = EnumVariant::new(<span class="string">&quot;Green&quot;</span>.into());
+            green.map(<span class="prelude-val">Some</span>(<span class="string">&quot;1Green&quot;</span>));
+            r#enum.push_variant(green);
+        }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>variant = EnumVariant::new(<span class="string">&quot;-Blue&quot;</span>);
-        variant.map(<span class="string">&quot;Yellow&quot;</span>);
-        variant.documentation(<span class="string">&quot;Twenty-first century schizoid man!&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>variant = EnumVariant::new(<span class="string">&quot;Blue&quot;</span>.into());
+        variant.map(<span class="string">&quot;Yellow&quot;</span>.into());
+        variant.documentation(<span class="prelude-val">Some</span>(<span class="string">&quot;Twenty-first century schizoid man!&quot;</span>));
 
         r#enum.push_variant(variant);
 
-        <span class="kw">let </span>variant = EnumVariant::new(<span class="string">&quot;Invalid&quot;</span>).into_commented_out();
+        <span class="kw">let </span><span class="kw-2">mut </span>variant = EnumVariant::new(<span class="string">&quot;Invalid&quot;</span>.into());
+        variant.comment_out(<span class="bool-val">true</span>);
         r#enum.push_variant(variant);
         r#enum.push_variant(<span class="string">&quot;Black&quot;</span>);
 
