@@ -4,6 +4,9 @@ use sql_schema_describer as sql;
 use std::collections::HashMap;
 
 pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
+    // The following local variables are for different types of warnings. We should refactor these
+    // to either be as-is inside the context, or find another mechanism, and abstract to avoid the
+    // repetition.
     let mut re_introspected_model_ignores = Vec::new();
     let mut remapped_models = Vec::new();
     let mut remapped_fields = Vec::new();
