@@ -23,15 +23,6 @@ pub(crate) struct ModelAndField {
     pub(crate) field: String,
 }
 
-impl ModelAndField {
-    pub(crate) fn new(model: &str, field: &str) -> Self {
-        ModelAndField {
-            model: model.to_owned(),
-            field: field.to_owned(),
-        }
-    }
-}
-
 #[derive(Serialize, Debug, Clone)]
 pub(crate) struct ModelAndIndex {
     pub(crate) model: String,
@@ -51,15 +42,6 @@ pub(crate) struct EnumAndValue {
     pub(crate) value: String,
 }
 
-impl EnumAndValue {
-    pub(crate) fn new(enm: &str, value: &str) -> Self {
-        EnumAndValue {
-            enm: enm.to_owned(),
-            value: value.to_owned(),
-        }
-    }
-}
-
 pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     Warning {
         code: 1,
@@ -72,15 +54,6 @@ pub(crate) fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Wa
     Warning {
         code: 3,
         message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-pub(crate) fn warning_enum_values_with_empty_names(affected: &[EnumAndValue]) -> Warning {
-    Warning {
-        code: 4,
-        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
-            .into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }
