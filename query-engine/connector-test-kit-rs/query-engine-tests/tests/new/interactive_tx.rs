@@ -1,7 +1,6 @@
 use query_engine_tests::test_suite;
 use std::borrow::Cow;
 
-/// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
 #[test_suite(schema(generic))]
 mod interactive_tx {
     use query_engine_tests::*;
