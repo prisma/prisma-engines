@@ -8,9 +8,9 @@ enum FieldKind<'a> {
     Required(Constant<Cow<'a, str>>),
     Optional(Constant<Cow<'a, str>>),
     Array(Constant<Cow<'a, str>>),
-    RequiredUnsupported(Text<&'a str>),
-    OptionalUnsupported(Text<&'a str>),
-    ArrayUnsupported(Text<&'a str>),
+    RequiredUnsupported(Text<Cow<'a, str>>),
+    OptionalUnsupported(Text<Cow<'a, str>>),
+    ArrayUnsupported(Text<Cow<'a, str>>),
 }
 
 /// A type of a field in the datamodel.
@@ -24,12 +24,8 @@ impl<'a> FieldType<'a> {
     /// type. For example: `Int`.
     ///
     /// The name will be sanitized, removing unsupported characters.
-    pub fn required(name: &'a str) -> Self {
-        let name = match Constant::new(name) {
-            Ok(name) => name,
-            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
-        };
+    pub fn required(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             inner: FieldKind::Required(name),
@@ -40,13 +36,8 @@ impl<'a> FieldType<'a> {
     /// type name. For example: `Int?`.
     ///
     /// The name will be sanitized, removing unsupported characters.
-    pub fn optional(name: &'a str) -> Self {
-        let name = match Constant::new(name) {
-            Ok(name) => name,
-            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
-        };
-
+    pub fn optional(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
         Self {
             inner: FieldKind::Optional(name),
         }
@@ -56,13 +47,8 @@ impl<'a> FieldType<'a> {
     /// type name. For example: `Int[]`.
     ///
     /// The name will be sanitized, removing unsupported characters.
-    pub fn array(name: &'a str) -> Self {
-        let name = match Constant::new(name) {
-            Ok(name) => name,
-            Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-            Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
-        };
-
+    pub fn array(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
         Self {
             inner: FieldKind::Array(name),
         }
@@ -70,25 +56,25 @@ impl<'a> FieldType<'a> {
 
     /// The field is required, but not supported by Prisma, rendered
     /// as `Unsupported(ts_vector)`.
-    pub fn required_unsupported(name: &'a str) -> Self {
+    pub fn required_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            inner: FieldKind::RequiredUnsupported(Text(name)),
+            inner: FieldKind::RequiredUnsupported(Text(name.into())),
         }
     }
 
     /// The field is optional, but not supported by Prisma, rendered
     /// as `Unsupported(ts_vector)?`.
-    pub fn optional_unsupported(name: &'a str) -> Self {
+    pub fn optional_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            inner: FieldKind::OptionalUnsupported(Text(name)),
+            inner: FieldKind::OptionalUnsupported(Text(name.into())),
         }
     }
 
     /// The field is optional, but not supported by Prisma, rendered
     /// as `Unsupported(ts_vector)?`.
-    pub fn array_unsupported(name: &'a str) -> Self {
+    pub fn array_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            inner: FieldKind::ArrayUnsupported(Text(name)),
+            inner: FieldKind::ArrayUnsupported(Text(name.into())),
         }
     }
 }

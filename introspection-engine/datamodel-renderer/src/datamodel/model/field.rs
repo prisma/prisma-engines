@@ -3,7 +3,7 @@ use crate::{
         attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
         IdFieldDefinition, Relation,
     },
-    value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
+    value::{Constant, Documentation, Function, Text},
 };
 use psl::dml;
 use std::{borrow::Cow, collections::HashMap, fmt};
@@ -127,8 +127,8 @@ impl<'a> ModelField<'a> {
     ///   bar Int
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Sets the field default attribute.
@@ -191,7 +191,7 @@ impl<'a> ModelField<'a> {
         let mut fun = Function::new("unique");
 
         if let Some(map) = options.map {
-            fun.push_param(("map", Text(map)));
+            fun.push_param(("map", Text::new(map)));
         }
 
         if let Some(sort_order) = options.sort_order {
@@ -251,39 +251,13 @@ impl<'a> ModelField<'a> {
     }
 
     fn new(name: &'a str, r#type: FieldType<'a>) -> Self {
-        let (name, map, commented_out) = match Constant::new(name) {
-            Ok(name) => (name, None, false),
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (sanitized, Some(map), false)
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), true)
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), true)
-            }
-        };
+        let name = Constant::new_no_validate(Cow::Borrowed(name));
 
         Self {
             name,
-            commented_out,
+            commented_out: false,
             r#type,
-            map,
+            map: None,
             documentation: None,
             updated_at: None,
             unique: None,

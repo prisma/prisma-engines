@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use psl::dml;
 
@@ -38,9 +38,9 @@ impl<'a> DefaultValue<'a> {
     ///                          ^^^^ this
     /// }
     /// ```
-    pub fn text(value: &'a str) -> Self {
+    pub fn text(value: impl Into<Cow<'a, str>>) -> Self {
         let mut inner = Function::new("default");
-        inner.push_param(Value::from(Text(value)));
+        inner.push_param(Value::from(Text::new(value)));
 
         Self::new(inner)
     }
@@ -53,9 +53,9 @@ impl<'a> DefaultValue<'a> {
     ///                          ^^^^^^^^ this
     /// }
     /// ```
-    pub fn bytes(value: &'a [u8]) -> Self {
+    pub fn bytes(value: impl Into<Cow<'a, [u8]>>) -> Self {
         let mut inner = Function::new("default");
-        inner.push_param(Value::from(value));
+        inner.push_param(Value::from(value.into().into_owned()));
 
         Self::new(inner)
     }
@@ -73,7 +73,7 @@ impl<'a> DefaultValue<'a> {
         T: fmt::Display + 'a,
     {
         let mut inner = Function::new("default");
-        inner.push_param(Value::Constant(Constant::new_no_validate(Box::new(value))));
+        inner.push_param(Value::from(Constant::new_no_validate(value)));
 
         Self::new(inner)
     }
@@ -93,7 +93,7 @@ impl<'a> DefaultValue<'a> {
         let mut inner = Function::new("default");
         let constant = Box::new(Array::from(values));
 
-        inner.push_param(Value::Constant(Constant::new_no_validate(constant)));
+        inner.push_param(Value::from(Constant::new_no_validate(constant)));
 
         Self::new(inner)
     }
@@ -106,38 +106,40 @@ impl<'a> DefaultValue<'a> {
     ///                                      ^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, mapped_name: &'a str) {
-        self.0.push_param(("map", Text(mapped_name)));
+    pub fn map(&mut self, mapped_name: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("map", Text::new(mapped_name)));
     }
 
     /// Here to cope with the initial issue of needing the DML
     /// structures. Remove when we don't generate DML in intro
     /// anymore.
-    pub fn from_dml(val: &'a dml::DefaultValue) -> Self {
+    pub fn from_dml(val: &dml::DefaultValue) -> Self {
         let mut dv = match &val.kind {
-            dml::DefaultKind::Single(dml::PrismaValue::String(ref val)) => Self::text(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Boolean(val)) => Self::constant(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Enum(val)) => Self::constant(val.as_str()),
-            dml::DefaultKind::Single(dml::PrismaValue::Int(val)) => Self::constant(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Uuid(val)) => Self::constant(val.as_hyphenated()),
+            dml::DefaultKind::Single(dml::PrismaValue::String(val)) => Self::text(val.clone()),
+            dml::DefaultKind::Single(dml::PrismaValue::Boolean(val)) => Self::constant(*val),
+            dml::DefaultKind::Single(dml::PrismaValue::Enum(val)) => {
+                Self::constant(Cow::<str>::Owned(String::clone(val)))
+            }
+            dml::DefaultKind::Single(dml::PrismaValue::Int(val)) => Self::constant(*val),
+            dml::DefaultKind::Single(dml::PrismaValue::Uuid(val)) => Self::constant(val.as_hyphenated().to_string()),
             dml::DefaultKind::Single(dml::PrismaValue::List(ref vals)) => {
                 Self::array(vals.iter().map(Value::from).collect())
             }
-            dml::DefaultKind::Single(dml::PrismaValue::Json(ref val)) => Self::text(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Xml(ref val)) => Self::text(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Float(ref val)) => Self::constant(val),
-            dml::DefaultKind::Single(dml::PrismaValue::BigInt(val)) => Self::constant(val),
-            dml::DefaultKind::Single(dml::PrismaValue::Bytes(ref val)) => Self::bytes(val),
-            dml::DefaultKind::Single(dml::PrismaValue::DateTime(val)) => Self::constant(val),
+            dml::DefaultKind::Single(dml::PrismaValue::Json(val)) => Self::text(val.clone()),
+            dml::DefaultKind::Single(dml::PrismaValue::Xml(val)) => Self::text(val.clone()),
+            dml::DefaultKind::Single(dml::PrismaValue::Float(ref val)) => Self::constant(val.clone()),
+            dml::DefaultKind::Single(dml::PrismaValue::BigInt(val)) => Self::constant(*val),
+            dml::DefaultKind::Single(dml::PrismaValue::Bytes(val)) => Self::bytes(Cow::Owned(val.clone())),
+            dml::DefaultKind::Single(dml::PrismaValue::DateTime(val)) => Self::constant(*val),
             dml::DefaultKind::Single(dml::PrismaValue::Object(_)) => unreachable!(),
             dml::DefaultKind::Single(dml::PrismaValue::Null) => unreachable!(),
             dml::DefaultKind::Expression(ref expr) => {
-                let mut fun = Function::new(expr.name());
+                let mut fun = Function::new(expr.name().to_owned());
                 fun.render_empty_parentheses();
 
                 for (arg_name, value) in expr.args() {
                     match arg_name {
-                        Some(name) => fun.push_param((name.as_str(), Value::from(value))),
+                        Some(name) => fun.push_param((Cow::Owned(name.clone()), Value::from(value))),
                         None => fun.push_param(Value::from(value)),
                     }
                 }
@@ -147,7 +149,7 @@ impl<'a> DefaultValue<'a> {
         };
 
         if let Some(s) = val.db_name() {
-            dv.map(s);
+            dv.map(s.to_owned());
         }
 
         dv
@@ -159,28 +161,28 @@ impl<'a> DefaultValue<'a> {
 }
 
 // TODO: remove when dml is dead.
-impl<'a> From<&'a dml::PrismaValue> for Value<'a> {
-    fn from(value: &'a dml::PrismaValue) -> Self {
+impl From<&dml::PrismaValue> for Value<'static> {
+    fn from(value: &dml::PrismaValue) -> Self {
         match value {
-            dml::PrismaValue::String(ref s) => Value::Text(Text(s)),
-            dml::PrismaValue::Boolean(v) => Value::Constant(Constant::new_no_validate(Box::new(v))),
-            dml::PrismaValue::Enum(val) => Value::Constant(Constant::new_no_validate(Box::new(val.as_str()))),
-            dml::PrismaValue::Int(val) => Value::Constant(Constant::new_no_validate(Box::new(val))),
-            dml::PrismaValue::Uuid(val) => Value::Constant(Constant::new_no_validate(Box::new(val.as_hyphenated()))),
+            dml::PrismaValue::String(s) => Value::Text(Text(s.clone().into())),
+            dml::PrismaValue::Boolean(v) => Value::from(Constant::new_no_validate(v)),
+            dml::PrismaValue::Enum(val) => Value::from(Constant::new_no_validate(val)),
+            dml::PrismaValue::Int(val) => Value::from(Constant::new_no_validate(val)),
+            dml::PrismaValue::Uuid(val) => Value::from(Constant::new_no_validate(val.as_hyphenated())),
             dml::PrismaValue::List(vals) => {
                 let vals = vals.iter().collect::<Vec<_>>();
                 let constant = Box::new(Array::from(vals));
 
-                Value::Constant(Constant::new_no_validate(constant))
+                Value::from(Constant::new_no_validate(constant))
             }
-            dml::PrismaValue::Json(ref val) => Value::Text(Text(val)),
-            dml::PrismaValue::Xml(ref val) => Value::Text(Text(val)),
+            dml::PrismaValue::Json(val) => Value::Text(Text(val.clone().into())),
+            dml::PrismaValue::Xml(val) => Value::Text(Text(val.clone().into())),
             dml::PrismaValue::Object(_) => unreachable!(),
             dml::PrismaValue::Null => unreachable!(),
-            dml::PrismaValue::DateTime(val) => Value::Constant(Constant::new_no_validate(Box::new(val))),
-            dml::PrismaValue::Float(val) => Value::Constant(Constant::new_no_validate(Box::new(val))),
-            dml::PrismaValue::BigInt(val) => Value::Constant(Constant::new_no_validate(Box::new(val))),
-            dml::PrismaValue::Bytes(val) => Value::from(val.as_slice()),
+            dml::PrismaValue::DateTime(val) => Value::from(Constant::new_no_validate(val)),
+            dml::PrismaValue::Float(val) => Value::from(Constant::new_no_validate(val)),
+            dml::PrismaValue::BigInt(val) => Value::from(Constant::new_no_validate(val)),
+            dml::PrismaValue::Bytes(val) => Value::from(val.clone()),
         }
     }
 }

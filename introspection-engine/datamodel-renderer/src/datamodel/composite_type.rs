@@ -3,7 +3,7 @@ mod field;
 use crate::value::{Constant, Documentation};
 pub use field::CompositeTypeField;
 use psl::dml;
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 /// A type block in a PSL file.
 #[derive(Debug)]
@@ -40,8 +40,8 @@ impl<'a> CompositeType<'a> {
     ///   ....
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Add a new field to the type.
@@ -115,10 +115,13 @@ mod tests {
         let field = CompositeTypeField::new_array("Other", "String");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("1Invalid", "Float");
+        let mut field = CompositeTypeField::new_required("Invalid", "Float");
+        field.map("1Invalid");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("11111", "Float");
+        let mut field = CompositeTypeField::new_required("11111", "Float");
+        field.commented_out();
+        field.map("11111");
         composite_type.push_field(field);
 
         let expected = expect![[r#"

@@ -30,13 +30,13 @@ impl<'a> IndexDefinition<'a> {
     /// The client name of the index, defined as the `name` argument
     /// inside the attribute.
     pub fn name(&mut self, name: &'a str) {
-        self.0.push_param(("name", Text(name)));
+        self.0.push_param(("name", Text::new(name)));
     }
 
     /// The constraint name in the database, defined as the `map`
     /// argument inside the attribute.
     pub fn map(&mut self, map: &'a str) {
-        self.0.push_param(("map", Text(map)));
+        self.0.push_param(("map", Text::new(map)));
     }
 
     /// Defines the `clustered` argument inside the attribute.
