@@ -200,7 +200,7 @@
 <span id="200">200</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::value::{Array, Documentation, Env, Text};
 <span class="kw">use </span>psl::PreviewFeature;
-<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="doccomment">/// The generator block of the datasource.
 </span><span class="attribute">#[derive(Debug)]
@@ -281,8 +281,8 @@
     ///   provider = &quot;prisma-client-js&quot;
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, docs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(docs));
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, docs: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(docs.into()));
     }
 
     <span class="doccomment">/// Add a custom config value to the block. For now we support any
@@ -321,7 +321,7 @@
             output: psl_gen.output.as_ref().map(Env::from),
             preview_features,
             binary_targets: Array::from(binary_targets),
-            documentation: psl_gen.documentation.as_deref().map(Documentation),
+            documentation: psl_gen.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             config,
         }
     }

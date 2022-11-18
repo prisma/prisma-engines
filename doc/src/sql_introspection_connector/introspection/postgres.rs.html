@@ -62,6 +62,15 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">use </span>datamodel_renderer <span class="kw">as </span>render;
 <span class="kw">use </span>psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 <span class="kw">use </span>sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
@@ -88,26 +97,35 @@
     <span class="kw">let </span><span class="kw-2">mut </span>next_extensions = render::value::Array::new();
 
     <span class="kw">for </span>ext <span class="kw">in </span>pg_schema_ext.extension_walkers() {
-        <span class="kw">let </span><span class="kw-2">mut </span>next_extension = render::value::Function::new(ext.name());
+        <span class="kw">let </span><span class="kw-2">mut </span>next_extension = {
+            <span class="kw">if </span><span class="kw">crate</span>::needs_sanitation(ext.name()) {
+                <span class="kw">let </span>sanitized_name = <span class="kw">crate</span>::sanitize_string(ext.name());
+                <span class="kw">let </span><span class="kw-2">mut </span>func = render::value::Function::new(sanitized_name);
+                func.push_param((<span class="string">&quot;map&quot;</span>, render::value::Text::new(ext.name())));
+                func
+            } <span class="kw">else </span>{
+                render::value::Function::new(ext.name())
+            }
+        };
 
         <span class="kw">match </span>previous_extensions.and_then(|e| e.find_by_name(ext.name())) {
             <span class="prelude-val">Some</span>(prev) =&gt; {
                 <span class="kw">match </span>prev.version() {
                     <span class="prelude-val">Some</span>(previous_version) <span class="kw">if </span>previous_version != ext.version() =&gt; {
-                        next_extension.push_param((<span class="string">&quot;version&quot;</span>, render::value::Text(ext.version())));
+                        next_extension.push_param((<span class="string">&quot;version&quot;</span>, render::value::Text::new(ext.version())));
                     }
                     <span class="prelude-val">Some</span>(previous_version) =&gt; {
-                        next_extension.push_param((<span class="string">&quot;version&quot;</span>, render::value::Text(previous_version)));
+                        next_extension.push_param((<span class="string">&quot;version&quot;</span>, render::value::Text::new(previous_version)));
                     }
                     <span class="prelude-val">None </span>=&gt; (),
                 };
 
                 <span class="kw">match </span>prev.schema() {
                     <span class="prelude-val">Some</span>(previous_schema) <span class="kw">if </span>previous_schema != ext.schema() =&gt; {
-                        next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text(ext.schema())));
+                        next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text::new(ext.schema())));
                     }
                     <span class="prelude-val">Some</span>(previous_schema) =&gt; {
-                        next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text(previous_schema)));
+                        next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text::new(previous_schema)));
                     }
                     <span class="prelude-val">None </span>=&gt; (),
                 }
@@ -115,7 +133,7 @@
                 next_extensions.push(next_extension);
             }
             <span class="prelude-val">None </span><span class="kw">if </span>EXTENSION_ALLOW_LIST.contains(<span class="kw-2">&amp;</span>ext.name()) =&gt; {
-                next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text(ext.schema())));
+                next_extension.push_param((<span class="string">&quot;schema&quot;</span>, render::value::Text::new(ext.schema())));
                 next_extensions.push(next_extension);
             }
             <span class="prelude-val">None </span>=&gt; (),

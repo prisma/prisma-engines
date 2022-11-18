@@ -138,12 +138,15 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>field;
 
 <span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Documentation};
 <span class="kw">pub use </span>field::CompositeTypeField;
 <span class="kw">use </span>psl::dml;
-<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="doccomment">/// A type block in a PSL file.
 </span><span class="attribute">#[derive(Debug)]
@@ -180,8 +183,8 @@
     ///   ....
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into()));
     }
 
     <span class="doccomment">/// Add a new field to the type.
@@ -255,10 +258,13 @@
         <span class="kw">let </span>field = CompositeTypeField::new_array(<span class="string">&quot;Other&quot;</span>, <span class="string">&quot;String&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;1Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        field.map(<span class="string">&quot;1Invalid&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        field.commented_out();
+        field.map(<span class="string">&quot;11111&quot;</span>);
         composite_type.push_field(field);
 
         <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;

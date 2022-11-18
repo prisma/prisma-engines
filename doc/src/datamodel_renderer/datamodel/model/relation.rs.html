@@ -95,14 +95,6 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use crate</span>::{
@@ -163,7 +155,7 @@
     /// //              ^^^^^^ this
     /// ```
     </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text(name)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(name)));
     }
 
     <span class="doccomment">/// Defines the fields array.
@@ -187,15 +179,7 @@
     }
 
     <span class="kw">fn </span>push_array_parameter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, data: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) {
-        <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = data
-            .map(|name| <span class="kw">match </span>Constant::new(name) {
-                <span class="prelude-val">Ok</span>(name) =&gt; name,
-                <span class="prelude-val">Err</span>(<span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized { sanitized }) =&gt; sanitized,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; Constant::new_no_validate(Cow::Borrowed(name)),
-            })
-            .map(|c| c.boxed())
-            .map(Value::Constant)
-            .collect();
+        <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = data.map(Cow::Borrowed).map(Value::Constant).collect();
 
         <span class="kw">if </span>!fields.is_empty() {
             <span class="self">self</span>.<span class="number">0</span>.push_param((param_name, Array::from(fields)));

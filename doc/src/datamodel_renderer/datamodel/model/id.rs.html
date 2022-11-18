@@ -167,7 +167,7 @@
     /// //                     ^^^^^ here
     /// ```
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text(name)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text::new(name)));
     }
 
     <span class="doccomment">/// The primary key constraint name.
@@ -177,7 +177,7 @@
     /// //                    ^^^^^ here
     /// ```
     </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text(map)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
     }
 
     <span class="doccomment">/// The constraint clustering setting.
@@ -219,7 +219,7 @@
     /// //                 ^^^^^ here
     /// ```
     </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text(map)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
     }
 
     <span class="doccomment">/// The constraint clustering setting.

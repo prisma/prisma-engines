@@ -126,14 +126,10 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::IndexOps;
-<span class="kw">use </span><span class="kw">crate</span>::value::{Constant, ConstantNameValidationError, Function};
+<span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Function};
 
 <span class="doccomment">/// Input parameters for a field in a model index definition.
 </span><span class="attribute">#[derive(Debug, Clone)]
@@ -237,11 +233,7 @@
         <span class="kw">let </span>name: Vec&lt;<span class="kw">_</span>&gt; = definition
             .name
             .split(<span class="string">&#39;.&#39;</span>)
-            .map(|name| <span class="kw">match </span>Constant::new(name) {
-                <span class="prelude-val">Ok</span>(c) =&gt; c,
-                <span class="prelude-val">Err</span>(ConstantNameValidationError::WasSanitized { sanitized }) =&gt; sanitized,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; Constant::new_no_validate(Cow::Borrowed(name)),
-            })
+            .map(|name| Constant::new_no_validate(Cow::Borrowed(name)))
             .map(|constant| constant.into_inner())
             .collect();
 

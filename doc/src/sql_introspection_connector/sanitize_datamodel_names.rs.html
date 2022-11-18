@@ -154,11 +154,11 @@
 <span class="kw">static </span>RE_START: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;^[^a-zA-Z]+&quot;</span>).unwrap());
 <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;[^_a-zA-Z0-9]&quot;</span>).unwrap());
 
-<span class="kw">fn </span>needs_sanitation(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>needs_sanitation(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
     RE_START.is_match(s) || RE.is_match(s)
 }
 
-<span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="kw">if </span>needs_sanitation(s) {
         <span class="kw">let </span>start_cleaned = RE_START.replace_all(s, <span class="string">&quot;&quot;</span>);
         RE.replace_all(start_cleaned.as_ref(), <span class="string">&quot;_&quot;</span>).into_owned()

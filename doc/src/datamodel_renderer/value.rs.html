@@ -126,6 +126,12 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Common types needed in the configuration and datamodel.
 
 </span><span class="kw">mod </span>array;
@@ -136,25 +142,24 @@
 <span class="kw">mod </span>text;
 
 <span class="kw">pub use </span>array::Array;
-<span class="kw">pub use </span>constant::{Constant, ConstantNameValidationError};
+<span class="kw">pub use </span>constant::Constant;
 <span class="kw">pub use </span>documentation::Documentation;
 <span class="kw">pub use </span>env::Env;
 <span class="kw">pub use </span>function::{Function, FunctionParam};
 <span class="kw">pub use </span>text::Text;
 
+<span class="kw">use crate</span>::{datamodel::IndexOps, Cow};
 <span class="kw">use </span>base64::display::Base64Display;
 <span class="kw">use </span>std::fmt;
-
-<span class="kw">use </span><span class="kw">crate</span>::datamodel::IndexOps;
 
 <span class="doccomment">/// A PSL value representation.
 </span><span class="kw">pub enum </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// A string value, quoted and escaped accordingly.
-    </span>Text(Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
+    </span>Text(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
     <span class="doccomment">/// A byte value, quoted and base64-encoded.
     </span>Bytes(Text&lt;Base64Display&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
     <span class="doccomment">/// A constant value without quoting.
-    </span>Constant(Constant&lt;Box&lt;<span class="kw">dyn </span>fmt::Display + <span class="lifetime">&#39;a</span>&gt;&gt;),
+    </span>Constant(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
     <span class="doccomment">/// An array of values.
     </span>Array(Array&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
     <span class="doccomment">/// A function has a name, and optionally named parameters.
@@ -189,10 +194,17 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;Constant&lt;T&gt;&gt; <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;a</span>&gt;
 <span class="kw">where
-    </span>T: fmt::Display + <span class="lifetime">&#39;a</span>,
+    </span>T: fmt::Display,
 {
     <span class="kw">fn </span>from(c: Constant&lt;T&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Constant(c.boxed())
+        <span class="self">Self</span>::Constant(c.to_string().into())
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(bytes: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>display = Base64Display::with_config(<span class="kw-2">&amp;</span>bytes, base64::STANDARD).to_string();
+        <span class="self">Self</span>::Text(Text::new(display))
     }
 }
 
@@ -203,8 +215,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt; <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(t: Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt; <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(t: Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Text(t)
     }
 }

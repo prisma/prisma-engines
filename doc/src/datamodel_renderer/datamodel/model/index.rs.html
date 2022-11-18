@@ -126,13 +126,13 @@
     <span class="doccomment">/// The client name of the index, defined as the `name` argument
     /// inside the attribute.
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text(name)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text::new(name)));
     }
 
     <span class="doccomment">/// The constraint name in the database, defined as the `map`
     /// argument inside the attribute.
     </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text(map)));
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
     }
 
     <span class="doccomment">/// Defines the `clustered` argument inside the attribute.

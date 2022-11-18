@@ -191,10 +191,18 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::value::{Array, Documentation, Env, Text, Value};
 <span class="kw">use </span>core::fmt;
 <span class="kw">use </span>psl::datamodel_connector::RelationMode;
-<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>std::{borrow::Cow, default::Default};
 
 <span class="doccomment">/// The datasource block in a PSL file.
 </span><span class="attribute">#[derive(Debug)]
@@ -206,7 +214,7 @@
     relation_mode: <span class="prelude-ty">Option</span>&lt;RelationMode&gt;,
     custom_properties: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Value&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;,
     documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    namespaces: Array&lt;Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;,
+    namespaces: Array&lt;Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Datasource&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -292,14 +300,18 @@
     ///   url      = env(&quot;DATABASE_URL&quot;)
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into()));
     }
 
     <span class="doccomment">/// Create a rendering from a PSL datasource.
     </span><span class="kw">pub fn </span>from_psl(psl_ds: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, <span class="kw">_</span>)| Env::from(url));
-        <span class="kw">let </span>namespaces: Vec&lt;Text&lt;<span class="kw">_</span>&gt;&gt; = psl_ds.namespaces.iter().map(|(ns, <span class="kw">_</span>)| Text(ns.as_str())).collect();
+        <span class="kw">let </span>namespaces: Vec&lt;Text&lt;<span class="kw">_</span>&gt;&gt; = psl_ds
+            .namespaces
+            .iter()
+            .map(|(ns, <span class="kw">_</span>)| Text(Cow::Owned(ns.clone())))
+            .collect();
 
         <span class="self">Self </span>{
             name: <span class="kw-2">&amp;</span>psl_ds.name,
@@ -307,7 +319,7 @@
             url: Env::from(<span class="kw-2">&amp;</span>psl_ds.url),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
-            documentation: psl_ds.documentation.as_deref().map(Documentation),
+            documentation: psl_ds.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             custom_properties: Default::default(),
             namespaces: Array::from(namespaces),
         }
@@ -362,7 +374,11 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>extensions = Array::new();
         extensions.push(Function::new(<span class="string">&quot;postgis&quot;</span>));
-        extensions.push(Function::new(<span class="string">&quot;uuid-ossp&quot;</span>));
+        {
+            <span class="kw">let </span><span class="kw-2">mut </span>ext = Function::new(<span class="string">&quot;uuid_ossp&quot;</span>);
+            ext.push_param((<span class="string">&quot;map&quot;</span>, Text::new(<span class="string">&quot;uuid-ossp&quot;</span>)));
+            extensions.push(ext);
+        }
 
         datasource.push_custom_property(<span class="string">&quot;extensions&quot;</span>, extensions);
 
