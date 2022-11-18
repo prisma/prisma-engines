@@ -55,7 +55,7 @@ pub(super) async fn sample(
     renderer.push_dml(ctx.datasource(), &data_model);
 
     let data_model = if ctx.render_config {
-        format!("{}\n{}", render::Configuration::from_psl(ctx.configuration()), renderer)
+        format!("{}\n{}", render::Configuration::from_psl(ctx.configuration()),renderer)
     } else {
         renderer.to_string()
     };

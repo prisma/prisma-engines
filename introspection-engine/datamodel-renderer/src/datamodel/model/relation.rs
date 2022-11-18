@@ -38,7 +38,8 @@ impl<'a> Relation<'a> {
     /// //                  ^^^^^^^^^ this
     /// ```
     pub fn on_delete(&mut self, action: impl Into<Cow<'a, str>>) {
-        self.0.push_param(("onDelete", Constant::new_no_validate(action.into())));
+        self.0
+            .push_param(("onDelete", Constant::new_no_validate(action.into())));
     }
 
     /// Defines the `ON UPDATE` referential action.
@@ -48,7 +49,8 @@ impl<'a> Relation<'a> {
     /// //                  ^^^^^^^^^ this
     /// ```
     pub fn on_update(&mut self, action: impl Into<Cow<'a, str>>) {
-        self.0.push_param(("onUpdate", Constant::new_no_validate(action.into())));
+        self.0
+            .push_param(("onUpdate", Constant::new_no_validate(action.into())));
     }
 
     /// Defines the foreign key constraint name.
@@ -81,8 +83,8 @@ impl<'a> Relation<'a> {
         self.push_array_parameter("references", fields);
     }
 
-    fn push_array_parameter(&mut self, param_name: &'static str, data: impl Iterator<Item = &'a str>) {
-        let fields: Vec<_> = data.map(Cow::Borrowed).map(Value::Constant).collect();
+    fn push_array_parameter(&mut self, param_name: &'static str, data: impl Iterator<Item = Cow<'a, str>>) {
+        let fields: Vec<_> = data.map(Value::Constant).collect();
 
         if !fields.is_empty() {
             self.0.push_param((param_name, Array::from(fields)));

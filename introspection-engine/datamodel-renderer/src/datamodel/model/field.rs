@@ -283,9 +283,9 @@ impl<'a> ModelField<'a> {
         datasource: &'a psl::Datasource,
         _dml_model: &dml::Model,
         dml_field: &dml::Field,
-        uniques: &HashMap<&'a str, IndexFieldOptions<'a>>,
-        id: Option<IdFieldDefinition<'a>>,
-    ) -> Self {
+        uniques: &HashMap<&str, IndexFieldOptions<'static>>,
+        id: Option<IdFieldDefinition<'static>>,
+    ) -> ModelField<'a> {
         match dml_field {
             dml::Field::ScalarField(ref sf) => {
                 let field_name = sf.name.clone();
@@ -331,7 +331,7 @@ impl<'a> ModelField<'a> {
                 }
 
                 if let Some(unique) = uniques.get(sf.name.as_str()) {
-                    field.unique(*unique);
+                    field.unique(unique.clone());
                 }
 
                 if sf.is_ignored {
@@ -384,15 +384,15 @@ impl<'a> ModelField<'a> {
                         relation.name(relation_name.to_owned());
                     }
 
-                    relation.fields(dml_info.fields.iter().map(Clone::clone));
-                    relation.references(dml_info.references.iter().map(Clone::clone));
+                    relation.fields(dml_info.fields.iter().map(Clone::clone).map(Cow::Owned));
+                    relation.references(dml_info.references.iter().map(Clone::clone).map(Cow::Owned));
 
                     if let Some(ref action) = dml_info.on_delete {
-                        relation.on_delete(action.as_ref());
+                        relation.on_delete(action.as_ref().to_owned());
                     }
 
                     if let Some(ref action) = dml_info.on_update {
-                        relation.on_update(action.as_ref());
+                        relation.on_update(action.as_ref().to_owned());
                     }
 
                     if let Some(ref map) = &dml_info.fk_name {

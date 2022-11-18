@@ -224,130 +224,130 @@ impl<'a> Model<'a> {
             _ => (),
         }
 
-        // // weep
-        // let uniques: HashMap<&str, IndexFieldOptions> = dml_model
-        //     .indices
-        //     .iter()
-        //     .rev() // replicate existing behaviour on duplicate unique constraints
-        //     .filter(|ix| ix.is_unique())
-        //     .filter(|ix| ix.defined_on_field)
-        //     .map(|ix| {
-        //         let definition = ix.fields.first().unwrap();
-        //         let mut opts = IndexFieldOptions::default();
+        // weep
+        let uniques: HashMap<&str, IndexFieldOptions<'static>> = dml_model
+            .indices
+            .iter()
+            .rev() // replicate existing behaviour on duplicate unique constraints
+            .filter(|ix| ix.is_unique())
+            .filter(|ix| ix.defined_on_field)
+            .map(|ix| {
+                let definition = ix.fields.first().unwrap();
+                let mut opts = IndexFieldOptions::default();
 
-        //         if let Some(clustered) = ix.clustered {
-        //             opts.clustered(clustered);
-        //         }
+                if let Some(clustered) = ix.clustered {
+                    opts.clustered(clustered);
+                }
 
-        //         if let Some(ref sort_order) = definition.sort_order {
-        //             opts.sort_order(sort_order.as_ref());
-        //         }
+                if let Some(ref sort_order) = definition.sort_order {
+                    opts.sort_order(sort_order.as_ref().to_owned());
+                }
 
-        //         if let Some(length) = definition.length {
-        //             opts.length(length);
-        //         }
+                if let Some(length) = definition.length {
+                    opts.length(length);
+                }
 
-        //         if let Some(ref map) = ix.db_name {
-        //             opts.map(map);
-        //         }
+                if let Some(ref map) = ix.db_name {
+                    opts.map(map.clone());
+                }
 
-        //         (definition.from_field(), opts)
-        //     })
-        //     .collect();
+                (definition.from_field(), opts)
+            })
+            .collect();
 
-        // let primary_key = dml_model.primary_key.as_ref().filter(|pk| pk.defined_on_field);
+        let primary_key = dml_model.primary_key.as_ref().filter(|pk| pk.defined_on_field);
 
-        // for dml_field in dml_model.fields.iter() {
-        //     // sob :(
-        //     let id = primary_key.and_then(|pk| {
-        //         let field = pk.fields.first().unwrap();
+        for dml_field in dml_model.fields.iter() {
+            // sob :(
+            let id = primary_key.and_then(|pk| {
+                let field = pk.fields.first().unwrap();
 
-        //         if field.name == dml_field.name() {
-        //             let mut opts = IdFieldDefinition::default();
+                if field.name == dml_field.name() {
+                    let mut opts = IdFieldDefinition::default();
 
-        //             if let Some(clustered) = pk.clustered {
-        //                 opts.clustered(clustered);
-        //             }
+                    if let Some(clustered) = pk.clustered {
+                        opts.clustered(clustered);
+                    }
 
-        //             if let Some(ref sort_order) = field.sort_order {
-        //                 opts.sort_order(sort_order.as_ref());
-        //             }
+                    if let Some(ref sort_order) = field.sort_order {
+                        opts.sort_order(sort_order.as_ref().to_owned());
+                    }
 
-        //             if let Some(length) = field.length {
-        //                 opts.length(length);
-        //             }
+                    if let Some(length) = field.length {
+                        opts.length(length);
+                    }
 
-        //             if let Some(ref map) = pk.db_name {
-        //                 opts.map(map);
-        //             }
+                    if let Some(ref map) = pk.db_name {
+                        opts.map(map.clone());
+                    }
 
-        //             Some(opts)
-        //         } else {
-        //             None
-        //         }
-        //     });
+                    Some(opts)
+                } else {
+                    None
+                }
+            });
 
-        //     model.push_field(ModelField::from_dml(datasource, dml_model, dml_field, &uniques, id));
-        // }
+            model.push_field(ModelField::from_dml(datasource, dml_model, dml_field, &uniques, id));
+        }
 
-        // for dml_index in dml_model.indices.iter() {
-        //     if dml_index.defined_on_field && dml_index.is_unique() {
-        //         continue;
-        //     }
+        for dml_index in dml_model.indices.iter() {
+            if dml_index.defined_on_field && dml_index.is_unique() {
+                continue;
+            }
 
-        //     // cry
-        //     let fields = dml_index.fields.iter().map(|f| {
-        //         let mut name = String::new();
-        //         let mut name_path = f.path.iter().peekable();
+            // cry
+            let fields = dml_index.fields.iter().map(|f| {
+                let mut name = String::new();
+                let mut name_path = f.path.iter().peekable();
 
-        //         while let Some((ident, _)) = name_path.next() {
-        //             name.push_str(ident);
+                while let Some((ident, _)) = name_path.next() {
+                    name.push_str(ident);
 
-        //             if name_path.peek().is_some() {
-        //                 name.push('.');
-        //             }
-        //         }
+                    if name_path.peek().is_some() {
+                        name.push('.');
+                    }
+                }
 
-        //         let ops = f.operator_class.as_ref().map(|c| {
-        //             if c.is_raw() {
-        //                 IndexOps::Raw(Text(c.as_ref()))
-        //             } else {
-        //                 IndexOps::Managed(c.as_ref())
-        //             }
-        //         });
+                let ops = f.operator_class.as_ref().map(|c| {
+                    if c.is_raw() {
+                        IndexOps::Raw(Text(c.as_ref().to_owned().into()))
+                    } else {
+                        IndexOps::Managed(c.as_ref().to_owned().into())
+                    }
+                });
 
-        //         IndexFieldInput {
-        //             name: Cow::Owned(name),
-        //             sort_order: f.sort_order.as_ref().map(AsRef::as_ref),
-        //             length: f.length,
-        //             ops,
-        //         }
-        //     });
+                IndexFieldInput {
+                    name: Cow::Owned(name),
+                    sort_order: f.sort_order.map(|s| s.as_ref().to_string().into()),
+                    length: f.length,
+                    ops,
+                }
+            });
 
-        //     let mut definition = match dml_index.tpe {
-        //         dml::IndexType::Unique => IndexDefinition::unique(fields),
-        //         dml::IndexType::Normal => IndexDefinition::index(fields),
-        //         dml::IndexType::Fulltext => IndexDefinition::fulltext(fields),
-        //     };
+            let mut definition = match dml_index.tpe {
+                dml::IndexType::Unique => IndexDefinition::unique(fields),
+                dml::IndexType::Normal => IndexDefinition::index(fields),
+                dml::IndexType::Fulltext => IndexDefinition::fulltext(fields),
+            };
 
-        //     if let Some(ref name) = dml_index.name {
-        //         definition.name(name);
-        //     }
+            if let Some(ref name) = dml_index.name {
+                definition.name(name.clone());
+            }
 
-        //     if let Some(ref map) = dml_index.db_name {
-        //         definition.map(map);
-        //     }
+            if let Some(ref map) = dml_index.db_name {
+                definition.map(map.clone());
+            }
 
-        //     if let Some(clustered) = dml_index.clustered {
-        //         definition.clustered(clustered);
-        //     }
+            if let Some(clustered) = dml_index.clustered {
+                definition.clustered(clustered);
+            }
 
-        //     if let Some(ref algo) = dml_index.algorithm {
-        //         definition.index_type(algo.as_ref());
-        //     }
+            if let Some(ref algo) = dml_index.algorithm {
+                definition.index_type(algo.as_ref().to_string());
+            }
 
-        //     model.push_index(definition);
-        // }
+            model.push_index(definition);
+        }
 
         model
     }
@@ -397,7 +397,7 @@ impl<'a> fmt::Display for Model<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::{borrow::Cow, ops::Deref};
+    use std::borrow::Cow;
 
     use crate::{datamodel::*, value::Function};
     use expect_test::expect;
@@ -448,8 +448,8 @@ mod tests {
         model.push_field(field);
 
         let mut relation = Relation::new();
-        relation.fields(["information"].iter().map(Deref::deref));
-        relation.references(["id"].iter().map(Deref::deref));
+        relation.fields(["information"].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
+        relation.references(["id"].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
         relation.on_delete("Cascade");
         relation.on_update("Restrict");
 

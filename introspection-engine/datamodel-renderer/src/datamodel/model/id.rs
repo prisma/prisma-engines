@@ -85,8 +85,8 @@ impl<'a> IdFieldDefinition<'a> {
     /// field Int @id(map: "Foo")
     /// //                 ^^^^^ here
     /// ```
-    pub fn map(&mut self, map: &'a str) {
-        self.0.push_param(("map", Text::new(map)));
+    pub fn map(&mut self, map: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("map", Text::new(map.into())));
     }
 
     /// The constraint clustering setting.
@@ -105,8 +105,8 @@ impl<'a> IdFieldDefinition<'a> {
     /// field Int @id(sort: Desc)
     /// //                  ^^^^ here
     /// ```
-    pub(crate) fn sort_order(&mut self, sort: &'a str) {
-        self.0.push_param(("sort", Constant::new_no_validate(sort)));
+    pub(crate) fn sort_order(&mut self, sort: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("sort", Constant::new_no_validate(sort.into())));
     }
 
     /// The constraint length setting.
