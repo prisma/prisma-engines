@@ -956,6 +956,11 @@
 <span id="956">956</span>
 <span id="957">957</span>
 <span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>migration_assertions;
 <span class="kw">mod </span>quaint_result_set_ext;
 
@@ -1196,6 +1201,11 @@
 <span class="kw">pub struct </span>EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt;(sql::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_namespace(<span class="self">self</span>, namespace: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.namespace(), <span class="prelude-val">Some</span>(namespace));
+        <span class="self">self
+    </span>}
+
     <span class="kw">pub fn </span>assert_values(<span class="self">self</span>, expected_values: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="number">0</span>.values().len() == expected_values.len() &amp;&amp; <span class="self">self</span>.<span class="number">0</span>.values().zip(expected_values).all(|(a, b)| a == <span class="kw-2">*</span>b),
