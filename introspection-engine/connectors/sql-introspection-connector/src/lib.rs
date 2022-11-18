@@ -3,7 +3,6 @@
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
 
-mod commenting_out_guardrails;
 mod defaults;
 mod error;
 mod introspection;

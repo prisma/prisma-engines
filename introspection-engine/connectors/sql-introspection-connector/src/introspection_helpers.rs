@@ -202,12 +202,25 @@ pub(crate) fn calculate_scalar_field(
     ctx: &mut Context<'_>,
 ) -> ScalarField {
     let existing_field = ctx.existing_scalar_field(column.id);
-    let (name, database_name) = {
-        let name = ctx.column_prisma_name(column.id);
-        (
-            name.prisma_name().into_owned(),
-            name.mapped_name().map(ToOwned::to_owned),
-        )
+    let mut documentation = existing_field
+        .and_then(|f| f.ast_field().documentation())
+        .map(ToOwned::to_owned);
+
+    let (name, database_name, is_commented_out) = {
+        let names = ctx.column_prisma_name(column.id);
+        let prisma_name = names.prisma_name().into_owned();
+        let mapped_name = names.mapped_name().map(ToOwned::to_owned);
+
+        if prisma_name.is_empty() {
+            ctx.fields_with_empty_names.push(crate::warnings::ModelAndField {
+                model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
+                field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+            });
+            documentation = Some("This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*".to_owned());
+            (mapped_name.clone().unwrap_or(prisma_name), mapped_name, true)
+        } else {
+            (prisma_name, mapped_name, false)
+        }
     };
 
     if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
@@ -240,12 +253,10 @@ pub(crate) fn calculate_scalar_field(
         arity,
         field_type: calculate_scalar_field_type_with_native_types(column, ctx),
         database_name,
-        documentation: existing_field
-            .and_then(|f| f.ast_field().documentation())
-            .map(ToOwned::to_owned),
+        documentation,
         default_value,
         is_generated: false,
-        is_commented_out: false,
+        is_commented_out,
         is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(false),
         is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(false),
     }

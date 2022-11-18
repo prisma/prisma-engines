@@ -66,17 +66,27 @@ fn sql_enum_to_dml_enum(
     for sql_variant in sql_enum.variants() {
         let mut dml_value = dml::EnumValue::new("");
         let variant_name = ctx.enum_variant_name(sql_variant.id);
-        let prisma_name = variant_name.prisma_name().into_owned();
+        let mut prisma_name = variant_name.prisma_name().into_owned();
         let mapped_name = variant_name.mapped_name().map(ToOwned::to_owned);
 
-        if let EnumVariantName::FromPsl {
-            mapped_name: Some(_), ..
-        } = &variant_name
-        {
-            remapped_values.push(warnings::EnumAndValue {
-                value: prisma_name.clone(),
-                enm: enum_name.to_owned(),
-            });
+        match variant_name {
+            EnumVariantName::RenamedSanitized { mapped_name } if prisma_name.is_empty() => {
+                ctx.enum_values_with_empty_names.push(warnings::EnumAndValue {
+                    enm: enum_name.clone(),
+                    value: mapped_name.to_owned(),
+                });
+                prisma_name = mapped_name.to_owned();
+                dml_value.commented_out = true;
+            }
+            EnumVariantName::FromPsl {
+                mapped_name: Some(_), ..
+            } => {
+                remapped_values.push(warnings::EnumAndValue {
+                    value: prisma_name.clone(),
+                    enm: enum_name.to_owned(),
+                });
+            }
+            _ => (),
         }
 
         let existing_value = existing_enum.and_then(|enm| {

@@ -8,10 +8,7 @@ mod postgres;
 mod prisma_relation_mode;
 mod relation_names;
 
-use crate::{
-    calculate_datamodel::CalculateDatamodelContext as Context, commenting_out_guardrails::commenting_out_guardrails,
-    SqlError,
-};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError};
 use datamodel_renderer as render;
 use psl::{dml, Configuration};
 use sql_schema_describer::SqlSchema;
@@ -29,9 +26,6 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
     } else {
         prisma_relation_mode::reintrospect_relations(&mut datamodel, ctx);
     }
-
-    // commenting out models, fields, enums, enum values
-    ctx.warnings.append(&mut commenting_out_guardrails(&mut datamodel));
 
     m2m_relations::introspect_m2m_relations(&relation_names, &mut datamodel, ctx);
 

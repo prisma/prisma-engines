@@ -17,6 +17,8 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) version: Version,
     pub(crate) prisma_1_uuid_defaults: Vec<warnings::ModelAndField>,
     pub(crate) prisma_1_cuid_defaults: Vec<warnings::ModelAndField>,
+    pub(crate) fields_with_empty_names: Vec<warnings::ModelAndField>,
+    pub(crate) enum_values_with_empty_names: Vec<warnings::EnumAndValue>,
     introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
@@ -145,6 +147,18 @@ impl<'a> CalculateDatamodelContext<'a> {
             warnings::warning_default_cuid_warning,
             self.warnings,
         );
+
+        maybe_warn(
+            &self.enum_values_with_empty_names,
+            warnings::warning_enum_values_with_empty_names,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.fields_with_empty_names,
+            warnings::warning_fields_with_empty_names,
+            self.warnings,
+        )
     }
 }
 
@@ -166,6 +180,8 @@ pub fn calculate_datamodel(
         version: Version::NonPrisma,
         prisma_1_uuid_defaults: Vec::new(),
         prisma_1_cuid_defaults: Vec::new(),
+        fields_with_empty_names: Vec::new(),
+        enum_values_with_empty_names: Vec::new(),
     };
 
     context.version = crate::version_checker::check_prisma_version(&context);

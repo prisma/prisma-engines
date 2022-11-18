@@ -23,15 +23,6 @@ pub(crate) struct ModelAndField {
     pub(crate) field: String,
 }
 
-impl ModelAndField {
-    pub(crate) fn new(model: &str, field: &str) -> Self {
-        ModelAndField {
-            model: model.to_owned(),
-            field: field.to_owned(),
-        }
-    }
-}
-
 #[derive(Serialize, Debug, Clone)]
 pub(crate) struct ModelAndIndex {
     pub(crate) model: String,
@@ -49,15 +40,6 @@ pub(crate) struct ModelAndFieldAndType {
 pub(crate) struct EnumAndValue {
     pub(crate) enm: String,
     pub(crate) value: String,
-}
-
-impl EnumAndValue {
-    pub(crate) fn new(enm: &str, value: &str) -> Self {
-        EnumAndValue {
-            enm: enm.to_owned(),
-            value: value.to_owned(),
-        }
-    }
 }
 
 pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
