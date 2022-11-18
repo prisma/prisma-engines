@@ -238,6 +238,11 @@ impl SchemaAssertion {
 pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
 impl<'a> EnumAssertion<'a> {
+    pub fn assert_namespace(self, namespace: &'static str) -> Self {
+        assert_eq!(self.0.namespace(), Some(namespace));
+        self
+    }
+
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
             self.0.values().len() == expected_values.len() && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
