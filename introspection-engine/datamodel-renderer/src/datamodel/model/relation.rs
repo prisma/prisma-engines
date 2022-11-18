@@ -27,8 +27,8 @@ impl<'a> Relation<'a> {
     /// @relation("foo")
     /// //         ^^^ this
     /// ```
-    pub fn name(&mut self, name: &'a str) {
-        self.0.push_param(name);
+    pub fn name(&mut self, name: impl Into<Cow<'a, str>>) {
+        self.0.push_param(name.into());
     }
 
     /// Defines the `ON DELETE` referential action.
@@ -37,8 +37,8 @@ impl<'a> Relation<'a> {
     /// @relation(onDelete: DoNothing)
     /// //                  ^^^^^^^^^ this
     /// ```
-    pub fn on_delete(&mut self, action: &'a str) {
-        self.0.push_param(("onDelete", Constant::new_no_validate(action)));
+    pub fn on_delete(&mut self, action: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("onDelete", Constant::new_no_validate(action.into())));
     }
 
     /// Defines the `ON UPDATE` referential action.
@@ -47,8 +47,8 @@ impl<'a> Relation<'a> {
     /// @relation(onUpdate: DoNothing)
     /// //                  ^^^^^^^^^ this
     /// ```
-    pub fn on_update(&mut self, action: &'a str) {
-        self.0.push_param(("onUpdate", Constant::new_no_validate(action)));
+    pub fn on_update(&mut self, action: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("onUpdate", Constant::new_no_validate(action.into())));
     }
 
     /// Defines the foreign key constraint name.
@@ -57,7 +57,7 @@ impl<'a> Relation<'a> {
     /// @relation(map: "FK_foo")
     /// //              ^^^^^^ this
     /// ```
-    pub fn map(&mut self, name: &'a str) {
+    pub fn map(&mut self, name: impl Into<Cow<'a, str>>) {
         self.0.push_param(("map", Text::new(name)));
     }
 
@@ -67,7 +67,7 @@ impl<'a> Relation<'a> {
     /// @relation(fields: [foo, bar])
     /// //                ^^^^^^^^^^ this
     /// ```
-    pub fn fields(&mut self, fields: impl Iterator<Item = &'a str>) {
+    pub fn fields(&mut self, fields: impl Iterator<Item = Cow<'a, str>>) {
         self.push_array_parameter("fields", fields);
     }
 
@@ -77,7 +77,7 @@ impl<'a> Relation<'a> {
     /// @relation(references: [foo, bar])
     /// //                    ^^^^^^^^^^ this
     /// ```
-    pub fn references(&mut self, fields: impl Iterator<Item = &'a str>) {
+    pub fn references(&mut self, fields: impl Iterator<Item = Cow<'a, str>>) {
         self.push_array_parameter("references", fields);
     }
 

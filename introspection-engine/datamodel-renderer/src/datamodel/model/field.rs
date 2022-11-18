@@ -289,14 +289,14 @@ impl<'a> ModelField<'a> {
         match dml_field {
             dml::Field::ScalarField(ref sf) => {
                 let field_name = sf.name.clone();
-                let (r#type, native_type) = match sf.field_type {
-                    dml::FieldType::Enum(ref ct) => (ct.as_str(), None),
-                    dml::FieldType::Relation(ref info) => (info.referenced_model.as_str(), None),
-                    dml::FieldType::Unsupported(ref s) => (s.as_str(), None),
+                let (r#type, native_type): (String, _) = match sf.field_type {
+                    dml::FieldType::Enum(ref ct) => (ct.clone(), None),
+                    dml::FieldType::Relation(ref info) => (info.referenced_model.clone(), None),
+                    dml::FieldType::Unsupported(ref s) => (s.clone(), None),
                     dml::FieldType::Scalar(ref st, ref nt) => {
-                        (st.as_ref(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
+                        (st.as_ref().to_owned(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
                     }
-                    dml::FieldType::CompositeType(ref ct) => (ct.as_str(), None),
+                    dml::FieldType::CompositeType(ref ct) => (ct.clone(), None),
                 };
 
                 let mut field = match sf.arity {
@@ -315,7 +315,7 @@ impl<'a> ModelField<'a> {
                 };
 
                 if let Some(ref docs) = sf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 if let Some(dv) = sf.default_value() {
@@ -343,7 +343,7 @@ impl<'a> ModelField<'a> {
                 }
 
                 if let Some(ref map) = sf.database_name {
-                    field.map(map);
+                    field.map(map.clone());
                 }
 
                 if let Some(id) = id {
@@ -362,7 +362,7 @@ impl<'a> ModelField<'a> {
                 };
 
                 if let Some(ref docs) = rf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 if rf.is_commented_out {
@@ -381,11 +381,11 @@ impl<'a> ModelField<'a> {
                     let mut relation = Relation::new();
 
                     if !relation_name.is_empty() {
-                        relation.name(relation_name);
+                        relation.name(relation_name.to_owned());
                     }
 
-                    relation.fields(dml_info.fields.iter().map(AsRef::as_ref));
-                    relation.references(dml_info.references.iter().map(AsRef::as_ref));
+                    relation.fields(dml_info.fields.iter().map(Clone::clone));
+                    relation.references(dml_info.references.iter().map(Clone::clone));
 
                     if let Some(ref action) = dml_info.on_delete {
                         relation.on_delete(action.as_ref());
@@ -396,7 +396,7 @@ impl<'a> ModelField<'a> {
                     }
 
                     if let Some(ref map) = &dml_info.fk_name {
-                        relation.map(map);
+                        relation.map(map.clone());
                     }
 
                     field.relation(relation);
