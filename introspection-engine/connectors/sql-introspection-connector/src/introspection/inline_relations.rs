@@ -7,7 +7,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::{borrow::Cow, collections::HashMap};
 
-/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
+/// For each foreign key in the SQL schema, produce two relation fields in the resulting Prisma
 /// schema.
 pub(super) fn introspect_inline_relations(
     relation_names: &RelationNames,

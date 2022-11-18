@@ -19,6 +19,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) prisma_1_cuid_defaults: Vec<warnings::ModelAndField>,
     pub(crate) fields_with_empty_names: Vec<warnings::ModelAndField>,
     pub(crate) enum_values_with_empty_names: Vec<warnings::EnumAndValue>,
+    pub(crate) rendered_schema: datamodel_renderer::Datamodel<'a>,
     introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
