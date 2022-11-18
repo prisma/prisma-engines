@@ -113,14 +113,64 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context;
-<span class="kw">use </span>psl::{dml, parser_database::walkers};
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
+<span class="kw">use </span>introspection_connector::Version;
+<span class="kw">use </span>psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    dml,
+    parser_database::walkers,
+};
 <span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, postgres::PostgresSchemaExt};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_default(
     column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
     existing_field: <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt; {
     <span class="kw">match </span>(column.default().map(|d| d.kind()), <span class="kw-2">&amp;</span>column.column_type_family()) {
         (<span class="prelude-val">Some</span>(sql::DefaultKind::Sequence(name)), <span class="kw">_</span>) <span class="kw">if </span>ctx.is_cockroach() =&gt; {
@@ -206,8 +256,9 @@
 
         <span class="comment">// Prisma-level defaults.
         </span>(<span class="prelude-val">None</span>, sql::ColumnTypeFamily::String) =&gt; <span class="kw">match </span>existing_field.and_then(|f| f.default_value()) {
-            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_cuid() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())),
-            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_uuid() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())),
+            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_cuid() =&gt; <span class="prelude-val">Some</span>(default_cuid()),
+            <span class="prelude-val">Some</span>(value) <span class="kw">if </span>value.is_uuid() =&gt; <span class="prelude-val">Some</span>(default_uuid()),
+            <span class="prelude-val">None </span><span class="kw">if </span><span class="macro">matches!</span>(ctx.version, Version::Prisma1 | Version::Prisma11) =&gt; maybe_prisma1_default(column, ctx),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         },
 
@@ -227,6 +278,45 @@
 
 <span class="kw">fn </span>is_sequence(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     column.is_single_primary_key() &amp;&amp; <span class="macro">matches!</span>(<span class="kw-2">&amp;</span>column.default(), <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.is_sequence())
+}
+
+<span class="kw">fn </span>maybe_prisma1_default(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt; {
+    <span class="kw">let </span>model_and_field = || <span class="kw">crate</span>::warnings::ModelAndField {
+        model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
+        field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+    };
+
+    <span class="kw">if </span>ctx.sql_family().is_postgres() {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = column.column_type().native_type.as_ref()<span class="question-mark">?</span>.downcast_ref();
+
+        <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">25</span>)) {
+            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(default_cuid());
+        } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">36</span>)) {
+            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(default_uuid());
+        }
+    } <span class="kw">else if </span>ctx.sql_family().is_mysql() {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>MySqlType = column.column_type().native_type.as_ref()<span class="question-mark">?</span>.downcast_ref();
+
+        <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">25</span>) {
+            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(default_cuid());
+        } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">36</span>) {
+            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(default_uuid());
+        }
+    };
+
+    <span class="prelude-val">None
+</span>}
+
+<span class="kw">fn </span>default_cuid() -&gt; dml::DefaultValue {
+    dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())
+}
+
+<span class="kw">fn </span>default_uuid() -&gt; dml::DefaultValue {
+    dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -236,22 +236,13 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext;
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 <span class="kw">use </span><span class="kw">crate</span>::SqlFamilyTrait;
-<span class="kw">use </span>introspection_connector::{Version, Warning};
+<span class="kw">use </span>introspection_connector::Version;
 <span class="kw">use </span>psl::builtin_connectors::{MySqlType, PostgresType};
 <span class="kw">use </span>quaint::connector::SqlFamily;
 <span class="kw">use </span>sql_schema_describer::ForeignKeyWalker;
@@ -259,7 +250,6 @@
     walkers::{ColumnWalker, TableWalker},
     ForeignKeyAction,
 };
-<span class="kw">use </span>tracing::debug;
 
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">struct </span>VersionChecker {
@@ -344,19 +334,17 @@
         }
     }
 
-    <span class="macro">debug!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span>version_checker);
-
     <span class="kw">match </span>version_checker.sql_family {
         <span class="kw">_ if </span>ctx.schema.is_empty() =&gt; Version::NonPrisma,
-        SqlFamily::Sqlite <span class="kw">if </span>version_checker.is_prisma_2(ctx.warnings) =&gt; Version::Prisma2,
+        SqlFamily::Sqlite <span class="kw">if </span>version_checker.is_prisma_2() =&gt; Version::Prisma2,
         SqlFamily::Sqlite =&gt; Version::NonPrisma,
-        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_2(ctx.warnings) =&gt; Version::Prisma2,
-        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_1(ctx.warnings) =&gt; Version::Prisma1,
-        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_1_1(ctx.warnings) =&gt; Version::Prisma11,
+        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_2() =&gt; Version::Prisma2,
+        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_1() =&gt; Version::Prisma1,
+        SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_1_1() =&gt; Version::Prisma11,
         SqlFamily::Mysql =&gt; Version::NonPrisma,
-        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_2(ctx.warnings) =&gt; Version::Prisma2,
-        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_1(ctx.warnings) =&gt; Version::Prisma1,
-        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_1_1(ctx.warnings) =&gt; Version::Prisma11,
+        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_2() =&gt; Version::Prisma2,
+        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_1() =&gt; Version::Prisma1,
+        SqlFamily::Postgres <span class="kw">if </span>version_checker.is_prisma_1_1() =&gt; Version::Prisma11,
         SqlFamily::Postgres =&gt; Version::NonPrisma,
         SqlFamily::Mssql =&gt; Version::NonPrisma,
     }
@@ -460,15 +448,11 @@
         }
     }
 
-    <span class="kw">fn </span>is_prisma_2(<span class="kw-2">&amp;</span><span class="self">self</span>, warnings: <span class="kw-2">&amp;</span>[Warning]) -&gt; bool {
-        !<span class="self">self</span>.has_relay_table
-            &amp;&amp; !<span class="self">self</span>.uses_on_delete
-            &amp;&amp; !<span class="self">self</span>.uses_non_prisma_types
-            &amp;&amp; <span class="self">self</span>.has_migration_table
-            &amp;&amp; warnings.is_empty()
+    <span class="kw">fn </span>is_prisma_2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.has_relay_table &amp;&amp; !<span class="self">self</span>.uses_on_delete &amp;&amp; !<span class="self">self</span>.uses_non_prisma_types &amp;&amp; <span class="self">self</span>.has_migration_table
     }
 
-    <span class="kw">fn </span>is_prisma_1_1(<span class="kw-2">&amp;</span><span class="self">self</span>, warnings: <span class="kw-2">&amp;</span>[Warning]) -&gt; bool {
+    <span class="kw">fn </span>is_prisma_1_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         !<span class="self">self</span>.has_migration_table
             &amp;&amp; !<span class="self">self</span>.has_relay_table
             &amp;&amp; !<span class="self">self</span>.uses_on_delete
@@ -476,10 +460,9 @@
             &amp;&amp; !<span class="self">self</span>.uses_non_prisma_types
             &amp;&amp; !<span class="self">self</span>.has_prisma_1_join_table
             &amp;&amp; <span class="self">self</span>.always_has_p1_or_p_1_1_compatible_id
-            &amp;&amp; warnings.is_empty()
     }
 
-    <span class="kw">fn </span>is_prisma_1(<span class="kw-2">&amp;</span><span class="self">self</span>, warnings: <span class="kw-2">&amp;</span>[Warning]) -&gt; bool {
+    <span class="kw">fn </span>is_prisma_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         !<span class="self">self</span>.has_migration_table
             &amp;&amp; !<span class="self">self</span>.uses_on_delete
             &amp;&amp; !<span class="self">self</span>.uses_default_values
@@ -489,7 +472,6 @@
             &amp;&amp; <span class="self">self</span>.has_relay_table
             &amp;&amp; <span class="self">self</span>.always_has_created_at_updated_at
             &amp;&amp; <span class="self">self</span>.always_has_p1_or_p_1_1_compatible_id
-            &amp;&amp; warnings.is_empty()
     }
 }
 </code></pre></div>
