@@ -448,6 +448,17 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
 <span class="kw">use </span>psl::{
     datamodel_connector::constraint_names::ConstraintNames,
@@ -652,12 +663,25 @@
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; ScalarField {
     <span class="kw">let </span>existing_field = ctx.existing_scalar_field(column.id);
-    <span class="kw">let </span>(name, database_name) = {
-        <span class="kw">let </span>name = ctx.column_prisma_name(column.id);
-        (
-            name.prisma_name().into_owned(),
-            name.mapped_name().map(ToOwned::to_owned),
-        )
+    <span class="kw">let </span><span class="kw-2">mut </span>documentation = existing_field
+        .and_then(|f| f.ast_field().documentation())
+        .map(ToOwned::to_owned);
+
+    <span class="kw">let </span>(name, database_name, is_commented_out) = {
+        <span class="kw">let </span>names = ctx.column_prisma_name(column.id);
+        <span class="kw">let </span>prisma_name = names.prisma_name().into_owned();
+        <span class="kw">let </span>mapped_name = names.mapped_name().map(ToOwned::to_owned);
+
+        <span class="kw">if </span>prisma_name.is_empty() {
+            ctx.fields_with_empty_names.push(<span class="kw">crate</span>::warnings::ModelAndField {
+                model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
+                field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+            });
+            documentation = <span class="prelude-val">Some</span>(<span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>.to_owned());
+            (mapped_name.clone().unwrap_or(prisma_name), mapped_name, <span class="bool-val">true</span>)
+        } <span class="kw">else </span>{
+            (prisma_name, mapped_name, <span class="bool-val">false</span>)
+        }
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
@@ -690,12 +714,10 @@
         arity,
         field_type: calculate_scalar_field_type_with_native_types(column, ctx),
         database_name,
-        documentation: existing_field
-            .and_then(|f| f.ast_field().documentation())
-            .map(ToOwned::to_owned),
+        documentation,
         default_value,
         is_generated: <span class="bool-val">false</span>,
-        is_commented_out: <span class="bool-val">false</span>,
+        is_commented_out,
         is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(<span class="bool-val">false</span>),
         is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(<span class="bool-val">false</span>),
     }

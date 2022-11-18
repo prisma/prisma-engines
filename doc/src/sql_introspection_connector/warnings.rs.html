@@ -155,24 +155,6 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::Warning;
 <span class="kw">use </span>serde::Serialize;
 
@@ -198,15 +180,6 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) field: String,
 }
 
-<span class="kw">impl </span>ModelAndField {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        ModelAndField {
-            model: model.to_owned(),
-            field: field.to_owned(),
-        }
-    }
-}
-
 <span class="attribute">#[derive(Serialize, Debug, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndIndex {
     <span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
@@ -224,15 +197,6 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EnumAndValue {
     <span class="kw">pub</span>(<span class="kw">crate</span>) enm: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) value: String,
-}
-
-<span class="kw">impl </span>EnumAndValue {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(enm: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        EnumAndValue {
-            enm: enm.to_owned(),
-            value: value.to_owned(),
-        }
-    }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>warning_models_without_identifier(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {

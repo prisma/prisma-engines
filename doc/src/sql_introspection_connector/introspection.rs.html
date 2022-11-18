@@ -81,12 +81,6 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
 <span class="kw">mod </span>enums;
@@ -97,10 +91,7 @@
 <span class="kw">mod </span>prisma_relation_mode;
 <span class="kw">mod </span>relation_names;
 
-<span class="kw">use crate</span>::{
-    calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, commenting_out_guardrails::commenting_out_guardrails,
-    SqlError,
-};
+<span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlError};
 <span class="kw">use </span>datamodel_renderer <span class="kw">as </span>render;
 <span class="kw">use </span>psl::{dml, Configuration};
 <span class="kw">use </span>sql_schema_describer::SqlSchema;
@@ -118,9 +109,6 @@
     } <span class="kw">else </span>{
         prisma_relation_mode::reintrospect_relations(<span class="kw-2">&amp;mut </span>datamodel, ctx);
     }
-
-    <span class="comment">// commenting out models, fields, enums, enum values
-    </span>ctx.warnings.append(<span class="kw-2">&amp;mut </span>commenting_out_guardrails(<span class="kw-2">&amp;mut </span>datamodel));
 
     m2m_relations::introspect_m2m_relations(<span class="kw-2">&amp;</span>relation_names, <span class="kw-2">&amp;mut </span>datamodel, ctx);
 

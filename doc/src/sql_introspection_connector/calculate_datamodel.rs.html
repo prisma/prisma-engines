@@ -186,6 +186,22 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
     SqlIntrospectionResult,
@@ -205,6 +221,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
     <span class="kw">pub</span>(<span class="kw">crate</span>) prisma_1_uuid_defaults: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) prisma_1_cuid_defaults: Vec&lt;warnings::ModelAndField&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields_with_empty_names: Vec&lt;warnings::ModelAndField&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enum_values_with_empty_names: Vec&lt;warnings::EnumAndValue&gt;,
     introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
@@ -333,6 +351,18 @@
             warnings::warning_default_cuid_warning,
             <span class="self">self</span>.warnings,
         );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.enum_values_with_empty_names,
+            warnings::warning_enum_values_with_empty_names,
+            <span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.fields_with_empty_names,
+            warnings::warning_fields_with_empty_names,
+            <span class="self">self</span>.warnings,
+        )
     }
 }
 
@@ -354,6 +384,8 @@
         version: Version::NonPrisma,
         prisma_1_uuid_defaults: Vec::new(),
         prisma_1_cuid_defaults: Vec::new(),
+        fields_with_empty_names: Vec::new(),
+        enum_values_with_empty_names: Vec::new(),
     };
 
     context.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>context);

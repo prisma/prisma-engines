@@ -181,6 +181,11 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{models::table_has_usable_identifier, relation_names::RelationNames};
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
 <span class="kw">use </span>psl::{
@@ -190,7 +195,7 @@
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
-<span class="doccomment">/// For each foreign key in the SQL schema, produce two relation fields in the resulting Prisma
+<span class="doccomment">/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_inline_relations(
     relation_names: <span class="kw-2">&amp;</span>RelationNames,
@@ -300,6 +305,11 @@
     <span class="kw">let </span>on_update_action = map_action(foreign_key.on_update_action());
 
     relation_field.supports_restrict_action(!ctx.sql_family.is_mssql());
+
+    <span class="comment">// Add an @ignore attribute if 1. the parent model isn&#39;t already ignored, and 2. the referenced
+    // model is ignored.
+    </span>relation_field.is_ignored = table_has_usable_identifier(foreign_key.table())
+        &amp;&amp; !table_has_usable_identifier(foreign_key.referenced_table());
 
     <span class="kw">if </span>relation_field.default_on_delete_action() != on_delete_action {
         relation_field.relation_info.on_delete = <span class="prelude-val">Some</span>(on_delete_action);

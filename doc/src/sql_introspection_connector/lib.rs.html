@@ -192,14 +192,12 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::vec_init_then_push)]
 #![allow(clippy::ptr_arg)] </span><span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 </span><span class="kw">pub mod </span>calculate_datamodel; <span class="comment">// only exported to be able to unit test it
 
-</span><span class="kw">mod </span>commenting_out_guardrails;
-<span class="kw">mod </span>defaults;
+</span><span class="kw">mod </span>defaults;
 <span class="kw">mod </span>error;
 <span class="kw">mod </span>introspection;
 <span class="kw">mod </span>introspection_helpers;

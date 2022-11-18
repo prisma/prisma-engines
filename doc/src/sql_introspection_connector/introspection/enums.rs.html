@@ -97,6 +97,16 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings, EnumVariantName, ModelName};
 <span class="kw">use </span>psl::{
     dml,
@@ -165,17 +175,27 @@
     </span><span class="kw">for </span>sql_variant <span class="kw">in </span>sql_enum.variants() {
         <span class="kw">let </span><span class="kw-2">mut </span>dml_value = dml::EnumValue::new(<span class="string">&quot;&quot;</span>);
         <span class="kw">let </span>variant_name = ctx.enum_variant_name(sql_variant.id);
-        <span class="kw">let </span>prisma_name = variant_name.prisma_name().into_owned();
+        <span class="kw">let </span><span class="kw-2">mut </span>prisma_name = variant_name.prisma_name().into_owned();
         <span class="kw">let </span>mapped_name = variant_name.mapped_name().map(ToOwned::to_owned);
 
-        <span class="kw">if let </span>EnumVariantName::FromPsl {
-            mapped_name: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
-        } = <span class="kw-2">&amp;</span>variant_name
-        {
-            remapped_values.push(warnings::EnumAndValue {
-                value: prisma_name.clone(),
-                enm: enum_name.to_owned(),
-            });
+        <span class="kw">match </span>variant_name {
+            EnumVariantName::RenamedSanitized { mapped_name } <span class="kw">if </span>prisma_name.is_empty() =&gt; {
+                ctx.enum_values_with_empty_names.push(warnings::EnumAndValue {
+                    enm: enum_name.clone(),
+                    value: mapped_name.to_owned(),
+                });
+                prisma_name = mapped_name.to_owned();
+                dml_value.commented_out = <span class="bool-val">true</span>;
+            }
+            EnumVariantName::FromPsl {
+                mapped_name: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
+            } =&gt; {
+                remapped_values.push(warnings::EnumAndValue {
+                    value: prisma_name.clone(),
+                    enm: enum_name.to_owned(),
+                });
+            }
+            <span class="kw">_ </span>=&gt; (),
         }
 
         <span class="kw">let </span>existing_value = existing_enum.and_then(|enm| {
