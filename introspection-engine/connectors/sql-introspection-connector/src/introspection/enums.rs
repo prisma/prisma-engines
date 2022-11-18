@@ -1,7 +1,8 @@
+use std::borrow::Cow;
+
 use crate::{introspection::Context, introspection_helpers::*, warnings, EnumVariantName, ModelName};
 use datamodel_renderer::datamodel as renderer;
 use psl::{
-    dml,
     parser_database::{ast, walkers},
     schema_ast::ast::WithDocumentation,
 };
@@ -38,19 +39,20 @@ fn render_enum<'a>(
     existing_enum: Option<walkers::EnumWalker<'a>>,
     ctx: &mut Context<'a>,
 ) -> renderer::Enum<'a> {
+    let mut remapped_values = Vec::new();
     let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
         sql_enum.namespace()
     } else {
         None
     };
     let (enum_name, enum_database_name) = match ctx.enum_prisma_name(sql_enum.id) {
-        ModelName::FromPsl { name, mapped_name } => (name.to_owned(), mapped_name),
-        ModelName::FromSql { name } => (name.to_owned(), None),
+        ModelName::FromPsl { name, mapped_name } => (Cow::Borrowed(name), mapped_name),
+        ModelName::FromSql { name } => (Cow::Borrowed(name), None),
         name @ ModelName::RenamedReserved { mapped_name } | name @ ModelName::RenamedSanitized { mapped_name } => {
-            (name.prisma_name().into_owned(), Some(mapped_name))
+            (name.prisma_name(), Some(mapped_name))
         }
     };
-    let mut rendered_enum = renderer::Enum::new(&enum_name);
+    let mut rendered_enum = renderer::Enum::new(enum_name.clone());
 
     if let Some(schema) = schema {
         rendered_enum.schema(schema);
@@ -68,30 +70,27 @@ fn render_enum<'a>(
         rendered_enum.documentation(docs);
     }
 
-    rendered_enum.values.reserve(sql_enum.values().len());
-    let mut remapped_values = Vec::new(); // for warnings
-
     for sql_variant in sql_enum.variants() {
         let variant_name = ctx.enum_variant_name(sql_variant.id);
         let mut prisma_name = variant_name.prisma_name();
-        let mapped_name = variant_name.mapped_name().map(ToOwned::to_owned);
-        let mut rendered_variant = renderer::EnumVariant::new(prisma_name);
+        let mapped_name = variant_name.mapped_name();
+        let mut comment_out = false;
 
         match variant_name {
             EnumVariantName::RenamedSanitized { mapped_name } if prisma_name.is_empty() => {
                 ctx.enum_values_with_empty_names.push(warnings::EnumAndValue {
-                    enm: enum_name.clone(),
+                    enm: enum_name.clone().into_owned(),
                     value: mapped_name.to_owned(),
                 });
-                prisma_name = mapped_name.to_owned();
-                rendered_variant.commented_out = true;
+                prisma_name = Cow::Borrowed(mapped_name);
+                comment_out = true;
             }
             EnumVariantName::FromPsl {
                 mapped_name: Some(_), ..
             } => {
                 remapped_values.push(warnings::EnumAndValue {
-                    value: prisma_name.clone(),
-                    enm: enum_name.to_owned(),
+                    value: prisma_name.clone().into_owned(),
+                    enm: enum_name.clone().into_owned(),
                 });
             }
             _ => (),
@@ -99,11 +98,13 @@ fn render_enum<'a>(
 
         let existing_value = existing_enum.and_then(|enm| {
             enm.values()
-                .find(|val| val.database_name() == mapped_name.as_ref().unwrap_or(&prisma_name))
+                .find(|val| val.database_name() == mapped_name.as_deref().unwrap_or(prisma_name.as_ref()))
         });
-        rendered_variant.documentation = existing_value.and_then(|v| v.documentation()).map(ToOwned::to_owned);
-        rendered_variant.name = prisma_name;
-        rendered_variant.database_name = mapped_name;
+
+        let mut rendered_variant = renderer::EnumVariant::new(prisma_name);
+        rendered_variant.documentation(existing_value.and_then(|v| v.documentation()));
+        rendered_variant.map(mapped_name);
+        rendered_variant.comment_out(comment_out);
 
         rendered_enum.push_variant(rendered_variant);
     }

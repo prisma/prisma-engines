@@ -183,6 +183,7 @@ pub fn calculate_datamodel(
         prisma_1_cuid_defaults: Vec::new(),
         fields_with_empty_names: Vec::new(),
         enum_values_with_empty_names: Vec::new(),
+        rendered_schema: Default::default(),
     };
 
     context.version = crate::version_checker::check_prisma_version(&context);
