@@ -48,6 +48,10 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
                 if version.contains("MariaDB") {
                     tags |= Tags::Mariadb
                 } else {
+                    if version.contains("TiDB") {
+                        tags |= Tags::TiDB
+                    }
+
                     if version.contains("vitess") {
                         tags |= Tags::Vitess;
                     }

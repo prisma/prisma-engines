@@ -171,6 +171,11 @@ impl TestApi {
         self.root.is_cockroach()
     }
 
+    /// Returns true only when testing on tidb.
+    pub fn is_tidb(&self) -> bool {
+        self.root.is_tidb()
+    }
+
     /// Returns true only when testing on sqlite.
     pub fn is_sqlite(&self) -> bool {
         self.root.is_sqlite()

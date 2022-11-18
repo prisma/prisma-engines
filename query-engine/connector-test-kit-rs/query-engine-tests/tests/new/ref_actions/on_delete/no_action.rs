@@ -54,7 +54,7 @@ mod one2one_req {
 #[test_suite(
     suite = "noaction_onD_1to1_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite, MongoDb, TiDB)
 )]
 mod one2one_opt {
     fn optional() -> String {
@@ -126,7 +126,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test(only(MongoDb, TiDB))]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -251,7 +251,7 @@ mod one2many_req {
 #[test_suite(
     suite = "noaction_onD_1toM_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite, MongoDb, TiDB)
 )]
 mod one2many_opt {
     fn optional() -> String {
@@ -323,7 +323,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent leaves the data in a integrity-violating state.
-    #[connector_test(only(MongoDb))]
+    #[connector_test(only(MongoDb, TiDB))]
     async fn delete_parent_violation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),

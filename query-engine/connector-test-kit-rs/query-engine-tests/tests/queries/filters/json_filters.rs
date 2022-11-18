@@ -111,7 +111,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(capabilities(JsonFilteringJsonPath), only(MySql(5.7), MySql(8)))]
+    #[connector_test(capabilities(JsonFilteringJsonPath), only(MySql(5.7), MySql(8), TiDB))]
     async fn extract_json_path(runner: Runner) -> TestResult<()> {
         create_row(&runner, 1, r#"{ \"a\": { \"b\": \"c\" } }"#, false).await?;
         create_row(&runner, 2, r#"{ \"a\": { \"b\": [1, 2, 3] } }"#, false).await?;
@@ -905,7 +905,7 @@ mod json_filters {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::MySql(_) | ConnectorVersion::TiDB => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }

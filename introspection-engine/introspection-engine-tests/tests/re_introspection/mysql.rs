@@ -41,7 +41,7 @@ async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -116,7 +116,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

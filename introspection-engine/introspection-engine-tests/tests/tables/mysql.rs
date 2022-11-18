@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 use url::Url;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE `Test` (
@@ -219,7 +219,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql), preview_features("fullTextIndex"), exclude(TiDB))]
 async fn a_table_with_fulltext_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -248,7 +248,7 @@ async fn a_table_with_fulltext_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql), preview_features("fullTextIndex"), exclude(TiDB))]
 async fn a_table_with_fulltext_index_with_custom_name(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -277,7 +277,7 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -420,7 +420,7 @@ async fn missing_select_rights(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn northwind(api: TestApi) {
     let setup = include_str!("./northwind_mysql.sql");
     api.raw_cmd(setup).await;

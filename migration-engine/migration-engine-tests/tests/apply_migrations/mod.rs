@@ -126,6 +126,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
             error_code = match api.tags() {
                 t if t.contains(Tags::Vitess) => 1105,
                 t if t.contains(Tags::Mysql) => 1064,
+                t if t.contains(Tags::TiDB) => 1064,
                 t if t.contains(Tags::Mssql) => 102,
                 t if t.contains(Tags::Postgres) => 42601,
                 t if t.contains(Tags::Sqlite) => 1,
@@ -139,6 +140,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                             ^
                     HINT: try \h SELECT
                 "#},
+                t if t.contains(Tags::TiDB) => "You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 10 column 10 near \"^.^)_n;\n\" ",
                 t if t.contains(Tags::Vitess) => "syntax error at position 10",
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",

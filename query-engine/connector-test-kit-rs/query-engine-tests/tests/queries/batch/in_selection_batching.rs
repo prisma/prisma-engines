@@ -39,13 +39,23 @@ mod isb {
     async fn in_more_items(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
-        insta::assert_snapshot!(
-          run_query!(&runner, indoc! { r#"
-            query {
-              findManyA(where: { id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}) { id }
-            }"# }),
-          @r###"{"data":{"findManyA":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
-        );
+        if matches!(runner.connector(), ConnectorTag::TiDB(_)) {
+            insta::assert_snapshot!(
+              run_query!(&runner, indoc! { r#"
+                query {
+                  findManyA(where: { id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}) { id }
+                }"# }),
+              @r###"{"data":{"findManyA":[{"id":5},{"id":4},{"id":3},{"id":2},{"id":1}]}}"###
+            );
+        } else {
+            insta::assert_snapshot!(
+              run_query!(&runner, indoc! { r#"
+                query {
+                  findManyA(where: { id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}) { id }
+                }"# }),
+              @r###"{"data":{"findManyA":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -82,7 +92,7 @@ mod isb {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test(exclude(MongoDb, TiDB))]
     async fn order_by_aggregation_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

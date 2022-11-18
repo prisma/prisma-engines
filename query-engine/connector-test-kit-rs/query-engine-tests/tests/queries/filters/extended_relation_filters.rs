@@ -90,7 +90,7 @@ mod ext_rel_filters {
     }
 
     // MySql is case insensitive and Postgres case sensitive
-    #[connector_test(only(MySQL))]
+    #[connector_test(only(MySQL, TiDB))]
     async fn mysql_rel1_many_filters(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 

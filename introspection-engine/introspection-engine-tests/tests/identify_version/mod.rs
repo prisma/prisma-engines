@@ -215,7 +215,7 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
 
 //Mysql
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn introspect_mysql_non_prisma(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -335,6 +335,24 @@ async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> TestResult {
 #[test_connector(tags(Mssql))]
 async fn introspect_mssql_non_prisma_empty(api: &TestApi) -> TestResult {
     api.barrel().execute(|_migration| {}).await?;
+
+    assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+
+    Ok(())
+}
+
+// TiDB
+
+#[test_connector(tags(TiDB))]
+async fn introspect_tidb_non_prisma(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("location   json");
+            });
+        })
+        .await?;
 
     assert_eq!(Version::NonPrisma, api.introspect_version().await?);
 

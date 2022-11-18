@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod self_relation_filters {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query};
+    use query_engine_tests::{assert_error, match_connector_result, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -111,15 +111,20 @@ mod self_relation_filters {
     async fn one2one_null(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
-        insta::assert_snapshot!(
-          run_query!(&runner, indoc! { r#"
-            query {
-              findManySong(where: { creator: { is: { wife: { is: null }}}}) {
-                title
+        match_connector_result!(
+            &runner,
+            indoc! { r#"
+              query {
+                findManySong(where: { creator: { is: { wife: { is: null }}}}) {
+                  title
+                }
               }
-            }
-          "# }),
-          @r###"{"data":{"findManySong":[{"title":"Bicycle"},{"title":"Gasag"}]}}"###
+            "# },
+            TiDB => vec![
+              r###"{"data":{"findManySong":[{"title":"Bicycle"},{"title":"Gasag"}]}}"###,
+              r###"{"data":{"findManySong":[{"title":"Gasag"},{"title":"Bicycle"}]}}"###
+            ],
+            _ => vec![r###"{"data":{"findManySong":[{"title":"Bicycle"},{"title":"Gasag"}]}}"###]
         );
 
         Ok(())

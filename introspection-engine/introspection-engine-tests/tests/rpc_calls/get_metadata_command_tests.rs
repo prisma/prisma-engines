@@ -15,6 +15,23 @@ async fn metadata_for_mysql_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
+// Because the underlying storage structure is different, TiDB and MySQL InnoDB calculate DATA_LENGTH
+// in different ways.
+// For TiDB, DATA_LENGTH = TABLE_ROWS * the sum of storage lengths of the columns in the tuple. And
+// the replicas of TiKV are not taken into account.
+// Reference: https://docs.pingcap.com/tidb/stable/information-schema-tables#tables
+#[test_connector(tags(TiDB))]
+async fn metadata_for_tidb_should_work(api: &TestApi) -> TestResult {
+    setup(&api.barrel(), api.schema_name()).await?;
+
+    let result = api.get_metadata().await?;
+
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 0);
+
+    Ok(())
+}
+
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn metadata_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;

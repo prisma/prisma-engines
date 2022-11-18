@@ -45,7 +45,7 @@ async fn referential_actions(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn referential_actions_mysql(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -156,7 +156,7 @@ async fn default_referential_actions_with_restrict_sqlite(api: &TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn default_referential_actions_with_restrict_mysql(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -194,7 +194,7 @@ async fn default_referential_actions_with_restrict_mysql(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn default_optional_actions_mysql(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

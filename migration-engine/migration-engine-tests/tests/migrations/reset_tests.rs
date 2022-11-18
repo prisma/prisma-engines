@@ -58,7 +58,7 @@ fn reset_then_apply_with_migrations_directory_works(api: TestApi) {
         .assert_has_table("_prisma_migrations");
 }
 
-#[test_connector]
+#[test_connector(exclude(TiDB))]
 fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"

@@ -20,14 +20,14 @@ async fn on_single_field(runner: Runner) -> TestResult<()> {
       &runner,
       r#"{ findManyTestModel(orderBy: { _relevance: { fields: fieldA, search: "developer", sort: desc } }) { id } }"#,
       // For MySql id 3 and id 1 row have the same ranking score so they are switched between position 2 and 3
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":1}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":1}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3}]}}"#]
     );
 
     match_connector_result!(
       &runner,
       r#"{ findManyTestModel(orderBy: { _relevance: { fields: fieldA, search: "developer", sort: asc } }) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"#]
     );
 
@@ -40,14 +40,14 @@ async fn on_single_nullable_field(runner: Runner) -> TestResult<()> {
     match_connector_result!(
       &runner,
       r#"{ findManyTestModel(orderBy: { _relevance: { fields: fieldC, search: "developer", sort: desc } }) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2}]}}"#]
     );
 
     match_connector_result!(
       &runner,
       r#"{ findManyTestModel(orderBy: { _relevance: { fields: fieldC, search: "developer", sort: asc } }) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"#]
     );
 
@@ -198,7 +198,7 @@ async fn on_single_field_with_pagination(runner: Runner) -> TestResult<()> {
             take: 1,
             orderBy: { _relevance: { fields: fieldA, search: "developer", sort: desc } }
           ) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#]
     );
 
@@ -219,7 +219,7 @@ async fn on_single_field_with_pagination(runner: Runner) -> TestResult<()> {
               take: 1,
               orderBy: { _relevance: { fields: fieldA, search: "developer", sort: asc } }
             ) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":2}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":3}]}}"#]
     );
 
@@ -246,7 +246,7 @@ async fn on_single_nullable_field_with_pagination(runner: Runner) -> TestResult<
             take: 1,
             orderBy: { _relevance: { fields: fieldC, search: "developer", sort: desc } }
           ) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#, r#"{"data":{"findManyTestModel":[]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#]
     );
 
@@ -266,7 +266,7 @@ async fn on_single_nullable_field_with_pagination(runner: Runner) -> TestResult<
             skip: 1,
             orderBy: { _relevance: { fields: fieldC, search: "developer", sort: asc } }
           ) { id } }"#,
-      MySql(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3}]}}"#],
+      MySql(_) | TiDB => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#, r#"{"data":{"findManyTestModel":[{"id":3}]}}"#],
       _ => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"#]
     );
 

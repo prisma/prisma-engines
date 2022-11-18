@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(MySql))]
+#[test_suite(schema(schema), only(MySql, TiDB))]
 mod prisma_ref_integrity {
     fn schema() -> String {
         let schema = indoc! {

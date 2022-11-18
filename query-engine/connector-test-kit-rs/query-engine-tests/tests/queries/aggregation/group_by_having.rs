@@ -42,7 +42,7 @@ mod aggr_group_by_having {
                 _sum { int }
               }
             }"#,
-            MongoDb(_) => vec![
+            MongoDb(_) | TiDB => vec![
               r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#,
               r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
             ],

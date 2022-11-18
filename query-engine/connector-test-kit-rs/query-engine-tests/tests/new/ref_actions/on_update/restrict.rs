@@ -32,7 +32,7 @@ mod one2one_req {
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -57,7 +57,7 @@ mod one2one_req {
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -82,7 +82,7 @@ mod one2one_req {
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -138,7 +138,7 @@ mod one2one_opt {
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -163,7 +163,7 @@ mod one2one_opt {
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -188,7 +188,7 @@ mod one2one_opt {
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -244,7 +244,7 @@ mod one2many_req {
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -269,7 +269,7 @@ mod one2many_req {
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -294,7 +294,7 @@ mod one2many_req {
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -386,7 +386,7 @@ mod one2many_opt {
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -411,7 +411,7 @@ mod one2many_opt {
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
                 runner,
                 query,
                 2014,
@@ -436,7 +436,7 @@ mod one2many_opt {
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
 
         match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
+            ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB  => assert_error!(
                 runner,
                 query,
                 2014,
