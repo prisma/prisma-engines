@@ -8,7 +8,7 @@ use std::{borrow::Cow, fmt};
 /// A type block in a PSL file.
 #[derive(Debug)]
 pub struct CompositeType<'a> {
-    name: Constant<&'a str>,
+    name: Constant<Cow<'a, str>>,
     documentation: Option<Documentation<'a>>,
     fields: Vec<CompositeTypeField<'a>>,
 }
@@ -22,8 +22,8 @@ impl<'a> CompositeType<'a> {
     /// //   ^^^^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let name = Constant::new_no_validate(name);
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             name,
@@ -59,8 +59,8 @@ impl<'a> CompositeType<'a> {
     /// Generate a composite type rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &'a dml::CompositeType) -> Self {
-        let mut composite_type = CompositeType::new(&dml_ct.name);
+    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &dml::CompositeType) -> Self {
+        let mut composite_type = CompositeType::new(dml_ct.name.clone());
 
         for dml_field in dml_ct.fields.iter() {
             composite_type.push_field(CompositeTypeField::from_dml(datasource, dml_field));

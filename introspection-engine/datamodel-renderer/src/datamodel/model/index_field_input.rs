@@ -7,7 +7,7 @@ use crate::value::{Constant, Function};
 #[derive(Debug, Clone)]
 pub struct IndexFieldInput<'a> {
     pub(super) name: Cow<'a, str>,
-    pub(super) sort_order: Option<&'a str>,
+    pub(super) sort_order: Option<Cow<'a, str>>,
     pub(super) length: Option<u32>,
     pub(super) ops: Option<IndexOps<'a>>,
 }
@@ -34,8 +34,8 @@ impl<'a> IndexFieldInput<'a> {
     /// @@index([foobar(sort: Desc)])
     /// //                    ^^^^ here
     /// ```
-    pub fn sort_order(&mut self, sort_order: &'a str) {
-        self.sort_order = Some(sort_order);
+    pub fn sort_order(&mut self, sort_order: impl Into<Cow<'a, str>>) {
+        self.sort_order = Some(sort_order.into());
     }
 
     /// Define the length of the indexed field.

@@ -70,22 +70,14 @@ impl<'a> Datamodel<'a> {
     /// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_data_model: &'a dml::Datamodel) -> Datamodel<'a> {
-        let mut data_model = Self::new();
-
+    pub fn push_dml(&mut self, datasource: &'a psl::Datasource, dml_data_model: &dml::Datamodel) {
         for dml_model in dml_data_model.models() {
-            data_model.push_model(Model::from_dml(datasource, dml_model));
+            self.push_model(Model::from_dml(datasource, dml_model));
         }
 
         for dml_ct in dml_data_model.composite_types() {
-            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
+            self.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
-
-        for dml_enum in dml_data_model.enums() {
-            data_model.push_enum(Enum::from_dml(dml_enum));
-        }
-
-        data_model
     }
 }
 

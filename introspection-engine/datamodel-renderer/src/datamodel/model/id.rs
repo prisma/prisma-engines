@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use crate::{
     datamodel::attributes::{BlockAttribute, FieldAttribute},
@@ -33,8 +33,8 @@ impl<'a> IdDefinition<'a> {
     /// @@id([foo, bar], name: "Foo")
     /// //                     ^^^^^ here
     /// ```
-    pub fn name(&mut self, name: &'a str) {
-        self.0.push_param(("name", Text::new(name)));
+    pub fn name(&mut self, name: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("name", Text::new(name.into())));
     }
 
     /// The primary key constraint name.
@@ -43,7 +43,7 @@ impl<'a> IdDefinition<'a> {
     /// @@id([foo, bar], map: "Foo")
     /// //                    ^^^^^ here
     /// ```
-    pub fn map(&mut self, map: &'a str) {
+    pub fn map(&mut self, map: impl Into<Cow<'a, str>>) {
         self.0.push_param(("map", Text::new(map)));
     }
 
