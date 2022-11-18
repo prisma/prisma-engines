@@ -8,7 +8,7 @@ pub enum TransactionError {
     #[error("Attempted to start a transaction inside of a transaction.")]
     AlreadyStarted,
 
-    #[error("Transaction not found.")]
+    #[error("Transaction not found. Transaction ID is invalid or refers to an old closed transaction Prisma doesn't have information about anymore.")]
     NotFound,
 
     #[error("Transaction already closed: {reason}.")]
