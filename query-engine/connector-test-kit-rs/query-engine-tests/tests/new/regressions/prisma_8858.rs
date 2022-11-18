@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), capabilities(CompoundIds))]
 mod prisma_8858 {
     fn schema() -> String {
         r#"
@@ -9,8 +9,8 @@ mod prisma_8858 {
           uuid      String
           otherUuid String?
         
-          otherObject        Object? @relation("objectToobject", fields: [clientId, otherUuid], references: [clientId, uuid])
-          otherObjectReverse Object? @relation("objectToobject")
+          otherObject        Object? @relation("objectToobject", fields: [clientId, otherUuid], references: [clientId, uuid], onDelete: NoAction, onUpdate: NoAction)
+          otherObjectReverse Object? @relation("objectToobject", onDelete: NoAction, onUpdate: NoAction)
         
           @@id([clientId, uuid])
           @@unique([clientId, otherUuid])
