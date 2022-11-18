@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use super::IndexOps;
-use crate::value::{Constant, ConstantNameValidationError, Function};
+use crate::value::{Constant, Function};
 
 /// Input parameters for a field in a model index definition.
 #[derive(Debug, Clone)]
@@ -105,11 +105,7 @@ impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
         let name: Vec<_> = definition
             .name
             .split('.')
-            .map(|name| match Constant::new(name) {
-                Ok(c) => c,
-                Err(ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-                Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
-            })
+            .map(|name| Constant::new_no_validate(Cow::Borrowed(name)))
             .map(|constant| constant.into_inner())
             .collect();
 

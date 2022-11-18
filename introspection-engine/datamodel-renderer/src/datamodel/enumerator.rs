@@ -1,10 +1,8 @@
 use psl::dml;
 
 use super::attributes::{BlockAttribute, FieldAttribute};
-use crate::value::{Constant, ConstantNameValidationError, Documentation, Function};
+use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
-
-static ENUM_EMPTY_NAME: &str = "ENUM_EMPTY_NAME";
 
 /// A variant declaration in an enum block.
 #[derive(Debug)]
@@ -69,8 +67,8 @@ impl<'a> EnumVariant<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: Option<&'a str>) {
-        self.documentation = documentation.map(Documentation);
+    pub fn documentation(&mut self, documentation: Option<impl Into<Cow<'a, str>>>) {
+        self.documentation = documentation.map(|d| Documentation(d.into()));
     }
 
     /// A throwaway function to help generate a rendering from the DML structures.
@@ -130,40 +128,12 @@ impl<'a> Enum<'a> {
     /// //   ^^^^^^^^^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let (name, map) = match Constant::new(name) {
-            Ok(name) => (name, None),
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (sanitized, Some(BlockAttribute(fun)))
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (
-                    Constant::new_no_validate(Cow::Borrowed(name)),
-                    Some(BlockAttribute(fun)),
-                )
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (
-                    Constant::new_no_validate(Cow::Borrowed(ENUM_EMPTY_NAME)),
-                    Some(BlockAttribute(fun)),
-                )
-            }
-        };
-
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            name,
+            name: Constant::new_no_validate(name.into()),
             documentation: None,
             variants: Vec::new(),
-            map,
+            map: None,
             schema: None,
         }
     }
@@ -176,8 +146,8 @@ impl<'a> Enum<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// The schema attribute of the enum block
@@ -286,7 +256,8 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut r#enum = Enum::new("1TrafficLight");
+        let mut r#enum = Enum::new("TrafficLight");
+        r#enum.map("1TrafficLight");
         r#enum.documentation("Cat's foot, iron claw\nNeuro-surgeons scream for more\nAt paranoia's poison door...");
 
         r#enum.push_variant("Red");

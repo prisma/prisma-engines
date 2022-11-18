@@ -58,7 +58,7 @@ impl<'a> Relation<'a> {
     /// //              ^^^^^^ this
     /// ```
     pub fn map(&mut self, name: &'a str) {
-        self.0.push_param(("map", Text(name)));
+        self.0.push_param(("map", Text::new(name)));
     }
 
     /// Defines the fields array.
@@ -82,15 +82,7 @@ impl<'a> Relation<'a> {
     }
 
     fn push_array_parameter(&mut self, param_name: &'static str, data: impl Iterator<Item = &'a str>) {
-        let fields: Vec<_> = data
-            .map(|name| match Constant::new(name) {
-                Ok(name) => name,
-                Err(crate::value::ConstantNameValidationError::WasSanitized { sanitized }) => sanitized,
-                Err(_) => Constant::new_no_validate(Cow::Borrowed(name)),
-            })
-            .map(|c| c.boxed())
-            .map(Value::Constant)
-            .collect();
+        let fields: Vec<_> = data.map(Cow::Borrowed).map(Value::Constant).collect();
 
         if !fields.is_empty() {
             self.0.push_param((param_name, Array::from(fields)));

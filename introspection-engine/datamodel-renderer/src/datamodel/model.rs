@@ -11,7 +11,7 @@ pub use index_field_input::{IndexFieldInput, IndexFieldOptions};
 use psl::dml;
 pub use relation::Relation;
 
-use crate::value::{Constant, ConstantNameValidationError, Documentation, Function, Text};
+use crate::value::{Constant, Documentation, Function, Text};
 use std::{borrow::Cow, collections::HashMap, fmt};
 
 use super::attributes::BlockAttribute;
@@ -54,38 +54,12 @@ impl<'a> Model<'a> {
     /// }
     /// ```
     pub fn new(name: &'a str) -> Self {
-        let (name, map, commented_out) = match Constant::new(name) {
-            Ok(name) => (name, None, Commented::Off),
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = BlockAttribute(map);
-
-                (sanitized, Some(map), Commented::Off)
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = BlockAttribute(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), Commented::On)
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = BlockAttribute(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), Commented::On)
-            }
-        };
+        let name = Constant::new_no_validate(Cow::Borrowed(name));
 
         Self {
             name,
-            commented_out,
-            map,
+            commented_out: Commented::Off,
+            map: None,
             documentation: None,
             ignore: None,
             id: None,
@@ -103,8 +77,8 @@ impl<'a> Model<'a> {
     ///   ....
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Ignore the model.
@@ -430,7 +404,8 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut model = Model::new("1Country");
+        let mut model = Model::new("Country");
+        model.map("1Country");
         model.documentation("Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!");
 
         let mut field = ModelField::new_required("id", "String");
@@ -449,10 +424,11 @@ mod tests {
 
         let mut field = ModelField::new_optional("value", "Bytes");
         field.documentation("NOPEUSKUNINGAS");
-        field.default(DefaultValue::bytes(&[1, 2, 3, 4]));
+        field.default(DefaultValue::bytes(&[1u8, 2, 3, 4] as &[u8]));
         model.push_field(field);
 
-        let mut field = ModelField::new_array("1array", "Int");
+        let mut field = ModelField::new_array("array", "Int");
+        field.map("1array");
         field.default(DefaultValue::array(vec![1, 2, 3, 4]));
         model.push_field(field);
 
@@ -477,7 +453,7 @@ mod tests {
         relation.on_delete("Cascade");
         relation.on_update("Restrict");
 
-        let mut field = ModelField::new_required("relfield", "1Planet");
+        let mut field = ModelField::new_required("relfield", "Planet");
         field.relation(relation);
 
         model.push_field(field);

@@ -34,7 +34,7 @@ impl<'a> IdDefinition<'a> {
     /// //                     ^^^^^ here
     /// ```
     pub fn name(&mut self, name: &'a str) {
-        self.0.push_param(("name", Text(name)));
+        self.0.push_param(("name", Text::new(name)));
     }
 
     /// The primary key constraint name.
@@ -44,7 +44,7 @@ impl<'a> IdDefinition<'a> {
     /// //                    ^^^^^ here
     /// ```
     pub fn map(&mut self, map: &'a str) {
-        self.0.push_param(("map", Text(map)));
+        self.0.push_param(("map", Text::new(map)));
     }
 
     /// The constraint clustering setting.
@@ -86,7 +86,7 @@ impl<'a> IdFieldDefinition<'a> {
     /// //                 ^^^^^ here
     /// ```
     pub fn map(&mut self, map: &'a str) {
-        self.0.push_param(("map", Text(map)));
+        self.0.push_param(("map", Text::new(map)));
     }
 
     /// The constraint clustering setting.
