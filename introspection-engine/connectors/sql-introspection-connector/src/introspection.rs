@@ -53,11 +53,9 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
         String::new()
     };
 
-    let rendered = format!(
-        "{}\n{}",
-        config,
-        render::Datamodel::from_dml(&ctx.config.datasources[0], &datamodel),
-    );
+    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
+
+    let rendered = format!("{}\n{}", config, ctx.rendered_schema);
 
     ctx.finalize_warnings();
 
