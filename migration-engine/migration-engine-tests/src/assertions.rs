@@ -189,7 +189,7 @@ impl SchemaAssertion {
         if actual_count != expected_count {
             self.print_context();
             println!(
-                "The schema was expected to have {} tables, but we {} were found.",
+                "The schema was expected to have {} tables, but {} were found.",
                 format!("{}", expected_count).green(),
                 format!("{}", actual_count).red()
             );
@@ -212,7 +212,7 @@ impl SchemaAssertion {
         if actual_count != expected_count {
             self.print_context();
             println!(
-                "The schema was expected to have {} views, but we {} were found.",
+                "The schema was expected to have {} views, but {} were found.",
                 format!("{}", expected_count).green(),
                 format!("{}", actual_count).red()
             );
