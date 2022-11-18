@@ -321,5 +321,5 @@ pub(crate) fn extensions_match(previous: ExtensionWalker<'_>, next: ExtensionWal
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {
-    previous.name() == next.name()
+    previous.name() == next.name() && previous.namespace() == next.namespace()
 }

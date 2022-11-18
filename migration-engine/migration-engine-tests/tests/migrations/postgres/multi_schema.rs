@@ -591,7 +591,9 @@ fn multi_schema_tests(_api: TestApi) {
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
+                assert.assert_enum("SomeEnum", |e|
+                                         e.assert_values(&["First", "Second", "Third"])
+                                           .assert_namespace("one"));
             }),
             skip: None,
         },
@@ -610,15 +612,18 @@ fn multi_schema_tests(_api: TestApi) {
       enum SomeEnum {
         First
         Second
+        Three
         @@schema("two")
       }"#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert.assert_enum("SomeEnum", |e| e.assert_values(&["First", "Second", "Third"]));
+                assert.assert_enum("SomeEnum", |e|
+                                         e.assert_values(&["First", "Second", "Three"])
+                                          .assert_namespace("two"));
             }),
-            skip: Some("TODO".into()),
+            skip: None,
         },
     ];
 
