@@ -7,7 +7,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::{borrow::Cow, collections::HashMap};
 
-/// For each foreign key in the SQL schema, produce two relation fields in the resulting Prisma
+/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
 pub(super) fn introspect_inline_relations(
     relation_names: &RelationNames,
@@ -117,6 +117,11 @@ fn calculate_relation_field(
     let on_update_action = map_action(foreign_key.on_update_action());
 
     relation_field.supports_restrict_action(!ctx.sql_family.is_mssql());
+
+    // Add an @ignore attribute if 1. the parent model isn't already ignored, and 2. the referenced
+    // model is ignored.
+    relation_field.is_ignored = table_has_usable_identifier(foreign_key.table())
+        && !table_has_usable_identifier(foreign_key.referenced_table());
 
     if relation_field.default_on_delete_action() != on_delete_action {
         relation_field.relation_info.on_delete = Some(on_delete_action);
