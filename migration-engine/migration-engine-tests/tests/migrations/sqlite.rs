@@ -185,7 +185,7 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
     let expected_json = expect![[r#"
         {
           "is_panic": false,
-          "message": "SQLite database error\nUNIQUE constraint failed: Fruit.name\n   0: sql_migration_connector::apply_migration::apply_migration\n             at migration-engine/connectors/sql-migration-connector/src/apply_migration.rs:10\n   1: migration_engine_tests::commands::schema_push::SchemaPush\n           with \u001b[3mmigration_id\u001b[0m\u001b[2m=\u001b[0mSome(\"the-migration\")\n             at migration-engine/migration-engine-tests/src/commands/schema_push.rs:42",
+          "message": "SQLite database error\nUNIQUE constraint failed: Fruit.name\n   0: sql_migration_connector::apply_migration::apply_migration\n             at migration-engine/connectors/sql-migration-connector/src/apply_migration.rs:10\n   1: migration_engine_tests::commands::schema_push::SchemaPush\n           with \u001b[3mmigration_id\u001b[0m\u001b[2m=\u001b[0mSome(\"the-migration\")\n             at migration-engine/migration-engine-tests/src/commands/schema_push.rs:43",
           "backtrace": null
         }"#]];
     expected_json.assert_eq(&serde_json::to_string_pretty(&res).unwrap())
