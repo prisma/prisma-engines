@@ -78,7 +78,7 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use </span><span class="kw">crate</span>::value::{Function, FunctionParam};
 
@@ -93,7 +93,7 @@
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>FieldAttribute&lt;<span class="lifetime">&#39;a</span>&gt; {
     attribute: Function&lt;<span class="lifetime">&#39;a</span>&gt;,
-    prefix: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    prefix: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FieldAttribute&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -107,8 +107,8 @@
     <span class="doccomment">/// Adds a prefix to the field attribute. Useful for native types,
     /// e.g. `attr.prefix(&quot;db&quot;)` for a type attribute renders as
     /// `@db.Type`.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.prefix = <span class="prelude-val">Some</span>(prefix);
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.prefix = <span class="prelude-val">Some</span>(prefix.into());
     }
 
     <span class="doccomment">/// Add a new parameter to the attribute function.
@@ -121,7 +121,7 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.write_str(<span class="string">&quot;@&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix) = <span class="self">self</span>.prefix {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix) = <span class="kw-2">&amp;</span><span class="self">self</span>.prefix {
             f.write_str(prefix)<span class="question-mark">?</span>;
             f.write_str(<span class="string">&quot;.&quot;</span>)<span class="question-mark">?</span>;
         }

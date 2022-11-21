@@ -169,10 +169,6 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.
 //!
 //! Includes the `model`, `enum` and `type` definitions.
@@ -245,22 +241,18 @@
     <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_data_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Datamodel) -&gt; Datamodel&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>data_model = <span class="self">Self</span>::new();
-
+    </span><span class="kw">pub fn </span>push_dml(<span class="kw-2">&amp;mut </span><span class="self">self</span>, datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_data_model: <span class="kw-2">&amp;</span>dml::Datamodel) {
         <span class="kw">for </span>dml_model <span class="kw">in </span>dml_data_model.models() {
-            data_model.push_model(Model::from_dml(datasource, dml_model));
+            <span class="self">self</span>.push_model(Model::from_dml(datasource, dml_model));
         }
 
         <span class="kw">for </span>dml_ct <span class="kw">in </span>dml_data_model.composite_types() {
-            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
+            <span class="self">self</span>.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
 
-        <span class="kw">for </span>dml_enum <span class="kw">in </span>dml_data_model.enums() {
-            data_model.push_enum(Enum::from_dml(dml_enum));
+        <span class="kw">for </span>r#enum <span class="kw">in </span>dml_data_model.enums() {
+            <span class="self">self</span>.push_enum(Enum::from_dml(r#enum));
         }
-
-        data_model
     }
 }
 

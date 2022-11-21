@@ -94,7 +94,8 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span id="97">97</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use crate</span>::{
     datamodel::attributes::BlockAttribute,
@@ -125,13 +126,13 @@
 
     <span class="doccomment">/// The client name of the index, defined as the `name` argument
     /// inside the attribute.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text::new(name)));
     }
 
     <span class="doccomment">/// The constraint name in the database, defined as the `map`
     /// argument inside the attribute.
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
     }
 
@@ -141,8 +142,9 @@
     }
 
     <span class="doccomment">/// Defines the `type` argument inside the attribute.
-    </span><span class="kw">pub fn </span>index_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;type&quot;</span>, Constant::new_no_validate(index_type)));
+    </span><span class="kw">pub fn </span>index_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index_type: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.<span class="number">0
+            </span>.push_param((<span class="string">&quot;type&quot;</span>, Constant::new_no_validate(index_type.into())));
     }
 
     <span class="kw">fn </span>new(index_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, fields: <span class="kw">impl </span>Iterator&lt;Item = IndexFieldInput&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
@@ -162,7 +164,7 @@
 }
 
 <span class="doccomment">/// Index type definition.
-</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="attribute">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>IndexOps&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Managed and known by Prisma. Renders as-is as a constant.
     ///
@@ -170,14 +172,14 @@
     /// @@index([field(ops: Int2BloomOps)], type: Brin)
     /// //                  ^^^^^^^^^^^^ like this
     /// ```
-    </span>Managed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    </span>Managed(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
     <span class="doccomment">/// A type we don&#39;t handle yet. Renders as raw.
     ///
     /// ```ignore
     /// @@index([field(ops: raw(&quot;tsvector_ops&quot;))], type: Gist)
     /// //                  ^^^^^^^^^^^^^^^^^^^ like this
     /// ```
-    </span>Raw(Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
+    </span>Raw(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>IndexOps&lt;<span class="lifetime">&#39;a</span>&gt; {

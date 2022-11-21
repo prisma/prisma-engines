@@ -68,7 +68,6 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>field_type;
 <span class="kw">mod </span>statistics;
 
@@ -122,16 +121,15 @@
 
     <span class="kw">let </span>data_model = statistics.into_datamodel(<span class="kw-2">&amp;mut </span>warnings);
     <span class="kw">let </span>is_empty = data_model.is_empty();
-
-    <span class="kw">let </span>data_model = <span class="kw">if </span>ctx.render_config {
-        <span class="macro">format!</span>(
-            <span class="string">&quot;{}\n{}&quot;</span>,
-            render::Configuration::from_psl(ctx.configuration()),
-            render::Datamodel::from_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model),
-        )
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered = render::Datamodel::default();
+    rendered.push_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model);
+    <span class="kw">let </span>config = <span class="kw">if </span>ctx.render_config {
+        render::Configuration::from_psl(ctx.configuration()).to_string()
     } <span class="kw">else </span>{
-        render::Datamodel::from_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model).to_string()
+        String::new()
     };
+
+    <span class="kw">let </span>data_model = <span class="macro">format!</span>(<span class="string">&quot;{config}\n{rendered}&quot;</span>);
 
     <span class="prelude-val">Ok</span>(IntrospectionResult {
         data_model: psl::reformat(<span class="kw-2">&amp;</span>data_model, <span class="number">2</span>).unwrap(),

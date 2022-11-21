@@ -602,8 +602,8 @@
     /// //    ^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>name = Constant::new_no_validate(Cow::Borrowed(name));
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = Constant::new_no_validate(name.into());
 
         <span class="self">Self </span>{
             name,
@@ -662,9 +662,9 @@
     ///   ^^^^^^^^^^^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
-        fun.push_param(map);
+        fun.push_param(map.into());
 
         <span class="self">self</span>.map = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
@@ -677,9 +677,9 @@
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;schema&quot;</span>);
-        fun.push_param(schema);
+        fun.push_param(schema.into());
 
         <span class="self">self</span>.schema = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
@@ -722,19 +722,19 @@
     <span class="doccomment">/// Generate a model rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML.
-    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Model) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="kw-2">&amp;</span>dml_model.name);
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_model: <span class="kw-2">&amp;</span>dml::Model) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(dml_model.name.clone());
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_model.documentation {
-            model.documentation(docs);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = <span class="kw-2">&amp;</span>dml_model.documentation {
+            model.documentation(docs.clone());
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_model.database_name {
-            model.map(map);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = <span class="kw-2">&amp;</span>dml_model.database_name {
+            model.map(map.clone());
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>schema) = dml_model.schema {
-            model.schema(schema);
+            model.schema(schema.clone());
         }
 
         <span class="kw">if </span>dml_model.is_commented_out {
@@ -748,20 +748,20 @@
         <span class="kw">match </span>dml_model.primary_key {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>pk) <span class="kw">if </span>!dml_model.has_single_id_field() =&gt; {
                 <span class="kw">let </span>fields = pk.fields.iter().map(|field| IndexFieldInput {
-                    name: Cow::Borrowed(<span class="kw-2">&amp;</span>field.name),
-                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref()),
+                    name: Cow::Owned(field.name.clone()),
+                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref().to_owned().into()),
                     length: field.length,
                     ops: <span class="prelude-val">None</span>,
                 });
 
-                <span class="kw">let </span><span class="kw-2">mut </span>definition = IdDefinition::new(fields);
+                <span class="kw">let </span><span class="kw-2">mut </span>definition: IdDefinition&lt;<span class="lifetime">&#39;static</span>&gt; = IdDefinition::new(fields);
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = pk.name {
-                    definition.name(name);
+                    definition.name(name.clone());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="kw-2">&amp;</span>pk.db_name {
-                    definition.map(map);
+                    definition.map(map.clone());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = pk.clustered {
@@ -774,7 +774,7 @@
         }
 
         <span class="comment">// weep
-        </span><span class="kw">let </span>uniques: HashMap&lt;<span class="kw-2">&amp;</span>str, IndexFieldOptions&gt; = dml_model
+        </span><span class="kw">let </span>uniques: HashMap&lt;<span class="kw-2">&amp;</span>str, IndexFieldOptions&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = dml_model
             .indices
             .iter()
             .rev() <span class="comment">// replicate existing behaviour on duplicate unique constraints
@@ -789,7 +789,7 @@
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sort_order) = definition.sort_order {
-                    opts.sort_order(sort_order.as_ref());
+                    opts.sort_order(sort_order.as_ref().to_owned());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = definition.length {
@@ -797,7 +797,7 @@
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = ix.db_name {
-                    opts.map(map);
+                    opts.map(map.clone());
                 }
 
                 (definition.from_field(), opts)
@@ -819,7 +819,7 @@
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sort_order) = field.sort_order {
-                        opts.sort_order(sort_order.as_ref());
+                        opts.sort_order(sort_order.as_ref().to_owned());
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length {
@@ -827,7 +827,7 @@
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = pk.db_name {
-                        opts.map(map);
+                        opts.map(map.clone());
                     }
 
                     <span class="prelude-val">Some</span>(opts)
@@ -859,15 +859,15 @@
 
                 <span class="kw">let </span>ops = f.operator_class.as_ref().map(|c| {
                     <span class="kw">if </span>c.is_raw() {
-                        IndexOps::Raw(Text(c.as_ref()))
+                        IndexOps::Raw(Text(c.as_ref().to_owned().into()))
                     } <span class="kw">else </span>{
-                        IndexOps::Managed(c.as_ref())
+                        IndexOps::Managed(c.as_ref().to_owned().into())
                     }
                 });
 
                 IndexFieldInput {
                     name: Cow::Owned(name),
-                    sort_order: f.sort_order.as_ref().map(AsRef::as_ref),
+                    sort_order: f.sort_order.map(|s| s.as_ref().to_string().into()),
                     length: f.length,
                     ops,
                 }
@@ -880,11 +880,11 @@
             };
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = dml_index.name {
-                definition.name(name);
+                definition.name(name.clone());
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_index.db_name {
-                definition.map(map);
+                definition.map(map.clone());
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = dml_index.clustered {
@@ -892,7 +892,7 @@
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>algo) = dml_index.algorithm {
-                definition.index_type(algo.as_ref());
+                definition.index_type(algo.as_ref().to_string());
             }
 
             model.push_index(definition);
@@ -946,7 +946,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::{borrow::Cow, ops::Deref};
+    <span class="kw">use </span>std::borrow::Cow;
 
     <span class="kw">use crate</span>::{datamodel::<span class="kw-2">*</span>, value::Function};
     <span class="kw">use </span>expect_test::expect;
@@ -997,8 +997,8 @@
         model.push_field(field);
 
         <span class="kw">let </span><span class="kw-2">mut </span>relation = Relation::new();
-        relation.fields([<span class="string">&quot;information&quot;</span>].iter().map(Deref::deref));
-        relation.references([<span class="string">&quot;id&quot;</span>].iter().map(Deref::deref));
+        relation.fields([<span class="string">&quot;information&quot;</span>].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
+        relation.references([<span class="string">&quot;id&quot;</span>].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
         relation.on_delete(<span class="string">&quot;Cascade&quot;</span>);
         relation.on_update(<span class="string">&quot;Restrict&quot;</span>);
 
@@ -1011,7 +1011,7 @@
             <span class="kw">if </span>i == <span class="number">1 </span>{
                 IndexFieldInput {
                     name: Cow::Borrowed(name),
-                    sort_order: <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>),
+                    sort_order: <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>.into()),
                     length: <span class="prelude-val">Some</span>(<span class="number">32</span>),
                     ops: <span class="prelude-val">None</span>,
                 }

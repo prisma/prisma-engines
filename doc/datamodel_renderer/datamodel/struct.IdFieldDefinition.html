@@ -3,7 +3,7 @@
 
 <div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code>field Int @id
 <span class="comment">//        ^^^ here</span></code></pre></div>
-</div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.map" class="method has-srclink"><a class="srclink rightside" href="../../src/datamodel_renderer/datamodel/model/id.rs.html#88-90">source</a><h4 class="code-header">pub fn <a href="#method.map" class="fnname">map</a>(&amp;mut self, map: &amp;'a <a class="primitive" href="https://doc.rust-lang.org/1.65.0/std/primitive.str.html">str</a>)</h4></section></summary><div class="docblock"><p>The primary key constraint name.</p>
+</div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.map" class="method has-srclink"><a class="srclink rightside" href="../../src/datamodel_renderer/datamodel/model/id.rs.html#88-90">source</a><h4 class="code-header">pub fn <a href="#method.map" class="fnname">map</a>(&amp;mut self, map: impl <a class="trait" href="https://doc.rust-lang.org/1.65.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.65.0/alloc/borrow/enum.Cow.html" title="enum alloc::borrow::Cow">Cow</a>&lt;'a, <a class="primitive" href="https://doc.rust-lang.org/1.65.0/std/primitive.str.html">str</a>&gt;&gt;)</h4></section></summary><div class="docblock"><p>The primary key constraint name.</p>
 
 <div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code>field Int @id(map: <span class="string">&quot;Foo&quot;</span>)
 <span class="comment">//                 ^^^^^ here</span></code></pre></div>

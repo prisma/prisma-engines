@@ -151,7 +151,7 @@
 <span class="doccomment">/// A type block in a PSL file.
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CompositeType&lt;<span class="lifetime">&#39;a</span>&gt; {
-    name: Constant&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    name: Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     fields: Vec&lt;CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
@@ -165,8 +165,8 @@
     /// //   ^^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>name = Constant::new_no_validate(name);
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = Constant::new_no_validate(name.into());
 
         <span class="self">Self </span>{
             name,
@@ -202,8 +202,8 @@
     <span class="doccomment">/// Generate a composite type rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML.
-    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_ct: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::CompositeType) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>composite_type = CompositeType::new(<span class="kw-2">&amp;</span>dml_ct.name);
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_ct: <span class="kw-2">&amp;</span>dml::CompositeType) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>composite_type = CompositeType::new(dml_ct.name.clone());
 
         <span class="kw">for </span>dml_field <span class="kw">in </span>dml_ct.fields.iter() {
             composite_type.push_field(CompositeTypeField::from_dml(datasource, dml_field));

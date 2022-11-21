@@ -342,10 +342,10 @@
     ///             ^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = value {
             <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
-            map.push_param(value);
+            map.push_param(value.into());
             <span class="self">self</span>.map = <span class="prelude-val">Some</span>(FieldAttribute::new(map));
         }
     }
@@ -377,10 +377,10 @@
     <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    </span><span class="kw">fn </span>from_dml(dml_variant: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::EnumValue) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>variant = <span class="self">Self</span>::new(Cow::Borrowed(<span class="kw-2">&amp;</span>dml_variant.name));
+    </span><span class="kw">fn </span>from_dml(dml_variant: <span class="kw-2">&amp;</span>dml::EnumValue) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>variant = <span class="self">Self</span>::new(Cow::Owned(dml_variant.name.clone()));
         variant.comment_out(dml_variant.commented_out);
-        variant.map(dml_variant.database_name.as_deref());
+        variant.map(dml_variant.database_name.as_ref().map(Clone::clone));
         variant
     }
 }
@@ -463,9 +463,9 @@
     ///             ^^^^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;schema&quot;</span>);
-        fun.push_param(schema);
+        fun.push_param(schema.into());
 
         <span class="self">self</span>.schema = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
@@ -493,9 +493,9 @@
     ///          ^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mapped_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>fun = Function::new(<span class="string">&quot;map&quot;</span>);
-        fun.push_param(mapped_name);
+        fun.push_param(mapped_name.into());
 
         <span class="self">self</span>.map = <span class="prelude-val">Some</span>(BlockAttribute(fun));
     }
@@ -503,19 +503,19 @@
     <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    </span><span class="kw">pub fn </span>from_dml(dml_enum: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Enum) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>r#enum = <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>dml_enum.name);
+    </span><span class="kw">pub fn </span>from_dml(dml_enum: <span class="kw-2">&amp;</span>dml::Enum) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>r#enum = <span class="self">Self</span>::new(dml_enum.name.clone());
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_enum.documentation {
-            r#enum.documentation(docs);
+            r#enum.documentation(docs.clone());
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>schema) = dml_enum.schema {
-            r#enum.schema(schema);
+            r#enum.schema(schema.clone());
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_enum.database_name {
-            r#enum.map(map);
+            r#enum.map(map.clone());
         }
 
         <span class="kw">for </span>dml_variant <span class="kw">in </span>dml_enum.values.iter() {

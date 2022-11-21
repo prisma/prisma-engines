@@ -476,6 +476,16 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel::{
         attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
@@ -513,7 +523,7 @@
     /// //^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_required(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_required(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(name, FieldType::required(type_name))
     }
 
@@ -526,7 +536,7 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_optional(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_optional(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(name, FieldType::optional(type_name))
     }
 
@@ -539,7 +549,7 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_array(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_array(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(name, FieldType::array(type_name))
     }
 
@@ -552,7 +562,7 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_required_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_required_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(name, FieldType::required_unsupported(type_name))
     }
 
@@ -565,7 +575,7 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_optional_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_optional_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(name, FieldType::optional_unsupported(type_name))
     }
 
@@ -578,8 +588,8 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_array_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name, FieldType::array_unsupported(type_name))
+    </span><span class="kw">pub fn </span>new_array_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name.into(), FieldType::array_unsupported(type_name.into()))
     }
 
     <span class="doccomment">/// Sets the field map attribute.
@@ -590,9 +600,9 @@
     ///                       ^^^^^^ value
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
-        map.push_param(value);
+        map.push_param(value.into());
 
         <span class="self">self</span>.map = <span class="prelude-val">Some</span>(FieldAttribute::new(map));
     }
@@ -633,7 +643,12 @@
     /// ```
     ///
     /// TODO: `params` as `&amp;[&amp;str]` when we get rid of the DML.
-    </span><span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, r#type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, params: Vec&lt;String&gt;) {
+    </span><span class="kw">pub fn </span>native_type(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        r#type: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        params: Vec&lt;String&gt;,
+    ) {
         <span class="kw">let </span><span class="kw-2">mut </span>native_type = FieldAttribute::new(Function::new(r#type));
 
         <span class="kw">for </span>param <span class="kw">in </span>params {
@@ -728,8 +743,8 @@
         <span class="self">self</span>.commented_out = <span class="bool-val">true</span>;
     }
 
-    <span class="kw">fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, r#type: FieldType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>name = Constant::new_no_validate(Cow::Borrowed(name));
+    <span class="kw">fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, r#type: FieldType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = Constant::new_no_validate(name.into());
 
         <span class="self">Self </span>{
             name,
@@ -755,39 +770,40 @@
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_dml(
         datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource,
         _dml_model: <span class="kw-2">&amp;</span>dml::Model,
-        dml_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::Field,
-        uniques: <span class="kw-2">&amp;</span>HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, IndexFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-        id: <span class="prelude-ty">Option</span>&lt;IdFieldDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    ) -&gt; <span class="self">Self </span>{
+        dml_field: <span class="kw-2">&amp;</span>dml::Field,
+        uniques: <span class="kw-2">&amp;</span>HashMap&lt;<span class="kw-2">&amp;</span>str, IndexFieldOptions&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+        id: <span class="prelude-ty">Option</span>&lt;IdFieldDefinition&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    ) -&gt; ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">match </span>dml_field {
             dml::Field::ScalarField(<span class="kw-2">ref </span>sf) =&gt; {
-                <span class="kw">let </span>(r#type, native_type) = <span class="kw">match </span>sf.field_type {
-                    dml::FieldType::Enum(<span class="kw-2">ref </span>ct) =&gt; (ct.as_str(), <span class="prelude-val">None</span>),
-                    dml::FieldType::Relation(<span class="kw-2">ref </span>info) =&gt; (info.referenced_model.as_str(), <span class="prelude-val">None</span>),
-                    dml::FieldType::Unsupported(<span class="kw-2">ref </span>s) =&gt; (s.as_str(), <span class="prelude-val">None</span>),
+                <span class="kw">let </span>field_name = sf.name.clone();
+                <span class="kw">let </span>(r#type, native_type): (String, <span class="kw">_</span>) = <span class="kw">match </span>sf.field_type {
+                    dml::FieldType::Enum(<span class="kw-2">ref </span>ct) =&gt; (ct.clone(), <span class="prelude-val">None</span>),
+                    dml::FieldType::Relation(<span class="kw-2">ref </span>info) =&gt; (info.referenced_model.clone(), <span class="prelude-val">None</span>),
+                    dml::FieldType::Unsupported(<span class="kw-2">ref </span>s) =&gt; (s.clone(), <span class="prelude-val">None</span>),
                     dml::FieldType::Scalar(<span class="kw-2">ref </span>st, <span class="kw-2">ref </span>nt) =&gt; {
-                        (st.as_ref(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
+                        (st.as_ref().to_owned(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
                     }
-                    dml::FieldType::CompositeType(<span class="kw-2">ref </span>ct) =&gt; (ct.as_str(), <span class="prelude-val">None</span>),
+                    dml::FieldType::CompositeType(<span class="kw-2">ref </span>ct) =&gt; (ct.clone(), <span class="prelude-val">None</span>),
                 };
 
                 <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>sf.arity {
                     dml::FieldArity::Required <span class="kw">if </span>sf.field_type.is_unsupported() =&gt; {
-                        <span class="self">Self</span>::new_required_unsupported(<span class="kw-2">&amp;</span>sf.name, r#type)
+                        <span class="self">Self</span>::new_required_unsupported(sf.name.clone(), r#type)
                     }
                     dml::FieldArity::Optional <span class="kw">if </span>sf.field_type.is_unsupported() =&gt; {
-                        <span class="self">Self</span>::new_optional_unsupported(<span class="kw-2">&amp;</span>sf.name, r#type)
+                        <span class="self">Self</span>::new_optional_unsupported(sf.name.clone(), r#type)
                     }
                     dml::FieldArity::List <span class="kw">if </span>sf.field_type.is_unsupported() =&gt; {
-                        <span class="self">Self</span>::new_array_unsupported(<span class="kw-2">&amp;</span>sf.name, r#type)
+                        <span class="self">Self</span>::new_array_unsupported(sf.name.clone(), r#type)
                     }
-                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(<span class="kw-2">&amp;</span>sf.name, r#type),
-                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(<span class="kw-2">&amp;</span>sf.name, r#type),
-                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(<span class="kw-2">&amp;</span>sf.name, r#type),
+                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(field_name, r#type),
+                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(field_name, r#type),
+                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(field_name, r#type),
                 };
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = sf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(dv) = sf.default_value() {
@@ -803,7 +819,7 @@
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(unique) = uniques.get(sf.name.as_str()) {
-                    field.unique(<span class="kw-2">*</span>unique);
+                    field.unique(unique.clone());
                 }
 
                 <span class="kw">if </span>sf.is_ignored {
@@ -815,7 +831,7 @@
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = sf.database_name {
-                    field.map(map);
+                    field.map(map.clone());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = id {
@@ -825,14 +841,16 @@
                 field
             }
             dml::Field::RelationField(rf) =&gt; {
+                <span class="kw">let </span>field_name = rf.name.clone();
+                <span class="kw">let </span>referenced_model = rf.relation_info.referenced_model.clone();
                 <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>rf.arity {
-                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(<span class="kw-2">&amp;</span>rf.name, <span class="kw-2">&amp;</span>rf.relation_info.referenced_model),
-                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(<span class="kw-2">&amp;</span>rf.name, <span class="kw-2">&amp;</span>rf.relation_info.referenced_model),
-                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(<span class="kw-2">&amp;</span>rf.name, <span class="kw-2">&amp;</span>rf.relation_info.referenced_model),
+                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(field_name, referenced_model),
+                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(field_name, referenced_model),
+                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(field_name, referenced_model),
                 };
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = rf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 <span class="kw">if </span>rf.is_commented_out {
@@ -851,22 +869,22 @@
                     <span class="kw">let </span><span class="kw-2">mut </span>relation = Relation::new();
 
                     <span class="kw">if </span>!relation_name.is_empty() {
-                        relation.name(relation_name);
+                        relation.name(relation_name.to_owned());
                     }
 
-                    relation.fields(dml_info.fields.iter().map(AsRef::as_ref));
-                    relation.references(dml_info.references.iter().map(AsRef::as_ref));
+                    relation.fields(dml_info.fields.iter().map(Clone::clone).map(Cow::Owned));
+                    relation.references(dml_info.references.iter().map(Clone::clone).map(Cow::Owned));
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>action) = dml_info.on_delete {
-                        relation.on_delete(action.as_ref());
+                        relation.on_delete(action.as_ref().to_owned());
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>action) = dml_info.on_update {
-                        relation.on_update(action.as_ref());
+                        relation.on_update(action.as_ref().to_owned());
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="kw-2">&amp;</span>dml_info.fk_name {
-                        relation.map(map);
+                        relation.map(map.clone());
                     }
 
                     field.relation(relation);
@@ -875,18 +893,20 @@
                 field
             }
             dml::Field::CompositeField(cf) =&gt; {
+                <span class="kw">let </span>name = cf.name.clone();
+                <span class="kw">let </span>ct = cf.composite_type.clone();
                 <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>cf.arity {
-                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(<span class="kw-2">&amp;</span>cf.name, <span class="kw-2">&amp;</span>cf.composite_type),
-                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(<span class="kw-2">&amp;</span>cf.name, <span class="kw-2">&amp;</span>cf.composite_type),
-                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(<span class="kw-2">&amp;</span>cf.name, <span class="kw-2">&amp;</span>cf.composite_type),
+                    dml::FieldArity::Required =&gt; <span class="self">Self</span>::new_required(name, ct),
+                    dml::FieldArity::Optional =&gt; <span class="self">Self</span>::new_optional(name, ct),
+                    dml::FieldArity::List =&gt; <span class="self">Self</span>::new_array(name, ct),
                 };
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = cf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = cf.database_name {
-                    field.map(map);
+                    field.map(map.clone());
                 }
 
                 <span class="kw">if </span>cf.is_commented_out {

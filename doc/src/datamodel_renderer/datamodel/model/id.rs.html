@@ -131,7 +131,7 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use crate</span>::{
     datamodel::attributes::{BlockAttribute, FieldAttribute},
@@ -166,8 +166,8 @@
     /// @@id([foo, bar], name: &quot;Foo&quot;)
     /// //                     ^^^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text::new(name)));
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;name&quot;</span>, Text::new(name.into())));
     }
 
     <span class="doccomment">/// The primary key constraint name.
@@ -176,7 +176,7 @@
     /// @@id([foo, bar], map: &quot;Foo&quot;)
     /// //                    ^^^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
     }
 
@@ -218,8 +218,8 @@
     /// field Int @id(map: &quot;Foo&quot;)
     /// //                 ^^^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map)));
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, map: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;map&quot;</span>, Text::new(map.into())));
     }
 
     <span class="doccomment">/// The constraint clustering setting.
@@ -238,8 +238,8 @@
     /// field Int @id(sort: Desc)
     /// //                  ^^^^ here
     /// ```
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;sort&quot;</span>, Constant::new_no_validate(sort)));
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;sort&quot;</span>, Constant::new_no_validate(sort.into())));
     }
 
     <span class="doccomment">/// The constraint length setting.

@@ -135,7 +135,7 @@
 </span><span class="attribute">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>IndexFieldInput&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) sort_order: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) sort_order: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) ops: <span class="prelude-ty">Option</span>&lt;IndexOps&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
@@ -162,8 +162,8 @@
     /// @@index([foobar(sort: Desc)])
     /// //                    ^^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort_order: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.sort_order = <span class="prelude-val">Some</span>(sort_order);
+    </span><span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort_order: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.sort_order = <span class="prelude-val">Some</span>(sort_order.into());
     }
 
     <span class="doccomment">/// Define the length of the indexed field.
@@ -178,12 +178,12 @@
 }
 
 <span class="doccomment">/// Options for a field-level index attribute.
-</span><span class="attribute">#[derive(Debug, Default, Clone, Copy)]
+</span><span class="attribute">#[derive(Debug, Default, Clone)]
 </span><span class="kw">pub struct </span>IndexFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) sort_order: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) sort_order: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) clustered: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) map: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) map: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -193,8 +193,8 @@
     /// @unique(sort: Asc)
     /// //            ^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort_order: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.sort_order = <span class="prelude-val">Some</span>(sort_order);
+    </span><span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort_order: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.sort_order = <span class="prelude-val">Some</span>(sort_order.into());
     }
 
     <span class="doccomment">/// Define the length of the inline field index.
@@ -223,8 +223,8 @@
     /// @unique(map: &quot;key_foo&quot;)
     /// //            ^^^^^^^ here
     /// ```
-    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.map = <span class="prelude-val">Some</span>(value);
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="self">self</span>.map = <span class="prelude-val">Some</span>(value.into());
     }
 }
 

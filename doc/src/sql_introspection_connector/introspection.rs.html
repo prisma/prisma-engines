@@ -80,7 +80,6 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
-<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
 <span class="kw">mod </span>enums;
@@ -136,11 +135,10 @@
         String::new()
     };
 
-    <span class="kw">let </span>rendered = <span class="macro">format!</span>(
-        <span class="string">&quot;{}\n{}&quot;</span>,
-        config,
-        render::Datamodel::from_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel),
-    );
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered_datamodel = render::Datamodel::default();
+    rendered_datamodel.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
+
+    <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{config}\n{rendered_datamodel}&quot;</span>);
 
     ctx.finalize_warnings();
 
