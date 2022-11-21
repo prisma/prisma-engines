@@ -53,8 +53,8 @@ impl<'a> Model<'a> {
     /// //    ^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let name = Constant::new_no_validate(Cow::Borrowed(name));
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             name,
@@ -113,9 +113,9 @@ impl<'a> Model<'a> {
     ///   ^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, map: &'a str) {
+    pub fn map(&mut self, map: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("map");
-        fun.push_param(map);
+        fun.push_param(map.into());
 
         self.map = Some(BlockAttribute(fun));
     }
@@ -128,9 +128,9 @@ impl<'a> Model<'a> {
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: &'a str) {
+    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("schema");
-        fun.push_param(schema);
+        fun.push_param(schema.into());
 
         self.schema = Some(BlockAttribute(fun));
     }
@@ -173,19 +173,19 @@ impl<'a> Model<'a> {
     /// Generate a model rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_model: &'a dml::Model) -> Self {
-        let mut model = Model::new(&dml_model.name);
+    pub fn from_dml(datasource: &'a psl::Datasource, dml_model: &dml::Model) -> Self {
+        let mut model = Model::new(dml_model.name.clone());
 
-        if let Some(ref docs) = dml_model.documentation {
-            model.documentation(docs);
+        if let Some(docs) = &dml_model.documentation {
+            model.documentation(docs.clone());
         }
 
-        if let Some(ref map) = dml_model.database_name {
-            model.map(map);
+        if let Some(map) = &dml_model.database_name {
+            model.map(map.clone());
         }
 
         if let Some(ref schema) = dml_model.schema {
-            model.schema(schema);
+            model.schema(schema.clone());
         }
 
         if dml_model.is_commented_out {
@@ -199,20 +199,20 @@ impl<'a> Model<'a> {
         match dml_model.primary_key {
             Some(ref pk) if !dml_model.has_single_id_field() => {
                 let fields = pk.fields.iter().map(|field| IndexFieldInput {
-                    name: Cow::Borrowed(&field.name),
-                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref()),
+                    name: Cow::Owned(field.name.clone()),
+                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref().to_owned().into()),
                     length: field.length,
                     ops: None,
                 });
 
-                let mut definition = IdDefinition::new(fields);
+                let mut definition: IdDefinition<'static> = IdDefinition::new(fields);
 
                 if let Some(ref name) = pk.name {
-                    definition.name(name);
+                    definition.name(name.clone());
                 }
 
                 if let Some(ref map) = &pk.db_name {
-                    definition.map(map);
+                    definition.map(map.clone());
                 }
 
                 if let Some(clustered) = pk.clustered {
@@ -225,7 +225,7 @@ impl<'a> Model<'a> {
         }
 
         // weep
-        let uniques: HashMap<&str, IndexFieldOptions> = dml_model
+        let uniques: HashMap<&str, IndexFieldOptions<'static>> = dml_model
             .indices
             .iter()
             .rev() // replicate existing behaviour on duplicate unique constraints
@@ -240,7 +240,7 @@ impl<'a> Model<'a> {
                 }
 
                 if let Some(ref sort_order) = definition.sort_order {
-                    opts.sort_order(sort_order.as_ref());
+                    opts.sort_order(sort_order.as_ref().to_owned());
                 }
 
                 if let Some(length) = definition.length {
@@ -248,7 +248,7 @@ impl<'a> Model<'a> {
                 }
 
                 if let Some(ref map) = ix.db_name {
-                    opts.map(map);
+                    opts.map(map.clone());
                 }
 
                 (definition.from_field(), opts)
@@ -270,7 +270,7 @@ impl<'a> Model<'a> {
                     }
 
                     if let Some(ref sort_order) = field.sort_order {
-                        opts.sort_order(sort_order.as_ref());
+                        opts.sort_order(sort_order.as_ref().to_owned());
                     }
 
                     if let Some(length) = field.length {
@@ -278,7 +278,7 @@ impl<'a> Model<'a> {
                     }
 
                     if let Some(ref map) = pk.db_name {
-                        opts.map(map);
+                        opts.map(map.clone());
                     }
 
                     Some(opts)
@@ -310,15 +310,15 @@ impl<'a> Model<'a> {
 
                 let ops = f.operator_class.as_ref().map(|c| {
                     if c.is_raw() {
-                        IndexOps::Raw(Text(c.as_ref()))
+                        IndexOps::Raw(Text(c.as_ref().to_owned().into()))
                     } else {
-                        IndexOps::Managed(c.as_ref())
+                        IndexOps::Managed(c.as_ref().to_owned().into())
                     }
                 });
 
                 IndexFieldInput {
                     name: Cow::Owned(name),
-                    sort_order: f.sort_order.as_ref().map(AsRef::as_ref),
+                    sort_order: f.sort_order.map(|s| s.as_ref().to_string().into()),
                     length: f.length,
                     ops,
                 }
@@ -331,11 +331,11 @@ impl<'a> Model<'a> {
             };
 
             if let Some(ref name) = dml_index.name {
-                definition.name(name);
+                definition.name(name.clone());
             }
 
             if let Some(ref map) = dml_index.db_name {
-                definition.map(map);
+                definition.map(map.clone());
             }
 
             if let Some(clustered) = dml_index.clustered {
@@ -343,7 +343,7 @@ impl<'a> Model<'a> {
             }
 
             if let Some(ref algo) = dml_index.algorithm {
-                definition.index_type(algo.as_ref());
+                definition.index_type(algo.as_ref().to_string());
             }
 
             model.push_index(definition);
@@ -397,7 +397,7 @@ impl<'a> fmt::Display for Model<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::{borrow::Cow, ops::Deref};
+    use std::borrow::Cow;
 
     use crate::{datamodel::*, value::Function};
     use expect_test::expect;
@@ -448,8 +448,8 @@ mod tests {
         model.push_field(field);
 
         let mut relation = Relation::new();
-        relation.fields(["information"].iter().map(Deref::deref));
-        relation.references(["id"].iter().map(Deref::deref));
+        relation.fields(["information"].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
+        relation.references(["id"].into_iter().map(ToOwned::to_owned).map(Cow::Owned));
         relation.on_delete("Cascade");
         relation.on_update("Restrict");
 
@@ -462,7 +462,7 @@ mod tests {
             if i == 1 {
                 IndexFieldInput {
                     name: Cow::Borrowed(name),
-                    sort_order: Some("Asc"),
+                    sort_order: Some("Asc".into()),
                     length: Some(32),
                     ops: None,
                 }
