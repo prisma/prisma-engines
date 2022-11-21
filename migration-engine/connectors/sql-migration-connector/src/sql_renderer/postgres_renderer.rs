@@ -725,11 +725,7 @@ fn render_alter_column(
 ) {
     let steps = expand_alter_column(columns, column_changes);
     let table_name = TableName::new(
-        columns
-            .previous
-            .table()
-            .namespace()
-            .map(|ns| Quoted::postgres_ident(ns)),
+        columns.previous.table().namespace().map(Quoted::postgres_ident),
         Quoted::postgres_ident(columns.previous.table().name()),
     );
     let column_name = Quoted::postgres_ident(columns.previous.name());
