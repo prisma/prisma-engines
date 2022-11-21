@@ -173,7 +173,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         relation_to_fields: get_relation_to_fields(field),
         relation_on_delete: get_relation_delete_strategy(field),
         field_type: get_field_type(field),
-        is_generated: Some(field.is_generated()),
+        is_generated: Some(false),
         is_updated_at: Some(field.is_updated_at()),
         documentation: field.documentation().map(|v| v.to_owned()),
     }
