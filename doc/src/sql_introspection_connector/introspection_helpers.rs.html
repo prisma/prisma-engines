@@ -675,7 +675,7 @@
         <span class="kw">if </span>prisma_name.is_empty() {
             ctx.fields_with_empty_names.push(<span class="kw">crate</span>::warnings::ModelAndField {
                 model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
-                field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+                field: column.name().to_owned(),
             });
             documentation = <span class="prelude-val">Some</span>(<span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>.to_owned());
             (mapped_name.clone().unwrap_or(prisma_name), mapped_name, <span class="bool-val">true</span>)
