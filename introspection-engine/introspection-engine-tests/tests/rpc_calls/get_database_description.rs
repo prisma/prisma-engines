@@ -30,6 +30,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -100,6 +101,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -172,6 +174,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -247,6 +250,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,

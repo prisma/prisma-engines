@@ -24,26 +24,35 @@ pub(super) fn add_extensions<'a>(
     let mut next_extensions = render::value::Array::new();
 
     for ext in pg_schema_ext.extension_walkers() {
-        let mut next_extension = render::value::Function::new(ext.name());
+        let mut next_extension = {
+            if crate::needs_sanitation(ext.name()) {
+                let sanitized_name = crate::sanitize_string(ext.name());
+                let mut func = render::value::Function::new(sanitized_name);
+                func.push_param(("map", render::value::Text::new(ext.name())));
+                func
+            } else {
+                render::value::Function::new(ext.name())
+            }
+        };
 
         match previous_extensions.and_then(|e| e.find_by_name(ext.name())) {
             Some(prev) => {
                 match prev.version() {
                     Some(previous_version) if previous_version != ext.version() => {
-                        next_extension.push_param(("version", render::value::Text(ext.version())));
+                        next_extension.push_param(("version", render::value::Text::new(ext.version())));
                     }
                     Some(previous_version) => {
-                        next_extension.push_param(("version", render::value::Text(previous_version)));
+                        next_extension.push_param(("version", render::value::Text::new(previous_version)));
                     }
                     None => (),
                 };
 
                 match prev.schema() {
                     Some(previous_schema) if previous_schema != ext.schema() => {
-                        next_extension.push_param(("schema", render::value::Text(ext.schema())));
+                        next_extension.push_param(("schema", render::value::Text::new(ext.schema())));
                     }
                     Some(previous_schema) => {
-                        next_extension.push_param(("schema", render::value::Text(previous_schema)));
+                        next_extension.push_param(("schema", render::value::Text::new(previous_schema)));
                     }
                     None => (),
                 }
@@ -51,7 +60,7 @@ pub(super) fn add_extensions<'a>(
                 next_extensions.push(next_extension);
             }
             None if EXTENSION_ALLOW_LIST.contains(&ext.name()) => {
-                next_extension.push_param(("schema", render::value::Text(ext.schema())));
+                next_extension.push_param(("schema", render::value::Text::new(ext.schema())));
                 next_extensions.push(next_extension);
             }
             None => (),

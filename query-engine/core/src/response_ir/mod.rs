@@ -16,7 +16,7 @@ use crate::QueryValue;
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
-use std::{fmt, sync::Arc};
+use std::{collections::HashMap, fmt, sync::Arc};
 
 pub use ir_serializer::*;
 pub use response::*;
@@ -44,16 +44,15 @@ impl List {
         self.len() == 0
     }
 
-    pub fn index_by(self, keys: &[String]) -> Vec<(Vec<QueryValue>, Map)> {
-        let mut map = Vec::with_capacity(self.len());
+    pub fn index_by(self, keys: &[String]) -> Vec<(HashMap<String, QueryValue>, Map)> {
+        let mut map: Vec<(HashMap<String, QueryValue>, Map)> = Vec::with_capacity(self.len());
 
         for item in self.into_iter() {
             let inner = item.into_map().unwrap();
-
-            let key: Vec<QueryValue> = keys
+            let key: HashMap<String, QueryValue> = keys
                 .iter()
-                .map(|key| inner.get(key).unwrap().clone().into_value().unwrap())
-                .map(QueryValue::from)
+                .map(|key| (key.clone(), inner.get(key).unwrap().clone().into_value().unwrap()))
+                .map(|(key, val)| (key, QueryValue::from(val)))
                 .collect();
 
             map.push((key, inner));
@@ -133,6 +132,19 @@ impl Item {
         match self {
             Self::Value(pv) => Some(pv),
             Self::Ref(r) => Arc::try_unwrap(r).ok().and_then(|r| r.into_value()),
+            Self::List(list) => {
+                let mut values = vec![];
+
+                for item in list {
+                    if let Some(pv) = item.into_value() {
+                        values.push(pv)
+                    } else {
+                        return None;
+                    }
+                }
+
+                Some(PrismaValue::List(values))
+            }
             _ => None,
         }
     }

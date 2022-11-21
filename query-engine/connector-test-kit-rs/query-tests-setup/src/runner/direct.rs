@@ -118,4 +118,8 @@ impl RunnerInterface for DirectRunner {
     fn get_metrics(&self) -> MetricRegistry {
         self.metrics.clone()
     }
+
+    fn query_schema(&self) -> &QuerySchemaRef {
+        &self.query_schema
+    }
 }

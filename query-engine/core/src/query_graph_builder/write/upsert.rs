@@ -2,7 +2,7 @@ use super::{write_args_parser::WriteArgsParser, *};
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ParsedField, ParsedInputMap, ParsedInputValue,
+    ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
@@ -60,12 +60,14 @@ pub fn upsert_record(
     let where_argument = field.where_arg()?.unwrap();
     let create_argument = field.create_arg()?.unwrap();
     let update_argument = field.update_arg()?.unwrap();
+    let selection = &field.nested_fields;
 
     let can_use_native_upsert = can_use_connector_native_upsert(
         &model,
         &where_argument,
         &create_argument,
         &update_argument,
+        selection,
         connector_ctx,
     );
 
@@ -204,8 +206,11 @@ fn can_use_connector_native_upsert(
     where_field: &ParsedInputMap,
     create_argument: &ParsedInputMap,
     update_argument: &ParsedInputMap,
+    selection: &Option<ParsedObject>,
     connector_ctx: &ConnectorContext,
 ) -> bool {
+    let has_nested_selects = has_nested_selects(selection);
+
     let has_nested_create = create_argument
         .iter()
         .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
@@ -231,6 +236,7 @@ fn can_use_connector_native_upsert(
         && !has_nested_create
         && !has_nested_update
         && !empty_update
+        && !has_nested_selects
         && where_values_same_as_create
 }
 
@@ -238,6 +244,17 @@ fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
     match model.fields().find_from_scalar(&field_name) {
         Ok(field) => field.unique(),
         Err(_) => resolve_compound_field(field_name, model).is_some(),
+    }
+}
+
+fn has_nested_selects(selection: &Option<ParsedObject>) -> bool {
+    if let Some(parsed_object) = selection {
+        parsed_object
+            .fields
+            .iter()
+            .any(|field| field.parsed_field.nested_fields.is_some())
+    } else {
+        false
     }
 }
 

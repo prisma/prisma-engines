@@ -1319,13 +1319,13 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     let final_dm = expect![[r#"
         model B {
           id        Int @id @default(autoincrement())
-          custom_A  A[]
+          custom_A  A[] @relation("AToB")
           special_A A[] @relation("AToB2")
         }
 
         model A {
           id        Int @id @default(autoincrement())
-          custom_B  B[]
+          custom_B  B[] @relation("AToB")
           special_B B[] @relation("AToB2")
         }
 
@@ -1654,17 +1654,6 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
      "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
     Ok(())
 }
 
@@ -1712,17 +1701,6 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
      "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "compound"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
     Ok(())
 }
 

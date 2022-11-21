@@ -1,0 +1,9 @@
+model User {
+  id Int @id
+  post Post
+}
+
+model Post {
+  id Int @id
+}
+

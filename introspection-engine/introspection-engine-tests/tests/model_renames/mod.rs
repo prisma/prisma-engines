@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(Postgres, CockroachDb))]
 async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

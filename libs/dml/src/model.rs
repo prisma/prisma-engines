@@ -3,6 +3,7 @@ use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
+use psl_core::parser_database::IndexType;
 use std::{borrow::Cow, fmt};
 
 /// Represents a model in a prisma schema.
@@ -310,19 +311,6 @@ impl PrimaryKeyField {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub enum IndexType {
-    Unique,
-    Normal,
-    Fulltext,
-}
-
-impl IndexType {
-    pub fn is_fulltext(self) -> bool {
-        matches!(self, IndexType::Fulltext)
-    }
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SortOrder {
     Asc,
     Desc,
@@ -467,33 +455,18 @@ impl Model {
     /// optional unique fields are NOT considered a unique criteria
     /// used for: A Model must have at least one STRICT unique criteria.
     pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(false, false)
-    }
-
-    /// optional unique fields are NOT considered a unique criteria
-    /// used for: A Model must have at least one STRICT unique criteria.
-    /// Ignores unsupported, used for introspection to decide when to ignore
-    pub fn strict_unique_criterias_disregarding_unsupported(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(false, true)
+        self.unique_criterias(false)
     }
 
     /// optional unique fields are considered a unique criteria
     /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
     pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(true, false)
+        self.unique_criterias(true)
     }
 
     /// returns the order of unique criterias ordered based on their precedence
-    fn unique_criterias(&self, allow_optional: bool, disregard_unsupported: bool) -> Vec<UniqueCriteria> {
+    fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
-
-        let in_eligible = |field: &ScalarField| {
-            if disregard_unsupported {
-                field.is_commented_out || matches!(field.field_type, FieldType::Unsupported(_))
-            } else {
-                field.is_commented_out
-            }
-        };
 
         // first candidate: primary key
         {
@@ -525,7 +498,7 @@ impl Model {
                 if !id_fields.is_empty()
                     && !id_fields
                         .iter()
-                        .any(|f| in_eligible(f) || (f.is_optional() && !allow_optional))
+                        .any(|f| f.is_commented_out || (f.is_optional() && !allow_optional))
                 {
                     result.push(UniqueCriteria::new(id_fields));
                 }
@@ -547,7 +520,7 @@ impl Model {
                         .map(|f| &f.path.first().unwrap().0)
                         .map(|name| self.find_scalar_field(name).unwrap())
                         .collect();
-                    let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
+                    let no_fields_are_ineligible = !fields.iter().any(|f| f.is_commented_out);
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
                         .then(|| UniqueCriteria::new(fields))

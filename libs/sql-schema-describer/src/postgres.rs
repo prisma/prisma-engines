@@ -1201,30 +1201,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut enum_values: BTreeMap<(String, String), Vec<String>> = BTreeMap::new();
+        let mut enum_values: BTreeMap<(NamespaceId, String), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
-            trace!("Got enum row: {:?}", row);
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
             let namespace = row.get_expect_string("namespace");
-
-            let values = enum_values.entry((name, namespace)).or_insert_with(Vec::new);
+            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
+            let values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
             values.push(value);
         }
 
-        let mut enums: Vec<Enum> = enum_values
-            .into_iter()
-            .map(|((name, namespace), values)| Enum {
-                namespace_id: sql_schema.get_namespace_id(&namespace).unwrap(),
-                name,
-                values,
-            })
-            .collect();
+        for ((namespace_id, enum_name), variants) in enum_values {
+            let enum_id = sql_schema.push_enum(namespace_id, enum_name);
+            for variant in variants {
+                sql_schema.push_enum_variant(enum_id, variant);
+            }
+        }
 
-        enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
-
-        sql_schema.enums = enums;
         Ok(())
     }
 }

@@ -138,7 +138,11 @@ fn render_raw_sql(
 
             vec![renderer.render_create_table(table)]
         }
-        SqlMigrationStep::DropTable { table_id } => renderer.render_drop_table(schemas.previous.walk(*table_id).name()),
+        SqlMigrationStep::DropTable { table_id } => {
+            let table = schemas.previous.walk(*table_id);
+
+            renderer.render_drop_table(table.namespace(), table.name())
+        }
         SqlMigrationStep::RedefineIndex { index } => renderer.render_drop_and_recreate_index(schemas.walk(*index)),
         SqlMigrationStep::AddForeignKey { foreign_key_id } => {
             let foreign_key = schemas.next.walk(*foreign_key_id);

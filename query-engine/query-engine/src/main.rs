@@ -37,7 +37,7 @@ async fn main() -> Result<(), AnyError> {
 
         logger.install().unwrap();
 
-        if opts.enable_metrics {
+        if opts.enable_metrics || opts.dataproxy_metric_override {
             query_engine_metrics::setup();
         }
 

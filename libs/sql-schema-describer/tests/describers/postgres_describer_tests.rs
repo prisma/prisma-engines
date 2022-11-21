@@ -142,6 +142,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1152,7 +1153,11 @@ fn postgres_enums_must_work(api: TestApi) {
     let values = &["sad", "ok", "happy"];
 
     assert_eq!(got_enum.name(), "mood");
-    assert_eq!(got_enum.values(), values);
+    let found_values = got_enum.values();
+    assert_eq!(found_values.len(), values.len());
+    for (a, b) in found_values.zip(values) {
+        assert_eq!(a, *b)
+    }
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -1272,6 +1277,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1431,6 +1437,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1780,6 +1787,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1999,6 +2007,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(

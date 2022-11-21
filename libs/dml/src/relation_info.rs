@@ -84,7 +84,7 @@ impl From<db::ReferentialAction> for ReferentialAction {
 }
 
 impl AsRef<str> for ReferentialAction {
-    fn as_ref(&self) -> &str {
+    fn as_ref(&self) -> &'static str {
         match self {
             ReferentialAction::Cascade => "Cascade",
             ReferentialAction::Restrict => "Restrict",

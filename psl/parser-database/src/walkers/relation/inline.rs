@@ -116,12 +116,20 @@ impl<'db> InlineRelationWalker<'db> {
         self.0.id
     }
 
+    /// The relation name in the schema.
+    ///
+    /// ```ignore
+    /// myField OtherModel @relation("thisModelToOtherModel", fields: [fkfield], references: [id])
+    /// //                           ^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.0.explicit_relation_name()
+    }
+
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
     pub fn relation_name(self) -> RelationName<'db> {
-        self.get()
-            .relation_name
-            .map(|string_id| &self.0.db[string_id])
+        self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.referencing_model().name(), self.referenced_model().name()))
     }

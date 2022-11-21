@@ -1,13 +1,12 @@
-use std::{borrow::Cow, collections::HashMap, fmt};
-
-use psl::{dml, RelationNames};
-
 use crate::{
-    datamodel::{attributes::FieldAttribute, DefaultValue, FieldType},
-    value::{Constant, ConstantNameValidationError, Documentation, Function, Text},
+    datamodel::{
+        attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
+        IdFieldDefinition, Relation,
+    },
+    value::{Constant, Documentation, Function, Text},
 };
-
-use super::{index_field_input::IndexFieldOptions, IdFieldDefinition, Relation};
+use psl::dml;
+use std::{borrow::Cow, collections::HashMap, fmt};
 
 /// A field in a model block.
 #[derive(Debug)]
@@ -36,7 +35,7 @@ impl<'a> ModelField<'a> {
     /// //^^^^ name
     /// }
     /// ```
-    pub fn new_required(name: &'a str, type_name: &'a str) -> Self {
+    pub fn new_required(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
         Self::new(name, FieldType::required(type_name))
     }
 
@@ -49,7 +48,7 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_optional(name: &'a str, type_name: &'a str) -> Self {
+    pub fn new_optional(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
         Self::new(name, FieldType::optional(type_name))
     }
 
@@ -62,7 +61,7 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_array(name: &'a str, type_name: &'a str) -> Self {
+    pub fn new_array(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
         Self::new(name, FieldType::array(type_name))
     }
 
@@ -75,7 +74,7 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_required_unsupported(name: &'a str, type_name: &'a str) -> Self {
+    pub fn new_required_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
         Self::new(name, FieldType::required_unsupported(type_name))
     }
 
@@ -88,7 +87,7 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_optional_unsupported(name: &'a str, type_name: &'a str) -> Self {
+    pub fn new_optional_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
         Self::new(name, FieldType::optional_unsupported(type_name))
     }
 
@@ -101,8 +100,8 @@ impl<'a> ModelField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_array_unsupported(name: &'a str, type_name: &'a str) -> Self {
-        Self::new(name, FieldType::array_unsupported(type_name))
+    pub fn new_array_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
+        Self::new(name.into(), FieldType::array_unsupported(type_name.into()))
     }
 
     /// Sets the field map attribute.
@@ -113,9 +112,9 @@ impl<'a> ModelField<'a> {
     ///                       ^^^^^^ value
     /// }
     /// ```
-    pub fn map(&mut self, value: &'a str) {
+    pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
         let mut map = Function::new("map");
-        map.push_param(value);
+        map.push_param(value.into());
 
         self.map = Some(FieldAttribute::new(map));
     }
@@ -128,8 +127,8 @@ impl<'a> ModelField<'a> {
     ///   bar Int
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Sets the field default attribute.
@@ -156,7 +155,12 @@ impl<'a> ModelField<'a> {
     /// ```
     ///
     /// TODO: `params` as `&[&str]` when we get rid of the DML.
-    pub fn native_type(&mut self, prefix: &'a str, r#type: &'a str, params: Vec<String>) {
+    pub fn native_type(
+        &mut self,
+        prefix: impl Into<Cow<'a, str>>,
+        r#type: impl Into<Cow<'a, str>>,
+        params: Vec<String>,
+    ) {
         let mut native_type = FieldAttribute::new(Function::new(r#type));
 
         for param in params {
@@ -192,7 +196,7 @@ impl<'a> ModelField<'a> {
         let mut fun = Function::new("unique");
 
         if let Some(map) = options.map {
-            fun.push_param(("map", Text(map)));
+            fun.push_param(("map", Text::new(map)));
         }
 
         if let Some(sort_order) = options.sort_order {
@@ -251,40 +255,14 @@ impl<'a> ModelField<'a> {
         self.commented_out = true;
     }
 
-    fn new(name: &'a str, r#type: FieldType<'a>) -> Self {
-        let (name, map, commented_out) = match Constant::new(name) {
-            Ok(name) => (name, None, false),
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (sanitized, Some(map), false)
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), true)
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut map = Function::new("map");
-                map.push_param(name);
-
-                let map = FieldAttribute::new(map);
-
-                (Constant::new_no_validate(Cow::Borrowed(name)), Some(map), true)
-            }
-        };
+    fn new(name: impl Into<Cow<'a, str>>, r#type: FieldType<'a>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             name,
-            commented_out,
+            commented_out: false,
             r#type,
-            map,
+            map: None,
             documentation: None,
             updated_at: None,
             unique: None,
@@ -303,40 +281,41 @@ impl<'a> ModelField<'a> {
     /// make much sense to call this from outside of the module.
     pub(super) fn from_dml(
         datasource: &'a psl::Datasource,
-        dml_model: &dml::Model,
-        dml_field: &'a dml::Field,
-        uniques: &HashMap<&'a str, IndexFieldOptions<'a>>,
-        id: Option<IdFieldDefinition<'a>>,
-    ) -> Self {
+        _dml_model: &dml::Model,
+        dml_field: &dml::Field,
+        uniques: &HashMap<&str, IndexFieldOptions<'static>>,
+        id: Option<IdFieldDefinition<'static>>,
+    ) -> ModelField<'a> {
         match dml_field {
             dml::Field::ScalarField(ref sf) => {
-                let (r#type, native_type) = match sf.field_type {
-                    dml::FieldType::Enum(ref ct) => (ct.as_str(), None),
-                    dml::FieldType::Relation(ref info) => (info.referenced_model.as_str(), None),
-                    dml::FieldType::Unsupported(ref s) => (s.as_str(), None),
+                let field_name = sf.name.clone();
+                let (r#type, native_type): (String, _) = match sf.field_type {
+                    dml::FieldType::Enum(ref ct) => (ct.clone(), None),
+                    dml::FieldType::Relation(ref info) => (info.referenced_model.clone(), None),
+                    dml::FieldType::Unsupported(ref s) => (s.clone(), None),
                     dml::FieldType::Scalar(ref st, ref nt) => {
-                        (st.as_ref(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
+                        (st.as_ref().to_owned(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
                     }
-                    dml::FieldType::CompositeType(ref ct) => (ct.as_str(), None),
+                    dml::FieldType::CompositeType(ref ct) => (ct.clone(), None),
                 };
 
                 let mut field = match sf.arity {
                     dml::FieldArity::Required if sf.field_type.is_unsupported() => {
-                        Self::new_required_unsupported(&sf.name, r#type)
+                        Self::new_required_unsupported(sf.name.clone(), r#type)
                     }
                     dml::FieldArity::Optional if sf.field_type.is_unsupported() => {
-                        Self::new_optional_unsupported(&sf.name, r#type)
+                        Self::new_optional_unsupported(sf.name.clone(), r#type)
                     }
                     dml::FieldArity::List if sf.field_type.is_unsupported() => {
-                        Self::new_array_unsupported(&sf.name, r#type)
+                        Self::new_array_unsupported(sf.name.clone(), r#type)
                     }
-                    dml::FieldArity::Required => Self::new_required(&sf.name, r#type),
-                    dml::FieldArity::Optional => Self::new_optional(&sf.name, r#type),
-                    dml::FieldArity::List => Self::new_array(&sf.name, r#type),
+                    dml::FieldArity::Required => Self::new_required(field_name, r#type),
+                    dml::FieldArity::Optional => Self::new_optional(field_name, r#type),
+                    dml::FieldArity::List => Self::new_array(field_name, r#type),
                 };
 
                 if let Some(ref docs) = sf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 if let Some(dv) = sf.default_value() {
@@ -352,7 +331,7 @@ impl<'a> ModelField<'a> {
                 }
 
                 if let Some(unique) = uniques.get(sf.name.as_str()) {
-                    field.unique(*unique);
+                    field.unique(unique.clone());
                 }
 
                 if sf.is_ignored {
@@ -364,7 +343,7 @@ impl<'a> ModelField<'a> {
                 }
 
                 if let Some(ref map) = sf.database_name {
-                    field.map(map);
+                    field.map(map.clone());
                 }
 
                 if let Some(id) = id {
@@ -374,14 +353,16 @@ impl<'a> ModelField<'a> {
                 field
             }
             dml::Field::RelationField(rf) => {
+                let field_name = rf.name.clone();
+                let referenced_model = rf.relation_info.referenced_model.clone();
                 let mut field = match rf.arity {
-                    dml::FieldArity::Required => Self::new_required(&rf.name, &rf.relation_info.referenced_model),
-                    dml::FieldArity::Optional => Self::new_optional(&rf.name, &rf.relation_info.referenced_model),
-                    dml::FieldArity::List => Self::new_array(&rf.name, &rf.relation_info.referenced_model),
+                    dml::FieldArity::Required => Self::new_required(field_name, referenced_model),
+                    dml::FieldArity::Optional => Self::new_optional(field_name, referenced_model),
+                    dml::FieldArity::List => Self::new_array(field_name, referenced_model),
                 };
 
                 if let Some(ref docs) = rf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 if rf.is_commented_out {
@@ -393,40 +374,29 @@ impl<'a> ModelField<'a> {
                 }
 
                 let dml_info = &rf.relation_info;
-
-                let default_name =
-                    RelationNames::name_for_unambiguous_relation(&dml_info.referenced_model, &dml_model.name);
-
-                let is_self_relation = dml_model.name == dml_info.referenced_model;
-
-                // :( :(
-                let relation_name = if dml_info.name != default_name || is_self_relation {
-                    dml_info.name.as_str()
-                } else {
-                    ""
-                };
+                let relation_name = dml_info.name.as_str();
 
                 // :(
                 if !relation_name.is_empty() || (!dml_info.fields.is_empty() || !dml_info.references.is_empty()) {
                     let mut relation = Relation::new();
 
                     if !relation_name.is_empty() {
-                        relation.name(relation_name);
+                        relation.name(relation_name.to_owned());
                     }
 
-                    relation.fields(dml_info.fields.iter().map(AsRef::as_ref));
-                    relation.references(dml_info.references.iter().map(AsRef::as_ref));
+                    relation.fields(dml_info.fields.iter().map(Clone::clone).map(Cow::Owned));
+                    relation.references(dml_info.references.iter().map(Clone::clone).map(Cow::Owned));
 
                     if let Some(ref action) = dml_info.on_delete {
-                        relation.on_delete(action.as_ref());
+                        relation.on_delete(action.as_ref().to_owned());
                     }
 
                     if let Some(ref action) = dml_info.on_update {
-                        relation.on_update(action.as_ref());
+                        relation.on_update(action.as_ref().to_owned());
                     }
 
                     if let Some(ref map) = &dml_info.fk_name {
-                        relation.map(map);
+                        relation.map(map.clone());
                     }
 
                     field.relation(relation);
@@ -435,18 +405,20 @@ impl<'a> ModelField<'a> {
                 field
             }
             dml::Field::CompositeField(cf) => {
+                let name = cf.name.clone();
+                let ct = cf.composite_type.clone();
                 let mut field = match cf.arity {
-                    dml::FieldArity::Required => Self::new_required(&cf.name, &cf.composite_type),
-                    dml::FieldArity::Optional => Self::new_optional(&cf.name, &cf.composite_type),
-                    dml::FieldArity::List => Self::new_array(&cf.name, &cf.composite_type),
+                    dml::FieldArity::Required => Self::new_required(name, ct),
+                    dml::FieldArity::Optional => Self::new_optional(name, ct),
+                    dml::FieldArity::List => Self::new_array(name, ct),
                 };
 
                 if let Some(ref docs) = cf.documentation {
-                    field.documentation(docs);
+                    field.documentation(docs.clone());
                 }
 
                 if let Some(ref map) = cf.database_name {
-                    field.map(map);
+                    field.map(map.clone());
                 }
 
                 if cf.is_commented_out {

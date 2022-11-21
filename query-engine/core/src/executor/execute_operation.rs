@@ -44,16 +44,25 @@ pub async fn execute_many_operations(
 
     let mut results = Vec::with_capacity(queries.len());
 
-    for (query_graph, serializer) in queries {
+    for (i, (query_graph, serializer)) in queries.into_iter().enumerate() {
         increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
         let operation_timer = Instant::now();
         let interpreter = QueryInterpreter::new(conn);
         let result = QueryPipeline::new(query_graph, interpreter, serializer)
             .execute(trace_id.clone())
-            .await?;
+            .await;
 
         histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
-        results.push(Ok(result));
+
+        match result {
+            Ok(result) => results.push(Ok(result)),
+            Err(error) => {
+                return Err(crate::CoreError::BatchError {
+                    request_idx: i,
+                    error: Box::new(error),
+                });
+            }
+        }
     }
 
     Ok(results)

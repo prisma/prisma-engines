@@ -6,8 +6,7 @@ mod sqlite;
 
 use barrel::types;
 use expect_test::expect;
-use indoc::formatdoc;
-use indoc::indoc;
+use indoc::*;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
@@ -103,13 +102,13 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
           id                      Int   @id @default(autoincrement())
           user_id                 Int   @unique
           User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_PostToUser_post_id User? @relation("PostToUser_post_id")
+          User_User_post_idToPost User? @relation("User_post_idToPost")
         }
 
         model User {
           id                      Int   @id @default(autoincrement())
           post_id                 Int   @unique
-          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          Post_User_post_idToPost Post  @relation("User_post_idToPost", fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
         }
     "#]];
@@ -397,10 +396,10 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  Int    @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
-          other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-          other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+          User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
+          other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
+          other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
         }
     "#]];
 
@@ -520,15 +519,15 @@ async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
 
     let dm = formatdoc! {r##"
         model Book {{
-            id        String      @id {}
+            id        String      @id {native_string}
             Royalty   Royalty[]   @relation("BookRoyalty")
         }}
 
         model Royalty {{
-            id        String      @id {}
+            id        String      @id {native_string}
             Book      Book[]      @relation("BookRoyalty")
         }}
-    "##, native_string, native_string};
+    "##};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -554,15 +553,15 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model x {
-          id     Int @id
-          y      Int
-          y_xToy y   @relation(fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          id       Int @id
+          y        Int
+          y_x_yToy y   @relation("x_yToy", fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model y {
-          id     Int @id
-          x      Int
-          x_xToy x[]
+          id       Int @id
+          x        Int
+          x_x_yToy x[] @relation("x_yToy")
         }
     "#]];
 
@@ -607,16 +606,16 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 
     let expected = expect![[r#"
         model Event {
-          id                      Int    @id @default(autoincrement())
-          host_id                 Int
-          UserEvent_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User                    User[]
+          id                       Int    @id @default(autoincrement())
+          host_id                  Int
+          User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          User_EventToUser         User[] @relation("EventToUser")
         }
 
         model User {
-          id                       Int     @id @default(autoincrement())
-          EventEvent_host_idToUser Event[] @relation("Event_host_idToUser")
-          Event                    Event[]
+          id                        Int     @id @default(autoincrement())
+          Event_Event_host_idToUser Event[] @relation("Event_host_idToUser")
+          Event_EventToUser         Event[] @relation("EventToUser")
         }
     "#]];
 

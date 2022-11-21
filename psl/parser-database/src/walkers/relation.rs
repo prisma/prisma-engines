@@ -25,6 +25,16 @@ impl<'db> RelationWalker<'db> {
         }
     }
 
+    /// The relation name in the schema.
+    ///
+    /// ```ignore
+    /// myField OtherModel @relation("thisModelToOtherModel", fields: [fkfield], references: [id])
+    /// //                           ^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.get().relation_name.map(|string_id| &self.db[string_id])
+    }
+
     pub(crate) fn has_field(self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
         self.get().has_field(model_id, field_id)
     }

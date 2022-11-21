@@ -44,6 +44,8 @@ const TYPES: &[(&str, &str)] = &[
     ("json", "Json"),
 ];
 
+// NOTE: The MariaDB expectations broke with 10.11.2
+// (https://prisma-company.slack.com/archives/C4GCG53BP/p1668766257151269)
 #[test_connector(tags(Mariadb, Mysql8))]
 async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
@@ -61,9 +63,9 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let (json, default) = match api {
-        _ if api.tags().contains(Tags::Mysql8) => ("Json", ""),
-        _ if api.tags().contains(Tags::Mariadb) => ("String   @db.LongText", "@default(now())"),
+    let json = match api {
+        _ if api.tags().contains(Tags::Mysql8) => "Json",
+        _ if api.tags().contains(Tags::Mariadb) => "String   @db.LongText",
         _ => unreachable!(),
     };
 
@@ -104,13 +106,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
             timeWithPrecision              DateTime @db.Time(3)
             timeWithPrecision_no_precision DateTime @db.DateTime(0)
             dateTimeWithPrecision          DateTime
-            timestampWithPrecision         DateTime {default} @db.Timestamp(3)
+            timestampWithPrecision         DateTime @db.Timestamp(3)
             year                           Int      @db.Year
             json                           {json}
         }}
     "#,
-    default = default,
-    json = json
     };
 
     let result = api.introspect().await?;

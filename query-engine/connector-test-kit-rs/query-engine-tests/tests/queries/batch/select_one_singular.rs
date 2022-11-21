@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
-mod singlular_batch {
+mod singular_batch {
     use indoc::indoc;
 
     fn schema() -> String {
@@ -41,6 +41,17 @@ mod singlular_batch {
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}}]}"###
         );
 
+        // With non-unique filter
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }){ Name }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}}]}"###
+        );
+
         Ok(())
     }
 
@@ -52,6 +63,19 @@ mod singlular_batch {
             r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name, ArtistId }}"#.to_string(),
             r#"query { findUniqueArtist(where: { ArtistId: 420 }) { Name, ArtistId }}"#.to_string(),
             r#"query { findUniqueArtist(where: { ArtistId: 2 }) { ArtistId, Name }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"data":{"findUniqueArtist":null}},{"data":{"findUniqueArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]}"###
+        );
+
+        // With non-unique filters
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Name, ArtistId }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 420, Name: "Bonamassa" }) { Name, ArtistId }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 2, Name: { equals: "ArtistWithOneAlbumWithoutTracks" } }) { ArtistId, Name }}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;
@@ -99,6 +123,19 @@ mod singlular_batch {
             @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findUniqueArtist":{"Albums":[]}}},{"data":{"findUniqueArtist":null}}]}"###
         );
 
+        // With non-unique filter
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 2, Name: "ArtistWithOneAlbumWithoutTracks" }) { Albums { AlbumId, Title }}}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Albums { Title, AlbumId }}}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 420, Name: "Bonamassa" }) { Albums { AlbumId, Title }}}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findUniqueArtist":{"Albums":[]}}},{"data":{"findUniqueArtist":null}}]}"###
+        );
+
         Ok(())
     }
 
@@ -110,6 +147,19 @@ mod singlular_batch {
             r#"query { findUniqueArtist(where: { ArtistId: 2 }) { Albums(where: { AlbumId: { equals: 2 }}) { AlbumId, Title }}}"#.to_string(),
             r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Albums(where: { AlbumId: { equals: 2 }}) { Title, AlbumId }}}"#.to_string(),
             r#"query { findUniqueArtist(where: { ArtistId: 420 }) { Albums(where: { AlbumId: { equals: 2 }}) { AlbumId, Title }}}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findUniqueArtist":{"Albums":[]}}},{"data":{"findUniqueArtist":null}}]}"###
+        );
+
+        // With non-unique filter
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 2, Name: "ArtistWithOneAlbumWithoutTracks" }) { Albums(where: { AlbumId: { equals: 2 }}) { AlbumId, Title }}}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Albums(where: { AlbumId: { equals: 2 }}) { Title, AlbumId }}}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 420, Name: "Bonamassa" }) { Albums(where: { AlbumId: { equals: 2 }}) { AlbumId, Title }}}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;
@@ -178,8 +228,20 @@ mod singlular_batch {
         create_test_data(&runner).await?;
 
         let queries = vec![
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}}]}"###
+        );
+
+        // With non unique filters
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { Name: "ArtistWithoutAlbums", ArtistId: 1 }) { Name }}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;

@@ -303,7 +303,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&sql_ddl::mysql::DropTable {
@@ -386,12 +386,7 @@ fn render_mysql_modify(
 
 fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
-        let variants: String = column
-            .walk(*enum_id)
-            .values()
-            .iter()
-            .map(Quoted::mysql_string)
-            .join(", ");
+        let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
 
         return format!("ENUM({})", variants).into();
     }

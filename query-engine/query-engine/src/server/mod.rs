@@ -3,6 +3,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
 use psl::PreviewFeature;
+use query_core::schema::QuerySchemaRef;
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
@@ -46,6 +47,10 @@ impl State {
     pub fn get_metrics(&self) -> MetricRegistry {
         self.cx.metrics.clone()
     }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        self.cx.query_schema()
+    }
 }
 
 impl Clone for State {
@@ -71,7 +76,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .preview_features()
         .contains(PreviewFeature::InteractiveTransactions);
 
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
 
     let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)

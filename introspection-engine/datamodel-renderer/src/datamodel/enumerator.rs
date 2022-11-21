@@ -1,34 +1,12 @@
-use psl::dml;
-
 use super::attributes::{BlockAttribute, FieldAttribute};
-use crate::value::{Constant, ConstantNameValidationError, Documentation, Function};
+use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
-
-static ENUM_EMPTY_VALUE: &str = "EMPTY_ENUM_VALUE";
-static ENUM_EMPTY_NAME: &str = "ENUM_EMPTY_NAME";
-
-#[derive(Debug)]
-enum EnumVariantKind<'a> {
-    Valid(Constant<Cow<'a, str>>),
-    CommentedOut(Constant<Cow<'a, str>>),
-}
-
-impl<'a> fmt::Display for EnumVariantKind<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            EnumVariantKind::Valid(s) => s.fmt(f),
-            EnumVariantKind::CommentedOut(c) => {
-                f.write_str("// ")?;
-                c.fmt(f)
-            }
-        }
-    }
-}
 
 /// A variant declaration in an enum block.
 #[derive(Debug)]
 pub struct EnumVariant<'a> {
-    kind: EnumVariantKind<'a>,
+    name: Cow<'a, str>,
+    comment_out: bool,
     map: Option<FieldAttribute<'a>>,
     documentation: Option<Documentation<'a>>,
 }
@@ -42,41 +20,11 @@ impl<'a> EnumVariant<'a> {
     ///   ^^^ value
     /// }
     /// ```
-    pub fn new(value: &'a str) -> Self {
-        let (kind, map) = match Constant::new(value) {
-            Ok(constant) => {
-                let kind = EnumVariantKind::Valid(constant);
-                (kind, None)
-            }
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::Valid(sanitized);
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::Valid(Constant::new_no_validate(Cow::Borrowed(ENUM_EMPTY_VALUE)));
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(value);
-
-                let kind = EnumVariantKind::CommentedOut(Constant::new_no_validate(Cow::Borrowed(value)));
-
-                (kind, Some(FieldAttribute::new(fun)))
-            }
-        };
-
+    pub fn new(name: Cow<'a, str>) -> Self {
         Self {
-            kind,
-            map,
+            name,
+            comment_out: false,
+            map: None,
             documentation: None,
         }
     }
@@ -89,11 +37,12 @@ impl<'a> EnumVariant<'a> {
     ///             ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, value: &'a str) {
-        let mut map = Function::new("map");
-        map.push_param(value);
-
-        self.map = Some(FieldAttribute::new(map));
+    pub fn map(&mut self, value: Option<impl Into<Cow<'a, str>>>) {
+        if let Some(value) = value {
+            let mut map = Function::new("map");
+            map.push_param(value.into());
+            self.map = Some(FieldAttribute::new(map));
+        }
     }
 
     /// Comments the variant out in the declaration.
@@ -104,12 +53,8 @@ impl<'a> EnumVariant<'a> {
     ///   ^^ adds this
     /// }
     /// ```
-    pub fn into_commented_out(mut self) -> Self {
-        if let EnumVariantKind::Valid(value) = self.kind {
-            self.kind = EnumVariantKind::CommentedOut(value);
-        }
-
-        self
+    pub fn comment_out(&mut self, comment_out: bool) {
+        self.comment_out = comment_out;
     }
 
     /// Documentation of a variant.
@@ -120,35 +65,14 @@ impl<'a> EnumVariant<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
-    }
-
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    fn from_dml(dml_variant: &'a dml::EnumValue) -> Self {
-        let mut variant = Self::new(&dml_variant.name);
-
-        if dml_variant.commented_out {
-            variant = variant.into_commented_out();
-        }
-
-        if let Some(ref map) = dml_variant.database_name {
-            variant.map(map);
-        }
-
-        if let Some(ref docs) = dml_variant.documentation {
-            variant.documentation(docs);
-        }
-
-        variant
+    pub fn documentation(&mut self, documentation: Option<impl Into<Cow<'a, str>>>) {
+        self.documentation = documentation.map(|d| Documentation(d.into()));
     }
 }
 
 impl<'a> From<&'a str> for EnumVariant<'a> {
     fn from(variant: &'a str) -> Self {
-        Self::new(variant)
+        Self::new(Cow::Borrowed(variant))
     }
 }
 
@@ -158,7 +82,11 @@ impl<'a> fmt::Display for EnumVariant<'a> {
             docs.fmt(f)?;
         }
 
-        self.kind.fmt(f)?;
+        if self.comment_out {
+            f.write_str("// ")?;
+        }
+
+        f.write_str(&self.name)?;
 
         if let Some(ref map) = self.map {
             f.write_str(" ")?;
@@ -188,40 +116,12 @@ impl<'a> Enum<'a> {
     /// //   ^^^^^^^^^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let (name, map) = match Constant::new(name) {
-            Ok(name) => (name, None),
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (sanitized, Some(BlockAttribute(fun)))
-            }
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (
-                    Constant::new_no_validate(Cow::Borrowed(name)),
-                    Some(BlockAttribute(fun)),
-                )
-            }
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut fun = Function::new("map");
-                fun.push_param(name);
-
-                (
-                    Constant::new_no_validate(Cow::Borrowed(ENUM_EMPTY_NAME)),
-                    Some(BlockAttribute(fun)),
-                )
-            }
-        };
-
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            name,
+            name: Constant::new_no_validate(name.into()),
             documentation: None,
             variants: Vec::new(),
-            map,
+            map: None,
             schema: None,
         }
     }
@@ -234,8 +134,8 @@ impl<'a> Enum<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// The schema attribute of the enum block
@@ -248,9 +148,9 @@ impl<'a> Enum<'a> {
     ///             ^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: &'a str) {
+    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("schema");
-        fun.push_param(schema);
+        fun.push_param(schema.into());
 
         self.schema = Some(BlockAttribute(fun));
     }
@@ -278,36 +178,11 @@ impl<'a> Enum<'a> {
     ///          ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, mapped_name: &'a str) {
+    pub fn map(&mut self, mapped_name: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("map");
-        fun.push_param(mapped_name);
+        fun.push_param(mapped_name.into());
 
         self.map = Some(BlockAttribute(fun));
-    }
-
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    pub fn from_dml(dml_enum: &'a dml::Enum) -> Self {
-        let mut r#enum = Self::new(&dml_enum.name);
-
-        if let Some(ref docs) = dml_enum.documentation {
-            r#enum.documentation(docs);
-        }
-
-        if let Some(ref schema) = dml_enum.schema {
-            r#enum.schema(schema);
-        }
-
-        if let Some(ref map) = dml_enum.database_name {
-            r#enum.map(map);
-        }
-
-        for dml_variant in dml_enum.values.iter() {
-            r#enum.push_variant(EnumVariant::from_dml(dml_variant));
-        }
-
-        r#enum
     }
 }
 
@@ -344,19 +219,25 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut r#enum = Enum::new("1TrafficLight");
+        let mut r#enum = Enum::new("TrafficLight");
+        r#enum.map("1TrafficLight");
         r#enum.documentation("Cat's foot, iron claw\nNeuro-surgeons scream for more\nAt paranoia's poison door...");
 
         r#enum.push_variant("Red");
-        r#enum.push_variant("1Green");
+        {
+            let mut green = EnumVariant::new("Green".into());
+            green.map(Some("1Green"));
+            r#enum.push_variant(green);
+        }
 
-        let mut variant = EnumVariant::new("-Blue");
-        variant.map("Yellow");
-        variant.documentation("Twenty-first century schizoid man!");
+        let mut variant = EnumVariant::new("Blue".into());
+        variant.map("Yellow".into());
+        variant.documentation(Some("Twenty-first century schizoid man!"));
 
         r#enum.push_variant(variant);
 
-        let variant = EnumVariant::new("Invalid").into_commented_out();
+        let mut variant = EnumVariant::new("Invalid".into());
+        variant.comment_out(true);
         r#enum.push_variant(variant);
         r#enum.push_variant("Black");
 

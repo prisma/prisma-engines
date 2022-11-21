@@ -8,6 +8,10 @@ pub struct TableId(pub(crate) u32);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct EnumId(pub(crate) u32);
 
+/// The identifier for an enum variant in a SqlSchema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct EnumVariantId(pub(crate) u32);
+
 /// The identifier for a column in a SqlSchema.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ColumnId(pub(crate) u32);

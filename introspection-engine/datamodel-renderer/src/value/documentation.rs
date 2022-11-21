@@ -1,8 +1,8 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 /// A documentation block on top of an item in the PSL.
 #[derive(Debug)]
-pub struct Documentation<'a>(pub(crate) &'a str);
+pub struct Documentation<'a>(pub(crate) Cow<'a, str>);
 
 impl<'a> fmt::Display for Documentation<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

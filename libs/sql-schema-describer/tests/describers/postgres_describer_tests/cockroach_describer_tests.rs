@@ -240,6 +240,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
