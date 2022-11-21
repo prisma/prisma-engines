@@ -46,8 +46,8 @@ async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestAp
         model nodes {
           id                        Int     @id @default(autoincrement())
           nodes_nodes_node_aTonodes nodes   @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
-          nodes_nodes_node_bTonodes nodes   @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
           nodes_nodes_node_aTonodes nodes[] @relation("nodes_node_aTonodes") @ignore
+          nodes_nodes_node_bTonodes nodes   @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
           nodes_nodes_node_bTonodes nodes[] @relation("nodes_node_bTonodes") @ignore
         }
     "#]];

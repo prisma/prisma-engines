@@ -1,7 +1,6 @@
 use crate::{introspection::Context, introspection_helpers::*, warnings};
 use psl::{datamodel_connector::constraint_names::ConstraintNames, dml, schema_ast::ast::WithDocumentation};
 use sql_schema_describer as sql;
-use std::collections::HashMap;
 
 pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
     // The following local variables are for different types of warnings. We should refactor these
@@ -14,6 +13,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
     let mut models_without_identifiers = Vec::new();
     let mut models_without_columns = Vec::new();
     let mut unsupported_types = Vec::new();
+    let mut models_with_idx: Vec<(Option<_>, sql::TableId, dml::Model)> = Vec::with_capacity(ctx.schema.tables_count());
 
     for table in ctx
         .schema
@@ -148,7 +148,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
             });
         }
 
-        datamodel.models.push(model);
+        models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
     }
 
     if !models_without_columns.is_empty() {
@@ -183,24 +183,12 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
             ))
     }
 
-    sort_models(datamodel, ctx)
-}
+    models_with_idx.sort_by(|(a, _, _), (b, _, _)| compare_options_none_last(*a, *b));
 
-fn sort_models(datamodel: &mut dml::Datamodel, ctx: &Context<'_>) {
-    let existing_models_by_database_name: HashMap<&str, _> = ctx
-        .previous_schema
-        .db
-        .walk_models()
-        .map(|model| (model.database_name(), model.id))
-        .collect();
-
-    datamodel.models.sort_by(|a, b| {
-        let existing = |model: &dml::Model| -> Option<_> {
-            existing_models_by_database_name.get(model.database_name.as_deref().unwrap_or(&model.name))
-        };
-
-        compare_options_none_last(existing(a), existing(b))
-    });
+    for (idx, (_, table_id, dml_model)) in models_with_idx.into_iter().enumerate() {
+        datamodel.models.push(dml_model);
+        ctx.target_models.insert(table_id, idx);
+    }
 }
 
 fn empty_table_comment(ctx: &mut Context<'_>) -> &'static str {

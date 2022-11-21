@@ -607,14 +607,14 @@ async fn northwind(api: TestApi) {
           tax_rate               Float?                   @default(0)
           tax_status_id          Int?                     @db.TinyInt
           status_id              Int?                     @default(0) @db.TinyInt
+          inventory_transactions inventory_transactions[]
+          invoices               invoices[]
+          order_details          order_details[]
           customers              customers?               @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_customers")
           employees              employees?               @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_employees1")
           orders_status          orders_status?           @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_orders_status1")
           orders_tax_status      orders_tax_status?       @relation(fields: [tax_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_orders_tax_status1")
           shippers               shippers?                @relation(fields: [shipper_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_shippers1")
-          inventory_transactions inventory_transactions[]
-          invoices               invoices[]
-          order_details          order_details[]
 
           @@index([customer_id], map: "customer_id")
           @@index([customer_id], map: "customer_id_2")
@@ -715,11 +715,11 @@ async fn northwind(api: TestApi) {
           approved_by            Int?
           approved_date          DateTime?                @db.DateTime(0)
           submitted_by           Int?
+          inventory_transactions inventory_transactions[]
+          purchase_order_details purchase_order_details[]
           employees              employees?               @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_purchase_orders_employees1")
           purchase_order_status  purchase_order_status?   @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_purchase_orders_purchase_order_status1")
           suppliers              suppliers?               @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_purchase_orders_suppliers1")
-          inventory_transactions inventory_transactions[]
-          purchase_order_details purchase_order_details[]
 
           @@index([created_by], map: "created_by")
           @@index([id], map: "id_2")
