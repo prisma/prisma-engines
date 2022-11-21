@@ -25,8 +25,8 @@ pub trait SqlSchemaExt {
 
 pub struct SchemaAssertion {
     schema: SqlSchema,
-    context: Option<String>,
-    description: Option<String>,
+    context: Option<&'static str>,
+    description: Option<&'static str>,
     tags: BitFlags<Tags>,
 }
 
@@ -40,11 +40,11 @@ impl SchemaAssertion {
         }
     }
 
-    pub fn add_context(&mut self, context: String) {
+    pub fn add_context(&mut self, context: &'static str) {
         self.context = Some(context)
     }
 
-    pub fn add_description(&mut self, description: String) {
+    pub fn add_description(&mut self, description: &'static str) {
         self.description = Some(description)
     }
 
@@ -119,6 +119,21 @@ impl SchemaAssertion {
     }
 
     #[track_caller]
+    pub fn assert_has_table_with_ns(self, namespace: &str, table_name: &str) -> Self {
+        let table = self.find_table(table_name);
+
+        let assertion = TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        };
+        assertion.assert_namespace(namespace);
+
+        self
+    }
+
+    #[track_caller]
     pub fn assert_has_no_table(self, table_name: &str) -> Self {
         if self.find_table_option(table_name).is_some() {
             self.assert_error(table_name, false);
@@ -132,7 +147,29 @@ impl SchemaAssertion {
         F: for<'a> FnOnce(TableAssertion<'a>) -> TableAssertion<'a>,
     {
         let table = self.find_table(table_name);
-        table_assertions(TableAssertion { table, tags: self.tags });
+        table_assertions(TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        });
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_table_with_ns<F>(self, namespace: &str, table_name: &str, table_assertions: F) -> Self
+    where
+        F: for<'a> FnOnce(TableAssertion<'a>) -> TableAssertion<'a>,
+    {
+        let table = self.find_table(table_name);
+        let assertion = TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        };
+        assertion.assert_namespace(namespace);
+        table_assertions(assertion);
         self
     }
 
@@ -259,9 +296,38 @@ impl<'a> EnumAssertion<'a> {
 pub struct TableAssertion<'a> {
     table: TableWalker<'a>,
     tags: BitFlags<Tags>,
+    context: Option<&'static str>,
+    description: Option<&'static str>,
 }
 
 impl<'a> TableAssertion<'a> {
+    fn print_context(&self) {
+        match &self.context {
+            Some(context) => println!("Test failure with context <{}>", context.red()),
+            None => {}
+        }
+        match &self.description {
+            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
+            None => {}
+        }
+    }
+
+    pub fn assert_namespace(self, namespace: &str) -> Self {
+        if self.table.namespace() != Some(namespace) {
+            self.print_context();
+            println!(
+                "\n  {} has failed because table {}.{} {}",
+                "assert_namespace".bold(),
+                namespace.red(),
+                self.table.name().red(),
+                "was not found".bold(),
+            );
+
+            panic!();
+        }
+        self
+    }
+
     pub fn assert_column_count(self, n: usize) -> Self {
         let columns_count = self.table.columns().count();
 

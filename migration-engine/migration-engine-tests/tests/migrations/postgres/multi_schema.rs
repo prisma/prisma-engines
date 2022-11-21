@@ -124,7 +124,8 @@ fn multi_schema_tests(_api: TestApi) {
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
-                assert.assert_has_table("First").assert_has_table("Second");
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_has_table_with_ns("two", "Second");
             }),
             skip: None,
         },
@@ -155,7 +156,8 @@ fn multi_schema_tests(_api: TestApi) {
                            },
                            &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert.assert_has_table("First").assert_has_table("Second");
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_has_table_with_ns("two", "Second");
             }),
             skip: None,
         },
@@ -185,10 +187,9 @@ fn multi_schema_tests(_api: TestApi) {
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second")
-                    .assert_has_table("Third");
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_has_table_with_ns("two", "Second")
+                      .assert_has_table_with_ns("one", "Third");
             }),
             skip: None,
         },
@@ -211,9 +212,8 @@ fn multi_schema_tests(_api: TestApi) {
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert
-                    .assert_has_table("First")
-                    .assert_has_no_table("Second");
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_has_no_table("Second");
             }),
             skip: None,
         },
@@ -244,9 +244,11 @@ fn multi_schema_tests(_api: TestApi) {
                            &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, 'some value');",
                              &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done))),
             assertion: Box::new(|assert| {
-                assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_table_with_ns("two", "Second", |table|
+                          table.assert_column("name", |column|
+                              column.assert_is_required().assert_type_is_string()
+                          ));
             }),
             skip: None,
         },
@@ -284,8 +286,11 @@ fn multi_schema_tests(_api: TestApi) {
                              &SchemaPush::Done))),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_column("name", |column|
+                            column.assert_is_nullable()
+                        ));
             }),
             skip: None,
         },
@@ -314,8 +319,11 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_column("name", |column|
+                            column.assert_is_required()
+                        ));
             }),
             skip: None,
         },
@@ -345,8 +353,11 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_column("name", |column|
+                            column.assert_is_list()
+                        ));
             }),
             skip: None,
         },
@@ -376,8 +387,11 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_column("name", |column|
+                            column.assert_is_required()
+                        ));
             }),
             skip: None,
         },
@@ -409,8 +423,10 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_has_index_name_and_type("new_index_name", false)
+                        );
             }),
             skip: None,
         },
@@ -446,8 +462,11 @@ fn multi_schema_tests(_api: TestApi) {
                            }, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_index_on_columns(&["name"], |index|
+                            index.assert_is_unique()
+                        ));
             }),
             skip: None,
         },
@@ -467,13 +486,13 @@ fn multi_schema_tests(_api: TestApi) {
           Two
           @@schema("two")
         } "#}.into(),
-                second: Some( indoc! {r#""#}.into()),
+                second: Some(indoc! {r#""#}.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
+                    .assert_has_table_with_ns("one", "First")
                     .assert_has_no_enum("Second");
             }),
             skip: None,
@@ -509,8 +528,10 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("one", "Second", |table|
+                            table.assert_column_count(1)
+                        );
             }),
             skip: None,
         },
@@ -541,8 +562,10 @@ fn multi_schema_tests(_api: TestApi) {
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
-                    .assert_has_table("First")
-                    .assert_has_table("Second");
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_indexes_count(0)
+                        );
             }),
             skip: None,
         },
@@ -570,7 +593,7 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
-            name: "alter view",
+            name: "alter enum",
             description: "Test adding a variant to an enum in a namespace.",
             schema: Schema {
                 common: base_schema.to_string(),
@@ -644,8 +667,8 @@ fn run_test(test: &mut TestData) {
     run_schema_step(&mut api, test, namespaces.clone(), &test.schema_push);
 
     let mut assertion = api.assert_schema_with_namespaces(namespaces);
-    assertion.add_context(test.name.to_string());
-    assertion.add_description(test.description.to_string());
+    assertion.add_context(test.name);
+    assertion.add_description(test.description);
 
     (test.assertion)(assertion)
 }
