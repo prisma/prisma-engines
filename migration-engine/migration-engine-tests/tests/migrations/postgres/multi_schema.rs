@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use indoc::indoc;
 use migration_core::migration_connector::Namespaces;
 use migration_engine_tests::test_api::*;
+use sql_schema_describer::DefaultValue;
 use test_setup::TestApiArgs;
 
 /// Which schema to use during a `SchemaPush`. See `Schema` for more details.
@@ -218,6 +219,112 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "change type of column",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        }"#}),
+                first: indoc! {r#"
+        model Second {
+          id Int @id
+          name String
+          @@schema("two")
+        }"#}.into(),
+                second: Some(indoc!{r#"
+        model Second {
+          id Int @id
+          other_name String
+          @@schema("two")
+        }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_table_with_ns("two", "Second", |table|
+                          table.assert_column("other_name", |column|
+                              column.assert_is_required().assert_type_is_string()
+                          ));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add default to column",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        }"#}),
+                first: indoc! {r#"
+        model Second {
+          id Int @id
+          name String
+          @@schema("two")
+        }"#}.into(),
+                second: Some(indoc!{r#"
+        model Second {
+          id Int @id
+          name String @default("hello")
+          @@schema("two")
+        }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_table_with_ns("two", "Second", |table|
+                          table.assert_column("name", |column|
+                              column.assert_is_required()
+                                    .assert_type_is_string()
+                                    .assert_default(Some(DefaultValue::value("hello")))
+                          ));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add autoincrement default to pk",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        }"#}),
+                first: indoc! {r#"
+        model Second {
+          id Int @id
+          @@schema("two")
+        }"#}.into(),
+                second: Some(indoc!{r#"
+        model Second {
+          id Int @id @default(autoincrement())
+          @@schema("two")
+        }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_table_with_ns("two", "Second", |table|
+                          table.assert_column("id", |column|
+                              column.assert_is_required()
+                                    .assert_auto_increments()
+                          ));
+            }),
+            skip: None,
+        },
+        TestData {
             name: "recreate not null column with non-null values",
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a non-NULL value",
             schema: Schema {
@@ -249,6 +356,40 @@ fn multi_schema_tests(_api: TestApi) {
                           table.assert_column("name", |column|
                               column.assert_is_required().assert_type_is_string()
                           ));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "rename PK",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        }"#}),
+                first: indoc! {r#"
+        model Second {
+          id Int @id
+          @@schema("two")
+        }"#}.into(),
+                second: Some(indoc!{r#"
+        model Second {
+          new_id_name Int @id
+          @@schema("two")
+        }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("one", "First")
+                      .assert_table_with_ns("two", "Second", |table|
+                          table.assert_pk(|pk|
+                            pk.assert_column("new_id_name", |col|
+                              col.assert_no_length_prefix()
+                          )));
             }),
             skip: None,
         },

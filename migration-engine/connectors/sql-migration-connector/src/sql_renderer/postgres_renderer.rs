@@ -724,7 +724,14 @@ fn render_alter_column(
     flavour: &PostgresFlavour,
 ) {
     let steps = expand_alter_column(columns, column_changes);
-    let table_name = Quoted::postgres_ident(columns.previous.table().name());
+    let table_name = TableName::new(
+        columns
+            .previous
+            .table()
+            .namespace()
+            .map(|ns| Quoted::postgres_ident(ns)),
+        Quoted::postgres_ident(columns.previous.table().name()),
+    );
     let column_name = Quoted::postgres_ident(columns.previous.name());
 
     let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
@@ -761,13 +768,17 @@ fn render_alter_column(
                 // See the postgres docs for more details:
                 // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
                 let sequence_name = format!(
-                    "{table_name}_{column_name}_seq",
+                    "{namespace}{table_name}_{column_name}_seq",
+                    namespace = match columns.next.table().namespace() {
+                        Some(namespace) => format!("{}.", Quoted::postgres_ident(namespace)),
+                        None => String::from(""),
+                    },
                     table_name = columns.next.table().name(),
                     column_name = columns.next.name()
                 )
                 .to_lowercase();
 
-                before_statements.push(format!("CREATE SEQUENCE {}", Quoted::postgres_ident(&sequence_name)));
+                before_statements.push(format!("CREATE SEQUENCE {}", sequence_name));
 
                 clauses.push(format!(
                     "{prefix} SET DEFAULT {default}",
@@ -777,7 +788,7 @@ fn render_alter_column(
 
                 after_statements.push(format!(
                     "ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}",
-                    sequence_name = Quoted::postgres_ident(sequence_name),
+                    sequence_name = sequence_name,
                     table_name = table_name,
                     column_name = column_name,
                 ));
