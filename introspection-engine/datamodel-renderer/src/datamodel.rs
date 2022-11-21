@@ -78,10 +78,6 @@ impl<'a> Datamodel<'a> {
         for dml_ct in dml_data_model.composite_types() {
             self.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
-
-        for r#enum in dml_data_model.enums() {
-            self.push_enum(Enum::from_dml(r#enum));
-        }
     }
 }
 

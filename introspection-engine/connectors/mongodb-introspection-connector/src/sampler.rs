@@ -51,6 +51,7 @@ pub(super) async fn sample(
 
     let data_model = statistics.into_datamodel(&mut warnings);
     let is_empty = data_model.is_empty();
+
     let mut rendered = render::Datamodel::default();
     rendered.push_dml(ctx.datasource(), &data_model);
     let config = if ctx.render_config {

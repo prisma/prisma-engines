@@ -16,7 +16,7 @@ use sql_schema_describer::SqlSchema;
 pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> {
     let mut datamodel = dml::Datamodel::new();
 
-    enums::introspect_enums(&mut datamodel, ctx);
+    enums::introspect_enums(ctx);
     models::introspect_models(&mut datamodel, ctx);
 
     let relation_names = relation_names::introspect_relation_names(ctx);
@@ -53,10 +53,9 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
         String::new()
     };
 
-    let mut rendered_datamodel = render::Datamodel::default();
-    rendered_datamodel.push_dml(&ctx.config.datasources[0], &datamodel);
+    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
 
-    let rendered = format!("{config}\n{rendered_datamodel}");
+    let rendered = format!("{}\n{}", config, ctx.rendered_schema);
 
     ctx.finalize_warnings();
 

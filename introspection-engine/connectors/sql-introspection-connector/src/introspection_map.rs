@@ -4,7 +4,7 @@ use sql_schema_describer as sql;
 use std::collections::HashMap;
 
 /// This container is responsible for matching schema items (enums, models and tables, columns and
-/// fields, foreign keys and relations...) between a SQL schema from a database and a Prisma
+/// fields, foreign keys and relations...) between a SQL catalog from a database and a Prisma
 /// schema.
 #[derive(Default)]
 pub(crate) struct IntrospectionMap {

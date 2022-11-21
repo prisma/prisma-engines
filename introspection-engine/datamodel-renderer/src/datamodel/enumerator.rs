@@ -1,5 +1,3 @@
-use psl::dml;
-
 use super::attributes::{BlockAttribute, FieldAttribute};
 use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
@@ -69,16 +67,6 @@ impl<'a> EnumVariant<'a> {
     /// ```
     pub fn documentation(&mut self, documentation: Option<impl Into<Cow<'a, str>>>) {
         self.documentation = documentation.map(|d| Documentation(d.into()));
-    }
-
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    fn from_dml(dml_variant: &dml::EnumValue) -> Self {
-        let mut variant = Self::new(Cow::Owned(dml_variant.name.clone()));
-        variant.comment_out(dml_variant.commented_out);
-        variant.map(dml_variant.database_name.as_ref().map(Clone::clone));
-        variant
     }
 }
 
@@ -195,31 +183,6 @@ impl<'a> Enum<'a> {
         fun.push_param(mapped_name.into());
 
         self.map = Some(BlockAttribute(fun));
-    }
-
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    pub fn from_dml(dml_enum: &dml::Enum) -> Self {
-        let mut r#enum = Self::new(dml_enum.name.clone());
-
-        if let Some(ref docs) = dml_enum.documentation {
-            r#enum.documentation(docs.clone());
-        }
-
-        if let Some(ref schema) = dml_enum.schema {
-            r#enum.schema(schema.clone());
-        }
-
-        if let Some(ref map) = dml_enum.database_name {
-            r#enum.map(map.clone());
-        }
-
-        for dml_variant in dml_enum.values.iter() {
-            r#enum.push_variant(EnumVariant::from_dml(dml_variant));
-        }
-
-        r#enum
     }
 }
 
