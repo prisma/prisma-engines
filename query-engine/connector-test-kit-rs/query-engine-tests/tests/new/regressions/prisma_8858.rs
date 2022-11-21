@@ -10,7 +10,7 @@ mod prisma_8858 {
           otherUuid String?
         
           otherObject        Object? @relation("objectToobject", fields: [clientId, otherUuid], references: [clientId, uuid], onDelete: NoAction, onUpdate: NoAction)
-          otherObjectReverse Object? @relation("objectToobject", onDelete: NoAction, onUpdate: NoAction)
+          otherObjectReverse Object? @relation("objectToobject")
         
           @@id([clientId, uuid])
           @@unique([clientId, otherUuid])
