@@ -98,7 +98,7 @@ fn render_enum<'a>(
 
         let existing_value = existing_enum.and_then(|enm| {
             enm.values()
-                .find(|val| val.database_name() == mapped_name.as_deref().unwrap_or(prisma_name.as_ref()))
+                .find(|val| val.database_name() == mapped_name.unwrap_or_else(|| prisma_name.as_ref()))
         });
 
         let mut rendered_variant = renderer::EnumVariant::new(prisma_name);
