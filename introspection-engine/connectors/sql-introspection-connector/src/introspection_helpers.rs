@@ -214,7 +214,7 @@ pub(crate) fn calculate_scalar_field(
         if prisma_name.is_empty() {
             ctx.fields_with_empty_names.push(crate::warnings::ModelAndField {
                 model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
-                field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+                field: column.name().to_owned(),
             });
             documentation = Some("This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*".to_owned());
             (mapped_name.clone().unwrap_or(prisma_name), mapped_name, true)
