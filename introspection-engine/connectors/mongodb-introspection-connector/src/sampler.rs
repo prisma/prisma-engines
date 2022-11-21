@@ -51,16 +51,15 @@ pub(super) async fn sample(
 
     let data_model = statistics.into_datamodel(&mut warnings);
     let is_empty = data_model.is_empty();
-
-    let data_model = if ctx.render_config {
-        format!(
-            "{}\n{}",
-            render::Configuration::from_psl(ctx.configuration()),
-            render::Datamodel::from_dml(ctx.datasource(), &data_model),
-        )
+    let mut rendered = render::Datamodel::default();
+    rendered.push_dml(ctx.datasource(), &data_model);
+    let config = if ctx.render_config {
+        render::Configuration::from_psl(ctx.configuration()).to_string()
     } else {
-        render::Datamodel::from_dml(ctx.datasource(), &data_model).to_string()
+        String::new()
     };
+
+    let data_model = format!("{config}\n{rendered}");
 
     Ok(IntrospectionResult {
         data_model: psl::reformat(&data_model, 2).unwrap(),
