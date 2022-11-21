@@ -27,33 +27,15 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
         prisma_relation_mode::reintrospect_relations(&mut datamodel, ctx);
     }
 
-    m2m_relations::introspect_m2m_relations(&relation_names, &mut datamodel, ctx);
+    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
 
-    // Ordering of model fields.
-    //
-    // This sorts backrelation field after relation fields, in order to preserve an ordering
-    // similar to that of the previous implementation.
-    for model in &mut datamodel.models {
-        model
-            .fields
-            .sort_by(|a, b| match (a.as_relation_field(), b.as_relation_field()) {
-                (Some(a), Some(b)) if a.relation_info.fields.is_empty() && !b.relation_info.fields.is_empty() => {
-                    std::cmp::Ordering::Greater // back relation fields last
-                }
-                (Some(a), Some(b)) if b.relation_info.fields.is_empty() && !a.relation_info.fields.is_empty() => {
-                    std::cmp::Ordering::Less
-                }
-                _ => std::cmp::Ordering::Equal,
-            });
-    }
+    m2m_relations::introspect_m2m_relations(&relation_names, ctx);
 
     let config = if ctx.render_config {
         render_configuration(ctx.config, ctx.schema).to_string()
     } else {
         String::new()
     };
-
-    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
 
     let rendered = format!("{}\n{}", config, ctx.rendered_schema);
 

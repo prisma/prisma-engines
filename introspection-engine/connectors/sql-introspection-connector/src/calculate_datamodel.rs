@@ -6,6 +6,7 @@ use introspection_connector::{IntrospectionContext, IntrospectionResult, Version
 use psl::{builtin_connectors::*, datamodel_connector::Connector, parser_database::walkers, Configuration};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
+use std::collections::HashMap;
 
 pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) config: &'a Configuration,
@@ -20,6 +21,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) fields_with_empty_names: Vec<warnings::ModelAndField>,
     pub(crate) enum_values_with_empty_names: Vec<warnings::EnumAndValue>,
     pub(crate) rendered_schema: datamodel_renderer::Datamodel<'a>,
+    pub(crate) target_models: HashMap<sql::TableId, usize>,
     introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
@@ -183,7 +185,8 @@ pub fn calculate_datamodel(
         prisma_1_cuid_defaults: Vec::new(),
         fields_with_empty_names: Vec::new(),
         enum_values_with_empty_names: Vec::new(),
-        rendered_schema: Default::default(),
+        rendered_schema: datamodel_renderer::Datamodel::default(),
+        target_models: HashMap::default(),
     };
 
     context.version = crate::version_checker::check_prisma_version(&context);
