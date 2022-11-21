@@ -1,5 +1,3 @@
-use psl::dml;
-
 use super::attributes::{BlockAttribute, FieldAttribute};
 use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
