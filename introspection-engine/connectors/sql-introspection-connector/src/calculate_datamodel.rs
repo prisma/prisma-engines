@@ -22,7 +22,7 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) enum_values_with_empty_names: Vec<warnings::EnumAndValue>,
     pub(crate) rendered_schema: datamodel_renderer::Datamodel<'a>,
     pub(crate) target_models: HashMap<sql::TableId, usize>,
-    introspection_map: crate::introspection_map::IntrospectionMap,
+    pub(crate) introspection_map: crate::introspection_map::IntrospectionMap,
 }
 
 impl<'a> CalculateDatamodelContext<'a> {
@@ -30,13 +30,12 @@ impl<'a> CalculateDatamodelContext<'a> {
         self.active_connector().provider_name() == COCKROACH.provider_name()
     }
 
+    pub(crate) fn relation_mode(&self) -> psl::datamodel_connector::RelationMode {
+        self.config.datasources.first().unwrap().relation_mode()
+    }
+
     pub(crate) fn foreign_keys_enabled(&self) -> bool {
-        self.config
-            .datasources
-            .first()
-            .unwrap()
-            .relation_mode()
-            .uses_foreign_keys()
+        self.relation_mode().uses_foreign_keys()
     }
 
     pub(crate) fn active_connector(&self) -> &'static dyn Connector {
