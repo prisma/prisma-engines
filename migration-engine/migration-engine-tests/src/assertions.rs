@@ -231,11 +231,8 @@ impl SchemaAssertion {
                 format!("{}", actual_count).red()
             );
 
-            println!("Tables in the database:");
-            self.schema
-                .table_walkers()
-                .map(|table| table.name())
-                .for_each(|t| println!("\t - {}", t.bold()));
+            print_tables(&self.schema);
+
             panic!();
         }
 
@@ -254,11 +251,20 @@ impl SchemaAssertion {
                 format!("{}", actual_count).red()
             );
 
-            println!("Tables in the database:");
+            println!("\n  {}", "Views in database:".italic());
             self.schema
                 .view_walkers()
-                .map(|view| view.name())
-                .for_each(|t| println!("\t - {}", t.bold()));
+                .map(|view| (view.name(), view.namespace()))
+                .for_each(|(v, ns)| {
+                    println!(
+                        "\t - {}",
+                        match ns {
+                            Some(namespace) => format!("{}.{}", namespace.green(), v.green()),
+                            None => format!("{}", v.green()),
+                        }
+                    )
+                });
+
             panic!();
         }
 
@@ -322,6 +328,8 @@ impl<'a> TableAssertion<'a> {
                 self.table.name().red(),
                 "was not found".bold(),
             );
+
+            print_tables(self.table.schema);
 
             panic!();
         }
@@ -1026,4 +1034,20 @@ impl<'a> PostgresExtensionAssertion<'a> {
 
         self
     }
+}
+
+fn print_tables(schema: &SqlSchema) {
+    println!("\n  {}", "Tables in database:".italic());
+    schema
+        .table_walkers()
+        .map(|table| (table.name(), table.namespace()))
+        .for_each(|(t, ns)| {
+            println!(
+                "\t - {}",
+                match ns {
+                    Some(namespace) => format!("{}.{}", namespace.green(), t.green()),
+                    None => format!("{}", t.green()),
+                }
+            )
+        });
 }

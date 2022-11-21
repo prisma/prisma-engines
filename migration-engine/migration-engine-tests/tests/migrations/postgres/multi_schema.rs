@@ -163,6 +163,30 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "mapped table",
+            description: "use @map for a model and a field in a namespace",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#" "#}),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          name String @map("name_field")
+          @@map("first_table")
+          @@schema("one")
+        }"#}.into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
+            assertion: Box::new(|assert| {
+                assert.assert_table_with_ns("one", "first_table", |table|
+                         table.assert_column("name_field", |column|
+                           column.assert_type_is_string()
+                         ));
+            }),
+            skip: None,
+        },
+        TestData {
             name: "add table",
             description: "Test adding a new table to one of the namespaces",
             schema: Schema {
@@ -219,8 +243,8 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
-            name: "change type of column",
-            description: "todo",
+            name: "change name of column",
+            description: "change the name of a column in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
         model First {
@@ -255,7 +279,7 @@ fn multi_schema_tests(_api: TestApi) {
         },
         TestData {
             name: "add default to column",
-            description: "todo",
+            description: "add the @default attribute to a column in an namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
         model First {
@@ -292,7 +316,7 @@ fn multi_schema_tests(_api: TestApi) {
         },
         TestData {
             name: "add autoincrement default to pk",
-            description: "todo",
+            description: "add @autoincrement() to a column in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
         model First {
@@ -361,7 +385,7 @@ fn multi_schema_tests(_api: TestApi) {
         },
         TestData {
             name: "rename PK",
-            description: "todo",
+            description: "rename a primary key name in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
         model First {
@@ -612,6 +636,66 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "using enums",
+            description: "use an enum in a table in a namespace",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#""#}),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          field Second
+          @@schema("one")
+        }
+
+        enum Second {
+          One
+          Two
+          @@schema("one")
+        } "#}.into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_table_with_ns("one", "First", |table|
+                        table.assert_column("field", |column| column.assert_type_is_enum()))
+                    .assert_enum("Second", |r#enum|
+                        r#enum.assert_namespace("one")
+                      );
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "using enums cross namespaces",
+            description: "use enums in a table cross namespace",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#""#}),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          field Second
+          @@schema("one")
+        }
+
+        enum Second {
+          One
+          Two
+          @@schema("two")
+        } "#}.into(),
+                second: None,
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_table_with_ns("one", "First", |table|
+                        table.assert_column("field", |column| column.assert_type_is_enum()))
+                    .assert_enum("Second", |r#enum| r#enum.assert_namespace("two"));
+            }),
+            skip: None,
+        },
+        TestData {
             name: "drop enum",
             description: "Test removing an enum from a namespace.",
             schema: Schema {
@@ -635,6 +719,328 @@ fn multi_schema_tests(_api: TestApi) {
                 assert
                     .assert_has_table_with_ns("one", "First")
                     .assert_has_no_enum("Second");
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add one-to-one cross-namespace relation",
+            description: "adds a one-to-one namespace between two tables in different namespaces",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          second Second?
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id])
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["A unique constraint covering the columns `[first_id]` on the table `Second` will be added. If there are existing duplicate values, this will fail."],
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_fk_on_columns(&["first_id"], |fk|
+                            fk.assert_references("First", &["id"])
+                    ));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "drop one-to-one cross-namespace relation",
+            description: "drop a one-to-one relationship from tables in different namespaces",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          second Second?
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id])
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_table_with_ns("one", "First", |table| table.assert_foreign_keys_count(0))
+                    .assert_table_with_ns("two", "Second", |table| table.assert_foreign_keys_count(0));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add one-to-many cross-namespace relation",
+            description: "add a one-to-many relationship between tables across namespaces",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id])
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["A unique constraint covering the columns `[first_id]` on the table `Second` will be added. If there are existing duplicate values, this will fail."],
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                        table.assert_fk_on_columns(&["first_id"], |fk|
+                            fk.assert_references("First", &["id"])
+                    ));
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add explicit many-to-many cross-namespace relation",
+            description: "add an explicit many-to-many relationship for tables in different namespaces",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          thirds Third[]
+          @@schema("one")
+        }
+
+        model Second {
+          id Int @id
+          other_field String
+          thirds Third[]
+          @@schema("two")
+        }
+
+        model Third {
+          first First @relation(fields: [first_id], references: [id])
+          first_id Int
+
+          second Second @relation(fields: [second_id], references: [id])
+          second_id Int
+
+          @@id([first_id, second_id])
+          @@schema("two")
+        }
+        "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_has_table_with_ns("two", "Second")
+                    .assert_table_with_ns("two", "Third", |table| {
+                        table.assert_fk_on_columns(&["first_id"], |fk|
+                            fk.assert_references("First", &["id"]));
+
+                        table.assert_fk_on_columns(&["second_id"], |fk|
+                            fk.assert_references("Second", &["id"]))
+                    });
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add implicit many-to-many cross-namespace relation",
+            description: "add implicit many-to-many relationship between tables in different namespaces ",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+
+        model Second {
+          id Int @id
+          other_field String
+          firsts First[]
+          @@schema("two")
+        }
+        "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_has_table_with_ns("two", "Second")
+                    .assert_table_with_ns("one", "_FirstToSecond", |table| {
+                        table.assert_fk_on_columns(&["A"], |fk|
+                            fk.assert_references("First", &["id"]));
+
+                        table.assert_fk_on_columns(&["B"], |fk|
+                            fk.assert_references("Second", &["id"]))
+                    });
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add one-to-one self-relation",
+            description: "add a one-to-one self relationship in a table in a namespace",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        } "#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          next First? @relation("Line", fields: [next_id], references: [id])
+          prev First? @relation("Line")
+          next_id Int? @unique
+          @@schema("one")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["A unique constraint covering the columns `[next_id]` on the table `First` will be added. If there are existing duplicate values, this will fail."],
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_table_with_ns("one", "First", |table|
+                        table.assert_fk_on_columns(&["next_id"], |fk|
+                            fk.assert_references("First", &["id"]))
+                    );
+            }),
+            skip: None,
+        },
+        TestData {
+            name: "add one-to-many self-relation",
+            description: "add a one-to-many relationnship in a table in a namespace",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        } "#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          next First? @relation("Line", fields: [next_id], references: [id])
+          all First[] @relation("Line")
+          next_id Int?
+          @@schema("one")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_table_with_ns("one", "First", |table|
+                        table.assert_fk_on_columns(&["next_id"], |fk|
+                            fk.assert_references("First", &["id"]))
+                    );
             }),
             skip: None,
         },
