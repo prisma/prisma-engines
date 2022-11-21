@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use crate::{introspection::Context, introspection_helpers::*, warnings, EnumVariantName, ModelName};
 use datamodel_renderer::datamodel as renderer;
 use psl::{
@@ -7,6 +5,7 @@ use psl::{
     schema_ast::ast::WithDocumentation,
 };
 use sql_schema_describer as sql;
+use std::borrow::Cow;
 
 pub(super) fn introspect_enums(ctx: &mut Context<'_>) {
     let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum)> = ctx
