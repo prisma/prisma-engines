@@ -160,55 +160,16 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{models::table_has_usable_identifier, relation_names::RelationNames};
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
-<span class="kw">use </span>psl::{
-    datamodel_connector::{constraint_names::ConstraintNames, Connector},
-    dml::{FieldArity, ReferentialAction},
-};
+<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>render;
+<span class="kw">use </span>psl::datamodel_connector::{constraint_names::ConstraintNames, Connector};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
-<span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
+<span class="kw">use </span>std::borrow::Cow;
 
 <span class="doccomment">/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_inline_relations(
-    relation_names: <span class="kw-2">&amp;</span>RelationNames,
-    datamodel: <span class="kw-2">&amp;mut </span>psl::dml::Datamodel,
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) {
-    <span class="kw">let </span>dml_model_ids: HashMap&lt;String, usize&gt; = datamodel
-        .models
-        .iter()
-        .enumerate()
-        .map(|(id, m)| (m.name.clone(), id))
-        .collect();
-
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_inline_relations&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(<span class="kw-2">*</span>t)) {
         <span class="kw">for </span>(fk, relation_name_from_db) <span class="kw">in </span>table
             .foreign_keys()
@@ -232,112 +193,95 @@
 
             <span class="comment">// Forward relation field.
             </span>{
-                <span class="kw">let </span>referencing_model_name = ctx.table_prisma_name(table.id).prisma_name();
-                <span class="kw">let </span>referencing_model_idx: usize = dml_model_ids[referencing_model_name.as_ref()];
-                datamodel.models[referencing_model_idx].add_field(psl::dml::Field::RelationField(
-                    calculate_relation_field(
-                        fk,
-                        (relation_name.clone().into_owned(), forward_relation_field_name.clone()),
-                        ctx,
-                    ),
-                ));
+                <span class="kw">let </span>referencing_model_idx: usize = ctx.target_models[<span class="kw-2">&amp;</span>table.id];
+                <span class="kw">let </span>field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), ctx);
+                ctx.rendered_schema.model_at(referencing_model_idx).push_field(field);
             }
 
             <span class="comment">// Back relation field.
             </span>{
-                <span class="kw">let </span>referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
-                <span class="kw">let </span>referenced_model_idx: usize = dml_model_ids[referenced_model_name.as_ref()];
-
-                <span class="comment">// Back relation field
-                </span>datamodel.models[referenced_model_idx].add_field(psl::dml::Field::RelationField(
-                    calculate_backrelation_field(fk, (relation_name.into_owned(), back_relation_field_name), ctx),
-                ));
+                <span class="kw">let </span>referenced_model_idx: usize = ctx.target_models[<span class="kw-2">&amp;</span>fk.referenced_table().id];
+                <span class="kw">let </span>field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), ctx);
+                ctx.rendered_schema.model_at(referenced_model_idx).push_field(field);
             }
         }
     }
 }
 
-<span class="kw">fn </span>calculate_relation_field(
-    foreign_key: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    (relation_name, field_name): (String, Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;),
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; psl::dml::RelationField {
-    <span class="kw">let </span>map_action = |action: sql::ForeignKeyAction| <span class="kw">match </span>action {
-        sql::ForeignKeyAction::NoAction =&gt; ReferentialAction::NoAction,
-        sql::ForeignKeyAction::Restrict =&gt; ReferentialAction::Restrict,
-        sql::ForeignKeyAction::Cascade =&gt; ReferentialAction::Cascade,
-        sql::ForeignKeyAction::SetNull =&gt; ReferentialAction::SetNull,
-        sql::ForeignKeyAction::SetDefault =&gt; ReferentialAction::SetDefault,
+<span class="kw">fn </span>calculate_relation_field&lt;<span class="lifetime">&#39;a</span>&gt;(
+    foreign_key: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    (relation_name, field_name): (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; render::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>referenced_model_name = ctx.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
+
+    <span class="kw">let </span><span class="kw-2">mut </span>relation = render::Relation::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if </span>foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
+        render::ModelField::new_optional(field_name, referenced_model_name)
+    } <span class="kw">else </span>{
+        render::ModelField::new_required(field_name, referenced_model_name)
     };
 
-    <span class="kw">let </span>relation_info = psl::dml::RelationInfo {
-        name: relation_name,
-        fk_name: relation_mapped_name(foreign_key, ctx.active_connector()),
-        fields: foreign_key
+    <span class="kw">let </span>any_field_required = foreign_key.constrained_columns().any(|c| c.arity().is_required());
+
+    <span class="kw">if </span>!relation_name.is_empty() {
+        relation.name(relation_name)
+    }
+
+    relation.fields(
+        foreign_key
             .constrained_columns()
-            .map(|c| ctx.column_prisma_name(c.id).prisma_name().into_owned())
-            .collect(),
-        referenced_model: ctx
-            .table_prisma_name(foreign_key.referenced_table().id)
-            .prisma_name()
-            .into_owned(),
-        references: foreign_key
+            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+    );
+
+    relation.references(
+        foreign_key
             .referenced_columns()
-            .map(|c| ctx.column_prisma_name(c.id).prisma_name().into_owned())
-            .collect(),
-        on_delete: <span class="prelude-val">None</span>,
-        on_update: <span class="prelude-val">None</span>,
-    };
+            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+    );
 
-    <span class="kw">let </span>arity = <span class="kw">match </span>foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
-        <span class="bool-val">true </span>=&gt; FieldArity::Optional,
-        <span class="bool-val">false </span>=&gt; FieldArity::Required,
-    };
+    <span class="kw">match </span>(any_field_required, foreign_key.on_delete_action()) {
+        (<span class="bool-val">false</span>, sql::ForeignKeyAction::SetNull) =&gt; (),
+        (<span class="bool-val">true</span>, sql::ForeignKeyAction::Restrict) =&gt; (),
+        (<span class="bool-val">true</span>, sql::ForeignKeyAction::NoAction) <span class="kw">if </span>ctx.sql_family.is_mssql() =&gt; (),
 
-    <span class="kw">let </span>calculated_arity = <span class="kw">match </span>foreign_key.constrained_columns().any(|c| c.arity().is_required()) {
-        <span class="bool-val">true </span>=&gt; FieldArity::Required,
-        <span class="bool-val">false </span>=&gt; arity,
-    };
+        (<span class="kw">_</span>, sql::ForeignKeyAction::Cascade) =&gt; relation.on_delete(<span class="string">&quot;Cascade&quot;</span>),
+        (<span class="kw">_</span>, sql::ForeignKeyAction::SetDefault) =&gt; relation.on_delete(<span class="string">&quot;SetDefault&quot;</span>),
+        (<span class="bool-val">true</span>, sql::ForeignKeyAction::SetNull) =&gt; relation.on_delete(<span class="string">&quot;SetNull&quot;</span>),
+        (<span class="kw">_</span>, sql::ForeignKeyAction::NoAction) =&gt; relation.on_delete(<span class="string">&quot;NoAction&quot;</span>),
+        (<span class="bool-val">false</span>, sql::ForeignKeyAction::Restrict) =&gt; relation.on_delete(<span class="string">&quot;Restrict&quot;</span>),
+    }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>relation_field = psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, calculated_arity, relation_info);
+    <span class="kw">match </span>foreign_key.on_update_action() {
+        <span class="comment">// Cascade is the default
+        </span>sql::ForeignKeyAction::Cascade =&gt; (),
+        sql::ForeignKeyAction::NoAction =&gt; relation.on_update(<span class="string">&quot;NoAction&quot;</span>),
+        sql::ForeignKeyAction::Restrict =&gt; relation.on_update(<span class="string">&quot;Restrict&quot;</span>),
+        sql::ForeignKeyAction::SetNull =&gt; relation.on_update(<span class="string">&quot;SetNull&quot;</span>),
+        sql::ForeignKeyAction::SetDefault =&gt; relation.on_update(<span class="string">&quot;SetDefault&quot;</span>),
+    }
 
-    <span class="kw">let </span>on_delete_action = map_action(foreign_key.on_delete_action());
-    <span class="kw">let </span>on_update_action = map_action(foreign_key.on_update_action());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = relation_mapped_name(foreign_key, ctx.active_connector()) {
+        relation.map(mapped_name);
+    }
 
-    relation_field.supports_restrict_action(!ctx.sql_family.is_mssql());
+    field.relation(relation);
 
     <span class="comment">// Add an @ignore attribute if 1. the parent model isn&#39;t already ignored, and 2. the referenced
     // model is ignored.
-    </span>relation_field.is_ignored = table_has_usable_identifier(foreign_key.table())
-        &amp;&amp; !table_has_usable_identifier(foreign_key.referenced_table());
-
-    <span class="kw">if </span>relation_field.default_on_delete_action() != on_delete_action {
-        relation_field.relation_info.on_delete = <span class="prelude-val">Some</span>(on_delete_action);
+    </span><span class="kw">if </span>table_has_usable_identifier(foreign_key.table()) &amp;&amp; !table_has_usable_identifier(foreign_key.referenced_table())
+    {
+        field.ignore();
     }
 
-    <span class="kw">if </span>relation_field.default_on_update_action() != on_update_action {
-        relation_field.relation_info.on_update = <span class="prelude-val">Some</span>(on_update_action);
-    }
-
-    relation_field
+    field
 }
 
-<span class="kw">fn </span>calculate_backrelation_field(
-    fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    (relation_name, field_name): (String, Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;),
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; psl::dml::RelationField {
-    <span class="kw">let </span>model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name().into_owned();
-    <span class="kw">let </span>relation_info = psl::dml::RelationInfo {
-        name: relation_name,
-        fk_name: <span class="prelude-val">None</span>,
-        referenced_model: model_a_name,
-        fields: <span class="macro">vec!</span>[],
-        references: <span class="macro">vec!</span>[],
-        on_delete: <span class="prelude-val">None</span>,
-        on_update: <span class="prelude-val">None</span>,
-    };
-
+<span class="kw">fn </span>calculate_backrelation_field&lt;<span class="lifetime">&#39;a</span>&gt;(
+    fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    (relation_name, field_name): (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; render::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>forward_relation_field_is_unique = fk
         .table()
         .indexes()
@@ -349,30 +293,34 @@
             })
         });
 
-    <span class="kw">let </span>arity = <span class="kw">if </span>forward_relation_field_is_unique {
-        FieldArity::Optional <span class="comment">// 1:1 relation
-    </span>} <span class="kw">else </span>{
-        FieldArity::List
+    <span class="kw">let </span>model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name();
+    <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if </span>forward_relation_field_is_unique {
+        <span class="comment">// 1:1 relation
+        </span>render::ModelField::new_optional(field_name, model_a_name)
+    } <span class="kw">else </span>{
+        render::ModelField::new_array(field_name, model_a_name)
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>field = psl::dml::RelationField::new(<span class="kw-2">&amp;</span>field_name, arity, arity, relation_info);
+    <span class="kw">if </span>!relation_name.is_empty() {
+        <span class="kw">let </span><span class="kw-2">mut </span>relation = render::Relation::new();
+        relation.name(relation_name);
+        field.relation(relation);
+    }
 
     <span class="comment">// We want to put an @ignore on the field iff the field&#39;s referenced table is ignored, and the
     // parent table isn&#39;t, because otherwise the ignore would be redundant.
     </span><span class="kw">if </span>!table_has_usable_identifier(fk.table()) &amp;&amp; table_has_usable_identifier(fk.referenced_table()) {
-        field.is_ignored = <span class="bool-val">true</span>;
+        field.ignore();
     }
 
     field
 }
 
-<span class="kw">fn </span>relation_mapped_name(fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<span class="kw">fn </span>relation_mapped_name&lt;<span class="lifetime">&#39;a</span>&gt;(fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
     <span class="kw">let </span>cols: Vec&lt;<span class="kw">_</span>&gt; = fk.constrained_columns().map(|c| c.name()).collect();
     <span class="kw">let </span>default_name = ConstraintNames::foreign_key_constraint_name(fk.table().name(), <span class="kw-2">&amp;</span>cols, connector);
 
-    fk.constraint_name()
-        .filter(|name| <span class="kw-2">*</span>name != default_name.as_str())
-        .map(ToOwned::to_owned)
+    fk.constraint_name().filter(|name| <span class="kw-2">*</span>name != default_name.as_str())
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

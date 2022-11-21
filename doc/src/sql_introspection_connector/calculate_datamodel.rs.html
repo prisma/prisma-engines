@@ -206,7 +206,6 @@
 <span id="206">206</span>
 <span id="207">207</span>
 <span id="208">208</span>
-<span id="209">209</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
     SqlIntrospectionResult,
@@ -231,7 +230,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) enum_values_with_empty_names: Vec&lt;warnings::EnumAndValue&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) target_models: HashMap&lt;sql::TableId, usize&gt;,
-    introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -239,13 +238,12 @@
         <span class="self">self</span>.active_connector().provider_name() == COCKROACH.provider_name()
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; psl::datamodel_connector::RelationMode {
+        <span class="self">self</span>.config.datasources.first().unwrap().relation_mode()
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_keys_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.config
-            .datasources
-            .first()
-            .unwrap()
-            .relation_mode()
-            .uses_foreign_keys()
+        <span class="self">self</span>.relation_mode().uses_foreign_keys()
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>active_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector {

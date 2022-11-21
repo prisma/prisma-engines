@@ -82,15 +82,15 @@
     enums::introspect_enums(ctx);
     models::introspect_models(<span class="kw-2">&amp;mut </span>datamodel, ctx);
 
+    ctx.rendered_schema.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
+
     <span class="kw">let </span>relation_names = relation_names::introspect_relation_names(ctx);
 
     <span class="kw">if </span>ctx.foreign_keys_enabled() {
-        inline_relations::introspect_inline_relations(<span class="kw-2">&amp;</span>relation_names, <span class="kw-2">&amp;mut </span>datamodel, ctx);
+        inline_relations::introspect_inline_relations(<span class="kw-2">&amp;</span>relation_names, ctx);
     } <span class="kw">else </span>{
-        prisma_relation_mode::reintrospect_relations(<span class="kw-2">&amp;mut </span>datamodel, ctx);
+        prisma_relation_mode::reintrospect_relations(ctx);
     }
-
-    ctx.rendered_schema.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
 
     m2m_relations::introspect_m2m_relations(<span class="kw-2">&amp;</span>relation_names, ctx);
 

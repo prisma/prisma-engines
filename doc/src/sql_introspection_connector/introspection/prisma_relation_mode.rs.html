@@ -64,10 +64,36 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-</pre><pre class="rust"><code><span class="kw">use </span>psl::dml;
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+</pre><pre class="rust"><code><span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>render;
+<span class="kw">use </span>psl::parser_database::ast;
+<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>reintrospect_relations(datamodel: <span class="kw-2">&amp;mut </span>dml::Datamodel, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>reintrospect_relations(ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>reintrospected_relations = Vec::new();
+    <span class="kw">let </span>old_model_to_table: HashMap&lt;ast::ModelId, sql::TableId&gt; = ctx
+        .introspection_map
+        .existing_models
+        .iter()
+        .map(|(<span class="kw-2">&amp;</span>table, <span class="kw-2">&amp;</span>model)| (model, table))
+        .collect();
 
     <span class="kw">for </span>relation <span class="kw">in </span>ctx
         .previous_schema
@@ -76,8 +102,8 @@
         .filter_map(|r| r.refine().as_inline())
     {
         <span class="kw">let </span>relation_name = <span class="kw">match </span>relation.relation_name() {
-            psl::parser_database::walkers::RelationName::Explicit(name) =&gt; name.to_owned(),
-            psl::parser_database::walkers::RelationName::Generated(<span class="kw">_</span>) =&gt; String::new(),
+            psl::parser_database::walkers::RelationName::Explicit(name) =&gt; name,
+            psl::parser_database::walkers::RelationName::Generated(<span class="kw">_</span>) =&gt; <span class="string">&quot;&quot;</span>,
         };
 
         <span class="kw">let </span>fields =
@@ -87,37 +113,45 @@
                 <span class="kw">continue</span>;
             };
 
-        <span class="kw">if </span>fields.iter().any(|f| datamodel.find_model(f.model().name()).is_none()) {
+        <span class="kw">if </span>fields.iter().any(|f| !old_model_to_table.contains_key(<span class="kw-2">&amp;</span>f.model().id)) {
             <span class="kw">continue</span>;
         }
 
         <span class="kw">for </span>rf <span class="kw">in </span>fields {
-            <span class="kw">let </span>relation_info = dml::RelationInfo {
-                referenced_model: rf.related_model().name().to_owned(),
-                fields: rf
-                    .referencing_fields()
-                    .into_iter()
-                    .flatten()
-                    .map(|f| f.name().to_owned())
-                    .collect(),
-                references: rf
-                    .referenced_fields()
-                    .into_iter()
-                    .flatten()
-                    .map(|f| f.name().to_owned())
-                    .collect(),
-                name: relation_name.clone(),
-                fk_name: rf.mapped_name().map(ToOwned::to_owned),
-                on_delete: rf.explicit_on_delete().map(From::from),
-                on_update: rf.explicit_on_update().map(From::from),
+            <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>rf.ast_field().arity {
+                ast::FieldArity::Required =&gt; render::ModelField::new_required(rf.name(), rf.related_model().name()),
+                ast::FieldArity::Optional =&gt; render::ModelField::new_optional(rf.name(), rf.related_model().name()),
+                ast::FieldArity::List =&gt; render::ModelField::new_array(rf.name(), rf.related_model().name()),
             };
-            <span class="kw">let </span>model = datamodel.find_model_mut(rf.model().name());
-            model.add_field(dml::Field::RelationField(dml::RelationField::new(
-                rf.name(),
-                rf.ast_field().arity.into(),
-                rf.referential_arity().into(),
-                relation_info,
-            )));
+
+            <span class="kw">if </span>rf.relation_attribute().is_some() {
+                <span class="kw">let </span><span class="kw-2">mut </span>relation = render::Relation::new();
+
+                <span class="kw">if </span>!relation_name.is_empty() {
+                    relation.name(relation_name);
+                }
+
+                relation.fields(rf.fields().into_iter().flatten().map(|f| Cow::Borrowed(f.name())));
+                relation.references(
+                    rf.referenced_fields()
+                        .into_iter()
+                        .flatten()
+                        .map(|f| Cow::Borrowed(f.name())),
+                );
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = rf.explicit_on_delete() {
+                    relation.on_delete(on_delete.as_str());
+                }
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = rf.explicit_on_update() {
+                    relation.on_update(on_update.as_str());
+                }
+
+                field.relation(relation);
+            }
+
+            <span class="kw">let </span>new_model_idx = ctx.target_models[<span class="kw-2">&amp;</span>old_model_to_table[<span class="kw-2">&amp;</span>rf.model().model_id()]];
+            ctx.rendered_schema.model_at(new_model_idx).push_field(field);
 
             reintrospected_relations.push(<span class="kw">crate</span>::warnings::Model {
                 model: rf.model().name().to_owned(),

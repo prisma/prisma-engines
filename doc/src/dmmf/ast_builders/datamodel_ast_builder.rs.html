@@ -512,7 +512,7 @@
         relation_to_fields: get_relation_to_fields(field),
         relation_on_delete: get_relation_delete_strategy(field),
         field_type: get_field_type(field),
-        is_generated: <span class="prelude-val">Some</span>(field.is_generated()),
+        is_generated: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
         is_updated_at: <span class="prelude-val">Some</span>(field.is_updated_at()),
         documentation: field.documentation().map(|v| v.to_owned()),
     }

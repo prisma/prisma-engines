@@ -563,36 +563,6 @@
 <span id="563">563</span>
 <span id="564">564</span>
 <span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::native_type_instance::NativeTypeInstance;
@@ -777,8 +747,8 @@
     <span class="kw">pub fn </span>is_commented_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             Field::ScalarField(sf) =&gt; sf.is_commented_out,
-            Field::RelationField(rf) =&gt; rf.is_commented_out,
             Field::CompositeField(cf) =&gt; cf.is_commented_out,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -810,14 +780,6 @@
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
             Field::ScalarField(sf) =&gt; sf.is_updated_at,
             Field::RelationField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="kw">pub fn </span>is_generated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
-            Field::ScalarField(sf) =&gt; sf.is_generated,
-            Field::RelationField(rf) =&gt; rf.is_generated,
             Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
@@ -894,12 +856,6 @@
     <span class="doccomment">/// Comments associated with this field.
     </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// signals that this field was internally generated (only back relation fields as of now)
-    </span><span class="kw">pub </span>is_generated: bool,
-
-    <span class="doccomment">/// Indicates if this field has to be commented out.
-    </span><span class="kw">pub </span>is_commented_out: bool,
-
     <span class="doccomment">/// Indicates if this field has to be ignored by the Client.
     </span><span class="kw">pub </span>is_ignored: bool,
 
@@ -919,8 +875,6 @@
             referential_arity,
             relation_info,
             documentation: <span class="prelude-val">None</span>,
-            is_generated: <span class="bool-val">false</span>,
-            is_commented_out: <span class="bool-val">false</span>,
             is_ignored: <span class="bool-val">false</span>,
             supports_restrict_action: <span class="prelude-val">None</span>,
             emulates_referential_actions: <span class="prelude-val">None</span>,
@@ -935,20 +889,6 @@
     <span class="doccomment">/// The referential actions should be handled by the core.
     </span><span class="kw">pub fn </span>emulates_referential_actions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) {
         <span class="self">self</span>.emulates_referential_actions = <span class="prelude-val">Some</span>(value);
-    }
-
-    <span class="doccomment">/// Creates a new field with the given name and type, marked as generated and optional.
-    </span><span class="kw">pub fn </span>new_generated(name: <span class="kw-2">&amp;</span>str, info: RelationInfo, required: bool) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>arity = <span class="kw">if </span>required {
-            FieldArity::Required
-        } <span class="kw">else </span>{
-            FieldArity::Optional
-        };
-
-        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="self">Self</span>::new(name, arity, arity, info);
-        field.is_generated = <span class="bool-val">true</span>;
-
-        field
     }
 
     <span class="kw">pub fn </span>points_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
