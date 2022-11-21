@@ -264,46 +264,7 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-</pre><pre class="rust"><code><span class="kw">use </span>psl::dml;
-
-<span class="kw">use </span><span class="kw">super</span>::attributes::{BlockAttribute, FieldAttribute};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::attributes::{BlockAttribute, FieldAttribute};
 <span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Documentation, Function};
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 
@@ -372,16 +333,6 @@
     /// ```
     </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;) {
         <span class="self">self</span>.documentation = documentation.map(|d| Documentation(d.into()));
-    }
-
-    <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    </span><span class="kw">fn </span>from_dml(dml_variant: <span class="kw-2">&amp;</span>dml::EnumValue) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>variant = <span class="self">Self</span>::new(Cow::Owned(dml_variant.name.clone()));
-        variant.comment_out(dml_variant.commented_out);
-        variant.map(dml_variant.database_name.as_ref().map(Clone::clone));
-        variant
     }
 }
 
@@ -498,31 +449,6 @@
         fun.push_param(mapped_name.into());
 
         <span class="self">self</span>.map = <span class="prelude-val">Some</span>(BlockAttribute(fun));
-    }
-
-    <span class="doccomment">/// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    </span><span class="kw">pub fn </span>from_dml(dml_enum: <span class="kw-2">&amp;</span>dml::Enum) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>r#enum = <span class="self">Self</span>::new(dml_enum.name.clone());
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_enum.documentation {
-            r#enum.documentation(docs.clone());
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>schema) = dml_enum.schema {
-            r#enum.schema(schema.clone());
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_enum.database_name {
-            r#enum.map(map.clone());
-        }
-
-        <span class="kw">for </span>dml_variant <span class="kw">in </span>dml_enum.values.iter() {
-            r#enum.push_variant(EnumVariant::from_dml(dml_variant));
-        }
-
-        r#enum
     }
 }
 

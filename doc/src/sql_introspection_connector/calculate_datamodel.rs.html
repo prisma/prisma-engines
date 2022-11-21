@@ -202,6 +202,8 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
     SqlIntrospectionResult,
@@ -223,6 +225,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) prisma_1_cuid_defaults: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields_with_empty_names: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) enum_values_with_empty_names: Vec&lt;warnings::EnumAndValue&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
     introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
@@ -386,6 +389,7 @@
         prisma_1_cuid_defaults: Vec::new(),
         fields_with_empty_names: Vec::new(),
         enum_values_with_empty_names: Vec::new(),
+        rendered_schema: Default::default(),
     };
 
     context.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>context);

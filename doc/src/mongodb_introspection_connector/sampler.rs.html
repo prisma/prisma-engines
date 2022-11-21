@@ -68,6 +68,7 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>field_type;
 <span class="kw">mod </span>statistics;
 
@@ -121,6 +122,7 @@
 
     <span class="kw">let </span>data_model = statistics.into_datamodel(<span class="kw-2">&amp;mut </span>warnings);
     <span class="kw">let </span>is_empty = data_model.is_empty();
+
     <span class="kw">let </span><span class="kw-2">mut </span>rendered = render::Datamodel::default();
     rendered.push_dml(ctx.datasource(), <span class="kw-2">&amp;</span>data_model);
     <span class="kw">let </span>config = <span class="kw">if </span>ctx.render_config {

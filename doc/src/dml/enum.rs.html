@@ -129,12 +129,6 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::traits::{WithDatabaseName, WithName};
 
 <span class="doccomment">/// Represents an enum in the datamodel.
@@ -148,8 +142,6 @@
     </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Database internal name of this enum.
     </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// Has to be commented out.
-    </span><span class="kw">pub </span>commented_out: bool,
     <span class="doccomment">/// The contents of the `@@schema(&quot;...&quot;)` attribute.
     </span><span class="kw">pub </span>schema: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
@@ -162,7 +154,6 @@
             values,
             documentation: <span class="prelude-val">None</span>,
             database_name: <span class="prelude-val">None</span>,
-            commented_out: <span class="bool-val">false</span>,
             schema,
         }
     }
@@ -232,8 +223,6 @@
     </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Comments for this enum value.
     </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// Has to be commented out.
-    </span><span class="kw">pub </span>commented_out: bool,
 }
 
 <span class="kw">impl </span>EnumValue {
@@ -243,7 +232,6 @@
             name: String::from(name),
             database_name: <span class="prelude-val">None</span>,
             documentation: <span class="prelude-val">None</span>,
-            commented_out: <span class="bool-val">false</span>,
         }
     }
 

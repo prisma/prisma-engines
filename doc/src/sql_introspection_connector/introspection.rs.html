@@ -79,7 +79,6 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-<span id="82">82</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
 <span class="kw">mod </span>enums;
@@ -98,7 +97,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>introspect(ctx: <span class="kw-2">&amp;mut </span>Context) -&gt; <span class="prelude-ty">Result</span>&lt;(String, bool), SqlError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>datamodel = dml::Datamodel::new();
 
-    enums::introspect_enums(<span class="kw-2">&amp;mut </span>datamodel, ctx);
+    enums::introspect_enums(ctx);
     models::introspect_models(<span class="kw-2">&amp;mut </span>datamodel, ctx);
 
     <span class="kw">let </span>relation_names = relation_names::introspect_relation_names(ctx);
@@ -135,10 +134,9 @@
         String::new()
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>rendered_datamodel = render::Datamodel::default();
-    rendered_datamodel.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
+    ctx.rendered_schema.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
 
-    <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{config}\n{rendered_datamodel}&quot;</span>);
+    <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, config, ctx.rendered_schema);
 
     ctx.finalize_warnings();
 
