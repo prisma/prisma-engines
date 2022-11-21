@@ -39,10 +39,10 @@ impl<'a> EnumVariant<'a> {
     ///             ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, value: Option<&'a str>) {
+    pub fn map(&mut self, value: Option<impl Into<Cow<'a, str>>>) {
         if let Some(value) = value {
             let mut map = Function::new("map");
-            map.push_param(value);
+            map.push_param(value.into());
             self.map = Some(FieldAttribute::new(map));
         }
     }
@@ -74,10 +74,10 @@ impl<'a> EnumVariant<'a> {
     /// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    fn from_dml(dml_variant: &'a dml::EnumValue) -> Self {
-        let mut variant = Self::new(Cow::Borrowed(&dml_variant.name));
+    fn from_dml(dml_variant: &dml::EnumValue) -> Self {
+        let mut variant = Self::new(Cow::Owned(dml_variant.name.clone()));
         variant.comment_out(dml_variant.commented_out);
-        variant.map(dml_variant.database_name.as_deref());
+        variant.map(dml_variant.database_name.as_ref().map(Clone::clone));
         variant
     }
 }
@@ -160,9 +160,9 @@ impl<'a> Enum<'a> {
     ///             ^^^^^^ this
     /// }
     /// ```
-    pub fn schema(&mut self, schema: &'a str) {
+    pub fn schema(&mut self, schema: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("schema");
-        fun.push_param(schema);
+        fun.push_param(schema.into());
 
         self.schema = Some(BlockAttribute(fun));
     }
@@ -190,9 +190,9 @@ impl<'a> Enum<'a> {
     ///          ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, mapped_name: &'a str) {
+    pub fn map(&mut self, mapped_name: impl Into<Cow<'a, str>>) {
         let mut fun = Function::new("map");
-        fun.push_param(mapped_name);
+        fun.push_param(mapped_name.into());
 
         self.map = Some(BlockAttribute(fun));
     }
@@ -200,19 +200,19 @@ impl<'a> Enum<'a> {
     /// A throwaway function to help generate a rendering from the DML structures.
     ///
     /// Delete when removing DML.
-    pub fn from_dml(dml_enum: &'a dml::Enum) -> Self {
-        let mut r#enum = Self::new(&dml_enum.name);
+    pub fn from_dml(dml_enum: &dml::Enum) -> Self {
+        let mut r#enum = Self::new(dml_enum.name.clone());
 
         if let Some(ref docs) = dml_enum.documentation {
-            r#enum.documentation(docs);
+            r#enum.documentation(docs.clone());
         }
 
         if let Some(ref schema) = dml_enum.schema {
-            r#enum.schema(schema);
+            r#enum.schema(schema.clone());
         }
 
         if let Some(ref map) = dml_enum.database_name {
-            r#enum.map(map);
+            r#enum.map(map.clone());
         }
 
         for dml_variant in dml_enum.values.iter() {
