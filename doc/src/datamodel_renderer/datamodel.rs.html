@@ -165,6 +165,11 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.
 //!
 //! Includes the `model`, `enum` and `type` definitions.
@@ -199,6 +204,11 @@
     <span class="doccomment">/// Create a new empty data model.
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
+    }
+
+    <span class="doccomment">/// Get the model at the following index.
+    </span><span class="kw">pub fn </span>model_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; <span class="kw-2">&amp;mut </span>Model&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.models[idx]
     }
 
     <span class="doccomment">/// Add a model block to the data model.

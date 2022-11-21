@@ -213,22 +213,9 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings};
 <span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, dml, schema_ast::ast::WithDocumentation};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
-<span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_models(datamodel: <span class="kw-2">&amp;mut </span>dml::Datamodel, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="comment">// The following local variables are for different types of warnings. We should refactor these
@@ -241,6 +228,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>models_without_identifiers = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>models_without_columns = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>unsupported_types = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, dml::Model)&gt; = Vec::with_capacity(ctx.schema.tables_count());
 
     <span class="kw">for </span>table <span class="kw">in </span>ctx
         .schema
@@ -375,7 +363,7 @@
             });
         }
 
-        datamodel.models.push(model);
+        models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
     }
 
     <span class="kw">if </span>!models_without_columns.is_empty() {
@@ -410,24 +398,12 @@
             ))
     }
 
-    sort_models(datamodel, ctx)
-}
+    models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
 
-<span class="kw">fn </span>sort_models(datamodel: <span class="kw-2">&amp;mut </span>dml::Datamodel, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="kw">let </span>existing_models_by_database_name: HashMap&lt;<span class="kw-2">&amp;</span>str, <span class="kw">_</span>&gt; = ctx
-        .previous_schema
-        .db
-        .walk_models()
-        .map(|model| (model.database_name(), model.id))
-        .collect();
-
-    datamodel.models.sort_by(|a, b| {
-        <span class="kw">let </span>existing = |model: <span class="kw-2">&amp;</span>dml::Model| -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt; {
-            existing_models_by_database_name.get(model.database_name.as_deref().unwrap_or(<span class="kw-2">&amp;</span>model.name))
-        };
-
-        compare_options_none_last(existing(a), existing(b))
-    });
+    <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, dml_model)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
+        datamodel.models.push(dml_model);
+        ctx.target_models.insert(table_id, idx);
+    }
 }
 
 <span class="kw">fn </span>empty_table_comment(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {

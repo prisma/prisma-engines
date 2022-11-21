@@ -204,6 +204,9 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
     SqlIntrospectionResult,
@@ -212,6 +215,7 @@
 <span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Connector, parser_database::walkers, Configuration};
 <span class="kw">use </span>quaint::prelude::SqlFamily;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
@@ -226,6 +230,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields_with_empty_names: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) enum_values_with_empty_names: Vec&lt;warnings::EnumAndValue&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) target_models: HashMap&lt;sql::TableId, usize&gt;,
     introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
@@ -389,7 +394,8 @@
         prisma_1_cuid_defaults: Vec::new(),
         fields_with_empty_names: Vec::new(),
         enum_values_with_empty_names: Vec::new(),
-        rendered_schema: Default::default(),
+        rendered_schema: datamodel_renderer::Datamodel::default(),
+        target_models: HashMap::default(),
     };
 
     context.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>context);
