@@ -1,26 +1,13 @@
 use super::{models::table_has_usable_identifier, relation_names::RelationNames};
 use crate::introspection_helpers::is_prisma_join_table;
-use psl::{
-    datamodel_connector::{constraint_names::ConstraintNames, Connector},
-    dml::{FieldArity, ReferentialAction},
-};
+use datamodel_renderer::datamodel as render;
+use psl::datamodel_connector::{constraint_names::ConstraintNames, Connector};
 use sql_schema_describer as sql;
-use std::{borrow::Cow, collections::HashMap};
+use std::borrow::Cow;
 
 /// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-pub(super) fn introspect_inline_relations(
-    relation_names: &RelationNames,
-    datamodel: &mut psl::dml::Datamodel,
-    ctx: &mut super::Context<'_>,
-) {
-    let dml_model_ids: HashMap<String, usize> = datamodel
-        .models
-        .iter()
-        .enumerate()
-        .map(|(id, m)| (m.name.clone(), id))
-        .collect();
-
+pub(super) fn introspect_inline_relations<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
     for table in ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(*t)) {
         for (fk, relation_name_from_db) in table
             .foreign_keys()
@@ -44,112 +31,95 @@ pub(super) fn introspect_inline_relations(
 
             // Forward relation field.
             {
-                let referencing_model_name = ctx.table_prisma_name(table.id).prisma_name();
-                let referencing_model_idx: usize = dml_model_ids[referencing_model_name.as_ref()];
-                datamodel.models[referencing_model_idx].add_field(psl::dml::Field::RelationField(
-                    calculate_relation_field(
-                        fk,
-                        (relation_name.clone().into_owned(), forward_relation_field_name.clone()),
-                        ctx,
-                    ),
-                ));
+                let referencing_model_idx: usize = ctx.target_models[&table.id];
+                let field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), ctx);
+                ctx.rendered_schema.model_at(referencing_model_idx).push_field(field);
             }
 
             // Back relation field.
             {
-                let referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
-                let referenced_model_idx: usize = dml_model_ids[referenced_model_name.as_ref()];
-
-                // Back relation field
-                datamodel.models[referenced_model_idx].add_field(psl::dml::Field::RelationField(
-                    calculate_backrelation_field(fk, (relation_name.into_owned(), back_relation_field_name), ctx),
-                ));
+                let referenced_model_idx: usize = ctx.target_models[&fk.referenced_table().id];
+                let field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), ctx);
+                ctx.rendered_schema.model_at(referenced_model_idx).push_field(field);
             }
         }
     }
 }
 
-fn calculate_relation_field(
-    foreign_key: sql::ForeignKeyWalker<'_>,
-    (relation_name, field_name): (String, Cow<'_, str>),
-    ctx: &mut super::Context<'_>,
-) -> psl::dml::RelationField {
-    let map_action = |action: sql::ForeignKeyAction| match action {
-        sql::ForeignKeyAction::NoAction => ReferentialAction::NoAction,
-        sql::ForeignKeyAction::Restrict => ReferentialAction::Restrict,
-        sql::ForeignKeyAction::Cascade => ReferentialAction::Cascade,
-        sql::ForeignKeyAction::SetNull => ReferentialAction::SetNull,
-        sql::ForeignKeyAction::SetDefault => ReferentialAction::SetDefault,
+fn calculate_relation_field<'a>(
+    foreign_key: sql::ForeignKeyWalker<'a>,
+    (relation_name, field_name): (Cow<'a, str>, Cow<'a, str>),
+    ctx: &mut super::Context<'a>,
+) -> render::ModelField<'a> {
+    let referenced_model_name = ctx.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
+
+    let mut relation = render::Relation::new();
+    let mut field = if foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
+        render::ModelField::new_optional(field_name, referenced_model_name)
+    } else {
+        render::ModelField::new_required(field_name, referenced_model_name)
     };
 
-    let relation_info = psl::dml::RelationInfo {
-        name: relation_name,
-        fk_name: relation_mapped_name(foreign_key, ctx.active_connector()),
-        fields: foreign_key
+    let any_field_required = foreign_key.constrained_columns().any(|c| c.arity().is_required());
+
+    if !relation_name.is_empty() {
+        relation.name(relation_name)
+    }
+
+    relation.fields(
+        foreign_key
             .constrained_columns()
-            .map(|c| ctx.column_prisma_name(c.id).prisma_name().into_owned())
-            .collect(),
-        referenced_model: ctx
-            .table_prisma_name(foreign_key.referenced_table().id)
-            .prisma_name()
-            .into_owned(),
-        references: foreign_key
+            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+    );
+
+    relation.references(
+        foreign_key
             .referenced_columns()
-            .map(|c| ctx.column_prisma_name(c.id).prisma_name().into_owned())
-            .collect(),
-        on_delete: None,
-        on_update: None,
-    };
+            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+    );
 
-    let arity = match foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
-        true => FieldArity::Optional,
-        false => FieldArity::Required,
-    };
+    match (any_field_required, foreign_key.on_delete_action()) {
+        (false, sql::ForeignKeyAction::SetNull) => (),
+        (true, sql::ForeignKeyAction::Restrict) => (),
+        (true, sql::ForeignKeyAction::NoAction) if ctx.sql_family.is_mssql() => (),
 
-    let calculated_arity = match foreign_key.constrained_columns().any(|c| c.arity().is_required()) {
-        true => FieldArity::Required,
-        false => arity,
-    };
+        (_, sql::ForeignKeyAction::Cascade) => relation.on_delete("Cascade"),
+        (_, sql::ForeignKeyAction::SetDefault) => relation.on_delete("SetDefault"),
+        (true, sql::ForeignKeyAction::SetNull) => relation.on_delete("SetNull"),
+        (_, sql::ForeignKeyAction::NoAction) => relation.on_delete("NoAction"),
+        (false, sql::ForeignKeyAction::Restrict) => relation.on_delete("Restrict"),
+    }
 
-    let mut relation_field = psl::dml::RelationField::new(&field_name, arity, calculated_arity, relation_info);
+    match foreign_key.on_update_action() {
+        // Cascade is the default
+        sql::ForeignKeyAction::Cascade => (),
+        sql::ForeignKeyAction::NoAction => relation.on_update("NoAction"),
+        sql::ForeignKeyAction::Restrict => relation.on_update("Restrict"),
+        sql::ForeignKeyAction::SetNull => relation.on_update("SetNull"),
+        sql::ForeignKeyAction::SetDefault => relation.on_update("SetDefault"),
+    }
 
-    let on_delete_action = map_action(foreign_key.on_delete_action());
-    let on_update_action = map_action(foreign_key.on_update_action());
+    if let Some(mapped_name) = relation_mapped_name(foreign_key, ctx.active_connector()) {
+        relation.map(mapped_name);
+    }
 
-    relation_field.supports_restrict_action(!ctx.sql_family.is_mssql());
+    field.relation(relation);
 
     // Add an @ignore attribute if 1. the parent model isn't already ignored, and 2. the referenced
     // model is ignored.
-    relation_field.is_ignored = table_has_usable_identifier(foreign_key.table())
-        && !table_has_usable_identifier(foreign_key.referenced_table());
-
-    if relation_field.default_on_delete_action() != on_delete_action {
-        relation_field.relation_info.on_delete = Some(on_delete_action);
+    if table_has_usable_identifier(foreign_key.table()) && !table_has_usable_identifier(foreign_key.referenced_table())
+    {
+        field.ignore();
     }
 
-    if relation_field.default_on_update_action() != on_update_action {
-        relation_field.relation_info.on_update = Some(on_update_action);
-    }
-
-    relation_field
+    field
 }
 
-fn calculate_backrelation_field(
-    fk: sql::ForeignKeyWalker<'_>,
-    (relation_name, field_name): (String, Cow<'_, str>),
-    ctx: &mut super::Context<'_>,
-) -> psl::dml::RelationField {
-    let model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name().into_owned();
-    let relation_info = psl::dml::RelationInfo {
-        name: relation_name,
-        fk_name: None,
-        referenced_model: model_a_name,
-        fields: vec![],
-        references: vec![],
-        on_delete: None,
-        on_update: None,
-    };
-
+fn calculate_backrelation_field<'a>(
+    fk: sql::ForeignKeyWalker<'a>,
+    (relation_name, field_name): (Cow<'a, str>, Cow<'a, str>),
+    ctx: &mut super::Context<'a>,
+) -> render::ModelField<'a> {
     let forward_relation_field_is_unique = fk
         .table()
         .indexes()
@@ -161,28 +131,32 @@ fn calculate_backrelation_field(
             })
         });
 
-    let arity = if forward_relation_field_is_unique {
-        FieldArity::Optional // 1:1 relation
+    let model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name();
+    let mut field = if forward_relation_field_is_unique {
+        // 1:1 relation
+        render::ModelField::new_optional(field_name, model_a_name)
     } else {
-        FieldArity::List
+        render::ModelField::new_array(field_name, model_a_name)
     };
 
-    let mut field = psl::dml::RelationField::new(&field_name, arity, arity, relation_info);
+    if !relation_name.is_empty() {
+        let mut relation = render::Relation::new();
+        relation.name(relation_name);
+        field.relation(relation);
+    }
 
     // We want to put an @ignore on the field iff the field's referenced table is ignored, and the
     // parent table isn't, because otherwise the ignore would be redundant.
     if !table_has_usable_identifier(fk.table()) && table_has_usable_identifier(fk.referenced_table()) {
-        field.is_ignored = true;
+        field.ignore();
     }
 
     field
 }
 
-fn relation_mapped_name(fk: sql::ForeignKeyWalker<'_>, connector: &dyn Connector) -> Option<String> {
+fn relation_mapped_name<'a>(fk: sql::ForeignKeyWalker<'a>, connector: &dyn Connector) -> Option<&'a str> {
     let cols: Vec<_> = fk.constrained_columns().map(|c| c.name()).collect();
     let default_name = ConstraintNames::foreign_key_constraint_name(fk.table().name(), &cols, connector);
 
-    fk.constraint_name()
-        .filter(|name| *name != default_name.as_str())
-        .map(ToOwned::to_owned)
+    fk.constraint_name().filter(|name| *name != default_name.as_str())
 }

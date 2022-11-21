@@ -19,15 +19,15 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
     enums::introspect_enums(ctx);
     models::introspect_models(&mut datamodel, ctx);
 
+    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
+
     let relation_names = relation_names::introspect_relation_names(ctx);
 
     if ctx.foreign_keys_enabled() {
-        inline_relations::introspect_inline_relations(&relation_names, &mut datamodel, ctx);
+        inline_relations::introspect_inline_relations(&relation_names, ctx);
     } else {
-        prisma_relation_mode::reintrospect_relations(&mut datamodel, ctx);
+        prisma_relation_mode::reintrospect_relations(ctx);
     }
-
-    ctx.rendered_schema.push_dml(&ctx.config.datasources[0], &datamodel);
 
     m2m_relations::introspect_m2m_relations(&relation_names, ctx);
 

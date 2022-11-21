@@ -365,10 +365,6 @@ impl<'a> ModelField<'a> {
                     field.documentation(docs.clone());
                 }
 
-                if rf.is_commented_out {
-                    field.commented_out();
-                }
-
                 if rf.is_ignored {
                     field.ignore();
                 }
