@@ -31,7 +31,7 @@ pub(super) fn validate_missing_relation_indexes(
         return;
     }
 
-    if let Some(fields) = relation_field.referenced_fields() {
+    if let Some(fields) = relation_field.referencing_fields() {
         // Collects all fields that should be part of an index in the given model, w.r.t. to left-wise inclusion.
         let relation_fields: Vec<FieldId> = fields.map(|field| field.field_id()).collect();
 
@@ -48,7 +48,7 @@ pub(super) fn validate_missing_relation_indexes(
             .iter()
             .any(|index_set| is_left_wise_included(&relation_fields, index_set));
 
-        if !(relation_fields_appear_in_index) {
+        if !relation_fields_appear_in_index {
             let span = relation_field.ast_field().field_type.span();
             ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
         }
