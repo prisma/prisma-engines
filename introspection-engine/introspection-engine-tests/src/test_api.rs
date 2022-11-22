@@ -255,12 +255,11 @@ impl TestApi {
     }
 
     pub fn datasource_block_string(&self) -> String {
-        let relation_mode =
-            if self.is_vitess() {
-                "\nrelationMode = \"prisma\""
-            } else {
-                ""
-            };
+        let relation_mode = if self.is_vitess() {
+            "\nrelationMode = \"prisma\""
+        } else {
+            ""
+        };
 
         let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
 

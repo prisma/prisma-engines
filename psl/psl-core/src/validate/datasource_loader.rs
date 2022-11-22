@@ -219,9 +219,8 @@ fn get_relation_mode(
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                let message = format!(
-                    "Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",
-                );
+                let message =
+                    format!("Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",);
                 let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
                 diagnostics.push_error(error);
             }
