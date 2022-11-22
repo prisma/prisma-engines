@@ -589,10 +589,10 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
         [1;94m   | [0m
     "#]];
 
@@ -626,10 +626,10 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
 
     let expected = expect!([r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
         [1;94m   | [0m
     "#]);
 
@@ -663,10 +663,10 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
         [1;94m   | [0m
     "#]];
 
@@ -700,10 +700,10 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
 
     let expected = expect!([r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
         [1;94m   | [0m
     "#]);
 
@@ -779,10 +779,10 @@ fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
         [1;94m   | [0m
     "#]];
 
