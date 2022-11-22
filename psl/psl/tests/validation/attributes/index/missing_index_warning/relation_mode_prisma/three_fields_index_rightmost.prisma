@@ -1,0 +1,31 @@
+// add missing relation index validation warning on relationMode = "prisma".
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model SomeUser {
+    idA Int
+    idB Int
+    idC Int
+    posts Post[]
+
+    @@id([idA, idB, idC])
+}
+
+model Post {
+    id Int @id
+    userIdA Int
+    userIdB Int
+    userIdC Int
+    user SomeUser @relation(fields: [userIdA, userIdB, userIdC], references: [idA, idB, idC])
+
+    @@index([userIdB, userIdC])
+}
