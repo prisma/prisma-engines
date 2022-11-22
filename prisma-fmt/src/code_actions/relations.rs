@@ -1,9 +1,11 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
+    walkers::{CompleteInlineRelationWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker},
 };
 use std::collections::HashMap;
+
+use crate::offset_to_position;
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -220,4 +222,99 @@ fn create_missing_unique<'a>(
     };
 
     TextEdit { range, new_text }
+}
+
+/// For schema's with emulated relations,
+/// If the referenced side of the relation does not point to a unique
+/// constraint, the action adds the attribute.
+///
+/// If referencing a single field:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId], references: [id])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId     Int
+///
+///     // <- suggest @@index([bId]) here
+/// }
+///
+/// model B {
+///     id Int @id
+///     as A[]
+/// }
+/// ```
+///
+/// If referencing multiple fields:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId1, bId2, bId3], references: [id1, id2, id3])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId1    Int
+///     bId2    Int
+///     bId3    Int
+///
+///     // <- suggest @@index([bId1, bId2, bId3]) here
+/// }
+///
+/// model B {
+///     id1 Int
+///     id2 Int
+///     id3 Int
+///     as  A[]
+///
+///     @@id([id1, id2, id3])
+/// }
+/// ```
+pub(super) fn add_reference_index(
+    actions: &mut Vec<CodeActionOrCommand>,
+    params: &CodeActionParams,
+    schema: &str,
+    relation: RelationFieldWalker<'_>,
+) {
+    let Some(fields) = relation.fields() else { return; };
+    if relation.model().indexes().any(|index| {
+        index
+            .fields()
+            .zip(fields.clone())
+            .all(|(index_field, relation_field)| index_field.field_id() == relation_field.field_id())
+    }) {
+        return;
+    }
+
+    let model_end = Range {
+        start: offset_to_position(relation.model().ast_model().span().end, schema).unwrap(),
+        end: offset_to_position(relation.model().ast_model().span().end, schema).unwrap(),
+    };
+
+    let text = TextEdit {
+        range: model_end,
+        new_text: String::from("new_text"),
+    };
+    let mut changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), vec![text]);
+
+    let edit = WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    };
+
+    let diagnostics = super::diagnostics_for_span(
+        schema,
+        &params.context.diagnostics,
+        relation.relation_attribute().unwrap().span(),
+    );
+
+    let action = CodeAction {
+        title: String::from("Index relations"),
+        kind: Some(CodeActionKind::QUICKFIX),
+        edit: Some(edit),
+        diagnostics,
+        ..Default::default()
+    };
+
+    actions.push(CodeActionOrCommand::CodeAction(action))
 }

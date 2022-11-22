@@ -1,0 +1,16 @@
+datasource db {
+    provider = "mongodb"
+    url = env("DATABASE_URL")
+}
+
+model A {
+    id String @id @map("_id")
+    field1 B @relation(fields: [bId], references: [id])
+    
+    bId String
+}
+
+model B {
+    id String @id @map("_id")
+    as A[]
+}
