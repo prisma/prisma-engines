@@ -15,7 +15,7 @@ enum CatMood {
 }
 "#;
 
-#[test_connector(capabilities(Enums), preview_features("referentialIntegrity"))]
+#[test_connector(capabilities(Enums))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green();
 
