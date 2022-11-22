@@ -136,6 +136,10 @@ impl TestApi {
         self.tags().contains(Tags::Vitess)
     }
 
+    pub fn is_relation_mode_prisma(&self) -> bool {
+        self.tags().contains(Tags::RelationModePrisma)
+    }
+
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.preview_features
     }
@@ -255,7 +259,7 @@ impl TestApi {
     }
 
     pub fn datasource_block_string(&self) -> String {
-        let relation_mode = if self.is_vitess() {
+        let relation_mode = if self.is_vitess() && self.is_relation_mode_prisma() {
             "\nrelationMode = \"prisma\""
         } else {
             ""
@@ -283,7 +287,7 @@ impl TestApi {
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         self.args.datasource_block(
             "env(TEST_DATABASE_URL)",
-            if self.is_vitess() {
+            if self.is_vitess() && self.is_relation_mode_prisma() {
                 &[("relationMode", r#""prisma""#)]
             } else {
                 &[]
