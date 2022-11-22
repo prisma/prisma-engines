@@ -69,7 +69,6 @@ fn run_validation_test(test_file_path: &str) {
 
     let source_file = psl::parser_database::SourceFile::new_allocated(Arc::from(text.into_boxed_str()));
 
-    // let validation_result = psl::parse_schema(source_file.clone());
     let validation_result = parse_schema_fail_on_diagnostics(source_file.clone());
 
     let diagnostics = match (last_comment_contents.is_empty(), validation_result) {
@@ -94,29 +93,6 @@ fn run_validation_test(test_file_path: &str) {
     }
 
     panic_with_diff::panic_with_diff(&last_comment_contents, &diagnostics)
-
-    // let errors = match (last_comment_contents.is_empty(), validation_result) {
-    //     (true, Ok(_)) => return, // expected and got a valid schema
-    //     (false, Err(errors)) if last_comment_contents == errors => return, // we expected the errors we got
-    //     (_, Err(errors)) => errors,
-    //     (false, Ok(_)) => String::new(), // expected errors, got none
-    // };
-
-    // if std::env::var("UPDATE_EXPECT").is_ok() {
-    //     let mut file = fs::File::create(&file_path).unwrap(); // truncate
-    //
-    //     let schema = last_comment_idx
-    //         .map(|idx| &source_file.as_str()[..idx])
-    //         .unwrap_or(source_file.as_str());
-    //     file.write_all(schema.as_bytes()).unwrap();
-    //
-    //     for line in errors.lines() {
-    //         writeln!(file, "// {line}").unwrap();
-    //     }
-    //     return;
-    // }
-
-    // panic_with_diff::panic_with_diff(&last_comment_contents, &errors)
 }
 
 include!(concat!(env!("OUT_DIR"), "/validation_tests.rs"));
