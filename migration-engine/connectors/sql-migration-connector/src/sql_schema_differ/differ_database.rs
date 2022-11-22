@@ -11,6 +11,8 @@ use std::{
     ops::Bound,
 };
 
+type Table<'a> = (Option<Cow<'a, str>>, Cow<'a, str>);
+
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
@@ -18,7 +20,7 @@ pub(crate) struct DifferDatabase<'a> {
     /// Namespace name -> namespace indexes.
     namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
-    tables: HashMap<(Option<Cow<'a, str>>, Cow<'a, str>), Pair<Option<TableId>>>,
+    tables: HashMap<Table<'a>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
     /// queries (-> all the columns in a table).
     columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
@@ -111,7 +113,10 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
-            let entry = db.tables.entry((table.namespace().map(Cow::Borrowed), table_name)).or_default();
+            let entry = db
+                .tables
+                .entry((table.namespace().map(Cow::Borrowed), table_name))
+                .or_default();
             entry.next = Some(table.id);
 
             // Deal with tables that are both in the previous and the next
