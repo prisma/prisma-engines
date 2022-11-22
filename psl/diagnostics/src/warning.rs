@@ -1,4 +1,9 @@
-use crate::Span;
+use colored::{ColoredString, Colorize};
+
+use crate::{
+    pretty_print::{pretty_print, DiagnosticColorer},
+    Span,
+};
 
 /// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
@@ -28,5 +33,25 @@ impl DatamodelWarning {
     /// The source span the warning applies to.
     pub fn span(&self) -> Span {
         self.span
+    }
+
+    pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
+        let colorer = Box::new(DatamodelWarningColorer {});
+        pretty_print(f, file_name, text, self.span(), self.message.as_ref(), colorer)
+    }
+}
+
+struct DatamodelWarningColorer {}
+
+impl DiagnosticColorer for DatamodelWarningColorer {
+    fn title(&self) -> &'static str {
+        "warning"
+    }
+
+    fn primary_color<S>(&self, token: S) -> ColoredString
+    where
+        S: Sized + AsRef<str>,
+    {
+        token.as_ref().bright_yellow()
     }
 }

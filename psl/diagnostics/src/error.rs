@@ -1,4 +1,9 @@
-use crate::{pretty_print::pretty_print, Span};
+use colored::{ColoredString, Colorize};
+
+use crate::{
+    pretty_print::{pretty_print, DiagnosticColorer},
+    Span,
+};
 use std::borrow::Cow;
 
 #[derive(Debug, Clone)]
@@ -373,6 +378,22 @@ impl DatamodelError {
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-        pretty_print(f, file_name, text, self.span(), self.message.as_ref())
+        let colorer = Box::new(DatamodelErrorColorer {});
+        pretty_print(f, file_name, text, self.span(), self.message.as_ref(), colorer)
+    }
+}
+
+struct DatamodelErrorColorer {}
+
+impl DiagnosticColorer for DatamodelErrorColorer {
+    fn title(&self) -> &'static str {
+        "error"
+    }
+
+    fn primary_color<S>(&self, token: S) -> ColoredString
+    where
+        S: Sized + AsRef<str>,
+    {
+        token.as_ref().bright_red()
     }
 }
