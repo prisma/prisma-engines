@@ -3,16 +3,6 @@ use psl::{datamodel_connector::constraint_names::ConstraintNames, dml, schema_as
 use sql_schema_describer as sql;
 
 pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
-    // The following local variables are for different types of warnings. We should refactor these
-    // to either be as-is inside the context, or find another mechanism, and abstract to avoid the
-    // repetition.
-    let mut re_introspected_model_ignores = Vec::new();
-    let mut remapped_models = Vec::new();
-    let mut remapped_fields = Vec::new();
-    let mut reintrospected_id_names = Vec::new();
-    let mut models_without_identifiers = Vec::new();
-    let mut models_without_columns = Vec::new();
-    let mut unsupported_types = Vec::new();
     let mut models_with_idx: Vec<(Option<_>, sql::TableId, dml::Model)> = Vec::with_capacity(ctx.schema.tables_count());
 
     for table in ctx
@@ -52,11 +42,11 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         if table.columns().len() == 0 {
             documentation.push_str(empty_table_comment(ctx));
             model.is_commented_out = true;
-            models_without_columns.push(warnings::Model {
+            ctx.models_without_columns.push(warnings::Model {
                 model: model.name.clone(),
             });
         } else if !table_has_usable_identifier(table) {
-            models_without_identifiers.push(warnings::Model {
+            ctx.models_without_identifiers.push(warnings::Model {
                 model: model.name.clone(),
             });
             documentation.push_str("The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.");
@@ -64,7 +54,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         }
 
         if let Some(m) = existing_model.filter(|m| m.mapped_name().is_some()) {
-            remapped_models.push(warnings::Model {
+            ctx.remapped_models.push(warnings::Model {
                 model: m.name().to_owned(),
             });
         }
@@ -75,18 +65,14 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
 
         for column in table.columns() {
             if let sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
-                unsupported_types.push(warnings::ModelAndFieldAndType {
+                ctx.unsupported_types.push(warnings::ModelAndFieldAndType {
                     model: model.name.clone(),
                     field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
                     tpe: tpe.to_owned(),
                 })
             }
 
-            model.add_field(dml::Field::ScalarField(calculate_scalar_field(
-                column,
-                &mut remapped_fields,
-                ctx,
-            )));
+            model.add_field(dml::Field::ScalarField(calculate_scalar_field(column, ctx)));
         }
 
         super::indexes::calculate_model_indexes(table, existing_model, &mut model, ctx);
@@ -99,7 +85,7 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
                 .map(ToOwned::to_owned);
 
             if name.is_some() {
-                reintrospected_id_names.push(warnings::Model {
+                ctx.reintrospected_id_names.push(warnings::Model {
                     model: existing_model.unwrap().name().to_owned(),
                 });
             }
@@ -143,44 +129,9 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
 
         if existing_model.map(|model| model.is_ignored()).unwrap_or(false) {
             model.is_ignored = true;
-            re_introspected_model_ignores.push(warnings::Model {
-                model: model.name.clone(),
-            });
         }
 
         models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
-    }
-
-    if !models_without_columns.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_models_without_columns(&models_without_columns))
-    }
-
-    if !models_without_identifiers.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_models_without_identifier(&models_without_identifiers))
-    }
-
-    if !unsupported_types.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_unsupported_types(&unsupported_types));
-    }
-
-    if !remapped_models.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_model(&remapped_models));
-    }
-
-    if !remapped_fields.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_field(&remapped_fields));
-    }
-
-    if !reintrospected_id_names.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_custom_primary_key_names(
-                &reintrospected_id_names,
-            ))
     }
 
     models_with_idx.sort_by(|(a, _, _), (b, _, _)| compare_options_none_last(*a, *b));

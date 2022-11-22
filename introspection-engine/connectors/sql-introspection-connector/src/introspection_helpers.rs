@@ -196,11 +196,7 @@ pub(crate) fn calculate_index(
     })
 }
 
-pub(crate) fn calculate_scalar_field(
-    column: ColumnWalker<'_>,
-    remapped_fields: &mut Vec<crate::warnings::ModelAndField>,
-    ctx: &mut Context<'_>,
-) -> ScalarField {
+pub(crate) fn calculate_scalar_field(column: ColumnWalker<'_>, ctx: &mut Context<'_>) -> ScalarField {
     let existing_field = ctx.existing_scalar_field(column.id);
     let mut documentation = existing_field
         .and_then(|f| f.ast_field().documentation())
@@ -224,7 +220,7 @@ pub(crate) fn calculate_scalar_field(
     };
 
     if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
-        remapped_fields.push(crate::warnings::ModelAndField {
+        ctx.remapped_fields.push(crate::warnings::ModelAndField {
             model: field.model().name().to_owned(),
             field: field.name().to_owned(),
         });
