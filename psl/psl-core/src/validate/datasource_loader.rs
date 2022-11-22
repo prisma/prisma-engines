@@ -139,7 +139,7 @@ fn lift_datasource(
             }
         };
 
-    let relation_mode = get_relation_mode(&mut args, preview_features, ast_source, diagnostics, active_connector);
+    let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 
     let (schemas, schemas_span) = args
         .remove(SCHEMAS_KEY)
@@ -190,7 +190,6 @@ fn lift_datasource(
 
 fn get_relation_mode(
     args: &mut HashMap<&str, (Span, &ast::Expression)>,
-    preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
     connector: &'static dyn crate::datamodel_connector::Connector,
