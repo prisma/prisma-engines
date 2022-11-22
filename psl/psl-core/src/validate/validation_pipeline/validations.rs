@@ -10,6 +10,7 @@ mod indexes;
 mod models;
 mod names;
 mod relation_fields;
+mod relation_indexes;
 mod relations;
 
 use super::context::Context;
@@ -123,6 +124,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
+        }
+
+        for field in model.relation_fields() {
+            relation_indexes::validate_missing_relation_indexes(model, field, ctx);
         }
     }
 
