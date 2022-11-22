@@ -22,7 +22,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider        = "prisma-client-js"
+            provider = "prisma-client-js"
         }
 
         datasource db {
@@ -45,7 +45,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -95,7 +95,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider        = "prisma-client-js"
+            provider = "prisma-client-js"
         }
 
         datasource db {
@@ -118,7 +118,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -166,7 +166,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider        = "prisma-client-js"
+            provider = "prisma-client-js"
         }
 
         datasource db {
@@ -189,7 +189,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -239,7 +239,7 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
 
     let input = indoc! {r#"
         generator client {
-            provider        = "prisma-client-js"
+            provider = "prisma-client-js"
         }
 
         datasource db {
@@ -262,7 +262,7 @@ async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         generator client {
-          provider        = "prisma-client-js"
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -315,7 +315,7 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider        = "prisma-client-js"
+                provider = "prisma-client-js"
             }
 
             datasource db {
@@ -396,7 +396,7 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider        = "prisma-client-js"
+                provider = "prisma-client-js"
             }
 
             datasource db {
@@ -475,7 +475,7 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider        = "prisma-client-js"
+                provider = "prisma-client-js"
             }
 
             datasource db {
@@ -556,7 +556,7 @@ mod at_at_map {
 
         let input = indoc! {r#"
             generator client {
-                provider        = "prisma-client-js"
+                provider = "prisma-client-js"
             }
 
             datasource db {
