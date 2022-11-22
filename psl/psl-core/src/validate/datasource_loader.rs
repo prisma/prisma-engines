@@ -188,17 +188,6 @@ fn lift_datasource(
     })
 }
 
-const RELATION_MODE_PREVIEW_FEATURE_ERR: &str = r#"
-This option can only be set if the preview feature is enabled in a generator block.
-
-Example:
-
-generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
-}
-"#;
-
 fn get_relation_mode(
     args: &mut HashMap<&str, (Span, &ast::Expression)>,
     preview_features: BitFlags<PreviewFeature>,
@@ -212,45 +201,36 @@ fn get_relation_mode(
             diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
             None
         }
-        (Some((span, rm)), None) | (None, Some((span, rm))) => {
-            if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
-                diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    RELATION_MODE_PREVIEW_FEATURE_ERR,
-                    &source.name.name,
-                    span,
-                ));
-                None
-            } else {
-                let integrity = match coerce::string(rm, diagnostics)? {
-                    "prisma" => RelationMode::Prisma,
-                    "foreignKeys" => RelationMode::ForeignKeys,
-                    other => {
-                        let message = format!(
-                            "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
-                        );
-                        let error = DatamodelError::new_source_validation_error(&message, "relationMode", source.span);
-                        diagnostics.push_error(error);
-                        return None;
-                    }
-                };
-
-                if !connector.allowed_relation_mode_settings().contains(integrity) {
-                    let supported_values = connector
-                        .allowed_relation_mode_settings()
-                        .iter()
-                        .map(|v| format!(r#""{}""#, v))
-                        .collect::<Vec<_>>()
-                        .join(", ");
-
+        (Some((_span, rm)), None) | (None, Some((_span, rm))) => {
+            let integrity = match coerce::string(rm, diagnostics)? {
+                "prisma" => RelationMode::Prisma,
+                "foreignKeys" => RelationMode::ForeignKeys,
+                other => {
                     let message = format!(
-                        "Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",
+                        "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
                     );
-                    let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
+                    let error = DatamodelError::new_source_validation_error(&message, "relationMode", source.span);
                     diagnostics.push_error(error);
+                    return None;
                 }
+            };
 
-                Some(integrity)
+            if !connector.allowed_relation_mode_settings().contains(integrity) {
+                let supported_values = connector
+                    .allowed_relation_mode_settings()
+                    .iter()
+                    .map(|v| format!(r#""{}""#, v))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                let message = format!(
+                    "Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",
+                );
+                let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
+                diagnostics.push_error(error);
             }
+
+            Some(integrity)
         }
     }
 }
