@@ -61,6 +61,7 @@ mod prisma_15581 {
         .to_owned()
     }
 
+    // TODO: This test works locally, but seem to fail on the CI. Investigate.
     #[connector_test(only(Postgres), schema(pg_schema))]
     async fn create_one_model_with_low_precision_datetime_in_id(runner: Runner) -> TestResult<()> {
         let result = runner
