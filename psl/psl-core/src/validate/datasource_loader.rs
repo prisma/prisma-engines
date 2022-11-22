@@ -3,9 +3,8 @@ use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
-    Datasource, PreviewFeature,
+    Datasource,
 };
-use enumflags2::BitFlags;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 use std::{borrow::Cow, collections::HashMap};
 
