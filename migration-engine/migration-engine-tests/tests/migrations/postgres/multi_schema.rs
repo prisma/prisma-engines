@@ -723,8 +723,8 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
-            name: "add one-to-one cross-namespace relation",
-            description: "adds a one-to-one namespace between two tables in different namespaces",
+            name: "add a one-to-one relationship cross-namespace relation",
+            description: "adds a one-to-one relationship namespace between two tables in different namespaces",
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"

@@ -784,7 +784,6 @@ fn render_alter_column(
 
                 after_statements.push(format!(
                     "ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}",
-                    sequence_name = sequence_name,
                     table_name = table_name,
                     column_name = column_name,
                 ));
