@@ -6,7 +6,7 @@ mod logger;
 
 use migration_connector::{BoxFuture, ConnectorHost, ConnectorResult};
 use migration_core::rpc_api;
-use std::sync::Arc;
+use std::{env::set_current_dir, path::PathBuf, sync::Arc};
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -17,6 +17,9 @@ struct MigrationEngineCli {
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
+    /// Current working directory
+    #[structopt(long, name = "PATH")]
+    cwd: Option<PathBuf>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
 }
@@ -34,6 +37,11 @@ async fn main() {
     logger::init_logger();
 
     let input = MigrationEngineCli::from_args();
+
+    // workaround for windows long paths (>260 characters long)
+    // process can not be started from the long path, but cwd could
+    // be switched to
+    input.cwd.map(|path| set_current_dir(path).unwrap());
 
     match input.cli_subcommand {
         None => start_engine(input.datamodel.as_deref()).await,
