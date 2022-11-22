@@ -48,10 +48,7 @@ impl DiagnosticColorer for DatamodelWarningColorer {
         "warning"
     }
 
-    fn primary_color<S>(&self, token: S) -> ColoredString
-    where
-        S: Sized + AsRef<str>,
-    {
-        token.as_ref().bright_yellow()
+    fn primary_color(&self, token: &'_ str) -> ColoredString {
+        token.bright_yellow()
     }
 }

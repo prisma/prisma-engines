@@ -390,10 +390,7 @@ impl DiagnosticColorer for DatamodelErrorColorer {
         "error"
     }
 
-    fn primary_color<S>(&self, token: S) -> ColoredString
-    where
-        S: Sized + AsRef<str>,
-    {
-        token.as_ref().bright_red()
+    fn primary_color(&self, token: &'_ str) -> ColoredString {
+        token.bright_red()
     }
 }

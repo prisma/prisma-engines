@@ -4,9 +4,7 @@ use colored::{ColoredString, Colorize};
 pub trait DiagnosticColorer {
     fn title(&self) -> &'static str;
 
-    fn primary_color<S>(&self, token: S) -> ColoredString
-    where
-        S: Sized + AsRef<str>;
+    fn primary_color(&self, token: &'_ str) -> ColoredString;
 }
 
 /// Given the datamodel text representation, pretty prints an error or warning, including
