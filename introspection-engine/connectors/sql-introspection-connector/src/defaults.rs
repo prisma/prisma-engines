@@ -1,79 +1,80 @@
 use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
+use datamodel_renderer::datamodel as renderer;
 use introspection_connector::Version;
 use psl::{
     builtin_connectors::{MySqlType, PostgresType},
+    datamodel_connector::constraint_names::ConstraintNames,
     dml,
     parser_database::walkers,
 };
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
-pub(crate) fn calculate_default(
-    column: sql::ColumnWalker<'_>,
-    existing_field: Option<walkers::ScalarFieldWalker<'_>>,
-    ctx: &mut Context<'_>,
-) -> Option<dml::DefaultValue> {
-    match (column.default().map(|d| d.kind()), &column.column_type_family()) {
-        (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
-            use dml::PrismaValue;
+pub(crate) fn render_default<'a>(
+    column: sql::ColumnWalker<'a>,
+    existing_field: Option<walkers::ScalarFieldWalker<'a>>,
+    ctx: &mut Context<'a>,
+) -> Option<renderer::DefaultValue<'a>> {
+    use datamodel_renderer::value::{Constant, Function, Text, Value};
 
+    let mut result = match (column.default().map(|d| d.kind()), column.column_type_family()) {
+        (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
             let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
+
             let sequence_idx = connector_data
                 .sequences
                 .binary_search_by_key(&name, |s| &s.name)
                 .unwrap();
+
             let sequence = &connector_data.sequences[sequence_idx];
 
-            let mut args = Vec::new();
+            let mut fun = Function::new("sequence");
 
             if sequence.min_value != 1 {
-                args.push((Some("minValue".to_owned()), PrismaValue::Int(sequence.min_value)));
+                fun.push_param(("minValue", Constant::from(sequence.min_value)));
             }
 
             if sequence.max_value != i64::MAX {
-                args.push((Some("maxValue".to_owned()), PrismaValue::Int(sequence.max_value)));
+                fun.push_param(("maxValue", Constant::from(sequence.max_value)));
             }
 
             if sequence.cache_size != 1 {
-                args.push((Some("cache".to_owned()), PrismaValue::Int(sequence.cache_size)));
+                fun.push_param(("cache", Constant::from(sequence.cache_size)));
             }
 
             if sequence.increment_by != 1 {
-                args.push((Some("increment".to_owned()), PrismaValue::Int(sequence.increment_by)));
+                fun.push_param(("increment", Constant::from(sequence.increment_by)));
             }
 
             if sequence.start_value != 1 {
-                args.push((Some("start".to_owned()), PrismaValue::Int(sequence.start_value)));
+                fun.push_param(("start", Constant::from(sequence.start_value)));
             }
 
-            Some(dml::DefaultValue::new_expression(dml::ValueGenerator::new_sequence(
-                args,
-            )))
+            Some(renderer::DefaultValue::function(fun))
         }
-        (_, sql::ColumnTypeFamily::Int) if column.is_autoincrement() => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
-        (_, sql::ColumnTypeFamily::BigInt) if column.is_autoincrement() => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
-        (_, sql::ColumnTypeFamily::Int) if is_sequence(column) => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
-        (_, sql::ColumnTypeFamily::BigInt) if is_sequence(column) => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
-        (Some(sql::DefaultKind::Sequence(_)), _) => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
-        (Some(sql::DefaultKind::Now), sql::ColumnTypeFamily::DateTime) => Some(set_default(
-            dml::DefaultValue::new_expression(dml::ValueGenerator::new_now()),
-            column,
-        )),
-        (Some(sql::DefaultKind::DbGenerated(default_string)), _) => Some(set_default(
-            dml::DefaultValue::new_expression(dml::ValueGenerator::new_dbgenerated(
-                default_string.as_ref().unwrap().clone(),
-            )),
-            column,
-        )),
+        (_, sql::ColumnTypeFamily::Int | sql::ColumnTypeFamily::BigInt) if column.is_autoincrement() => {
+            Some(renderer::DefaultValue::function(Function::new("autoincrement")))
+        }
+        (_, sql::ColumnTypeFamily::Int | sql::ColumnTypeFamily::BigInt) if is_sequence(column) => {
+            Some(renderer::DefaultValue::function(Function::new("autoincrement")))
+        }
+        (Some(sql::DefaultKind::Sequence(_)), _) => {
+            Some(renderer::DefaultValue::function(Function::new("autoincrement")))
+        }
+        (Some(sql::DefaultKind::UniqueRowid), _) => {
+            Some(renderer::DefaultValue::function(Function::new("autoincrement")))
+        }
+        (Some(sql::DefaultKind::Now), sql::ColumnTypeFamily::DateTime) => {
+            Some(renderer::DefaultValue::function(Function::new("now")))
+        }
+        (Some(sql::DefaultKind::DbGenerated(default_string)), _) => {
+            let mut fun = Function::new("dbgenerated");
+
+            if let Some(param) = default_string.as_ref().filter(|s| !s.trim_matches('\0').is_empty()) {
+                fun.push_param(Value::from(Text::new(param)));
+            }
+
+            Some(renderer::DefaultValue::function(fun))
+        }
         (Some(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
             let variant = ctx
                 .schema
@@ -81,46 +82,49 @@ pub(crate) fn calculate_default(
                 .variants()
                 .find(|v| v.name() == variant)
                 .unwrap();
+
             let variant_name = ctx.enum_variant_name(variant.id).prisma_name();
-            Some(set_default(
-                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.into_owned())),
-                column,
-            ))
+            Some(renderer::DefaultValue::constant(variant_name))
         }
-        (Some(sql::DefaultKind::Value(val)), _) => {
-            Some(set_default(dml::DefaultValue::new_single(val.clone()), column))
-        }
-        (Some(sql::DefaultKind::UniqueRowid), _) => Some(dml::DefaultValue::new_expression(
-            dml::ValueGenerator::new_autoincrement(),
-        )),
+        (Some(sql::DefaultKind::Value(dml::PrismaValue::String(val))), _) => Some(renderer::DefaultValue::text(val)),
+        (Some(sql::DefaultKind::Value(val)), _) => Some(renderer::DefaultValue::constant(val)),
 
         // Prisma-level defaults.
         (None, sql::ColumnTypeFamily::String) => match existing_field.and_then(|f| f.default_value()) {
-            Some(value) if value.is_cuid() => Some(default_cuid()),
-            Some(value) if value.is_uuid() => Some(default_uuid()),
+            Some(value) if value.is_cuid() => Some(renderer::DefaultValue::function(Function::new("cuid"))),
+            Some(value) if value.is_uuid() => Some(renderer::DefaultValue::function(Function::new("uuid"))),
             None if matches!(ctx.version, Version::Prisma1 | Version::Prisma11) => maybe_prisma1_default(column, ctx),
             _ => None,
         },
 
         _ => None,
+    };
+
+    if let Some(res) = result.as_mut() {
+        let default_default_value =
+            ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
+
+        match column.default().and_then(|def| def.constraint_name()) {
+            Some(map) if map != default_default_value => {
+                res.map(map);
+            }
+            _ => (),
+        }
     }
-}
 
-fn set_default(mut default: dml::DefaultValue, column: sql::ColumnWalker<'_>) -> dml::DefaultValue {
-    let db_name = column.default().and_then(|df| df.constraint_name());
-
-    if let Some(name) = db_name {
-        default.set_db_name(name);
-    }
-
-    default
+    result
 }
 
 fn is_sequence(column: sql::ColumnWalker<'_>) -> bool {
     column.is_single_primary_key() && matches!(&column.default(), Some(d) if d.is_sequence())
 }
 
-fn maybe_prisma1_default(column: sql::ColumnWalker<'_>, ctx: &mut Context<'_>) -> Option<dml::DefaultValue> {
+fn maybe_prisma1_default<'a>(
+    column: sql::ColumnWalker<'a>,
+    ctx: &mut Context<'a>,
+) -> Option<renderer::DefaultValue<'a>> {
+    use datamodel_renderer::value::Function;
+
     let model_and_field = || crate::warnings::ModelAndField {
         model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
         field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
@@ -131,30 +135,26 @@ fn maybe_prisma1_default(column: sql::ColumnWalker<'_>, ctx: &mut Context<'_>) -
 
         if native_type == &PostgresType::VarChar(Some(25)) {
             ctx.prisma_1_cuid_defaults.push(model_and_field());
-            return Some(default_cuid());
+
+            return Some(renderer::DefaultValue::function(Function::new("cuid")));
         } else if native_type == &PostgresType::VarChar(Some(36)) {
             ctx.prisma_1_uuid_defaults.push(model_and_field());
-            return Some(default_uuid());
+
+            return Some(renderer::DefaultValue::function(Function::new("cuid")));
         }
     } else if ctx.sql_family().is_mysql() {
         let native_type: &MySqlType = column.column_type().native_type.as_ref()?.downcast_ref();
 
         if native_type == &MySqlType::Char(25) {
             ctx.prisma_1_cuid_defaults.push(model_and_field());
-            return Some(default_cuid());
+
+            return Some(renderer::DefaultValue::function(Function::new("cuid")));
         } else if native_type == &MySqlType::Char(36) {
             ctx.prisma_1_uuid_defaults.push(model_and_field());
-            return Some(default_uuid());
+
+            return Some(renderer::DefaultValue::function(Function::new("cuid")));
         }
-    };
+    }
 
     None
-}
-
-fn default_cuid() -> dml::DefaultValue {
-    dml::DefaultValue::new_expression(dml::ValueGenerator::new_cuid())
-}
-
-fn default_uuid() -> dml::DefaultValue {
-    dml::DefaultValue::new_expression(dml::ValueGenerator::new_uuid())
 }

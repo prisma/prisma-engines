@@ -7,7 +7,7 @@ use std::borrow::Cow;
 
 /// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-pub(super) fn introspect_inline_relations<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
+pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
     for table in ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(*t)) {
         for (fk, relation_name_from_db) in table
             .foreign_keys()

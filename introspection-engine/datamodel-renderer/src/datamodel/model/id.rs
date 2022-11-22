@@ -105,7 +105,7 @@ impl<'a> IdFieldDefinition<'a> {
     /// field Int @id(sort: Desc)
     /// //                  ^^^^ here
     /// ```
-    pub(crate) fn sort_order(&mut self, sort: impl Into<Cow<'a, str>>) {
+    pub fn sort_order(&mut self, sort: impl Into<Cow<'a, str>>) {
         self.0.push_param(("sort", Constant::new_no_validate(sort.into())));
     }
 
@@ -115,7 +115,7 @@ impl<'a> IdFieldDefinition<'a> {
     /// field Int @id(length: 32)
     /// //                    ^^ here
     /// ```
-    pub(crate) fn length(&mut self, length: u32) {
+    pub fn length(&mut self, length: u32) {
         self.0.push_param(("length", Constant::new_no_validate(length)));
     }
 }

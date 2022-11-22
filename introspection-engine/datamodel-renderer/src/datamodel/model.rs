@@ -11,7 +11,7 @@ pub use index_field_input::{IndexFieldInput, IndexFieldOptions};
 use psl::dml;
 pub use relation::Relation;
 
-use crate::value::{Constant, Documentation, Function, Text};
+use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, collections::HashMap, fmt};
 
 use super::attributes::BlockAttribute;
@@ -69,7 +69,8 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Documentation of the model.
+    /// Documentation of the model. If called repeteadly,
+    /// adds the new docs to the end with a newline.
     ///
     /// ```ignore
     /// /// This is the documentation.
@@ -78,7 +79,10 @@ impl<'a> Model<'a> {
     /// }
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
-        self.documentation = Some(Documentation(documentation.into()));
+        match self.documentation.as_mut() {
+            Some(docs) => docs.push(documentation),
+            None => self.documentation = Some(Documentation(documentation.into())),
+        }
     }
 
     /// Ignore the model.
@@ -310,9 +314,9 @@ impl<'a> Model<'a> {
 
                 let ops = f.operator_class.as_ref().map(|c| {
                     if c.is_raw() {
-                        IndexOps::Raw(Text(c.as_ref().to_owned().into()))
+                        IndexOps::raw(c.as_ref().to_owned())
                     } else {
-                        IndexOps::Managed(c.as_ref().to_owned().into())
+                        IndexOps::managed(c.as_ref().to_owned())
                     }
                 });
 

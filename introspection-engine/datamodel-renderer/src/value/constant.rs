@@ -45,3 +45,12 @@ where
         self.0.fmt(f)
     }
 }
+
+impl<T> From<T> for Constant<T>
+where
+    T: fmt::Display,
+{
+    fn from(inner: T) -> Self {
+        Self(inner)
+    }
+}

@@ -7,7 +7,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-pub(super) fn introspect_enums(ctx: &mut Context<'_>) {
+pub(super) fn render(ctx: &mut Context<'_>) {
     let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum)> = ctx
         .schema
         .enum_walkers()

@@ -65,6 +65,7 @@ pub(super) fn introspect_relation_names<'a>(ctx: &mut super::Context<'a>) -> Rel
         inline_relation_names: Default::default(),
         m2m_relation_names: Default::default(),
     };
+
     let mut duplicated_fks = Default::default();
     let ambiguous_relations = find_ambiguous_relations(ctx);
 

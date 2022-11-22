@@ -84,6 +84,11 @@ impl<'a> Datamodel<'a> {
             self.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
     }
+
+    /// True if the render output would be an empty string.
+    pub fn is_empty(&self) -> bool {
+        self.models.is_empty() && self.enums.is_empty() && self.composite_types.is_empty()
+    }
 }
 
 impl<'a> fmt::Display for Datamodel<'a> {
