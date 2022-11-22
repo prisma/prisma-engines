@@ -78,10 +78,9 @@ fn validate_configuration(
     connectors: ConnectorRegistry,
 ) -> Configuration {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-    let preview_features = generators.iter().filter_map(|gen| gen.preview_features).collect();
 
     let datasources =
-        datasource_loader::load_datasources_from_ast(schema_ast, preview_features, diagnostics, connectors);
+        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
     Configuration {
         generators,

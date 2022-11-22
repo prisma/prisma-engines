@@ -19,14 +19,13 @@ const URL_KEY: &str = "url";
 /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
 pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
-    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
     for src in ast_schema.sources() {
-        if let Some(source) = lift_datasource(src, preview_features, diagnostics, connectors) {
+        if let Some(source) = lift_datasource(src, diagnostics, connectors) {
             sources.push(source)
         }
     }
@@ -46,7 +45,6 @@ pub(crate) fn load_datasources_from_ast(
 
 fn lift_datasource(
     ast_source: &ast::SourceConfig,
-    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry,
 ) -> Option<Datasource> {
