@@ -36,7 +36,7 @@ impl DatamodelWarning {
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-        let colorer = Box::new(DatamodelWarningColorer {});
+        let colorer = DatamodelWarningColorer {};
         pretty_print(f, file_name, text, self.span(), self.message.as_ref(), colorer)
     }
 }

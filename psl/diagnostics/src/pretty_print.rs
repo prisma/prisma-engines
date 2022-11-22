@@ -17,7 +17,7 @@ pub(crate) fn pretty_print(
     text: &str,
     span: Span,
     description: &str,
-    colorer: Box<impl DiagnosticColorer>,
+    colorer: impl DiagnosticColorer,
 ) -> std::io::Result<()> {
     let start_line_number = text[..span.start].matches('\n').count();
     let end_line_number = text[..span.end].matches('\n').count();
