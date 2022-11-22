@@ -30,7 +30,40 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Span;
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+</pre><pre class="rust"><code><span class="kw">use </span>colored::{ColoredString, Colorize};
+
+<span class="kw">use crate</span>::{
+    pretty_print::{pretty_print, DiagnosticColorer},
+    Span,
+};
 
 <span class="doccomment">/// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
@@ -60,6 +93,29 @@
     <span class="doccomment">/// The source span the warning applies to.
     </span><span class="kw">pub fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Span {
         <span class="self">self</span>.span
+    }
+
+    <span class="kw">pub fn </span>pretty_print(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>std::io::Write, file_name: <span class="kw-2">&amp;</span>str, text: <span class="kw-2">&amp;</span>str) -&gt; std::io::Result&lt;()&gt; {
+        pretty_print(
+            f,
+            file_name,
+            text,
+            <span class="self">self</span>.span(),
+            <span class="self">self</span>.message.as_ref(),
+            <span class="kw-2">&amp;</span>DatamodelWarningColorer {},
+        )
+    }
+}
+
+<span class="kw">struct </span>DatamodelWarningColorer {}
+
+<span class="kw">impl </span>DiagnosticColorer <span class="kw">for </span>DatamodelWarningColorer {
+    <span class="kw">fn </span>title(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;warning&quot;
+    </span>}
+
+    <span class="kw">fn </span>primary_color(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str) -&gt; ColoredString {
+        token.bright_yellow()
     }
 }
 </code></pre></div>

@@ -76,8 +76,26 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Span;
-<span class="kw">use </span>colored::Colorize;
+<span class="kw">use </span>colored::{ColoredString, Colorize};
+
+<span class="kw">pub trait </span>DiagnosticColorer {
+    <span class="kw">fn </span>title(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+
+    <span class="kw">fn </span>primary_color(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str) -&gt; ColoredString;
+}
 
 <span class="doccomment">/// Given the datamodel text representation, pretty prints an error or warning, including
 /// the offending portion of the source code, for human-friendly reading.
@@ -87,6 +105,7 @@
     text: <span class="kw-2">&amp;</span>str,
     span: Span,
     description: <span class="kw-2">&amp;</span>str,
+    colorer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>DiagnosticColorer,
 ) -&gt; std::io::Result&lt;()&gt; {
     <span class="kw">let </span>start_line_number = text[..span.start].matches(<span class="string">&#39;\n&#39;</span>).count();
     <span class="kw">let </span>end_line_number = text[..span.end].matches(<span class="string">&#39;\n&#39;</span>).count();
@@ -102,13 +121,18 @@
     <span class="kw">let </span>end_in_line = std::cmp::min(start_in_line + (span.end - span.start), line.len());
 
     <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>line[..start_in_line];
-    <span class="kw">let </span>offending = <span class="kw-2">&amp;</span>line[start_in_line..end_in_line].bright_red().bold();
+    <span class="kw">let </span>offending = colorer.primary_color(<span class="kw-2">&amp;</span>line[start_in_line..end_in_line]).bold();
     <span class="kw">let </span>suffix = <span class="kw-2">&amp;</span>line[end_in_line..];
 
     <span class="kw">let </span>arrow = <span class="string">&quot;--&gt;&quot;</span>.bright_blue().bold();
     <span class="kw">let </span>file_path = <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, file_name, start_line_number + <span class="number">1</span>).underline();
 
-    <span class="macro">writeln!</span>(f, <span class="string">&quot;{}: {}&quot;</span>, <span class="string">&quot;error&quot;</span>.bright_red().bold(), description.bold())<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(
+        f,
+        <span class="string">&quot;{}: {}&quot;</span>,
+        colorer.primary_color(colorer.title()).bold(),
+        description.bold()
+    )<span class="question-mark">?</span>;
     <span class="macro">writeln!</span>(f, <span class="string">&quot;  {}  {}&quot;</span>, arrow, file_path)<span class="question-mark">?</span>;
     <span class="macro">writeln!</span>(f, <span class="string">&quot;{}&quot;</span>, format_line_number(<span class="number">0</span>))<span class="question-mark">?</span>;
 
@@ -128,7 +152,7 @@
             <span class="string">&quot;{}{}{}&quot;</span>,
             format_line_number(<span class="number">0</span>),
             spacing,
-            <span class="string">&quot;^ Unexpected token.&quot;</span>.bold().bright_red()
+            colorer.primary_color(<span class="string">&quot;^ Unexpected token.&quot;</span>).bold()
         )<span class="question-mark">?</span>;
     }
 
