@@ -1,6 +1,6 @@
 use diagnostics::DatamodelWarning;
 use parser_database::{
-    ast::ModelId,
+    ast::{FieldId, ModelId},
     walkers::{RelationFieldWalker, Walker},
 };
 
@@ -16,7 +16,7 @@ where
 }
 
 pub(super) fn validate_missing_relation_indexes(
-    _model: Walker<'_, ModelId>,
+    model: Walker<'_, ModelId>,
     relation_field: RelationFieldWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
@@ -32,33 +32,23 @@ pub(super) fn validate_missing_relation_indexes(
     }
 
     if let Some(fields) = relation_field.referenced_fields() {
-        // vector of ids of the fields that should be part of an index in the given model, w.r.t. to left-wise inclusion.
-        let relation_fields = fields.map(|field| field.field_id()).collect::<Vec<_>>();
+        // Collects all fields that should be part of an index in the given model, w.r.t. to left-wise inclusion.
+        let relation_fields: Vec<FieldId> = fields.map(|field| field.field_id()).collect();
 
-        // for index_walker in model.indexes() {
-        //     dbg!("exploring index: {:?}", index_walker.name());
-        //     index_walker.fields().for_each(|index| {
-        //         dbg!("  index: {:?}", index);
-        //     });
-        // }
-
-        // vector of all @unique/@@unique attributes in the given model
-        // TODO: figure out how to retrieve these attributes
-        let unique_sets: Vec<Vec<_>> = vec![];
-
-        // vector of all @@index attributes in the given model
-        // TODO: figure out how to retrieve these attributes
-        let index_sets: Vec<Vec<_>> = vec![];
-
-        let relation_fields_appear_in_unique = unique_sets
-            .iter()
-            .any(|unique_set| is_left_wise_included(&relation_fields, unique_set));
+        // Collects all groups of indexes explicitly declared in the given model.
+        // An index group can be:
+        // - a singleton (@unique or @id)
+        // - an ordered set (@@unique or @@index)
+        let index_sets: Vec<Vec<FieldId>> = model
+            .indexes()
+            .map(|index_walker| index_walker.fields().map(|index| index.field_id()).collect())
+            .collect();
 
         let relation_fields_appear_in_index = index_sets
             .iter()
             .any(|index_set| is_left_wise_included(&relation_fields, index_set));
 
-        if !(relation_fields_appear_in_unique || relation_fields_appear_in_index) {
+        if !(relation_fields_appear_in_index) {
             let span = relation_field.ast_field().field_type.span();
             ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
         }
