@@ -36,12 +36,18 @@ impl DatamodelWarning {
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-        pretty_print(f, file_name, text, self.span(), self.message.as_ref(), &COLORER)
+        pretty_print(
+            f,
+            file_name,
+            text,
+            self.span(),
+            self.message.as_ref(),
+            &DatamodelWarningColorer {},
+        )
     }
 }
 
 struct DatamodelWarningColorer {}
-static COLORER: DatamodelWarningColorer = DatamodelWarningColorer {};
 
 impl DiagnosticColorer for DatamodelWarningColorer {
     fn title(&self) -> &'static str {

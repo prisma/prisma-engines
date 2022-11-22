@@ -378,12 +378,18 @@ impl DatamodelError {
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-        pretty_print(f, file_name, text, self.span(), self.message.as_ref(), &COLORER)
+        pretty_print(
+            f,
+            file_name,
+            text,
+            self.span(),
+            self.message.as_ref(),
+            &DatamodelErrorColorer {},
+        )
     }
 }
 
 struct DatamodelErrorColorer {}
-static COLORER: DatamodelErrorColorer = DatamodelErrorColorer {};
 
 impl DiagnosticColorer for DatamodelErrorColorer {
     fn title(&self) -> &'static str {
