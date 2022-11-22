@@ -79,8 +79,7 @@ fn validate_configuration(
 ) -> Configuration {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
 
-    let datasources =
-        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+    let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
     Configuration {
         generators,
