@@ -8,7 +8,7 @@ use crate::{datamodel_connector::RelationMode, validate::validation_pipeline::co
 
 // { x_1, x_2, ..., x_n } is left-wise included in { y_1, y_2, ..., y_m } if and only if
 // n <= m and x_i = y_i for all i in [1, n].
-fn is_left_wise_included<T>(item: &Vec<T>, group: &Vec<T>) -> bool
+fn is_left_wise_included<T>(item: &[T], group: &[T]) -> bool
 where
     T: PartialEq,
 {
@@ -60,6 +60,10 @@ mod tests {
     #[test]
     fn test_is_left_wise_included() {
         let item = vec![1, 2];
+        let group = vec![1, 2, 3, 4];
+        assert_eq!(is_left_wise_included(&item, &group), true);
+
+        let item = vec![1, 2, 3, 4];
         let group = vec![1, 2, 3, 4];
         assert_eq!(is_left_wise_included(&item, &group), true);
 
