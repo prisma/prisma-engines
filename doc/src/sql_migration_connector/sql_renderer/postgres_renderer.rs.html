@@ -1163,6 +1163,12 @@
 <span id="1163">1163</span>
 <span id="1164">1164</span>
 <span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1889,7 +1895,10 @@
     flavour: <span class="kw-2">&amp;</span>PostgresFlavour,
 ) {
     <span class="kw">let </span>steps = expand_alter_column(columns, column_changes);
-    <span class="kw">let </span>table_name = Quoted::postgres_ident(columns.previous.table().name());
+    <span class="kw">let </span>table_name = TableName::new(
+        columns.previous.table().namespace().map(Quoted::postgres_ident),
+        Quoted::postgres_ident(columns.previous.table().name()),
+    );
     <span class="kw">let </span>column_name = Quoted::postgres_ident(columns.previous.name());
 
     <span class="kw">let </span>alter_column_prefix = <span class="macro">format!</span>(<span class="string">&quot;ALTER COLUMN {}&quot;</span>, column_name);
@@ -1926,13 +1935,17 @@
                 // See the postgres docs for more details:
                 // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
                 </span><span class="kw">let </span>sequence_name = <span class="macro">format!</span>(
-                    <span class="string">&quot;{table_name}_{column_name}_seq&quot;</span>,
+                    <span class="string">&quot;{namespace}{table_name}_{column_name}_seq&quot;</span>,
+                    namespace = <span class="kw">match </span>columns.next.table().namespace() {
+                        <span class="prelude-val">Some</span>(namespace) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}.&quot;</span>, Quoted::postgres_ident(namespace)),
+                        <span class="prelude-val">None </span>=&gt; String::from(<span class="string">&quot;&quot;</span>),
+                    },
                     table_name = columns.next.table().name(),
                     column_name = columns.next.name()
                 )
                 .to_lowercase();
 
-                before_statements.push(<span class="macro">format!</span>(<span class="string">&quot;CREATE SEQUENCE {}&quot;</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>sequence_name)));
+                before_statements.push(<span class="macro">format!</span>(<span class="string">&quot;CREATE SEQUENCE {}&quot;</span>, sequence_name));
 
                 clauses.push(<span class="macro">format!</span>(
                     <span class="string">&quot;{prefix} SET DEFAULT {default}&quot;</span>,
@@ -1942,7 +1955,6 @@
 
                 after_statements.push(<span class="macro">format!</span>(
                     <span class="string">&quot;ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}&quot;</span>,
-                    sequence_name = Quoted::postgres_ident(sequence_name),
                     table_name = table_name,
                     column_name = column_name,
                 ));
