@@ -20,8 +20,6 @@ pub(super) fn validate_missing_relation_indexes(
     relation_field: RelationFieldWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    dbg!("Inspecting: {:?}", relation_field.name());
-
     let is_provider_mongodb = ctx
         .datasource
         .map(|datasource| datasource.active_provider == "mongodb")

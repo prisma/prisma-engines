@@ -1,9 +1,4 @@
-// no missing relation index validation on relationMode = "foreignKeys".
-
-generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
-}
+// no missing relation index validation on relationMode = "foreignKeys" / no relationMode at all.
 
 datasource db {
     provider = "mysql"
