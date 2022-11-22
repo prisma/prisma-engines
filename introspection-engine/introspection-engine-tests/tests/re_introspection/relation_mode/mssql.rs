@@ -342,7 +342,7 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider        = "prisma-client-js"
+              provider = "prisma-client-js"
             }
 
             datasource db {
@@ -423,7 +423,7 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider        = "prisma-client-js"
+              provider = "prisma-client-js"
             }
 
             datasource db {
@@ -502,7 +502,7 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider        = "prisma-client-js"
+              provider = "prisma-client-js"
             }
 
             datasource db {
@@ -583,7 +583,7 @@ mod at_at_map {
 
         let expected = expect![[r#"
             generator client {
-              provider        = "prisma-client-js"
+              provider = "prisma-client-js"
             }
 
             datasource db {
