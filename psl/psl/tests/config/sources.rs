@@ -615,7 +615,6 @@ fn relation_mode_works() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -634,7 +633,6 @@ fn relation_mode_default() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -654,7 +652,6 @@ fn relation_mode_and_referential_integrity_cannot_cooccur() {
         }
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 

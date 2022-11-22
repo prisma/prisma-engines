@@ -8,7 +8,6 @@ fn no_action_is_alias_for_restrict_when_prisma_relation_mode() {
         r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -44,7 +43,6 @@ fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
         r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {

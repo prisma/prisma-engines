@@ -91,7 +91,6 @@ fn cycles_are_allowed_outside_of_emulation_and_sqlserver() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -117,7 +116,6 @@ fn emulated_cascading_on_delete_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -183,7 +181,6 @@ fn emulated_cascading_on_update_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -249,7 +246,6 @@ fn emulated_null_setting_on_delete_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -315,7 +311,6 @@ fn emulated_null_setting_on_update_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -381,7 +376,6 @@ fn emulated_default_setting_on_delete_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -453,7 +447,6 @@ fn emulated_default_setting_on_update_self_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -539,7 +532,6 @@ fn emulated_cascading_cyclic_one_hop_relations() {
 
         generator js1 {
           provider = "javascript"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {

@@ -104,7 +104,6 @@ fn actions_on_mysql_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -143,7 +142,6 @@ fn actions_on_sqlserver_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -182,7 +180,6 @@ fn actions_on_cockroachdb_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -221,7 +218,6 @@ fn actions_on_postgres_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -260,7 +256,6 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -305,7 +300,6 @@ fn on_delete_actions_should_work_on_prisma_relation_mode() {
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
 
             model A {{
@@ -340,7 +334,6 @@ fn on_update_no_action_should_work_on_prisma_relation_mode() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -372,7 +365,6 @@ fn foreign_keys_not_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -410,7 +402,6 @@ fn prisma_level_integrity_should_be_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -576,7 +567,6 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -614,7 +604,6 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -652,7 +641,6 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -690,7 +678,6 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -775,7 +762,6 @@ fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }
 
             model A {{
