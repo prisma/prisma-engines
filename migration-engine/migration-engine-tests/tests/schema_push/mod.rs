@@ -16,7 +16,7 @@ model Box {
 }
 "#;
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector]
 fn schema_push_happy_path(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
@@ -62,7 +62,7 @@ fn schema_push_happy_path(api: TestApi) {
         });
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector]
 fn schema_push_warns_about_destructive_changes(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()
@@ -97,7 +97,7 @@ fn schema_push_warns_about_destructive_changes(api: TestApi) {
         .assert_has_executed_steps();
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector]
 fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts(api: TestApi) {
     api.schema_push_w_datasource(SCHEMA)
         .send()

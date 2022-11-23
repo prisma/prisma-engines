@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn remapping_enum_names(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `123Book` (

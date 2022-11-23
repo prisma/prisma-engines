@@ -586,7 +586,7 @@ fn fail_when_no_source_is_declared() {
 }
 
 #[test]
-fn referential_integrity_without_preview_feature_errors() {
+fn referential_integrity_works() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
@@ -596,83 +596,6 @@ fn referential_integrity_without_preview_feature_errors() {
 
         generator client {
           provider = "prisma-client-js"
-        }
-    "#};
-
-    let error = parse_config(schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `ps`: 
-        This option can only be set if the preview feature is enabled in a generator block.
-
-        Example:
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
-        }
-        [0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  [1;91mreferentialIntegrity = "prisma"[0m
-        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn relation_mode_without_preview_feature_errors() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          relationMode = "prisma"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-        }
-    "#};
-
-    let error = parse_config(schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `ps`: 
-        This option can only be set if the preview feature is enabled in a generator block.
-
-        Example:
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
-        }
-        [0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  [1;91mrelationMode = "prisma"[0m
-        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn referential_integrity_with_preview_feature_works() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          referentialIntegrity = "prisma"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -682,7 +605,7 @@ fn referential_integrity_with_preview_feature_works() {
 }
 
 #[test]
-fn relation_mode_with_preview_feature_works() {
+fn relation_mode_works() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
@@ -692,7 +615,6 @@ fn relation_mode_with_preview_feature_works() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -711,7 +633,6 @@ fn relation_mode_default() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -731,7 +652,6 @@ fn relation_mode_and_referential_integrity_cannot_cooccur() {
         }
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 

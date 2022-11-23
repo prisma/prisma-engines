@@ -33,7 +33,7 @@ async fn empty_preview_features_are_kept(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("referentialIntegrity"))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
     assert!(!result.contains(r#"relationMode = "#));
