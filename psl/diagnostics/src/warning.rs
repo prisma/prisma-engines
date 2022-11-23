@@ -26,7 +26,7 @@ impl DatamodelWarning {
     }
 
     pub fn new_missing_index_on_emulated_relation(span: Span) -> DatamodelWarning {
-        let message = "The fields referenced in a `@relation` should be indexed to prevent potential performance penalties. Learn more at https://pris.ly/d/relation-mode-prisma-indexes.".to_owned();
+        let message = "The fields referenced in a `@relation` should be indexed to prevent potential performance penalties. Learn more at https://pris.ly/d/relation-mode#indexes.".to_owned();
         Self::new(message, span)
     }
 
