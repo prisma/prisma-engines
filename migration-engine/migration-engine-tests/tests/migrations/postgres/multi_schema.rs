@@ -1223,24 +1223,43 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_string(),
                 first: indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
       enum SomeEnum {
         First
         Second
         @@schema("one")
       }"#}.into(),
                 second: Some(indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
       enum SomeEnum {
         First
-        Second
         Third
         @@schema("one")
       }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["The values [Second] on the enum `SomeEnum` will be removed. If these variants are still used in the database, this will fail."],
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert.assert_enum("SomeEnum", |e|
-                                         e.assert_values(&["First", "Second", "Third"])
+                assert.assert_has_table("SomeModel")
+                      .assert_enum("SomeEnum", |e|
+                                         e.assert_values(&["First", "Third"])
                                            .assert_namespace("one"));
             }),
             skip: None,
