@@ -125,7 +125,28 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{Operation, ResponseData};
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ClosedTx, Operation, ResponseData};
 <span class="kw">use </span>lru::LruCache;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>schema::QuerySchemaRef;
@@ -153,9 +174,9 @@
     </span><span class="kw">pub </span>clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt;,
     <span class="doccomment">/// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    </span><span class="kw">pub </span>closed_txs: Arc&lt;RwLock&lt;LruCache&lt;TxId, ()&gt;&gt;&gt;,
+    </span><span class="kw">pub </span>closed_txs: Arc&lt;RwLock&lt;LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
     <span class="doccomment">/// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
-    </span>send_done: Sender&lt;TxId&gt;,
+    </span>send_done: Sender&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
     <span class="doccomment">/// Handle to the task in charge of clearing actors.
     /// Used to abort the task when the TransactionActorManager is dropped.
     </span>bg_reader_clear: JoinHandle&lt;()&gt;,
@@ -176,10 +197,10 @@
 
 <span class="kw">impl </span>TransactionActorManager {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt; = Arc::new(RwLock::new(HashMap::new()));
-        <span class="kw">let </span>closed_txs: Arc&lt;RwLock&lt;LruCache&lt;TxId, ()&gt;&gt;&gt; = Arc::new(RwLock::new(LruCache::new(<span class="kw-2">*</span>CLOSED_TX_CACHE_SIZE)));
+        <span class="kw">let </span>clients = Arc::new(RwLock::new(HashMap::new()));
+        <span class="kw">let </span>closed_txs = Arc::new(RwLock::new(LruCache::new(<span class="kw-2">*</span>CLOSED_TX_CACHE_SIZE)));
 
-        <span class="kw">let </span>(send_done, rx) = channel::&lt;TxId&gt;(CHANNEL_SIZE);
+        <span class="kw">let </span>(send_done, rx) = channel(CHANNEL_SIZE);
         <span class="kw">let </span>handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);
 
         <span class="self">Self </span>{
@@ -206,9 +227,30 @@
     <span class="kw">async fn </span>get_client(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: <span class="kw-2">&amp;</span>TxId, from_operation: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ITXClient&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(client) = <span class="self">self</span>.clients.read().<span class="kw">await</span>.get(tx_id) {
             <span class="prelude-val">Ok</span>(client.clone())
-        } <span class="kw">else if </span><span class="self">self</span>.closed_txs.read().<span class="kw">await</span>.contains(tx_id) {
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(closed_tx) = <span class="self">self</span>.closed_txs.read().<span class="kw">await</span>.peek(tx_id) {
             <span class="prelude-val">Err</span>(TransactionError::Closed {
-                reason: <span class="macro">format!</span>(<span class="string">&quot;A {from_operation} cannot be executed on a closed transaction.&quot;</span>),
+                reason: <span class="kw">match </span>closed_tx {
+                    <span class="prelude-val">Some</span>(ClosedTx::Committed) =&gt; {
+                        <span class="macro">format!</span>(<span class="string">&quot;A {from_operation} cannot be executed on a committed transaction&quot;</span>)
+                    }
+                    <span class="prelude-val">Some</span>(ClosedTx::RolledBack) =&gt; {
+                        <span class="macro">format!</span>(<span class="string">&quot;A {from_operation} cannot be executed on a transaction that was rolled back&quot;</span>)
+                    }
+                    <span class="prelude-val">Some</span>(ClosedTx::Expired { start_time, timeout }) =&gt; {
+                        <span class="macro">format!</span>(
+                            <span class="string">&quot;A {from_operation} cannot be executed on an expired transaction. \
+                             The timeout for this transaction was {} ms, however {} ms passed since the start \
+                             of the transaction. Consider increasing the interactive transaction timeout \
+                             or doing less work in the transaction&quot;</span>,
+                            timeout.as_millis(),
+                            start_time.elapsed().as_millis(),
+                        )
+                    }
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="macro">error!</span>(<span class="string">&quot;[{tx_id}] no details about closed transaction&quot;</span>);
+                        <span class="macro">format!</span>(<span class="string">&quot;A {from_operation} cannot be executed on a closed transaction&quot;</span>)
+                    }
+                },
             }
             .into())
         } <span class="kw">else </span>{

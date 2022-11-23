@@ -368,10 +368,16 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 <span class="kw">use crate</span>::{
-    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, OpenTx, Operation, ResponseData,
-    TxId,
+    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, ClosedTx, OpenTx, Operation,
+    ResponseData, TxId,
 };
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
@@ -381,7 +387,7 @@
         oneshot, RwLock,
     },
     task::JoinHandle,
-    time::{<span class="self">self</span>, Duration},
+    time::{<span class="self">self</span>, Duration, Instant},
 };
 <span class="kw">use </span>tracing::Span;
 <span class="kw">use </span>tracing_futures::Instrument;
@@ -619,7 +625,7 @@
     value: OpenTx,
     timeout: Duration,
     channel_size: usize,
-    send_done: Sender&lt;TxId&gt;,
+    send_done: Sender&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
 ) -&gt; ITXClient {
     <span class="kw">let </span>(tx_to_server, rx_from_client) = channel::&lt;TxOpRequest&gt;(channel_size);
 
@@ -643,6 +649,7 @@
 
     tokio::task::spawn(
         <span class="kw">crate</span>::executor::with_request_now(<span class="kw">async move </span>{
+            <span class="kw">let </span>start_time = Instant::now();
             <span class="kw">let </span>sleep = time::sleep(timeout);
             <span class="macro">tokio::pin!</span>(sleep);
 
@@ -667,7 +674,12 @@
 
             <span class="macro">trace!</span>(<span class="string">&quot;[{}] completed with {}&quot;</span>, server.id.to_string(), server.cached_tx);
 
-            <span class="kw">let _ </span>= send_done.send(server.id.clone()).<span class="kw">await</span>;
+            <span class="kw">let _ </span>= send_done
+                .send((
+                    server.id.clone(),
+                    server.cached_tx.to_closed(start_time, server.timeout),
+                ))
+                .<span class="kw">await</span>;
 
             <span class="macro">trace!</span>(<span class="string">&quot;[{}] has stopped with {}&quot;</span>, server.id.to_string(), server.cached_tx);
         })
@@ -721,19 +733,19 @@
 */
 </span><span class="kw">pub fn </span>spawn_client_list_clear_actor(
     clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt;,
-    closed_txs: Arc&lt;RwLock&lt;lru::LruCache&lt;TxId, ()&gt;&gt;&gt;,
-    <span class="kw-2">mut </span>rx: Receiver&lt;TxId&gt;,
+    closed_txs: Arc&lt;RwLock&lt;lru::LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
+    <span class="kw-2">mut </span>rx: Receiver&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
 ) -&gt; JoinHandle&lt;()&gt; {
     tokio::task::spawn(<span class="kw">async move </span>{
         <span class="kw">loop </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = rx.recv().<span class="kw">await </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((id, closed_tx)) = rx.recv().<span class="kw">await </span>{
                 <span class="macro">trace!</span>(<span class="string">&quot;removing {} from client list&quot;</span>, id);
 
                 <span class="kw">let </span><span class="kw-2">mut </span>clients_guard = clients.write().<span class="kw">await</span>;
                 clients_guard.remove(<span class="kw-2">&amp;</span>id);
                 drop(clients_guard);
 
-                closed_txs.write().<span class="kw">await</span>.put(id, ());
+                closed_txs.write().<span class="kw">await</span>.put(id, closed_tx);
             }
         }
     })

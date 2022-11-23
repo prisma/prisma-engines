@@ -140,10 +140,29 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreError;
 <span class="kw">use </span>connector::{Connection, ConnectionLike, Transaction};
 <span class="kw">use </span>std::fmt::Display;
-<span class="kw">use </span>tokio::task::JoinHandle;
+<span class="kw">use </span>tokio::{
+    task::JoinHandle,
+    time::{Duration, Instant},
+};
 
 <span class="kw">mod </span>actor_manager;
 <span class="kw">mod </span>actors;
@@ -204,7 +223,6 @@
 
 <span class="kw">pub enum </span>CachedTx {
     Open(OpenTx),
-    Aborted,
     Committed,
     RolledBack,
     Expired,
@@ -214,7 +232,6 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             CachedTx::Open(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Open&quot;</span>),
-            CachedTx::Aborted =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Aborted&quot;</span>),
             CachedTx::Committed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Committed&quot;</span>),
             CachedTx::RolledBack =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Rolled back&quot;</span>),
             CachedTx::Expired =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expired&quot;</span>),
@@ -241,6 +258,15 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;Transaction is no longer valid. Last state: &#39;{}&#39;&quot;</span>, <span class="self">self</span>);
             <span class="prelude-val">Err</span>(CoreError::from(TransactionError::Closed { reason }))
+        }
+    }
+
+    <span class="kw">pub fn </span>to_closed(<span class="kw-2">&amp;</span><span class="self">self</span>, start_time: Instant, timeout: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;ClosedTx&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            CachedTx::Open(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            CachedTx::Committed =&gt; <span class="prelude-val">Some</span>(ClosedTx::Committed),
+            CachedTx::RolledBack =&gt; <span class="prelude-val">Some</span>(ClosedTx::RolledBack),
+            CachedTx::Expired =&gt; <span class="prelude-val">Some</span>(ClosedTx::Expired { start_time, timeout }),
         }
     }
 }
@@ -281,6 +307,12 @@
     <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; CachedTx {
         CachedTx::Open(<span class="self">self</span>)
     }
+}
+
+<span class="kw">pub enum </span>ClosedTx {
+    Committed,
+    RolledBack,
+    Expired { start_time: Instant, timeout: Duration },
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -27,7 +27,7 @@
     <span class="attribute">#[error(<span class="string">&quot;Attempted to start a transaction inside of a transaction.&quot;</span>)]
     </span>AlreadyStarted,
 
-    <span class="attribute">#[error(<span class="string">&quot;Transaction not found.&quot;</span>)]
+    <span class="attribute">#[error(<span class="string">&quot;Transaction not found. Transaction ID is invalid, refers to an old closed transaction Prisma doesn&#39;t have information about anymore, or was obtained before disconnecting.&quot;</span>)]
     </span>NotFound,
 
     <span class="attribute">#[error(<span class="string">&quot;Transaction already closed: {reason}.&quot;</span>)]
