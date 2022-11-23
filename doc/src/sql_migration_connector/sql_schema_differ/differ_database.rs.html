@@ -323,6 +323,14 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{column, enums::EnumDiffer, table::TableDiffer};
 <span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 <span class="kw">use </span>sql_schema_describer::{
@@ -336,6 +344,8 @@
     ops::Bound,
 };
 
+<span class="kw">type </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; = (<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;);
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) flavour: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>SqlFlavour,
     <span class="doccomment">/// The schemas being diffed
@@ -343,7 +353,7 @@
     <span class="doccomment">/// Namespace name -&gt; namespace indexes.
     </span>namespaces: HashMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Pair&lt;<span class="prelude-ty">Option</span>&lt;NamespaceId&gt;&gt;&gt;,
     <span class="doccomment">/// Table name -&gt; table indexes.
-    </span>tables: HashMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Pair&lt;<span class="prelude-ty">Option</span>&lt;TableId&gt;&gt;&gt;,
+    </span>tables: HashMap&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;, Pair&lt;<span class="prelude-ty">Option</span>&lt;TableId&gt;&gt;&gt;,
     <span class="doccomment">/// (table_idxs, column_name) -&gt; column_idxs. BTreeMap because we want range
     /// queries (-&gt; all the columns in a table).
     </span>columns: BTreeMap&lt;(Pair&lt;TableId&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), Pair&lt;<span class="prelude-ty">Option</span>&lt;ColumnId&gt;&gt;&gt;,
@@ -417,7 +427,10 @@
             } <span class="kw">else </span>{
                 Cow::Borrowed(table.name())
             };
-            db.tables.insert(table_name, Pair::new(<span class="prelude-val">Some</span>(table.id), <span class="prelude-val">None</span>));
+            db.tables.insert(
+                (table.namespace().map(Cow::Borrowed), table_name),
+                Pair::new(<span class="prelude-val">Some</span>(table.id), <span class="prelude-val">None</span>),
+            );
         }
 
         <span class="comment">// Then insert all tables from the next schema. Since we have all the
@@ -433,7 +446,10 @@
             } <span class="kw">else </span>{
                 Cow::Borrowed(table.name())
             };
-            <span class="kw">let </span>entry = db.tables.entry(table_name).or_default();
+            <span class="kw">let </span>entry = db
+                .tables
+                .entry((table.namespace().map(Cow::Borrowed), table_name))
+                .or_default();
             entry.next = <span class="prelude-val">Some</span>(table.id);
 
             <span class="comment">// Deal with tables that are both in the previous and the next
@@ -551,9 +567,9 @@
             .filter(<span class="kw">move </span>|differ| !<span class="self">self</span>.tables_to_redefine.contains(<span class="kw-2">&amp;</span>differ.table_ids()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_is_redefined(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_is_redefined(<span class="kw-2">&amp;</span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt;, table_name: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;) -&gt; bool {
         <span class="self">self</span>.tables
-            .get(table_name)
+            .get(<span class="kw-2">&amp;</span>(namespace, table_name))
             .and_then(|pair| pair.transpose())
             .map(|ids| <span class="self">self</span>.tables_to_redefine.contains(<span class="kw-2">&amp;</span>ids))
             .unwrap_or(<span class="bool-val">false</span>)
