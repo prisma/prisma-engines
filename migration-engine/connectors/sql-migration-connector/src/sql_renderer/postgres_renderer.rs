@@ -561,10 +561,13 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String {
         format!(
-            r#"ALTER TABLE "{table}" RENAME CONSTRAINT "{previous}" TO "{next}""#,
-            table = fks.previous.table().name(),
-            previous = fks.previous.constraint_name().unwrap(),
-            next = fks.next.constraint_name().unwrap(),
+            r#"ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}"#,
+            table = TableName(
+                fks.previous.table().namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(fks.previous.table().name()),
+            ),
+            previous = self.quote(fks.previous.constraint_name().unwrap()),
+            next = self.quote(fks.next.constraint_name().unwrap()),
         )
     }
 }

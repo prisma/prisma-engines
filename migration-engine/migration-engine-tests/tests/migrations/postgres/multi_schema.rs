@@ -896,6 +896,53 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "rename foreign key",
+            description: "Rename a foreign key in a table inside a namespace",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id])
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id], map: "new_name")
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                               table.assert_fk_with_name("new_name")
+                        );
+            }),
+            skip: None,
+        },
+        TestData {
             name: "add explicit many-to-many cross-namespace relation",
             description: "add an explicit many-to-many relationship for tables in different namespaces",
             schema: Schema {
