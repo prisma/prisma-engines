@@ -98,6 +98,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             relation_fields::ignored_related_model(field, ctx);
             relation_fields::referential_actions(field, ctx);
             relation_fields::map(field, ctx);
+            relation_indexes::validate_missing_relation_indexes(field, ctx);
         }
 
         for index in model.indexes() {
@@ -124,10 +125,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
-        }
-
-        for field in model.relation_fields() {
-            relation_indexes::validate_missing_relation_indexes(field, ctx);
         }
     }
 
