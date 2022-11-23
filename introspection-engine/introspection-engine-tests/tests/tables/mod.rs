@@ -708,7 +708,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
