@@ -1,10 +1,7 @@
 use crate::{datamodel_connector::RelationMode, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelWarning;
 use parser_database::ast::WithSpan;
-use parser_database::{
-    ast::ModelId,
-    walkers::{RelationFieldWalker, Walker},
-};
+use parser_database::walkers::RelationFieldWalker;
 
 // { x_1, x_2, ..., x_n } is left-wise included in { y_1, y_2, ..., y_m } if and only if
 // n <= m and x_i = y_i for all i in [1, n].
@@ -15,16 +12,13 @@ where
     group.take(item.len()).eq(item)
 }
 
-pub(super) fn validate_missing_relation_indexes(
-    model: Walker<'_, ModelId>,
-    relation_field: RelationFieldWalker<'_>,
-    ctx: &mut Context<'_>,
-) {
+pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx.connector.should_suggest_missing_referencing_fields_indexes() || ctx.relation_mode != RelationMode::Prisma {
         return;
     }
 
     if let Some(fields) = relation_field.referencing_fields() {
+        let model = relation_field.model();
         // Considers all fields that should be part of an index in the given model, w.r.t. to left-wise inclusion.
         let referencing_fields_it = fields.map(|field| field.field_id());
 

@@ -127,7 +127,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
 
         for field in model.relation_fields() {
-            relation_indexes::validate_missing_relation_indexes(model, field, ctx);
+            relation_indexes::validate_missing_relation_indexes(field, ctx);
         }
     }
 
