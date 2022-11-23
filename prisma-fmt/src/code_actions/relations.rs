@@ -237,7 +237,7 @@ pub(super) fn add_referenced_side_unique(
 ///     @@id([id1, id2, id3])
 /// }
 /// ```
-pub(super) fn add_reference_index(
+pub(super) fn add_index_for_relation_fields(
     actions: &mut Vec<CodeActionOrCommand>,
     params: &CodeActionParams,
     schema: &str,
@@ -272,7 +272,7 @@ pub(super) fn add_reference_index(
     );
 
     let action = CodeAction {
-        title: String::from("Index relations"),
+        title: String::from("Add an index for the relation's field(s)"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
         diagnostics,

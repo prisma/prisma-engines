@@ -39,7 +39,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             }
 
             if validated_schema.relation_mode().is_prisma() {
-                relations::add_reference_index(
+                relations::add_index_for_relation_fields(
                     &mut actions,
                     &params,
                     validated_schema.db.source(),
