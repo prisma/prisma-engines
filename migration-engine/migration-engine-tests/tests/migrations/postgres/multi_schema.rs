@@ -418,6 +418,37 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "move table across namespaces",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        "#}),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        } "#}.into(),
+                second: Some(indoc!{r#"
+        model First {
+          id Int @id
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &[] ,
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("two", "First");
+            }),
+            skip: None,
+        },
+        TestData {
             name: "recreate not null column with null values",
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a NULL value",
             schema: Schema {
@@ -1254,7 +1285,7 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
                 WithSchema::First => test.schema.common.to_owned() + test.schema.first.as_str(),
                 WithSchema::Second => match &test.schema.second {
                     Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
-                    None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
+                    None => panic!("Trying to run PushCustomAnd but without defining the second migration."),
                 },
             };
 

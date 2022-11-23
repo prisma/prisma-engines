@@ -205,6 +205,7 @@ impl SqlRenderer for PostgresFlavour {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_str("ALTER TABLE ");
+                // TODO(MultiSchema): This only matters for CockroachDB.
                 stmt.push_display(&Quoted::postgres_ident(tables.previous.name()));
                 stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
                 let column_names = tables
@@ -230,6 +231,8 @@ impl SqlRenderer for PostgresFlavour {
                 stmt.push_str("ALTER INDEX ");
                 stmt.push_str(&index_previous_name);
                 stmt.push_str(" RENAME TO ");
+                // Postgres assumes we use the same schema as the previous name's, so we're not
+                // allowed to qualify this identifier.
                 stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
             })
         })
@@ -319,6 +322,7 @@ impl SqlRenderer for PostgresFlavour {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements.into_iter());
             for line in lines {
+                // TODO(MultiSchema): This will need qualifying when implementing CockroachDB.
                 out.push(format!("ALTER TABLE \"{}\" {}", tables.previous.name(), line))
             }
             out.extend(after_statements.into_iter());
@@ -542,6 +546,7 @@ impl SqlRenderer for PostgresFlavour {
         result
     }
 
+    // TODO(MultiSchema): I _think_ this only exists for CockroachDB.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
