@@ -18,8 +18,6 @@ model SomeUser {
 
 model Profile {
     id Int @id
-    userId Int
+    userId Int @unique
     user SomeUser? @relation(fields: [userId], references: [id])
-
-    @@unique([userId])
 }
