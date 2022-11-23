@@ -5,7 +5,9 @@ pub use native_types::MySqlType;
 
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+    },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
 };
@@ -211,13 +213,19 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: walkers::ModelWalker<'_>, relation_mode: RelationMode, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::field_types_can_be_used_in_an_index(self, index, errors);
         }
 
         if let Some(pk) = model.primary_key() {
             validations::field_types_can_be_used_in_a_primary_key(self, pk, errors);
+        }
+
+        if relation_mode.uses_foreign_keys() {
+            for field in model.relation_fields() {
+                validations::uses_native_referential_action_set_default(self, field, errors);
+            }
         }
     }
 

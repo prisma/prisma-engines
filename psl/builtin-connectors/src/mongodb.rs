@@ -59,7 +59,7 @@ impl Connector for MongoDbDatamodelConnector {
         BitFlags::empty()
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         validations::id_must_be_defined(model, errors);
 
         if let Some(pk) = model.primary_key() {
