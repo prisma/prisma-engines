@@ -14,7 +14,9 @@ pub struct DatamodelWarning {
 }
 
 impl DatamodelWarning {
-    fn new(message: String, span: Span) -> DatamodelWarning {
+    /// You should avoid using this constructor directly when possible, and define warnings as public methods of this class.
+    /// The constructor is only left public for supporting connector-specific warnings (which should not live in the core).
+    pub fn new(message: String, span: Span) -> DatamodelWarning {
         DatamodelWarning { message, span }
     }
 
