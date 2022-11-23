@@ -1174,6 +1174,24 @@
 <span id="1174">1174</span>
 <span id="1175">1175</span>
 <span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1216,7 +1234,8 @@
 }
 
 <span class="kw">impl </span>SqlRenderer <span class="kw">for </span>PostgresFlavour {
-    <span class="kw">fn </span>render_alter_sequence(
+    <span class="comment">// TODO(MultiSchema): We only do alter_sequence on CockroachDB.
+    </span><span class="kw">fn </span>render_alter_sequence(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         sequence_idx: Pair&lt;u32&gt;,
         changes: SequenceChanges,
@@ -1737,10 +1756,13 @@
 
     <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">format!</span>(
-            <span class="string">r#&quot;ALTER TABLE &quot;{table}&quot; RENAME CONSTRAINT &quot;{previous}&quot; TO &quot;{next}&quot;&quot;#</span>,
-            table = fks.previous.table().name(),
-            previous = fks.previous.constraint_name().unwrap(),
-            next = fks.next.constraint_name().unwrap(),
+            <span class="string">r#&quot;ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}&quot;#</span>,
+            table = TableName(
+                fks.previous.table().namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(fks.previous.table().name()),
+            ),
+            previous = <span class="self">self</span>.quote(fks.previous.constraint_name().unwrap()),
+            next = <span class="self">self</span>.quote(fks.next.constraint_name().unwrap()),
         )
     }
 }
@@ -2135,7 +2157,11 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>stmts = Vec::with_capacity(<span class="number">10</span>);
 
-    <span class="kw">let </span>tmp_name = <span class="macro">format!</span>(<span class="string">&quot;{}_new&quot;</span>, <span class="kw-2">&amp;</span>enums.next.name());
+    <span class="kw">let </span>temporary_enum_name = <span class="macro">format!</span>(<span class="string">&quot;{}_new&quot;</span>, <span class="kw-2">&amp;</span>enums.next.name());
+    <span class="kw">let </span>tmp_name = TableName::new(
+        enums.next.namespace().map(Quoted::postgres_ident),
+        Quoted::postgres_ident(temporary_enum_name.as_str()),
+    );
     <span class="kw">let </span>tmp_old_name = <span class="macro">format!</span>(<span class="string">&quot;{}_old&quot;</span>, <span class="kw-2">&amp;</span>enums.previous.name());
 
     stmts.push(<span class="string">&quot;BEGIN&quot;</span>.to_string());
@@ -2144,7 +2170,7 @@
     </span>{
         <span class="kw">let </span>create_new_enum = <span class="macro">format!</span>(
             <span class="string">&quot;CREATE TYPE {enum_name} AS ENUM ({variants})&quot;</span>,
-            enum_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_name),
+            enum_name = tmp_name,
             variants = enums.next.values().map(Quoted::postgres_string).join(<span class="string">&quot;, &quot;</span>)
         );
 
@@ -2157,9 +2183,12 @@
             <span class="kw">let </span>column = schemas.previous.walk(<span class="kw-2">*</span>colid);
 
             <span class="kw">let </span>drop_default = <span class="macro">format!</span>(
-                <span class="string">r#&quot;ALTER TABLE &quot;{table_name}&quot; ALTER COLUMN &quot;{column_name}&quot; DROP DEFAULT&quot;#</span>,
-                table_name = column.table().name(),
-                column_name = column.name(),
+                <span class="string">r#&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} DROP DEFAULT&quot;#</span>,
+                table_name = TableName::new(
+                    column.table().namespace().map(Quoted::postgres_ident),
+                    Quoted::postgres_ident(column.table().name())
+                ),
+                column_name = Quoted::postgres_ident(column.name()),
             );
 
             stmts.push(drop_default);
@@ -2179,9 +2208,11 @@
                 <span class="string">&quot;ALTER TABLE {table_name} \
                             ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
                                 USING ({column_name}::text::{tmp_name}{array})&quot;</span>,
-                table_name = Quoted::postgres_ident(column.table().name()),
+                table_name = TableName::new(
+                    column.table().namespace().map(Quoted::postgres_ident),
+                    Quoted::postgres_ident(column.table().name())
+                ),
                 column_name = Quoted::postgres_ident(column.name()),
-                tmp_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_name),
                 array = array,
             );
 
@@ -2193,7 +2224,10 @@
     </span>{
         <span class="kw">let </span>sql = <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TYPE {enum_name} RENAME TO {tmp_old_name}&quot;</span>,
-            enum_name = Quoted::postgres_ident(enums.previous.name()),
+            enum_name = TableName::new(
+                enums.previous.namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(enums.previous.name())
+            ),
             tmp_old_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_old_name)
         );
 
@@ -2204,7 +2238,6 @@
     </span>{
         <span class="kw">let </span>sql = <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TYPE {tmp_name} RENAME TO {enum_name}&quot;</span>,
-            tmp_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_name),
             enum_name = Quoted::postgres_ident(enums.next.name())
         );
 
@@ -2239,7 +2272,10 @@
 
             <span class="kw">let </span>set_default = <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}&quot;</span>,
-                table_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>table_name),
+                table_name = TableName::new(
+                    columns.previous.table().namespace().map(Quoted::postgres_ident),
+                    Quoted::postgres_ident(table_name)
+                ),
                 column_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>column_name),
                 default = default_str,
             );
