@@ -1,4 +1,4 @@
-// no relation index validation warning on relationMode = "prisma" when a referenced field is already @unique.
+// no relation index validation warning on relationMode = "prisma" when a referenced field is already in @@unique.
 
 generator client {
     provider        = "prisma-client-js"
@@ -18,8 +18,6 @@ model SomeUser {
 
 model Profile {
     id Int @id
-    userId Int
-    user SomeUser @relation(fields: [userId], references: [id])
-
-    @@unique([userId])
+    userId Int @unique
+    user SomeUser? @relation(fields: [userId], references: [id])
 }
