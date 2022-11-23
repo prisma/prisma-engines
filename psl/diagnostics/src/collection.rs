@@ -62,6 +62,17 @@ impl Diagnostics {
 
         String::from_utf8_lossy(&message).into_owned()
     }
+
+    pub fn warnings_to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
+        let mut message: Vec<u8> = Vec::new();
+
+        for warn in self.warnings() {
+            warn.pretty_print(&mut message, file_name, datamodel_string)
+                .expect("printing datamodel warning");
+        }
+
+        String::from_utf8_lossy(&message).into_owned()
+    }
 }
 
 impl From<DatamodelError> for Diagnostics {
