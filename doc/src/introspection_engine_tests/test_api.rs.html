@@ -370,7 +370,6 @@
 <span id="370">370</span>
 <span id="371">371</span>
 <span id="372">372</span>
-<span id="373">373</span>
 </pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>indoc::{formatdoc, indoc};
@@ -628,12 +627,11 @@
     }
 
     <span class="kw">pub fn </span>datasource_block_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span>relation_mode =
-            <span class="kw">if </span><span class="self">self</span>.is_vitess() &amp;&amp; <span class="self">self</span>.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
-                <span class="string">&quot;\nrelationMode = \&quot;prisma\&quot;&quot;
-            </span>} <span class="kw">else </span>{
-                <span class="string">&quot;&quot;
-            </span>};
+        <span class="kw">let </span>relation_mode = <span class="kw">if </span><span class="self">self</span>.is_vitess() {
+            <span class="string">&quot;\nrelationMode = \&quot;prisma\&quot;&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>};
 
         <span class="kw">let </span>namespaces: Vec&lt;String&gt; = <span class="self">self</span>.namespaces().iter().map(|ns| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, ns)).collect();
 
@@ -657,7 +655,7 @@
     <span class="kw">pub fn </span>datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="self">self</span>.args.datasource_block(
             <span class="string">&quot;env(TEST_DATABASE_URL)&quot;</span>,
-            <span class="kw">if </span><span class="self">self</span>.is_vitess() &amp;&amp; <span class="self">self</span>.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+            <span class="kw">if </span><span class="self">self</span>.is_vitess() {
                 <span class="kw-2">&amp;</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
             } <span class="kw">else </span>{
                 <span class="kw-2">&amp;</span>[]

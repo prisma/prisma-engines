@@ -237,7 +237,7 @@
 <span class="doccomment">/// Generator preview features
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
-        ReferentialIntegrity
+        Deno
          | InteractiveTransactions
          | FullTextSearch
          | FullTextIndex
@@ -247,7 +247,6 @@
          | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
-         | Deno
          | ExtendedWhereUnique
     }),
     deprecated: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
@@ -271,6 +270,7 @@
         | OrderByAggregateGroup
         | OrderByRelation
         | ReferentialActions
+        | ReferentialIntegrity
         | NApi
         | ImprovedQueryRaw
         | DataProxy

@@ -415,10 +415,6 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
 </pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>migration_core::json_rpc::types::{
@@ -434,7 +430,7 @@
         BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
     },
 };
-<span class="kw">use </span>psl::{parser_database::SourceFile, PreviewFeature};
+<span class="kw">use </span>psl::parser_database::SourceFile;
 <span class="kw">use </span>quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -741,11 +737,7 @@
 
     <span class="doccomment">/// Render a valid datasource block, including database URL.
     </span><span class="kw">pub fn </span>write_datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>std::fmt::Write) {
-        <span class="kw">let </span>no_foreign_keys = <span class="self">self</span>.is_vitess()
-            &amp;&amp; <span class="self">self
-                </span>.root
-                .preview_features()
-                .contains(PreviewFeature::ReferentialIntegrity);
+        <span class="kw">let </span>no_foreign_keys = <span class="self">self</span>.is_vitess();
 
         <span class="kw">let </span>params = <span class="kw">if </span>no_foreign_keys {
             <span class="macro">vec!</span>[(<span class="string">&quot;relationMode&quot;</span>, <span class="string">r#&quot;&quot;prisma&quot;&quot;#</span>)]
