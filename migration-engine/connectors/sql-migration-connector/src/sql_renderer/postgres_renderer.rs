@@ -40,6 +40,7 @@ impl PostgresFlavour {
 }
 
 impl SqlRenderer for PostgresFlavour {
+    // TODO(MultiSchema): We only do alter_sequence on CockroachDB.
     fn render_alter_sequence(
         &self,
         sequence_idx: Pair<u32>,
