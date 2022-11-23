@@ -20,12 +20,7 @@ pub(super) fn validate_missing_relation_indexes(
     relation_field: RelationFieldWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    let is_provider_mongodb = ctx
-        .datasource
-        .map(|datasource| datasource.active_provider == "mongodb")
-        .unwrap_or(false);
-
-    if is_provider_mongodb || ctx.relation_mode != RelationMode::Prisma {
+    if ctx.connector.should_suggest_missing_referencing_fields_indexes() || ctx.relation_mode != RelationMode::Prisma {
         return;
     }
 

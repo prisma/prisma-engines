@@ -132,4 +132,9 @@ impl Connector for MongoDbDatamodelConnector {
     fn allowed_relation_mode_settings(&self) -> enumflags2::BitFlags<RelationMode> {
         RelationMode::Prisma.into()
     }
+
+    // avoid checking whether the referencing fields in a `@relation` attribute belong to an index during the schema validation
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        false
+    }
 }
