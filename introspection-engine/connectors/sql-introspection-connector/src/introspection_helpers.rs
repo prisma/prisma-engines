@@ -287,10 +287,10 @@ pub(crate) fn render_scalar_field<'a>(
     if let Some((scalar_type, native_type)) = types {
         let is_default = ctx
             .active_connector()
-            .native_type_is_default_for_scalar_type(&native_type, &scalar_type);
+            .native_type_is_default_for_scalar_type(native_type, &scalar_type);
 
         if !is_default {
-            let (r#type, params) = ctx.active_connector().native_type_to_parts(&native_type);
+            let (r#type, params) = ctx.active_connector().native_type_to_parts(native_type);
             let prefix = &ctx.config.datasources.first().unwrap().name;
 
             field.native_type(prefix, r#type, params)
