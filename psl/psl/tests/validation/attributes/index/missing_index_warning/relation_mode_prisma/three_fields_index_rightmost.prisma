@@ -33,5 +33,5 @@ model Post {
 //   [1;94m-->[0m  [4mschema.prisma:28[0m
 // [1;94m   | [0m
 // [1;94m27 | [0m    userIdC Int
-// [1;94m28 | [0m    user [1;93mSomeUser[0m @relation(fields: [userIdA, userIdB, userIdC], references: [idA, idB, idC])
+// [1;94m28 | [0m    user SomeUser [1;93m@relation(fields: [userIdA, userIdB, userIdC], references: [idA, idB, idC])[0m
 // [1;94m   | [0m
