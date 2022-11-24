@@ -2,7 +2,7 @@ use crate::{
     datamodel_connector::{Connector, RelationMode},
     Datasource, PreviewFeature,
 };
-use diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use enumflags2::BitFlags;
 
 /// The validation context. The lifetime parameter is _not_ the AST lifetime, but the subtype of
@@ -23,5 +23,10 @@ impl Context<'_> {
     /// Pure convenience method. Forwards to Diagnostics::push_error().
     pub(super) fn push_error(&mut self, error: DatamodelError) {
         self.diagnostics.push_error(error);
+    }
+
+    /// Pure convenience method. Forwards to Diagnostics::push_warning().
+    pub(super) fn push_warning(&mut self, warning: DatamodelWarning) {
+        self.diagnostics.push_warning(warning);
     }
 }

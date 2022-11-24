@@ -1,0 +1,17 @@
+// no missing relation index validation on relationMode = "foreignKeys" / no relationMode at all.
+
+datasource db {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+}
+
+model SomeUser {
+    id Int @id
+    posts Post[]
+}
+
+model Post {
+    id Int @id
+    userId Int
+    user SomeUser @relation(fields: [userId], references: [id])
+}
