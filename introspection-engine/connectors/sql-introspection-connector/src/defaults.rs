@@ -1,4 +1,4 @@
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
+use crate::calculate_datamodel::{InputContext, OutputContext};
 use datamodel_renderer::datamodel as renderer;
 use introspection_connector::Version;
 use psl::{
@@ -12,13 +12,14 @@ use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 pub(crate) fn render_default<'a>(
     column: sql::ColumnWalker<'a>,
     existing_field: Option<walkers::ScalarFieldWalker<'a>>,
-    ctx: &mut Context<'a>,
+    input: InputContext<'a>,
+    output: &mut OutputContext<'a>,
 ) -> Option<renderer::DefaultValue<'a>> {
     use datamodel_renderer::value::{Constant, Function, Text, Value};
 
     let mut result = match (column.default().map(|d| d.kind()), column.column_type_family()) {
-        (Some(sql::DefaultKind::Sequence(name)), _) if ctx.is_cockroach() => {
-            let connector_data: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
+        (Some(sql::DefaultKind::Sequence(name)), _) if input.is_cockroach() => {
+            let connector_data: &PostgresSchemaExt = input.schema.downcast_connector_data();
 
             let sequence_idx = connector_data
                 .sequences
@@ -76,14 +77,14 @@ pub(crate) fn render_default<'a>(
             Some(renderer::DefaultValue::function(fun))
         }
         (Some(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
-            let variant = ctx
+            let variant = input
                 .schema
                 .walk(*enum_id)
                 .variants()
                 .find(|v| v.name() == variant)
                 .unwrap();
 
-            let variant_name = ctx.enum_variant_name(variant.id).prisma_name();
+            let variant_name = input.enum_variant_name(variant.id).prisma_name();
             Some(renderer::DefaultValue::constant(variant_name))
         }
         (Some(sql::DefaultKind::Value(dml::PrismaValue::String(val))), _) => Some(renderer::DefaultValue::text(val)),
@@ -116,7 +117,9 @@ pub(crate) fn render_default<'a>(
         (None, sql::ColumnTypeFamily::String) => match existing_field.and_then(|f| f.default_value()) {
             Some(value) if value.is_cuid() => Some(renderer::DefaultValue::function(Function::new("cuid"))),
             Some(value) if value.is_uuid() => Some(renderer::DefaultValue::function(Function::new("uuid"))),
-            None if matches!(ctx.version, Version::Prisma1 | Version::Prisma11) => maybe_prisma1_default(column, ctx),
+            None if matches!(output.version, Version::Prisma1 | Version::Prisma11) => {
+                maybe_prisma1_default(column, input, output)
+            }
             _ => None,
         },
 
@@ -125,7 +128,7 @@ pub(crate) fn render_default<'a>(
 
     if let Some(res) = result.as_mut() {
         let default_default_value =
-            ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
+            ConstraintNames::default_name(column.table().name(), column.name(), input.active_connector());
 
         match column.default().and_then(|def| def.constraint_name()) {
             Some(map) if map != default_default_value => {
@@ -144,36 +147,37 @@ fn is_sequence(column: sql::ColumnWalker<'_>) -> bool {
 
 fn maybe_prisma1_default<'a>(
     column: sql::ColumnWalker<'a>,
-    ctx: &mut Context<'a>,
+    input: InputContext<'a>,
+    output: &mut OutputContext<'a>,
 ) -> Option<renderer::DefaultValue<'a>> {
     use datamodel_renderer::value::Function;
 
     let model_and_field = || crate::warnings::ModelAndField {
-        model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
-        field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+        model: input.table_prisma_name(column.table().id).prisma_name().into_owned(),
+        field: input.column_prisma_name(column.id).prisma_name().into_owned(),
     };
 
-    if ctx.sql_family().is_postgres() {
+    if input.sql_family.is_postgres() {
         let native_type: &PostgresType = column.column_type().native_type.as_ref()?.downcast_ref();
 
         if native_type == &PostgresType::VarChar(Some(25)) {
-            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            output.warnings.prisma_1_cuid_defaults.push(model_and_field());
 
             return Some(renderer::DefaultValue::function(Function::new("cuid")));
         } else if native_type == &PostgresType::VarChar(Some(36)) {
-            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            output.warnings.prisma_1_uuid_defaults.push(model_and_field());
 
             return Some(renderer::DefaultValue::function(Function::new("uuid")));
         }
-    } else if ctx.sql_family().is_mysql() {
+    } else if input.sql_family.is_mysql() {
         let native_type: &MySqlType = column.column_type().native_type.as_ref()?.downcast_ref();
 
         if native_type == &MySqlType::Char(25) {
-            ctx.prisma_1_cuid_defaults.push(model_and_field());
+            output.warnings.prisma_1_cuid_defaults.push(model_and_field());
 
             return Some(renderer::DefaultValue::function(Function::new("cuid")));
         } else if native_type == &MySqlType::Char(36) {
-            ctx.prisma_1_uuid_defaults.push(model_and_field());
+            output.warnings.prisma_1_uuid_defaults.push(model_and_field());
 
             return Some(renderer::DefaultValue::function(Function::new("uuid")));
         }

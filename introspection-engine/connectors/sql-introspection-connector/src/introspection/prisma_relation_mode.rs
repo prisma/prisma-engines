@@ -3,16 +3,18 @@ use psl::parser_database::ast;
 use sql_schema_describer as sql;
 use std::{borrow::Cow, collections::HashMap};
 
-pub(super) fn render(ctx: &mut super::Context<'_>) {
+use crate::calculate_datamodel::{InputContext, OutputContext};
+
+pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
     let mut reintrospected_relations = Vec::new();
-    let old_model_to_table: HashMap<ast::ModelId, sql::TableId> = ctx
+    let old_model_to_table: HashMap<ast::ModelId, sql::TableId> = input
         .introspection_map
         .existing_models
         .iter()
         .map(|(&table, &model)| (model, table))
         .collect();
 
-    for relation in ctx
+    for relation in input
         .previous_schema
         .db
         .walk_relations()
@@ -67,8 +69,8 @@ pub(super) fn render(ctx: &mut super::Context<'_>) {
                 field.relation(relation);
             }
 
-            let new_model_idx = ctx.target_models[&old_model_to_table[&rf.model().model_id()]];
-            ctx.rendered_schema.model_at(new_model_idx).push_field(field);
+            let new_model_idx = output.target_models[&old_model_to_table[&rf.model().model_id()]];
+            output.rendered_schema.model_at(new_model_idx).push_field(field);
 
             reintrospected_relations.push(crate::warnings::Model {
                 model: rf.model().name().to_owned(),
@@ -78,6 +80,6 @@ pub(super) fn render(ctx: &mut super::Context<'_>) {
 
     if !reintrospected_relations.is_empty() {
         let warning = crate::warnings::warning_relations_added_from_the_previous_data_model(&reintrospected_relations);
-        ctx.warnings.push(warning);
+        output.warnings.push(warning);
     }
 }

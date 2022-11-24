@@ -1,4 +1,4 @@
-use crate::calculate_datamodel::CalculateDatamodelContext;
+use crate::calculate_datamodel::InputContext;
 use crate::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
@@ -53,14 +53,14 @@ const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::Char(36),
 ];
 
-pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
+pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
     let mut version_checker = VersionChecker {
-        sql_family: ctx.sql_family(),
-        is_cockroachdb: ctx.is_cockroach(),
-        has_migration_table: ctx.schema.table_walkers().any(is_old_migration_table),
-        has_relay_table: ctx.schema.table_walkers().any(is_relay_table),
-        has_prisma_1_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_0_join_table),
-        has_prisma_1_1_or_2_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
+        sql_family: input.sql_family(),
+        is_cockroachdb: input.is_cockroach(),
+        has_migration_table: input.schema.table_walkers().any(is_old_migration_table),
+        has_relay_table: input.schema.table_walkers().any(is_relay_table),
+        has_prisma_1_join_table: input.schema.table_walkers().any(is_prisma_1_point_0_join_table),
+        has_prisma_1_1_or_2_join_table: input.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
         uses_on_delete: false,
         uses_default_values: false,
         always_has_created_at_updated_at: true,
@@ -69,7 +69,7 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
         has_inline_relations: false,
     };
 
-    for table in ctx
+    for table in input
         .schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(*table))
@@ -97,7 +97,7 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
     }
 
     match version_checker.sql_family {
-        _ if ctx.schema.is_empty() => Version::NonPrisma,
+        _ if input.schema.is_empty() => Version::NonPrisma,
         SqlFamily::Sqlite if version_checker.is_prisma_2() => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
         SqlFamily::Mysql if version_checker.is_prisma_2() => Version::Prisma2,
