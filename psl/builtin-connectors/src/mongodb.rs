@@ -59,7 +59,7 @@ impl Connector for MongoDbDatamodelConnector {
         BitFlags::empty()
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         validations::id_must_be_defined(model, errors);
 
         if let Some(pk) = model.primary_key() {
@@ -131,5 +131,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn allowed_relation_mode_settings(&self) -> enumflags2::BitFlags<RelationMode> {
         RelationMode::Prisma.into()
+    }
+
+    /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        false
     }
 }

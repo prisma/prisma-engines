@@ -66,30 +66,43 @@ impl<'a> fmt::Display for IndexDefinition<'a> {
     }
 }
 
-/// Index type definition.
 #[derive(Debug, Clone)]
-pub enum IndexOps<'a> {
+pub enum InnerOps<'a> {
+    Managed(Cow<'a, str>),
+    Raw(Text<Cow<'a, str>>),
+}
+
+/// Index field operator definition.
+#[derive(Debug, Clone)]
+pub struct IndexOps<'a>(InnerOps<'a>);
+
+impl<'a> IndexOps<'a> {
     /// Managed and known by Prisma. Renders as-is as a constant.
     ///
     /// ```ignore
     /// @@index([field(ops: Int2BloomOps)], type: Brin)
     /// //                  ^^^^^^^^^^^^ like this
     /// ```
-    Managed(Cow<'a, str>),
+    pub fn managed(ops: impl Into<Cow<'a, str>>) -> Self {
+        Self(InnerOps::Managed(ops.into()))
+    }
+
     /// A type we don't handle yet. Renders as raw.
     ///
     /// ```ignore
     /// @@index([field(ops: raw("tsvector_ops"))], type: Gist)
     /// //                  ^^^^^^^^^^^^^^^^^^^ like this
     /// ```
-    Raw(Text<Cow<'a, str>>),
+    pub fn raw(ops: impl Into<Cow<'a, str>>) -> Self {
+        Self(InnerOps::Raw(Text(ops.into())))
+    }
 }
 
 impl<'a> fmt::Display for IndexOps<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Managed(s) => f.write_str(s),
-            Self::Raw(s) => {
+        match &self.0 {
+            InnerOps::Managed(ref s) => f.write_str(s),
+            InnerOps::Raw(ref s) => {
                 write!(f, "raw({s})")
             }
         }

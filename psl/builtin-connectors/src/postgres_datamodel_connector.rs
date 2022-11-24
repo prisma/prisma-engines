@@ -8,7 +8,8 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
@@ -361,7 +362,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: walkers::ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::compatible_native_types(index, self, errors);
             validations::generalized_index_validations(index, self, errors);

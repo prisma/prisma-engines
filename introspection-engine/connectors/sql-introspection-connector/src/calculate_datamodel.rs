@@ -19,7 +19,13 @@ pub(crate) struct CalculateDatamodelContext<'a> {
     pub(crate) prisma_1_uuid_defaults: Vec<warnings::ModelAndField>,
     pub(crate) prisma_1_cuid_defaults: Vec<warnings::ModelAndField>,
     pub(crate) fields_with_empty_names: Vec<warnings::ModelAndField>,
+    pub(crate) remapped_fields: Vec<warnings::ModelAndField>,
     pub(crate) enum_values_with_empty_names: Vec<warnings::EnumAndValue>,
+    pub(crate) models_without_columns: Vec<warnings::Model>,
+    pub(crate) models_without_identifiers: Vec<warnings::Model>,
+    pub(crate) reintrospected_id_names: Vec<warnings::Model>,
+    pub(crate) unsupported_types: Vec<warnings::ModelAndFieldAndType>,
+    pub(crate) remapped_models: Vec<warnings::Model>,
     pub(crate) rendered_schema: datamodel_renderer::Datamodel<'a>,
     pub(crate) target_models: HashMap<sql::TableId, usize>,
     pub(crate) introspection_map: crate::introspection_map::IntrospectionMap,
@@ -139,6 +145,42 @@ impl<'a> CalculateDatamodelContext<'a> {
         }
 
         maybe_warn(
+            &self.models_without_identifiers,
+            warnings::warning_models_without_identifier,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.unsupported_types,
+            warnings::warning_unsupported_types,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.remapped_models,
+            warnings::warning_enriched_with_map_on_model,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.remapped_fields,
+            warnings::warning_enriched_with_map_on_field,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.models_without_columns,
+            warnings::warning_models_without_columns,
+            self.warnings,
+        );
+
+        maybe_warn(
+            &self.reintrospected_id_names,
+            warnings::warning_enriched_with_custom_primary_key_names,
+            self.warnings,
+        );
+
+        maybe_warn(
             &self.prisma_1_uuid_defaults,
             warnings::warning_default_uuid_warning,
             self.warnings,
@@ -184,8 +226,14 @@ pub fn calculate_datamodel(
         prisma_1_cuid_defaults: Vec::new(),
         fields_with_empty_names: Vec::new(),
         enum_values_with_empty_names: Vec::new(),
+        models_without_columns: Vec::new(),
+        models_without_identifiers: Vec::new(),
         rendered_schema: datamodel_renderer::Datamodel::default(),
         target_models: HashMap::default(),
+        unsupported_types: Vec::new(),
+        remapped_models: Vec::new(),
+        remapped_fields: Vec::new(),
+        reintrospected_id_names: Vec::new(),
     };
 
     context.version = crate::version_checker::check_prisma_version(&context);

@@ -13,7 +13,7 @@ use migration_core::{
         BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
     },
 };
-use psl::{parser_database::SourceFile, PreviewFeature};
+use psl::parser_database::SourceFile;
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -320,11 +320,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        let no_foreign_keys = self.is_vitess()
-            && self
-                .root
-                .preview_features()
-                .contains(PreviewFeature::ReferentialIntegrity);
+        let no_foreign_keys = self.is_vitess();
 
         let params = if no_foreign_keys {
             vec![("relationMode", r#""prisma""#)]

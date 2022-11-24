@@ -148,7 +148,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: RelationMode, _: &mut Diagnostics) {}
     fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
@@ -297,6 +297,12 @@ pub trait Connector: Send + Sync {
 
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
+    }
+
+    /// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
+    /// are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        true
     }
 
     fn native_type_to_string(&self, instance: &NativeTypeInstance) -> String {

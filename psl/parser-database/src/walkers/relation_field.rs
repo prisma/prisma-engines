@@ -170,7 +170,7 @@ impl<'db> RelationFieldWalker<'db> {
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
+    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         self.fields()
     }
 

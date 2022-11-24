@@ -1,0 +1,20 @@
+// no relation index validation warning on relationMode = "prisma" when a referenced field is already in @@unique.
+
+datasource db {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model SomeUser {
+    id Int @id
+    profile Profile?
+}
+
+model Profile {
+    id Int @id
+    userId Int
+    user SomeUser? @relation(fields: [userId], references: [id])
+
+    @@unique([userId])
+}

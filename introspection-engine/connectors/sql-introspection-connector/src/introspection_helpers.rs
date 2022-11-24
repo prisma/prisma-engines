@@ -1,21 +1,17 @@
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlFamilyTrait};
+use crate::{calculate_datamodel::CalculateDatamodelContext as Context, defaults::render_default, SqlFamilyTrait};
+use datamodel_renderer::datamodel as renderer;
 use psl::{
-    datamodel_connector::constraint_names::ConstraintNames,
-    dml::{
-        FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
-        SortOrder,
-    },
-    parser_database::{self as db, walkers},
-    schema_ast::ast::WithDocumentation,
-    PreviewFeature,
+    datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers,
+    schema_ast::ast::WithDocumentation, PreviewFeature,
 };
-use sql::walkers::{ColumnWalker, TableWalker};
+use sql::{
+    walkers::{ColumnWalker, TableWalker},
+    IndexWalker,
+};
 use sql_schema_describer::{
     self as sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, IndexType,
-    SQLSortOrder, SqlSchema,
 };
-use std::cmp;
-use tracing::debug;
+use std::{borrow::Cow, cmp};
 
 /// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
 /// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.
@@ -141,12 +137,47 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 
 //calculators
 
-pub(crate) fn calculate_index(
-    index: sql::walkers::IndexWalker<'_>,
-    existing_index: Option<walkers::IndexWalker<'_>>,
-    ctx: &Context<'_>,
-) -> Option<IndexDefinition> {
-    let tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)?;
+pub(crate) fn render_index<'a>(
+    index: sql::IndexWalker<'a>,
+    existing_index: Option<walkers::IndexWalker<'a>>,
+    ctx: &Context<'a>,
+) -> Option<renderer::IndexDefinition<'a>> {
+    let fields = index.columns().map(|col| {
+        let name = ctx.column_prisma_name(col.as_column().id).prisma_name();
+        let mut definition = renderer::IndexFieldInput::new(name);
+
+        if col
+            .sort_order()
+            .filter(|so| matches!(so, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            definition.sort_order("Desc");
+        }
+
+        if let Some(length) = col.length() {
+            definition.length(length);
+        }
+
+        if let Some(ops) = render_opclass(col.id, ctx) {
+            definition.ops(ops);
+        }
+
+        definition
+    });
+
+    let mut definition = match index.index_type() {
+        // we handle these in the field level
+        sql::IndexType::Unique if fields.len() == 1 => {
+            return None;
+        }
+        sql::IndexType::Unique => renderer::IndexDefinition::unique(fields),
+        sql::IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
+            renderer::IndexDefinition::fulltext(fields)
+        }
+        sql::IndexType::Normal | sql::IndexType::Fulltext => renderer::IndexDefinition::index(fields),
+        // we handle these in the model id definition
+        sql::IndexType::PrimaryKey => return None,
+    };
 
     let default_constraint_name = match index.index_type() {
         IndexType::Unique => {
@@ -159,172 +190,219 @@ pub(crate) fn calculate_index(
         }
     };
 
-    let db_name = if index.name() == default_constraint_name {
-        None
-    } else {
-        Some(index.name().to_owned())
-    };
+    if let Some(name) = existing_index.and_then(|idx| idx.name()) {
+        definition.name(name);
+    }
 
-    Some(IndexDefinition {
-        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
-        db_name,
-        fields: index
-            .columns()
-            .map(|c| {
-                let sort_order = c.sort_order().and_then(|sort| match sort {
-                    SQLSortOrder::Asc => None,
-                    SQLSortOrder::Desc => Some(SortOrder::Desc),
-                });
+    if index.name() != default_constraint_name {
+        definition.map(index.name());
+    }
 
-                let operator_class = get_opclass(c.id, index.schema, ctx);
+    if let Some(clustered) = index_is_clustered(index.id, ctx) {
+        definition.clustered(clustered);
+    }
 
-                IndexField {
-                    path: vec![(
-                        ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
-                        None,
-                    )],
-                    sort_order,
-                    length: c.length(),
-                    operator_class,
-                }
-            })
-            .collect(),
-        tpe,
-        defined_on_field: index.columns().len() == 1,
-        algorithm: index_algorithm(index, ctx),
-        clustered: index_is_clustered(index.id, index.schema, ctx),
-    })
+    if let Some(algo) = render_index_algorithm(index, ctx) {
+        definition.index_type(algo);
+    }
+
+    Some(definition)
 }
 
-pub(crate) fn calculate_scalar_field(
-    column: ColumnWalker<'_>,
-    remapped_fields: &mut Vec<crate::warnings::ModelAndField>,
-    ctx: &mut Context<'_>,
-) -> ScalarField {
+pub(crate) fn render_scalar_field<'a>(
+    column: ColumnWalker<'a>,
+    primary_key: Option<IndexWalker<'a>>,
+    unique: Option<IndexWalker<'a>>,
+    ctx: &mut Context<'a>,
+) -> renderer::ModelField<'a> {
     let existing_field = ctx.existing_scalar_field(column.id);
-    let mut documentation = existing_field
-        .and_then(|f| f.ast_field().documentation())
-        .map(ToOwned::to_owned);
 
-    let (name, database_name, is_commented_out) = {
+    let (name, database_name, docs_for_commenting_out, is_commented_out) = {
         let names = ctx.column_prisma_name(column.id);
-        let prisma_name = names.prisma_name().into_owned();
-        let mapped_name = names.mapped_name().map(ToOwned::to_owned);
+        let prisma_name = names.prisma_name();
+        let mapped_name = names.mapped_name();
 
         if prisma_name.is_empty() {
             ctx.fields_with_empty_names.push(crate::warnings::ModelAndField {
                 model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
                 field: column.name().to_owned(),
             });
-            documentation = Some("This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*".to_owned());
-            (mapped_name.clone().unwrap_or(prisma_name), mapped_name, true)
+
+            let docs = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+
+            (
+                mapped_name.map(Cow::from).unwrap_or(prisma_name),
+                mapped_name,
+                Some(docs),
+                true,
+            )
         } else {
-            (prisma_name, mapped_name, false)
+            (prisma_name, mapped_name, None, false)
         }
     };
 
     if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
-        remapped_fields.push(crate::warnings::ModelAndField {
+        ctx.remapped_fields.push(crate::warnings::ModelAndField {
             model: field.model().name().to_owned(),
             field: field.name().to_owned(),
         });
     }
 
-    let arity = match column.column_type().arity {
-        _ if column.is_single_primary_key() && column.is_autoincrement() => FieldArity::Required,
-        ColumnArity::Required => FieldArity::Required,
-        ColumnArity::Nullable => FieldArity::Optional,
-        ColumnArity::List => FieldArity::List,
+    let column_type = match column.column_type_family() {
+        ColumnTypeFamily::Int => Cow::from("Int"),
+        ColumnTypeFamily::BigInt => Cow::from("BigInt"),
+        ColumnTypeFamily::Float => Cow::from("Float"),
+        ColumnTypeFamily::Decimal => Cow::from("Decimal"),
+        ColumnTypeFamily::Boolean => Cow::from("Boolean"),
+        ColumnTypeFamily::String => Cow::from("String"),
+        ColumnTypeFamily::DateTime => Cow::from("DateTime"),
+        ColumnTypeFamily::Binary => Cow::from("Bytes"),
+        ColumnTypeFamily::Json => Cow::from("Json"),
+        ColumnTypeFamily::Uuid => Cow::from("String"),
+        ColumnTypeFamily::Enum(id) => ctx.enum_prisma_name(*id).prisma_name(),
+        ColumnTypeFamily::Unsupported(ref typ) => Cow::from(typ),
     };
 
-    let mut default_value = crate::defaults::calculate_default(column, existing_field, ctx);
+    let mut field = match column.column_type().arity {
+        ColumnArity::Required if column.column_type_family().is_unsupported() => {
+            renderer::ModelField::new_required_unsupported(name, column_type)
+        }
+        ColumnArity::Nullable if column.column_type_family().is_unsupported() => {
+            renderer::ModelField::new_optional_unsupported(name, column_type)
+        }
+        ColumnArity::List if column.column_type_family().is_unsupported() => {
+            renderer::ModelField::new_array_unsupported(name, column_type)
+        }
+        ColumnArity::Required => renderer::ModelField::new_required(name, column_type),
+        ColumnArity::Nullable => renderer::ModelField::new_optional(name, column_type),
+        ColumnArity::List => renderer::ModelField::new_array(name, column_type),
+    };
 
-    let default_default_value =
-        ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
+    let types =
+        calculate_psl_scalar_type(column).and_then(|st| column.column_type().native_type.as_ref().map(|nt| (st, nt)));
 
-    if let Some(ref mut default_value) = default_value {
-        if default_value.db_name == Some(default_default_value) {
-            default_value.db_name = None;
+    if let Some((scalar_type, native_type)) = types {
+        let is_default = ctx
+            .active_connector()
+            .native_type_is_default_for_scalar_type(native_type, &scalar_type);
+
+        if !is_default {
+            let (r#type, params) = ctx.active_connector().native_type_to_parts(native_type);
+            let prefix = &ctx.config.datasources.first().unwrap().name;
+
+            field.native_type(prefix, r#type, params)
         }
     }
 
-    ScalarField {
-        name,
-        arity,
-        field_type: calculate_scalar_field_type_with_native_types(column, ctx),
-        database_name,
-        documentation,
-        default_value,
-        is_generated: false,
-        is_commented_out,
-        is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(false),
-        is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(false),
+    if let Some(pk) = primary_key {
+        let mut id_field = renderer::IdFieldDefinition::default();
+        let col = pk.columns().next().unwrap();
+
+        if let Some(clustered) = primary_key_is_clustered(pk.id, ctx) {
+            id_field.clustered(clustered);
+        }
+
+        if col
+            .sort_order()
+            .filter(|o| matches!(o, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            id_field.sort_order("Desc");
+        }
+
+        if let Some(length) = col.length() {
+            id_field.length(length);
+        }
+
+        let default_name = ConstraintNames::primary_key_name(column.table().name(), ctx.active_connector());
+        if pk.name() != default_name && !pk.name().is_empty() {
+            id_field.map(pk.name());
+        }
+
+        field.id(id_field);
     }
+
+    if let Some(unique) = unique {
+        let mut opts = renderer::IndexFieldOptions::default();
+        let col = unique.columns().next().unwrap();
+
+        let default_constraint_name =
+            ConstraintNames::unique_index_name(unique.table().name(), &[col.name()], ctx.active_connector());
+
+        if unique.name() != default_constraint_name {
+            opts.map(unique.name());
+        }
+
+        if let Some(clustered) = index_is_clustered(unique.id, ctx) {
+            opts.clustered(clustered);
+        }
+
+        if col
+            .sort_order()
+            .filter(|o| matches!(o, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            opts.sort_order("Desc");
+        }
+
+        if let Some(length) = col.length() {
+            opts.length(length);
+        }
+
+        field.unique(opts);
+    }
+
+    if let Some(docs) = existing_field.and_then(|f| f.ast_field().documentation()) {
+        field.documentation(docs);
+    }
+
+    if let Some(docs) = docs_for_commenting_out {
+        field.documentation(docs);
+    }
+
+    if is_commented_out {
+        field.commented_out();
+    }
+
+    if let Some(default) = render_default(column, existing_field, ctx) {
+        field.default(default);
+    }
+
+    if let Some(map) = database_name {
+        field.map(map);
+    }
+
+    if existing_field.map(|f| f.is_updated_at()).unwrap_or(false) {
+        field.updated_at();
+    }
+
+    if existing_field.map(|f| f.is_ignored()).unwrap_or(false) {
+        field.ignore();
+    }
+
+    field
 }
 
-pub(crate) fn calculate_scalar_field_type_for_native_type(column: ColumnWalker<'_>, ctx: &Context) -> FieldType {
-    debug!("Calculating field type for '{}'", column.name());
-    let fdt = column.column_type().full_data_type.to_owned();
-
+pub(crate) fn calculate_psl_scalar_type(column: ColumnWalker<'_>) -> Option<psl::parser_database::ScalarType> {
     match column.column_type_family() {
-        ColumnTypeFamily::Int => FieldType::Scalar(ScalarType::Int, None),
-        ColumnTypeFamily::BigInt => FieldType::Scalar(ScalarType::BigInt, None),
-        ColumnTypeFamily::Float => FieldType::Scalar(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Scalar(ScalarType::Decimal, None),
-        ColumnTypeFamily::Boolean => FieldType::Scalar(ScalarType::Boolean, None),
-        ColumnTypeFamily::String => FieldType::Scalar(ScalarType::String, None),
-        ColumnTypeFamily::DateTime => FieldType::Scalar(ScalarType::DateTime, None),
-        ColumnTypeFamily::Json => FieldType::Scalar(ScalarType::Json, None),
-        ColumnTypeFamily::Uuid => FieldType::Scalar(ScalarType::String, None),
-        ColumnTypeFamily::Binary => FieldType::Scalar(ScalarType::Bytes, None),
-        ColumnTypeFamily::Enum(id) => FieldType::Enum(ctx.enum_prisma_name(*id).prisma_name().into_owned()),
-        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
-    }
-}
-
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker<'_>, ctx: &Context) -> FieldType {
-    debug!("Calculating native field type for '{}'", column.name());
-    let scalar_type = calculate_scalar_field_type_for_native_type(column, ctx);
-
-    match scalar_type {
-        FieldType::Scalar(scal_type, _) => match &column.column_type().native_type {
-            None => scalar_type,
-            Some(native_type) => {
-                let is_default = ctx.active_connector().native_type_is_default_for_scalar_type(
-                    native_type,
-                    &dml_scalar_type_to_parser_database_scalar_type(scal_type),
-                );
-
-                if is_default {
-                    FieldType::Scalar(scal_type, None)
-                } else {
-                    let instance = psl::dml::NativeTypeInstance::new(native_type.clone(), ctx.active_connector());
-
-                    FieldType::Scalar(scal_type, Some(instance))
-                }
-            }
-        },
-        field_type => field_type,
-    }
-}
-
-fn dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -> db::ScalarType {
-    match st {
-        ScalarType::Int => db::ScalarType::Int,
-        ScalarType::BigInt => db::ScalarType::BigInt,
-        ScalarType::Float => db::ScalarType::Float,
-        ScalarType::Boolean => db::ScalarType::Boolean,
-        ScalarType::String => db::ScalarType::String,
-        ScalarType::DateTime => db::ScalarType::DateTime,
-        ScalarType::Json => db::ScalarType::Json,
-        ScalarType::Bytes => db::ScalarType::Bytes,
-        ScalarType::Decimal => db::ScalarType::Decimal,
+        ColumnTypeFamily::Int => Some(psl::parser_database::ScalarType::Int),
+        ColumnTypeFamily::BigInt => Some(psl::parser_database::ScalarType::BigInt),
+        ColumnTypeFamily::Float => Some(psl::parser_database::ScalarType::Float),
+        ColumnTypeFamily::Decimal => Some(psl::parser_database::ScalarType::Decimal),
+        ColumnTypeFamily::Boolean => Some(psl::parser_database::ScalarType::Boolean),
+        ColumnTypeFamily::String => Some(psl::parser_database::ScalarType::String),
+        ColumnTypeFamily::DateTime => Some(psl::parser_database::ScalarType::DateTime),
+        ColumnTypeFamily::Json => Some(psl::parser_database::ScalarType::Json),
+        ColumnTypeFamily::Uuid => Some(psl::parser_database::ScalarType::String),
+        ColumnTypeFamily::Binary => Some(psl::parser_database::ScalarType::Bytes),
+        ColumnTypeFamily::Enum(_) => None,
+        ColumnTypeFamily::Unsupported(_) => None,
     }
 }
 
 // misc
 
-fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<IndexAlgorithm> {
+fn render_index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<&'static str> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }
@@ -333,20 +411,20 @@ fn index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Optio
 
     match data.index_algorithm(index.id) {
         sql::postgres::SqlIndexAlgorithm::BTree => None,
-        sql::postgres::SqlIndexAlgorithm::Hash => Some(IndexAlgorithm::Hash),
-        sql::postgres::SqlIndexAlgorithm::Gist => Some(IndexAlgorithm::Gist),
-        sql::postgres::SqlIndexAlgorithm::Gin => Some(IndexAlgorithm::Gin),
-        sql::postgres::SqlIndexAlgorithm::SpGist => Some(IndexAlgorithm::SpGist),
-        sql::postgres::SqlIndexAlgorithm::Brin => Some(IndexAlgorithm::Brin),
+        sql::postgres::SqlIndexAlgorithm::Hash => Some("Hash"),
+        sql::postgres::SqlIndexAlgorithm::Gist => Some("Gist"),
+        sql::postgres::SqlIndexAlgorithm::Gin => Some("Gin"),
+        sql::postgres::SqlIndexAlgorithm::SpGist => Some("SpGist"),
+        sql::postgres::SqlIndexAlgorithm::Brin => Some("Brin"),
     }
 }
 
-fn index_is_clustered(index_id: sql::IndexId, schema: &SqlSchema, ctx: &Context) -> Option<bool> {
+fn index_is_clustered(index_id: sql::IndexId, ctx: &Context) -> Option<bool> {
     if !ctx.sql_family().is_mssql() {
         return None;
     }
 
-    let ext: &MssqlSchemaExt = schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
     let clustered = ext.index_is_clustered(index_id);
 
     if !clustered {
@@ -372,12 +450,12 @@ pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Opt
     Some(clustered)
 }
 
-fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Context) -> Option<OperatorClass> {
+fn render_opclass<'a>(index_field_id: sql::IndexColumnId, ctx: &Context<'a>) -> Option<renderer::IndexOps<'a>> {
     if !ctx.sql_family().is_postgres() {
         return None;
     }
 
-    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let ext: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
 
     let opclass = match ext.get_opclass(index_field_id) {
         Some(opclass) => opclass,
@@ -386,76 +464,98 @@ fn get_opclass(index_field_id: sql::IndexColumnId, schema: &SqlSchema, ctx: &Con
 
     match &opclass.kind {
         _ if opclass.is_default => None,
-        sql::postgres::SQLOperatorClassKind::InetOps => Some(OperatorClass::InetOps),
-        sql::postgres::SQLOperatorClassKind::JsonbOps => Some(OperatorClass::JsonbOps),
-        sql::postgres::SQLOperatorClassKind::JsonbPathOps => Some(OperatorClass::JsonbPathOps),
-        sql::postgres::SQLOperatorClassKind::ArrayOps => Some(OperatorClass::ArrayOps),
-        sql::postgres::SQLOperatorClassKind::TextOps => Some(OperatorClass::TextOps),
-        sql::postgres::SQLOperatorClassKind::BitMinMaxOps => Some(OperatorClass::BitMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps => Some(OperatorClass::VarBitMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::BpcharBloomOps => Some(OperatorClass::BpcharBloomOps),
-        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps => Some(OperatorClass::BpcharMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::ByteaBloomOps => Some(OperatorClass::ByteaBloomOps),
-        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps => Some(OperatorClass::ByteaMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::DateBloomOps => Some(OperatorClass::DateBloomOps),
-        sql::postgres::SQLOperatorClassKind::DateMinMaxOps => Some(OperatorClass::DateMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps => Some(OperatorClass::DateMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Float4BloomOps => Some(OperatorClass::Float4BloomOps),
-        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps => Some(OperatorClass::Float4MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps => Some(OperatorClass::Float4MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(OperatorClass::Float8BloomOps),
-        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps => Some(OperatorClass::Float8MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps => Some(OperatorClass::Float8MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::InetInclusionOps => Some(OperatorClass::InetInclusionOps),
-        sql::postgres::SQLOperatorClassKind::InetBloomOps => Some(OperatorClass::InetBloomOps),
-        sql::postgres::SQLOperatorClassKind::InetMinMaxOps => Some(OperatorClass::InetMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps => Some(OperatorClass::InetMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int2BloomOps => Some(OperatorClass::Int2BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps => Some(OperatorClass::Int2MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps => Some(OperatorClass::Int2MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int4BloomOps => Some(OperatorClass::Int4BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps => Some(OperatorClass::Int4MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps => Some(OperatorClass::Int4MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int8BloomOps => Some(OperatorClass::Int8BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps => Some(OperatorClass::Int8MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps => Some(OperatorClass::Int8MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::NumericBloomOps => Some(OperatorClass::NumericBloomOps),
-        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps => Some(OperatorClass::NumericMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps => Some(OperatorClass::NumericMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::OidBloomOps => Some(OperatorClass::OidBloomOps),
-        sql::postgres::SQLOperatorClassKind::OidMinMaxOps => Some(OperatorClass::OidMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps => Some(OperatorClass::OidMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TextBloomOps => Some(OperatorClass::TextBloomOps),
-        sql::postgres::SQLOperatorClassKind::TextMinMaxOps => Some(OperatorClass::TextMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimestampBloomOps => Some(OperatorClass::TimestampBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps => Some(OperatorClass::TimestampMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps => Some(OperatorClass::TimestampMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps => Some(OperatorClass::TimestampTzBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps => Some(OperatorClass::TimestampTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::InetOps => Some(renderer::IndexOps::managed("InetOps")),
+        sql::postgres::SQLOperatorClassKind::JsonbOps => Some(renderer::IndexOps::managed("JsonbOps")),
+        sql::postgres::SQLOperatorClassKind::JsonbPathOps => Some(renderer::IndexOps::managed("JsonbPathOps")),
+        sql::postgres::SQLOperatorClassKind::ArrayOps => Some(renderer::IndexOps::managed("ArrayOps")),
+        sql::postgres::SQLOperatorClassKind::TextOps => Some(renderer::IndexOps::managed("TextOps")),
+        sql::postgres::SQLOperatorClassKind::BitMinMaxOps => Some(renderer::IndexOps::managed("BitMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps => Some(renderer::IndexOps::managed("VarBitMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::BpcharBloomOps => Some(renderer::IndexOps::managed("BpcharBloomOps")),
+        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps => Some(renderer::IndexOps::managed("BpcharMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::ByteaBloomOps => Some(renderer::IndexOps::managed("ByteaBloomOps")),
+        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps => Some(renderer::IndexOps::managed("ByteaMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::DateBloomOps => Some(renderer::IndexOps::managed("DateBloomOps")),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxOps => Some(renderer::IndexOps::managed("DateMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("DateMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Float4BloomOps => Some(renderer::IndexOps::managed("Float4BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps => Some(renderer::IndexOps::managed("Float4MinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("Float4MinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(renderer::IndexOps::managed("Float8BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps => Some(renderer::IndexOps::managed("Float8MinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("Float8MinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::InetInclusionOps => Some(renderer::IndexOps::managed("InetInclusionOps")),
+        sql::postgres::SQLOperatorClassKind::InetBloomOps => Some(renderer::IndexOps::managed("InetBloomOps")),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxOps => Some(renderer::IndexOps::managed("InetMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("InetMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Int2BloomOps => Some(renderer::IndexOps::managed("Int2BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps => Some(renderer::IndexOps::managed("Int2MinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("Int2MinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Int4BloomOps => Some(renderer::IndexOps::managed("Int4BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps => Some(renderer::IndexOps::managed("Int4MinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("Int4MinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Int8BloomOps => Some(renderer::IndexOps::managed("Int8BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps => Some(renderer::IndexOps::managed("Int8MinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("Int8MinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::NumericBloomOps => Some(renderer::IndexOps::managed("NumericBloomOps")),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps => Some(renderer::IndexOps::managed("NumericMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("NumericMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::OidBloomOps => Some(renderer::IndexOps::managed("OidBloomOps")),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxOps => Some(renderer::IndexOps::managed("OidMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("OidMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::TextBloomOps => Some(renderer::IndexOps::managed("TextBloomOps")),
+        sql::postgres::SQLOperatorClassKind::TextMinMaxOps => Some(renderer::IndexOps::managed("TextMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::TimestampBloomOps => {
+            Some(renderer::IndexOps::managed("TimestampBloomOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps => {
+            Some(renderer::IndexOps::managed("TimestampMinMaxOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("TimestampMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps => {
+            Some(renderer::IndexOps::managed("TimestampTzBloomOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps => {
+            Some(renderer::IndexOps::managed("TimestampTzMinMaxOps"))
+        }
         sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => {
-            Some(OperatorClass::TimestampTzMinMaxMultiOps)
+            Some(renderer::IndexOps::managed("TimestampTzMinMaxMultiOps"))
         }
-        sql::postgres::SQLOperatorClassKind::TimeBloomOps => Some(OperatorClass::TimeBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps => Some(OperatorClass::TimeMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps => Some(OperatorClass::TimeMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps => Some(OperatorClass::TimeTzBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps => Some(OperatorClass::TimeTzMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps => Some(OperatorClass::TimeTzMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(OperatorClass::UuidBloomOps),
-        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(OperatorClass::UuidMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => Some(OperatorClass::UuidMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Raw(c) => Some(OperatorClass::Raw(c.to_string().into())),
-    }
-}
-
-fn sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: &Context) -> Option<psl::parser_database::IndexType> {
-    match sql {
-        IndexType::Unique => Some(psl::dml::IndexType::Unique),
-        IndexType::Normal => Some(psl::dml::IndexType::Normal),
-        IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
-            Some(psl::dml::IndexType::Fulltext)
+        sql::postgres::SQLOperatorClassKind::TimeBloomOps => Some(renderer::IndexOps::managed("TimeBloomOps")),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps => Some(renderer::IndexOps::managed("TimeMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("TimeMinMaxMultiOps"))
         }
-        IndexType::Fulltext => Some(psl::dml::IndexType::Normal),
-        IndexType::PrimaryKey => None,
+        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps => Some(renderer::IndexOps::managed("TimeTzBloomOps")),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps => Some(renderer::IndexOps::managed("TimeTzMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("TimeTzMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::UuidBloomOps => Some(renderer::IndexOps::managed("UuidBloomOps")),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps => Some(renderer::IndexOps::managed("UuidMinMaxOps")),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps => {
+            Some(renderer::IndexOps::managed("UuidMinMaxMultiOps"))
+        }
+        sql::postgres::SQLOperatorClassKind::Raw(ref c) => Some(renderer::IndexOps::raw(c)),
     }
 }

@@ -1,7 +1,6 @@
 use query_engine_tests::test_suite;
 use std::borrow::Cow;
 
-/// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
 #[test_suite(schema(generic))]
 mod interactive_tx {
     use query_engine_tests::*;
@@ -91,7 +90,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit cannot be executed on a closed transaction."));
+            .contains("A commit cannot be executed on an expired transaction"));
 
         // Try again
         let res = runner.commit_tx(tx_id).await?;
@@ -101,7 +100,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit cannot be executed on a closed transaction."));
+            .contains("A commit cannot be executed on an expired transaction"));
 
         Ok(())
     }
@@ -287,7 +286,7 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A commit cannot be executed on a closed transaction."));
+            .contains("A commit cannot be executed on an expired transaction"));
 
         // Expect the state of the tx to be expired so the rollback should fail.
         let res = runner.rollback_tx(tx_id.clone()).await?;
@@ -297,14 +296,14 @@ mod interactive_tx {
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
         assert!(known_err
             .message
-            .contains("A rollback cannot be executed on a closed transaction."));
+            .contains("A rollback cannot be executed on an expired transaction"));
 
         // Expect the state of the tx to be expired so the query should fail.
         assert_error!(
             runner,
             r#"{ findManyTestModel { id } }"#,
             2028,
-            "A query cannot be executed on a closed transaction."
+            "A query cannot be executed on an expired transaction"
         );
 
         runner
@@ -319,7 +318,7 @@ mod interactive_tx {
             .await?
             .assert_failure(
                 2028,
-                Some("A batch query cannot be executed on a closed transaction.".to_string()),
+                Some("A batch query cannot be executed on an expired transaction".to_string()),
             );
 
         Ok(())
@@ -416,6 +415,154 @@ mod interactive_tx {
             .await?;
 
         res.assert_failure(2034, None);
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn double_commit(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // First commit must be successful
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
+
+        // Second commit
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_err());
+
+        runner.clear_active_tx();
+
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a committed transaction"));
+
+        // The first commit must have worked
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn double_rollback(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // First rollback must be successful
+        let res = runner.rollback_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
+
+        // Second rollback must return error
+        let res = runner.rollback_tx(tx_id).await?;
+        assert!(res.is_err());
+
+        runner.clear_active_tx();
+
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A rollback cannot be executed on a transaction that was rolled back"));
+
+        // Check that the rollback still worked
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn commit_after_rollback(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // Rollback must be successful
+        let res = runner.rollback_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
+
+        // Commit must fail
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_err());
+
+        runner.clear_active_tx();
+
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A commit cannot be executed on a transaction that was rolled back"));
+
+        // Check that the commit didn't work
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn rollback_after_commit(mut runner: Runner) -> TestResult<()> {
+        let tx_id = runner.start_tx(5000, 5000, None).await?;
+        runner.set_active_tx(tx_id.clone());
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
+
+        // Commit must be successful
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
+
+        // Rollback must fail
+        let res = runner.rollback_tx(tx_id).await?;
+        assert!(res.is_err());
+
+        runner.clear_active_tx();
+
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err
+            .message
+            .contains("A rollback cannot be executed on a committed transaction"));
+
+        // Check that the commit worked
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"field":null}]}}"###
+        );
 
         Ok(())
     }

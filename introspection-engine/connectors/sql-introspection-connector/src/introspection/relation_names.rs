@@ -60,11 +60,12 @@ impl<'a> RelationNames<'a> {
 ///
 /// Additionally, in self-relations, the names of the two relation fields are disambiguated by
 /// prefixing the name of the backrelation field with "other_".
-pub(super) fn introspect_relation_names<'a>(ctx: &mut super::Context<'a>) -> RelationNames<'a> {
+pub(super) fn introspect<'a>(ctx: &mut super::Context<'a>) -> RelationNames<'a> {
     let mut names = RelationNames {
         inline_relation_names: Default::default(),
         m2m_relation_names: Default::default(),
     };
+
     let mut duplicated_fks = Default::default();
     let ambiguous_relations = find_ambiguous_relations(ctx);
 

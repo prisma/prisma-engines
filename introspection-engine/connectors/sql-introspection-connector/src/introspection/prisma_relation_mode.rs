@@ -3,7 +3,7 @@ use psl::parser_database::ast;
 use sql_schema_describer as sql;
 use std::{borrow::Cow, collections::HashMap};
 
-pub(super) fn reintrospect_relations(ctx: &mut super::Context<'_>) {
+pub(super) fn render(ctx: &mut super::Context<'_>) {
     let mut reintrospected_relations = Vec::new();
     let old_model_to_table: HashMap<ast::ModelId, sql::TableId> = ctx
         .introspection_map

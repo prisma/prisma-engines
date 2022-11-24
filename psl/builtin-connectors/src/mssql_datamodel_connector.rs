@@ -7,7 +7,9 @@ use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
-    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+    },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
 };
@@ -228,7 +230,12 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(
+        &self,
+        model: parser_database::walkers::ModelWalker<'_>,
+        _: RelationMode,
+        errors: &mut Diagnostics,
+    ) {
         for index in model.indexes() {
             validations::index_uses_correct_field_types(self, index, errors);
         }
