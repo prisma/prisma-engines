@@ -114,17 +114,13 @@ pub(crate) fn uses_native_referential_action_set_default(
         )
     };
 
-    if let Some(on_delete) = field.explicit_on_delete() {
-        if on_delete == ReferentialAction::SetDefault {
-            let span = get_span("onDelete");
-            diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
-        }
+    if let Some(ReferentialAction::SetDefault) = field.explicit_on_delete() {
+        let span = get_span("onDelete");
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
     }
 
-    if let Some(on_update) = field.explicit_on_update() {
-        if on_update == ReferentialAction::SetDefault {
-            let span = get_span("onUpdate");
-            diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
-        }
+    if let Some(ReferentialAction::SetDefault) = field.explicit_on_update() {
+        let span = get_span("onUpdate");
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
     }
 }
