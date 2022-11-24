@@ -1292,6 +1292,54 @@ fn multi_schema_tests(_api: TestApi) {
             }),
             skip: None,
         },
+        TestData {
+            name: "modify and move enum across namespaces",
+            description: "this is a special case of alter enum, where we also move it across namespaces",
+            schema: Schema {
+                common: base_schema.to_string(),
+                first: indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
+      enum SomeEnum {
+        First
+        Second
+        @@schema("one")
+      }"#}.into(),
+                second: Some(indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
+      enum SomeEnum {
+        First
+        Third
+        @@schema("two")
+      }"#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::RawCmdAnd("insert into \"one\".\"SomeModel\" values(1, 'First');",
+                             &SchemaPush::PushCustomAnd(CustomPushStep {
+                                 warnings: &["The `value` column on the `SomeModel` table would be dropped and recreated. This will lead to data loss."],
+                                 errors: &[],
+                                 with_schema: WithSchema::Second,
+                                 executed_steps: ExecutedSteps::NonZero,
+                             },
+                                &SchemaPush::Done))),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table("SomeModel")
+                      .assert_enum("SomeEnum", |e|
+                                         e.assert_values(&["First", "Third"])
+                                           .assert_namespace("two"));
+            }),
+            skip: None,
+        },
     ];
 
     // traverse_ is always the answer
