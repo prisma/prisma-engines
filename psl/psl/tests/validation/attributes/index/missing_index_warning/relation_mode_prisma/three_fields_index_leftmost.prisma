@@ -1,9 +1,5 @@
 // add missing relation index validation warning on relationMode = "prisma".
 
-generator client {
-    provider        = "prisma-client-js"
-}
-
 datasource db {
     provider = "mysql"
     url = env("TEST_DATABASE_URL")
@@ -28,19 +24,11 @@ model Post {
 
     @@index([userIdA, userIdB])
 }
-// [1;91merror[0m: [1mError validating datasource `db`: 
-// This option can only be set if the preview feature is enabled in a generator block.
-// 
-// Example:
-// 
-// generator client {
-//     provider = "prisma-client-js"
-//     previewFeatures = ["referentialIntegrity"]
-// }
-// [0m
-//   [1;94m-->[0m  [4mschema.prisma:10[0m
+// [1;93mwarning[0m: [1mWith `relationMode = \"prisma\"`, no foreign keys are used, so `@relation`'s fields will not benefit from the index usually created by the relational database under the hood.
+// This can lead to poor performance when querying these fields. We recommend adding an index manually.
+// Learn more at https://pris.ly/d/relation-mode-prisma#indexes[0m
+//   [1;94m-->[0m  [4mschema.prisma:23[0m
 // [1;94m   | [0m
-// [1;94m 9 | [0m    url = env("TEST_DATABASE_URL")
-// [1;94m10 | [0m    [1;91mrelationMode = "prisma"[0m
-// [1;94m11 | [0m}
+// [1;94m22 | [0m    userIdC Int
+// [1;94m23 | [0m    user SomeUser [1;93m@relation(fields: [userIdA, userIdB, userIdC], references: [idA, idB, idC])[0m
 // [1;94m   | [0m
