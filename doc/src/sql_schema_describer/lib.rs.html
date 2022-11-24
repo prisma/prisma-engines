@@ -769,6 +769,10 @@
 <span id="769">769</span>
 <span id="770">770</span>
 <span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attribute">#![deny(rust_2018_idioms, unsafe_code)]
@@ -1306,6 +1310,10 @@
 
     <span class="kw">pub fn </span>is_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, ColumnTypeFamily::String)
+    }
+
+    <span class="kw">pub fn </span>is_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ColumnTypeFamily::Unsupported(<span class="kw">_</span>))
     }
 }
 

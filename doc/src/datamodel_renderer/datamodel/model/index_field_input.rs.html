@@ -126,6 +126,16 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::IndexOps;
@@ -147,9 +157,9 @@
     /// @@index([foobar])
     /// //       ^^^^^^ name
     /// ```
-    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: Cow::Borrowed(name),
+            name: name.into(),
             sort_order: <span class="prelude-val">None</span>,
             length: <span class="prelude-val">None</span>,
             ops: <span class="prelude-val">None</span>,
@@ -174,6 +184,16 @@
     /// ```
     </span><span class="kw">pub fn </span>length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, length: u32) {
         <span class="self">self</span>.length = <span class="prelude-val">Some</span>(length);
+    }
+
+    <span class="doccomment">/// Define index operators for the field.
+    ///
+    /// ```ignore
+    /// @@index([foobar(ops: MinMaxFoobarOps), type: Brin])
+    /// //                      ^^ here
+    /// ```
+    </span><span class="kw">pub fn </span>ops(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ops: IndexOps&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.ops = <span class="prelude-val">Some</span>(ops);
     }
 }
 

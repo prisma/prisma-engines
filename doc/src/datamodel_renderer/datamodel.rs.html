@@ -170,6 +170,11 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Types related to the _datamodel section_ in the PSL.
 //!
 //! Includes the `model`, `enum` and `type` definitions.
@@ -255,6 +260,11 @@
         <span class="kw">for </span>dml_ct <span class="kw">in </span>dml_data_model.composite_types() {
             <span class="self">self</span>.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
         }
+    }
+
+    <span class="doccomment">/// True if the render output would be an empty string.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.models.is_empty() &amp;&amp; <span class="self">self</span>.enums.is_empty() &amp;&amp; <span class="self">self</span>.composite_types.is_empty()
     }
 }
 

@@ -238,7 +238,7 @@
     /// field Int @id(sort: Desc)
     /// //                  ^^^^ here
     /// ```
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>sort_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sort: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;sort&quot;</span>, Constant::new_no_validate(sort.into())));
     }
 
@@ -248,7 +248,7 @@
     /// field Int @id(length: 32)
     /// //                    ^^ here
     /// ```
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, length: u32) {
+    </span><span class="kw">pub fn </span>length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, length: u32) {
         <span class="self">self</span>.<span class="number">0</span>.push_param((<span class="string">&quot;length&quot;</span>, Constant::new_no_validate(length)));
     }
 }

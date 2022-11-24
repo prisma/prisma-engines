@@ -38,31 +38,9 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
+<span class="kw">mod </span>configuration;
 <span class="kw">mod </span>enums;
 <span class="kw">mod </span>indexes;
 <span class="kw">mod </span>m2m_relations;
@@ -72,57 +50,33 @@
 <span class="kw">mod </span>relation_names;
 
 <span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlError};
-<span class="kw">use </span>datamodel_renderer <span class="kw">as </span>render;
-<span class="kw">use </span>psl::{dml, Configuration};
-<span class="kw">use </span>sql_schema_describer::SqlSchema;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>introspect(ctx: <span class="kw-2">&amp;mut </span>Context) -&gt; <span class="prelude-ty">Result</span>&lt;(String, bool), SqlError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>datamodel = dml::Datamodel::new();
-
-    enums::introspect_enums(ctx);
-    models::introspect_models(<span class="kw-2">&amp;mut </span>datamodel, ctx);
-
-    ctx.rendered_schema.push_dml(<span class="kw-2">&amp;</span>ctx.config.datasources[<span class="number">0</span>], <span class="kw-2">&amp;</span>datamodel);
-
-    <span class="kw">let </span>relation_names = relation_names::introspect_relation_names(ctx);
+    enums::render(ctx);
+    models::render(ctx);
 
     <span class="kw">if </span>ctx.foreign_keys_enabled() {
-        inline_relations::introspect_inline_relations(<span class="kw-2">&amp;</span>relation_names, ctx);
+        <span class="kw">let </span>relation_names = relation_names::introspect(ctx);
+
+        inline_relations::render(<span class="kw-2">&amp;</span>relation_names, ctx);
+        m2m_relations::render(<span class="kw-2">&amp;</span>relation_names, ctx);
     } <span class="kw">else </span>{
-        prisma_relation_mode::reintrospect_relations(ctx);
+        prisma_relation_mode::render(ctx);
     }
 
-    m2m_relations::introspect_m2m_relations(<span class="kw-2">&amp;</span>relation_names, ctx);
-
-    <span class="kw">let </span>config = <span class="kw">if </span>ctx.render_config {
-        render_configuration(ctx.config, ctx.schema).to_string()
+    <span class="kw">let </span>rendered = <span class="kw">if </span>ctx.render_config {
+        <span class="macro">format!</span>(
+            <span class="string">&quot;{}\n{}&quot;</span>,
+            configuration::render(ctx.config, ctx.schema),
+            ctx.rendered_schema
+        )
     } <span class="kw">else </span>{
-        String::new()
+        ctx.rendered_schema.to_string()
     };
-
-    <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, config, ctx.rendered_schema);
 
     ctx.finalize_warnings();
 
-    <span class="prelude-val">Ok</span>((psl::reformat(<span class="kw-2">&amp;</span>rendered, <span class="number">2</span>).unwrap(), datamodel.is_empty()))
-}
-
-<span class="kw">fn </span>render_configuration&lt;<span class="lifetime">&#39;a</span>&gt;(config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SqlSchema) -&gt; render::Configuration&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>output = render::Configuration::default();
-    <span class="kw">let </span>prev_ds = config.datasources.first().unwrap();
-    <span class="kw">let </span><span class="kw-2">mut </span>datasource = render::configuration::Datasource::from_psl(prev_ds);
-
-    <span class="kw">if </span>prev_ds.active_connector.is_provider(<span class="string">&quot;postgres&quot;</span>) {
-        postgres::add_extensions(<span class="kw-2">&amp;mut </span>datasource, schema, config);
-    }
-
-    output.push_datasource(datasource);
-
-    <span class="kw">for </span>prev <span class="kw">in </span>config.generators.iter() {
-        output.push_generator(render::configuration::Generator::from_psl(prev));
-    }
-
-    output
+    <span class="prelude-val">Ok</span>((psl::reformat(<span class="kw-2">&amp;</span>rendered, <span class="number">2</span>).unwrap(), ctx.rendered_schema.is_empty()))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

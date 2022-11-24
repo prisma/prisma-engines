@@ -482,6 +482,9 @@
 <span id="482">482</span>
 <span id="483">483</span>
 <span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel::{
         attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
@@ -612,7 +615,10 @@
     /// }
     /// ```
     </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
-        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into()));
+        <span class="kw">match </span><span class="self">self</span>.documentation.as_mut() {
+            <span class="prelude-val">Some</span>(docs) =&gt; docs.push(documentation),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into())),
+        }
     }
 
     <span class="doccomment">/// Sets the field default attribute.

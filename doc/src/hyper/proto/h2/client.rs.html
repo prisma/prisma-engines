@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h2/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.23/src/proto/h2/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -386,6 +386,68 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
 </span><span class="kw">use </span>std::time::Duration;
@@ -395,12 +457,14 @@
 <span class="kw">use </span>futures_util::future::{<span class="self">self</span>, Either, FutureExt <span class="kw">as _</span>, TryFutureExt <span class="kw">as _</span>};
 <span class="kw">use </span>futures_util::stream::StreamExt <span class="kw">as _</span>;
 <span class="kw">use </span>h2::client::{Builder, SendRequest};
+<span class="kw">use </span>h2::SendStream;
 <span class="kw">use </span>http::{Method, StatusCode};
 <span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
 <span class="kw">use </span>tracing::{debug, trace, warn};
 
 <span class="kw">use super</span>::{ping, H2Upgraded, PipeToSendStream, SendBuf};
 <span class="kw">use </span><span class="kw">crate</span>::body::HttpBody;
+<span class="kw">use </span><span class="kw">crate</span>::client::dispatch::Callback;
 <span class="kw">use </span><span class="kw">crate</span>::common::{exec::Exec, task, Future, Never, Pin, Poll};
 <span class="kw">use </span><span class="kw">crate</span>::ext::Protocol;
 <span class="kw">use </span><span class="kw">crate</span>::headers;
@@ -408,6 +472,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::proto::Dispatched;
 <span class="kw">use </span><span class="kw">crate</span>::upgrade::Upgraded;
 <span class="kw">use crate</span>::{Body, Request, Response};
+<span class="kw">use </span>h2::client::ResponseFuture;
 
 <span class="kw">type </span>ClientRx&lt;B&gt; = <span class="kw">crate</span>::client::dispatch::Receiver&lt;Request&lt;B&gt;, Response&lt;Body&gt;&gt;;
 
@@ -558,6 +623,7 @@
         executor: exec,
         h2_tx,
         req_rx,
+        fut_ctx: <span class="prelude-val">None</span>,
     })
 }
 
@@ -581,6 +647,20 @@
     }
 }
 
+<span class="kw">struct </span>FutCtx&lt;B&gt;
+<span class="kw">where
+    </span>B: HttpBody,
+{
+    is_connect: bool,
+    eos: bool,
+    fut: ResponseFuture,
+    body_tx: SendStream&lt;SendBuf&lt;B::Data&gt;&gt;,
+    body: B,
+    cb: Callback&lt;Request&lt;B&gt;, Response&lt;Body&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;B: HttpBody&gt; Unpin <span class="kw">for </span>FutCtx&lt;B&gt; {}
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ClientTask&lt;B&gt;
 <span class="kw">where
     </span>B: HttpBody,
@@ -591,6 +671,7 @@
     executor: Exec,
     h2_tx: SendRequest&lt;SendBuf&lt;B::Data&gt;&gt;,
     req_rx: ClientRx&lt;B&gt;,
+    fut_ctx: <span class="prelude-ty">Option</span>&lt;FutCtx&lt;B&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;B&gt; ClientTask&lt;B&gt;
@@ -599,6 +680,99 @@
 {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_extended_connect_protocol_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.h2_tx.is_extended_connect_protocol_enabled()
+    }
+}
+
+<span class="kw">impl</span>&lt;B&gt; ClientTask&lt;B&gt;
+<span class="kw">where
+    </span>B: HttpBody + Send + <span class="lifetime">&#39;static</span>,
+    B::Data: Send,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+{
+    <span class="kw">fn </span>poll_pipe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: FutCtx&lt;B&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">let </span>ping = <span class="self">self</span>.ping.clone();
+        <span class="kw">let </span>send_stream = <span class="kw">if </span>!f.is_connect {
+            <span class="kw">if </span>!f.eos {
+                <span class="kw">let </span><span class="kw-2">mut </span>pipe = Box::pin(PipeToSendStream::new(f.body, f.body_tx)).map(|res| {
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = res {
+                        <span class="macro">debug!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, e);
+                    }
+                });
+
+                <span class="comment">// eagerly see if the body pipe is ready and
+                // can thus skip allocating in the executor
+                </span><span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span>pipe).poll(cx) {
+                    Poll::Ready(<span class="kw">_</span>) =&gt; (),
+                    Poll::Pending =&gt; {
+                        <span class="kw">let </span>conn_drop_ref = <span class="self">self</span>.conn_drop_ref.clone();
+                        <span class="comment">// keep the ping recorder&#39;s knowledge of an
+                        // &quot;open stream&quot; alive while this body is
+                        // still sending...
+                        </span><span class="kw">let </span>ping = ping.clone();
+                        <span class="kw">let </span>pipe = pipe.map(<span class="kw">move </span>|x| {
+                            drop(conn_drop_ref);
+                            drop(ping);
+                            x
+                        });
+                        <span class="comment">// Clear send task
+                        </span><span class="self">self</span>.executor.execute(pipe);
+                    }
+                }
+            }
+
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(f.body_tx)
+        };
+
+        <span class="kw">let </span>fut = f.fut.map(<span class="kw">move </span>|result| <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(res) =&gt; {
+                <span class="comment">// record that we got the response headers
+                </span>ping.record_non_data();
+
+                <span class="kw">let </span>content_length = headers::content_length_parse_all(res.headers());
+                <span class="kw">if let </span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>send_stream), StatusCode::OK) = (send_stream, res.status()) {
+                    <span class="kw">if </span>content_length.map_or(<span class="bool-val">false</span>, |len| len != <span class="number">0</span>) {
+                        <span class="macro">warn!</span>(<span class="string">&quot;h2 connect response with non-zero body not supported&quot;</span>);
+
+                        send_stream.send_reset(h2::Reason::INTERNAL_ERROR);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>((
+                            <span class="kw">crate</span>::Error::new_h2(h2::Reason::INTERNAL_ERROR.into()),
+                            <span class="prelude-val">None</span>,
+                        ));
+                    }
+                    <span class="kw">let </span>(parts, recv_stream) = res.into_parts();
+                    <span class="kw">let </span><span class="kw-2">mut </span>res = Response::from_parts(parts, Body::empty());
+
+                    <span class="kw">let </span>(pending, on_upgrade) = <span class="kw">crate</span>::upgrade::pending();
+                    <span class="kw">let </span>io = H2Upgraded {
+                        ping,
+                        send_stream: <span class="kw">unsafe </span>{ UpgradedSendStream::new(send_stream) },
+                        recv_stream,
+                        buf: Bytes::new(),
+                    };
+                    <span class="kw">let </span>upgraded = Upgraded::new(io, Bytes::new());
+
+                    pending.fulfill(upgraded);
+                    res.extensions_mut().insert(on_upgrade);
+
+                    <span class="prelude-val">Ok</span>(res)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>res = res.map(|stream| {
+                        <span class="kw">let </span>ping = ping.for_stream(<span class="kw-2">&amp;</span>stream);
+                        <span class="kw">crate</span>::Body::h2(stream, content_length.into(), ping)
+                    });
+                    <span class="prelude-val">Ok</span>(res)
+                }
+            }
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                ping.ensure_not_timed_out().map_err(|e| (e, <span class="prelude-val">None</span>))<span class="question-mark">?</span>;
+
+                <span class="macro">debug!</span>(<span class="string">&quot;client response error: {}&quot;</span>, err);
+                <span class="prelude-val">Err</span>((<span class="kw">crate</span>::Error::new_h2(err), <span class="prelude-val">None</span>))
+            }
+        });
+        <span class="self">self</span>.executor.execute(f.cb.send_when(fut));
     }
 }
 
@@ -625,6 +799,16 @@
                 }
             };
 
+            <span class="kw">match </span><span class="self">self</span>.fut_ctx.take() {
+                <span class="comment">// If we were waiting on pending open
+                // continue where we left off.
+                </span><span class="prelude-val">Some</span>(f) =&gt; {
+                    <span class="self">self</span>.poll_pipe(f, cx);
+                    <span class="kw">continue</span>;
+                }
+                <span class="prelude-val">None </span>=&gt; (),
+            }
+
             <span class="kw">match </span><span class="self">self</span>.req_rx.poll_recv(cx) {
                 Poll::Ready(<span class="prelude-val">Some</span>((req, cb))) =&gt; {
                     <span class="comment">// check that future hasn&#39;t been canceled already
@@ -643,7 +827,6 @@
 
                     <span class="kw">let </span>is_connect = req.method() == Method::CONNECT;
                     <span class="kw">let </span>eos = body.is_end_stream();
-                    <span class="kw">let </span>ping = <span class="self">self</span>.ping.clone();
 
                     <span class="kw">if </span>is_connect {
                         <span class="kw">if </span>headers::content_length_parse_all(req.headers())
@@ -671,90 +854,31 @@
                         }
                     };
 
-                    <span class="kw">let </span>send_stream = <span class="kw">if </span>!is_connect {
-                        <span class="kw">if </span>!eos {
-                            <span class="kw">let </span><span class="kw-2">mut </span>pipe =
-                                Box::pin(PipeToSendStream::new(body, body_tx)).map(|res| {
-                                    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = res {
-                                        <span class="macro">debug!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, e);
-                                    }
-                                });
-
-                            <span class="comment">// eagerly see if the body pipe is ready and
-                            // can thus skip allocating in the executor
-                            </span><span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span>pipe).poll(cx) {
-                                Poll::Ready(<span class="kw">_</span>) =&gt; (),
-                                Poll::Pending =&gt; {
-                                    <span class="kw">let </span>conn_drop_ref = <span class="self">self</span>.conn_drop_ref.clone();
-                                    <span class="comment">// keep the ping recorder&#39;s knowledge of an
-                                    // &quot;open stream&quot; alive while this body is
-                                    // still sending...
-                                    </span><span class="kw">let </span>ping = ping.clone();
-                                    <span class="kw">let </span>pipe = pipe.map(<span class="kw">move </span>|x| {
-                                        drop(conn_drop_ref);
-                                        drop(ping);
-                                        x
-                                    });
-                                    <span class="self">self</span>.executor.execute(pipe);
-                                }
-                            }
-                        }
-
-                        <span class="prelude-val">None
-                    </span>} <span class="kw">else </span>{
-                        <span class="prelude-val">Some</span>(body_tx)
+                    <span class="kw">let </span>f = FutCtx {
+                        is_connect,
+                        eos,
+                        fut,
+                        body_tx,
+                        body,
+                        cb,
                     };
 
-                    <span class="kw">let </span>fut = fut.map(<span class="kw">move </span>|result| <span class="kw">match </span>result {
-                        <span class="prelude-val">Ok</span>(res) =&gt; {
-                            <span class="comment">// record that we got the response headers
-                            </span>ping.record_non_data();
-
-                            <span class="kw">let </span>content_length = headers::content_length_parse_all(res.headers());
-                            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>send_stream), StatusCode::OK) =
-                                (send_stream, res.status())
-                            {
-                                <span class="kw">if </span>content_length.map_or(<span class="bool-val">false</span>, |len| len != <span class="number">0</span>) {
-                                    <span class="macro">warn!</span>(<span class="string">&quot;h2 connect response with non-zero body not supported&quot;</span>);
-
-                                    send_stream.send_reset(h2::Reason::INTERNAL_ERROR);
-                                    <span class="kw">return </span><span class="prelude-val">Err</span>((
-                                        <span class="kw">crate</span>::Error::new_h2(h2::Reason::INTERNAL_ERROR.into()),
-                                        <span class="prelude-val">None</span>,
-                                    ));
-                                }
-                                <span class="kw">let </span>(parts, recv_stream) = res.into_parts();
-                                <span class="kw">let </span><span class="kw-2">mut </span>res = Response::from_parts(parts, Body::empty());
-
-                                <span class="kw">let </span>(pending, on_upgrade) = <span class="kw">crate</span>::upgrade::pending();
-                                <span class="kw">let </span>io = H2Upgraded {
-                                    ping,
-                                    send_stream: <span class="kw">unsafe </span>{ UpgradedSendStream::new(send_stream) },
-                                    recv_stream,
-                                    buf: Bytes::new(),
-                                };
-                                <span class="kw">let </span>upgraded = Upgraded::new(io, Bytes::new());
-
-                                pending.fulfill(upgraded);
-                                res.extensions_mut().insert(on_upgrade);
-
-                                <span class="prelude-val">Ok</span>(res)
-                            } <span class="kw">else </span>{
-                                <span class="kw">let </span>res = res.map(|stream| {
-                                    <span class="kw">let </span>ping = ping.for_stream(<span class="kw-2">&amp;</span>stream);
-                                    <span class="kw">crate</span>::Body::h2(stream, content_length.into(), ping)
-                                });
-                                <span class="prelude-val">Ok</span>(res)
-                            }
+                    <span class="comment">// Check poll_ready() again.
+                    // If the call to send_request() resulted in the new stream being pending open
+                    // we have to wait for the open to complete before accepting new requests.
+                    </span><span class="kw">match </span><span class="self">self</span>.h2_tx.poll_ready(cx) {
+                        Poll::Pending =&gt; {
+                            <span class="comment">// Save Context
+                            </span><span class="self">self</span>.fut_ctx = <span class="prelude-val">Some</span>(f);
+                            <span class="kw">return </span>Poll::Pending;
                         }
-                        <span class="prelude-val">Err</span>(err) =&gt; {
-                            ping.ensure_not_timed_out().map_err(|e| (e, <span class="prelude-val">None</span>))<span class="question-mark">?</span>;
-
-                            <span class="macro">debug!</span>(<span class="string">&quot;client response error: {}&quot;</span>, err);
-                            <span class="prelude-val">Err</span>((<span class="kw">crate</span>::Error::new_h2(err), <span class="prelude-val">None</span>))
+                        Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; (),
+                        Poll::Ready(<span class="prelude-val">Err</span>(err)) =&gt; {
+                            f.cb.send(<span class="prelude-val">Err</span>((<span class="kw">crate</span>::Error::new_h2(err), <span class="prelude-val">None</span>)));
+                            <span class="kw">continue</span>;
                         }
-                    });
-                    <span class="self">self</span>.executor.execute(cb.send_when(fut));
+                    }
+                    <span class="self">self</span>.poll_pipe(f, cx);
                     <span class="kw">continue</span>;
                 }
 

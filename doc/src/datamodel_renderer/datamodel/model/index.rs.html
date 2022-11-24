@@ -95,6 +95,19 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use crate</span>::{
@@ -163,30 +176,43 @@
     }
 }
 
-<span class="doccomment">/// Index type definition.
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>InnerOps&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Managed(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    Raw(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+}
+
+<span class="doccomment">/// Index field operator definition.
 </span><span class="attribute">#[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>IndexOps&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>IndexOps&lt;<span class="lifetime">&#39;a</span>&gt;(InnerOps&lt;<span class="lifetime">&#39;a</span>&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexOps&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Managed and known by Prisma. Renders as-is as a constant.
     ///
     /// ```ignore
     /// @@index([field(ops: Int2BloomOps)], type: Brin)
     /// //                  ^^^^^^^^^^^^ like this
     /// ```
-    </span>Managed(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    </span><span class="kw">pub fn </span>managed(ops: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(InnerOps::Managed(ops.into()))
+    }
+
     <span class="doccomment">/// A type we don&#39;t handle yet. Renders as raw.
     ///
     /// ```ignore
     /// @@index([field(ops: raw(&quot;tsvector_ops&quot;))], type: Gist)
     /// //                  ^^^^^^^^^^^^^^^^^^^ like this
     /// ```
-    </span>Raw(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    </span><span class="kw">pub fn </span>raw(ops: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(InnerOps::Raw(Text(ops.into())))
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>IndexOps&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Managed(s) =&gt; f.write_str(s),
-            <span class="self">Self</span>::Raw(s) =&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            InnerOps::Managed(<span class="kw-2">ref </span>s) =&gt; f.write_str(s),
+            InnerOps::Raw(<span class="kw-2">ref </span>s) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;raw({s})&quot;</span>)
             }
         }

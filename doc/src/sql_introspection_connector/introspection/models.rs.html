@@ -186,49 +186,16 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings};
-<span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, dml, schema_ast::ast::WithDocumentation};
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings};
+<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
+<span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, schema_ast::ast::WithDocumentation};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_models(datamodel: <span class="kw-2">&amp;mut </span>dml::Datamodel, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="comment">// The following local variables are for different types of warnings. We should refactor these
-    // to either be as-is inside the context, or find another mechanism, and abstract to avoid the
-    // repetition.
-    </span><span class="kw">let </span><span class="kw-2">mut </span>re_introspected_model_ignores = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>remapped_models = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>remapped_fields = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>reintrospected_id_names = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>models_without_identifiers = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>models_without_columns = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>unsupported_types = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, dml::Model)&gt; = Vec::with_capacity(ctx.schema.tables_count());
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
+        Vec::with_capacity(ctx.schema.tables_count());
 
     <span class="kw">for </span>table <span class="kw">in </span>ctx
         .schema
@@ -239,169 +206,148 @@
         .filter(|table| !is_relay_table(<span class="kw-2">*</span>table))
     {
         <span class="kw">let </span>existing_model = ctx.existing_model(table.id);
-        <span class="kw">let </span><span class="kw-2">mut </span>model = dml::Model::new(String::new(), <span class="prelude-val">None</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>documentation = String::new();
 
-        <span class="kw">match </span>ctx.table_prisma_name(table.id) {
-            <span class="kw">crate</span>::ModelName::FromPsl { name, mapped_name } =&gt; {
-                model.name = name.to_owned();
-                model.database_name = mapped_name.map(ToOwned::to_owned);
-            }
-            <span class="kw">crate</span>::ModelName::FromSql { name } =&gt; {
-                model.name = name.to_owned();
-            }
+        <span class="kw">let </span>(name, map, docs) = <span class="kw">match </span>ctx.table_prisma_name(table.id) {
+            <span class="kw">crate</span>::ModelName::FromPsl { name, mapped_name } =&gt; (Cow::from(name), mapped_name, <span class="prelude-val">None</span>),
+            <span class="kw">crate</span>::ModelName::FromSql { name } =&gt; (Cow::from(name), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             model_name @ <span class="kw">crate</span>::ModelName::RenamedReserved { mapped_name } =&gt; {
-                <span class="kw">let </span>renamed = model_name.prisma_name().into_owned();
-                documentation.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">&quot;This model has been renamed to &#39;{renamed}&#39; during introspection, because the original name &#39;{mapped_name}&#39; is reserved.&quot;</span>,
-                ));
-                model.name = renamed;
-                model.database_name = <span class="prelude-val">Some</span>(table.name().to_owned());
+                <span class="kw">let </span>docs =  <span class="macro">format!</span>(
+                    <span class="string">&quot;This model has been renamed to &#39;{}&#39; during introspection, because the original name &#39;{}&#39; is reserved.&quot;</span>,
+                    model_name.prisma_name(),
+                    mapped_name,
+                );
+
+                (model_name.prisma_name(), <span class="prelude-val">Some</span>(mapped_name), <span class="prelude-val">Some</span>(docs))
             }
             model_name @ <span class="kw">crate</span>::ModelName::RenamedSanitized { mapped_name: <span class="kw">_ </span>} =&gt; {
-                model.name = model_name.prisma_name().into_owned();
-                model.database_name = <span class="prelude-val">Some</span>(table.name().to_owned());
+                (model_name.prisma_name(), <span class="prelude-val">Some</span>(table.name()), <span class="prelude-val">None</span>)
             }
+        };
+
+        <span class="kw">let </span><span class="kw-2">mut </span>model = renderer::Model::new(name.clone());
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = map {
+            model.map(map);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = docs {
+            model.documentation(docs);
         }
 
         <span class="kw">if </span>table.columns().len() == <span class="number">0 </span>{
-            documentation.push_str(empty_table_comment(ctx));
-            model.is_commented_out = <span class="bool-val">true</span>;
-            models_without_columns.push(warnings::Model {
-                model: model.name.clone(),
+            model.documentation(empty_table_comment(ctx));
+            model.comment_out();
+
+            ctx.models_without_columns.push(warnings::Model {
+                model: name.to_string(),
             });
         } <span class="kw">else if </span>!table_has_usable_identifier(table) {
-            models_without_identifiers.push(warnings::Model {
-                model: model.name.clone(),
+            model.documentation(<span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>);
+            model.ignore();
+
+            ctx.models_without_identifiers.push(warnings::Model {
+                model: name.to_string(),
             });
-            documentation.push_str(<span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>);
-            model.is_ignored = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = existing_model.filter(|m| m.mapped_name().is_some()) {
-            remapped_models.push(warnings::Model {
-                model: m.name().to_owned(),
+        <span class="kw">if </span>existing_model.filter(|m| m.mapped_name().is_some()).is_some() {
+            ctx.remapped_models.push(warnings::Model {
+                model: name.to_string(),
             });
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = existing_model.and_then(|m| m.ast_model().documentation()) {
-            documentation.push_str(docs);
+            model.documentation(docs);
         }
 
         <span class="kw">for </span>column <span class="kw">in </span>table.columns() {
             <span class="kw">if let </span>sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
-                unsupported_types.push(warnings::ModelAndFieldAndType {
-                    model: model.name.clone(),
+                ctx.unsupported_types.push(warnings::ModelAndFieldAndType {
+                    model: name.to_string(),
                     field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
                     tpe: tpe.to_owned(),
                 })
             }
 
-            model.add_field(dml::Field::ScalarField(calculate_scalar_field(
-                column,
-                <span class="kw-2">&amp;mut </span>remapped_fields,
-                ctx,
-            )));
+            <span class="kw">let </span>pk = table
+                .primary_key()
+                .filter(|pk| pk.columns().len() == <span class="number">1</span>)
+                .filter(|pk| pk.contains_column(column.id));
+
+            <span class="kw">let </span>unique = table
+                .indexes()
+                .filter(|i| i.is_unique())
+                .filter(|i| i.columns().len() == <span class="number">1</span>)
+                .find(|i| i.contains_column(column.id));
+
+            model.push_field(render_scalar_field(column, pk, unique, ctx));
         }
 
-        <span class="kw">super</span>::indexes::calculate_model_indexes(table, existing_model, <span class="kw-2">&amp;mut </span>model, ctx);
+        <span class="kw">super</span>::indexes::render_model_indexes(table, existing_model, <span class="kw-2">&amp;mut </span>model, ctx);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = table.primary_key() {
-            <span class="kw">let </span>clustered = primary_key_is_clustered(pk.id, ctx);
-            <span class="kw">let </span>name = existing_model
-                .and_then(|model| model.primary_key())
-                .and_then(|pk| pk.name())
-                .map(ToOwned::to_owned);
+            <span class="kw">let </span>fields = pk.columns().map(|c| {
+                <span class="kw">let </span><span class="kw-2">mut </span>field = renderer::IndexFieldInput::new(ctx.column_prisma_name(c.as_column().id).prisma_name());
 
-            <span class="kw">if </span>name.is_some() {
-                reintrospected_id_names.push(warnings::Model {
-                    model: existing_model.unwrap().name().to_owned(),
-                });
-            }
+                <span class="kw">if </span>c.sort_order()
+                    .filter(|o| <span class="macro">matches!</span>(o, sql::SQLSortOrder::Desc))
+                    .is_some()
+                {
+                    field.sort_order(<span class="string">&quot;Desc&quot;</span>);
+                };
 
-            <span class="kw">let </span>db_name = <span class="kw">if </span>pk.name() == ConstraintNames::primary_key_name(table.name(), ctx.active_connector())
-                || pk.name().is_empty()
-            {
-                <span class="prelude-val">None
-            </span>} <span class="kw">else </span>{
-                <span class="prelude-val">Some</span>(pk.name().to_owned())
-            };
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = c.length() {
+                    field.length(length);
+                }
 
-            model.primary_key = <span class="prelude-val">Some</span>(dml::PrimaryKeyDefinition {
-                name,
-                db_name,
-                fields: pk
-                    .columns()
-                    .map(|c| {
-                        <span class="kw">let </span>sort_order = c.sort_order().and_then(|sort| <span class="kw">match </span>sort {
-                            sql::SQLSortOrder::Asc =&gt; <span class="prelude-val">None</span>,
-                            sql::SQLSortOrder::Desc =&gt; <span class="prelude-val">Some</span>(dml::SortOrder::Desc),
-                        });
-
-                        dml::PrimaryKeyField {
-                            name: ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
-                            sort_order,
-                            length: c.length(),
-                        }
-                    })
-                    .collect(),
-                defined_on_field: pk.columns().len() == <span class="number">1</span>,
-                clustered,
+                field
             });
+
+            <span class="kw">if </span>fields.len() &gt; <span class="number">1 </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>id = renderer::IdDefinition::new(fields);
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = existing_model
+                    .and_then(|model| model.primary_key())
+                    .and_then(|pk| pk.name())
+                {
+                    id.name(name);
+
+                    ctx.reintrospected_id_names.push(warnings::Model {
+                        model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                    });
+                }
+
+                <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(table.name(), ctx.active_connector());
+                <span class="kw">if </span>pk.name() != default_name &amp;&amp; !pk.name().is_empty() {
+                    id.map(pk.name());
+                }
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, ctx) {
+                    id.clustered(clustered);
+                }
+
+                model.id(id);
+            }
         }
 
-        <span class="kw">if </span><span class="macro">matches!</span>(ctx.config.datasources.first(), <span class="prelude-val">Some</span>(ds) <span class="kw">if </span>!ds.namespaces.is_empty()) {
-            model.schema = table.namespace().map(|n| n.to_string());
+        <span class="kw">match </span>(table.namespace(), ctx.config.datasources.first()) {
+            (<span class="prelude-val">Some</span>(namespace), <span class="prelude-val">Some</span>(ds)) <span class="kw">if </span>!ds.namespaces.is_empty() =&gt; {
+                model.schema(namespace);
+            }
+            <span class="kw">_ </span>=&gt; (),
         }
-
-        model.documentation = <span class="prelude-val">Some</span>(documentation).filter(|doc| !doc.is_empty());
 
         <span class="kw">if </span>existing_model.map(|model| model.is_ignored()).unwrap_or(<span class="bool-val">false</span>) {
-            model.is_ignored = <span class="bool-val">true</span>;
-            re_introspected_model_ignores.push(warnings::Model {
-                model: model.name.clone(),
-            });
+            model.ignore();
         }
 
         models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
     }
 
-    <span class="kw">if </span>!models_without_columns.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_models_without_columns(<span class="kw-2">&amp;</span>models_without_columns))
-    }
-
-    <span class="kw">if </span>!models_without_identifiers.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_models_without_identifier(<span class="kw-2">&amp;</span>models_without_identifiers))
-    }
-
-    <span class="kw">if </span>!unsupported_types.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_unsupported_types(<span class="kw-2">&amp;</span>unsupported_types));
-    }
-
-    <span class="kw">if </span>!remapped_models.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_model(<span class="kw-2">&amp;</span>remapped_models));
-    }
-
-    <span class="kw">if </span>!remapped_fields.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_field(<span class="kw-2">&amp;</span>remapped_fields));
-    }
-
-    <span class="kw">if </span>!reintrospected_id_names.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_custom_primary_key_names(
-                <span class="kw-2">&amp;</span>reintrospected_id_names,
-            ))
-    }
-
     models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
 
-    <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, dml_model)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
-        datamodel.models.push(dml_model);
+    <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, render)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
+        ctx.rendered_schema.push_model(render);
         ctx.target_models.insert(table_id, idx);
     }
 }

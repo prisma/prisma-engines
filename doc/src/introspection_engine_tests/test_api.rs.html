@@ -370,6 +370,14 @@
 <span id="370">370</span>
 <span id="371">371</span>
 <span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
 </pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>indoc::{formatdoc, indoc};
@@ -683,6 +691,14 @@
         <span class="kw">let </span>reintrospected = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">false</span>).<span class="kw">await</span>.unwrap();
 
         expectation.assert_eq(<span class="kw-2">&amp;</span>reintrospected.data_model);
+    }
+
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub async fn </span>expect_re_introspect_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str, expectation: expect_test::Expect) {
+        <span class="kw">let </span>data_model = parse_datamodel(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.pure_config(), schema));
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(data_model, <span class="bool-val">false</span>).<span class="kw">await</span>.unwrap();
+
+        expectation.assert_eq(<span class="kw-2">&amp;</span>serde_json::to_string_pretty(<span class="kw-2">&amp;</span>introspection_result.warnings).unwrap());
     }
 
     <span class="attribute">#[track_caller]

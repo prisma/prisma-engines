@@ -169,7 +169,7 @@
 
 <span class="doccomment">/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect_inline_relations&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(<span class="kw-2">*</span>t)) {
         <span class="kw">for </span>(fk, relation_name_from_db) <span class="kw">in </span>table
             .foreign_keys()

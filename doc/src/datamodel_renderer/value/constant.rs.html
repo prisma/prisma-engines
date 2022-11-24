@@ -45,6 +45,15 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="doccomment">/// A unquoted identifier. Should be used if a value has certain naming standards.
@@ -90,6 +99,15 @@
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="self">self</span>.<span class="number">0</span>.fmt(f)
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; From&lt;T&gt; <span class="kw">for </span>Constant&lt;T&gt;
+<span class="kw">where
+    </span>T: fmt::Display,
+{
+    <span class="kw">fn </span>from(inner: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(inner)
     }
 }
 </code></pre></div>

@@ -47,37 +47,43 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Context;
-<span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{calculate_index, compare_options_none_last};
-<span class="kw">use </span>psl::{datamodel_connector::walker_ext_traits::IndexWalkerExt, dml, parser_database::walkers};
+<span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{compare_options_none_last, render_index};
+<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
+<span class="kw">use </span>psl::{datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>calculate_model_indexes(
-    table: sql::TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    existing_model: <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-    model: <span class="kw-2">&amp;mut </span>dml::Model,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_model_indexes&lt;<span class="lifetime">&#39;a</span>&gt;(
+    table: sql::TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    existing_model: <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    model: <span class="kw-2">&amp;mut </span>renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) {
     <span class="comment">// (Position in the existing model, index definition)
-    </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_indexes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, dml::IndexDefinition)&gt; = Vec::with_capacity(table.indexes().len());
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_indexes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
+        Vec::with_capacity(table.indexes().len());
 
     <span class="kw">for </span>index <span class="kw">in </span>table.indexes() {
-        <span class="kw">let </span>sql_constraint_name = index.name();
         <span class="kw">let </span>existing_index = existing_model.and_then(|model| {
             model
                 .indexes()
-                .find(|model_index| existing_index_matches(<span class="kw-2">*</span>model_index, sql_constraint_name, ctx))
+                .find(|model_index| existing_index_matches(<span class="kw-2">*</span>model_index, index.name(), ctx))
         });
-        <span class="kw">let </span>attrid = existing_index.map(|idx| idx.attribute_id());
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(index_def) = calculate_index(index, existing_index, ctx) {
-            ordered_indexes.push((attrid, index_def));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(definition) = render_index(index, existing_index, ctx) {
+            <span class="kw">let </span>attrid = existing_index.map(|idx| idx.attribute_id());
+            ordered_indexes.push((attrid, definition));
         }
     }
 
     ordered_indexes.sort_by(|(idx, <span class="kw">_</span>), (idx_b, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>idx, <span class="kw-2">*</span>idx_b));
 
-    model.indices = ordered_indexes.into_iter().map(|(<span class="kw">_</span>, idx)| idx).collect();
+    <span class="kw">for </span>(<span class="kw">_</span>, definition) <span class="kw">in </span>ordered_indexes {
+        model.push_index(definition);
+    }
 }
 
 <span class="kw">fn </span>existing_index_matches(

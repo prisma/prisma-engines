@@ -459,24 +459,120 @@
 <span id="459">459</span>
 <span id="460">460</span>
 <span id="461">461</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, defaults::render_default, SqlFamilyTrait};
+<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>psl::{
-    datamodel_connector::constraint_names::ConstraintNames,
-    dml::{
-        FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField, ScalarType,
-        SortOrder,
-    },
-    parser_database::{<span class="self">self </span><span class="kw">as </span>db, walkers},
-    schema_ast::ast::WithDocumentation,
-    PreviewFeature,
+    datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers,
+    schema_ast::ast::WithDocumentation, PreviewFeature,
 };
-<span class="kw">use </span>sql::walkers::{ColumnWalker, TableWalker};
+<span class="kw">use </span>sql::{
+    walkers::{ColumnWalker, TableWalker},
+    IndexWalker,
+};
 <span class="kw">use </span>sql_schema_describer::{
     <span class="self">self </span><span class="kw">as </span>sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, IndexType,
-    SQLSortOrder, SqlSchema,
 };
-<span class="kw">use </span>std::cmp;
-<span class="kw">use </span>tracing::debug;
+<span class="kw">use </span>std::{borrow::Cow, cmp};
 
 <span class="doccomment">/// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
 /// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.
@@ -602,12 +698,47 @@
 
 <span class="comment">//calculators
 
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_index(
-    index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    existing_index: <span class="prelude-ty">Option</span>&lt;walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; <span class="prelude-ty">Option</span>&lt;IndexDefinition&gt; {
-    <span class="kw">let </span>tpe = sql_index_type_to_psl_index_type(index.index_type(), ctx)<span class="question-mark">?</span>;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_index&lt;<span class="lifetime">&#39;a</span>&gt;(
+    index: sql::IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    existing_index: <span class="prelude-ty">Option</span>&lt;walkers::IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">let </span>fields = index.columns().map(|col| {
+        <span class="kw">let </span>name = ctx.column_prisma_name(col.as_column().id).prisma_name();
+        <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IndexFieldInput::new(name);
+
+        <span class="kw">if </span>col
+            .sort_order()
+            .filter(|so| <span class="macro">matches!</span>(so, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            definition.sort_order(<span class="string">&quot;Desc&quot;</span>);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = col.length() {
+            definition.length(length);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ops) = render_opclass(col.id, ctx) {
+            definition.ops(ops);
+        }
+
+        definition
+    });
+
+    <span class="kw">let </span><span class="kw-2">mut </span>definition = <span class="kw">match </span>index.index_type() {
+        <span class="comment">// we handle these in the field level
+        </span>sql::IndexType::Unique <span class="kw">if </span>fields.len() == <span class="number">1 </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        sql::IndexType::Unique =&gt; renderer::IndexDefinition::unique(fields),
+        sql::IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
+            renderer::IndexDefinition::fulltext(fields)
+        }
+        sql::IndexType::Normal | sql::IndexType::Fulltext =&gt; renderer::IndexDefinition::index(fields),
+        <span class="comment">// we handle these in the model id definition
+        </span>sql::IndexType::PrimaryKey =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+    };
 
     <span class="kw">let </span>default_constraint_name = <span class="kw">match </span>index.index_type() {
         IndexType::Unique =&gt; {
@@ -620,172 +751,219 @@
         }
     };
 
-    <span class="kw">let </span>db_name = <span class="kw">if </span>index.name() == default_constraint_name {
-        <span class="prelude-val">None
-    </span>} <span class="kw">else </span>{
-        <span class="prelude-val">Some</span>(index.name().to_owned())
-    };
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = existing_index.and_then(|idx| idx.name()) {
+        definition.name(name);
+    }
 
-    <span class="prelude-val">Some</span>(IndexDefinition {
-        name: existing_index.and_then(|idx| idx.name()).map(ToOwned::to_owned),
-        db_name,
-        fields: index
-            .columns()
-            .map(|c| {
-                <span class="kw">let </span>sort_order = c.sort_order().and_then(|sort| <span class="kw">match </span>sort {
-                    SQLSortOrder::Asc =&gt; <span class="prelude-val">None</span>,
-                    SQLSortOrder::Desc =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
-                });
+    <span class="kw">if </span>index.name() != default_constraint_name {
+        definition.map(index.name());
+    }
 
-                <span class="kw">let </span>operator_class = get_opclass(c.id, index.schema, ctx);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(index.id, ctx) {
+        definition.clustered(clustered);
+    }
 
-                IndexField {
-                    path: <span class="macro">vec!</span>[(
-                        ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
-                        <span class="prelude-val">None</span>,
-                    )],
-                    sort_order,
-                    length: c.length(),
-                    operator_class,
-                }
-            })
-            .collect(),
-        tpe,
-        defined_on_field: index.columns().len() == <span class="number">1</span>,
-        algorithm: index_algorithm(index, ctx),
-        clustered: index_is_clustered(index.id, index.schema, ctx),
-    })
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(algo) = render_index_algorithm(index, ctx) {
+        definition.index_type(algo);
+    }
+
+    <span class="prelude-val">Some</span>(definition)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field(
-    column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    remapped_fields: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw">crate</span>::warnings::ModelAndField&gt;,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; ScalarField {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_scalar_field&lt;<span class="lifetime">&#39;a</span>&gt;(
+    column: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    primary_key: <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    unique: <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; renderer::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>existing_field = ctx.existing_scalar_field(column.id);
-    <span class="kw">let </span><span class="kw-2">mut </span>documentation = existing_field
-        .and_then(|f| f.ast_field().documentation())
-        .map(ToOwned::to_owned);
 
-    <span class="kw">let </span>(name, database_name, is_commented_out) = {
+    <span class="kw">let </span>(name, database_name, docs_for_commenting_out, is_commented_out) = {
         <span class="kw">let </span>names = ctx.column_prisma_name(column.id);
-        <span class="kw">let </span>prisma_name = names.prisma_name().into_owned();
-        <span class="kw">let </span>mapped_name = names.mapped_name().map(ToOwned::to_owned);
+        <span class="kw">let </span>prisma_name = names.prisma_name();
+        <span class="kw">let </span>mapped_name = names.mapped_name();
 
         <span class="kw">if </span>prisma_name.is_empty() {
             ctx.fields_with_empty_names.push(<span class="kw">crate</span>::warnings::ModelAndField {
                 model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
                 field: column.name().to_owned(),
             });
-            documentation = <span class="prelude-val">Some</span>(<span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>.to_owned());
-            (mapped_name.clone().unwrap_or(prisma_name), mapped_name, <span class="bool-val">true</span>)
+
+            <span class="kw">let </span>docs = <span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>;
+
+            (
+                mapped_name.map(Cow::from).unwrap_or(prisma_name),
+                mapped_name,
+                <span class="prelude-val">Some</span>(docs),
+                <span class="bool-val">true</span>,
+            )
         } <span class="kw">else </span>{
-            (prisma_name, mapped_name, <span class="bool-val">false</span>)
+            (prisma_name, mapped_name, <span class="prelude-val">None</span>, <span class="bool-val">false</span>)
         }
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
-        remapped_fields.push(<span class="kw">crate</span>::warnings::ModelAndField {
+        ctx.remapped_fields.push(<span class="kw">crate</span>::warnings::ModelAndField {
             model: field.model().name().to_owned(),
             field: field.name().to_owned(),
         });
     }
 
-    <span class="kw">let </span>arity = <span class="kw">match </span>column.column_type().arity {
-        <span class="kw">_ if </span>column.is_single_primary_key() &amp;&amp; column.is_autoincrement() =&gt; FieldArity::Required,
-        ColumnArity::Required =&gt; FieldArity::Required,
-        ColumnArity::Nullable =&gt; FieldArity::Optional,
-        ColumnArity::List =&gt; FieldArity::List,
+    <span class="kw">let </span>column_type = <span class="kw">match </span>column.column_type_family() {
+        ColumnTypeFamily::Int =&gt; Cow::from(<span class="string">&quot;Int&quot;</span>),
+        ColumnTypeFamily::BigInt =&gt; Cow::from(<span class="string">&quot;BigInt&quot;</span>),
+        ColumnTypeFamily::Float =&gt; Cow::from(<span class="string">&quot;Float&quot;</span>),
+        ColumnTypeFamily::Decimal =&gt; Cow::from(<span class="string">&quot;Decimal&quot;</span>),
+        ColumnTypeFamily::Boolean =&gt; Cow::from(<span class="string">&quot;Boolean&quot;</span>),
+        ColumnTypeFamily::String =&gt; Cow::from(<span class="string">&quot;String&quot;</span>),
+        ColumnTypeFamily::DateTime =&gt; Cow::from(<span class="string">&quot;DateTime&quot;</span>),
+        ColumnTypeFamily::Binary =&gt; Cow::from(<span class="string">&quot;Bytes&quot;</span>),
+        ColumnTypeFamily::Json =&gt; Cow::from(<span class="string">&quot;Json&quot;</span>),
+        ColumnTypeFamily::Uuid =&gt; Cow::from(<span class="string">&quot;String&quot;</span>),
+        ColumnTypeFamily::Enum(id) =&gt; ctx.enum_prisma_name(<span class="kw-2">*</span>id).prisma_name(),
+        ColumnTypeFamily::Unsupported(<span class="kw-2">ref </span>typ) =&gt; Cow::from(typ),
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>default_value = <span class="kw">crate</span>::defaults::calculate_default(column, existing_field, ctx);
+    <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>column.column_type().arity {
+        ColumnArity::Required <span class="kw">if </span>column.column_type_family().is_unsupported() =&gt; {
+            renderer::ModelField::new_required_unsupported(name, column_type)
+        }
+        ColumnArity::Nullable <span class="kw">if </span>column.column_type_family().is_unsupported() =&gt; {
+            renderer::ModelField::new_optional_unsupported(name, column_type)
+        }
+        ColumnArity::List <span class="kw">if </span>column.column_type_family().is_unsupported() =&gt; {
+            renderer::ModelField::new_array_unsupported(name, column_type)
+        }
+        ColumnArity::Required =&gt; renderer::ModelField::new_required(name, column_type),
+        ColumnArity::Nullable =&gt; renderer::ModelField::new_optional(name, column_type),
+        ColumnArity::List =&gt; renderer::ModelField::new_array(name, column_type),
+    };
 
-    <span class="kw">let </span>default_default_value =
-        ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
+    <span class="kw">let </span>types =
+        calculate_psl_scalar_type(column).and_then(|st| column.column_type().native_type.as_ref().map(|nt| (st, nt)));
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>default_value) = default_value {
-        <span class="kw">if </span>default_value.db_name == <span class="prelude-val">Some</span>(default_default_value) {
-            default_value.db_name = <span class="prelude-val">None</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((scalar_type, native_type)) = types {
+        <span class="kw">let </span>is_default = ctx
+            .active_connector()
+            .native_type_is_default_for_scalar_type(native_type, <span class="kw-2">&amp;</span>scalar_type);
+
+        <span class="kw">if </span>!is_default {
+            <span class="kw">let </span>(r#type, params) = ctx.active_connector().native_type_to_parts(native_type);
+            <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>ctx.config.datasources.first().unwrap().name;
+
+            field.native_type(prefix, r#type, params)
         }
     }
 
-    ScalarField {
-        name,
-        arity,
-        field_type: calculate_scalar_field_type_with_native_types(column, ctx),
-        database_name,
-        documentation,
-        default_value,
-        is_generated: <span class="bool-val">false</span>,
-        is_commented_out,
-        is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(<span class="bool-val">false</span>),
-        is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(<span class="bool-val">false</span>),
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = primary_key {
+        <span class="kw">let </span><span class="kw-2">mut </span>id_field = renderer::IdFieldDefinition::default();
+        <span class="kw">let </span>col = pk.columns().next().unwrap();
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, ctx) {
+            id_field.clustered(clustered);
+        }
+
+        <span class="kw">if </span>col
+            .sort_order()
+            .filter(|o| <span class="macro">matches!</span>(o, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            id_field.sort_order(<span class="string">&quot;Desc&quot;</span>);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = col.length() {
+            id_field.length(length);
+        }
+
+        <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(column.table().name(), ctx.active_connector());
+        <span class="kw">if </span>pk.name() != default_name &amp;&amp; !pk.name().is_empty() {
+            id_field.map(pk.name());
+        }
+
+        field.id(id_field);
     }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(unique) = unique {
+        <span class="kw">let </span><span class="kw-2">mut </span>opts = renderer::IndexFieldOptions::default();
+        <span class="kw">let </span>col = unique.columns().next().unwrap();
+
+        <span class="kw">let </span>default_constraint_name =
+            ConstraintNames::unique_index_name(unique.table().name(), <span class="kw-2">&amp;</span>[col.name()], ctx.active_connector());
+
+        <span class="kw">if </span>unique.name() != default_constraint_name {
+            opts.map(unique.name());
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(unique.id, ctx) {
+            opts.clustered(clustered);
+        }
+
+        <span class="kw">if </span>col
+            .sort_order()
+            .filter(|o| <span class="macro">matches!</span>(o, sql::SQLSortOrder::Desc))
+            .is_some()
+        {
+            opts.sort_order(<span class="string">&quot;Desc&quot;</span>);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = col.length() {
+            opts.length(length);
+        }
+
+        field.unique(opts);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = existing_field.and_then(|f| f.ast_field().documentation()) {
+        field.documentation(docs);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = docs_for_commenting_out {
+        field.documentation(docs);
+    }
+
+    <span class="kw">if </span>is_commented_out {
+        field.commented_out();
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = render_default(column, existing_field, ctx) {
+        field.default(default);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = database_name {
+        field.map(map);
+    }
+
+    <span class="kw">if </span>existing_field.map(|f| f.is_updated_at()).unwrap_or(<span class="bool-val">false</span>) {
+        field.updated_at();
+    }
+
+    <span class="kw">if </span>existing_field.map(|f| f.is_ignored()).unwrap_or(<span class="bool-val">false</span>) {
+        field.ignore();
+    }
+
+    field
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field_type_for_native_type(column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; FieldType {
-    <span class="macro">debug!</span>(<span class="string">&quot;Calculating field type for &#39;{}&#39;&quot;</span>, column.name());
-    <span class="kw">let </span>fdt = column.column_type().full_data_type.to_owned();
-
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_psl_scalar_type(column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;psl::parser_database::ScalarType&gt; {
     <span class="kw">match </span>column.column_type_family() {
-        ColumnTypeFamily::Int =&gt; FieldType::Scalar(ScalarType::Int, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::BigInt =&gt; FieldType::Scalar(ScalarType::BigInt, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Float =&gt; FieldType::Scalar(ScalarType::Float, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Decimal =&gt; FieldType::Scalar(ScalarType::Decimal, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Boolean =&gt; FieldType::Scalar(ScalarType::Boolean, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::String =&gt; FieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::DateTime =&gt; FieldType::Scalar(ScalarType::DateTime, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Json =&gt; FieldType::Scalar(ScalarType::Json, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Uuid =&gt; FieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Binary =&gt; FieldType::Scalar(ScalarType::Bytes, <span class="prelude-val">None</span>),
-        ColumnTypeFamily::Enum(id) =&gt; FieldType::Enum(ctx.enum_prisma_name(<span class="kw-2">*</span>id).prisma_name().into_owned()),
-        ColumnTypeFamily::Unsupported(<span class="kw">_</span>) =&gt; FieldType::Unsupported(fdt),
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; FieldType {
-    <span class="macro">debug!</span>(<span class="string">&quot;Calculating native field type for &#39;{}&#39;&quot;</span>, column.name());
-    <span class="kw">let </span>scalar_type = calculate_scalar_field_type_for_native_type(column, ctx);
-
-    <span class="kw">match </span>scalar_type {
-        FieldType::Scalar(scal_type, <span class="kw">_</span>) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>column.column_type().native_type {
-            <span class="prelude-val">None </span>=&gt; scalar_type,
-            <span class="prelude-val">Some</span>(native_type) =&gt; {
-                <span class="kw">let </span>is_default = ctx.active_connector().native_type_is_default_for_scalar_type(
-                    native_type,
-                    <span class="kw-2">&amp;</span>dml_scalar_type_to_parser_database_scalar_type(scal_type),
-                );
-
-                <span class="kw">if </span>is_default {
-                    FieldType::Scalar(scal_type, <span class="prelude-val">None</span>)
-                } <span class="kw">else </span>{
-                    <span class="kw">let </span>instance = psl::dml::NativeTypeInstance::new(native_type.clone(), ctx.active_connector());
-
-                    FieldType::Scalar(scal_type, <span class="prelude-val">Some</span>(instance))
-                }
-            }
-        },
-        field_type =&gt; field_type,
-    }
-}
-
-<span class="kw">fn </span>dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -&gt; db::ScalarType {
-    <span class="kw">match </span>st {
-        ScalarType::Int =&gt; db::ScalarType::Int,
-        ScalarType::BigInt =&gt; db::ScalarType::BigInt,
-        ScalarType::Float =&gt; db::ScalarType::Float,
-        ScalarType::Boolean =&gt; db::ScalarType::Boolean,
-        ScalarType::String =&gt; db::ScalarType::String,
-        ScalarType::DateTime =&gt; db::ScalarType::DateTime,
-        ScalarType::Json =&gt; db::ScalarType::Json,
-        ScalarType::Bytes =&gt; db::ScalarType::Bytes,
-        ScalarType::Decimal =&gt; db::ScalarType::Decimal,
+        ColumnTypeFamily::Int =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Int),
+        ColumnTypeFamily::BigInt =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::BigInt),
+        ColumnTypeFamily::Float =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Float),
+        ColumnTypeFamily::Decimal =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Decimal),
+        ColumnTypeFamily::Boolean =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Boolean),
+        ColumnTypeFamily::String =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::String),
+        ColumnTypeFamily::DateTime =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::DateTime),
+        ColumnTypeFamily::Json =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Json),
+        ColumnTypeFamily::Uuid =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::String),
+        ColumnTypeFamily::Binary =&gt; <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Bytes),
+        ColumnTypeFamily::Enum(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+        ColumnTypeFamily::Unsupported(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
     }
 }
 
 <span class="comment">// misc
 
-</span><span class="kw">fn </span>index_algorithm(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt; {
+</span><span class="kw">fn </span>render_index_algorithm(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
     <span class="kw">if </span>!ctx.sql_family().is_postgres() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
@@ -794,20 +972,20 @@
 
     <span class="kw">match </span>data.index_algorithm(index.id) {
         sql::postgres::SqlIndexAlgorithm::BTree =&gt; <span class="prelude-val">None</span>,
-        sql::postgres::SqlIndexAlgorithm::Hash =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Hash),
-        sql::postgres::SqlIndexAlgorithm::Gist =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gist),
-        sql::postgres::SqlIndexAlgorithm::Gin =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gin),
-        sql::postgres::SqlIndexAlgorithm::SpGist =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist),
-        sql::postgres::SqlIndexAlgorithm::Brin =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Brin),
+        sql::postgres::SqlIndexAlgorithm::Hash =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;Hash&quot;</span>),
+        sql::postgres::SqlIndexAlgorithm::Gist =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;Gist&quot;</span>),
+        sql::postgres::SqlIndexAlgorithm::Gin =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;Gin&quot;</span>),
+        sql::postgres::SqlIndexAlgorithm::SpGist =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;SpGist&quot;</span>),
+        sql::postgres::SqlIndexAlgorithm::Brin =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;Brin&quot;</span>),
     }
 }
 
-<span class="kw">fn </span>index_is_clustered(index_id: sql::IndexId, schema: <span class="kw-2">&amp;</span>SqlSchema, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+<span class="kw">fn </span>index_is_clustered(index_id: sql::IndexId, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
     <span class="kw">if </span>!ctx.sql_family().is_mssql() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = schema.downcast_connector_data();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = ctx.schema.downcast_connector_data();
     <span class="kw">let </span>clustered = ext.index_is_clustered(index_id);
 
     <span class="kw">if </span>!clustered {
@@ -833,12 +1011,12 @@
     <span class="prelude-val">Some</span>(clustered)
 }
 
-<span class="kw">fn </span>get_opclass(index_field_id: sql::IndexColumnId, schema: <span class="kw-2">&amp;</span>SqlSchema, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;OperatorClass&gt; {
+<span class="kw">fn </span>render_opclass&lt;<span class="lifetime">&#39;a</span>&gt;(index_field_id: sql::IndexColumnId, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;renderer::IndexOps&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">if </span>!ctx.sql_family().is_postgres() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = schema.downcast_connector_data();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.schema.downcast_connector_data();
 
     <span class="kw">let </span>opclass = <span class="kw">match </span>ext.get_opclass(index_field_id) {
         <span class="prelude-val">Some</span>(opclass) =&gt; opclass,
@@ -847,77 +1025,99 @@
 
     <span class="kw">match </span><span class="kw-2">&amp;</span>opclass.kind {
         <span class="kw">_ if </span>opclass.is_default =&gt; <span class="prelude-val">None</span>,
-        sql::postgres::SQLOperatorClassKind::InetOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetOps),
-        sql::postgres::SQLOperatorClassKind::JsonbOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::JsonbOps),
-        sql::postgres::SQLOperatorClassKind::JsonbPathOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::JsonbPathOps),
-        sql::postgres::SQLOperatorClassKind::ArrayOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ArrayOps),
-        sql::postgres::SQLOperatorClassKind::TextOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextOps),
-        sql::postgres::SQLOperatorClassKind::BitMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BitMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::VarBitMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::BpcharBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BpcharBloomOps),
-        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BpcharMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::ByteaBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ByteaBloomOps),
-        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ByteaMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::DateBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateBloomOps),
-        sql::postgres::SQLOperatorClassKind::DateMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Float4BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4BloomOps),
-        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Float8BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8BloomOps),
-        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::InetInclusionOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetInclusionOps),
-        sql::postgres::SQLOperatorClassKind::InetBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetBloomOps),
-        sql::postgres::SQLOperatorClassKind::InetMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int2BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int4BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Int8BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8BloomOps),
-        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8MinMaxOps),
-        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8MinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::NumericBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericBloomOps),
-        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::OidBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidBloomOps),
-        sql::postgres::SQLOperatorClassKind::OidMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TextBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextBloomOps),
-        sql::postgres::SQLOperatorClassKind::TextMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimestampBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampTzBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::InetOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;InetOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::JsonbOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;JsonbOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::JsonbPathOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;JsonbPathOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::ArrayOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;ArrayOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TextOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TextOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::BitMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;BitMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;VarBitMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::BpcharBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;BpcharBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;BpcharMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::ByteaBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;ByteaBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;ByteaMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::DateBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;DateBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;DateMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;DateMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Float4BloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float4BloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float4MinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float4MinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float8BloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float8MinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Float8MinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::InetInclusionOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;InetInclusionOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::InetBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;InetBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;InetMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;InetMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Int2BloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int2BloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int2MinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int2MinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Int4BloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int4BloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int4MinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int4MinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Int8BloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int8BloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int8MinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;Int8MinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::NumericBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;NumericBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;NumericMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;NumericMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::OidBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;OidBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;OidMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;OidMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::TextBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TextBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TextMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TextMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TimestampBloomOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampBloomOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampMinMaxOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampTzBloomOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampTzMinMaxOps&quot;</span>))
+        }
         sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps =&gt; {
-            <span class="prelude-val">Some</span>(OperatorClass::TimestampTzMinMaxMultiOps)
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span>))
         }
-        sql::postgres::SQLOperatorClassKind::TimeBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzBloomOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::UuidBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidBloomOps),
-        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxOps),
-        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxMultiOps),
-        sql::postgres::SQLOperatorClassKind::Raw(c) =&gt; <span class="prelude-val">Some</span>(OperatorClass::Raw(c.to_string().into())),
-    }
-}
-
-<span class="kw">fn </span>sql_index_type_to_psl_index_type(sql: sql::IndexType, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;psl::parser_database::IndexType&gt; {
-    <span class="kw">match </span>sql {
-        IndexType::Unique =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Unique),
-        IndexType::Normal =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Normal),
-        IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
-            <span class="prelude-val">Some</span>(psl::dml::IndexType::Fulltext)
+        sql::postgres::SQLOperatorClassKind::TimeBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeMinMaxMultiOps&quot;</span>))
         }
-        IndexType::Fulltext =&gt; <span class="prelude-val">Some</span>(psl::dml::IndexType::Normal),
-        IndexType::PrimaryKey =&gt; <span class="prelude-val">None</span>,
+        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeTzBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeTzMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::UuidBloomOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;UuidBloomOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;UuidMinMaxOps&quot;</span>)),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(renderer::IndexOps::managed(<span class="string">&quot;UuidMinMaxMultiOps&quot;</span>))
+        }
+        sql::postgres::SQLOperatorClassKind::Raw(<span class="kw-2">ref </span>c) =&gt; <span class="prelude-val">Some</span>(renderer::IndexOps::raw(c)),
     }
 }
 </code></pre></div>
