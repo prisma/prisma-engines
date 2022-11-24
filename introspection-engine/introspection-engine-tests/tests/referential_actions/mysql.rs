@@ -3,7 +3,7 @@ use introspection_engine_tests::test_api::*;
 // Older versions of MySQL (5.6+) raise a syntax error on `CREATE TABLE` declarations with `SET DEFAULT` referential actions,
 // so we can skip introspecting those. MariaDb 10.0 suffers from the same issue.
 // We should see validation warnings on MySQL 8+.
-#[test_connector(tags(Mysql8))]
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 async fn introspect_set_default_should_warn(api: &TestApi) -> TestResult {
     let setup = r#"
       CREATE TABLE `SomeUser` (
