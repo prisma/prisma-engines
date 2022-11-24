@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector(exclude(CockroachDb), preview_features("referentialIntegrity"))]
+#[test_connector(exclude(CockroachDb))]
 fn typescript_starter_schema_is_idempotent_without_native_type_annotations(api: TestApi) {
     let dm = r#"
         model Post {

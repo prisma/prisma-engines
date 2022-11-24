@@ -418,6 +418,37 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "move table across namespaces",
+            description: "todo",
+            schema: Schema {
+                common: (base_schema.to_owned() + indoc! {r#"
+        "#}),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          @@schema("one")
+        } "#}.into(),
+                second: Some(indoc!{r#"
+        model First {
+          id Int @id
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &[] ,
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert.assert_has_table_with_ns("two", "First");
+            }),
+            skip: None,
+        },
+        TestData {
             name: "recreate not null column with null values",
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a NULL value",
             schema: Schema {
@@ -865,6 +896,53 @@ fn multi_schema_tests(_api: TestApi) {
             skip: None,
         },
         TestData {
+            name: "rename foreign key",
+            description: "Rename a foreign key in a table inside a namespace",
+            schema: Schema {
+                common: base_schema.to_owned(),
+                first: indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id])
+          @@schema("two")
+        }"#}.into(),
+                second: Some( indoc! {r#"
+        model First {
+          id Int @id
+          some_field String
+          seconds Second[]
+          @@schema("one")
+        }
+        model Second {
+          id Int @id
+          other_field String
+          first_id Int @unique
+          first First @relation(fields: [first_id], references: [id], map: "new_name")
+          @@schema("two")
+        } "#}.into()),
+            },
+            namespaces: &namespaces,
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushAnd(WithSchema::Second,
+                              &SchemaPush::Done)),
+            assertion: Box::new(|assert| {
+                assert
+                    .assert_has_table_with_ns("one", "First")
+                    .assert_table_with_ns("two", "Second", |table|
+                               table.assert_fk_with_name("new_name")
+                        );
+            }),
+            skip: None,
+        },
+        TestData {
             name: "add explicit many-to-many cross-namespace relation",
             description: "add an explicit many-to-many relationship for tables in different namespaces",
             schema: Schema {
@@ -1145,24 +1223,43 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_string(),
                 first: indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
       enum SomeEnum {
         First
         Second
         @@schema("one")
       }"#}.into(),
                 second: Some(indoc! {r#"
+      model SomeModel {
+        id Int @id
+        value SomeEnum @default(First)
+        @@schema("one")
+      }
+
       enum SomeEnum {
         First
-        Second
         Third
         @@schema("one")
       }"#}.into()),
             },
             namespaces: &namespaces,
-            schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
+            schema_push: SchemaPush::PushAnd(WithSchema::First,
+                           &SchemaPush::PushCustomAnd(CustomPushStep {
+                               warnings: &["The values [Second] on the enum `SomeEnum` will be removed. If these variants are still used in the database, this will fail."],
+                               errors: &[],
+                               with_schema: WithSchema::Second,
+                               executed_steps: ExecutedSteps::NonZero,
+                           },
+                              &SchemaPush::Done)),
             assertion: Box::new(|assert| {
-                assert.assert_enum("SomeEnum", |e|
-                                         e.assert_values(&["First", "Second", "Third"])
+                assert.assert_has_table("SomeModel")
+                      .assert_enum("SomeEnum", |e|
+                                         e.assert_values(&["First", "Third"])
                                            .assert_namespace("one"));
             }),
             skip: None,
@@ -1254,7 +1351,7 @@ fn run_schema_step(api: &mut TestApi, test: &TestData, namespaces: Option<Namesp
                 WithSchema::First => test.schema.common.to_owned() + test.schema.first.as_str(),
                 WithSchema::Second => match &test.schema.second {
                     Some(base_second) => test.schema.common.to_owned() + base_second.as_str(),
-                    None => panic!("Trying to run PushTwiceWithSteps but without defining the second migration."),
+                    None => panic!("Trying to run PushCustomAnd but without defining the second migration."),
                 },
             };
 

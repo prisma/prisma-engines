@@ -8,7 +8,6 @@ fn schema_push_referential_integrity_prisma_works(api: TestApi) {
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model Post {{
@@ -54,7 +53,6 @@ fn create_migration_referential_integrity_prisma_works(api: TestApi) {
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model Post {{
@@ -117,7 +115,6 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model A {{
@@ -145,7 +142,6 @@ fn switching_from_foreign_keys_to_prisma_integrity_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model A {{
@@ -176,7 +172,6 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model A {{
@@ -204,7 +199,6 @@ fn switching_from_prisma_integrity_to_foreign_keys_drops_the_foreign_keys(api: T
 
         generator client {{
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }}
 
         model A {{
