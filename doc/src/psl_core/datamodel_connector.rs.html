@@ -380,6 +380,12 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.
 
 /// Connector capabilities
@@ -680,6 +686,12 @@
     <span class="kw">fn </span>allows_relation_fields_in_arbitrary_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
+
+    <span class="doccomment">/// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
+    /// are included in an index.
+    </span><span class="kw">fn </span>should_suggest_missing_referencing_fields_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
     <span class="kw">fn </span>native_type_to_string(<span class="kw-2">&amp;</span><span class="self">self</span>, instance: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; String {
         <span class="kw">let </span>(name, args) = <span class="self">self</span>.native_type_to_parts(instance);

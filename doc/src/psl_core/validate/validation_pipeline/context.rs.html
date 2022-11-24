@@ -25,11 +25,16 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel_connector::{Connector, RelationMode},
     Datasource, PreviewFeature,
 };
-<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
+<span class="kw">use </span>diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 <span class="kw">use </span>enumflags2::BitFlags;
 
 <span class="doccomment">/// The validation context. The lifetime parameter is _not_ the AST lifetime, but the subtype of
@@ -50,6 +55,11 @@
     <span class="doccomment">/// Pure convenience method. Forwards to Diagnostics::push_error().
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: DatamodelError) {
         <span class="self">self</span>.diagnostics.push_error(error);
+    }
+
+    <span class="doccomment">/// Pure convenience method. Forwards to Diagnostics::push_warning().
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_warning(<span class="kw-2">&amp;mut </span><span class="self">self</span>, warning: DatamodelWarning) {
+        <span class="self">self</span>.diagnostics.push_warning(warning);
     }
 }
 </code></pre></div>

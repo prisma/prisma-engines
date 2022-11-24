@@ -133,6 +133,11 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>mongodb_types;
 <span class="kw">mod </span>validations;
 
@@ -267,6 +272,11 @@
     <span class="kw">fn </span>allowed_relation_mode_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; enumflags2::BitFlags&lt;RelationMode&gt; {
         RelationMode::Prisma.into()
     }
+
+    <span class="doccomment">/// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
+    </span><span class="kw">fn </span>should_suggest_missing_referencing_fields_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

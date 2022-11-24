@@ -450,12 +450,12 @@
     }
 
     <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
-    </span><span class="kw">pub fn </span>referencing_fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+    </span><span class="kw">pub fn </span>referencing_fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone&gt; {
         <span class="self">self</span>.fields()
     }
 
     <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
-    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone&gt; {
         <span class="kw">let </span>model_id = <span class="self">self</span>.model_id;
         <span class="kw">let </span>attributes = <span class="self">self</span>.attributes();
         attributes.fields.as_ref().map(<span class="kw">move </span>|fields| {
