@@ -557,7 +557,7 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
             let set_null = ReferentialAction::SetNull.as_str();
             let msg = formatdoc! {r#"
                 The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required.
-                We recommend to either choose another referential action, or make the referenced fields optional.
+                We recommend either to choose another referential action, or to make the referenced fields optional.
             "#};
             msg
         };
