@@ -7,7 +7,8 @@ mod visited_relation;
 use super::constraint_namespace::ConstraintName;
 use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use indoc::indoc;
+use diagnostics::DatamodelWarning;
+use indoc::formatdoc;
 use itertools::Itertools;
 use parser_database::ReferentialAction;
 use parser_database::{
@@ -545,25 +546,54 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
         return;
     }
 
-    if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            indoc! {r#"
-                The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-                Either choose another referential action, or make the referenced fields optional.
-            "#},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
-    }
+    let span = forward.ast_field().span();
 
-    if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            indoc! {r#"
-                The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+    if ctx
+        .connector
+        .allows_set_null_referential_action_on_non_nullable_fields(ctx.relation_mode)
+    {
+        // the database allows SetNull on non-nullable fields, we add a validation warning to avoid breaking changes
+        let warning_template = |referential_action_type: &str| {
+            let set_null = ReferentialAction::SetNull.as_str();
+            let msg = formatdoc! {r#"
+                The `{referential_action_type}` referential action of a relation must not be set to `{set_null}` when a referenced field is required.
                 Either choose another referential action, or make the referenced fields optional.
-            "#},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
+            "#};
+            msg
+        };
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_warning(DatamodelWarning::new(warning_template("onDelete"), span))
+        }
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_warning(DatamodelWarning::new(warning_template("onUpdate"), span))
+        }
+    } else {
+        // the database allows does not allow SetNull on non-nullable fields, we add a validation error
+        let error_template = |referential_action_type: &str| {
+            let set_null = ReferentialAction::SetNull.as_str();
+            let msg = formatdoc! {r#"
+                The `{referential_action_type}` referential action of a relation must not be set to `{set_null}` when a referenced field is required.
+                Either choose another referential action, or make the referenced fields optional.
+            "#};
+            msg
+        };
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &error_template("onDelete"),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &error_template("onUpdate"),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
     }
 }

@@ -1,0 +1,34 @@
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model SomeUser {
+  id      Int      @id
+  profile Profile?
+}
+
+model Profile {
+  id      Int       @id
+  user    SomeUser? @relation(fields: [user_id], references: [id], onUpdate: SetNull, onDelete: SetNull)
+  user_id Int       @unique
+}
+// [1;91merror[0m: [1mError parsing attribute "@relation": The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+// Either choose another referential action, or make the referenced fields optional.
+// [0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m  id      Int       @id
+// [1;94m14 | [0m  [1;91muser    SomeUser? @relation(fields: [user_id], references: [id], onUpdate: SetNull, onDelete: SetNull)[0m
+// [1;94m15 | [0m  user_id Int       @unique
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError parsing attribute "@relation": The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+// Either choose another referential action, or make the referenced fields optional.
+// [0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m  id      Int       @id
+// [1;94m14 | [0m  [1;91muser    SomeUser? @relation(fields: [user_id], references: [id], onUpdate: SetNull, onDelete: SetNull)[0m
+// [1;94m15 | [0m  user_id Int       @unique
+// [1;94m   | [0m
