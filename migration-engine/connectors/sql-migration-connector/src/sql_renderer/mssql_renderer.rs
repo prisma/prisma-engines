@@ -13,8 +13,8 @@ use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
 
 impl MssqlFlavour {
-    fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> TableName<&'a str> {
-        TableName(
+    fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> QuotedWithPrefix<&'a str> {
+        QuotedWithPrefix(
             Some(Quoted::mssql_ident(
                 table.namespace().unwrap_or_else(|| self.schema_name()),
             )),
@@ -22,8 +22,8 @@ impl MssqlFlavour {
         )
     }
 
-    fn quote_with_schema<'a>(&'a self, name: &'a str) -> TableName<&'a str> {
-        TableName(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
+    fn quote_with_schema<'a>(&'a self, name: &'a str) -> QuotedWithPrefix<&'a str> {
+        QuotedWithPrefix(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
     }
 
     fn render_column(&self, column: sql::ColumnWalker<'_>) -> String {
@@ -149,7 +149,7 @@ impl SqlRenderer for MssqlFlavour {
         self.render_create_table_as(table, self.table_name(table))
     }
 
-    fn render_create_table_as(&self, table: sql::TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: sql::TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n    ");
         let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data();
 

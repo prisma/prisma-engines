@@ -16,7 +16,7 @@ mod sqlite_renderer;
 
 pub(crate) use common::IteratorJoin;
 
-use self::common::{Quoted, TableName};
+use self::common::{Quoted, QuotedWithPrefix};
 use crate::{
     pair::Pair,
     sql_migration::{
@@ -63,7 +63,7 @@ pub(crate) trait SqlRenderer {
     fn render_create_table(&self, table: TableWalker<'_>) -> String;
 
     /// Render a table creation with the provided table name.
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String;
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String;
 
     fn render_drop_and_recreate_index(&self, _indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_drop_and_recreate_index")
