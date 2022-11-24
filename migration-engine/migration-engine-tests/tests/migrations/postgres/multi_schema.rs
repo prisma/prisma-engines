@@ -79,7 +79,7 @@ struct TestData {
     /// The assertion about tables, enums, etc.
     assertion: Box<dyn Fn(SchemaAssertion) -> ()>,
     /// Should we skip this test? None for yes, Some("reason") otherwise.
-    skip: Option<String>,
+    skip: Option<&'static str>,
 }
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
