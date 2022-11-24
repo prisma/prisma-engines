@@ -87,6 +87,29 @@ pub(crate) fn render_default<'a>(
             Some(renderer::DefaultValue::constant(variant_name))
         }
         (Some(sql::DefaultKind::Value(dml::PrismaValue::String(val))), _) => Some(renderer::DefaultValue::text(val)),
+        (Some(sql::DefaultKind::Value(dml::PrismaValue::List(val))), _) => {
+            let vals = val
+                .iter()
+                .map(|val| match val {
+                    dml::PrismaValue::String(v) => Value::from(Text::new(v)),
+                    dml::PrismaValue::Boolean(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::Enum(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::Int(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::Uuid(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::List(_) => unreachable!("Lists of lists are not supported in defaults."),
+                    dml::PrismaValue::Json(v) => Value::from(Text::new(v)),
+                    dml::PrismaValue::Xml(v) => Value::from(Text::new(v)),
+                    dml::PrismaValue::Object(_) => unreachable!("Objects are not supported in defaults."),
+                    dml::PrismaValue::Null => Value::from(Constant::from("null")),
+                    dml::PrismaValue::DateTime(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::Float(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::BigInt(v) => Value::from(Constant::from(v)),
+                    dml::PrismaValue::Bytes(v) => Value::from(v.clone()),
+                })
+                .collect();
+
+            Some(renderer::DefaultValue::array(vals))
+        }
         (Some(sql::DefaultKind::Value(val)), _) => Some(renderer::DefaultValue::constant(val)),
 
         // Prisma-level defaults.
@@ -140,7 +163,7 @@ fn maybe_prisma1_default<'a>(
         } else if native_type == &PostgresType::VarChar(Some(36)) {
             ctx.prisma_1_uuid_defaults.push(model_and_field());
 
-            return Some(renderer::DefaultValue::function(Function::new("cuid")));
+            return Some(renderer::DefaultValue::function(Function::new("uuid")));
         }
     } else if ctx.sql_family().is_mysql() {
         let native_type: &MySqlType = column.column_type().native_type.as_ref()?.downcast_ref();
@@ -152,7 +175,7 @@ fn maybe_prisma1_default<'a>(
         } else if native_type == &MySqlType::Char(36) {
             ctx.prisma_1_uuid_defaults.push(model_and_field());
 
-            return Some(renderer::DefaultValue::function(Function::new("cuid")));
+            return Some(renderer::DefaultValue::function(Function::new("uuid")));
         }
     }
 

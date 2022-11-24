@@ -1,5 +1,6 @@
 mod mssql;
 mod mysql;
+mod postgresql;
 mod relation_mode;
 mod sqlite;
 mod vitess;
@@ -1607,56 +1608,6 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     Ok(())
 }
 
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_index(
-                    "User.something@invalid-and/weird",
-                    types::index(["first", "last"]).unique(true),
-                );
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-     "#};
-
-    let final_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#};
-
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-    Ok(())
-}
-
 #[test_connector(tags(Postgres, Mssql, Mysql, Sqlite), exclude(CockroachDb))]
 async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestResult {
     api.barrel()
@@ -1701,86 +1652,6 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
      "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint(
-                    "User.something@invalid-and/weird",
-                    types::primary_constraint(["first", "last"]),
-                );
-            });
-
-            migration.create_table("User2", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint("User2_pkey", types::primary_constraint(["first", "last"]));
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-     "#;
-
-    let final_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#;
-
-    let re_introspected = api.re_introspect(input_dm).await?;
-
-    api.assert_eq_datamodels(final_dm, &re_introspected);
-
-    let expected = json!([{
-        "code": 18,
-        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User"},
-            {"model": "User2"}
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
     Ok(())
 }
 

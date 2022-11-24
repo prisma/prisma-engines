@@ -15,15 +15,14 @@ pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> 
     enums::render(ctx);
     models::render(ctx);
 
-    let relation_names = relation_names::introspect_relation_names(ctx);
-
     if ctx.foreign_keys_enabled() {
+        let relation_names = relation_names::introspect(ctx);
+
         inline_relations::render(&relation_names, ctx);
+        m2m_relations::render(&relation_names, ctx);
     } else {
         prisma_relation_mode::render(ctx);
     }
-
-    m2m_relations::render(&relation_names, ctx);
 
     let rendered = if ctx.render_config {
         format!(

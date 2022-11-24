@@ -190,20 +190,20 @@ pub(crate) fn render_index<'a>(
         }
     };
 
-    if index.name() != default_constraint_name {
-        definition.map(index.name());
-    }
-
-    if let Some(algo) = render_index_algorithm(index, ctx) {
-        definition.index_type(algo);
-    }
-
     if let Some(name) = existing_index.and_then(|idx| idx.name()) {
         definition.name(name);
     }
 
+    if index.name() != default_constraint_name {
+        definition.map(index.name());
+    }
+
     if let Some(clustered) = index_is_clustered(index.id, ctx) {
         definition.clustered(clustered);
+    }
+
+    if let Some(algo) = render_index_algorithm(index, ctx) {
+        definition.index_type(algo);
     }
 
     Some(definition)
@@ -249,21 +249,18 @@ pub(crate) fn render_scalar_field<'a>(
     }
 
     let column_type = match column.column_type_family() {
-        ColumnTypeFamily::Int => "Int",
-        ColumnTypeFamily::BigInt => "BigInt",
-        ColumnTypeFamily::Float => "Float",
-        ColumnTypeFamily::Decimal => "Decimal",
-        ColumnTypeFamily::Boolean => "Boolean",
-        ColumnTypeFamily::String => "String",
-        ColumnTypeFamily::DateTime => "DateTime",
-        ColumnTypeFamily::Binary => "Binary",
-        ColumnTypeFamily::Json => "Json",
-        ColumnTypeFamily::Uuid => "Uuid",
-        ColumnTypeFamily::Enum(id) => {
-            let enm: sql::EnumWalker<'_> = ctx.schema.walk(*id);
-            enm.name()
-        }
-        ColumnTypeFamily::Unsupported(ref typ) => typ,
+        ColumnTypeFamily::Int => Cow::from("Int"),
+        ColumnTypeFamily::BigInt => Cow::from("BigInt"),
+        ColumnTypeFamily::Float => Cow::from("Float"),
+        ColumnTypeFamily::Decimal => Cow::from("Decimal"),
+        ColumnTypeFamily::Boolean => Cow::from("Boolean"),
+        ColumnTypeFamily::String => Cow::from("String"),
+        ColumnTypeFamily::DateTime => Cow::from("DateTime"),
+        ColumnTypeFamily::Binary => Cow::from("Bytes"),
+        ColumnTypeFamily::Json => Cow::from("Json"),
+        ColumnTypeFamily::Uuid => Cow::from("String"),
+        ColumnTypeFamily::Enum(id) => ctx.enum_prisma_name(*id).prisma_name(),
+        ColumnTypeFamily::Unsupported(ref typ) => Cow::from(typ),
     };
 
     let mut field = match column.column_type().arity {

@@ -124,8 +124,9 @@ pub(super) fn render<'a>(ctx: &mut Context<'a>) {
                 {
                     id.name(name);
 
-                    ctx.reintrospected_id_names
-                        .push(warnings::Model { model: name.to_owned() });
+                    ctx.reintrospected_id_names.push(warnings::Model {
+                        model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                    });
                 }
 
                 let default_name = ConstraintNames::primary_key_name(table.name(), ctx.active_connector());
