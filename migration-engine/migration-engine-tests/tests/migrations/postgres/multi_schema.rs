@@ -77,7 +77,7 @@ struct TestData {
     /// Database setup through schema pushing, see `SchemaPush`.
     schema_push: SchemaPush,
     /// The assertion about tables, enums, etc.
-    assertion: Box<dyn Fn(SchemaAssertion) -> ()>,
+    assertion: Box<dyn Fn(SchemaAssertion)>,
     /// Should we skip this test? None for yes, Some("reason") otherwise.
     skip: Option<String>,
 }
@@ -102,7 +102,8 @@ fn multi_schema_tests(_api: TestApi) {
         generator js {
           provider        = "prisma-client-js"
           previewFeatures = ["multiSchema"]
-        } "#};
+        }
+    "#};
 
     let mut tests = [
         TestData {
@@ -111,18 +112,18 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.into(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }
 
-        model Second {
-          id Int @id
-          @@schema("two")
-        } "#}.into(),
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    } "#}.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
                 assert.assert_has_table_with_ns("one", "First")
@@ -136,18 +137,18 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.into(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }
 
-        model Second {
-          id Int @id
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    }"#}.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                            warnings: &[],
@@ -168,15 +169,15 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#" "#}),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          name String @map("name_field")
-          @@map("first_table")
-          @@schema("one")
-        }"#}.into(),
+                    model First {
+                      id Int @id
+                      name String @map("name_field")
+                      @@map("first_table")
+                      @@schema("one")
+                    }"#}.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
                 assert.assert_table_with_ns("one", "first_table", |table|
@@ -191,25 +192,26 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test adding a new table to one of the namespaces",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }
+                     model First {
+                       id Int @id
+                       @@schema("one")
+                     }
 
-        model Second {
-          id Int @id
-          @@schema("two")
-        }"#}),
+                     model Second {
+                       id Int @id
+                       @@schema("two")
+                     }"#}),
                 first: "".into(),
                 second: Some(
                     indoc! {r#"
-        model Third {
-          id Int @id
-          @@schema("one")
-        } "#}.into(),
+                        model Third {
+                          id Int @id
+                          @@schema("one")
+                        }
+                    "#}.into(),
                 ),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_has_table_with_ns("one", "First")
@@ -223,18 +225,19 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test removing a table to one of the namespaces",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
-                first: indoc! {r#"
-        model Second {
-          id Int @id
-          @@schema("two")
-        } "#}.into(),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#}),
+                            first: indoc! {r#"
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    } "#
+                }.into(),
                 second: Some(" ".into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_has_table_with_ns("one", "First")
@@ -247,24 +250,26 @@ fn multi_schema_tests(_api: TestApi) {
             description: "change the name of a column in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#}.into(),
                 second: Some(indoc!{r#"
-        model Second {
-          id Int @id
-          other_name String
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      other_name String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -282,24 +287,27 @@ fn multi_schema_tests(_api: TestApi) {
             description: "add the @default attribute to a column in an namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc!{r#"
-        model Second {
-          id Int @id
-          name String @default("hello")
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String @default("hello")
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -319,22 +327,25 @@ fn multi_schema_tests(_api: TestApi) {
             description: "add @autoincrement() to a column in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc!{r#"
-        model Second {
-          id Int @id @default(autoincrement())
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id @default(autoincrement())
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -353,24 +364,27 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a non-NULL value",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String?
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      name String?
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc!{r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, 'some value');",
                              &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done))),
@@ -388,22 +402,25 @@ fn multi_schema_tests(_api: TestApi) {
             description: "rename a primary key name in a table in a namespace",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc!{r#"
-        model Second {
-          new_id_name Int @id
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      new_id_name Int @id
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -453,16 +470,18 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test dropping a nullable column and recreating it as non-nullable, given a row exists with a NULL value",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String?
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      name String?
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc!{r#"
         model Second {
           id Int @id
@@ -470,7 +489,7 @@ fn multi_schema_tests(_api: TestApi) {
           @@schema("two")
         }"#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("INSERT INTO \"two\".\"Second\" VALUES(1, NULL);",
                              &SchemaPush::PushCustomAnd(CustomPushStep {
@@ -495,23 +514,26 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test adding a required field to a table with no records",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -528,24 +550,27 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test changing a field type to array.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into(),
-                second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String[]
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into(),
+                second: Some(indoc! {r#"
+                    model Second {
+                      id Int @id
+                      name String[]
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -562,24 +587,27 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test changing a field type from array.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String[]
-          @@schema("two")
-        }"#}.into(),
-                second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String[]
+                      @@schema("two")
+                    }"#
+                }.into(),
+                second: Some(indoc! {r#"
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -596,26 +624,29 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test renaming an index.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@index(fields: [name], map: "index_name")
-          @@schema("two")
-        }"#}.into(),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@index(fields: [name], map: "index_name")
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@index(fields: [name], map: "new_index_name")
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@index(fields: [name], map: "new_index_name")
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -631,24 +662,27 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test adding the unique flag to a column.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        } "#}.into(),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String @unique
-          @@schema("two")
-        }"#}.into()),
+                    model Second {
+                      id Int @id
+                      name String @unique
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &["A unique constraint covering the columns `[name]` on the table `Second` will be added. If there are existing duplicate values, this will fail."] ,
@@ -672,20 +706,21 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#""#}),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          field Second
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      field Second
+                      @@schema("one")
+                    }
 
-        enum Second {
-          One
-          Two
-          @@schema("one")
-        } "#}.into(),
+                    enum Second {
+                      One
+                      Two
+                      @@schema("one")
+                    }"#
+                }.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
                 assert
@@ -703,20 +738,21 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#""#}),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          field Second
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      field Second
+                      @@schema("one")
+                    }
 
-        enum Second {
-          One
-          Two
-          @@schema("two")
-        } "#}.into(),
+                    enum Second {
+                      One
+                      Two
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::Done),
             assertion: Box::new(|assert| {
                 assert
@@ -731,20 +767,21 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test removing an enum from a namespace.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }
-    "#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        enum Second {
-          One
-          Two
-          @@schema("two")
-        } "#}.into(),
+                    enum Second {
+                      One
+                      Two
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some(indoc! {r#""#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -759,32 +796,34 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          @@schema("two")
-        }"#}.into(),
+                    model First {
+                      id Int @id
+                      some_field String
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          second Second?
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          first_id Int @unique
-          first First @relation(fields: [first_id], references: [id])
-          @@schema("two")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      some_field String
+                      second Second?
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      first_id Int @unique
+                      first First @relation(fields: [first_id], references: [id])
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &["A unique constraint covering the columns `[first_id]` on the table `Second` will be added. If there are existing duplicate values, this will fail."],
@@ -809,32 +848,34 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          second Second?
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          first_id Int @unique
-          first First @relation(fields: [first_id], references: [id])
-          @@schema("two")
-        }"#}.into(),
+                    model First {
+                      id Int @id
+                      some_field String
+                      second Second?
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      first_id Int @unique
+                      first First @relation(fields: [first_id], references: [id])
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          @@schema("two")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      some_field String
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -851,32 +892,34 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          @@schema("two")
-        }"#}.into(),
+                    model First {
+                      id Int @id
+                      some_field String
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          seconds Second[]
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          first_id Int @unique
-          first First @relation(fields: [first_id], references: [id])
-          @@schema("two")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      some_field String
+                      seconds Second[]
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      first_id Int @unique
+                      first First @relation(fields: [first_id], references: [id])
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &["A unique constraint covering the columns `[first_id]` on the table `Second` will be added. If there are existing duplicate values, this will fail."],
@@ -948,44 +991,46 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          @@schema("two")
-        }"#}.into(),
+                    model First {
+                      id Int @id
+                      some_field String
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      @@schema("two")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          thirds Third[]
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      some_field String
+                      thirds Third[]
+                      @@schema("one")
+                    }
 
-        model Second {
-          id Int @id
-          other_field String
-          thirds Third[]
-          @@schema("two")
-        }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      thirds Third[]
+                      @@schema("two")
+                    }
 
-        model Third {
-          first First @relation(fields: [first_id], references: [id])
-          first_id Int
+                    model Third {
+                      first First @relation(fields: [first_id], references: [id])
+                      first_id Int
 
-          second Second @relation(fields: [second_id], references: [id])
-          second_id Int
+                      second Second @relation(fields: [second_id], references: [id])
+                      second_id Int
 
-          @@id([first_id, second_id])
-          @@schema("two")
-        }
-        "#}.into()),
+                      @@id([first_id, second_id])
+                      @@schema("two")
+                    }
+                    "#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -1009,33 +1054,35 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          other_field String
-          @@schema("two")
-        }"#}.into(),
-                second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          some_field String
-          seconds Second[]
-          @@schema("one")
-        }
+                    model First {
+                      id Int @id
+                      some_field String
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      other_field String
+                      @@schema("two")
+                    }"#
+                }.into(),
+                second: Some(indoc! {r#"
+                    model First {
+                      id Int @id
+                      some_field String
+                      seconds Second[]
+                      @@schema("one")
+                    }
 
-        model Second {
-          id Int @id
-          other_field String
-          firsts First[]
-          @@schema("two")
-        }
-        "#}.into()),
+                    model Second {
+                      id Int @id
+                      other_field String
+                      firsts First[]
+                      @@schema("two")
+                    }
+                    "#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -1059,20 +1106,22 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        } "#}.into(),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          next First? @relation("Line", fields: [next_id], references: [id])
-          prev First? @relation("Line")
-          next_id Int? @unique
-          @@schema("one")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      next First? @relation("Line", fields: [next_id], references: [id])
+                      prev First? @relation("Line")
+                      next_id Int? @unique
+                      @@schema("one")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &["A unique constraint covering the columns `[next_id]` on the table `First` will be added. If there are existing duplicate values, this will fail."],
@@ -1096,20 +1145,22 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        } "#}.into(),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }.into(),
                 second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          next First? @relation("Line", fields: [next_id], references: [id])
-          all First[] @relation("Line")
-          next_id Int?
-          @@schema("one")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      next First? @relation("Line", fields: [next_id], references: [id])
+                      all First[] @relation("Line")
+                      next_id Int?
+                      @@schema("one")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -1128,28 +1179,30 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_owned(),
                 first: indoc! {r#"
-        model First {
-          id Int @id
-          seconds Second[]
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          first_id Int
-          first First? @relation(fields: [first_id], references: [id])
-          @@schema("one")
-        }"#}.into(),
-                second: Some( indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }
-        model Second {
-          id Int @id
-          @@schema("one")
-        } "#}.into()),
+                    model First {
+                      id Int @id
+                      seconds Second[]
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      first_id Int
+                      first First? @relation(fields: [first_id], references: [id])
+                      @@schema("one")
+                    }"#
+                }.into(),
+                second: Some(indoc! {r#"
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }
+                    model Second {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -1165,25 +1218,28 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test removing an index from a namespace.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@index(fields: [name], map: "index_name")
-          @@schema("two")
-        }"#}.into(),
-                second: Some( indoc! {r#"
-        model Second {
-          id Int @id
-          name String
-          @@schema("two")
-        } "#}.into()),
+                    model Second {
+                      id Int @id
+                      name String
+                      @@index(fields: [name], map: "index_name")
+                      @@schema("two")
+                    }"#
+                }.into(),
+                second: Some(indoc! {r#"
+                    model Second {
+                      id Int @id
+                      name String
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert
@@ -1199,15 +1255,16 @@ fn multi_schema_tests(_api: TestApi) {
             description: "Test removing a view via reset from a namespace.",
             schema: Schema {
                 common: (base_schema.to_owned() + indoc! {r#"
-        model First {
-          id Int @id
-          name String
-          @@schema("one")
-        }"#}),
+                    model First {
+                      id Int @id
+                      name String
+                      @@schema("one")
+                    }"#
+                }),
                 first: indoc! {r#""#}.into(),
                 second: None,
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("CREATE VIEW \"two\".\"Test\" (id, name) as SELECT id, name FROM \"one\".\"First\"",
                              &SchemaPush::Reset(true,
@@ -1223,29 +1280,30 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_string(),
                 first: indoc! {r#"
-      model SomeModel {
-        id Int @id
-        value SomeEnum @default(First)
-        @@schema("one")
-      }
+                    model SomeModel {
+                      id Int @id
+                      value SomeEnum @default(First)
+                      @@schema("one")
+                    }
 
-      enum SomeEnum {
-        First
-        Second
-        @@schema("one")
-      }"#}.into(),
-                second: Some(indoc! {r#"
-      model SomeModel {
-        id Int @id
-        value SomeEnum @default(First)
-        @@schema("one")
-      }
+                    enum SomeEnum {
+                      First
+                      Second
+                      @@schema("one")
+                    }"#}.into(),
+                              second: Some(indoc! {r#"
+                    model SomeModel {
+                      id Int @id
+                      value SomeEnum @default(First)
+                      @@schema("one")
+                    }
 
-      enum SomeEnum {
-        First
-        Third
-        @@schema("one")
-      }"#}.into()),
+                    enum SomeEnum {
+                      First
+                      Third
+                      @@schema("one")
+                    }"#
+                }.into()),
             },
             namespaces: &namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
@@ -1270,20 +1328,22 @@ fn multi_schema_tests(_api: TestApi) {
             schema: Schema {
                 common: base_schema.to_string(),
                 first: indoc! {r#"
-      enum SomeEnum {
-        First
-        Second
-        @@schema("one")
-      }"#}.into(),
+                    enum SomeEnum {
+                      First
+                      Second
+                      @@schema("one")
+                    }"#
+                }.into(),
                 second: Some(indoc! {r#"
-      enum SomeEnum {
-        First
-        Second
-        Three
-        @@schema("two")
-      }"#}.into()),
+                    enum SomeEnum {
+                      First
+                      Second
+                      Three
+                      @@schema("two")
+                    }"#
+                }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First, &SchemaPush::PushAnd(WithSchema::Second, &SchemaPush::Done)),
             assertion: Box::new(|assert| {
                 assert.assert_enum("SomeEnum", |e|
@@ -1343,8 +1403,8 @@ fn multi_schema_tests(_api: TestApi) {
     ];
 
     // traverse_ is always the answer
-    tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|mut t| {
-        run_test(&mut t);
+    tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|t| {
+        run_test(t);
     });
 }
 

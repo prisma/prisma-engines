@@ -128,7 +128,10 @@ impl<'a> ModelField<'a> {
     /// }
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
-        self.documentation = Some(Documentation(documentation.into()));
+        match self.documentation.as_mut() {
+            Some(docs) => docs.push(documentation),
+            None => self.documentation = Some(Documentation(documentation.into())),
+        }
     }
 
     /// Sets the field default attribute.

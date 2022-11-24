@@ -3,7 +3,7 @@ use crate::introspection_helpers::is_prisma_join_table;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-pub(super) fn introspect_m2m_relations<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
+pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
     for table in ctx.schema.table_walkers().filter(|t| is_prisma_join_table(*t)) {
         let existing_relation = ctx.existing_m2m_relation(table.id);
         let mut fks = table.foreign_keys();

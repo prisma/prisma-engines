@@ -314,6 +314,14 @@ impl TestApi {
     }
 
     #[track_caller]
+    pub async fn expect_re_introspect_warnings(&self, schema: &str, expectation: expect_test::Expect) {
+        let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
+        let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
+
+        expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
+    }
+
+    #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);

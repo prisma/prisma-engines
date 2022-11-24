@@ -7,7 +7,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-pub(super) fn introspect_enums(ctx: &mut Context<'_>) {
+pub(super) fn render(ctx: &mut Context<'_>) {
     let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum)> = ctx
         .schema
         .enum_walkers()
@@ -39,11 +39,13 @@ fn render_enum<'a>(
     ctx: &mut Context<'a>,
 ) -> renderer::Enum<'a> {
     let mut remapped_values = Vec::new();
+
     let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
         sql_enum.namespace()
     } else {
         None
     };
+
     let (enum_name, enum_database_name) = match ctx.enum_prisma_name(sql_enum.id) {
         ModelName::FromPsl { name, mapped_name } => (Cow::Borrowed(name), mapped_name),
         ModelName::FromSql { name } => (Cow::Borrowed(name), None),
@@ -51,6 +53,7 @@ fn render_enum<'a>(
             (name.prisma_name(), Some(mapped_name))
         }
     };
+
     let mut rendered_enum = renderer::Enum::new(enum_name.clone());
 
     if let Some(schema) = schema {

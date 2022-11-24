@@ -19,9 +19,9 @@ impl<'a> IndexFieldInput<'a> {
     /// @@index([foobar])
     /// //       ^^^^^^ name
     /// ```
-    pub fn new(name: &'a str) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            name: Cow::Borrowed(name),
+            name: name.into(),
             sort_order: None,
             length: None,
             ops: None,
@@ -46,6 +46,16 @@ impl<'a> IndexFieldInput<'a> {
     /// ```
     pub fn length(&mut self, length: u32) {
         self.length = Some(length);
+    }
+
+    /// Define index operators for the field.
+    ///
+    /// ```ignore
+    /// @@index([foobar(ops: MinMaxFoobarOps), type: Brin])
+    /// //                      ^^ here
+    /// ```
+    pub fn ops(&mut self, ops: IndexOps<'a>) {
+        self.ops = Some(ops);
     }
 }
 

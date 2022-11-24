@@ -83,7 +83,7 @@ async fn field_with_empty_name(api: &TestApi) -> TestResult {
     let expectation = expect![[r#"
         model A {
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          //   Int @default(autoincrement()) @map(" ")
+          //   Int @id @default(autoincrement()) @map(" ")
         }
     "#]];
 

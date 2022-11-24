@@ -536,6 +536,10 @@ impl ColumnTypeFamily {
     pub fn is_string(&self) -> bool {
         matches!(self, ColumnTypeFamily::String)
     }
+
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Unsupported(_))
+    }
 }
 
 /// A column's arity.
