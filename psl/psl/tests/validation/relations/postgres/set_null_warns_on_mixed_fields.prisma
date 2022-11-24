@@ -19,8 +19,8 @@ model Profile {
 
   @@unique([user_id, user_ref])
 }
-// [1;93mwarning[0m: [1mThe `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-// Either choose another referential action, or make the referenced fields optional.
+// [1;93mwarning[0m: [1mThe `onDelete` referential action of a relation should not be set to `SetNull` when a referenced field is required.
+// We recommend to either choose another referential action, or make the referenced fields optional.
 // [0m
 //   [1;94m-->[0m  [4mschema.prisma:16[0m
 // [1;94m   | [0m
@@ -28,8 +28,8 @@ model Profile {
 // [1;94m16 | [0m  [1;93muser     SomeUser? @relation(fields: [user_id, user_ref], references: [id, ref], onUpdate: SetNull, onDelete: SetNull)[0m
 // [1;94m17 | [0m  user_id  Int?
 // [1;94m   | [0m
-// [1;93mwarning[0m: [1mThe `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-// Either choose another referential action, or make the referenced fields optional.
+// [1;93mwarning[0m: [1mThe `onUpdate` referential action of a relation should not be set to `SetNull` when a referenced field is required.
+// We recommend to either choose another referential action, or make the referenced fields optional.
 // [0m
 //   [1;94m-->[0m  [4mschema.prisma:16[0m
 // [1;94m   | [0m
