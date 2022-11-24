@@ -489,27 +489,34 @@
     cx: Arc&lt;PrismaContext&gt;,
     enable_playground: bool,
     enable_debug_mode: bool,
-    enable_itx: bool,
     enable_metrics: bool,
 }
 
 <span class="kw">impl </span>State {
     <span class="doccomment">/// Create a new instance of `State`.
-    </span><span class="kw">fn </span>new(
-        cx: PrismaContext,
-        enable_playground: bool,
-        enable_debug_mode: bool,
-        enable_itx: bool,
-        enable_metrics: bool,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">fn </span>new(cx: PrismaContext) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             cx: Arc::new(cx),
-            enable_playground,
-            enable_debug_mode,
-            enable_itx,
-            enable_metrics,
+            enable_playground: <span class="bool-val">false</span>,
+            enable_debug_mode: <span class="bool-val">false</span>,
+            enable_metrics: <span class="bool-val">false</span>,
         }
     }
+
+    <span class="kw">pub fn </span>enable_playground(<span class="kw-2">mut </span><span class="self">self</span>, enable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.enable_playground = enable;
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>enable_debug_mode(<span class="kw-2">mut </span><span class="self">self</span>, enable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.enable_debug_mode = enable;
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>enable_metrics(<span class="kw-2">mut </span><span class="self">self</span>, enable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.enable_metrics = enable;
+        <span class="self">self
+    </span>}
 
     <span class="kw">pub fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
         <span class="self">self</span>.cx.metrics.clone()
@@ -526,7 +533,6 @@
             cx: <span class="self">self</span>.cx.clone(),
             enable_playground: <span class="self">self</span>.enable_playground,
             enable_debug_mode: <span class="self">self</span>.enable_debug_mode,
-            enable_itx: <span class="self">self</span>.enable_itx,
             enable_metrics: <span class="self">self</span>.enable_metrics,
         }
     }
@@ -539,10 +545,6 @@
 
     <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:connect&quot;</span>);
 
-    <span class="kw">let </span>enable_itx = config
-        .preview_features()
-        .contains(PreviewFeature::InteractiveTransactions);
-
     <span class="kw">let </span>enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
 
     <span class="kw">let </span>cx = PrismaContext::builder(datamodel)
@@ -552,13 +554,11 @@
         .instrument(span)
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let </span>state = State::new(
-        cx,
-        opts.enable_playground,
-        opts.enable_debug_mode,
-        enable_itx,
-        enable_metrics,
-    );
+    <span class="kw">let </span>state = State::new(cx)
+        .enable_playground(opts.enable_playground)
+        .enable_debug_mode(opts.enable_debug_mode)
+        .enable_metrics(enable_metrics);
+
     <span class="prelude-val">Ok</span>(state)
 }
 
@@ -588,7 +588,7 @@
 <span class="kw">pub async fn </span>routes(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>start = Instant::now();
 
-    <span class="kw">if </span>req.method() == Method::POST &amp;&amp; req.uri().path().contains(<span class="string">&quot;transaction&quot;</span>) &amp;&amp; state.enable_itx {
+    <span class="kw">if </span>req.method() == Method::POST &amp;&amp; req.uri().path().contains(<span class="string">&quot;transaction&quot;</span>) {
         <span class="kw">return </span>handle_transaction(state, req).<span class="kw">await</span>;
     }
 

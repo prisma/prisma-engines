@@ -238,7 +238,6 @@
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         Deno
-         | InteractiveTransactions
          | FullTextSearch
          | FullTextIndex
          | Tracing
@@ -274,6 +273,7 @@
         | NApi
         | ImprovedQueryRaw
         | DataProxy
+        | InteractiveTransactions
     }),
     hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         MultiSchema
