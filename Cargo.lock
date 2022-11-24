@@ -700,6 +700,7 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "colored",
+ "indoc",
  "pest",
 ]
 
