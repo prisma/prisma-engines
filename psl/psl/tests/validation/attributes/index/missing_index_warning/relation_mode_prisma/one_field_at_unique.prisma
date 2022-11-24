@@ -1,4 +1,4 @@
-// no relation index validation warning on relationMode = "prisma" when a referenced field is already in @@unique.
+// no relation index validation warning on relationMode = "prisma" when a referenced field is already in @unique.
 
 datasource db {
     provider = "mysql"
