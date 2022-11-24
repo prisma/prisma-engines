@@ -643,6 +643,7 @@
 <span id="643">643</span>
 <span id="644">644</span>
 <span id="645">645</span>
+<span id="646">646</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>datasource;
 <span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
@@ -653,7 +654,8 @@
 <span class="kw">use </span>lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 <span class="kw">use </span>psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
@@ -1006,7 +1008,7 @@
         }
     }
 
-    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: RelationMode, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
         <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
             validations::compatible_native_types(index, <span class="self">self</span>, errors);
             validations::generalized_index_validations(index, <span class="self">self</span>, errors);

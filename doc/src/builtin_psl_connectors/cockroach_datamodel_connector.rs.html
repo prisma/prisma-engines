@@ -316,6 +316,7 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -325,7 +326,8 @@
 <span class="kw">use </span>lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 <span class="kw">use </span>psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -510,7 +512,7 @@
         }
     }
 
-    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) {
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: RelationMode, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) {
         validations::autoincrement_validations(model, diagnostics);
 
         <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {

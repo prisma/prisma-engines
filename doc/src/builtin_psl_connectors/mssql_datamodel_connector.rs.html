@@ -302,6 +302,13 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -311,7 +318,9 @@
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 <span class="kw">use </span>psl_core::{
-    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+    },
     diagnostics::{Diagnostics, Span},
     parser_database::{<span class="self">self</span>, ast, ParserDatabase, ReferentialAction, ScalarType},
 };
@@ -532,7 +541,12 @@
         }
     }
 
-    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: parser_database::walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+    <span class="kw">fn </span>validate_model(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model: parser_database::walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+        <span class="kw">_</span>: RelationMode,
+        errors: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) {
         <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
             validations::index_uses_correct_field_types(<span class="self">self</span>, index, errors);
         }

@@ -89,10 +89,48 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-</pre><pre class="rust"><code><span class="kw">use </span>psl_core::{
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+</pre><pre class="rust"><code><span class="kw">use </span>psl_core::diagnostics::{DatamodelWarning, Span};
+<span class="kw">use </span>psl_core::parser_database::ast::WithSpan;
+<span class="kw">use </span>psl_core::parser_database::ReferentialAction;
+<span class="kw">use </span>psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::Diagnostics,
-    parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
+    parser_database::walkers::{IndexWalker, PrimaryKeyWalker, RelationFieldWalker},
 };
 
 <span class="kw">const </span>LENGTH_GUIDE: <span class="kw-2">&amp;</span>str = <span class="string">&quot; Please use the `length` argument to the field in the index definition to allow this.&quot;</span>;
@@ -178,6 +216,38 @@
         errors.push_error(error);
 
         <span class="kw">break</span>;
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>uses_native_referential_action_set_default(
+    connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+) {
+    <span class="kw">let </span>get_span = |referential_action_type: <span class="kw-2">&amp;</span>str| -&gt; Span {
+        field
+            .ast_field()
+            .span_for_argument(<span class="string">&quot;relation&quot;</span>, referential_action_type)
+            .unwrap_or_else(|| field.ast_field().span())
+    };
+
+    <span class="kw">let </span>warning_msg = || {
+        <span class="macro">format!</span>(
+            <span class="string">&quot;Using {set_default} on {connector} may yield to unexpected results, as the database will silently change the referential action to `{no_action}`.&quot;</span>,
+            set_default = ReferentialAction::SetDefault.as_str(),
+            connector = connector.name(),
+            no_action = ReferentialAction::NoAction.as_str(),
+        )
+    };
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetDefault) = field.explicit_on_delete() {
+        <span class="kw">let </span>span = get_span(<span class="string">&quot;onDelete&quot;</span>);
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetDefault) = field.explicit_on_update() {
+        <span class="kw">let </span>span = get_span(<span class="string">&quot;onUpdate&quot;</span>);
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
     }
 }
 </code></pre></div>
