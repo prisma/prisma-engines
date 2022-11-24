@@ -90,7 +90,7 @@ impl QueryGraphBuilder {
         // Run final transformations.
         graph.finalize()?;
         trace!("{}", graph);
-    
+
         // Used to debug generated graph.
         if *PRISMA_RENDER_DOT_FILE {
             let mut f = File::create("graph.dot").unwrap();
