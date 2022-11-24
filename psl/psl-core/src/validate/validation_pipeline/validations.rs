@@ -10,7 +10,6 @@ mod indexes;
 mod models;
 mod names;
 mod relation_fields;
-mod relation_indexes;
 mod relations;
 
 use super::context::Context;
@@ -98,7 +97,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             relation_fields::ignored_related_model(field, ctx);
             relation_fields::referential_actions(field, ctx);
             relation_fields::map(field, ctx);
-            relation_indexes::validate_missing_relation_indexes(field, ctx);
+            relation_fields::validate_missing_relation_indexes(field, ctx);
         }
 
         for index in model.indexes() {

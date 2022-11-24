@@ -133,7 +133,7 @@ impl Connector for MongoDbDatamodelConnector {
         RelationMode::Prisma.into()
     }
 
-    // avoid checking whether the referencing fields in a `@relation` attribute belong to an index during the schema validation
+    /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
     fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
         false
     }
