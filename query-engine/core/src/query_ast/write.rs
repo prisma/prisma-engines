@@ -1,6 +1,6 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
-use crate::RecordQuery;
+use crate::{RecordQuery, ToGraphviz};
 use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
@@ -146,7 +146,32 @@ impl std::fmt::Display for WriteQuery {
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
             Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
             Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
-            Self::Upsert(q) => q.fmt(f),
+            Self::Upsert(q) => write!(
+                f,
+                "Upsert(model: {}, filter: {:?}, create: {:?}, update: {:?}",
+                q.model().name,
+                q.record_filter(),
+                q.create(),
+                q.update()
+            ),
+        }
+    }
+}
+
+impl ToGraphviz for WriteQuery {
+    fn to_graphviz(&self) -> String {
+        match self {
+            Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name, q.args),
+            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name),
+            Self::UpdateRecord(q) => format!("UpdateRecord(model: {})", q.model.name,),
+            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name, q.record_filter),
+            Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
+            Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name),
+            Self::ConnectRecords(_) => "ConnectRecords".to_string(),
+            Self::DisconnectRecords(_) => "DisconnectRecords".to_string(),
+            Self::ExecuteRaw(r) => format!("ExecuteRaw: {:?}", r.inputs),
+            Self::QueryRaw(r) => format!("QueryRaw: {:?}", r.inputs),
+            Self::Upsert(q) => format!("Upsert(model: {}", q.model().name),
         }
     }
 }

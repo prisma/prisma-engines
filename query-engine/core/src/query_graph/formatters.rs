@@ -79,6 +79,17 @@ impl Display for Node {
     }
 }
 
+impl ToGraphviz for Node {
+    fn to_graphviz(&self) -> String {
+        match self {
+            Node::Query(q) => q.to_graphviz(),
+            Node::Flow(f) => format!("{}", f),
+            Node::Computation(c) => format!("{}", c),
+            Node::Empty => "Empty".to_string(),
+        }
+    }
+}
+
 impl Display for NodeRef {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Node {}", self.id())

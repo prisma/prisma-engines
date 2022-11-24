@@ -4,6 +4,7 @@ mod write;
 pub use read::*;
 pub use write::*;
 
+use crate::ToGraphviz;
 use connector::filter::Filter;
 use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 
@@ -96,6 +97,15 @@ impl std::fmt::Display for Query {
         match self {
             Self::Read(q) => write!(f, "{}", q),
             Self::Write(q) => write!(f, "{}", q),
+        }
+    }
+}
+
+impl ToGraphviz for Query {
+    fn to_graphviz(&self) -> String {
+        match self {
+            Self::Read(q) => q.to_graphviz(),
+            Self::Write(q) => q.to_graphviz(),
         }
     }
 }

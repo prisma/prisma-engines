@@ -42,6 +42,12 @@ pub struct DiffResult {
     pub right: Vec<SelectionResult>,
 }
 
+impl DiffResult {
+    pub fn has_no_diff(&self) -> bool {
+        self.left.is_empty() && self.right.is_empty()
+    }
+}
+
 impl ExpressionResult {
     /// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
     /// A vector is returned as some expression results return more than one result row at once.

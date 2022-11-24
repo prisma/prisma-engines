@@ -13,7 +13,12 @@ use crate::{
 };
 use connector::{IntoFilter, QueryArguments};
 use guard::*;
-use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
+use itertools::Itertools;
+use petgraph::{
+    graph::*,
+    visit::{EdgeRef as PEdgeRef, NodeIndexable},
+    *,
+};
 use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
@@ -850,5 +855,64 @@ impl QueryGraph {
         }
 
         Ok(())
+    }
+}
+
+pub trait ToGraphviz {
+    fn to_graphviz(&self) -> String;
+}
+
+impl ToGraphviz for QueryGraph {
+    fn to_graphviz(&self) -> String {
+        let nodes = self
+            .graph
+            .node_indices()
+            .into_iter()
+            .map(|idx| (idx, self.graph.node_weight(idx).unwrap().borrow().unwrap()))
+            .map(|(idx, node)| {
+                if self.is_result_node(&NodeRef { node_ix: idx.clone() }) {
+                    format!(
+                        "    {} [label=\"{}\", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]",
+                        idx.index(),
+                        node.to_graphviz().replace('\"', "\\\"")
+                    )
+                } else if self
+                    .root_nodes()
+                    .iter()
+                    .any(|root_node| root_node == &NodeRef { node_ix: idx.clone() })
+                {
+                    format!(
+                        "    {} [label=\"{}\", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]",
+                        idx.index(),
+                        node.to_graphviz().replace('\"', "\\\"")
+                    )
+                } else {
+                    format!(
+                        "    {} [label=\"{}\", shape=rectangle]",
+                        idx.index(),
+                        node.to_graphviz().replace('\"', "\\\"")
+                    )
+                }
+            })
+            .join("\n");
+
+        let edges = self
+            .graph
+            .edge_references()
+            .into_iter()
+            .map(|edge| {
+                let idx = edge.id();
+                let edge_content = self.graph.edge_weight(idx).unwrap().borrow().unwrap();
+
+                format!(
+                    "    {} -> {} [label=\"{}\"]",
+                    self.graph.to_index(edge.source()),
+                    self.graph.to_index(edge.target()),
+                    edge_content.to_string().replace('\"', "\\\"")
+                )
+            })
+            .join("\n");
+
+        format!("digraph {{\n{nodes}\n{edges}\n}}")
     }
 }
