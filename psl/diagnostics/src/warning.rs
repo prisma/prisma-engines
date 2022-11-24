@@ -1,9 +1,9 @@
-use colored::{ColoredString, Colorize};
-
 use crate::{
     pretty_print::{pretty_print, DiagnosticColorer},
     Span,
 };
+use colored::{ColoredString, Colorize};
+use indoc::indoc;
 
 /// A non-fatal warning emitted by the schema parser.
 /// For fancy printing, please use the `pretty_print_error` function.
@@ -26,8 +26,12 @@ impl DatamodelWarning {
     }
 
     pub fn new_missing_index_on_emulated_relation(span: Span) -> DatamodelWarning {
-        let message = "The fields referenced in a `@relation` should be indexed to prevent potential performance penalties. Learn more at https://pris.ly/d/relation-mode#indexes.".to_owned();
-        Self::new(message, span)
+        let message = indoc! {
+            r#"With `relationMode = \"prisma\"`, no foreign keys are used, so `@relation`'s fields will not benefit from the index usually created by the relational database under the hood.
+            This can lead to poor performance when querying these fields. We recommend adding an index manually.
+            Learn more at https://pris.ly/d/relation-mode-prisma#indexes"#
+        };
+        Self::new(message.to_owned(), span)
     }
 
     /// The user-facing warning message.

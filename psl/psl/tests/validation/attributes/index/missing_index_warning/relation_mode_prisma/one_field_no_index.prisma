@@ -21,7 +21,9 @@ model Post {
     userId Int
     user SomeUser @relation(fields: [userId], references: [id])
 }
-// [1;93mwarning[0m: [1mThe fields referenced in a `@relation` should be indexed to prevent potential performance penalties. Learn more at https://pris.ly/d/relation-mode#indexes.[0m
+// [1;93mwarning[0m: [1mWith `relationMode = \"prisma\"`, no foreign keys are used, so `@relation`'s fields will not benefit from the index usually created by the relational database under the hood.
+// This can lead to poor performance when querying these fields. We recommend adding an index manually.
+// Learn more at https://pris.ly/d/relation-mode-prisma#indexes[0m
 //   [1;94m-->[0m  [4mschema.prisma:22[0m
 // [1;94m   | [0m
 // [1;94m21 | [0m    userId Int
