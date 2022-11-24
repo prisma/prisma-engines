@@ -738,7 +738,7 @@
         .to_string()
     }
 
-    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
         ddl::CreateTable {
             table_name: <span class="kw-2">&amp;</span>table_name,
             columns: table.columns().map(|col| <span class="self">self</span>.render_column(col)).collect(),
@@ -846,7 +846,7 @@
     }
 
     <span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
-        <span class="self">self</span>.render_create_table_as(table, TableName(<span class="prelude-val">None</span>, Quoted::mysql_ident(table.name())))
+        <span class="self">self</span>.render_create_table_as(table, QuotedWithPrefix(<span class="prelude-val">None</span>, Quoted::mysql_ident(table.name())))
     }
 
     <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {

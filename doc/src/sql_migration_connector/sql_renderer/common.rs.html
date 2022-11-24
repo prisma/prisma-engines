@@ -182,21 +182,35 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, <span class="kw-2">*</span>};
 <span class="kw">use </span>std::fmt::{Display, Write <span class="kw">as _</span>};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>SQL_INDENTATION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;    &quot;</span>;
 
-<span class="doccomment">/// A table name with an optional schema prefix.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableName&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, <span class="kw">pub</span>(<span class="kw">crate</span>) Quoted&lt;T&gt;);
+<span class="doccomment">/// A quoted identifier with an optional schema prefix.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QuotedWithPrefix&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, <span class="kw">pub</span>(<span class="kw">crate</span>) Quoted&lt;T&gt;);
 
-<span class="kw">impl</span>&lt;T&gt; TableName&lt;T&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(namespace: <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, name: Quoted&lt;T&gt;) -&gt; <span class="self">Self </span>{
-        TableName(namespace, name)
+<span class="kw">impl </span>QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pg_new&lt;<span class="lifetime">&#39;a</span>&gt;(namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; QuotedWithPrefix&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        QuotedWithPrefix(namespace.map(Quoted::postgres_ident), Quoted::postgres_ident(name))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pg_from_table_walker(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt; {
+        QuotedWithPrefix(
+            table.namespace().map(Quoted::postgres_ident),
+            Quoted::postgres_ident(table.name()),
+        )
     }
 }
 
-<span class="kw">impl</span>&lt;T&gt; Display <span class="kw">for </span>TableName&lt;T&gt;
+<span class="kw">impl</span>&lt;T&gt; Display <span class="kw">for </span>QuotedWithPrefix&lt;T&gt;
 <span class="kw">where
     </span>T: Display,
 {

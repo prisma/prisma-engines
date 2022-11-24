@@ -445,10 +445,10 @@
     }
 
     <span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
-        <span class="self">self</span>.render_create_table_as(table, TableName(<span class="prelude-val">None</span>, Quoted::sqlite_ident(table.name())))
+        <span class="self">self</span>.render_create_table_as(table, QuotedWithPrefix(<span class="prelude-val">None</span>, Quoted::sqlite_ident(table.name())))
     }
 
-    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>create_table = sql_ddl::sqlite::CreateTable {
             table_name: <span class="kw-2">&amp;</span>table_name,
             columns: table.columns().map(|col| render_column(<span class="kw-2">&amp;</span>col)).collect(),
@@ -537,7 +537,7 @@
 
             result.push(<span class="self">self</span>.render_create_table_as(
                 tables.next,
-                TableName(<span class="prelude-val">None</span>, Quoted::sqlite_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
+                QuotedWithPrefix(<span class="prelude-val">None</span>, Quoted::sqlite_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
             ));
 
             copy_current_table_into_new_table(<span class="kw-2">&amp;mut </span>result, redefine_table, tables, <span class="kw-2">&amp;</span>temporary_table_name);

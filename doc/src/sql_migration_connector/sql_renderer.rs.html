@@ -146,7 +146,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>common::IteratorJoin;
 
-<span class="kw">use </span><span class="self">self</span>::common::{Quoted, TableName};
+<span class="kw">use </span><span class="self">self</span>::common::{Quoted, QuotedWithPrefix};
 <span class="kw">use crate</span>::{
     pair::Pair,
     sql_migration::{
@@ -193,7 +193,7 @@
     </span><span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String;
 
     <span class="doccomment">/// Render a table creation with the provided table name.
-    </span><span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
+    </span><span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
     <span class="kw">fn </span>render_drop_and_recreate_index(<span class="kw-2">&amp;</span><span class="self">self</span>, _indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;unreachable render_drop_and_recreate_index&quot;</span>)

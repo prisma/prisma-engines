@@ -1123,75 +1123,6 @@
 <span id="1123">1123</span>
 <span id="1124">1124</span>
 <span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
-<span id="1177">1177</span>
-<span id="1178">1178</span>
-<span id="1179">1179</span>
-<span id="1180">1180</span>
-<span id="1181">1181</span>
-<span id="1182">1182</span>
-<span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
-<span id="1186">1186</span>
-<span id="1187">1187</span>
-<span id="1188">1188</span>
-<span id="1189">1189</span>
-<span id="1190">1190</span>
-<span id="1191">1191</span>
-<span id="1192">1192</span>
-<span id="1193">1193</span>
-<span id="1194">1194</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1349,18 +1280,12 @@
 
     <span class="kw">fn </span>render_add_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         ddl::AlterTable {
-            table_name: <span class="kw-2">&amp;</span>TableName(
-                foreign_key.table().namespace().map(Quoted::postgres_ident),
-                Quoted::postgres_ident(foreign_key.table().name()),
-            ),
+            table_name: <span class="kw-2">&amp;</span>QuotedWithPrefix::pg_from_table_walker(foreign_key.table()),
             clauses: <span class="macro">vec!</span>[ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
                 constrained_columns: foreign_key.constrained_columns().map(|c| c.name().into()).collect(),
                 referenced_columns: foreign_key.referenced_columns().map(|c| c.name().into()).collect(),
                 constraint_name: foreign_key.constraint_name().map(From::from),
-                referenced_table: <span class="kw-2">&amp;</span>TableName(
-                    foreign_key.referenced_table().namespace().map(Quoted::postgres_ident),
-                    Quoted::postgres_ident(foreign_key.referenced_table().name()),
-                ),
+                referenced_table: <span class="kw-2">&amp;</span>QuotedWithPrefix::pg_from_table_walker(foreign_key.referenced_table()),
                 on_delete: <span class="prelude-val">Some</span>(<span class="kw">match </span>foreign_key.on_delete_action() {
                     ForeignKeyAction::Cascade =&gt; ddl::ForeignKeyAction::Cascade,
                     ForeignKeyAction::NoAction =&gt; ddl::ForeignKeyAction::NoAction,
@@ -1419,12 +1344,9 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 <span class="kw">let </span>previous_table = indexes.previous.table();
-                <span class="kw">let </span>index_previous_name = <span class="kw">match </span>previous_table.namespace() {
-                    <span class="prelude-val">Some</span>(ns) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.quote(ns), <span class="self">self</span>.quote(indexes.previous.name())),
-                    <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.quote(indexes.previous.name()).to_string(),
-                };
+                <span class="kw">let </span>index_previous_name = QuotedWithPrefix::pg_new(previous_table.namespace(), indexes.previous.name());
                 stmt.push_str(<span class="string">&quot;ALTER INDEX &quot;</span>);
-                stmt.push_str(<span class="kw-2">&amp;</span>index_previous_name);
+                stmt.push_str(<span class="kw-2">&amp;</span>index_previous_name.to_string());
                 stmt.push_str(<span class="string">&quot; RENAME TO &quot;</span>);
                 <span class="comment">// Postgres assumes we use the same schema as the previous name&#39;s, so we&#39;re not
                 // allowed to qualify this identifier.
@@ -1525,10 +1447,7 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>alter_table = <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} {}&quot;</span>,
-                TableName::new(
-                    tables.previous.namespace().map(|ns| <span class="self">self</span>.quote(ns)),
-                    <span class="self">self</span>.quote(tables.previous.name())
-                ),
+                QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
                 lines.join(<span class="string">&quot;,\n&quot;</span>)
             );
 
@@ -1544,10 +1463,7 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_str(<span class="string">&quot;CREATE TYPE &quot;</span>);
-                stmt.push_display(<span class="kw-2">&amp;</span>TableName(
-                    enm.namespace().map(Quoted::postgres_ident),
-                    Quoted::postgres_ident(enm.name()),
-                ));
+                stmt.push_display(<span class="kw-2">&amp;</span>QuotedWithPrefix::pg_new(enm.namespace(), enm.name()));
                 stmt.push_str(<span class="string">&quot; AS ENUM (&quot;</span>);
                 <span class="kw">let </span><span class="kw-2">mut </span>values = enm.values().peekable();
                 <span class="kw">while let </span><span class="prelude-val">Some</span>(value) = values.next() {
@@ -1567,10 +1483,7 @@
         ddl::CreateIndex {
             index_name: index.name().into(),
             is_unique: index.is_unique(),
-            table_reference: <span class="kw-2">&amp;</span>TableName(
-                index.table().namespace().map(Quoted::postgres_ident),
-                Quoted::postgres_ident(index.table().name()),
-            ),
+            table_reference: <span class="kw-2">&amp;</span>QuotedWithPrefix::pg_from_table_walker(index.table()),
             using: <span class="prelude-val">Some</span>(<span class="kw">match </span>pg_ext.index_algorithm(index.id) {
                 SqlIndexAlgorithm::BTree =&gt; ddl::IndexAlgorithm::BTree,
                 SqlIndexAlgorithm::Hash =&gt; ddl::IndexAlgorithm::Hash,
@@ -1600,16 +1513,10 @@
     }
 
     <span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
-        <span class="self">self</span>.render_create_table_as(
-            table,
-            TableName(
-                table.namespace().map(Quoted::postgres_ident),
-                Quoted::postgres_ident(table.name()),
-            ),
-        )
+        <span class="self">self</span>.render_create_table_as(table, QuotedWithPrefix::pg_from_table_walker(table))
     }
 
-    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
         <span class="kw">let </span>columns: String = table.columns().map(|column| <span class="self">self</span>.render_column(column)).join(<span class="string">&quot;,\n&quot;</span>);
 
         <span class="kw">let </span>pk = <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = table.primary_key() {
@@ -1632,10 +1539,7 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_display(<span class="kw-2">&amp;</span>ddl::DropType {
-                    type_name: <span class="kw">match </span>dropped_enum.namespace() {
-                        <span class="prelude-val">Some</span>(ns) =&gt; PostgresIdentifier::WithSchema(ns.into(), dropped_enum.name().into()),
-                        <span class="prelude-val">None </span>=&gt; dropped_enum.name().into(),
-                    },
+                    type_name: PostgresIdentifier::new(dropped_enum.namespace(), dropped_enum.name()),
                 })
             })
         })
@@ -1644,20 +1548,14 @@
     <span class="kw">fn </span>render_drop_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {table} DROP CONSTRAINT {constraint_name}&quot;</span>,
-            table = <span class="kw">match </span>foreign_key.table().namespace() {
-                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), foreign_key.table().name().into()),
-                <span class="prelude-val">None </span>=&gt; foreign_key.table().name().into(),
-            },
+            table = PostgresIdentifier::new(foreign_key.table().namespace(), foreign_key.table().name()),
             constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
     <span class="kw">fn </span>render_drop_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         ddl::DropIndex {
-            index_name: <span class="kw">match </span>index.table().namespace() {
-                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), index.name().into()),
-                <span class="prelude-val">None </span>=&gt; index.name().into(),
-            },
+            index_name: PostgresIdentifier::new(index.table().namespace(), index.name()),
         }
         .to_string()
     }
@@ -1666,10 +1564,7 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_display(<span class="kw-2">&amp;</span>ddl::DropTable {
-                    table_name: <span class="kw">match </span>namespace {
-                        <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), table_name.into()),
-                        <span class="prelude-val">None </span>=&gt; table_name.into(),
-                    },
+                    table_name: PostgresIdentifier::new(namespace, table_name),
                     cascade: <span class="bool-val">false</span>,
                 })
             })
@@ -1678,10 +1573,7 @@
 
     <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         ddl::DropView {
-            view_name: <span class="kw">match </span>view.namespace() {
-                <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(namespace.into(), view.name().into()),
-                <span class="prelude-val">None </span>=&gt; view.name().into(),
-            },
+            view_name: PostgresIdentifier::new(view.namespace(), view.name()),
         }
         .to_string()
     }
@@ -1696,7 +1588,7 @@
                 tables.next,
                 <span class="comment">// TODO(MultiSchema): This only matters for CockroachDB, which is not currently
                 // supported by MultiSchema.
-                </span>TableName(<span class="prelude-val">None</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
+                </span>QuotedWithPrefix(<span class="prelude-val">None</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
             ));
 
             <span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = redefine_table
@@ -1757,10 +1649,7 @@
     <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">r#&quot;ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}&quot;#</span>,
-            table = TableName(
-                fks.previous.table().namespace().map(Quoted::postgres_ident),
-                Quoted::postgres_ident(fks.previous.table().name()),
-            ),
+            table = QuotedWithPrefix::pg_from_table_walker(fks.previous.table()),
             previous = <span class="self">self</span>.quote(fks.previous.constraint_name().unwrap()),
             next = <span class="self">self</span>.quote(fks.next.constraint_name().unwrap()),
         )
@@ -1770,10 +1659,7 @@
 <span class="kw">fn </span>render_column_type(col: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, flavour: <span class="kw-2">&amp;</span>PostgresFlavour) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
     <span class="kw">let </span>t = col.column_type();
     <span class="kw">if let </span><span class="prelude-val">Some</span>(enm) = col.column_type_family_as_enum() {
-        <span class="kw">let </span>name = TableName(
-            enm.namespace().map(Quoted::postgres_ident),
-            Quoted::postgres_ident(enm.name()),
-        );
+        <span class="kw">let </span>name = QuotedWithPrefix::pg_new(enm.namespace(), enm.name());
         <span class="kw">let </span>arity = <span class="kw">if </span>t.arity.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
         <span class="kw">return </span><span class="macro">format!</span>(<span class="string">&quot;{name}{arity}&quot;</span>).into();
     }
@@ -1927,10 +1813,7 @@
     flavour: <span class="kw-2">&amp;</span>PostgresFlavour,
 ) {
     <span class="kw">let </span>steps = expand_alter_column(columns, column_changes);
-    <span class="kw">let </span>table_name = TableName::new(
-        columns.previous.table().namespace().map(Quoted::postgres_ident),
-        Quoted::postgres_ident(columns.previous.table().name()),
-    );
+    <span class="kw">let </span>table_name = QuotedWithPrefix::pg_from_table_walker(columns.previous.table());
     <span class="kw">let </span>column_name = Quoted::postgres_ident(columns.previous.name());
 
     <span class="kw">let </span>alter_column_prefix = <span class="macro">format!</span>(<span class="string">&quot;ALTER COLUMN {}&quot;</span>, column_name);
@@ -2124,13 +2007,10 @@
             .map(|created_value| {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;ALTER TYPE {enum_name} ADD VALUE {value}&quot;</span>,
-                    enum_name = <span class="kw">match </span>schemas.walk(alter_enum.id).previous.namespace() {
-                        <span class="prelude-val">Some</span>(namespace) =&gt; PostgresIdentifier::WithSchema(
-                            namespace.into(),
-                            schemas.walk(alter_enum.id).previous.name().into()
-                        ),
-                        <span class="prelude-val">None </span>=&gt; schemas.walk(alter_enum.id).previous.name().into(),
-                    },
+                    enum_name = QuotedWithPrefix::pg_new(
+                        schemas.walk(alter_enum.id).previous.namespace(),
+                        schemas.walk(alter_enum.id).previous.name()
+                    ),
                     value = Quoted::postgres_string(created_value)
                 )
             })
@@ -2158,10 +2038,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>stmts = Vec::with_capacity(<span class="number">10</span>);
 
     <span class="kw">let </span>temporary_enum_name = <span class="macro">format!</span>(<span class="string">&quot;{}_new&quot;</span>, <span class="kw-2">&amp;</span>enums.next.name());
-    <span class="kw">let </span>tmp_name = TableName::new(
-        enums.next.namespace().map(Quoted::postgres_ident),
-        Quoted::postgres_ident(temporary_enum_name.as_str()),
-    );
+    <span class="kw">let </span>tmp_name = QuotedWithPrefix::pg_new(enums.next.namespace(), temporary_enum_name.as_str());
     <span class="kw">let </span>tmp_old_name = <span class="macro">format!</span>(<span class="string">&quot;{}_old&quot;</span>, <span class="kw-2">&amp;</span>enums.previous.name());
 
     stmts.push(<span class="string">&quot;BEGIN&quot;</span>.to_string());
@@ -2184,10 +2061,7 @@
 
             <span class="kw">let </span>drop_default = <span class="macro">format!</span>(
                 <span class="string">r#&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} DROP DEFAULT&quot;#</span>,
-                table_name = TableName::new(
-                    column.table().namespace().map(Quoted::postgres_ident),
-                    Quoted::postgres_ident(column.table().name())
-                ),
+                table_name = QuotedWithPrefix::pg_from_table_walker(column.table()),
                 column_name = Quoted::postgres_ident(column.name()),
             );
 
@@ -2208,10 +2082,7 @@
                 <span class="string">&quot;ALTER TABLE {table_name} \
                             ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
                                 USING ({column_name}::text::{tmp_name}{array})&quot;</span>,
-                table_name = TableName::new(
-                    column.table().namespace().map(Quoted::postgres_ident),
-                    Quoted::postgres_ident(column.table().name())
-                ),
+                table_name = QuotedWithPrefix::pg_from_table_walker(column.table()),
                 column_name = Quoted::postgres_ident(column.name()),
                 array = array,
             );
@@ -2224,10 +2095,7 @@
     </span>{
         <span class="kw">let </span>sql = <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TYPE {enum_name} RENAME TO {tmp_old_name}&quot;</span>,
-            enum_name = TableName::new(
-                enums.previous.namespace().map(Quoted::postgres_ident),
-                Quoted::postgres_ident(enums.previous.name())
-            ),
+            enum_name = QuotedWithPrefix::pg_new(enums.previous.namespace(), enums.previous.name()),
             tmp_old_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>tmp_old_name)
         );
 
@@ -2247,10 +2115,7 @@
     <span class="comment">// Drop old enum
     </span>{
         <span class="kw">let </span>sql = ddl::DropType {
-            type_name: <span class="kw">match </span>enums.previous.namespace() {
-                <span class="prelude-val">Some</span>(ns) =&gt; PostgresIdentifier::WithSchema(ns.into(), tmp_old_name.as_str().into()),
-                <span class="prelude-val">None </span>=&gt; tmp_old_name.as_str().into(),
-            },
+            type_name: PostgresIdentifier::new(enums.previous.namespace(), tmp_old_name.as_str()),
         }
         .to_string();
 
@@ -2272,10 +2137,7 @@
 
             <span class="kw">let </span>set_default = <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}&quot;</span>,
-                table_name = TableName::new(
-                    columns.previous.table().namespace().map(Quoted::postgres_ident),
-                    Quoted::postgres_ident(table_name)
-                ),
+                table_name = QuotedWithPrefix::pg_new(columns.previous.table().namespace(), table_name),
                 column_name = Quoted::postgres_ident(<span class="kw-2">&amp;</span>column_name),
                 default = default_str,
             );

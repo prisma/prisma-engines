@@ -513,6 +513,15 @@
 <span id="513">513</span>
 <span id="514">514</span>
 <span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::common::{IndexColumn, IteratorJoin};
 <span class="kw">use </span>std::{borrow::Cow, fmt::Display};
 
@@ -770,6 +779,15 @@
     </span>Simple(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
     <span class="doccomment">/// Identifier with a schema(namespace). The first field is the schema.
     </span>WithSchema(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PostgresIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>namespace {
+            <span class="prelude-val">Some</span>(ns) =&gt; PostgresIdentifier::WithSchema(ns.into(), name.into()),
+            <span class="prelude-val">None </span>=&gt; PostgresIdentifier::Simple(name.into()),
+        }
+    }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>PostgresIdentifier&lt;<span class="lifetime">&#39;_</span>&gt; {
