@@ -1,4 +1,6 @@
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
+use lsp_types::{
+    CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit,
+};
 use psl::parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker},
@@ -265,17 +267,22 @@ pub(super) fn add_index_for_relation_fields(
         ..Default::default()
     };
 
-    let diagnostics = super::diagnostics_for_span(
+    let Some(span_diagnostics) = super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,
         relation.relation_attribute().unwrap().span(),
-    );
+    ) else { return; };
+
+    let diagnostics = span_diagnostics
+        .into_iter()
+        .filter(|diag| diag.message.contains("relationMode = \"prisma\""))
+        .collect::<Vec<Diagnostic>>();
 
     let action = CodeAction {
         title: String::from("Add an index for the relation's field(s)"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
-        diagnostics,
+        diagnostics: Some(diagnostics),
         ..Default::default()
     };
 
