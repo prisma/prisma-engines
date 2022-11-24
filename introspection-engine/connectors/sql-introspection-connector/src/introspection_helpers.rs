@@ -485,7 +485,7 @@ fn render_opclass<'a>(index_field_id: sql::IndexColumnId, ctx: &Context<'a>) -> 
         sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps => {
             Some(renderer::IndexOps::managed("Float4MinMaxMultiOps"))
         }
-        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(renderer::IndexOps::managed("Floar8BloomOps")),
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps => Some(renderer::IndexOps::managed("Float8BloomOps")),
         sql::postgres::SQLOperatorClassKind::Float8MinMaxOps => Some(renderer::IndexOps::managed("Float8MinMaxOps")),
         sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps => {
             Some(renderer::IndexOps::managed("Float8MinMaxMultiOps"))
@@ -539,7 +539,7 @@ fn render_opclass<'a>(index_field_id: sql::IndexColumnId, ctx: &Context<'a>) -> 
             Some(renderer::IndexOps::managed("TimestampTzMinMaxOps"))
         }
         sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps => {
-            Some(renderer::IndexOps::managed("TimestampTzMinMaxOps"))
+            Some(renderer::IndexOps::managed("TimestampTzMinMaxMultiOps"))
         }
         sql::postgres::SQLOperatorClassKind::TimeBloomOps => Some(renderer::IndexOps::managed("TimeBloomOps")),
         sql::postgres::SQLOperatorClassKind::TimeMinMaxOps => Some(renderer::IndexOps::managed("TimeMinMaxOps")),
