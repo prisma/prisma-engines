@@ -77,7 +77,6 @@ features!(
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | InteractiveTransactions
          | FullTextSearch
          | FullTextIndex
          | Tracing
@@ -113,6 +112,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | NApi
         | ImprovedQueryRaw
         | DataProxy
+        | InteractiveTransactions
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         MultiSchema
