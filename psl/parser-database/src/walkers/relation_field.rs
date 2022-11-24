@@ -170,12 +170,12 @@ impl<'db> RelationFieldWalker<'db> {
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
+    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         self.fields()
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
+    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         let model_id = self.model_id;
         let attributes = self.attributes();
         attributes.fields.as_ref().map(move |fields| {

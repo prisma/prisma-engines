@@ -299,6 +299,12 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
+    /// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
+    /// are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        true
+    }
+
     fn native_type_to_string(&self, instance: &NativeTypeInstance) -> String {
         let (name, args) = self.native_type_to_parts(instance);
         let args = if args.is_empty() {
