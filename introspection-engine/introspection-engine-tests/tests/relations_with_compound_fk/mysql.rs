@@ -424,8 +424,8 @@ async fn compound_foreign_keys_for_required_self_relations(api: &TestApi) -> Tes
           age          Int
           partner_id   Int
           partner_age  Int
-          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
-          other_Person Person[]
+          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
+          other_Person Person[] @relation("PersonToPerson")
 
           @@unique([id, age], map: "post_user_unique")
           @@index([partner_id, partner_age], map: "partner_id")
@@ -462,8 +462,8 @@ async fn compound_foreign_keys_for_self_relations(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int?
           partner_age  Int?
-          Person       Person?  @relation(fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
-          other_Person Person[]
+          Person       Person?  @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
+          other_Person Person[] @relation("PersonToPerson")
 
           @@unique([id, age], map: "post_user_unique")
           @@index([partner_id, partner_age], map: "partner_id")
@@ -500,8 +500,8 @@ async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
           age          Int
           partner_id   Int      @default(0)
           partner_age  Int      @default(0)
-          Person       Person   @relation(fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
-          other_Person Person[]
+          Person       Person   @relation("PersonToPerson", fields: [partner_id, partner_age], references: [id, age], map: "partner_id")
+          other_Person Person[] @relation("PersonToPerson")
 
           @@unique([id, age], map: "post_user_unique")
           @@index([partner_id, partner_age], map: "partner_id")

@@ -360,9 +360,9 @@ async fn northwind(api: TestApi) {
           notes                String?
           reports_to           Int?                   @db.SmallInt
           photo_path           String?                @db.VarChar(255)
-          employees            employees?             @relation(fields: [reports_to], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employees_employees")
           employee_territories employee_territories[]
-          other_employees      employees[]
+          employees            employees?             @relation("employeesToemployees", fields: [reports_to], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employees_employees")
+          other_employees      employees[]            @relation("employeesToemployees")
           orders               orders[]
         }
 
@@ -393,10 +393,10 @@ async fn northwind(api: TestApi) {
           ship_region      String?         @db.VarChar(15)
           ship_postal_code String?         @db.VarChar(10)
           ship_country     String?         @db.VarChar(15)
+          order_details    order_details[]
           customers        customers?      @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_customers")
           employees        employees?      @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_employees")
           shippers         shippers?       @relation(fields: [ship_via], references: [shipper_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_shippers")
-          order_details    order_details[]
         }
 
         model products {
@@ -410,9 +410,9 @@ async fn northwind(api: TestApi) {
           units_on_order    Int?            @db.SmallInt
           reorder_level     Int?            @db.SmallInt
           discontinued      Int
+          order_details     order_details[]
           categories        categories?     @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_categories")
           suppliers         suppliers?      @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_suppliers")
-          order_details     order_details[]
         }
 
         model region {
@@ -448,8 +448,8 @@ async fn northwind(api: TestApi) {
           territory_id          String                 @id(map: "pk_territories") @db.VarChar(20)
           territory_description String                 @db.Char
           region_id             Int                    @db.SmallInt
-          region                region                 @relation(fields: [region_id], references: [region_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_territories_region")
           employee_territories  employee_territories[]
+          region                region                 @relation(fields: [region_id], references: [region_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_territories_region")
         }
 
         model us_states {

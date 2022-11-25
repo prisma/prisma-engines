@@ -47,8 +47,8 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
         model User {
           id                      Int   @id @default(autoincrement())
           post_id                 Int   @unique
-          Post_User_post_idToPost Post  @relation("User_post_idToPost", fields: [post_id], references: [id], onUpdate: NoAction, map: "user_fk")
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
+          Post_User_post_idToPost Post  @relation("User_post_idToPost", fields: [post_id], references: [id], onUpdate: NoAction, map: "user_fk")
         }
     "#]];
 
@@ -458,8 +458,8 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           x                    Int
           fk_x_1               Int
           fk_x_2               Int
-          x_y_fk_x_1_fk_x_2Tox x   @relation("y_fk_x_1_fk_x_2Tox", fields: [fk_x_1, fk_x_2], references: [id, y], onUpdate: NoAction, map: "yfk")
           x_x_yToy             x[] @relation("x_yToy")
+          x_y_fk_x_1_fk_x_2Tox x   @relation("y_fk_x_1_fk_x_2Tox", fields: [fk_x_1, fk_x_2], references: [id, y], onUpdate: NoAction, map: "yfk")
         }
     "#]];
 
@@ -544,8 +544,8 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           recruited_by                        Int?
           direct_report                       Int?
           User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
-          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
           other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
+          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
           other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
         }
     "#]];

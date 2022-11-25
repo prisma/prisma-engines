@@ -1,4 +1,5 @@
 mod cockroachdb;
+mod mysql;
 mod sqlite;
 
 use barrel::types;

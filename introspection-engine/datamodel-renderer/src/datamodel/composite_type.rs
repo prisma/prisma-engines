@@ -3,12 +3,12 @@ mod field;
 use crate::value::{Constant, Documentation};
 pub use field::CompositeTypeField;
 use psl::dml;
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 /// A type block in a PSL file.
 #[derive(Debug)]
 pub struct CompositeType<'a> {
-    name: Constant<&'a str>,
+    name: Constant<Cow<'a, str>>,
     documentation: Option<Documentation<'a>>,
     fields: Vec<CompositeTypeField<'a>>,
 }
@@ -22,8 +22,8 @@ impl<'a> CompositeType<'a> {
     /// //   ^^^^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let name = Constant::new_no_validate(name);
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             name,
@@ -40,8 +40,8 @@ impl<'a> CompositeType<'a> {
     ///   ....
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Add a new field to the type.
@@ -59,8 +59,8 @@ impl<'a> CompositeType<'a> {
     /// Generate a composite type rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &'a dml::CompositeType) -> Self {
-        let mut composite_type = CompositeType::new(&dml_ct.name);
+    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &dml::CompositeType) -> Self {
+        let mut composite_type = CompositeType::new(dml_ct.name.clone());
 
         for dml_field in dml_ct.fields.iter() {
             composite_type.push_field(CompositeTypeField::from_dml(datasource, dml_field));
@@ -115,10 +115,13 @@ mod tests {
         let field = CompositeTypeField::new_array("Other", "String");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("1Invalid", "Float");
+        let mut field = CompositeTypeField::new_required("Invalid", "Float");
+        field.map("1Invalid");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("11111", "Float");
+        let mut field = CompositeTypeField::new_required("11111", "Float");
+        field.commented_out();
+        field.map("11111");
         composite_type.push_field(field);
 
         let expected = expect![[r#"

@@ -3,16 +3,23 @@ use std::fmt::{Display, Write as _};
 
 pub(super) const SQL_INDENTATION: &str = "    ";
 
-/// A table name with an optional schema prefix.
-pub(crate) struct TableName<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
+/// A quoted identifier with an optional schema prefix.
+pub(crate) struct QuotedWithPrefix<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
 
-impl<T> TableName<T> {
-    pub(crate) fn new(namespace: Option<Quoted<T>>, name: Quoted<T>) -> Self {
-        TableName(namespace, name)
+impl QuotedWithPrefix<&str> {
+    pub(crate) fn pg_new<'a>(namespace: Option<&'a str>, name: &'a str) -> QuotedWithPrefix<&'a str> {
+        QuotedWithPrefix(namespace.map(Quoted::postgres_ident), Quoted::postgres_ident(name))
+    }
+
+    pub(crate) fn pg_from_table_walker(table: TableWalker<'_>) -> QuotedWithPrefix<&str> {
+        QuotedWithPrefix(
+            table.namespace().map(Quoted::postgres_ident),
+            Quoted::postgres_ident(table.name()),
+        )
     }
 }
 
-impl<T> Display for TableName<T>
+impl<T> Display for QuotedWithPrefix<T>
 where
     T: Display,
 {

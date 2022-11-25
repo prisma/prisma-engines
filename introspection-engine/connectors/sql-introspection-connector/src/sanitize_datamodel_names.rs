@@ -5,11 +5,11 @@ use std::borrow::Cow;
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-fn needs_sanitation(s: &str) -> bool {
+pub(crate) fn needs_sanitation(s: &str) -> bool {
     RE_START.is_match(s) || RE.is_match(s)
 }
 
-fn sanitize_string(s: &str) -> String {
+pub(crate) fn sanitize_string(s: &str) -> String {
     if needs_sanitation(s) {
         let start_cleaned = RE_START.replace_all(s, "");
         RE.replace_all(start_cleaned.as_ref(), "_").into_owned()

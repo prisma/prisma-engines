@@ -573,7 +573,8 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
 }
 
 // 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
-// (even if nullable). Maria will silently just use `RESTRICT` instead.
+// (even if nullable). MySQL 8.0+ & MariaDB 10.0 allow you to create a table with
+// `SET DEFAULT`, but will silently use `NO ACTION` / `RESTRICT` instead.
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_delete_set_default_should_work(api: TestApi) {
     let dm = r#"
@@ -661,7 +662,8 @@ fn on_update_referential_actions_should_work(api: TestApi) {
 }
 
 // 5.6 and 5.7 doesn't let you `SET DEFAULT` without setting the default value
-// (even if nullable). Maria will silently just use `RESTRICT` instead.
+// (even if nullable). MySQL 8.0+ & MariaDB 10.0 allow you to create a table with
+// `SET DEFAULT`, but will silently use `NO ACTION` / `RESTRICT` instead.
 #[test_connector(exclude(Mysql56, Mysql57, Mariadb, Mssql, Vitess, CockroachDb))]
 fn on_update_set_default_should_work(api: TestApi) {
     let dm = r#"
@@ -968,7 +970,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     };
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector]
 fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: TestApi) {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
@@ -1029,7 +1031,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         .assert_no_steps();
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+#[test_connector]
 fn removing_a_relation_field_must_work(api: TestApi) {
     let dm_1 = r#"
         model User {

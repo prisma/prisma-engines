@@ -257,6 +257,15 @@ pub enum PostgresIdentifier<'a> {
     WithSchema(Cow<'a, str>, Cow<'a, str>),
 }
 
+impl<'a> PostgresIdentifier<'a> {
+    pub fn new(namespace: Option<&'a str>, name: &'a str) -> Self {
+        match namespace {
+            Some(ns) => PostgresIdentifier::WithSchema(ns.into(), name.into()),
+            None => PostgresIdentifier::Simple(name.into()),
+        }
+    }
+}
+
 impl Default for PostgresIdentifier<'_> {
     fn default() -> Self {
         PostgresIdentifier::Simple(Cow::Borrowed(""))

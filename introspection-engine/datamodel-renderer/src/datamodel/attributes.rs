@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use crate::value::{Function, FunctionParam};
 
@@ -13,7 +13,7 @@ use crate::value::{Function, FunctionParam};
 #[derive(Debug)]
 pub(super) struct FieldAttribute<'a> {
     attribute: Function<'a>,
-    prefix: Option<&'a str>,
+    prefix: Option<Cow<'a, str>>,
 }
 
 impl<'a> FieldAttribute<'a> {
@@ -27,8 +27,8 @@ impl<'a> FieldAttribute<'a> {
     /// Adds a prefix to the field attribute. Useful for native types,
     /// e.g. `attr.prefix("db")` for a type attribute renders as
     /// `@db.Type`.
-    pub(super) fn prefix(&mut self, prefix: &'a str) {
-        self.prefix = Some(prefix);
+    pub(super) fn prefix(&mut self, prefix: impl Into<Cow<'a, str>>) {
+        self.prefix = Some(prefix.into());
     }
 
     /// Add a new parameter to the attribute function.
@@ -41,7 +41,7 @@ impl<'a> fmt::Display for FieldAttribute<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("@")?;
 
-        if let Some(prefix) = self.prefix {
+        if let Some(prefix) = &self.prefix {
             f.write_str(prefix)?;
             f.write_str(".")?;
         }

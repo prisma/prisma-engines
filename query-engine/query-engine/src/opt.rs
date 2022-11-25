@@ -86,6 +86,11 @@ pub struct PrismaOpt {
     #[structopt(long, short = "m")]
     pub enable_metrics: bool,
 
+    // Enable the metrics without having to enable the feature in the
+    // schema. Used by data proxy to count interactive transactions.
+    #[structopt(long)]
+    pub dataproxy_metric_override: bool,
+
     /// Enable query logging [env: LOG_QUERIES=y]
     #[structopt(long, short = "o")]
     pub log_queries: bool,

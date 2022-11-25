@@ -101,10 +101,10 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, TableName(None, Quoted::sqlite_ident(table.name())))
+        self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::sqlite_ident(table.name())))
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let mut create_table = sql_ddl::sqlite::CreateTable {
             table_name: &table_name,
             columns: table.columns().map(|col| render_column(&col)).collect(),
@@ -193,7 +193,7 @@ impl SqlRenderer for SqliteFlavour {
 
             result.push(self.render_create_table_as(
                 tables.next,
-                TableName(None, Quoted::sqlite_ident(&temporary_table_name)),
+                QuotedWithPrefix(None, Quoted::sqlite_ident(&temporary_table_name)),
             ));
 
             copy_current_table_into_new_table(&mut result, redefine_table, tables, &temporary_table_name);

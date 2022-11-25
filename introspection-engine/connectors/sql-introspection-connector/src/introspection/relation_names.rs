@@ -1,7 +1,7 @@
 //! This module is responsible for defining the relation names and the relation field names in an
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
-use crate::introspection_helpers::is_prisma_join_table;
+use crate::{calculate_datamodel::InputContext, introspection_helpers::is_prisma_join_table};
 use sql_schema_describer as sql;
 use std::{
     borrow::Cow,
@@ -60,24 +60,25 @@ impl<'a> RelationNames<'a> {
 ///
 /// Additionally, in self-relations, the names of the two relation fields are disambiguated by
 /// prefixing the name of the backrelation field with "other_".
-pub(super) fn introspect_relation_names<'a>(ctx: &mut super::Context<'a>) -> RelationNames<'a> {
+pub(super) fn introspect(input: InputContext) -> RelationNames {
     let mut names = RelationNames {
         inline_relation_names: Default::default(),
         m2m_relation_names: Default::default(),
     };
-    let mut duplicated_fks = Default::default();
-    let ambiguous_relations = find_ambiguous_relations(ctx);
 
-    for table in ctx.schema.table_walkers() {
+    let mut duplicated_fks = Default::default();
+    let ambiguous_relations = find_ambiguous_relations(input);
+
+    for table in input.schema.table_walkers() {
         if is_prisma_join_table(table) {
-            let name = prisma_m2m_relation_name(table, &ambiguous_relations, ctx);
+            let name = prisma_m2m_relation_name(table, &ambiguous_relations, input);
             names.m2m_relation_names.insert(table.id, name);
         } else {
             collect_duplicated_fks(table, &mut duplicated_fks);
             for fk in table.foreign_keys().filter(|fk| !duplicated_fks.contains(&fk.id)) {
                 names
                     .inline_relation_names
-                    .insert(fk.id, inline_relation_name(fk, &ambiguous_relations, ctx));
+                    .insert(fk.id, inline_relation_name(fk, &ambiguous_relations, input));
             }
         }
     }
@@ -88,32 +89,35 @@ pub(super) fn introspect_relation_names<'a>(ctx: &mut super::Context<'a>) -> Rel
 fn prisma_m2m_relation_name<'a>(
     table: sql::TableWalker<'a>,
     ambiguous_relations: &HashSet<[sql::TableId; 2]>,
-    ctx: &super::Context<'a>,
+    input: InputContext,
 ) -> RelationName<'a> {
     let ids = table_ids_for_m2m_relation_table(table);
+    let is_self_relation = ids[0] == ids[1];
+
     let (relation_name, field_name_suffix) = if ambiguous_relations.contains(&ids) {
         // the table names of prisma m2m tables starts with an underscore
         (Cow::Borrowed(&table.name()[1..]), table.name())
     } else {
-        let default_name = ids.map(|id| ctx.table_prisma_name(id).prisma_name()).join("To");
+        let default_name = ids.map(|id| input.table_prisma_name(id).prisma_name()).join("To");
         let found_name = &table.name()[1..];
-        // TODO: test this
-        let relation_name = if found_name == default_name { "" } else { found_name };
+        let relation_name = if found_name == default_name && !is_self_relation {
+            ""
+        } else {
+            found_name
+        };
         (Cow::Borrowed(relation_name), "")
     };
-
-    let is_self_relation = ids[0] == ids[1];
 
     [
         relation_name,
         Cow::Owned(format!(
             "{}{field_name_suffix}{}",
-            ctx.table_prisma_name(ids[1]).prisma_name(),
+            input.table_prisma_name(ids[1]).prisma_name(),
             if is_self_relation { "_A" } else { "" },
         )),
         Cow::Owned(format!(
             "{}{field_name_suffix}{}",
-            ctx.table_prisma_name(ids[0]).prisma_name(),
+            input.table_prisma_name(ids[0]).prisma_name(),
             if is_self_relation { "_B" } else { "" },
         )),
     ]
@@ -122,15 +126,21 @@ fn prisma_m2m_relation_name<'a>(
 fn inline_relation_name<'a>(
     fk: sql::ForeignKeyWalker<'a>,
     ambiguous_relations: &HashSet<[sql::TableId; 2]>,
-    ctx: &mut super::Context<'a>,
+    input: InputContext<'a>,
 ) -> RelationName<'a> {
-    let referencing_model_name = ctx.table_prisma_name(fk.table().id).prisma_name();
-    let referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
-    let self_relation_prefix = if fk.is_self_relation() { "other_" } else { "" };
+    let is_self_relation = fk.is_self_relation();
+    let referencing_model_name = input.table_prisma_name(fk.table().id).prisma_name();
+    let referenced_model_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
+    let self_relation_prefix = if is_self_relation { "other_" } else { "" };
 
     if !ambiguous_relations.contains(&sorted_table_ids(fk.table().id, fk.referenced_table().id)) {
+        let relation_name = if is_self_relation {
+            Cow::Owned(format!("{referencing_model_name}To{referenced_model_name}"))
+        } else {
+            Cow::Borrowed("")
+        };
         [
-            Cow::Borrowed(""),
+            relation_name,
             referenced_model_name,
             Cow::Owned(format!("{self_relation_prefix}{referencing_model_name}")),
         ]
@@ -139,7 +149,7 @@ fn inline_relation_name<'a>(
         relation_name.push('_');
         let mut cols = fk.constrained_columns().peekable();
         while let Some(col) = cols.next() {
-            relation_name.push_str(ctx.column_prisma_name(col.id).prisma_name().as_ref());
+            relation_name.push_str(input.column_prisma_name(col.id).prisma_name().as_ref());
             if cols.peek().is_some() {
                 relation_name.push('_');
             }
@@ -155,15 +165,15 @@ fn inline_relation_name<'a>(
 }
 
 /// Relation names are only ambiguous between two given models.
-fn find_ambiguous_relations(ctx: &mut super::Context<'_>) -> HashSet<[sql::TableId; 2]> {
+fn find_ambiguous_relations(input: InputContext) -> HashSet<[sql::TableId; 2]> {
     let mut ambiguous_relations = HashSet::new();
 
-    for table in ctx.schema.table_walkers() {
+    for table in input.schema.table_walkers() {
         if is_prisma_join_table(table) {
             m2m_relation_ambiguousness(table, &mut ambiguous_relations)
         } else {
             for fk in table.foreign_keys() {
-                inline_relation_ambiguousness(fk, &mut ambiguous_relations, ctx)
+                inline_relation_ambiguousness(fk, &mut ambiguous_relations, input)
             }
         }
     }
@@ -199,7 +209,7 @@ fn m2m_relation_ambiguousness(table: sql::TableWalker<'_>, ambiguous_relations: 
 fn inline_relation_ambiguousness(
     fk: sql::ForeignKeyWalker<'_>,
     ambiguous_relations: &mut HashSet<[sql::TableId; 2]>,
-    ctx: &mut super::Context<'_>,
+    input: InputContext,
 ) {
     let tables = table_ids_for_inline_relation(fk);
 
@@ -221,10 +231,10 @@ fn inline_relation_ambiguousness(
     }
 
     // ...or because the relation field name conflicts with one of the scalar fields' name.
-    let default_field_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
+    let default_field_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
     if fk
         .constrained_columns()
-        .any(|col| default_field_name == ctx.column_prisma_name(col.id).prisma_name())
+        .any(|col| default_field_name == input.column_prisma_name(col.id).prisma_name())
     {
         ambiguous_relations.insert(tables);
     }

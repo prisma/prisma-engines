@@ -1,0 +1,20 @@
+datasource pg {
+  provider = "postgres"
+  url      = "postgres://meowmeowmeowmeowmeow"
+}
+
+model Blog {
+  id    Int     @id @pg.SmallInt
+  posts Post[]
+}
+
+model Post {
+  id Int   @id @pg.SmallInt
+}
+
+model Post2 {
+  id     Int  @id @pg.SmallInt
+  blogId Int  @pg.SmallInt
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}
+

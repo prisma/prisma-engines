@@ -11,50 +11,6 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres12), exclude(CockroachDb))]
-async fn should_not_remap_if_renaming_would_lead_to_duplicate_names(api: &TestApi) -> TestResult {
-    let sql = r#"
-        CREATE TABLE nodes(id serial primary key);
-        CREATE TABLE _nodes(
-            node_a int NOT NULL,
-            node_b int NOT NULL,
-            CONSTRAINT _nodes_node_a_fkey FOREIGN KEY(node_a) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE,
-            CONSTRAINT _nodes_node_b_fkey FOREIGN KEY(node_b) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE
-        );
-    "#;
-    api.raw_cmd(sql).await;
-
-    let expected = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-        model nodes {
-          node_a Int
-          node_b Int
-
-          @@map("_nodes")
-          @@ignore
-        }
-
-        model nodes {
-          id                        Int     @id @default(autoincrement())
-          nodes_nodes_node_aTonodes nodes   @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade) @ignore
-          nodes_nodes_node_bTonodes nodes   @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade) @ignore
-          nodes_nodes_node_aTonodes nodes[] @relation("nodes_node_aTonodes") @ignore
-          nodes_nodes_node_bTonodes nodes[] @relation("nodes_node_bTonodes") @ignore
-        }
-    "#]];
-    api.expect_datamodel(&expected).await;
-    Ok(())
-}
-
 #[test_connector(exclude(CockroachDb))]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
     api.barrel()

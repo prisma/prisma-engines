@@ -1209,12 +1209,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Now,
-                                constraint_name: None,
-                            },
-                        ),
+                        default: None,
                         auto_increment: false,
                     },
                 ),

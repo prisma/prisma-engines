@@ -8,25 +8,24 @@ mod function;
 mod text;
 
 pub use array::Array;
-pub use constant::{Constant, ConstantNameValidationError};
+pub use constant::Constant;
 pub use documentation::Documentation;
 pub use env::Env;
 pub use function::{Function, FunctionParam};
 pub use text::Text;
 
+use crate::{datamodel::IndexOps, Cow};
 use base64::display::Base64Display;
 use std::fmt;
-
-use crate::datamodel::IndexOps;
 
 /// A PSL value representation.
 pub enum Value<'a> {
     /// A string value, quoted and escaped accordingly.
-    Text(Text<&'a str>),
+    Text(Text<Cow<'a, str>>),
     /// A byte value, quoted and base64-encoded.
     Bytes(Text<Base64Display<'a>>),
     /// A constant value without quoting.
-    Constant(Constant<Box<dyn fmt::Display + 'a>>),
+    Constant(Cow<'a, str>),
     /// An array of values.
     Array(Array<Value<'a>>),
     /// A function has a name, and optionally named parameters.
@@ -61,10 +60,17 @@ impl<'a> From<IndexOps<'a>> for Value<'a> {
 
 impl<'a, T> From<Constant<T>> for Value<'a>
 where
-    T: fmt::Display + 'a,
+    T: fmt::Display,
 {
     fn from(c: Constant<T>) -> Self {
-        Self::Constant(c.boxed())
+        Self::Constant(c.to_string().into())
+    }
+}
+
+impl<'a> From<Vec<u8>> for Value<'a> {
+    fn from(bytes: Vec<u8>) -> Self {
+        let display = Base64Display::with_config(&bytes, base64::STANDARD).to_string();
+        Self::Text(Text::new(display))
     }
 }
 
@@ -75,8 +81,8 @@ impl<'a> From<&'a [u8]> for Value<'a> {
     }
 }
 
-impl<'a> From<Text<&'a str>> for Value<'a> {
-    fn from(t: Text<&'a str>) -> Self {
+impl<'a> From<Text<Cow<'a, str>>> for Value<'a> {
+    fn from(t: Text<Cow<'a, str>>) -> Self {
         Self::Text(t)
     }
 }

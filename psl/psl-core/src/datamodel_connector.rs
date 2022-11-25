@@ -88,6 +88,15 @@ pub trait Connector: Send + Sync {
         RelationMode::allowed_emulated_referential_actions_default()
     }
 
+    /// Most SQL databases reject table definitions with a SET NULL referential action referencing a non-nullable field,
+    /// but that's not true for all of them.
+    /// This was introduced because Postgres accepts data definition language statements with the SET NULL
+    /// referential action referencing non-nullable fields, although this would lead to a runtime error once
+    /// the action is actually triggered.
+    fn allows_set_null_referential_action_on_non_nullable_fields(&self, _relation_mode: RelationMode) -> bool {
+        false
+    }
+
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
     }
@@ -148,7 +157,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: RelationMode, _: &mut Diagnostics) {}
     fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
@@ -297,6 +306,12 @@ pub trait Connector: Send + Sync {
 
     fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
+    }
+
+    /// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
+    /// are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        true
     }
 
     fn native_type_to_string(&self, instance: &NativeTypeInstance) -> String {

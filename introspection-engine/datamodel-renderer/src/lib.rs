@@ -71,3 +71,5 @@ pub mod value;
 
 pub use configuration::Configuration;
 pub use datamodel::Datamodel;
+
+use std::borrow::Cow;

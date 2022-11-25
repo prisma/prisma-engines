@@ -17,7 +17,7 @@ use crate::{
 };
 use column::ColumnTypeChange;
 use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId};
-use std::collections::HashSet;
+use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
 pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
@@ -472,8 +472,10 @@ fn push_foreign_key_pair_changes(
 ) {
     // Is the referenced table being redefined, meaning we need to drop and recreate
     // the foreign key?
-    if db.table_is_redefined(fk.previous.referenced_table().name())
-        && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
+    if db.table_is_redefined(
+        fk.previous.referenced_table().namespace().map(Cow::Borrowed),
+        fk.previous.referenced_table().name().into(),
+    ) && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
     {
         steps.push(SqlMigrationStep::DropForeignKey {
             foreign_key_id: fk.previous.id,

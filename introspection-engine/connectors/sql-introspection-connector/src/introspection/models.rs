@@ -1,15 +1,19 @@
-use crate::{introspection::Context, introspection_helpers::*, warnings};
-use psl::{datamodel_connector::constraint_names::ConstraintNames, dml, schema_ast::ast::WithDocumentation};
+use std::borrow::Cow;
+
+use crate::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::*,
+    warnings,
+};
+use datamodel_renderer::datamodel as renderer;
+use psl::{datamodel_connector::constraint_names::ConstraintNames, schema_ast::ast::WithDocumentation};
 use sql_schema_describer as sql;
-use std::collections::HashMap;
 
-pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
-    let mut re_introspected_model_ignores = Vec::new();
-    let mut remapped_models = Vec::new();
-    let mut remapped_fields = Vec::new();
-    let mut reintrospected_id_names = Vec::new();
+pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
+    let mut models_with_idx: Vec<(Option<_>, sql::TableId, renderer::Model<'a>)> =
+        Vec::with_capacity(input.schema.tables_count());
 
-    for table in ctx
+    for table in input
         .schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(*table))
@@ -17,149 +21,173 @@ pub(super) fn introspect_models(datamodel: &mut dml::Datamodel, ctx: &mut Contex
         .filter(|table| !is_prisma_join_table(*table))
         .filter(|table| !is_relay_table(*table))
     {
-        let existing_model = ctx.existing_model(table.id);
-        let mut model = dml::Model::new(String::new(), None);
-        let mut documentation = String::new();
+        let existing_model = input.existing_model(table.id);
 
-        match ctx.table_prisma_name(table.id) {
-            crate::ModelName::FromPsl { name, mapped_name } => {
-                model.name = name.to_owned();
-                model.database_name = mapped_name.map(ToOwned::to_owned);
-            }
-            crate::ModelName::FromSql { name } => {
-                model.name = name.to_owned();
-            }
+        let (name, map, docs) = match input.table_prisma_name(table.id) {
+            crate::ModelName::FromPsl { name, mapped_name } => (Cow::from(name), mapped_name, None),
+            crate::ModelName::FromSql { name } => (Cow::from(name), None, None),
             model_name @ crate::ModelName::RenamedReserved { mapped_name } => {
-                let renamed = model_name.prisma_name().into_owned();
-                documentation.push_str(&format!(
-                    "This model has been renamed to '{renamed}' during introspection, because the original name '{mapped_name}' is reserved.",
-                ));
-                model.name = renamed;
-                model.database_name = Some(table.name().to_owned());
+                let docs =  format!(
+                    "This model has been renamed to '{}' during introspection, because the original name '{}' is reserved.",
+                    model_name.prisma_name(),
+                    mapped_name,
+                );
+
+                (model_name.prisma_name(), Some(mapped_name), Some(docs))
             }
             model_name @ crate::ModelName::RenamedSanitized { mapped_name: _ } => {
-                model.name = model_name.prisma_name().into_owned();
-                model.database_name = Some(table.name().to_owned());
+                (model_name.prisma_name(), Some(table.name()), None)
             }
+        };
+
+        let mut model = renderer::Model::new(name.clone());
+
+        if let Some(map) = map {
+            model.map(map);
         }
 
-        if let Some(m) = existing_model.filter(|m| m.mapped_name().is_some()) {
-            remapped_models.push(warnings::Model {
-                model: m.name().to_owned(),
+        if let Some(docs) = docs {
+            model.documentation(docs);
+        }
+
+        if table.columns().len() == 0 {
+            model.documentation(empty_table_comment(input));
+            model.comment_out();
+
+            output.warnings.models_without_columns.push(warnings::Model {
+                model: name.to_string(),
+            });
+        } else if !table_has_usable_identifier(table) {
+            model.documentation("The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.");
+            model.ignore();
+
+            output.warnings.models_without_identifiers.push(warnings::Model {
+                model: name.to_string(),
+            });
+        }
+
+        if existing_model.filter(|m| m.mapped_name().is_some()).is_some() {
+            output.warnings.remapped_models.push(warnings::Model {
+                model: name.to_string(),
             });
         }
 
         if let Some(docs) = existing_model.and_then(|m| m.ast_model().documentation()) {
-            documentation.push_str(docs);
+            model.documentation(docs);
         }
 
         for column in table.columns() {
-            model.add_field(dml::Field::ScalarField(calculate_scalar_field(
-                column,
-                &mut remapped_fields,
-                ctx,
-            )));
+            if let sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
+                output.warnings.unsupported_types.push(warnings::ModelAndFieldAndType {
+                    model: name.to_string(),
+                    field: input.column_prisma_name(column.id).prisma_name().into_owned(),
+                    tpe: tpe.to_owned(),
+                })
+            }
+
+            let pk = table
+                .primary_key()
+                .filter(|pk| pk.columns().len() == 1)
+                .filter(|pk| pk.contains_column(column.id));
+
+            let unique = table
+                .indexes()
+                .filter(|i| i.is_unique())
+                .filter(|i| i.columns().len() == 1)
+                .find(|i| i.contains_column(column.id));
+
+            model.push_field(render_scalar_field(column, pk, unique, input, output));
         }
 
-        for index in table.indexes() {
-            if let Some(index) = calculate_index(index, ctx) {
-                model.add_index(index);
-            }
-        }
+        super::indexes::render_model_indexes(table, existing_model, &mut model, input);
 
         if let Some(pk) = table.primary_key() {
-            let clustered = primary_key_is_clustered(pk.id, ctx);
-            let name = existing_model
-                .and_then(|model| model.primary_key())
-                .and_then(|pk| pk.name())
-                .map(ToOwned::to_owned);
+            let fields = pk.columns().map(|c| {
+                let mut field =
+                    renderer::IndexFieldInput::new(input.column_prisma_name(c.as_column().id).prisma_name());
 
-            if name.is_some() {
-                reintrospected_id_names.push(warnings::Model {
-                    model: existing_model.unwrap().name().to_owned(),
-                });
-            }
+                if c.sort_order()
+                    .filter(|o| matches!(o, sql::SQLSortOrder::Desc))
+                    .is_some()
+                {
+                    field.sort_order("Desc");
+                };
 
-            let db_name = if pk.name() == ConstraintNames::primary_key_name(table.name(), ctx.active_connector())
-                || pk.name().is_empty()
-            {
-                None
-            } else {
-                Some(pk.name().to_owned())
-            };
+                if let Some(length) = c.length() {
+                    field.length(length);
+                }
 
-            model.primary_key = Some(dml::PrimaryKeyDefinition {
-                name,
-                db_name,
-                fields: pk
-                    .columns()
-                    .map(|c| {
-                        let sort_order = c.sort_order().and_then(|sort| match sort {
-                            sql::SQLSortOrder::Asc => None,
-                            sql::SQLSortOrder::Desc => Some(dml::SortOrder::Desc),
-                        });
-
-                        dml::PrimaryKeyField {
-                            name: ctx.column_prisma_name(c.as_column().id).prisma_name().into_owned(),
-                            sort_order,
-                            length: c.length(),
-                        }
-                    })
-                    .collect(),
-                defined_on_field: pk.columns().len() == 1,
-                clustered,
+                field
             });
+
+            if fields.len() > 1 {
+                let mut id = renderer::IdDefinition::new(fields);
+
+                if let Some(name) = existing_model
+                    .and_then(|model| model.primary_key())
+                    .and_then(|pk| pk.name())
+                {
+                    id.name(name);
+
+                    output.warnings.reintrospected_id_names.push(warnings::Model {
+                        model: input.table_prisma_name(table.id).prisma_name().to_string(),
+                    });
+                }
+
+                let default_name = ConstraintNames::primary_key_name(table.name(), input.active_connector());
+                if pk.name() != default_name && !pk.name().is_empty() {
+                    id.map(pk.name());
+                }
+
+                if let Some(clustered) = primary_key_is_clustered(pk.id, input) {
+                    id.clustered(clustered);
+                }
+
+                model.id(id);
+            }
         }
 
-        if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-            model.schema = table.namespace().map(|n| n.to_string());
+        match (table.namespace(), input.config.datasources.first()) {
+            (Some(namespace), Some(ds)) if !ds.namespaces.is_empty() => {
+                model.schema(namespace);
+            }
+            _ => (),
         }
-
-        model.documentation = Some(documentation).filter(|doc| !doc.is_empty());
 
         if existing_model.map(|model| model.is_ignored()).unwrap_or(false) {
-            model.is_ignored = true;
-            re_introspected_model_ignores.push(warnings::Model {
-                model: model.name.clone(),
-            });
+            model.ignore();
         }
 
-        datamodel.models.push(model);
+        models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
     }
 
-    if !remapped_models.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_model(&remapped_models));
-    }
+    models_with_idx.sort_by(|(a, _, _), (b, _, _)| compare_options_none_last(*a, *b));
 
-    if !remapped_fields.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_map_on_field(&remapped_fields));
+    for (idx, (_, table_id, render)) in models_with_idx.into_iter().enumerate() {
+        output.rendered_schema.push_model(render);
+        output.target_models.insert(table_id, idx);
     }
-
-    if !reintrospected_id_names.is_empty() {
-        ctx.warnings
-            .push(warnings::warning_enriched_with_custom_primary_key_names(
-                &reintrospected_id_names,
-            ))
-    }
-
-    sort_models(datamodel, ctx)
 }
 
-fn sort_models(datamodel: &mut dml::Datamodel, ctx: &Context) {
-    let existing_models_by_database_name: HashMap<&str, _> = ctx
-        .previous_schema
-        .db
-        .walk_models()
-        .map(|model| (model.database_name(), model.id))
-        .collect();
+fn empty_table_comment(input: InputContext<'_>) -> &'static str {
+    // On postgres this is allowed, on the other dbs, this could be a symptom of missing privileges.
+    if input.sql_family.is_postgres() {
+        "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges."
+    } else {
+        "We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges."
+    }
+}
 
-    datamodel.models.sort_by(|a, b| {
-        let existing = |model: &dml::Model| -> Option<_> {
-            existing_models_by_database_name.get(model.database_name.as_deref().unwrap_or(&model.name))
-        };
-
-        compare_options_none_last(existing(a), existing(b))
-    });
+pub(super) fn table_has_usable_identifier(table: sql::TableWalker<'_>) -> bool {
+    table
+        .indexes()
+        .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .any(|idx| {
+            idx.columns().all(|c| {
+                !matches!(
+                    c.as_column().column_type().family,
+                    sql::ColumnTypeFamily::Unsupported(_)
+                ) && c.as_column().arity().is_required()
+            })
+        })
 }

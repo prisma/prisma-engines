@@ -1,6 +1,7 @@
 mod migration_assertions;
 mod quaint_result_set_ext;
 
+use colored::Colorize;
 pub use migration_assertions::*;
 pub use quaint_result_set_ext::*;
 
@@ -24,12 +25,27 @@ pub trait SqlSchemaExt {
 
 pub struct SchemaAssertion {
     schema: SqlSchema,
+    context: Option<&'static str>,
+    description: Option<&'static str>,
     tags: BitFlags<Tags>,
 }
 
 impl SchemaAssertion {
     pub fn new(schema: SqlSchema, tags: BitFlags<Tags>) -> Self {
-        Self { schema, tags }
+        Self {
+            schema,
+            context: None,
+            description: None,
+            tags,
+        }
+    }
+
+    pub fn add_context(&mut self, context: &'static str) {
+        self.context = Some(context)
+    }
+
+    pub fn add_description(&mut self, description: &'static str) {
+        self.description = Some(description)
     }
 
     pub fn into_schema(self) -> SqlSchema {
@@ -51,15 +67,34 @@ impl SchemaAssertion {
     fn find_table<'a>(&'a self, table_name: &str) -> TableWalker<'a> {
         match self.find_table_option(table_name) {
             Some(table) => table,
-            None => panic!(
-                "assert_has_table failed. Table {} not found. Tables in database: {:?}",
-                table_name,
-                self.schema
-                    .table_walkers()
-                    .map(|table| table.name())
-                    .collect::<Vec<_>>()
-            ),
+            None => self.assert_error(table_name, true),
         }
+    }
+
+    fn assert_error(&self, table_name: &str, positive: bool) -> ! {
+        let method = if positive {
+            "assert_table"
+        } else {
+            "assert_has_no_table"
+        };
+        let result = if positive { "was not found" } else { "was found" };
+        self.print_context();
+        println!(
+            "{}{}",
+            format_args!(
+                "\n  {} has failed because table {} {}",
+                method.bold(),
+                table_name.red(),
+                result.bold(),
+            ),
+            "\n  Tables in database:".italic()
+        );
+        self.schema
+            .table_walkers()
+            .map(|table| table.name())
+            .for_each(|t| println!("\t - {}", t.green()));
+
+        panic!();
     }
 
     #[track_caller]
@@ -84,9 +119,25 @@ impl SchemaAssertion {
     }
 
     #[track_caller]
+    pub fn assert_has_table_with_ns(self, namespace: &str, table_name: &str) -> Self {
+        let table = self.find_table(table_name);
+
+        let assertion = TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        };
+        assertion.assert_namespace(namespace);
+
+        self
+    }
+
+    #[track_caller]
     pub fn assert_has_no_table(self, table_name: &str) -> Self {
-        self.find_table_option(table_name)
-            .and_then::<(), _>(|_| panic!("assert_has_no_table failed. Table {} was found.", table_name));
+        if self.find_table_option(table_name).is_some() {
+            self.assert_error(table_name, false);
+        }
         self
     }
 
@@ -96,8 +147,41 @@ impl SchemaAssertion {
         F: for<'a> FnOnce(TableAssertion<'a>) -> TableAssertion<'a>,
     {
         let table = self.find_table(table_name);
-        table_assertions(TableAssertion { table, tags: self.tags });
+        table_assertions(TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        });
         self
+    }
+
+    #[track_caller]
+    pub fn assert_table_with_ns<F>(self, namespace: &str, table_name: &str, table_assertions: F) -> Self
+    where
+        F: for<'a> FnOnce(TableAssertion<'a>) -> TableAssertion<'a>,
+    {
+        let table = self.find_table(table_name);
+        let assertion = TableAssertion {
+            table,
+            tags: self.tags,
+            context: self.context,
+            description: self.description,
+        };
+        assertion.assert_namespace(namespace);
+        table_assertions(assertion);
+        self
+    }
+
+    fn print_context(&self) {
+        match &self.context {
+            Some(context) => println!("Test failure with context <{}>", context.red()),
+            None => {}
+        }
+        match &self.description {
+            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
+            None => {}
+        }
     }
 
     pub fn assert_has_no_enum(self, enum_name: &str) -> Self {
@@ -110,7 +194,9 @@ impl SchemaAssertion {
         });
 
         if has_matching_enum {
-            panic!("Expected no enum named {}, found one", enum_name);
+            self.print_context();
+            println!("Found unexpected enum {}", enum_name.red());
+            panic!();
         }
 
         self
@@ -122,7 +208,11 @@ impl SchemaAssertion {
     {
         let r#enum = match self.schema.find_enum(enum_name) {
             Some(enm) => self.schema.walk(enm),
-            None => panic!("Assertion failed. Enum `{}` not found", enum_name),
+            None => {
+                self.print_context();
+                println!("Enum {} was {}", enum_name.red(), "not found".bold());
+                panic!();
+            }
         };
 
         enum_assertions(EnumAssertion(r#enum));
@@ -133,13 +223,18 @@ impl SchemaAssertion {
     pub fn assert_tables_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.tables_count();
 
-        assert_eq!(
-            actual_count, expected_count,
-            "Assertion failed. Expected the schema to have {expected_count} tables, found {actual_count}. ({table_names:?})",
-            expected_count = expected_count,
-            actual_count = actual_count,
-            table_names = self.schema.table_walkers().map(|t| t.name()).collect::<Vec<&str>>(),
-        );
+        if actual_count != expected_count {
+            self.print_context();
+            println!(
+                "The schema was expected to have {} tables, but {} were found.",
+                format!("{}", expected_count).green(),
+                format!("{}", actual_count).red()
+            );
+
+            print_tables(&self.schema);
+
+            panic!();
+        }
 
         self
     }
@@ -148,13 +243,30 @@ impl SchemaAssertion {
     pub fn assert_views_count(self, expected_count: usize) -> Self {
         let actual_count = self.schema.view_walkers().count();
 
-        assert_eq!(
-            actual_count, expected_count,
-            "Assertion failed. Expected the schema to have {expected_count} views, found {actual_count}. ({table_names:?})",
-            expected_count = expected_count,
-            actual_count = actual_count,
-            table_names = self.schema.view_walkers().map(|t| t.name()).collect::<Vec<&str>>(),
-        );
+        if actual_count != expected_count {
+            self.print_context();
+            println!(
+                "The schema was expected to have {} views, but {} were found.",
+                format!("{}", expected_count).green(),
+                format!("{}", actual_count).red()
+            );
+
+            println!("\n  {}", "Views in database:".italic());
+            self.schema
+                .view_walkers()
+                .map(|view| (view.name(), view.namespace()))
+                .for_each(|(v, ns)| {
+                    println!(
+                        "\t - {}",
+                        match ns {
+                            Some(namespace) => format!("{}.{}", namespace.green(), v.green()),
+                            None => format!("{}", v.green()),
+                        }
+                    )
+                });
+
+            panic!();
+        }
 
         self
     }
@@ -169,6 +281,11 @@ impl SchemaAssertion {
 pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
 impl<'a> EnumAssertion<'a> {
+    pub fn assert_namespace(self, namespace: &'static str) -> Self {
+        assert_eq!(self.0.namespace(), Some(namespace));
+        self
+    }
+
     pub fn assert_values(self, expected_values: &[&'static str]) -> Self {
         assert!(
             self.0.values().len() == expected_values.len() && self.0.values().zip(expected_values).all(|(a, b)| a == *b),
@@ -185,9 +302,40 @@ impl<'a> EnumAssertion<'a> {
 pub struct TableAssertion<'a> {
     table: TableWalker<'a>,
     tags: BitFlags<Tags>,
+    context: Option<&'static str>,
+    description: Option<&'static str>,
 }
 
 impl<'a> TableAssertion<'a> {
+    fn print_context(&self) {
+        match &self.context {
+            Some(context) => println!("Test failure with context <{}>", context.red()),
+            None => {}
+        }
+        match &self.description {
+            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
+            None => {}
+        }
+    }
+
+    pub fn assert_namespace(self, namespace: &str) -> Self {
+        if self.table.namespace() != Some(namespace) {
+            self.print_context();
+            println!(
+                "\n  {} has failed because table {}.{} {}",
+                "assert_namespace".bold(),
+                namespace.red(),
+                self.table.name().red(),
+                "was not found".bold(),
+            );
+
+            print_tables(self.table.schema);
+
+            panic!();
+        }
+        self
+    }
+
     pub fn assert_column_count(self, n: usize) -> Self {
         let columns_count = self.table.columns().count();
 
@@ -886,4 +1034,20 @@ impl<'a> PostgresExtensionAssertion<'a> {
 
         self
     }
+}
+
+fn print_tables(schema: &SqlSchema) {
+    println!("\n  {}", "Tables in database:".italic());
+    schema
+        .table_walkers()
+        .map(|table| (table.name(), table.namespace()))
+        .for_each(|(t, ns)| {
+            println!(
+                "\t - {}",
+                match ns {
+                    Some(namespace) => format!("{}.{}", namespace.green(), t.green()),
+                    None => format!("{}", t.green()),
+                }
+            )
+        });
 }

@@ -1,0 +1,52 @@
+// tags=vitess
+
+datasource mydb {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model A {
+    id   Int    @id
+    name String @unique(map: "SingleUnique")
+    a    String
+    b    String
+    B    B[]    @relation("AtoB")
+    @@unique([a, b], name: "compound", map:"NamedCompoundUnique")
+    @@unique([a, b], map:"UnNamedCompoundUnique")
+    @@index([a], map: "SingleIndex")
+}
+
+model B {
+    a   String
+    b   String
+    aId Int
+    A   A      @relation("AtoB", fields: [aId], references: [id], map: "ForeignKey")
+    @@index([a,b], map: "CompoundIndex")
+    @@id([a, b])
+}
+
+// Expected Migration:
+// -- CreateTable
+// CREATE TABLE `A` (
+//     `id` INTEGER NOT NULL,
+//     `name` VARCHAR(191) NOT NULL,
+//     `a` VARCHAR(191) NOT NULL,
+//     `b` VARCHAR(191) NOT NULL,
+// 
+//     UNIQUE INDEX `SingleUnique`(`name`),
+//     INDEX `SingleIndex`(`a`),
+//     UNIQUE INDEX `NamedCompoundUnique`(`a`, `b`),
+//     UNIQUE INDEX `UnNamedCompoundUnique`(`a`, `b`),
+//     PRIMARY KEY (`id`)
+// ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+// 
+// -- CreateTable
+// CREATE TABLE `B` (
+//     `a` VARCHAR(191) NOT NULL,
+//     `b` VARCHAR(191) NOT NULL,
+//     `aId` INTEGER NOT NULL,
+// 
+//     INDEX `CompoundIndex`(`a`, `b`),
+//     PRIMARY KEY (`a`, `b`)
+// ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

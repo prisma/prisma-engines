@@ -1,7 +1,7 @@
 use crate::value::{Array, Documentation, Env, Text, Value};
 use core::fmt;
 use psl::datamodel_connector::RelationMode;
-use std::default::Default;
+use std::{borrow::Cow, default::Default};
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct Datasource<'a> {
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Documentation<'a>>,
-    namespaces: Array<Text<&'a str>>,
+    namespaces: Array<Text<Cow<'a, str>>>,
 }
 
 impl<'a> Datasource<'a> {
@@ -99,14 +99,18 @@ impl<'a> Datasource<'a> {
     ///   url      = env("DATABASE_URL")
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Create a rendering from a PSL datasource.
     pub fn from_psl(psl_ds: &'a psl::Datasource) -> Self {
         let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
-        let namespaces: Vec<Text<_>> = psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect();
+        let namespaces: Vec<Text<_>> = psl_ds
+            .namespaces
+            .iter()
+            .map(|(ns, _)| Text(Cow::Owned(ns.clone())))
+            .collect();
 
         Self {
             name: &psl_ds.name,
@@ -114,7 +118,7 @@ impl<'a> Datasource<'a> {
             url: Env::from(&psl_ds.url),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
-            documentation: psl_ds.documentation.as_deref().map(Documentation),
+            documentation: psl_ds.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             custom_properties: Default::default(),
             namespaces: Array::from(namespaces),
         }
@@ -169,7 +173,11 @@ mod tests {
 
         let mut extensions = Array::new();
         extensions.push(Function::new("postgis"));
-        extensions.push(Function::new("uuid-ossp"));
+        {
+            let mut ext = Function::new("uuid_ossp");
+            ext.push_param(("map", Text::new("uuid-ossp")));
+            extensions.push(ext);
+        }
 
         datasource.push_custom_property("extensions", extensions);
 

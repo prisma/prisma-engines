@@ -168,18 +168,18 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
 
 /// Gives the LSP position right after the given span.
 pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
-    offset_to_position(span.end - 1, document).unwrap()
+    offset_to_position(span.end - 1, document)
 }
 
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
-pub(crate) fn offset_to_position(offset: usize, document: &str) -> Option<Position> {
+pub(crate) fn offset_to_position(offset: usize, document: &str) -> Position {
     let mut position = Position::default();
 
     for (i, chr) in document.chars().enumerate() {
         match chr {
             _ if i == offset => {
-                return Some(position);
+                return position;
             }
             '\n' => {
                 position.character = 0;
@@ -191,7 +191,7 @@ pub(crate) fn offset_to_position(offset: usize, document: &str) -> Option<Positi
         }
     }
 
-    None
+    position
 }
 
 #[cfg(test)]

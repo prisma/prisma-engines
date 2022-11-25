@@ -90,3 +90,82 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &T
     api.expect_datamodel(&expected).await;
     Ok(())
 }
+
+#[test_connector(exclude(CockroachDb), tags(Postgres))]
+async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TYPE "color" AS ENUM ('black', '');
+
+        CREATE TABLE "Book" (
+            id SERIAL PRIMARY KEY,
+            color color NOT NULL DEFAULT ''
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Book {
+          id    Int   @id @default(autoincrement())
+          color color @default(EMPTY_ENUM_VALUE)
+        }
+
+        enum color {
+          black
+          EMPTY_ENUM_VALUE @map("")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE Type truth as ENUM ('true', 'false', 'rumor');
+
+        CREATE TABLE "News" (
+            id SERIAL PRIMARY KEY,
+            confirmed truth NOT NULL DEFAULT 'true'
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model News {
+          id        Int   @id @default(autoincrement())
+          confirmed truth @default(true)
+        }
+
+        enum truth {
+          true
+          false
+          rumor
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

@@ -1,6 +1,6 @@
 use crate::value::{Array, Documentation, Env, Text};
 use psl::PreviewFeature;
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 /// The generator block of the datasource.
 #[derive(Debug)]
@@ -81,8 +81,8 @@ impl<'a> Generator<'a> {
     ///   provider = "prisma-client-js"
     /// }
     /// ```
-    pub fn documentation(&mut self, docs: &'a str) {
-        self.documentation = Some(Documentation(docs));
+    pub fn documentation(&mut self, docs: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(docs.into()));
     }
 
     /// Add a custom config value to the block. For now we support any
@@ -121,7 +121,7 @@ impl<'a> Generator<'a> {
             output: psl_gen.output.as_ref().map(Env::from),
             preview_features,
             binary_targets: Array::from(binary_targets),
-            documentation: psl_gen.documentation.as_deref().map(Documentation),
+            documentation: psl_gen.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             config,
         }
     }

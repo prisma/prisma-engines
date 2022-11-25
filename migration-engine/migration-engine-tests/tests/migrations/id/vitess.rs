@@ -1,6 +1,6 @@
 use migration_engine_tests::test_api::*;
 
-#[test_connector(tags(Vitess), preview_features("referentialIntegrity"))]
+#[test_connector(tags(Vitess))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {

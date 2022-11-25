@@ -1,11 +1,11 @@
-use super::{Constant, ConstantNameValidationError, Text, Value};
+use super::{Constant, Text, Value};
 use std::{borrow::Cow, fmt};
 
 /// Represents a function parameter in the PSL.
 #[derive(Debug)]
 pub enum FunctionParam<'a> {
     /// key: value
-    KeyValue(&'a str, Value<'a>),
+    KeyValue(Cow<'a, str>, Value<'a>),
     /// value (only)
     OnlyValue(Value<'a>),
 }
@@ -18,6 +18,12 @@ impl<'a> From<Value<'a>> for FunctionParam<'a> {
 
 impl<'a> From<&'a str> for FunctionParam<'a> {
     fn from(v: &'a str) -> Self {
+        Self::OnlyValue(Value::Text(Text::new(v)))
+    }
+}
+
+impl<'a> From<Cow<'a, str>> for FunctionParam<'a> {
+    fn from(v: Cow<'a, str>) -> Self {
         Self::OnlyValue(Value::Text(Text(v)))
     }
 }
@@ -27,7 +33,16 @@ where
     T: fmt::Display + 'a,
 {
     fn from(v: Constant<T>) -> Self {
-        Self::OnlyValue(Value::Constant(Constant::new_no_validate(Box::new(v))))
+        Self::OnlyValue(Value::from(Constant::new_no_validate(v)))
+    }
+}
+
+impl<'a, T> From<(Cow<'a, str>, T)> for FunctionParam<'a>
+where
+    T: Into<Value<'a>>,
+{
+    fn from(kv: (Cow<'a, str>, T)) -> Self {
+        Self::KeyValue(kv.0, kv.1.into())
     }
 }
 
@@ -36,7 +51,7 @@ where
     T: Into<Value<'a>>,
 {
     fn from(kv: (&'a str, T)) -> Self {
-        Self::KeyValue(kv.0, kv.1.into())
+        Self::KeyValue(kv.0.into(), kv.1.into())
     }
 }
 
@@ -71,52 +86,11 @@ impl<'a> From<Constant<Cow<'a, str>>> for Function<'a> {
 
 impl<'a> Function<'a> {
     /// Creates a plain function with no parameters.
-    pub fn new(name: &'a str) -> Self {
-        match Constant::new(name) {
-            Ok(name) => {
-                let params = Vec::new();
-
-                Self {
-                    name,
-                    params,
-                    render_empty_parentheses: false,
-                }
-            }
-            // Will render `sanitized(map: "original")`
-            Err(ConstantNameValidationError::WasSanitized { sanitized }) => {
-                let mut fun = Self {
-                    name: sanitized,
-                    params: Vec::new(),
-                    render_empty_parentheses: false,
-                };
-
-                fun.push_param(("map", Text(name)));
-                fun
-            }
-            // We just generate an invalid function in this case. It
-            // will error in the validation.
-            Err(ConstantNameValidationError::SanitizedEmpty) => {
-                let mut fun = Self {
-                    name: Constant::new_no_validate(Cow::Borrowed(name)),
-                    params: Vec::new(),
-                    render_empty_parentheses: false,
-                };
-
-                fun.push_param(("map", Text(name)));
-                fun
-            }
-            // Interesting if this ever happens... Blame me in a zoom call if we
-            // hit this.
-            Err(ConstantNameValidationError::OriginalEmpty) => {
-                let mut fun = Self {
-                    name: Constant::new_no_validate(Cow::Borrowed("emptyValue")),
-                    params: Vec::new(),
-                    render_empty_parentheses: false,
-                };
-
-                fun.push_param(("map", Text(name)));
-                fun
-            }
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            name: Constant::new_no_validate(name.into()),
+            params: Vec::new(),
+            render_empty_parentheses: false,
         }
     }
 

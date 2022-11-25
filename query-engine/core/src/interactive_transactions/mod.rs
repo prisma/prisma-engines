@@ -1,7 +1,10 @@
 use crate::CoreError;
 use connector::{Connection, ConnectionLike, Transaction};
 use std::fmt::Display;
-use tokio::task::JoinHandle;
+use tokio::{
+    task::JoinHandle,
+    time::{Duration, Instant},
+};
 
 mod actor_manager;
 mod actors;
@@ -62,7 +65,6 @@ impl Display for TxId {
 
 pub enum CachedTx {
     Open(OpenTx),
-    Aborted,
     Committed,
     RolledBack,
     Expired,
@@ -72,7 +74,6 @@ impl Display for CachedTx {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CachedTx::Open(_) => write!(f, "Open"),
-            CachedTx::Aborted => write!(f, "Aborted"),
             CachedTx::Committed => write!(f, "Committed"),
             CachedTx::RolledBack => write!(f, "Rolled back"),
             CachedTx::Expired => write!(f, "Expired"),
@@ -99,6 +100,15 @@ impl CachedTx {
         } else {
             let reason = format!("Transaction is no longer valid. Last state: '{}'", self);
             Err(CoreError::from(TransactionError::Closed { reason }))
+        }
+    }
+
+    pub fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
+        match self {
+            CachedTx::Open(_) => None,
+            CachedTx::Committed => Some(ClosedTx::Committed),
+            CachedTx::RolledBack => Some(ClosedTx::RolledBack),
+            CachedTx::Expired => Some(ClosedTx::Expired { start_time, timeout }),
         }
     }
 }
@@ -139,4 +149,10 @@ impl Into<CachedTx> for OpenTx {
     fn into(self) -> CachedTx {
         CachedTx::Open(self)
     }
+}
+
+pub enum ClosedTx {
+    Committed,
+    RolledBack,
+    Expired { start_time: Instant, timeout: Duration },
 }

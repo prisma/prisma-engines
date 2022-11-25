@@ -1,25 +1,23 @@
-use crate::{introspection::Context, introspection_helpers::*, warnings, EnumVariantName, ModelName};
-use psl::{
-    dml,
-    parser_database::{ast, walkers},
-    schema_ast::ast::WithDocumentation,
+use crate::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::*,
+    pair::EnumPair,
+    sanitize_datamodel_names, warnings,
 };
-use sql_schema_describer as sql;
+use datamodel_renderer::datamodel as renderer;
+use psl::parser_database::ast;
 
-pub(super) fn introspect_enums(datamodel: &mut dml::Datamodel, ctx: &mut Context<'_>) {
-    let mut all_enums: Vec<(Option<ast::EnumId>, dml::Enum)> = ctx
-        .schema
-        .enum_walkers()
-        .map(|enm| {
-            let existing_enum = ctx.existing_enum(enm.id);
-            let dml_enum = sql_enum_to_dml_enum(enm, existing_enum, ctx);
-            (existing_enum.map(|e| e.id), dml_enum)
-        })
-        .collect();
+pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
+    let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum)> = Vec::new();
+
+    for pair in input.enum_pairs() {
+        let rendered_enum = render_enum(pair, output);
+        all_enums.push((pair.previous_position(), rendered_enum))
+    }
 
     all_enums.sort_by(|(id_a, _), (id_b, _)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
 
-    if ctx.sql_family.is_mysql() {
+    if input.sql_family.is_mysql() {
         // MySQL can have multiple database enums matching one Prisma enum.
         all_enums.dedup_by(|(id_a, _), (id_b, _)| match (id_a, id_b) {
             (Some(id_a), Some(id_b)) => id_a == id_b,
@@ -27,73 +25,75 @@ pub(super) fn introspect_enums(datamodel: &mut dml::Datamodel, ctx: &mut Context
         });
     }
 
-    datamodel.enums = all_enums.into_iter().map(|(_id, dml_enum)| dml_enum).collect();
+    for (_, enm) in all_enums {
+        output.rendered_schema.push_enum(enm);
+    }
 }
 
-fn sql_enum_to_dml_enum(
-    sql_enum: sql::EnumWalker<'_>,
-    existing_enum: Option<walkers::EnumWalker<'_>>,
-    ctx: &mut Context,
-) -> dml::Enum {
-    let schema = if matches!(ctx.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-        sql_enum.namespace().map(String::from)
-    } else {
-        None
-    };
-    let (enum_name, enum_database_name) = match ctx.enum_prisma_name(sql_enum.id) {
-        ModelName::FromPsl { name, mapped_name } => (name.to_owned(), mapped_name),
-        ModelName::FromSql { name } => (name.to_owned(), None),
-        name @ ModelName::RenamedReserved { mapped_name } | name @ ModelName::RenamedSanitized { mapped_name } => {
-            (name.prisma_name().into_owned(), Some(mapped_name))
-        }
-    };
-    let mut dml_enum = dml::Enum::new(&enum_name, Vec::new(), schema);
-    dml_enum.database_name = enum_database_name.map(ToOwned::to_owned);
-    dml_enum.documentation = existing_enum
-        .and_then(|enm| enm.ast_enum().documentation())
-        .map(ToOwned::to_owned);
+fn render_enum<'a>(r#enum: EnumPair<'a>, output: &mut OutputContext<'a>) -> renderer::Enum<'a> {
+    let mut remapped_values = Vec::new();
+    let mut rendered_enum = renderer::Enum::new(r#enum.name());
 
-    if dml_enum.database_name.is_some() {
-        ctx.warnings
+    if let Some(schema) = r#enum.namespace() {
+        rendered_enum.schema(schema);
+    }
+
+    if let Some(mapped_name) = r#enum.mapped_name() {
+        rendered_enum.map(mapped_name);
+
+        output
+            .warnings
             .push(warnings::warning_enriched_with_map_on_enum(&[warnings::Enum::new(
-                &enum_name,
+                &r#enum.name(),
             )]));
     }
 
-    dml_enum.values.reserve(sql_enum.values().len());
-    let mut remapped_values = Vec::new(); // for warnings
+    if let Some(docs) = r#enum.documentation() {
+        rendered_enum.documentation(docs);
+    }
 
-    for sql_variant in sql_enum.variants() {
-        let mut dml_value = dml::EnumValue::new("");
-        let variant_name = ctx.enum_variant_name(sql_variant.id);
-        let prisma_name = variant_name.prisma_name().into_owned();
-        let mapped_name = variant_name.mapped_name().map(ToOwned::to_owned);
+    for variant in r#enum.variants() {
+        if variant.name().is_empty() {
+            let value = variant
+                .mapped_name()
+                .map(String::from)
+                .unwrap_or_else(|| variant.name().to_string());
 
-        if let EnumVariantName::FromPsl {
-            mapped_name: Some(_), ..
-        } = &variant_name
-        {
+            let warning = warnings::EnumAndValue {
+                enm: r#enum.name().to_string(),
+                value,
+            };
+
+            output.warnings.enum_values_with_empty_names.push(warning);
+        } else if variant.mapped_name().is_some() {
             remapped_values.push(warnings::EnumAndValue {
-                value: prisma_name.clone(),
-                enm: enum_name.to_owned(),
+                value: variant.name().to_string(),
+                enm: r#enum.name().to_string(),
             });
         }
 
-        let existing_value = existing_enum.and_then(|enm| {
-            enm.values()
-                .find(|val| val.database_name() == mapped_name.as_ref().unwrap_or(&prisma_name))
-        });
-        dml_value.documentation = existing_value.and_then(|v| v.documentation()).map(ToOwned::to_owned);
-        dml_value.name = prisma_name;
-        dml_value.database_name = mapped_name;
+        let mut rendered_variant = renderer::EnumVariant::new(variant.name());
 
-        dml_enum.values.push(dml_value);
+        if let Some(docs) = variant.documentation() {
+            rendered_variant.documentation(docs);
+        }
+
+        if let Some(map) = variant.mapped_name() {
+            rendered_variant.map(map);
+        }
+
+        if variant.name().is_empty() || sanitize_datamodel_names::needs_sanitation(&variant.name()) {
+            rendered_variant.comment_out();
+        }
+
+        rendered_enum.push_variant(rendered_variant);
     }
 
     if !remapped_values.is_empty() {
-        ctx.warnings
+        output
+            .warnings
             .push(warnings::warning_enriched_with_map_on_enum_value(&remapped_values))
     }
 
-    dml_enum
+    rendered_enum
 }

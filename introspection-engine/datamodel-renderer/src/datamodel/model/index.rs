@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use crate::{
     datamodel::attributes::BlockAttribute,
@@ -29,14 +29,14 @@ impl<'a> IndexDefinition<'a> {
 
     /// The client name of the index, defined as the `name` argument
     /// inside the attribute.
-    pub fn name(&mut self, name: &'a str) {
-        self.0.push_param(("name", Text(name)));
+    pub fn name(&mut self, name: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("name", Text::new(name)));
     }
 
     /// The constraint name in the database, defined as the `map`
     /// argument inside the attribute.
-    pub fn map(&mut self, map: &'a str) {
-        self.0.push_param(("map", Text(map)));
+    pub fn map(&mut self, map: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("map", Text::new(map)));
     }
 
     /// Defines the `clustered` argument inside the attribute.
@@ -45,8 +45,9 @@ impl<'a> IndexDefinition<'a> {
     }
 
     /// Defines the `type` argument inside the attribute.
-    pub fn index_type(&mut self, index_type: &'a str) {
-        self.0.push_param(("type", Constant::new_no_validate(index_type)));
+    pub fn index_type(&mut self, index_type: impl Into<Cow<'a, str>>) {
+        self.0
+            .push_param(("type", Constant::new_no_validate(index_type.into())));
     }
 
     fn new(index_type: &'static str, fields: impl Iterator<Item = IndexFieldInput<'a>>) -> Self {
@@ -65,30 +66,43 @@ impl<'a> fmt::Display for IndexDefinition<'a> {
     }
 }
 
-/// Index type definition.
-#[derive(Debug, Clone, Copy)]
-pub enum IndexOps<'a> {
+#[derive(Debug, Clone)]
+pub enum InnerOps<'a> {
+    Managed(Cow<'a, str>),
+    Raw(Text<Cow<'a, str>>),
+}
+
+/// Index field operator definition.
+#[derive(Debug, Clone)]
+pub struct IndexOps<'a>(InnerOps<'a>);
+
+impl<'a> IndexOps<'a> {
     /// Managed and known by Prisma. Renders as-is as a constant.
     ///
     /// ```ignore
     /// @@index([field(ops: Int2BloomOps)], type: Brin)
     /// //                  ^^^^^^^^^^^^ like this
     /// ```
-    Managed(&'a str),
+    pub fn managed(ops: impl Into<Cow<'a, str>>) -> Self {
+        Self(InnerOps::Managed(ops.into()))
+    }
+
     /// A type we don't handle yet. Renders as raw.
     ///
     /// ```ignore
     /// @@index([field(ops: raw("tsvector_ops"))], type: Gist)
     /// //                  ^^^^^^^^^^^^^^^^^^^ like this
     /// ```
-    Raw(Text<&'a str>),
+    pub fn raw(ops: impl Into<Cow<'a, str>>) -> Self {
+        Self(InnerOps::Raw(Text(ops.into())))
+    }
 }
 
 impl<'a> fmt::Display for IndexOps<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Managed(s) => f.write_str(s),
-            Self::Raw(s) => {
+        match &self.0 {
+            InnerOps::Managed(ref s) => f.write_str(s),
+            InnerOps::Raw(ref s) => {
                 write!(f, "raw({s})")
             }
         }
