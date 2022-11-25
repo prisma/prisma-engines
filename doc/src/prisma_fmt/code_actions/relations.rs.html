@@ -434,8 +434,8 @@
 
         <span class="kw">let </span>new_text = <span class="macro">format!</span>(<span class="string">&quot;{separator}{indentation}@@unique([{fields}]){newline}}}&quot;</span>);
 
-        <span class="kw">let </span>start = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end - <span class="number">1</span>, schema).unwrap();
-        <span class="kw">let </span>end = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end, schema).unwrap();
+        <span class="kw">let </span>start = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end - <span class="number">1</span>, schema);
+        <span class="kw">let </span>end = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end, schema);
 
         <span class="kw">let </span>range = Range { start, end };
 

@@ -379,18 +379,18 @@
 
 <span class="doccomment">/// Gives the LSP position right after the given span.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>position_after_span(span: ast::Span, document: <span class="kw-2">&amp;</span>str) -&gt; Position {
-    offset_to_position(span.end - <span class="number">1</span>, document).unwrap()
+    offset_to_position(span.end - <span class="number">1</span>, document)
 }
 
 <span class="doccomment">/// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>offset_to_position(offset: usize, document: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Position&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>offset_to_position(offset: usize, document: <span class="kw-2">&amp;</span>str) -&gt; Position {
     <span class="kw">let </span><span class="kw-2">mut </span>position = Position::default();
 
     <span class="kw">for </span>(i, chr) <span class="kw">in </span>document.chars().enumerate() {
         <span class="kw">match </span>chr {
             <span class="kw">_ if </span>i == offset =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Some</span>(position);
+                <span class="kw">return </span>position;
             }
             <span class="string">&#39;\n&#39; </span>=&gt; {
                 position.character = <span class="number">0</span>;
@@ -402,8 +402,8 @@
         }
     }
 
-    <span class="prelude-val">None
-</span>}
+    position
+}
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
