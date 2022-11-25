@@ -17,7 +17,7 @@ use crate::{
 };
 use column::ColumnTypeChange;
 use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId};
-use std::collections::HashSet;
+use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
 pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
@@ -312,9 +312,7 @@ fn push_alter_primary_key(differ: &TableDiffer<'_, '_>, steps: &mut Vec<SqlMigra
         _ => return,
     };
 
-    if previous.column_names().len() == next.column_names().len()
-        && previous.column_names().zip(next.column_names()).all(|(p, n)| p == n)
-    {
+    if all_match(&mut previous.column_names(), &mut next.column_names()) {
         return;
     }
 
@@ -474,8 +472,10 @@ fn push_foreign_key_pair_changes(
 ) {
     // Is the referenced table being redefined, meaning we need to drop and recreate
     // the foreign key?
-    if db.table_is_redefined(fk.previous.referenced_table().name())
-        && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
+    if db.table_is_redefined(
+        fk.previous.referenced_table().namespace().map(Cow::Borrowed),
+        fk.previous.referenced_table().name().into(),
+    ) && !db.flavour.can_redefine_tables_with_inbound_foreign_keys()
     {
         steps.push(SqlMigrationStep::DropForeignKey {
             foreign_key_id: fk.previous.id,
@@ -533,4 +533,8 @@ fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
     }
 
     table.column("A").is_some() && table.column("B").is_some()
+}
+
+fn all_match<T: PartialEq>(a: &mut dyn ExactSizeIterator<Item = T>, b: &mut dyn ExactSizeIterator<Item = T>) -> bool {
+    a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
 }

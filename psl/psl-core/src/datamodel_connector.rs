@@ -4,23 +4,19 @@
 pub mod capabilities;
 /// Constraint name defaults.
 pub mod constraint_names;
-/// Helpers for implementors of `Connector`.
-pub mod helper;
 /// Extensions for parser database walkers with context from the connector.
 pub mod walker_ext_traits;
 
 mod empty_connector;
 mod filters;
-mod native_type_constructor;
-mod native_type_instance;
+mod native_types;
 mod relation_mode;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     empty_connector::EmptyDatamodelConnector,
     filters::*,
-    native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance,
+    native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
     relation_mode::RelationMode,
 };
 
@@ -152,7 +148,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: &mut Diagnostics) {}
+    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: RelationMode, _: &mut Diagnostics) {}
     fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
@@ -176,15 +172,22 @@ pub trait Connector: Send + Sync {
     /// Powers the auto completion of the VSCode plugin.
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
 
-    /// Returns the Scalar Type for the given native type
-    fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
+    /// Returns the default scalar type for the given native type
+    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType;
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance;
 
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
-    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool;
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
+    ) -> bool;
+
+    /// Debug/error representation of a native type.
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
 
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
@@ -196,20 +199,17 @@ pub trait Connector: Send + Sync {
     fn parse_native_type(
         &self,
         name: &str,
-        args: Vec<String>,
+        args: &[String],
         span: Span,
-    ) -> Result<NativeTypeInstance, DatamodelError>;
-
-    /// This function is used during introspection to turn an introspected native type into an
-    /// instance that can be inserted into dml.
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance;
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance>;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
             let path = std::path::Path::new(path);
 
             if path.is_relative() {
-                Some(config_dir.join(&path).to_str().map(ToString::to_string).unwrap())
+                Some(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
             } else {
                 None
             }
@@ -299,8 +299,24 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
+    /// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
+    /// are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        true
+    }
+
+    fn native_type_to_string(&self, instance: &NativeTypeInstance) -> String {
+        let (name, args) = self.native_type_to_parts(instance);
+        let args = if args.is_empty() {
+            String::new()
+        } else {
+            format!("({})", args.join(","))
+        };
+        format!("{name}{args}")
+    }
+
     fn native_instance_error(&self, instance: &NativeTypeInstance) -> NativeTypeErrorFactory {
-        NativeTypeErrorFactory::new(instance.to_string(), self.name().to_owned())
+        NativeTypeErrorFactory::new(self.native_type_to_string(instance), self.name().to_owned())
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;

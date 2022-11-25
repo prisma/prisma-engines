@@ -2,7 +2,7 @@ mod c_style_scalar_lists;
 mod tokenize;
 
 use crate::{ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue};
-use prisma_value::PrismaValue;
+use psl::dml::prisma_value::PrismaValue;
 use tokenize::{tokenize, Token};
 
 #[derive(Debug)]
@@ -599,7 +599,7 @@ mod tests {
         let tokens = tokenize(input);
         let mut parser = Parser::new(input, &tokens);
 
-        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(String::new())).unwrap();
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(crate::EnumId(0))).unwrap();
 
         let expected = expect![[r#"
             [
@@ -621,7 +621,7 @@ mod tests {
         let tokens = tokenize(input);
         let mut parser = Parser::new(input, &tokens);
 
-        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(String::new())).unwrap();
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::Enum(crate::EnumId(0))).unwrap();
 
         let expected = expect![[r#"
             [

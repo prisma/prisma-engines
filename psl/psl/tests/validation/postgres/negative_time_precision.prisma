@@ -1,0 +1,23 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   Int      @id
+  val  DateTime @db.Timestamp(-1)
+  val2 DateTime @db.Time(-1)
+}
+
+// [1;91merror[0m: [1mExpected a nonnegative integer, but found (-1).[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id   Int      @id
+// [1;94m 8 | [0m  val  DateTime [1;91m@db.Timestamp(-1)[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mExpected a nonnegative integer, but found (-1).[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  val  DateTime @db.Timestamp(-1)
+// [1;94m 9 | [0m  val2 DateTime [1;91m@db.Time(-1)[0m
+// [1;94m   | [0m

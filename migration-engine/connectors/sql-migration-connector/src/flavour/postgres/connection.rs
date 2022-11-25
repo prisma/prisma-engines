@@ -1,7 +1,7 @@
 //! All the quaint-wrangling for the postgres connector should happen here.
 
 use enumflags2::BitFlags;
-use migration_connector::{ConnectorError, ConnectorResult};
+use migration_connector::{ConnectorError, ConnectorResult, Namespaces};
 use psl::PreviewFeature;
 use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
@@ -33,15 +33,20 @@ impl Connection {
         &mut self,
         circumstances: BitFlags<super::Circumstances>,
         params: &super::Params,
+        namespaces: Option<Namespaces>,
     ) -> ConnectorResult<SqlSchema> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
+
         if circumstances.contains(super::Circumstances::IsCockroachDb) {
             describer_circumstances |= describer::Circumstances::Cockroach;
         }
 
+        let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
+        let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
+
         let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(&[params.url.schema()])
+            .describe(namespaces_str.as_slice())
             .await
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),

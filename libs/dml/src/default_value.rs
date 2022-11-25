@@ -222,8 +222,7 @@ impl ValueGenerator {
         } else {
             Err(format!(
                 "The function `{}()` cannot be used on fields of type `{}`.",
-                &self.name,
-                scalar_type.to_string()
+                &self.name, scalar_type
             ))
         }
     }

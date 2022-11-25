@@ -160,10 +160,10 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  Int    @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], map: "direct_report")
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], map: "recruited_by")
-          other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-          other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+          User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], map: "direct_report")
+          other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
+          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], map: "recruited_by")
+          other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
 
           @@index([direct_report], map: "direct_report")
           @@index([recruited_by], map: "recruited_by")
@@ -221,7 +221,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         .execute(move |migration| {
             migration.create_table("User", |table| {
                 table.add_column("id", types::integer().increments(true));
-                table.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                table.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Event", |table| {
@@ -231,7 +231,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
                 table.inject_custom(
                     "CONSTRAINT host_id FOREIGN KEY (host_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
                 );
-                table.add_constraint("Event_pkey", types::primary_constraint(&["id"]));
+                table.add_constraint("Event_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("_EventToUser", |table| {
@@ -256,7 +256,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
           id                       Int    @id @default(autoincrement())
           host_id                  Int
           User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], map: "host_id")
-          User_EventToUser         User[]
+          User_EventToUser         User[] @relation("EventToUser")
 
           @@index([host_id], map: "host_id")
         }
@@ -264,7 +264,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         model User {
           id                        Int     @id @default(autoincrement())
           Event_Event_host_idToUser Event[] @relation("Event_host_idToUser")
-          Event_EventToUser         Event[]
+          Event_EventToUser         Event[] @relation("EventToUser")
         }
     "#]];
 
@@ -292,17 +292,17 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model x {
-          id     Int @id
-          y      Int
-          y_xToy y   @relation(fields: [y], references: [id], map: "y")
+          id       Int @id
+          y        Int
+          y_x_yToy y   @relation("x_yToy", fields: [y], references: [id], map: "y")
 
           @@index([y], map: "y")
         }
 
         model y {
-          id     Int @id
-          x      Int
-          x_xToy x[]
+          id       Int @id
+          x        Int
+          x_x_yToy x[] @relation("x_yToy")
         }
     "#]];
 
@@ -347,7 +347,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           id                   Int @id @default(autoincrement())
           y                    Int
           y_x_yToy             y   @relation("x_yToy", fields: [y], references: [id], map: "y")
-          y_xToy_fk_x_1_fk_x_2 y[] @relation("xToy_fk_x_1_fk_x_2")
+          y_y_fk_x_1_fk_x_2Tox y[] @relation("y_fk_x_1_fk_x_2Tox")
 
           @@unique([id, y], map: "unique_y_id")
           @@index([y], map: "y")
@@ -358,8 +358,8 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
           x                    Int
           fk_x_1               Int
           fk_x_2               Int
-          x_xToy_fk_x_1_fk_x_2 x   @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [id, y], map: "fk_x_1")
           x_x_yToy             x[] @relation("x_yToy")
+          x_y_fk_x_1_fk_x_2Tox x   @relation("y_fk_x_1_fk_x_2Tox", fields: [fk_x_1, fk_x_2], references: [id, y], map: "fk_x_1")
 
           @@index([fk_x_1, fk_x_2], map: "fk_x_1")
         }
@@ -408,14 +408,14 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
           id                      Int   @id @default(autoincrement())
           user_id                 Int   @unique(map: "user_id")
           User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id], map: "user_id")
-          User_PostToUser_post_id User? @relation("PostToUser_post_id")
+          User_User_post_idToPost User? @relation("User_post_idToPost")
         }
 
         model User {
           id                      Int   @id @default(autoincrement())
           post_id                 Int   @unique(map: "post_id")
-          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id], map: "post_id")
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
+          Post_User_post_idToPost Post  @relation("User_post_idToPost", fields: [post_id], references: [id], map: "post_id")
         }
     "#]];
 
@@ -540,14 +540,14 @@ async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResul
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.add_index("Post_user_id_key", types::index(["user_id"]).unique(true));
                 t.inject_custom(
                     "CONSTRAINT CustomFKName FOREIGN KEY (user_id) REFERENCES `User`(id) ON DELETE RESTRICT ON UPDATE CASCADE",
                 );

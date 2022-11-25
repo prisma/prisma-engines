@@ -35,11 +35,20 @@ use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
+use self::check::Column;
+
 impl SqlMigrationConnector {
-    fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan, step_index: usize) {
+    fn check_table_drop(
+        &self,
+        table_name: &str,
+        namespace: Option<&str>,
+        plan: &mut DestructiveCheckPlan,
+        step_index: usize,
+    ) {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyTableDrop {
                 table: table_name.to_owned(),
+                namespace: namespace.map(str::to_owned),
             },
             step_index,
         );
@@ -50,6 +59,7 @@ impl SqlMigrationConnector {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyColumnDrop {
                 table: column.table().name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
                 column: column.name().to_owned(),
             },
             step_index,
@@ -76,15 +86,17 @@ impl SqlMigrationConnector {
         }
 
         let typed_unexecutable = if has_virtual_default {
-            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
+            UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault(Column {
                 table: column.table().name().to_owned(),
+                namespace: column.table().namespace().map(str::to_owned),
                 column: column.name().to_owned(),
-            }
+            })
         } else {
-            UnexecutableStepCheck::AddedRequiredFieldToTable {
-                column: column.name().to_owned(),
+            UnexecutableStepCheck::AddedRequiredFieldToTable(Column {
                 table: column.table().name().to_owned(),
-            }
+                namespace: column.table().namespace().map(str::to_owned),
+                column: column.name().to_owned(),
+            })
         };
 
         plan.push_unexecutable(typed_unexecutable, step_index);
@@ -129,6 +141,7 @@ impl SqlMigrationConnector {
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
+                                    namespace: tables.previous.namespace().map(str::to_owned),
                                 },
                                 step_index,
                             ),
@@ -151,6 +164,7 @@ impl SqlMigrationConnector {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: tables.previous.name().to_owned(),
+                                    namespace: tables.previous.namespace().map(str::to_owned),
                                 },
                                 step_index,
                             )
@@ -194,22 +208,22 @@ impl SqlMigrationConnector {
                                 && columns.next.default().is_none()
                             {
                                 plan.push_unexecutable(
-                                    UnexecutableStepCheck::MadeOptionalFieldRequired {
+                                    UnexecutableStepCheck::MadeOptionalFieldRequired(Column {
                                         table: columns.previous.table().name().to_owned(),
+                                        namespace: columns.previous.table().namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
-                                    },
+                                    }),
                                     step_index,
                                 );
                             }
 
-                            // can this just use the flavour??
-                            // todo pull up type rendering and native type check here
                             match type_change {
                                 Some(ColumnTypeChange::SafeCast) | None => (),
                                 Some(ColumnTypeChange::RiskyCast) => {
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
                                             table: columns.previous.table().name().to_owned(),
+                                            namespace: columns.previous.table().namespace().map(str::to_owned),
                                             column: columns.previous.name().to_owned(),
                                             previous_type: format!("{:?}", columns.previous.column_type_family()),
                                             next_type: format!("{:?}", columns.next.column_type_family()),
@@ -217,10 +231,10 @@ impl SqlMigrationConnector {
                                         step_index,
                                     );
                                 }
-                                //todo why no precise type warnings here if native types are on?
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(
                                     SqlMigrationWarningCheck::NotCastable {
                                         table: columns.previous.table().name().to_owned(),
+                                        namespace: columns.previous.table().namespace().map(str::to_owned),
                                         column: columns.previous.name().to_owned(),
                                         previous_type: format!("{:?}", columns.previous.column_type_family()),
                                         next_type: format!("{:?}", columns.next.column_type_family()),
@@ -232,7 +246,8 @@ impl SqlMigrationConnector {
                     }
                 }
                 SqlMigrationStep::DropTable { table_id } => {
-                    self.check_table_drop(schemas.previous.walk(*table_id).name(), &mut plan, step_index);
+                    let table = schemas.previous.walk(*table_id);
+                    self.check_table_drop(table.name(), table.namespace(), &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), _),

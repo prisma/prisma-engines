@@ -55,7 +55,7 @@ impl ScalarFieldExt for ScalarField {
                 let params = self
                     .native_type
                     .as_ref()
-                    .map(|nt| nt.args.iter())
+                    .map(|nt| nt.args().into_iter())
                     .and_then(|mut args| Some((args.next()?, args.next()?)))
                     .and_then(|(p, s)| Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?)));
 
@@ -97,7 +97,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
 fn parse_scalar_length(sf: &ScalarField) -> Option<TypeDataLength> {
     sf.native_type
         .as_ref()
-        .and_then(|nt| nt.args.first())
+        .and_then(|nt| nt.args().into_iter().next())
         .and_then(|len| match len.to_lowercase().as_str() {
             "max" => Some(TypeDataLength::Maximum),
             num => num.parse().map(TypeDataLength::Constant).ok(),

@@ -1,0 +1,26 @@
+model MyModel {
+  // Example Comment
+  field1 Int // Comment Field 1
+  field2 Int // Comment Field 2
+  field3 Int // Comment Field 3
+
+  // This comment should stay here.
+  @@unique([field1, field2]) // younique
+
+  // This one must stay too.
+  @@unique([field1, field3]) // there too
+}
+
+type YourType {
+  // Example Comment
+  field1 Int // Comment Field 1
+  field2 Int // Comment Field 2
+  field3 Int // Comment Field 3
+
+  // This comment should stay here.
+  @@unique([field1, field2]) // younique
+
+  // This one must stay too.
+  @@unique([field1, field3]) // there too
+}
+

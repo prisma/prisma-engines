@@ -1,0 +1,5 @@
+model Pizza {
+  id       Int       @id
+  toppings String[]?
+  prices   Int[]?    @default([3, 6, 9])
+}

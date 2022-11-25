@@ -137,6 +137,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -149,7 +150,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Int"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -167,7 +168,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: Nullable,
                             native_type: Some(
-                                String("Bit"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -185,12 +186,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Decimal": Array [
-                                        Number(18),
-                                        Number(0),
-                                    ],
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -208,7 +204,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Int"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -226,7 +222,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String("Money"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -244,12 +240,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Decimal": Array [
-                                        Number(18),
-                                        Number(0),
-                                    ],
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -267,7 +258,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("SmallInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -285,7 +276,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String("SmallMoney"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -303,7 +294,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("TinyInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -321,7 +312,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String("Real"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -339,9 +330,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Float": Number(53),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -359,7 +348,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("Date"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -377,7 +366,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("DateTime2"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -395,7 +384,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("DateTime"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -413,7 +402,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("DateTimeOffset"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -431,7 +420,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("SmallDateTime"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -449,7 +438,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("Time"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -467,9 +456,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Char": Number(255),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -487,11 +474,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Object {
-                                        "Number": Number(255),
-                                    },
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -509,9 +492,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarChar": String("Max"),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -529,7 +510,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                String("Text"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -547,11 +528,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "NVarChar": Object {
-                                        "Number": Number(255),
-                                    },
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -569,9 +546,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "NVarChar": String("Max"),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -589,7 +564,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                String("NText"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -607,9 +582,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Binary": Number(20),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -627,11 +600,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarBinary": Object {
-                                        "Number": Number(20),
-                                    },
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -649,9 +618,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarBinary": String("Max"),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -669,7 +636,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                String("Image"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -687,7 +654,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                String("Xml"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,

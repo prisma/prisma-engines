@@ -66,6 +66,10 @@ impl ConnectorContext {
             relation_mode,
         }
     }
+
+    pub fn can_native_upsert(&self) -> bool {
+        self.capabilities.contains(&ConnectorCapability::NativeUpsert)
+    }
 }
 
 impl QuerySchema {
@@ -142,7 +146,9 @@ pub struct QueryInfo {
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
     FindUnique,
+    FindUniqueOrThrow,
     FindFirst,
+    FindFirstOrThrow,
     FindMany,
     CreateOne,
     CreateMany,
@@ -161,7 +167,9 @@ impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
             Self::FindUnique => "findUnique",
+            Self::FindUniqueOrThrow => "findUniqueOrThrow",
             Self::FindFirst => "findFirst",
+            Self::FindFirstOrThrow => "findFirstOrThrow",
             Self::FindMany => "findMany",
             Self::CreateOne => "createOne",
             Self::CreateMany => "createMany",

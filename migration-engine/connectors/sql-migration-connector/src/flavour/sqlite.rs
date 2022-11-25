@@ -4,7 +4,7 @@ use self::connection::*;
 use crate::flavour::SqlFlavour;
 use indoc::indoc;
 use migration_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use sql_schema_describer::SqlSchema;
 use std::path::Path;
@@ -100,7 +100,7 @@ impl SqlFlavour for SqliteFlavour {
         psl::builtin_connectors::SQLITE
     }
 
-    fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             let schema = with_connection(&mut self.state, |_, conn| Ok(Box::pin(conn.describe_schema())))?.await?;
             Ok(schema)
@@ -279,11 +279,25 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        match &mut self.state {
+            super::State::Initial => {
+                if !preview_features.is_empty() {
+                    tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+                }
+            }
+            super::State::WithParams(params) | super::State::Connected(params, _) => {
+                params.connector_params.preview_features = preview_features
+            }
+        }
+    }
+
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
         _shadow_database_connection_string: Option<String>,
+        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");

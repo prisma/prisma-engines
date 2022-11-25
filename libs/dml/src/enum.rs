@@ -11,8 +11,6 @@ pub struct Enum {
     pub documentation: Option<String>,
     /// Database internal name of this enum.
     pub database_name: Option<String>,
-    /// Has to be commented out.
-    pub commented_out: bool,
     /// The contents of the `@@schema("...")` attribute.
     pub schema: Option<String>,
 }
@@ -25,7 +23,6 @@ impl Enum {
             values,
             documentation: None,
             database_name: None,
-            commented_out: false,
             schema,
         }
     }
@@ -95,8 +92,6 @@ pub struct EnumValue {
     pub database_name: Option<String>,
     /// Comments for this enum value.
     pub documentation: Option<String>,
-    /// Has to be commented out.
-    pub commented_out: bool,
 }
 
 impl EnumValue {
@@ -106,7 +101,6 @@ impl EnumValue {
             name: String::from(name),
             database_name: None,
             documentation: None,
-            commented_out: false,
         }
     }
 

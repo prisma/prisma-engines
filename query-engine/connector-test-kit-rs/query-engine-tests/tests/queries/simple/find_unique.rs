@@ -5,7 +5,7 @@ mod find_unique {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn fetch_unique_by_id(runner: Runner) -> TestResult<()> {
+    async fn find_unique_by_id(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(
@@ -18,7 +18,7 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn fetch_unique_by_single_unique(runner: Runner) -> TestResult<()> {
+    async fn find_unique_by_single_unique(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(
@@ -31,7 +31,7 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn fetch_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
+    async fn find_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(
@@ -44,7 +44,7 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_id(runner: Runner) -> TestResult<()> {
+    async fn no_result_find_unique_by_id(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(
@@ -57,7 +57,7 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_single_unique(runner: Runner) -> TestResult<()> {
+    async fn no_result_find_unique_by_single_unique(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(
@@ -70,7 +70,7 @@ mod find_unique {
     }
 
     #[connector_test]
-    async fn no_result_fetch_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
+    async fn no_result_find_unique_by_multi_unique(runner: Runner) -> TestResult<()> {
         test_user(&runner).await?;
 
         assert_query!(

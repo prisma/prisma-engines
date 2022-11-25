@@ -5,8 +5,8 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use native_types::MySqlType;
 use once_cell::sync::Lazy;
+use psl::builtin_connectors::MySqlType;
 use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
@@ -220,7 +220,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         ddl::CreateTable {
             table_name: &table_name,
             columns: table.columns().map(|col| self.render_column(col)).collect(),
@@ -303,7 +303,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&sql_ddl::mysql::DropTable {
@@ -328,7 +328,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, TableName(None, Quoted::mysql_ident(table.name())))
+        self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::mysql_ident(table.name())))
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
@@ -385,13 +385,8 @@ fn render_mysql_modify(
 }
 
 fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
-    if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
-        let r#enum = column
-            .schema
-            .get_enum(enum_name)
-            .unwrap_or_else(|| panic!("Could not render the variants of enum `{enum_name}`"));
-
-        let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
+    if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
+        let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
 
         return format!("ENUM({})", variants).into();
     }
@@ -425,7 +420,7 @@ fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
         MySqlType::TinyInt => "TINYINT".into(),
         MySqlType::MediumInt => "MEDIUMINT".into(),
         MySqlType::BigInt => "BIGINT".into(),
-        MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)).into(),
+        MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(*precision)).into(),
         MySqlType::Float => "FLOAT".into(),
         MySqlType::Double => "DOUBLE".into(),
         MySqlType::Bit(size) => format!("BIT({size})", size = size).into(),
@@ -442,9 +437,9 @@ fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
         MySqlType::MediumText => "MEDIUMTEXT".into(),
         MySqlType::LongText => "LONGTEXT".into(),
         MySqlType::Date => "DATE".into(),
-        MySqlType::Time(precision) => format!("TIME{}", render(precision)).into(),
-        MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)).into(),
-        MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)).into(),
+        MySqlType::Time(precision) => format!("TIME{}", render(*precision)).into(),
+        MySqlType::DateTime(precision) => format!("DATETIME{}", render(*precision)).into(),
+        MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(*precision)).into(),
         MySqlType::Year => "YEAR".into(),
         MySqlType::Json => "JSON".into(),
         MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
@@ -509,7 +504,6 @@ fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Co
         DefaultKind::Now => {
             let precision = column
                 .column_native_type()
-                .as_ref()
                 .and_then(MySqlType::timestamp_precision)
                 .unwrap_or(3);
 

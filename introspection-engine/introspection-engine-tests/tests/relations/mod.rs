@@ -6,8 +6,7 @@ mod sqlite;
 
 use barrel::types;
 use expect_test::expect;
-use indoc::formatdoc;
-use indoc::indoc;
+use indoc::*;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
@@ -103,14 +102,14 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
           id                      Int   @id @default(autoincrement())
           user_id                 Int   @unique
           User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_PostToUser_post_id User? @relation("PostToUser_post_id")
+          User_User_post_idToPost User? @relation("User_post_idToPost")
         }
 
         model User {
           id                      Int   @id @default(autoincrement())
           post_id                 Int   @unique
-          Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
+          Post_User_post_idToPost Post  @relation("User_post_idToPost", fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
     "#]];
 
@@ -125,7 +124,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", |t| {
@@ -136,8 +135,8 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
                     "Post_user_id_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
-                t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
+                t.add_constraint("Post_user_id_key", types::unique_constraint(["user_id"]));
             });
         })
         .await?;
@@ -211,7 +210,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", |t| {
@@ -221,7 +220,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
                     "user_id_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -284,12 +283,12 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("_PostToUser", |t| {
@@ -387,7 +386,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
                     "direct_report_fkey",
                     types::foreign_constraint(&["direct_report"], "User", &["id"], None, None),
                 );
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -397,10 +396,10 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  Int    @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
-          other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-          other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+          User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
+          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
+          other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
         }
     "#]];
 
@@ -449,14 +448,14 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("user_id", types::integer().nullable(true));
 
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
             });
 
             migration.change_table("Post", |t| {
@@ -520,15 +519,15 @@ async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
 
     let dm = formatdoc! {r##"
         model Book {{
-            id        String      @id {}
+            id        String      @id {native_string}
             Royalty   Royalty[]   @relation("BookRoyalty")
         }}
 
         model Royalty {{
-            id        String      @id {}
+            id        String      @id {native_string}
             Book      Book[]      @relation("BookRoyalty")
         }}
-    "##, native_string, native_string};
+    "##};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
 
@@ -554,15 +553,15 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model x {
-          id     Int @id
-          y      Int
-          y_xToy y   @relation(fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          id       Int @id
+          y        Int
+          y_x_yToy y   @relation("x_yToy", fields: [y], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model y {
-          id     Int @id
-          x      Int
-          x_xToy x[]
+          id       Int @id
+          x        Int
+          x_x_yToy x[] @relation("x_yToy")
         }
     "#]];
 
@@ -610,71 +609,17 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
           id                       Int    @id @default(autoincrement())
           host_id                  Int
           User_Event_host_idToUser User   @relation("Event_host_idToUser", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-          User_EventToUser         User[]
+          User_EventToUser         User[] @relation("EventToUser")
         }
 
         model User {
           id                        Int     @id @default(autoincrement())
           Event_Event_host_idToUser Event[] @relation("Event_host_idToUser")
-          Event_EventToUser         Event[]
+          Event_EventToUser         Event[] @relation("EventToUser")
         }
     "#]];
 
     expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
-async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |table| {
-                table.add_column("id", types::integer().increments(true));
-                table.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-            });
-
-            migration.create_table("_Friendship", |table| {
-                table.add_column("A", types::integer().nullable(false));
-                table.add_column("B", types::integer().nullable(false));
-
-                table.add_foreign_key(&["A"], "User", &["id"]);
-                table.add_foreign_key(&["B"], "User", &["id"]);
-
-                table.add_index(
-                    "_FriendShip_AB_unique",
-                    barrel::types::index(vec!["A", "B"]).unique(true),
-                );
-                table.add_index("_FriendShip_B_index", barrel::types::index(vec!["B"]));
-            });
-
-            migration.create_table("_Frenemyship", |table| {
-                table.add_column("A", types::integer().nullable(false));
-                table.add_column("B", types::integer().nullable(false));
-
-                table.add_foreign_key(&["A"], "User", &["id"]);
-                table.add_foreign_key(&["B"], "User", &["id"]);
-
-                table.add_index(
-                    "_Frenemyship_AB_unique",
-                    barrel::types::index(vec!["A", "B"]).unique(true),
-                );
-                table.add_index("_Frenemyship_B_index", barrel::types::index(vec!["B"]));
-            });
-        })
-        .await?;
-
-    let expected_dm = indoc! {r#"
-        model User {
-            id                 Int    @id @default(autoincrement())
-            User_B_Frenemyship User[] @relation("Frenemyship")
-            User_A_Frenemyship User[] @relation("Frenemyship")
-            User_B_Friendship  User[] @relation("Friendship")
-            User_A_Friendship  User[] @relation("Friendship")
-        }
-    "#};
-
-    api.assert_eq_datamodels(expected_dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -685,14 +630,14 @@ async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResul
         .execute(move |migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Post", move |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
                 t.add_column("user_id", types::integer().nullable(false));
-                t.add_index("Post_user_id_key", types::index(&["user_id"]).unique(true));
+                t.add_index("Post_user_id_key", types::index(["user_id"]).unique(true));
                 t.add_constraint(
                     "CustomFKName",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),

@@ -4,7 +4,9 @@ use crate::{
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
+
 use indexmap::IndexMap;
+use itertools::Itertools;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use psl::dml::ReferentialAction;
 use schema::ConnectorContext;
@@ -44,6 +46,7 @@ where
         nested: vec![],
         selection_order: vec![],
         aggregation_selections: vec![],
+        options: QueryOptions::none(),
     });
 
     Query::Read(read_query)
@@ -252,7 +255,12 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                wq.inject_result_into_args(SelectionResult::from(&child_linking_fields));
+                // Only set optional linking fields to null. Not all linking fields have to be optional for the relation to be optional.
+                // NOTE: This can most likely be optimized better.
+                let nullable_linking_fields = child_linking_fields.as_fields().into_iter().filter(|f| !f.is_required()).collect_vec();
+                let nullable_linking_fields = FieldSelection::from(nullable_linking_fields);
+
+                wq.inject_result_into_args(SelectionResult::from(&nullable_linking_fields));
             }
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {

@@ -1,6 +1,6 @@
 use introspection_engine_tests::test_api::*;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &TestApi) -> TestResult {
     let sql = r#"CREATE TABLE `test` ( `threechars` ENUM ('123', 'wow','$§!') );"#;
     api.raw_cmd(sql).await;

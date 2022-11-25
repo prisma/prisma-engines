@@ -187,4 +187,8 @@ impl OutputField {
 
         self
     }
+
+    pub fn model(&self) -> Option<&ModelRef> {
+        self.query_info.as_ref().and_then(|info| info.model.as_ref())
+    }
 }

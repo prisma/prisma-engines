@@ -33,7 +33,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &Tes
     Ok(())
 }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
 async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -116,7 +116,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
 //     Ok(())
 // }
 
-#[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";

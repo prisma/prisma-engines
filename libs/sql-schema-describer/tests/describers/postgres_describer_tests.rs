@@ -2,8 +2,63 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use pretty_assertions::assert_eq;
-use prisma_value::PrismaValue;
+use psl::dml::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_nonexisting_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two"]);
+
+    schema.assert_namespace("one").assert_not_namespace("two");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_ignored_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one"]);
+
+    schema.assert_namespace("one").assert_not_namespace("two");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_skips_public_when_ignored_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA IF NOT EXISTS "public";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one"]);
+
+    schema.assert_namespace("one").assert_not_namespace("public");
+}
+
+#[test_connector(tags(Postgres))]
+fn postgres_many_namespaces(api: TestApi) {
+    let full_sql = r#"
+        CREATE SCHEMA "one";
+        CREATE SCHEMA "two";
+        CREATE SCHEMA "three";
+    "#;
+
+    api.raw_cmd(full_sql);
+    let schema = api.describe_with_schemas(&["one", "two", "three"]);
+
+    schema
+        .assert_namespace("one")
+        .assert_namespace("two")
+        .assert_namespace("three");
+}
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
@@ -87,6 +142,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -99,7 +155,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: List,
                             native_type: Some(
-                                String("ByteA"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -117,7 +173,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: List,
                             native_type: Some(
-                                String("Boolean"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -135,7 +191,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: List,
                             native_type: Some(
-                                String("Date"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -153,7 +209,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: List,
                             native_type: Some(
-                                String("DoublePrecision"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -171,7 +227,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: List,
                             native_type: Some(
-                                String("DoublePrecision"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -189,7 +245,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: List,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -207,7 +263,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: List,
                             native_type: Some(
-                                String("Text"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -225,9 +281,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: List,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Number(255),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -245,7 +299,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: BigInt,
                             arity: Nullable,
                             native_type: Some(
-                                String("BigInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -263,7 +317,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: BigInt,
                             arity: Required,
                             native_type: Some(
-                                String("BigInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -288,9 +342,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Bit": Number(1),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -308,9 +360,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarBit": Number(1),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -328,7 +378,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Binary,
                             arity: Nullable,
                             native_type: Some(
-                                String("ByteA"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -346,7 +396,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Boolean,
                             arity: Nullable,
                             native_type: Some(
-                                String("Boolean"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -382,9 +432,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Char": Number(1),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -420,7 +468,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                String("Date"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -438,7 +486,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String("DoublePrecision"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -456,7 +504,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Float,
                             arity: Nullable,
                             native_type: Some(
-                                String("DoublePrecision"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -474,7 +522,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -528,9 +576,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Decimal,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Decimal": Null,
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -602,7 +648,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("SmallInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -620,7 +666,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("SmallInt"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -645,7 +691,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -670,7 +716,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -695,7 +741,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                String("Text"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -713,9 +759,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: String,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Number(1),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -733,9 +777,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Time": Number(6),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -753,9 +795,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Timetz": Number(6),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -773,9 +813,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Timestamp": Number(6),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -793,9 +831,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: DateTime,
                             arity: Nullable,
                             native_type: Some(
-                                Object {
-                                    "Timestamptz": Number(6),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -867,7 +903,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Json,
                             arity: Nullable,
                             native_type: Some(
-                                String("Json"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -885,7 +921,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Json,
                             arity: Nullable,
                             native_type: Some(
-                                String("JsonB"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -903,7 +939,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             family: Uuid,
                             arity: Nullable,
                             native_type: Some(
-                                String("Uuid"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -1113,11 +1149,15 @@ fn postgres_enums_must_work(api: TestApi) {
         api.schema_name()
     ));
     let schema = api.describe();
-    let got_enum = schema.get_enum("mood").expect("get enum");
+    let got_enum = schema.walk(schema.find_enum("mood").expect("get enum"));
     let values = &["sad", "ok", "happy"];
 
-    assert_eq!(got_enum.name, "mood");
-    assert_eq!(got_enum.values, values);
+    assert_eq!(got_enum.name(), "mood");
+    let found_values = got_enum.values();
+    assert_eq!(found_values.len(), values.len());
+    for (a, b) in found_values.zip(values) {
+        assert_eq!(a, *b)
+    }
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -1237,6 +1277,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1249,7 +1290,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -1267,9 +1308,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Null,
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1296,9 +1335,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Null,
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1325,9 +1362,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Null,
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1402,6 +1437,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1414,9 +1450,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                             family: String,
                             arity: Required,
                             native_type: Some(
-                                Object {
-                                    "VarChar": Number(255),
-                                },
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1753,6 +1787,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1765,7 +1800,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1790,7 +1825,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1817,7 +1852,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1842,7 +1877,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -1972,6 +2007,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 },
             ],
             enums: [],
+            enum_variants: [],
             columns: [
                 (
                     TableId(
@@ -1984,7 +2020,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -2002,7 +2038,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -2027,7 +2063,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -2052,7 +2088,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -2070,7 +2106,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -2095,7 +2131,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -2120,7 +2156,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,
@@ -2138,7 +2174,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Required,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: Some(
@@ -2163,7 +2199,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             family: Int,
                             arity: Nullable,
                             native_type: Some(
-                                String("Integer"),
+                                NativeTypeInstance(..),
                             ),
                         },
                         default: None,

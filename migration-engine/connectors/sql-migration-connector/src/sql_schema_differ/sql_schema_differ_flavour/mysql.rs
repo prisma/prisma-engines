@@ -1,6 +1,10 @@
 use super::SqlSchemaDifferFlavour;
-use crate::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
-use native_types::MySqlType;
+use crate::{
+    flavour::MysqlFlavour,
+    pair::Pair,
+    sql_schema_differ::{all_match, ColumnTypeChange},
+};
+use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
     walkers::{ColumnWalker, IndexWalker},
     ColumnTypeFamily,
@@ -40,14 +44,13 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             differ.next.column_type_family_as_enum(),
         ) {
             (Some(previous_enum), Some(next_enum)) => {
-                if previous_enum.values() == next_enum.values() {
+                if all_match(&mut previous_enum.values(), &mut next_enum.values()) {
                     return None;
                 }
 
                 return if previous_enum
                     .values()
-                    .iter()
-                    .all(|previous_value| next_enum.values().iter().any(|next_value| previous_value == next_value))
+                    .all(|previous_value| next_enum.values().any(|next_value| previous_value == next_value))
                 {
                     Some(ColumnTypeChange::SafeCast)
                 } else {
@@ -113,7 +116,7 @@ fn safe() -> ColumnTypeChange {
     ColumnTypeChange::SafeCast
 }
 
-fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
+fn native_type_change(types: Pair<&MySqlType>) -> Option<ColumnTypeChange> {
     let next = &types.next;
 
     Some(match &types.previous {

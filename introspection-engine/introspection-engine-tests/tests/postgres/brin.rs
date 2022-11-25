@@ -1270,7 +1270,7 @@ async fn uuid_minmax_multi_ops(api: &TestApi) -> TestResult {
           id   Int     @id @default(autoincrement())
           data String? @db.Uuid
 
-          @@index([data(ops: UuidMinMaxOps)], type: Brin)
+          @@index([data(ops: UuidMinMaxMultiOps)], type: Brin)
         }
     "#]];
 

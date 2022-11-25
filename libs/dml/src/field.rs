@@ -84,6 +84,10 @@ impl FieldType {
         matches!(self, Self::Enum(this) if this == name)
     }
 
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
+
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
             FieldType::Scalar(st, _) => Some(*st),
@@ -178,8 +182,8 @@ impl Field {
     pub fn is_commented_out(&self) -> bool {
         match self {
             Field::ScalarField(sf) => sf.is_commented_out,
-            Field::RelationField(rf) => rf.is_commented_out,
             Field::CompositeField(cf) => cf.is_commented_out,
+            _ => false,
         }
     }
 
@@ -211,14 +215,6 @@ impl Field {
         match &self {
             Field::ScalarField(sf) => sf.is_updated_at,
             Field::RelationField(_) => false,
-            Field::CompositeField(_) => false,
-        }
-    }
-
-    pub fn is_generated(&self) -> bool {
-        match &self {
-            Field::ScalarField(sf) => sf.is_generated,
-            Field::RelationField(rf) => rf.is_generated,
             Field::CompositeField(_) => false,
         }
     }
@@ -295,12 +291,6 @@ pub struct RelationField {
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
-    /// signals that this field was internally generated (only back relation fields as of now)
-    pub is_generated: bool,
-
-    /// Indicates if this field has to be commented out.
-    pub is_commented_out: bool,
-
     /// Indicates if this field has to be ignored by the Client.
     pub is_ignored: bool,
 
@@ -320,8 +310,6 @@ impl RelationField {
             referential_arity,
             relation_info,
             documentation: None,
-            is_generated: false,
-            is_commented_out: false,
             is_ignored: false,
             supports_restrict_action: None,
             emulates_referential_actions: None,
@@ -336,20 +324,6 @@ impl RelationField {
     /// The referential actions should be handled by the core.
     pub fn emulates_referential_actions(&mut self, value: bool) {
         self.emulates_referential_actions = Some(value);
-    }
-
-    /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, info: RelationInfo, required: bool) -> Self {
-        let arity = if required {
-            FieldArity::Required
-        } else {
-            FieldArity::Optional
-        };
-
-        let mut field = Self::new(name, arity, arity, info);
-        field.is_generated = true;
-
-        field
     }
 
     pub fn points_to_model(&self, name: &str) -> bool {
@@ -577,5 +551,15 @@ impl WithDatabaseName for CompositeField {
     }
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl From<psl_core::parser_database::ast::FieldArity> for FieldArity {
+    fn from(arity: psl_core::parser_database::ast::FieldArity) -> Self {
+        match arity {
+            schema_ast::ast::FieldArity::Required => FieldArity::Required,
+            schema_ast::ast::FieldArity::Optional => FieldArity::Optional,
+            schema_ast::ast::FieldArity::List => FieldArity::List,
+        }
     }
 }

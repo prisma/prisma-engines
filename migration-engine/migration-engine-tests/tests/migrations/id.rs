@@ -154,7 +154,7 @@ fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Sqlite, CockroachDb), preview_features("referentialIntegrity"))]
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: TestApi) {
     let dm = r#"
         model List {
@@ -311,72 +311,6 @@ fn removing_autoincrement_from_an_existing_field_works(api: TestApi) {
     // Check that the migration is idempotent.
     api.schema_push_w_datasource(dm2)
         .migration_id(Some("idempotency-check"))
-        .send()
-        .assert_green()
-        .assert_no_steps();
-
-    assert_eq!(
-        3,
-        api.query(Select::from_table(api.render_table_name("Post")).into())
-            .len()
-    );
-}
-
-#[test_connector(tags(Mssql))]
-fn making_an_existing_id_field_autoincrement_works_with_indices(api: TestApi) {
-    use quaint::ast::{Insert, Select};
-
-    let dm1 = r#"
-        model Post {
-            id        Int        @id
-            content   String?
-
-            @@index([content], name: "fooBarIndex")
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm1).send().assert_green();
-
-    api.assert_schema().assert_table("Post", |model| {
-        model
-            .assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_no_autoincrement())
-            .assert_indexes_count(1)
-    });
-
-    // Data to see we don't lose anything in the translation.
-    for (i, content) in ["A", "B", "C"].iter().enumerate() {
-        let insert = Insert::single_into(api.render_table_name("Post"))
-            .value("content", *content)
-            .value("id", i);
-
-        api.query(insert.into());
-    }
-
-    assert_eq!(
-        3,
-        api.query(Select::from_table(api.render_table_name("Post")).into())
-            .len()
-    );
-
-    let dm2 = r#"
-        model Post {
-            id        Int         @id @default(autoincrement())
-            content   String?
-
-            @@index([content], name: "fooBarIndex")
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm2).send().assert_green();
-
-    api.assert_schema().assert_table("Post", |model| {
-        model
-            .assert_pk(|pk| pk.assert_columns(&["id"]).assert_has_autoincrement())
-            .assert_indexes_count(1)
-    });
-
-    // Check that the migration is idempotent.
-    api.schema_push_w_datasource(dm2)
         .send()
         .assert_green()
         .assert_no_steps();

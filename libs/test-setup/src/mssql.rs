@@ -1,4 +1,4 @@
-use crate::{runtime::run_with_tokio, Tags};
+use crate::{runtime::run_with_thread_local_runtime as tok, Tags};
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use quaint::{error::Error, prelude::Queryable, single::Quaint};
@@ -23,7 +23,7 @@ pub(crate) fn get_mssql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
         Ok(tags)
     };
 
-    run_with_tokio(fut)
+    tok(fut)
 }
 
 pub async fn init_mssql_database(original_url: &str, db_name: &str) -> Result<(Quaint, String), Error> {

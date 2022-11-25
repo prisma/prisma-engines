@@ -1,5 +1,7 @@
+use std::borrow::Cow;
+
 use migration_engine_tests::test_api::*;
-use sql_schema_describer::ColumnTypeFamily;
+use prisma_value::PrismaValue;
 
 const BASIC_ENUM_DM: &str = r#"
 model Cat {
@@ -14,75 +16,6 @@ enum CatMood {
 "#;
 
 #[test_connector(capabilities(Enums))]
-fn adding_an_enum_field_must_work(api: TestApi) {
-    let dm = r#"
-        model Test {
-            id String @id @default(cuid())
-            enum MyEnum
-        }
-
-        enum MyEnum {
-            A
-            B
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm).send().assert_green();
-
-    api.assert_schema().assert_table("Test", |table| {
-        table.assert_columns_count(2).assert_column("enum", |c| {
-            if api.is_postgres() {
-                c.assert_is_required()
-                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
-            } else if api.is_mysql() {
-                c.assert_is_required().assert_type_family(ColumnTypeFamily::Enum(
-                    api.normalize_identifier("Test_enum").into_owned(),
-                ))
-            } else {
-                c.assert_is_required().assert_type_is_string()
-            }
-        })
-    });
-
-    // Check that the migration is idempotent.
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(capabilities(Enums))]
-fn adding_an_enum_field_must_work_with_native_types_off(api: TestApi) {
-    let dm = r#"
-        model Test {
-            id String @id @default(cuid())
-            enum MyEnum
-        }
-
-        enum MyEnum {
-            A
-            B
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm).send().assert_green();
-
-    api.assert_schema().assert_table("Test", |table| {
-        table.assert_columns_count(2).assert_column("enum", |c| {
-            if api.is_postgres() {
-                c.assert_is_required()
-                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned()))
-            } else if api.is_mysql() {
-                c.assert_is_required()
-                    .assert_type_family(ColumnTypeFamily::Enum(api.normalize_identifier("Test_enum").into()))
-            } else {
-                c.assert_is_required().assert_type_is_string()
-            }
-        })
-    });
-
-    // Check that the migration is idempotent.
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(capabilities(Enums), preview_features("referentialIntegrity"))]
 fn an_enum_can_be_turned_into_a_model(api: TestApi) {
     api.schema_push_w_datasource(BASIC_ENUM_DM).send().assert_green();
 
@@ -310,9 +243,9 @@ fn string_field_to_enum_field_works(api: TestApi) {
     let warn = if api.is_postgres() {
         "The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
     } else if api.lower_cases_table_names() {
-        "You are about to alter the column `mood` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`."
+        "You are about to alter the column `mood` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`."
     } else {
-        "You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(\"Cat_mood\")`."
+        "You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`."
     };
 
     api.schema_push_w_datasource(dm2)
@@ -419,9 +352,7 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
             .force(true)
             .send()
             .assert_executable()
-            .assert_warnings(& ["The values [HUNGRY] on the enum `Panther_mood` will be removed. If these variants are still used in the database, this will fail.".into(),
-                "The values [HUNGRY] on the enum `Tiger_mood` will be removed. If these variants are still used in the database, this will fail.".into(),]
-            );
+            .assert_warnings(&["The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     };
 
     api.assert_schema().assert_tables_count(5);
@@ -605,4 +536,86 @@ fn mapped_enum_defaults_must_work(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn alter_enum_and_change_default_must_work(api: TestApi) {
+    let plain_dm = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([])
+        }
+        enum Mood {
+            SLEEPY
+            MOODY
+        }
+    "#;
+
+    api.schema_push(plain_dm).send().assert_green();
+
+    let custom_dm = r#"
+        datasource test {
+            provider = "postgres"
+            url = "postgres://meowmeowmeow"
+        }
+        model Cat {
+            id      Int    @id
+            moods   Mood[] @default([SLEEPY])
+        }
+        enum Mood {
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    // recall: schema_push doesn't run if it has warnings. You need to specify "force(true)"
+    api.schema_push(custom_dm).force(true).send().assert_warnings(&[Cow::from(
+        "The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.",
+    )]);
+    api.schema_push(custom_dm).send().assert_green().assert_no_steps();
+
+    api.assert_schema().assert_table("Cat", |table| {
+        table.assert_column("moods", |col| {
+            col.assert_default_value(&PrismaValue::List(vec![PrismaValue::Enum("SLEEPY".to_string())]))
+        })
+    });
+
+    // we repeat the same tests with migrations, so we can observe the generated SQL statements.
+    api.reset().send_sync(None);
+    api.assert_schema().assert_tables_count(0);
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain", plain_dm, &dir).send_sync();
+
+    api.create_migration("custom", custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - The values [MOODY] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.
+
+                */
+                -- AlterEnum
+                BEGIN;
+                CREATE TYPE "Mood_new" AS ENUM ('HUNGRY', 'SLEEPY');
+                ALTER TABLE "Cat" ALTER COLUMN "moods" DROP DEFAULT;
+                ALTER TABLE "Cat" ALTER COLUMN "moods" TYPE "Mood_new"[] USING ("moods"::text::"Mood_new"[]);
+                ALTER TYPE "Mood" RENAME TO "Mood_old";
+                ALTER TYPE "Mood_new" RENAME TO "Mood";
+                DROP TYPE "Mood_old";
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+                COMMIT;
+
+                -- AlterTable
+                ALTER TABLE "Cat" ALTER COLUMN "moods" SET DEFAULT ARRAY['SLEEPY']::"Mood"[];
+            "#]];
+            migration.expect_contents(expected_script)
+        });
 }

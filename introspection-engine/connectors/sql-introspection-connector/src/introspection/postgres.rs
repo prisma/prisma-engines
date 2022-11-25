@@ -1,15 +1,11 @@
 use datamodel_renderer as render;
-use psl::{
-    builtin_connectors::postgres_datamodel_connector::PostgresDatasourceProperties, Configuration, PreviewFeature,
-};
+use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
-
-use crate::sanitize_datamodel_names::sanitize_string;
 
 const EXTENSION_ALLOW_LIST: &[&str] = &["citext", "postgis", "pg_crypto", "uuid-ossp"];
 
 pub(super) fn add_extensions<'a>(
-    datasource: &mut render::Datasource<'a>,
+    datasource: &mut render::configuration::Datasource<'a>,
     schema: &'a SqlSchema,
     config: &'a Configuration,
 ) {
@@ -25,36 +21,38 @@ pub(super) fn add_extensions<'a>(
         .downcast_ref::<PostgresDatasourceProperties>();
 
     let previous_extensions = connector_data.and_then(|p| p.extensions());
-    let mut next_extensions = render::Array::default();
+    let mut next_extensions = render::value::Array::new();
 
     for ext in pg_schema_ext.extension_walkers() {
-        let sanitized_name = sanitize_string(ext.name());
-        let is_sanitized = ext.name() != sanitized_name;
-
-        let mut next_extension = render::Function::new(sanitized_name);
-
-        if is_sanitized {
-            next_extension.push_param(("map", render::Text(ext.name())));
-        }
+        let mut next_extension = {
+            if crate::needs_sanitation(ext.name()) {
+                let sanitized_name = crate::sanitize_string(ext.name());
+                let mut func = render::value::Function::new(sanitized_name);
+                func.push_param(("map", render::value::Text::new(ext.name())));
+                func
+            } else {
+                render::value::Function::new(ext.name())
+            }
+        };
 
         match previous_extensions.and_then(|e| e.find_by_name(ext.name())) {
             Some(prev) => {
                 match prev.version() {
                     Some(previous_version) if previous_version != ext.version() => {
-                        next_extension.push_param(("version", render::Text(ext.version())));
+                        next_extension.push_param(("version", render::value::Text::new(ext.version())));
                     }
                     Some(previous_version) => {
-                        next_extension.push_param(("version", render::Text(previous_version)));
+                        next_extension.push_param(("version", render::value::Text::new(previous_version)));
                     }
                     None => (),
                 };
 
                 match prev.schema() {
                     Some(previous_schema) if previous_schema != ext.schema() => {
-                        next_extension.push_param(("schema", render::Text(ext.schema())));
+                        next_extension.push_param(("schema", render::value::Text::new(ext.schema())));
                     }
                     Some(previous_schema) => {
-                        next_extension.push_param(("schema", render::Text(previous_schema)));
+                        next_extension.push_param(("schema", render::value::Text::new(previous_schema)));
                     }
                     None => (),
                 }
@@ -62,7 +60,7 @@ pub(super) fn add_extensions<'a>(
                 next_extensions.push(next_extension);
             }
             None if EXTENSION_ALLOW_LIST.contains(&ext.name()) => {
-                next_extension.push_param(("schema", render::Text(ext.schema())));
+                next_extension.push_param(("schema", render::value::Text::new(ext.schema())));
                 next_extensions.push(next_extension);
             }
             None => (),

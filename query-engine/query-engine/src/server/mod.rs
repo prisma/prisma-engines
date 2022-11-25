@@ -3,6 +3,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::{global, propagation::Extractor, Context};
 use psl::PreviewFeature;
+use query_core::schema::QuerySchemaRef;
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
@@ -21,30 +22,41 @@ pub struct State {
     cx: Arc<PrismaContext>,
     enable_playground: bool,
     enable_debug_mode: bool,
-    enable_itx: bool,
     enable_metrics: bool,
 }
 
 impl State {
     /// Create a new instance of `State`.
-    fn new(
-        cx: PrismaContext,
-        enable_playground: bool,
-        enable_debug_mode: bool,
-        enable_itx: bool,
-        enable_metrics: bool,
-    ) -> Self {
+    fn new(cx: PrismaContext) -> Self {
         Self {
             cx: Arc::new(cx),
-            enable_playground,
-            enable_debug_mode,
-            enable_itx,
-            enable_metrics,
+            enable_playground: false,
+            enable_debug_mode: false,
+            enable_metrics: false,
         }
+    }
+
+    pub fn enable_playground(mut self, enable: bool) -> Self {
+        self.enable_playground = enable;
+        self
+    }
+
+    pub fn enable_debug_mode(mut self, enable: bool) -> Self {
+        self.enable_debug_mode = enable;
+        self
+    }
+
+    pub fn enable_metrics(mut self, enable: bool) -> Self {
+        self.enable_metrics = enable;
+        self
     }
 
     pub fn get_metrics(&self) -> MetricRegistry {
         self.cx.metrics.clone()
+    }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        self.cx.query_schema()
     }
 }
 
@@ -54,7 +66,6 @@ impl Clone for State {
             cx: self.cx.clone(),
             enable_playground: self.enable_playground,
             enable_debug_mode: self.enable_debug_mode,
-            enable_itx: self.enable_itx,
             enable_metrics: self.enable_metrics,
         }
     }
@@ -67,11 +78,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
 
     let span = tracing::info_span!("prisma:engine:connect");
 
-    let enable_itx = config
-        .preview_features()
-        .contains(PreviewFeature::InteractiveTransactions);
-
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
 
     let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
@@ -80,13 +87,11 @@ pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<St
         .instrument(span)
         .await?;
 
-    let state = State::new(
-        cx,
-        opts.enable_playground,
-        opts.enable_debug_mode,
-        enable_itx,
-        enable_metrics,
-    );
+    let state = State::new(cx)
+        .enable_playground(opts.enable_playground)
+        .enable_debug_mode(opts.enable_debug_mode)
+        .enable_metrics(enable_metrics);
+
     Ok(state)
 }
 
@@ -116,7 +121,7 @@ pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()
 pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
-    if req.method() == Method::POST && req.uri().path().contains("transaction") && state.enable_itx {
+    if req.method() == Method::POST && req.uri().path().contains("transaction") {
         return handle_transaction(state, req).await;
     }
 

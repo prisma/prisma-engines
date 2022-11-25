@@ -5,7 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use connector::filter::Filter;
-use prisma_models::{FieldSelection, ModelRef};
+use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
@@ -82,6 +82,13 @@ pub trait FilteredQuery {
     fn default_filter_behaviour(inner_filters: Vec<Filter>) -> Filter {
         Filter::Or(inner_filters)
     }
+}
+
+pub trait FilteredNestedMutation {
+    /// Sets the parent id of a nested mutation.
+    /// This indicates the connector that it doesn't need to refetch the child and that the mutation
+    /// can directly be performed using that id.
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>);
 }
 
 impl std::fmt::Display for Query {

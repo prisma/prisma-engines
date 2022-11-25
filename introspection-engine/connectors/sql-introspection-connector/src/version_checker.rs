@@ -4,15 +4,14 @@ use crate::introspection_helpers::{
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use introspection_connector::{Version, Warning};
-use native_types::{MySqlType, PostgresType};
+use introspection_connector::Version;
+use psl::builtin_connectors::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::ForeignKeyWalker;
 use sql_schema_describer::{
     walkers::{ColumnWalker, TableWalker},
     ForeignKeyAction,
 };
-use tracing::debug;
 
 #[derive(Debug)]
 struct VersionChecker {
@@ -54,7 +53,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::Char(36),
 ];
 
-pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &mut Vec<Warning>) -> Version {
+pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext) -> Version {
     let mut version_checker = VersionChecker {
         sql_family: ctx.sql_family(),
         is_cockroachdb: ctx.is_cockroach(),
@@ -97,19 +96,17 @@ pub(crate) fn check_prisma_version(ctx: &CalculateDatamodelContext, warnings: &m
         }
     }
 
-    debug!("{:?}", &version_checker);
-
     match version_checker.sql_family {
         _ if ctx.schema.is_empty() => Version::NonPrisma,
-        SqlFamily::Sqlite if version_checker.is_prisma_2(warnings) => Version::Prisma2,
+        SqlFamily::Sqlite if version_checker.is_prisma_2() => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if version_checker.is_prisma_2(warnings) => Version::Prisma2,
-        SqlFamily::Mysql if version_checker.is_prisma_1(warnings) => Version::Prisma1,
-        SqlFamily::Mysql if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Mysql if version_checker.is_prisma_2() => Version::Prisma2,
+        SqlFamily::Mysql if version_checker.is_prisma_1() => Version::Prisma1,
+        SqlFamily::Mysql if version_checker.is_prisma_1_1() => Version::Prisma11,
         SqlFamily::Mysql => Version::NonPrisma,
-        SqlFamily::Postgres if version_checker.is_prisma_2(warnings) => Version::Prisma2,
-        SqlFamily::Postgres if version_checker.is_prisma_1(warnings) => Version::Prisma1,
-        SqlFamily::Postgres if version_checker.is_prisma_1_1(warnings) => Version::Prisma11,
+        SqlFamily::Postgres if version_checker.is_prisma_2() => Version::Prisma2,
+        SqlFamily::Postgres if version_checker.is_prisma_1() => Version::Prisma1,
+        SqlFamily::Postgres if version_checker.is_prisma_1_1() => Version::Prisma11,
         SqlFamily::Postgres => Version::NonPrisma,
         SqlFamily::Mssql => Version::NonPrisma,
     }
@@ -123,18 +120,18 @@ impl VersionChecker {
             }
             SqlFamily::Postgres => {
                 if let Some(native_type) = &column.column_type().native_type {
-                    let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+                    let native_type: &PostgresType = native_type.downcast_ref();
 
-                    if !POSTGRES_TYPES.contains(&native_type) {
+                    if !POSTGRES_TYPES.contains(native_type) {
                         self.uses_non_prisma_types = true
                     }
                 }
             }
             SqlFamily::Mysql => {
                 if let Some(native_type) = &column.column_type().native_type {
-                    let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                    let native_type: &MySqlType = native_type.downcast_ref();
 
-                    if !MYSQL_TYPES.contains(&native_type) {
+                    if !MYSQL_TYPES.contains(native_type) {
                         self.uses_non_prisma_types = true
                     }
                 }
@@ -187,22 +184,22 @@ impl VersionChecker {
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {
-                            let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+                            let native_type: &PostgresType = native_type.downcast_ref();
 
-                            if native_type != PostgresType::VarChar(Some(25))
-                                && native_type != PostgresType::VarChar(Some(36))
-                                && native_type != PostgresType::Integer
+                            if native_type != &PostgresType::VarChar(Some(25))
+                                && native_type != &PostgresType::VarChar(Some(36))
+                                && native_type != &PostgresType::Integer
                             {
                                 self.always_has_p1_or_p_1_1_compatible_id = false
                             }
                         }
                     } else if self.sql_family == SqlFamily::Mysql {
                         if let Some(native_type) = &tpe.native_type {
-                            let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+                            let native_type: &MySqlType = native_type.downcast_ref();
 
-                            if native_type != MySqlType::Char(25)
-                                && native_type != MySqlType::Char(36)
-                                && native_type != MySqlType::Int
+                            if native_type != &MySqlType::Char(25)
+                                && native_type != &MySqlType::Char(36)
+                                && native_type != &MySqlType::Int
                             {
                                 self.always_has_p1_or_p_1_1_compatible_id = false
                             }
@@ -213,15 +210,11 @@ impl VersionChecker {
         }
     }
 
-    fn is_prisma_2(&self, warnings: &[Warning]) -> bool {
-        !self.has_relay_table
-            && !self.uses_on_delete
-            && !self.uses_non_prisma_types
-            && self.has_migration_table
-            && warnings.is_empty()
+    fn is_prisma_2(&self) -> bool {
+        !self.has_relay_table && !self.uses_on_delete && !self.uses_non_prisma_types && self.has_migration_table
     }
 
-    fn is_prisma_1_1(&self, warnings: &[Warning]) -> bool {
+    fn is_prisma_1_1(&self) -> bool {
         !self.has_migration_table
             && !self.has_relay_table
             && !self.uses_on_delete
@@ -229,10 +222,9 @@ impl VersionChecker {
             && !self.uses_non_prisma_types
             && !self.has_prisma_1_join_table
             && self.always_has_p1_or_p_1_1_compatible_id
-            && warnings.is_empty()
     }
 
-    fn is_prisma_1(&self, warnings: &[Warning]) -> bool {
+    fn is_prisma_1(&self) -> bool {
         !self.has_migration_table
             && !self.uses_on_delete
             && !self.uses_default_values
@@ -242,6 +234,5 @@ impl VersionChecker {
             && self.has_relay_table
             && self.always_has_created_at_updated_at
             && self.always_has_p1_or_p_1_1_compatible_id
-            && warnings.is_empty()
     }
 }

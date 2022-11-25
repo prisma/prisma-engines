@@ -49,7 +49,7 @@ model Test5 {
   test4 Test4[]
   @@schema("security")
 }
-
+// Expected Migration:
 // -- CreateSchema
 // CREATE SCHEMA IF NOT EXISTS "public";
 // 

@@ -7,14 +7,14 @@ use crate::{
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
 use indoc::{formatdoc, indoc};
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use psl::dml::PrismaValue;
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
 use std::{borrow::Cow, fmt::Write};
 
 impl MssqlFlavour {
-    fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> TableName<&'a str> {
-        TableName(
+    fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> QuotedWithPrefix<&'a str> {
+        QuotedWithPrefix(
             Some(Quoted::mssql_ident(
                 table.namespace().unwrap_or_else(|| self.schema_name()),
             )),
@@ -22,8 +22,8 @@ impl MssqlFlavour {
         )
     }
 
-    fn quote_with_schema<'a>(&'a self, name: &'a str) -> TableName<&'a str> {
-        TableName(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
+    fn quote_with_schema<'a>(&'a self, name: &'a str) -> QuotedWithPrefix<&'a str> {
+        QuotedWithPrefix(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
     }
 
     fn render_column(&self, column: sql::ColumnWalker<'_>) -> String {
@@ -149,7 +149,7 @@ impl SqlRenderer for MssqlFlavour {
         self.render_create_table_as(table, self.table_name(table))
     }
 
-    fn render_create_table_as(&self, table: sql::TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: sql::TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n    ");
         let mssql_schema_ext: &MssqlSchemaExt = table.schema.downcast_connector_data();
 
@@ -331,7 +331,7 @@ impl SqlRenderer for MssqlFlavour {
             }
 
             // Drop the old, now empty table.
-            result.extend(self.render_drop_table(tables.previous.name()));
+            result.extend(self.render_drop_table(None, tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
             result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
@@ -394,7 +394,7 @@ impl SqlRenderer for MssqlFlavour {
         add_constraint
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
         vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 
@@ -485,7 +485,7 @@ fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::Money => "MONEY".into(),
         MsSqlType::SmallMoney => "SMALLMONEY".into(),
         MsSqlType::Bit => "BIT".into(),
-        MsSqlType::Float(bits) => format!("FLOAT{bits}", bits = format_u32_arg(bits)).into(),
+        MsSqlType::Float(bits) => format!("FLOAT{bits}", bits = format_u32_arg(*bits)).into(),
 
         MsSqlType::Real => "REAL".into(),
         MsSqlType::Date => "DATE".into(),
@@ -494,14 +494,14 @@ fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::DateTime2 => "DATETIME2".into(),
         MsSqlType::DateTimeOffset => "DATETIMEOFFSET".into(),
         MsSqlType::SmallDateTime => "SMALLDATETIME".into(),
-        MsSqlType::NChar(len) => format!("NCHAR{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::Char(len) => format!("CHAR{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::VarChar(len) => format!("VARCHAR{len}", len = format_type_param(len)).into(),
+        MsSqlType::NChar(len) => format!("NCHAR{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::Char(len) => format!("CHAR{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::VarChar(len) => format!("VARCHAR{len}", len = format_type_param(*len)).into(),
         MsSqlType::Text => "TEXT".into(),
-        MsSqlType::NVarChar(len) => format!("NVARCHAR{len}", len = format_type_param(len)).into(),
+        MsSqlType::NVarChar(len) => format!("NVARCHAR{len}", len = format_type_param(*len)).into(),
         MsSqlType::NText => "NTEXT".into(),
-        MsSqlType::Binary(len) => format!("BINARY{len}", len = format_u32_arg(len)).into(),
-        MsSqlType::VarBinary(len) => format!("VARBINARY{len}", len = format_type_param(len)).into(),
+        MsSqlType::Binary(len) => format!("BINARY{len}", len = format_u32_arg(*len)).into(),
+        MsSqlType::VarBinary(len) => format!("VARBINARY{len}", len = format_type_param(*len)).into(),
         MsSqlType::Image => "IMAGE".into(),
         MsSqlType::Xml => "XML".into(),
         MsSqlType::UniqueIdentifier => "UNIQUEIDENTIFIER".into(),

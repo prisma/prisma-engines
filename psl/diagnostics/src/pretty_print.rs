@@ -1,5 +1,11 @@
 use crate::Span;
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
+
+pub trait DiagnosticColorer {
+    fn title(&self) -> &'static str;
+
+    fn primary_color(&self, token: &'_ str) -> ColoredString;
+}
 
 /// Given the datamodel text representation, pretty prints an error or warning, including
 /// the offending portion of the source code, for human-friendly reading.
@@ -9,6 +15,7 @@ pub(crate) fn pretty_print(
     text: &str,
     span: Span,
     description: &str,
+    colorer: &'static dyn DiagnosticColorer,
 ) -> std::io::Result<()> {
     let start_line_number = text[..span.start].matches('\n').count();
     let end_line_number = text[..span.end].matches('\n').count();
@@ -24,13 +31,18 @@ pub(crate) fn pretty_print(
     let end_in_line = std::cmp::min(start_in_line + (span.end - span.start), line.len());
 
     let prefix = &line[..start_in_line];
-    let offending = &line[start_in_line..end_in_line].bright_red().bold();
+    let offending = colorer.primary_color(&line[start_in_line..end_in_line]).bold();
     let suffix = &line[end_in_line..];
 
     let arrow = "-->".bright_blue().bold();
     let file_path = format!("{}:{}", file_name, start_line_number + 1).underline();
 
-    writeln!(f, "{}: {}", "error".bright_red().bold(), description.bold())?;
+    writeln!(
+        f,
+        "{}: {}",
+        colorer.primary_color(colorer.title()).bold(),
+        description.bold()
+    )?;
     writeln!(f, "  {}  {}", arrow, file_path)?;
     writeln!(f, "{}", format_line_number(0))?;
 
@@ -50,7 +62,7 @@ pub(crate) fn pretty_print(
             "{}{}{}",
             format_line_number(0),
             spacing,
-            "^ Unexpected token.".bold().bright_red()
+            colorer.primary_color("^ Unexpected token.").bold()
         )?;
     }
 

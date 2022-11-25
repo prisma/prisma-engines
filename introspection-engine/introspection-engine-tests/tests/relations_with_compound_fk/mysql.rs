@@ -57,7 +57,7 @@ async fn compound_foreign_keys_for_duplicate_one_to_many_relations(api: &TestApi
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("age", types::integer());
-                t.add_constraint("user_unique", types::unique_constraint(&["id", "age"]));
+                t.add_constraint("user_unique", types::unique_constraint(["id", "age"]));
             });
 
             migration.create_table("Post", |t| {

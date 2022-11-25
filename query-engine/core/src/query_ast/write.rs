@@ -1,6 +1,7 @@
 //! Write query AST
-use super::FilteredQuery;
-use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
+use super::{FilteredNestedMutation, FilteredQuery};
+use crate::RecordQuery;
+use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::{collections::HashMap, sync::Arc};
 
@@ -16,6 +17,7 @@ pub enum WriteQuery {
     DisconnectRecords(DisconnectRecords),
     ExecuteRaw(RawQuery),
     QueryRaw(RawQuery),
+    Upsert(NativeUpsert),
 }
 
 impl WriteQuery {
@@ -39,6 +41,15 @@ impl WriteQuery {
         args.update_datetimes(&model);
     }
 
+    pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        match self {
+            Self::UpdateManyRecords(x) => x.set_selectors(selectors),
+            Self::UpdateRecord(x) => x.set_selectors(selectors),
+            Self::DeleteRecord(x) => x.set_selectors(selectors),
+            _ => return,
+        }
+    }
+
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         let returns_id = &self.model().primary_identifier() == field_selection;
 
@@ -56,6 +67,7 @@ impl WriteQuery {
             Self::DisconnectRecords(_) => false,
             Self::ExecuteRaw(_) => false,
             Self::QueryRaw(_) => false,
+            Self::Upsert(_) => returns_id,
         }
     }
 
@@ -64,6 +76,7 @@ impl WriteQuery {
             Self::CreateRecord(q) => Arc::clone(&q.model),
             Self::CreateManyRecords(q) => Arc::clone(&q.model),
             Self::UpdateRecord(q) => Arc::clone(&q.model),
+            Self::Upsert(q) => q.model().clone(),
             Self::DeleteRecord(q) => Arc::clone(&q.model),
             Self::UpdateManyRecords(q) => Arc::clone(&q.model),
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
@@ -72,6 +85,25 @@ impl WriteQuery {
             Self::ExecuteRaw(_) => unimplemented!(),
             Self::QueryRaw(_) => unimplemented!(),
         }
+    }
+
+    pub fn native_upsert(
+        name: String,
+        model: ModelRef,
+        record_filter: RecordFilter,
+        create: WriteArgs,
+        update: WriteArgs,
+        read: RecordQuery,
+    ) -> crate::Query {
+        crate::Query::Write(WriteQuery::Upsert(NativeUpsert::new(
+            name,
+            model,
+            record_filter,
+            create,
+            update,
+            read.selected_fields,
+            read.selection_order,
+        )))
     }
 }
 
@@ -114,6 +146,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
             Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
             Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
+            Self::Upsert(q) => q.fmt(f),
         }
     }
 }
@@ -234,7 +267,27 @@ impl FilteredQuery for DeleteRecord {
             Some(ref mut rf) => rf.filter = filter,
             None => self.record_filter = Some(filter.into()),
         }
+    }
+}
 
-        //.filter = Some(filter)
+impl FilteredNestedMutation for UpdateRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for UpdateManyRecords {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        self.record_filter.selectors = Some(selectors);
+    }
+}
+
+impl FilteredNestedMutation for DeleteRecord {
+    fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
+        if let Some(ref mut rf) = self.record_filter {
+            rf.selectors = Some(selectors);
+        } else {
+            self.record_filter = Some(selectors.into())
+        }
     }
 }

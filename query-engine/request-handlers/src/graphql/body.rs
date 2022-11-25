@@ -54,7 +54,7 @@ impl From<&str> for SingleQuery {
 
 impl GraphQlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
-    pub(crate) fn into_doc(self) -> crate::Result<QueryDocument> {
+    pub fn into_doc(self) -> crate::Result<QueryDocument> {
         match self {
             GraphQlBody::Single(body) => {
                 let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;

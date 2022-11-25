@@ -49,22 +49,12 @@ impl ParserDatabase {
             .map(move |enum_id| Walker { db: self, id: enum_id })
     }
 
-    /// Find a model by ID.
-    pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'_> {
-        self.walk(model_id)
-    }
-
-    /// Find an enum by ID.
-    pub fn walk_enum(&self, enum_id: ast::EnumId) -> EnumWalker<'_> {
-        Walker { db: self, id: enum_id }
-    }
-
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_model_id())
-            .map(move |model_id| self.walk_model(model_id))
+            .map(move |model_id| self.walk(model_id))
     }
 
     /// Walk a specific composite type by ID.

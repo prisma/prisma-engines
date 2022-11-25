@@ -81,7 +81,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Post", |t| {
@@ -97,14 +97,14 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
                     "post_userid2_fk",
                     types::foreign_constraint(&["user_id2"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]));
-                t.add_constraint("Post_user_id_key", types::unique_constraint(&["user_id"]));
-                t.add_constraint("Post_user_id2_key", types::unique_constraint(&["user_id2"]));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
+                t.add_constraint("Post_user_id_key", types::unique_constraint(["user_id"]));
+                t.add_constraint("Post_user_id2_key", types::unique_constraint(["user_id2"]));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]))
             });
         })
         .await?;
@@ -160,7 +160,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Post", |t| {
@@ -171,12 +171,12 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
                     "Post_fkey",
                     types::foreign_constraint(&["user_id"], "User", &["id"], None, None),
                 );
-                t.add_constraint("Post_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]))
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]))
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]))
             });
         })
         .await?;
@@ -270,4 +270,134 @@ async fn updated_at(api: &TestApi) {
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+}
+
+#[test_connector(tags(Mssql))]
+async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE [User] (
+            first INT NOT NULL,
+            last INT NOT NULL,
+            CONSTRAINT [User.something@invalid-and/weird] PRIMARY KEY (first, last)
+        );
+
+        CREATE TABLE [User2] (
+            first INT NOT NULL,
+            last INT NOT NULL,
+            CONSTRAINT [User2_pkey] PRIMARY KEY (first, last)
+        );
+
+        CREATE TABLE [Unrelated] (
+            id INT IDENTITY,
+            CONSTRAINT [Unrelated_pkey] PRIMARY KEY (id)
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+         model User {
+           first  Int
+           last   Int
+
+           @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+
+         model User2 {
+           first  Int
+           last   Int
+
+           @@id([first, last], name: "compound")
+         }
+     "#};
+
+    let expectation = expect![[r#"
+         model User {
+           first Int
+           last  Int
+
+           @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+
+         model User2 {
+           first Int
+           last  Int
+
+           @@id([first, last], name: "compound")
+         }
+
+         model Unrelated {
+           id Int @id @default(autoincrement())
+         }
+     "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 18,
+            "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "model": "User"
+              },
+              {
+                "model": "User2"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE [User] (
+            id INT IDENTITY,
+            first INT NOT NULL,
+            last INT NOT NULL,
+            CONSTRAINT [User.something@invalid-and/weird] UNIQUE (first, last),
+            CONSTRAINT [User_pkey] PRIMARY KEY (id)
+        );
+
+        CREATE TABLE [Unrelated] (
+            id INT IDENTITY,
+            CONSTRAINT [Unrelated_pkey] PRIMARY KEY (id)
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+         model User {
+           id    Int @id @default(autoincrement())
+           first Int
+           last  Int
+
+           @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+     "#};
+
+    let expectation = expect![[r#"
+         model User {
+           id    Int @id @default(autoincrement())
+           first Int
+           last  Int
+
+           @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
+         }
+
+         model Unrelated {
+           id Int @id @default(autoincrement())
+         }
+     "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    Ok(())
 }

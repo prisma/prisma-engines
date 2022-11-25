@@ -3,13 +3,11 @@
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
 
-mod commenting_out_guardrails;
 mod defaults;
 mod error;
 mod introspection;
 mod introspection_helpers;
-mod prisma_1_defaults;
-mod re_introspection;
+mod introspection_map;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
 mod version_checker;
@@ -17,14 +15,17 @@ mod warnings;
 
 pub use error::*;
 
+use self::sanitize_datamodel_names::*;
 use enumflags2::BitFlags;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 use psl::PreviewFeature;
-use quaint::prelude::SqlFamily;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{
+    prelude::{ConnectionInfo, SqlFamily},
+    single::Quaint,
+};
 use schema_describer_loading::load_describer;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;

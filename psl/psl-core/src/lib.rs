@@ -14,7 +14,7 @@ mod reformat;
 mod validate;
 
 pub use crate::{
-    common::{PreviewFeature, RelationNames, ALL_PREVIEW_FEATURES},
+    common::{PreviewFeature, ALL_PREVIEW_FEATURES},
     configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
     reformat::reformat,
 };
@@ -78,10 +78,8 @@ fn validate_configuration(
     connectors: ConnectorRegistry,
 ) -> Configuration {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-    let preview_features = generators.iter().filter_map(|gen| gen.preview_features).collect();
 
-    let datasources =
-        datasource_loader::load_datasources_from_ast(schema_ast, preview_features, diagnostics, connectors);
+    let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
     Configuration {
         generators,

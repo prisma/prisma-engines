@@ -1,6 +1,76 @@
 #![allow(non_snake_case)]
-use prisma_models::*;
+use prisma_models::{dml::ReferentialAction, *};
 use std::sync::Arc;
+
+#[test]
+fn no_action_is_alias_for_restrict_when_prisma_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+        }
+
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "prisma"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::Restrict);
+    assert_eq!(relation.on_delete(), ReferentialAction::Restrict);
+}
+
+#[test]
+fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
+    let datamodel = convert(
+        r#"
+        generator client {
+            provider = "prisma-client-js"
+        }
+
+        datasource db {
+            provider = "mysql"
+            url      = "mysql://"
+            relationMode = "foreignKeys"
+        }
+
+        model A {
+            id Int @id
+            bs B[]
+        }
+
+        model B {
+            id Int @id
+            aId Int
+            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+        }
+        "#,
+    );
+
+    let relations = datamodel.relations();
+    assert_eq!(relations.len(), 1);
+
+    let relation = &relations[0];
+    assert_eq!(relation.on_update(), ReferentialAction::NoAction);
+    assert_eq!(relation.on_delete(), ReferentialAction::NoAction);
+}
 
 #[test]
 fn an_empty_datamodel_must_work() {

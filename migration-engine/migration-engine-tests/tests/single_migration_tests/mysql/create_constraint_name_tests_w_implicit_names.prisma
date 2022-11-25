@@ -1,0 +1,50 @@
+// tags=vitess
+
+datasource mydb {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model A {
+    id   Int    @id
+    name String @unique
+    a    String
+    b    String
+    B    B[]    @relation("AtoB")
+    @@unique([a, b], name: "compound")
+    @@index([a])
+}
+
+model B {
+    a   String
+    b   String
+    aId Int
+    A   A      @relation("AtoB", fields: [aId], references: [id])
+    @@index([a,b])
+    @@id([a, b])
+}
+
+// Expected Migration:
+// -- CreateTable
+// CREATE TABLE `A` (
+//     `id` INTEGER NOT NULL,
+//     `name` VARCHAR(191) NOT NULL,
+//     `a` VARCHAR(191) NOT NULL,
+//     `b` VARCHAR(191) NOT NULL,
+// 
+//     UNIQUE INDEX `A_name_key`(`name`),
+//     INDEX `A_a_idx`(`a`),
+//     UNIQUE INDEX `A_a_b_key`(`a`, `b`),
+//     PRIMARY KEY (`id`)
+// ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+// 
+// -- CreateTable
+// CREATE TABLE `B` (
+//     `a` VARCHAR(191) NOT NULL,
+//     `b` VARCHAR(191) NOT NULL,
+//     `aId` INTEGER NOT NULL,
+// 
+//     INDEX `B_a_b_idx`(`a`, `b`),
+//     PRIMARY KEY (`a`, `b`)
+// ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

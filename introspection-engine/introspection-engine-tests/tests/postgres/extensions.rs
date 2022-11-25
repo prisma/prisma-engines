@@ -337,3 +337,22 @@ async fn should_remove_missing_extensions(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("postgresqlExtensions"))]
+async fn no_extensions_means_no_extensions(api: &TestApi) -> TestResult {
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

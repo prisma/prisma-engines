@@ -46,7 +46,7 @@ fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "puppiesCount"])
         .values(("a", 7))
         .values(("b", 8));
 
@@ -81,7 +81,7 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), ["id"])
         .values(("a",))
         .values(("b",));
 
@@ -289,7 +289,7 @@ fn changing_a_column_from_required_to_optional_should_work(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
@@ -331,7 +331,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green();
 
-    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Int32(None)));
@@ -658,7 +658,7 @@ fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
         .assert_green();
 
     {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), ["id", "mood"])
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
@@ -689,7 +689,7 @@ fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
         .send();
 
     if api.is_mysql() {
-        res.assert_warnings(&["The values [OUTRAGED] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        res.assert_warnings(&["The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [OUTRAGED] on the enum `Human_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     } else {
         res.assert_warnings(&["The values [OUTRAGED] on the enum `Mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
     }
@@ -779,7 +779,7 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 }
 
 // exclude: there is a cockroach-specific test. It's unexecutable there.
-#[test_connector(preview_features("referentialIntegrity"), exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {

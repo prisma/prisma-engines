@@ -1,4 +1,5 @@
 use crate::constants::args;
+use crate::input_types::fields::arguments::where_argument;
 use crate::mutations::create_one;
 
 use super::*;
@@ -82,10 +83,14 @@ fn nested_upsert_nonlist_input_object(
             let input_object = Arc::new(init_input_object_type(ident.clone()));
             ctx.cache_input_type(ident, input_object.clone());
 
-            let fields = vec![
+            let mut fields = vec![
                 input_field(args::UPDATE, update_types, None),
                 input_field(args::CREATE, create_types, None),
             ];
+
+            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+                fields.push(where_argument(ctx, &related_model));
+            }
 
             input_object.set_fields(fields);
             Some(Arc::downgrade(&input_object))

@@ -355,7 +355,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("authorId", types::serial().unique(true));
+                t.add_column("authorId", types::serial());
 
                 t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
                 t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));
@@ -708,7 +708,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

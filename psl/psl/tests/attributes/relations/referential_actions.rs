@@ -19,9 +19,9 @@ fn on_delete_actions() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {})
             }}
         "#,
             action
@@ -47,9 +47,9 @@ fn on_update_actions() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onUpdate: {})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onUpdate: {})
             }}
         "#,
             action
@@ -80,9 +80,9 @@ fn actions_on_mongo() {
             }}
 
             model B {{
-                id Int @id @map("_id")
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id   Int @id @map("_id")
+                aId  Int?
+                a A? @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -104,7 +104,6 @@ fn actions_on_mysql_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -119,9 +118,9 @@ fn actions_on_mysql_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -143,7 +142,6 @@ fn actions_on_sqlserver_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -158,9 +156,9 @@ fn actions_on_sqlserver_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -182,7 +180,6 @@ fn actions_on_cockroachdb_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -197,9 +194,9 @@ fn actions_on_cockroachdb_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -221,7 +218,6 @@ fn actions_on_postgres_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -236,9 +232,9 @@ fn actions_on_postgres_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -260,7 +256,6 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
             r#"
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
     
             datasource db {{
@@ -275,9 +270,9 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -305,7 +300,6 @@ fn on_delete_actions_should_work_on_prisma_relation_mode() {
 
             generator client {{
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }}
 
             model A {{
@@ -314,9 +308,9 @@ fn on_delete_actions_should_work_on_prisma_relation_mode() {
             }}
 
             model B {{
-                id Int @id
-                aId Int
-                a A @relation(fields: [aId], references: [id], onDelete: {action})
+                id  Int  @id
+                aId Int?
+                a   A?   @relation(fields: [aId], references: [id], onDelete: {action})
             }}
         "#,
             action = action
@@ -340,7 +334,6 @@ fn on_update_no_action_should_work_on_prisma_relation_mode() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -363,7 +356,7 @@ fn on_update_no_action_should_work_on_prisma_relation_mode() {
 
 #[test]
 fn foreign_keys_not_allowed_on_mongo() {
-    let dml = indoc! {r#"
+    let schema = indoc! {r#"
         datasource db {
           provider = "mongodb"
           relationMode = "foreignKeys"
@@ -372,7 +365,6 @@ fn foreign_keys_not_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -396,7 +388,7 @@ fn foreign_keys_not_allowed_on_mongo() {
         [1;94m   | [0m
     "#]];
 
-    expected.assert_eq(&parse_config(dml).map(drop).unwrap_err())
+    expect_error(schema, &expected)
 }
 
 #[test]
@@ -410,7 +402,6 @@ fn prisma_level_integrity_should_be_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
 
         model A {
@@ -576,7 +567,6 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -598,11 +588,11 @@ fn on_update_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
         [1;94m   | [0m
     "#]];
 
@@ -614,7 +604,6 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -636,11 +625,11 @@ fn on_delete_no_action_should_not_work_on_postgres_with_prisma_relation_mode() {
     "#};
 
     let expected = expect!([r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for Postgres when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
         [1;94m   | [0m
     "#]);
 
@@ -652,7 +641,6 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -674,11 +662,11 @@ fn on_update_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monUpdate: NoAction[0m, onDelete: Cascade)
         [1;94m   | [0m
     "#]];
 
@@ -690,7 +678,6 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     let dml = indoc! { r#"
         generator client {
             provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
         }
 
         datasource db {
@@ -712,11 +699,11 @@ fn on_delete_no_action_should_not_work_on_sqlite_with_prisma_relation_mode() {
     "#};
 
     let expected = expect!([r#"
-        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relationMode[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+        [1;91merror[0m: [1mError validating: Invalid referential action: `NoAction`. Allowed values: (`Cascade`, `Restrict`, `SetNull`). `NoAction` is not implemented for sqlite when using `relationMode = "prisma"`, you could try using `Restrict` instead. Learn more at https://pris.ly/d/relation-mode[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], onUpdate: Cascade, [1;91monDelete: NoAction[0m)
         [1;94m   | [0m
     "#]);
 
@@ -775,7 +762,6 @@ fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
 
             generator client {
                 provider = "prisma-client-js"
-                previewFeatures = ["referentialIntegrity"]
             }
 
             model A {{
@@ -793,10 +779,10 @@ fn set_default_action_should_not_work_on_prisma_level_relation_mode() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
-          [1;94m-->[0m  [4mschema.prisma:20[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
         [1;94m   | [0m
-        [1;94m19 | [0m    aId Int
-        [1;94m20 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
+        [1;94m18 | [0m    aId Int
+        [1;94m19 | [0m    a A @relation(fields: [aId], references: [id], [1;91monDelete: SetDefault[0m)
         [1;94m   | [0m
     "#]];
 

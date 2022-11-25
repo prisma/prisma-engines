@@ -1,8 +1,21 @@
 use super::*;
-use crate::{query_document::ParsedField, ManyRecordsQuery, ReadQuery};
+use crate::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 use prisma_models::ModelRef;
 
 pub fn find_many(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+    find_many_with_options(field, model, QueryOptions::none())
+}
+
+pub fn find_many_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+    find_many_with_options(field, model, QueryOption::ThrowOnEmpty.into())
+}
+
+#[inline]
+fn find_many_with_options(
+    field: ParsedField,
+    model: ModelRef,
+    options: QueryOptions,
+) -> QueryGraphBuilderResult<ReadQuery> {
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let name = field.name;
     let alias = field.alias;
@@ -26,5 +39,6 @@ pub fn find_many(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         nested,
         selection_order,
         aggregation_selections,
+        options,
     }))
 }

@@ -3,7 +3,10 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use super::DestructiveCheckPlan;
+use super::{
+    check::{Column, Table},
+    DestructiveCheckPlan,
+};
 use crate::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
 use migration_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::ColumnWalker;
@@ -28,12 +31,9 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
         step_index: usize,
     );
 
-    fn count_rows_in_table<'a>(&'a mut self, table_name: &'a str) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>>;
 
-    fn count_values_in_column<'a>(
-        &'a mut self,
-        table_and_column: (&'a str, &'a str),
-    ) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>>;
 }
 
 /// Display a column type for warnings/errors.
@@ -42,18 +42,18 @@ fn display_column_type(
     connector: &dyn psl::datamodel_connector::Connector,
 ) -> String {
     match &column.column_type().native_type {
-        Some(tpe) => connector.introspect_native_type(tpe.clone()).to_string(),
+        Some(tpe) => connector.native_type_to_string(tpe),
         _ => format!("{:?}", column.column_type_family()),
     }
 }
 
-fn extract_table_rows_count(table_name: &str, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
+fn extract_table_rows_count(table: &Table, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
         .ok_or_else(|| {
             ConnectorError::from_msg(format!(
                 "No row was returned when checking for existing rows in the `{}` table.",
-                table_name
+                table.table
             ))
         })?
         .at(0)
@@ -61,7 +61,7 @@ fn extract_table_rows_count(table_name: &str, result_set: quaint::prelude::Resul
         .ok_or_else(|| {
             ConnectorError::from_msg(format!(
                 "No count was returned when checking for existing rows in the `{}` table.",
-                table_name
+                table.table
             ))
         })
 }

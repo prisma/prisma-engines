@@ -21,6 +21,7 @@ pub enum ObjectTag {
     // Holds the type against which a field can be compared
     FieldRefType(InputType),
     WhereInputType(ParentContainer),
+    NestedToOneUpdateEnvelope,
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -30,6 +31,10 @@ pub struct InputObjectTypeConstraints {
 
     /// The minimum number of fields that must be provided.
     pub max_num_fields: Option<usize>,
+
+    /// The fields against which the constraints should be applied.
+    /// If `None`, constraints should be applied on _all_ fields on the input object type.
+    pub fields: Option<Vec<String>>,
 }
 
 impl Debug for InputObjectType {
@@ -66,19 +71,24 @@ impl InputObjectType {
         self.get_fields().iter().find(|f| f.name == name).cloned()
     }
 
-    /// Allow exactly one field of the possible ones to be in the input.
+    /// Require exactly one field of the possible ones to be in the input.
     pub fn require_exactly_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(1);
     }
 
-    /// Allow at most one field of the possible ones to be in the input.
-    pub fn allow_at_most_one_field(&mut self) {
+    /// Require at least one field of the possible ones to be in the input.
+    pub fn require_at_least_one_field(&mut self) {
+        self.set_min_fields(1);
+    }
+
+    /// Require at most one field of the possible ones to be in the input.
+    pub fn require_at_most_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(0);
     }
 
-    /// Allow a maximum of `max` fields to be present in the input.
+    /// Require a maximum of `max` fields to be present in the input.
     pub fn set_max_fields(&mut self, max: usize) {
         self.constraints.max_num_fields = Some(max);
     }
@@ -86,6 +96,10 @@ impl InputObjectType {
     /// Require a minimum of `min` fields to be present in the input.
     pub fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
+    }
+
+    pub fn apply_constraints_on_fields(&mut self, fields: Vec<String>) {
+        self.constraints.fields = Some(fields);
     }
 
     pub fn set_tag(&mut self, tag: ObjectTag) {

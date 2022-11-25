@@ -85,7 +85,7 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
         fragment_defs.push(fragment);
     }
 
-    let preprocessed = FRAGMENT_RE.replace_all(&template, "#{}").to_owned();
+    let preprocessed = FRAGMENT_RE.replace_all(&template, "#{}");
 
     fragment_defs.into_iter().fold(preprocessed.to_string(), |aggr, next| {
         aggr.replacen("#{}", &renderer.render(next), 1)

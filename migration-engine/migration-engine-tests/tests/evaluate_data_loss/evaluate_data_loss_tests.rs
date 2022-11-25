@@ -275,6 +275,8 @@ fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: TestApi) {
     );
 
     let is_postgres = api.is_postgres();
+
+    #[allow(clippy::bool_to_int_with_if)]
     api.evaluate_data_loss(&directory, dm2)
         .send()
         .assert_warnings_with_indices(&[(warn.into(), if is_postgres { 1 } else { 0 })])

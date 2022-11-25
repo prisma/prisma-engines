@@ -63,6 +63,21 @@ mod transactional {
     }
 
     #[connector_test]
+    async fn batch_request_idx(runner: Runner) -> TestResult<()> {
+        let queries = vec![
+            r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
+            r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, true, None).await?;
+        let batch_request_idx = batch_results.errors().get(0).unwrap().batch_request_idx();
+
+        assert_eq!(batch_request_idx, Some(1usize));
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn one_query(runner: Runner) -> TestResult<()> {
         // Existing ModelA in the DB will prevent the nested ModelA creation in the batch.
         insta::assert_snapshot!(

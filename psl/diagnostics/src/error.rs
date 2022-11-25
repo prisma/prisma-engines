@@ -1,4 +1,9 @@
-use crate::{pretty_print::pretty_print, Span};
+use colored::{ColoredString, Colorize};
+
+use crate::{
+    pretty_print::{pretty_print, DiagnosticColorer},
+    Span,
+};
 use std::borrow::Cow;
 
 #[derive(Debug, Clone)]
@@ -321,8 +326,8 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
-        let msg = format!("Expected a {expected_type} value, but failed while parsing \"{raw}\": {parser_error}.");
+    pub fn new_value_parser_error(expected_type: &str, raw: &str, span: Span) -> DatamodelError {
+        let msg = format!("Expected {expected_type}, but found {raw}.");
         Self::new(msg, span)
     }
 
@@ -359,6 +364,11 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_referential_integrity_and_relation_mode_cooccur_error(span: Span) -> DatamodelError {
+        let msg = "The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.".to_string();
+        Self::new(msg, span)
+    }
+
     pub fn span(&self) -> Span {
         self.span
     }
@@ -368,6 +378,25 @@ impl DatamodelError {
     }
 
     pub fn pretty_print(&self, f: &mut dyn std::io::Write, file_name: &str, text: &str) -> std::io::Result<()> {
-        pretty_print(f, file_name, text, self.span(), self.message.as_ref())
+        pretty_print(
+            f,
+            file_name,
+            text,
+            self.span(),
+            self.message.as_ref(),
+            &DatamodelErrorColorer {},
+        )
+    }
+}
+
+struct DatamodelErrorColorer {}
+
+impl DiagnosticColorer for DatamodelErrorColorer {
+    fn title(&self) -> &'static str {
+        "error"
+    }
+
+    fn primary_color(&self, token: &'_ str) -> ColoredString {
+        token.bright_red()
     }
 }

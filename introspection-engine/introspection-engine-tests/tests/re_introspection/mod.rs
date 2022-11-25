@@ -1,5 +1,7 @@
 mod mssql;
 mod mysql;
+mod postgresql;
+mod relation_mode;
 mod sqlite;
 mod vitess;
 
@@ -68,12 +70,12 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
                 t.add_column("id", types::integer().increments(true));
                 t.add_column("_test", types::integer());
 
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -260,7 +262,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 
                 t.add_index("test2", types::index(vec!["index"]));
 
-                t.add_constraint("User_pkey", types::primary_constraint(&["id_1", "id_2"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id_1", "id_2"]));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -332,8 +334,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
-        let sql = "CREATE Type color as ENUM ( \'black\', \'white\')";
-        api.database().execute_raw(sql, &[]).await?;
+        api.raw_cmd("CREATE TYPE color AS ENUM ( \'black\', \'white\')").await;
     }
 
     api.barrel()
@@ -375,8 +376,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
 
             @@map("{enum_name}")
         }}
-    "#,
-        enum_name = enum_name,
+    "#
     );
 
     let final_dm = format!(
@@ -396,8 +396,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
 
             @@map("{enum_name}")
         }}
-    "#,
-        enum_name = enum_name,
+    "#
     );
 
     api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
@@ -405,9 +404,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     let expected = json!([{
         "code": 9,
         "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-        "affected": [{
-            "enm": "BlackNWhite"
-        }]
+        "affected": [{ "enm": "BlackNWhite" }],
     }]);
 
     assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
@@ -630,25 +627,13 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
-    if sql_family.is_postgres() {
-        let sql = r#"CREATE TYPE "invalid" as ENUM ('@', '-')"#;
-        api.database().execute_raw(sql, &[]).await?;
-    }
+    api.raw_cmd(r#"CREATE TYPE "invalid" as ENUM ('@', '-')"#).await;
 
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
-
-                let typ = if sql_family.is_postgres() {
-                    "invalid"
-                } else {
-                    "ENUM ('@', '-')"
-                };
-
-                t.add_column("sign", types::custom(typ).nullable(false));
+                t.add_column("sign", types::custom("invalid").nullable(false));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -657,47 +642,35 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let enum_name = if sql_family.is_postgres() {
-        "invalid"
-    } else {
-        "User_sign"
-    };
-
-    let input_dm = format!(
-        r#"
-        model User {{
+    let input_dm = r#"
+        model User {
             id               Int @id @default(autoincrement())
-            sign             {0}
-        }}
+            sign             invalid
+        }
 
-        enum {0} {{
+        enum invalid {
             at      @map("@")
             dash    @map("-")
-        }}
-    "#,
-        enum_name
-    );
+        }
+    "#;
 
-    let final_dm = format!(
-        r#"
-        model User {{
+    let final_dm = r#"
+        model User {
             id               Int @id @default(autoincrement())
-            sign             {0}
-        }}
+            sign             invalid
+        }
 
-        model Unrelated {{
+        model Unrelated {
             id               Int @id @default(autoincrement())
-        }}
+        }
 
-        enum {0} {{
+        enum invalid {
             at      @map("@")
             dash    @map("-")
-        }}
-    "#,
-        enum_name
-    );
+        }
+    "#;
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
 
     let expected = json!([{
         "code": 10,
@@ -708,7 +681,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
         ]
     }]);
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -934,26 +907,16 @@ async fn custom_model_order(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn custom_enum_order(api: &TestApi) -> TestResult {
-    let sql = "CREATE Type a as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type b as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type j as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type f as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type z as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type m as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
-
-    let sql = "CREATE Type l as ENUM ( \'id\')".to_string();
-    api.database().execute_raw(&sql, &[]).await?;
+    let sql = r#"
+        CREATE TYPE a AS ENUM ('id');
+        CREATE TYPE b AS ENUM ('id');
+        CREATE TYPE j AS ENUM ('id');
+        CREATE TYPE f AS ENUM ('id');
+        CREATE TYPE z AS ENUM ('id');
+        CREATE TYPE m AS ENUM ('id');
+        CREATE TYPE l AS ENUM ('id');
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = indoc! {r#"
         enum b {
@@ -1357,13 +1320,13 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     let final_dm = expect![[r#"
         model B {
           id        Int @id @default(autoincrement())
-          custom_A  A[]
+          custom_A  A[] @relation("AToB")
           special_A A[] @relation("AToB2")
         }
 
         model A {
           id        Int @id @default(autoincrement())
-          custom_B  B[]
+          custom_B  B[] @relation("AToB")
           special_B B[] @relation("AToB2")
         }
 
@@ -1379,19 +1342,17 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  ENUM('black', 'white') Not Null");
-            });
+    let sql = r#"
+        CREATE TABLE `User` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            color  ENUM('black', 'white') NOT NULL
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
+        CREATE TABLE `Unrelated` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = r#"
             model User {
@@ -1431,20 +1392,18 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
 
 #[test_connector(tags(Mysql))]
 async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> TestResult {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  ENUM('black', 'white') Not Null");
-                t.inject_custom("color2  ENUM('black', 'white') Not Null");
-            });
+    let sql = r#"
+        CREATE TABLE `User` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            color  ENUM('black', 'white') NOT NULL,
+            color2 ENUM('black', 'white') NOT NULL
+        );
 
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
+        CREATE TABLE `Unrelated` (
+            id INTEGER AUTO_INCREMENT PRIMARY KEY
+        );
+    "#;
+    api.raw_cmd(sql).await;
 
     let input_dm = r#"
             model User {
@@ -1459,33 +1418,23 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
             }
         "#;
 
-    let final_dm = r#"
-             model User {
-               id               Int @id @default(autoincrement())
-               color            BlackNWhite
-               color2           User_color2
-            }
+    let expected = expect![[r#"
+        model User {
+          id     Int         @id @default(autoincrement())
+          color  BlackNWhite
+          color2 BlackNWhite
+        }
 
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
 
-            enum BlackNWhite{
-                black
-                white
-            }
-
-            enum User_color2{
-                black
-                white
-            }
-        "#;
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-    assert_eq_json!(
-        serde_json::Value::Array(vec![]),
-        &api.re_introspect_warnings(input_dm).await?
-    );
-
+        enum BlackNWhite {
+          black
+          white
+        }
+    "#]];
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
     Ok(())
 }
 
@@ -1622,7 +1571,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
         .execute(|migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::integer().increments(true));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
             });
 
             migration.create_table("_FollowRelation", |t| {
@@ -1649,73 +1598,12 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     let final_dm = indoc! {r#"
         model User {
           id            Int         @id @default(autoincrement())
-          User_B        User[]      @relation("FollowRelation")
           User_A        User[]      @relation("FollowRelation")
+          User_B        User[]      @relation("FollowRelation")
         }
     "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_index(
-                    "User.something@invalid-and/weird",
-                    types::index(&["first", "last"]).unique(true),
-                );
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-     "#};
-
-    let final_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#};
-
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
 
     Ok(())
 }
@@ -1726,15 +1614,15 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
                 t.add_column("first", types::integer());
                 t.add_column("last", types::integer());
-                t.add_index("compound", types::index(&["first", "last"]).unique(true));
+                t.add_index("compound", types::index(["first", "last"]).unique(true));
             });
 
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
             });
         })
         .await?;
@@ -1764,97 +1652,6 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
      "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "compound"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint(
-                    "User.something@invalid-and/weird",
-                    types::primary_constraint(&["first", "last"]),
-                );
-            });
-
-            migration.create_table("User2", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint("User2_pkey", types::primary_constraint(&["first", "last"]));
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(&["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-     "#;
-
-    let final_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#;
-
-    let re_introspected = api.re_introspect(input_dm).await?;
-
-    api.assert_eq_datamodels(final_dm, &re_introspected);
-
-    let expected = json!([{
-        "code": 18,
-        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User"},
-            {"model": "User2"}
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
     Ok(())
 }
 
@@ -1906,23 +1703,23 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
 #[test_connector(tags(Postgres))]
 async fn re_introspecting_with_schemas_property(api: &TestApi) -> TestResult {
     let create_schema = "CREATE SCHEMA \"first\"";
-    let create_table = format!("CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)",);
+    let create_table = "CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)";
 
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(create_schema).await?;
+    api.database().raw_cmd(create_table).await?;
 
     let create_schema = "CREATE SCHEMA \"second\"";
-    let create_table = format!("CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)",);
+    let create_table = "CREATE TABLE \"second\".\"B\" (id TEXT PRIMARY KEY)";
 
-    api.database().raw_cmd(&create_schema).await?;
-    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(create_schema).await?;
+    api.database().raw_cmd(create_table).await?;
 
     let input_dm = indoc! {r#"
           generator client {
            provider        = "prisma-client-js"
            previewFeatures = ["multiSchema"]
          }
-         
+
          datasource myds {
            provider = "postgresql"
            url      = env("DATABASE_URL")

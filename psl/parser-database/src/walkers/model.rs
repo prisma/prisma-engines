@@ -118,7 +118,7 @@ impl<'db> ModelWalker<'db> {
 
     /// Walk a scalar field by id.
     #[track_caller]
-    pub(crate) fn scalar_field(self, field_id: ast::FieldId) -> ScalarFieldWalker<'db> {
+    pub fn scalar_field(self, field_id: ast::FieldId) -> ScalarFieldWalker<'db> {
         ScalarFieldWalker {
             model_id: self.id,
             field_id,

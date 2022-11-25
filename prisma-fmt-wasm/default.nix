@@ -1,14 +1,8 @@
-{ crane, nixpkgs, rust-overlay, system, src }:
+args@{ pkgs, system, src, ... }:
 
 let
-  overlays = [
-    rust-overlay.overlays.default
-    (self: super:
-      let toolchain = super.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml; in
-      { cargo = toolchain; rustc = toolchain; })
-  ];
-  pkgs = import nixpkgs { inherit system overlays; };
-  craneLib = crane.mkLib pkgs;
+  toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+  craneLib = args.craneLib.overrideToolchain toolchain;
 
   inherit (pkgs) jq nodejs coreutils rustPlatform wasm-bindgen-cli;
   inherit (builtins) readFile replaceStrings;
@@ -59,7 +53,7 @@ rec {
 
   checks = {
     prismaFmtWasmE2E = pkgs.runCommand "prismaFmtWasmE2E"
-      { prisma_fmt_wasm = packages.prisma-fmt-wasm; node = "${nodejs}/bin/node"; }
+      { PRISMA_FMT_WASM = packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
       (readFile ./scripts/check.sh);
   };
 }

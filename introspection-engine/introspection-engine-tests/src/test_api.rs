@@ -40,7 +40,7 @@ impl TestApi {
             .flat_map(|f| PreviewFeature::parse_opt(f))
             .collect();
 
-        let namespaces = args.namespaces().iter().map(|ns| ns.to_string()).collect();
+        let namespaces: Vec<String> = args.namespaces().iter().map(|ns| ns.to_string()).collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
             let params = ConnectorParams {
@@ -51,7 +51,9 @@ impl TestApi {
             let mut me = SqlMigrationConnector::new_mysql();
             me.set_params(params).unwrap();
 
-            me.reset(true).await.unwrap();
+            me.reset(true, migration_connector::Namespaces::from_vec(&mut namespaces.clone()))
+                .await
+                .unwrap();
 
             (
                 Quaint::new(connection_string).await.unwrap(),
@@ -253,12 +255,11 @@ impl TestApi {
     }
 
     pub fn datasource_block_string(&self) -> String {
-        let relation_mode =
-            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
-                "\nrelationMode = \"prisma\""
-            } else {
-                ""
-            };
+        let relation_mode = if self.is_vitess() {
+            "\nrelationMode = \"prisma\""
+        } else {
+            ""
+        };
 
         let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
 
@@ -282,7 +283,7 @@ impl TestApi {
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
         self.args.datasource_block(
             "env(TEST_DATABASE_URL)",
-            if self.is_vitess() && self.preview_features().contains(PreviewFeature::ReferentialIntegrity) {
+            if self.is_vitess() {
                 &[("relationMode", r#""prisma""#)]
             } else {
                 &[]
@@ -310,6 +311,14 @@ impl TestApi {
         let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();
 
         expectation.assert_eq(&reintrospected.data_model);
+    }
+
+    #[track_caller]
+    pub async fn expect_re_introspect_warnings(&self, schema: &str, expectation: expect_test::Expect) {
+        let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
+        let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
+
+        expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
     }
 
     #[track_caller]

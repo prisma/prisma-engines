@@ -30,6 +30,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -38,8 +39,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                 "tpe": {
                   "full_data_type": "int(11)",
                   "family": "Int",
-                  "arity": "Required",
-                  "native_type": "Int"
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": true
@@ -52,8 +52,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                 "tpe": {
                   "full_data_type": "text",
                   "family": "String",
-                  "arity": "Required",
-                  "native_type": "Text"
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": false
@@ -102,6 +101,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -110,8 +110,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                 "tpe": {
                   "full_data_type": "int",
                   "family": "Int",
-                  "arity": "Required",
-                  "native_type": "Int"
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": true
@@ -124,8 +123,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                 "tpe": {
                   "full_data_type": "text",
                   "family": "String",
-                  "arity": "Required",
-                  "native_type": "Text"
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": false
@@ -176,6 +174,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -184,8 +183,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                 "tpe": {
                   "full_data_type": "int4",
                   "family": "Int",
-                  "arity": "Required",
-                  "native_type": "Integer"
+                  "arity": "Required"
                 },
                 "default": {
                   "kind": {
@@ -203,8 +201,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                 "tpe": {
                   "full_data_type": "text",
                   "family": "String",
-                  "arity": "Required",
-                  "native_type": "Text"
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": false
@@ -253,6 +250,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
             }
           ],
           "enums": [],
+          "enum_variants": [],
           "columns": [
             [
               0,
@@ -261,8 +259,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                 "tpe": {
                   "full_data_type": "integer",
                   "family": "Int",
-                  "arity": "Required",
-                  "native_type": null
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": true
@@ -275,8 +272,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                 "tpe": {
                   "full_data_type": "text",
                   "family": "String",
-                  "arity": "Required",
-                  "native_type": null
+                  "arity": "Required"
                 },
                 "default": null,
                 "auto_increment": false
