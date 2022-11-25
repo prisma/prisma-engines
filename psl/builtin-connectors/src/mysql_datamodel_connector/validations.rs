@@ -1,3 +1,4 @@
+use indoc::formatdoc;
 use psl_core::diagnostics::{DatamodelWarning, Span};
 use psl_core::parser_database::ast::WithSpan;
 use psl_core::parser_database::ReferentialAction;
@@ -106,12 +107,16 @@ pub(crate) fn uses_native_referential_action_set_default(
     };
 
     let warning_msg = || {
-        format!(
-            "Using {set_default} on {connector} may yield to unexpected results, as the database will silently change the referential action to `{no_action}`.",
+        let details = formatdoc!(
+            r#"
+            `{connector_name}` does not actually support the `{set_default}` referential action, so using it may result in unexpected errors.
+            Read more at https://pris.ly/d/mysql-set-default
+            "#,
+            connector_name = connector.name(),
             set_default = ReferentialAction::SetDefault.as_str(),
-            connector = connector.name(),
-            no_action = ReferentialAction::NoAction.as_str(),
         )
+        .replace('\n', " ");
+        details
     };
 
     if let Some(ReferentialAction::SetDefault) = field.explicit_on_delete() {

@@ -302,6 +302,7 @@ dependencies = [
  "connection-string",
  "either",
  "enumflags2",
+ "indoc",
  "lsp-types",
  "once_cell",
  "psl-core",
