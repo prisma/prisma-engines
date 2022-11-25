@@ -28,9 +28,14 @@ impl DatamodelWarning {
     }
 
     pub fn new_missing_index_on_emulated_relation(span: Span) -> DatamodelWarning {
-        let message = indoc! {
-            r#"With `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes"#
-        };
+        let message = indoc!(
+            r#"
+            With `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood.
+            This can lead to poor performance when querying these fields. We recommend adding an index manually.
+            Learn more at https://pris.ly/d/relation-mode-prisma-indexes"
+            "#,
+        )
+        .replace('\n', " ");
         Self::new(message.to_owned(), span)
     }
 

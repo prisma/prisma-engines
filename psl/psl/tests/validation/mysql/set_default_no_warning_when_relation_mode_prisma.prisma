@@ -18,7 +18,7 @@ model B {
     aId Int? @default(3)
     a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, onDelete: SetDefault)
 }
-// [1;93mwarning[0m: [1mWith `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes[0m
+// [1;93mwarning[0m: [1mWith `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes" [0m
 //   [1;94m-->[0m  [4mschema.prisma:19[0m
 // [1;94m   | [0m
 // [1;94m18 | [0m    aId Int? @default(3)
