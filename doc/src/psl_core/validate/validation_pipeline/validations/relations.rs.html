@@ -567,6 +567,35 @@
 <span id="567">567</span>
 <span id="568">568</span>
 <span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>many_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_one;
@@ -576,7 +605,8 @@
 <span class="kw">use </span><span class="kw">super</span>::constraint_namespace::ConstraintName;
 <span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, Connector, ConnectorCapability, RelationMode};
 <span class="kw">use crate</span>::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-<span class="kw">use </span>indoc::indoc;
+<span class="kw">use </span>diagnostics::DatamodelWarning;
+<span class="kw">use </span>indoc::formatdoc;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>parser_database::ReferentialAction;
 <span class="kw">use </span>parser_database::{
@@ -1114,26 +1144,54 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_delete() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            <span class="macro">indoc! </span>{<span class="string">r#&quot;
-                The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-                Either choose another referential action, or make the referenced fields optional.
-            &quot;#</span>},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
-    }
+    <span class="kw">let </span>span = forward.ast_field().span();
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_update() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            <span class="macro">indoc! </span>{<span class="string">r#&quot;
-                The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+    <span class="kw">if </span>ctx
+        .connector
+        .allows_set_null_referential_action_on_non_nullable_fields(ctx.relation_mode)
+    {
+        <span class="comment">// the database allows SetNull on non-nullable fields, we add a validation warning to avoid breaking changes
+        </span><span class="kw">let </span>warning_template = |referential_action_type: <span class="kw-2">&amp;</span>str| {
+            <span class="kw">let </span>set_null = ReferentialAction::SetNull.as_str();
+            <span class="kw">let </span>msg = <span class="macro">formatdoc! </span>{<span class="string">r#&quot;
+                The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required. We recommend either to choose another referential action, or to make the referenced fields optional. Read more at https://pris.ly/d/postgres-set-null
+            &quot;#</span>};
+            msg
+        };
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_warning(DatamodelWarning::new(warning_template(<span class="string">&quot;onDelete&quot;</span>), span))
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_warning(DatamodelWarning::new(warning_template(<span class="string">&quot;onUpdate&quot;</span>), span))
+        }
+    } <span class="kw">else </span>{
+        <span class="comment">// the database allows does not allow SetNull on non-nullable fields, we add a validation error
+        </span><span class="kw">let </span>error_template = |referential_action_type: <span class="kw-2">&amp;</span>str| {
+            <span class="kw">let </span>set_null = ReferentialAction::SetNull.as_str();
+            <span class="kw">let </span>msg = <span class="macro">formatdoc! </span>{<span class="string">r#&quot;
+                The `{referential_action_type}` referential action of a relation must not be set to `{set_null}` when a referenced field is required.
                 Either choose another referential action, or make the referenced fields optional.
-            &quot;#</span>},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
+            &quot;#</span>};
+            msg
+        };
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                <span class="kw-2">&amp;</span>error_template(<span class="string">&quot;onDelete&quot;</span>),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                <span class="kw-2">&amp;</span>error_template(<span class="string">&quot;onUpdate&quot;</span>),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
     }
 }
 </code></pre></div>
