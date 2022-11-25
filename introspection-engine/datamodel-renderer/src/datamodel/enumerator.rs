@@ -37,12 +37,10 @@ impl<'a> EnumVariant<'a> {
     ///             ^^^ this
     /// }
     /// ```
-    pub fn map(&mut self, value: Option<impl Into<Cow<'a, str>>>) {
-        if let Some(value) = value {
-            let mut map = Function::new("map");
-            map.push_param(value.into());
-            self.map = Some(FieldAttribute::new(map));
-        }
+    pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
+        let mut map = Function::new("map");
+        map.push_param(value.into());
+        self.map = Some(FieldAttribute::new(map));
     }
 
     /// Comments the variant out in the declaration.
@@ -53,8 +51,8 @@ impl<'a> EnumVariant<'a> {
     ///   ^^ adds this
     /// }
     /// ```
-    pub fn comment_out(&mut self, comment_out: bool) {
-        self.comment_out = comment_out;
+    pub fn comment_out(&mut self) {
+        self.comment_out = true;
     }
 
     /// Documentation of a variant.
@@ -65,8 +63,8 @@ impl<'a> EnumVariant<'a> {
     ///   Bar
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: Option<impl Into<Cow<'a, str>>>) {
-        self.documentation = documentation.map(|d| Documentation(d.into()));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 }
 
@@ -226,18 +224,18 @@ mod tests {
         r#enum.push_variant("Red");
         {
             let mut green = EnumVariant::new("Green".into());
-            green.map(Some("1Green"));
+            green.map("1Green");
             r#enum.push_variant(green);
         }
 
         let mut variant = EnumVariant::new("Blue".into());
-        variant.map("Yellow".into());
-        variant.documentation(Some("Twenty-first century schizoid man!"));
+        variant.map("Yellow");
+        variant.documentation("Twenty-first century schizoid man!");
 
         r#enum.push_variant(variant);
 
         let mut variant = EnumVariant::new("Invalid".into());
-        variant.comment_out(true);
+        variant.comment_out();
         r#enum.push_variant(variant);
         r#enum.push_variant("Black");
 

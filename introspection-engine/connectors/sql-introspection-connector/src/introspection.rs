@@ -9,32 +9,34 @@ mod postgres;
 mod prisma_relation_mode;
 mod relation_names;
 
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, SqlError};
+use crate::calculate_datamodel::{InputContext, OutputContext};
+pub(crate) use crate::SqlError;
 
-pub(crate) fn introspect(ctx: &mut Context) -> Result<(String, bool), SqlError> {
-    enums::render(ctx);
-    models::render(ctx);
+pub(crate) fn introspect<'a>(
+    input: InputContext<'a>,
+    output: &mut OutputContext<'a>,
+) -> Result<(String, bool), SqlError> {
+    enums::render(input, output);
+    models::render(input, output);
 
-    if ctx.foreign_keys_enabled() {
-        let relation_names = relation_names::introspect(ctx);
+    if input.foreign_keys_enabled() {
+        let relation_names = relation_names::introspect(input);
 
-        inline_relations::render(&relation_names, ctx);
-        m2m_relations::render(&relation_names, ctx);
+        inline_relations::render(&relation_names, input, output);
+        m2m_relations::render(&relation_names, input, output);
     } else {
-        prisma_relation_mode::render(ctx);
+        prisma_relation_mode::render(input, output);
     }
 
-    let rendered = if ctx.render_config {
+    let rendered = if input.render_config {
         format!(
             "{}\n{}",
-            configuration::render(ctx.config, ctx.schema),
-            ctx.rendered_schema
+            configuration::render(input.config, input.schema),
+            output.rendered_schema
         )
     } else {
-        ctx.rendered_schema.to_string()
+        output.rendered_schema.to_string()
     };
 
-    ctx.finalize_warnings();
-
-    Ok((psl::reformat(&rendered, 2).unwrap(), ctx.rendered_schema.is_empty()))
+    Ok((psl::reformat(&rendered, 2).unwrap(), output.rendered_schema.is_empty()))
 }

@@ -88,6 +88,15 @@ pub trait Connector: Send + Sync {
         RelationMode::allowed_emulated_referential_actions_default()
     }
 
+    /// Most SQL databases reject table definitions with a SET NULL referential action referencing a non-nullable field,
+    /// but that's not true for all of them.
+    /// This was introduced because Postgres accepts data definition language statements with the SET NULL
+    /// referential action referencing non-nullable fields, although this would lead to a runtime error once
+    /// the action is actually triggered.
+    fn allows_set_null_referential_action_on_non_nullable_fields(&self, _relation_mode: RelationMode) -> bool {
+        false
+    }
+
     fn supports_composite_types(&self) -> bool {
         self.has_capability(ConnectorCapability::CompositeTypes)
     }

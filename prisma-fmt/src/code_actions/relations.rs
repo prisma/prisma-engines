@@ -332,8 +332,9 @@ fn create_block_attribute<'a>(
     };
     let new_text = format!("{separator}{indentation}@@{attribute_name}([{fields}]){newline}}}");
 
-    let start = crate::offset_to_position(model.ast_model().span().end - 1, schema).unwrap();
-    let end = crate::offset_to_position(model.ast_model().span().end, schema).unwrap();
+    let start = crate::offset_to_position(model.ast_model().span().end - 1, schema);
+    let end = crate::offset_to_position(model.ast_model().span().end, schema);
+
     let range = Range { start, end };
 
     (new_text, range)

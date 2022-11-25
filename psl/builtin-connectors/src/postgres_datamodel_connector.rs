@@ -267,6 +267,12 @@ impl Connector for PostgresDatamodelConnector {
         Restrict | SetNull | Cascade
     }
 
+    /// Postgres accepts table definitions with a SET NULL referential action referencing a non-nullable field,
+    /// although that would lead to a runtime error once the action is actually triggered.
+    fn allows_set_null_referential_action_on_non_nullable_fields(&self, relation_mode: RelationMode) -> bool {
+        relation_mode.uses_foreign_keys()
+    }
+
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
         let native_type: &PostgresType = native_type.downcast_ref();
 
