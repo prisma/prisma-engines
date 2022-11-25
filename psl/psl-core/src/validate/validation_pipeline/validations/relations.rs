@@ -554,11 +554,16 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
     {
         // the database allows SetNull on non-nullable fields, we add a validation warning to avoid breaking changes
         let warning_template = |referential_action_type: &str| {
-            let set_null = ReferentialAction::SetNull.as_str();
-            let msg = formatdoc! {r#"
-                The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required. We recommend either to choose another referential action, or to make the referenced fields optional. Read more at https://pris.ly/d/postgres-set-null
-            "#};
-            msg
+            let details = formatdoc!(
+                    r#"
+                    The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required.
+                    We recommend either to choose another referential action, or to make the referenced fields optional.
+                    Read more at https://pris.ly/d/postgres-set-null
+                    "#,
+                    set_null = ReferentialAction::SetNull.as_str(),
+                )
+                .replace('\n', " ");
+            details
         };
 
         if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
