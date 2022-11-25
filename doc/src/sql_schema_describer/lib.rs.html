@@ -1085,7 +1085,7 @@
         (<span class="number">0</span>..<span class="self">self</span>.user_defined_types.len()).map(<span class="kw">move </span>|udt_index| <span class="self">self</span>.walk(UdtId(udt_index <span class="kw">as </span>u32)))
     }
 
-    <span class="kw">pub fn </span>enum_walkers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">pub fn </span>enum_walkers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         (<span class="number">0</span>..<span class="self">self</span>.enums.len()).map(<span class="kw">move </span>|enum_index| <span class="self">self</span>.walk(EnumId(enum_index <span class="kw">as </span>u32)))
     }
 

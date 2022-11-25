@@ -254,9 +254,42 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    introspection::introspect, warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait,
-    SqlIntrospectionResult,
+    introspection::introspect,
+    pair::{EnumPair, Pair},
+    warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
 <span class="kw">use </span>introspection_connector::{IntrospectionContext, IntrospectionResult, Version, Warning};
 <span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Connector, parser_database::walkers, Configuration};
@@ -264,14 +297,9 @@
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) sql_family: SqlFamily,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;Warning&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) previous_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Warnings {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: Vec&lt;Warning&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) prisma_1_uuid_defaults: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) prisma_1_cuid_defaults: Vec&lt;warnings::ModelAndField&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields_with_empty_names: Vec&lt;warnings::ModelAndField&gt;,
@@ -282,31 +310,140 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) reintrospected_id_names: Vec&lt;warnings::Model&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) unsupported_types: Vec&lt;warnings::ModelAndFieldAndType&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) remapped_models: Vec&lt;warnings::Model&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) target_models: HashMap&lt;sql::TableId, usize&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CalculateDatamodelContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_cockroach(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+<span class="kw">impl </span>Warnings {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            warnings: Vec::new(),
+            ..Default::default()
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, warning: Warning) {
+        <span class="self">self</span>.warnings.push(warning);
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;Warning&gt; {
+        <span class="kw">fn </span>maybe_warn&lt;T&gt;(elems: <span class="kw-2">&amp;</span>[T], warning: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>[T]) -&gt; Warning, warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;) {
+            <span class="kw">if </span>!elems.is_empty() {
+                warnings.push(warning(elems))
+            }
+        }
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.models_without_identifiers,
+            warnings::warning_models_without_identifier,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.unsupported_types,
+            warnings::warning_unsupported_types,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.remapped_models,
+            warnings::warning_enriched_with_map_on_model,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.remapped_fields,
+            warnings::warning_enriched_with_map_on_field,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.models_without_columns,
+            warnings::warning_models_without_columns,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.reintrospected_id_names,
+            warnings::warning_enriched_with_custom_primary_key_names,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.prisma_1_uuid_defaults,
+            warnings::warning_default_uuid_warning,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.prisma_1_cuid_defaults,
+            warnings::warning_default_cuid_warning,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.enum_values_with_empty_names,
+            warnings::warning_enum_values_with_empty_names,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        maybe_warn(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.fields_with_empty_names,
+            warnings::warning_fields_with_empty_names,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings,
+        );
+
+        std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings)
+    }
+}
+
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InputContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) sql_family: SqlFamily,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) previous_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">crate</span>::introspection_map::IntrospectionMap,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) target_models: HashMap&lt;sql::TableId, usize&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: Warnings,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OutputContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize_warnings(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;Warning&gt; {
+        <span class="self">self</span>.warnings.finalize()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_cockroach(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.active_connector().provider_name() == COCKROACH.provider_name()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; psl::datamodel_connector::RelationMode {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_mode(<span class="self">self</span>) -&gt; psl::datamodel_connector::RelationMode {
         <span class="self">self</span>.config.datasources.first().unwrap().relation_mode()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_keys_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_keys_enabled(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.relation_mode().uses_foreign_keys()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>active_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>active_connector(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector {
         <span class="self">self</span>.config.datasources.first().unwrap().active_connector
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.schema
+            .enum_walkers()
+            .map(<span class="kw">move </span>|next| Pair::new(<span class="self">self</span>, <span class="self">self</span>.existing_enum(next.id), next))
     }
 
     <span class="doccomment">/// Given a SQL enum from the database, this method returns the enum that matches it (by name)
     /// in the Prisma schema.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::EnumId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_enum(<span class="self">self</span>, id: sql::EnumId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
             .existing_enums
             .get(<span class="kw-2">&amp;</span>id)
@@ -316,7 +453,7 @@
     <span class="doccomment">/// Given a SQL enum from the database, this method returns the name it will be given in the
     /// introspected schema. If it matches a remapped enum in the Prisma schema, it is taken into
     /// account.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::EnumId) -&gt; ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_prisma_name(<span class="self">self</span>, id: sql::EnumId) -&gt; ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.existing_enum(id)
             .map(|enm| ModelName::FromPsl {
                 name: enm.name(),
@@ -328,9 +465,10 @@
     <span class="doccomment">/// Given a SQL enum variant from the database catalog, this method returns the name it will be
     /// given in the introspected schema. If it matches a remapped enum value in the Prisma schema,
     /// it is taken into account.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_variant_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::EnumVariantId) -&gt; EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_variant_name(<span class="self">self</span>, id: sql::EnumVariantId) -&gt; EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">let </span>variant = <span class="self">self</span>.schema.walk(id);
         <span class="kw">let </span>variant_name = variant.name();
+
         <span class="self">self</span>.existing_enum(variant.r#enum().id)
             .and_then(|enm| enm.values().find(|val| val.database_name() == variant_name))
             .map(|enm_value| EnumVariantName::FromPsl {
@@ -342,7 +480,7 @@
 
     <span class="doccomment">/// Given a foreign key from the database, this methods returns the existing relation in the
     /// Prisma schema that matches it.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_inline_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ForeignKeyId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_inline_relation(<span class="self">self</span>, id: sql::ForeignKeyId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
             .existing_inline_relations
             .get(<span class="kw-2">&amp;</span>id)
@@ -350,7 +488,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_m2m_relation(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="self">self</span>,
         id: sql::TableId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ImplicitManyToManyRelationWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
@@ -359,21 +497,21 @@
             .map(|relation_id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>relation_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_model(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::TableId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_model(<span class="self">self</span>, id: sql::TableId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
             .existing_models
             .get(<span class="kw-2">&amp;</span>id)
             .map(|id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_scalar_field(<span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
             .existing_scalar_fields
             .get(<span class="kw-2">&amp;</span>id)
             .map(|(model_id, field_id)| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>model_id).scalar_field(<span class="kw-2">*</span>field_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="kw">crate</span>::IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_prisma_name(<span class="self">self</span>, id: sql::ColumnId) -&gt; <span class="kw">crate</span>::IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.existing_scalar_field(id)
             .map(|sf| IntrospectedName::FromPsl {
                 name: sf.name(),
@@ -383,7 +521,7 @@
     }
 
     <span class="comment">// Use the existing model name when available.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::TableId) -&gt; <span class="kw">crate</span>::ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_prisma_name(<span class="self">self</span>, id: sql::TableId) -&gt; <span class="kw">crate</span>::ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.existing_model(id)
             .map(|model| ModelName::FromPsl {
                 name: model.name(),
@@ -392,74 +530,6 @@
             <span class="comment">// Failing that, potentially sanitize the table name.
             </span>.unwrap_or_else(|| ModelName::new_from_sql(<span class="self">self</span>.schema.walk(id).name()))
     }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize_warnings(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">fn </span>maybe_warn&lt;T&gt;(elems: <span class="kw-2">&amp;</span>[T], warning: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>[T]) -&gt; Warning, warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;) {
-            <span class="kw">if </span>!elems.is_empty() {
-                warnings.push(warning(elems))
-            }
-        }
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.models_without_identifiers,
-            warnings::warning_models_without_identifier,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.unsupported_types,
-            warnings::warning_unsupported_types,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.remapped_models,
-            warnings::warning_enriched_with_map_on_model,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.remapped_fields,
-            warnings::warning_enriched_with_map_on_field,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.models_without_columns,
-            warnings::warning_models_without_columns,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.reintrospected_id_names,
-            warnings::warning_enriched_with_custom_primary_key_names,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.prisma_1_uuid_defaults,
-            warnings::warning_default_uuid_warning,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.prisma_1_cuid_defaults,
-            warnings::warning_default_cuid_warning,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.enum_values_with_empty_names,
-            warnings::warning_enum_values_with_empty_names,
-            <span class="self">self</span>.warnings,
-        );
-
-        maybe_warn(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.fields_with_empty_names,
-            warnings::warning_fields_with_empty_names,
-            <span class="self">self</span>.warnings,
-        )
-    }
 }
 
 <span class="doccomment">/// Calculate a data model from a database schema.
@@ -467,40 +537,34 @@
     schema: <span class="kw-2">&amp;</span>sql::SqlSchema,
     ctx: <span class="kw-2">&amp;</span>IntrospectionContext,
 ) -&gt; SqlIntrospectionResult&lt;IntrospectionResult&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>warnings = Vec::new();
+    <span class="kw">let </span>introspection_map = <span class="kw">crate</span>::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema());
 
-    <span class="kw">let </span><span class="kw-2">mut </span>context = CalculateDatamodelContext {
+    <span class="kw">let </span>input = InputContext {
         config: ctx.configuration(),
         render_config: ctx.render_config,
         schema,
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),
-        warnings: <span class="kw-2">&amp;mut </span>warnings,
-        introspection_map: <span class="kw">crate</span>::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema()),
-        version: Version::NonPrisma,
-        prisma_1_uuid_defaults: Vec::new(),
-        prisma_1_cuid_defaults: Vec::new(),
-        fields_with_empty_names: Vec::new(),
-        enum_values_with_empty_names: Vec::new(),
-        models_without_columns: Vec::new(),
-        models_without_identifiers: Vec::new(),
-        rendered_schema: datamodel_renderer::Datamodel::default(),
-        target_models: HashMap::default(),
-        unsupported_types: Vec::new(),
-        remapped_models: Vec::new(),
-        remapped_fields: Vec::new(),
-        reintrospected_id_names: Vec::new(),
+        introspection_map: <span class="kw-2">&amp;</span>introspection_map,
     };
 
-    context.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>context);
+    <span class="kw">let </span><span class="kw-2">mut </span>output = OutputContext {
+        version: Version::NonPrisma,
+        rendered_schema: datamodel_renderer::Datamodel::default(),
+        target_models: HashMap::default(),
+        warnings: Warnings::new(),
+    };
 
-    <span class="kw">let </span>(schema_string, is_empty) = introspect(<span class="kw-2">&amp;mut </span>context)<span class="question-mark">?</span>;
+    output.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>input);
+
+    <span class="kw">let </span>(schema_string, is_empty) = introspect(input, <span class="kw-2">&amp;mut </span>output)<span class="question-mark">?</span>;
+    <span class="kw">let </span>warnings = output.finalize_warnings();
 
     <span class="comment">// Warning codes 5 and 6 are for Prisma 1 default reintrospection.
-    </span><span class="kw">let </span>version = <span class="kw">if </span>context.warnings.iter().any(|w| ![<span class="number">5</span>, <span class="number">6</span>].contains(<span class="kw-2">&amp;</span>w.code)) {
+    </span><span class="kw">let </span>version = <span class="kw">if </span>warnings.iter().any(|w| ![<span class="number">5</span>, <span class="number">6</span>].contains(<span class="kw-2">&amp;</span>w.code)) {
         Version::NonPrisma
     } <span class="kw">else </span>{
-        context.version
+        output.version
     };
 
     <span class="prelude-val">Ok</span>(IntrospectionResult {

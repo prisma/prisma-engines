@@ -97,50 +97,26 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings, EnumVariantName, ModelName};
-<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
-<span class="kw">use </span>psl::{
-    parser_database::{ast, walkers},
-    schema_ast::ast::WithDocumentation,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::<span class="kw-2">*</span>,
+    pair::EnumPair,
+    sanitize_datamodel_names, warnings,
 };
-<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
-<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
+<span class="kw">use </span>psl::parser_database::ast;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="kw">let </span><span class="kw-2">mut </span>all_enums: Vec&lt;(<span class="prelude-ty">Option</span>&lt;ast::EnumId&gt;, renderer::Enum)&gt; = ctx
-        .schema
-        .enum_walkers()
-        .map(|enm| {
-            <span class="kw">let </span>existing_enum = ctx.existing_enum(enm.id);
-            <span class="kw">let </span>rendered_enum = render_enum(enm, existing_enum, ctx);
-            (existing_enum.map(|e| e.id), rendered_enum)
-        })
-        .collect();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>all_enums: Vec&lt;(<span class="prelude-ty">Option</span>&lt;ast::EnumId&gt;, renderer::Enum)&gt; = Vec::new();
+
+    <span class="kw">for </span>pair <span class="kw">in </span>input.enum_pairs() {
+        <span class="kw">let </span>rendered_enum = render_enum(pair, output);
+        all_enums.push((pair.previous_position(), rendered_enum))
+    }
 
     all_enums.sort_by(|(id_a, <span class="kw">_</span>), (id_b, <span class="kw">_</span>)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
 
-    <span class="kw">if </span>ctx.sql_family.is_mysql() {
+    <span class="kw">if </span>input.sql_family.is_mysql() {
         <span class="comment">// MySQL can have multiple database enums matching one Prisma enum.
         </span>all_enums.dedup_by(|(id_a, <span class="kw">_</span>), (id_b, <span class="kw">_</span>)| <span class="kw">match </span>(id_a, id_b) {
             (<span class="prelude-val">Some</span>(id_a), <span class="prelude-val">Some</span>(id_b)) =&gt; id_a == id_b,
@@ -149,90 +125,72 @@
     }
 
     <span class="kw">for </span>(<span class="kw">_</span>, enm) <span class="kw">in </span>all_enums {
-        ctx.rendered_schema.push_enum(enm);
+        output.rendered_schema.push_enum(enm);
     }
 }
 
-<span class="kw">fn </span>render_enum&lt;<span class="lifetime">&#39;a</span>&gt;(
-    sql_enum: sql::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
-    existing_enum: <span class="prelude-ty">Option</span>&lt;walkers::EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
-) -&gt; renderer::Enum&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">fn </span>render_enum&lt;<span class="lifetime">&#39;a</span>&gt;(r#enum: EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; renderer::Enum&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>remapped_values = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered_enum = renderer::Enum::new(r#enum.name());
 
-    <span class="kw">let </span>schema = <span class="kw">if </span><span class="macro">matches!</span>(ctx.config.datasources.first(), <span class="prelude-val">Some</span>(ds) <span class="kw">if </span>!ds.namespaces.is_empty()) {
-        sql_enum.namespace()
-    } <span class="kw">else </span>{
-        <span class="prelude-val">None
-    </span>};
-
-    <span class="kw">let </span>(enum_name, enum_database_name) = <span class="kw">match </span>ctx.enum_prisma_name(sql_enum.id) {
-        ModelName::FromPsl { name, mapped_name } =&gt; (Cow::Borrowed(name), mapped_name),
-        ModelName::FromSql { name } =&gt; (Cow::Borrowed(name), <span class="prelude-val">None</span>),
-        name @ ModelName::RenamedReserved { mapped_name } | name @ ModelName::RenamedSanitized { mapped_name } =&gt; {
-            (name.prisma_name(), <span class="prelude-val">Some</span>(mapped_name))
-        }
-    };
-
-    <span class="kw">let </span><span class="kw-2">mut </span>rendered_enum = renderer::Enum::new(enum_name.clone());
-
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema) = schema {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema) = r#enum.namespace() {
         rendered_enum.schema(schema);
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = enum_database_name {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = r#enum.mapped_name() {
         rendered_enum.map(mapped_name);
-        ctx.warnings
+
+        output
+            .warnings
             .push(warnings::warning_enriched_with_map_on_enum(<span class="kw-2">&amp;</span>[warnings::Enum::new(
-                <span class="kw-2">&amp;</span>enum_name,
+                <span class="kw-2">&amp;</span>r#enum.name(),
             )]));
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = existing_enum.and_then(|e| e.ast_enum().documentation()) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = r#enum.documentation() {
         rendered_enum.documentation(docs);
     }
 
-    <span class="kw">for </span>sql_variant <span class="kw">in </span>sql_enum.variants() {
-        <span class="kw">let </span>variant_name = ctx.enum_variant_name(sql_variant.id);
-        <span class="kw">let </span><span class="kw-2">mut </span>prisma_name = variant_name.prisma_name();
-        <span class="kw">let </span>mapped_name = variant_name.mapped_name();
-        <span class="kw">let </span><span class="kw-2">mut </span>comment_out = <span class="bool-val">false</span>;
+    <span class="kw">for </span>variant <span class="kw">in </span>r#enum.variants() {
+        <span class="kw">if </span>variant.name().is_empty() {
+            <span class="kw">let </span>value = variant
+                .mapped_name()
+                .map(String::from)
+                .unwrap_or_else(|| variant.name().to_string());
 
-        <span class="kw">match </span>variant_name {
-            EnumVariantName::RenamedSanitized { mapped_name } <span class="kw">if </span>prisma_name.is_empty() =&gt; {
-                ctx.enum_values_with_empty_names.push(warnings::EnumAndValue {
-                    enm: enum_name.clone().into_owned(),
-                    value: mapped_name.to_owned(),
-                });
-                prisma_name = Cow::Borrowed(mapped_name);
-                comment_out = <span class="bool-val">true</span>;
-            }
-            EnumVariantName::FromPsl {
-                mapped_name: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
-            } =&gt; {
-                remapped_values.push(warnings::EnumAndValue {
-                    value: prisma_name.clone().into_owned(),
-                    enm: enum_name.clone().into_owned(),
-                });
-            }
-            <span class="kw">_ </span>=&gt; (),
+            <span class="kw">let </span>warning = warnings::EnumAndValue {
+                enm: r#enum.name().to_string(),
+                value,
+            };
+
+            output.warnings.enum_values_with_empty_names.push(warning);
+        } <span class="kw">else if </span>variant.mapped_name().is_some() {
+            remapped_values.push(warnings::EnumAndValue {
+                value: variant.name().to_string(),
+                enm: r#enum.name().to_string(),
+            });
         }
 
-        <span class="kw">let </span>existing_value = existing_enum.and_then(|enm| {
-            enm.values()
-                .find(|val| val.database_name() == mapped_name.unwrap_or_else(|| prisma_name.as_ref()))
-        });
+        <span class="kw">let </span><span class="kw-2">mut </span>rendered_variant = renderer::EnumVariant::new(variant.name());
 
-        <span class="kw">let </span><span class="kw-2">mut </span>rendered_variant = renderer::EnumVariant::new(prisma_name);
-        rendered_variant.documentation(existing_value.and_then(|v| v.documentation()));
-        rendered_variant.map(mapped_name);
-        rendered_variant.comment_out(comment_out);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = variant.documentation() {
+            rendered_variant.documentation(docs);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = variant.mapped_name() {
+            rendered_variant.map(map);
+        }
+
+        <span class="kw">if </span>variant.name().is_empty() || sanitize_datamodel_names::needs_sanitation(<span class="kw-2">&amp;</span>variant.name()) {
+            rendered_variant.comment_out();
+        }
 
         rendered_enum.push_variant(rendered_variant);
     }
 
     <span class="kw">if </span>!remapped_values.is_empty() {
-        ctx.warnings
+        output
+            .warnings
             .push(warnings::warning_enriched_with_map_on_enum_value(<span class="kw-2">&amp;</span>remapped_values))
     }
 

@@ -50,8 +50,12 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Context;
-<span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{compare_options_none_last, render_index};
+<span id="53">53</span>
+<span id="54">54</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::InputContext,
+    introspection_helpers::{compare_options_none_last, render_index},
+};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>psl::{datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
@@ -60,7 +64,7 @@
     table: sql::TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     existing_model: <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     model: <span class="kw-2">&amp;mut </span>renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) {
     <span class="comment">// (Position in the existing model, index definition)
     </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_indexes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
@@ -70,10 +74,10 @@
         <span class="kw">let </span>existing_index = existing_model.and_then(|model| {
             model
                 .indexes()
-                .find(|model_index| existing_index_matches(<span class="kw-2">*</span>model_index, index.name(), ctx))
+                .find(|model_index| existing_index_matches(<span class="kw-2">*</span>model_index, index.name(), input))
         });
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(definition) = render_index(index, existing_index, ctx) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(definition) = render_index(index, existing_index, input) {
             <span class="kw">let </span>attrid = existing_index.map(|idx| idx.attribute_id());
             ordered_indexes.push((attrid, definition));
         }
@@ -89,7 +93,7 @@
 <span class="kw">fn </span>existing_index_matches(
     existing_index: walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
     sql_constraint_name: <span class="kw-2">&amp;</span>str,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; bool {
     <span class="comment">// Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
     // argument. If we infer that an index in the database was produced using that logic, we
@@ -100,7 +104,7 @@
 
     <span class="comment">// Compare the constraint name (implicit or mapped name) from the Prisma schema with the
     // constraint name from the database.
-    </span>existing_index.constraint_name(ctx.active_connector()) == sql_constraint_name
+    </span>existing_index.constraint_name(input.active_connector()) == sql_constraint_name
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

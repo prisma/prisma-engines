@@ -62,14 +62,22 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::relation_names::RelationNames;
-<span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
+<span class="kw">use crate</span>::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::is_prisma_join_table,
+};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
-    <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers().filter(|t| is_prisma_join_table(<span class="kw-2">*</span>t)) {
-        <span class="kw">let </span>existing_relation = ctx.existing_m2m_relation(table.id);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
+    <span class="kw">for </span>table <span class="kw">in </span>input.schema.table_walkers().filter(|t| is_prisma_join_table(<span class="kw-2">*</span>t)) {
+        <span class="kw">let </span>existing_relation = input.existing_m2m_relation(table.id);
         <span class="kw">let </span><span class="kw-2">mut </span>fks = table.foreign_keys();
 
         <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first_fk), <span class="prelude-val">Some</span>(second_fk)) = (fks.next(), fks.next()) {
@@ -99,8 +107,8 @@
                 })
                 .unwrap_or_else(|| relation_names.m2m_relation_name(table.id).clone());
 
-            calculate_many_to_many_field(fk_a, fk_b, relation_name.clone(), field_a_name, ctx);
-            calculate_many_to_many_field(fk_b, fk_a, relation_name, field_b_name, ctx);
+            calculate_many_to_many_field(fk_a, fk_b, relation_name.clone(), field_a_name, input, output);
+            calculate_many_to_many_field(fk_b, fk_a, relation_name, field_b_name, input, output);
         }
     }
 }
@@ -110,9 +118,10 @@
     other_fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
     relation_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
     field_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+    output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) {
-    <span class="kw">let </span>opposite_model_name = ctx.table_prisma_name(other_fk.referenced_table().id).prisma_name();
+    <span class="kw">let </span>opposite_model_name = input.table_prisma_name(other_fk.referenced_table().id).prisma_name();
 
     <span class="kw">let </span><span class="kw-2">mut </span>field = datamodel_renderer::datamodel::ModelField::new_array(field_name, opposite_model_name);
 
@@ -122,8 +131,9 @@
         field.relation(relation);
     }
 
-    ctx.rendered_schema
-        .model_at(ctx.target_models[<span class="kw-2">&amp;</span>fk.referenced_table().id])
+    output
+        .rendered_schema
+        .model_at(output.target_models[<span class="kw-2">&amp;</span>fk.referenced_table().id])
         .push_field(field);
 }
 </code></pre></div>

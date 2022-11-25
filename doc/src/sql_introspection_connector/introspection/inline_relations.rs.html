@@ -160,8 +160,14 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{models::table_has_usable_identifier, relation_names::RelationNames};
-<span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
+<span class="kw">use crate</span>::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::is_prisma_join_table,
+};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>render;
 <span class="kw">use </span>psl::datamodel_connector::{constraint_names::ConstraintNames, Connector};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
@@ -169,13 +175,13 @@
 
 <span class="doccomment">/// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
-    <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(<span class="kw-2">*</span>t)) {
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(relation_names: <span class="kw-2">&amp;</span>RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;, input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
+    <span class="kw">for </span>table <span class="kw">in </span>input.schema.table_walkers().filter(|t| !is_prisma_join_table(<span class="kw-2">*</span>t)) {
         <span class="kw">for </span>(fk, relation_name_from_db) <span class="kw">in </span>table
             .foreign_keys()
             .filter_map(|fk| relation_names.inline_relation_name(fk.id).map(|name| (fk, name)))
         {
-            <span class="kw">let </span>existing_relation = ctx.existing_inline_relation(fk.id);
+            <span class="kw">let </span>existing_relation = input.existing_inline_relation(fk.id);
             <span class="kw">let </span>[relation_name, forward_relation_field_name, back_relation_field_name] = existing_relation
                 .and_then(|relation| {
                     <span class="prelude-val">Some</span>(relation)
@@ -193,16 +199,16 @@
 
             <span class="comment">// Forward relation field.
             </span>{
-                <span class="kw">let </span>referencing_model_idx: usize = ctx.target_models[<span class="kw-2">&amp;</span>table.id];
-                <span class="kw">let </span>field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), ctx);
-                ctx.rendered_schema.model_at(referencing_model_idx).push_field(field);
+                <span class="kw">let </span>referencing_model_idx: usize = output.target_models[<span class="kw-2">&amp;</span>table.id];
+                <span class="kw">let </span>field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), input);
+                output.rendered_schema.model_at(referencing_model_idx).push_field(field);
             }
 
             <span class="comment">// Back relation field.
             </span>{
-                <span class="kw">let </span>referenced_model_idx: usize = ctx.target_models[<span class="kw-2">&amp;</span>fk.referenced_table().id];
-                <span class="kw">let </span>field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), ctx);
-                ctx.rendered_schema.model_at(referenced_model_idx).push_field(field);
+                <span class="kw">let </span>referenced_model_idx: usize = output.target_models[<span class="kw-2">&amp;</span>fk.referenced_table().id];
+                <span class="kw">let </span>field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), input);
+                output.rendered_schema.model_at(referenced_model_idx).push_field(field);
             }
         }
     }
@@ -211,9 +217,9 @@
 <span class="kw">fn </span>calculate_relation_field&lt;<span class="lifetime">&#39;a</span>&gt;(
     foreign_key: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     (relation_name, field_name): (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; render::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">let </span>referenced_model_name = ctx.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
+    <span class="kw">let </span>referenced_model_name = input.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
 
     <span class="kw">let </span><span class="kw-2">mut </span>relation = render::Relation::new();
     <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if </span>foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
@@ -231,19 +237,19 @@
     relation.fields(
         foreign_key
             .constrained_columns()
-            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+            .map(|col| input.column_prisma_name(col.id).prisma_name()),
     );
 
     relation.references(
         foreign_key
             .referenced_columns()
-            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+            .map(|col| input.column_prisma_name(col.id).prisma_name()),
     );
 
     <span class="kw">match </span>(any_field_required, foreign_key.on_delete_action()) {
         (<span class="bool-val">false</span>, sql::ForeignKeyAction::SetNull) =&gt; (),
         (<span class="bool-val">true</span>, sql::ForeignKeyAction::Restrict) =&gt; (),
-        (<span class="bool-val">true</span>, sql::ForeignKeyAction::NoAction) <span class="kw">if </span>ctx.sql_family.is_mssql() =&gt; (),
+        (<span class="bool-val">true</span>, sql::ForeignKeyAction::NoAction) <span class="kw">if </span>input.sql_family.is_mssql() =&gt; (),
 
         (<span class="kw">_</span>, sql::ForeignKeyAction::Cascade) =&gt; relation.on_delete(<span class="string">&quot;Cascade&quot;</span>),
         (<span class="kw">_</span>, sql::ForeignKeyAction::SetDefault) =&gt; relation.on_delete(<span class="string">&quot;SetDefault&quot;</span>),
@@ -261,7 +267,7 @@
         sql::ForeignKeyAction::SetDefault =&gt; relation.on_update(<span class="string">&quot;SetDefault&quot;</span>),
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = relation_mapped_name(foreign_key, ctx.active_connector()) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = relation_mapped_name(foreign_key, input.active_connector()) {
         relation.map(mapped_name);
     }
 
@@ -280,7 +286,7 @@
 <span class="kw">fn </span>calculate_backrelation_field&lt;<span class="lifetime">&#39;a</span>&gt;(
     fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     (relation_name, field_name): (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; render::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>forward_relation_field_is_unique = fk
         .table()
@@ -293,7 +299,7 @@
             })
         });
 
-    <span class="kw">let </span>model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name();
+    <span class="kw">let </span>model_a_name = input.table_prisma_name(fk.table().id).prisma_name();
     <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if </span>forward_relation_field_is_unique {
         <span class="comment">// 1:1 relation
         </span>render::ModelField::new_optional(field_name, model_a_name)

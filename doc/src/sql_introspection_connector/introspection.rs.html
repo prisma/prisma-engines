@@ -38,6 +38,8 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>inline_relations;
 
 <span class="kw">mod </span>configuration;
@@ -49,34 +51,36 @@
 <span class="kw">mod </span>prisma_relation_mode;
 <span class="kw">mod </span>relation_names;
 
-<span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlError};
+<span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::{InputContext, OutputContext};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::SqlError;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>introspect(ctx: <span class="kw-2">&amp;mut </span>Context) -&gt; <span class="prelude-ty">Result</span>&lt;(String, bool), SqlError&gt; {
-    enums::render(ctx);
-    models::render(ctx);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>introspect&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+    output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(String, bool), SqlError&gt; {
+    enums::render(input, output);
+    models::render(input, output);
 
-    <span class="kw">if </span>ctx.foreign_keys_enabled() {
-        <span class="kw">let </span>relation_names = relation_names::introspect(ctx);
+    <span class="kw">if </span>input.foreign_keys_enabled() {
+        <span class="kw">let </span>relation_names = relation_names::introspect(input);
 
-        inline_relations::render(<span class="kw-2">&amp;</span>relation_names, ctx);
-        m2m_relations::render(<span class="kw-2">&amp;</span>relation_names, ctx);
+        inline_relations::render(<span class="kw-2">&amp;</span>relation_names, input, output);
+        m2m_relations::render(<span class="kw-2">&amp;</span>relation_names, input, output);
     } <span class="kw">else </span>{
-        prisma_relation_mode::render(ctx);
+        prisma_relation_mode::render(input, output);
     }
 
-    <span class="kw">let </span>rendered = <span class="kw">if </span>ctx.render_config {
+    <span class="kw">let </span>rendered = <span class="kw">if </span>input.render_config {
         <span class="macro">format!</span>(
             <span class="string">&quot;{}\n{}&quot;</span>,
-            configuration::render(ctx.config, ctx.schema),
-            ctx.rendered_schema
+            configuration::render(input.config, input.schema),
+            output.rendered_schema
         )
     } <span class="kw">else </span>{
-        ctx.rendered_schema.to_string()
+        output.rendered_schema.to_string()
     };
 
-    ctx.finalize_warnings();
-
-    <span class="prelude-val">Ok</span>((psl::reformat(<span class="kw-2">&amp;</span>rendered, <span class="number">2</span>).unwrap(), ctx.rendered_schema.is_empty()))
+    <span class="prelude-val">Ok</span>((psl::reformat(<span class="kw-2">&amp;</span>rendered, <span class="number">2</span>).unwrap(), output.rendered_schema.is_empty()))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

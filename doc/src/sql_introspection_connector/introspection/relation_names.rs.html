@@ -293,7 +293,7 @@
 </pre><pre class="rust"><code><span class="doccomment">//! This module is responsible for defining the relation names and the relation field names in an
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
+</span><span class="kw">use crate</span>::{calculate_datamodel::InputContext, introspection_helpers::is_prisma_join_table};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{
     borrow::Cow,
@@ -352,25 +352,25 @@
 ///
 /// Additionally, in self-relations, the names of the two relation fields are disambiguated by
 /// prefixing the name of the backrelation field with &quot;other_&quot;.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RelationNames&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>introspect(input: InputContext) -&gt; RelationNames {
     <span class="kw">let </span><span class="kw-2">mut </span>names = RelationNames {
         inline_relation_names: Default::default(),
         m2m_relation_names: Default::default(),
     };
 
     <span class="kw">let </span><span class="kw-2">mut </span>duplicated_fks = Default::default();
-    <span class="kw">let </span>ambiguous_relations = find_ambiguous_relations(ctx);
+    <span class="kw">let </span>ambiguous_relations = find_ambiguous_relations(input);
 
-    <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers() {
+    <span class="kw">for </span>table <span class="kw">in </span>input.schema.table_walkers() {
         <span class="kw">if </span>is_prisma_join_table(table) {
-            <span class="kw">let </span>name = prisma_m2m_relation_name(table, <span class="kw-2">&amp;</span>ambiguous_relations, ctx);
+            <span class="kw">let </span>name = prisma_m2m_relation_name(table, <span class="kw-2">&amp;</span>ambiguous_relations, input);
             names.m2m_relation_names.insert(table.id, name);
         } <span class="kw">else </span>{
             collect_duplicated_fks(table, <span class="kw-2">&amp;mut </span>duplicated_fks);
             <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys().filter(|fk| !duplicated_fks.contains(<span class="kw-2">&amp;</span>fk.id)) {
                 names
                     .inline_relation_names
-                    .insert(fk.id, inline_relation_name(fk, <span class="kw-2">&amp;</span>ambiguous_relations, ctx));
+                    .insert(fk.id, inline_relation_name(fk, <span class="kw-2">&amp;</span>ambiguous_relations, input));
             }
         }
     }
@@ -381,7 +381,7 @@
 <span class="kw">fn </span>prisma_m2m_relation_name&lt;<span class="lifetime">&#39;a</span>&gt;(
     table: sql::TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     ambiguous_relations: <span class="kw-2">&amp;</span>HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt;,
-    ctx: <span class="kw-2">&amp;</span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext,
 ) -&gt; RelationName&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>ids = table_ids_for_m2m_relation_table(table);
     <span class="kw">let </span>is_self_relation = ids[<span class="number">0</span>] == ids[<span class="number">1</span>];
@@ -390,7 +390,7 @@
         <span class="comment">// the table names of prisma m2m tables starts with an underscore
         </span>(Cow::Borrowed(<span class="kw-2">&amp;</span>table.name()[<span class="number">1</span>..]), table.name())
     } <span class="kw">else </span>{
-        <span class="kw">let </span>default_name = ids.map(|id| ctx.table_prisma_name(id).prisma_name()).join(<span class="string">&quot;To&quot;</span>);
+        <span class="kw">let </span>default_name = ids.map(|id| input.table_prisma_name(id).prisma_name()).join(<span class="string">&quot;To&quot;</span>);
         <span class="kw">let </span>found_name = <span class="kw-2">&amp;</span>table.name()[<span class="number">1</span>..];
         <span class="kw">let </span>relation_name = <span class="kw">if </span>found_name == default_name &amp;&amp; !is_self_relation {
             <span class="string">&quot;&quot;
@@ -404,12 +404,12 @@
         relation_name,
         Cow::Owned(<span class="macro">format!</span>(
             <span class="string">&quot;{}{field_name_suffix}{}&quot;</span>,
-            ctx.table_prisma_name(ids[<span class="number">1</span>]).prisma_name(),
+            input.table_prisma_name(ids[<span class="number">1</span>]).prisma_name(),
             <span class="kw">if </span>is_self_relation { <span class="string">&quot;_A&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
         )),
         Cow::Owned(<span class="macro">format!</span>(
             <span class="string">&quot;{}{field_name_suffix}{}&quot;</span>,
-            ctx.table_prisma_name(ids[<span class="number">0</span>]).prisma_name(),
+            input.table_prisma_name(ids[<span class="number">0</span>]).prisma_name(),
             <span class="kw">if </span>is_self_relation { <span class="string">&quot;_B&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
         )),
     ]
@@ -418,11 +418,11 @@
 <span class="kw">fn </span>inline_relation_name&lt;<span class="lifetime">&#39;a</span>&gt;(
     fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     ambiguous_relations: <span class="kw-2">&amp;</span>HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt;,
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; RelationName&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>is_self_relation = fk.is_self_relation();
-    <span class="kw">let </span>referencing_model_name = ctx.table_prisma_name(fk.table().id).prisma_name();
-    <span class="kw">let </span>referenced_model_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
+    <span class="kw">let </span>referencing_model_name = input.table_prisma_name(fk.table().id).prisma_name();
+    <span class="kw">let </span>referenced_model_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
     <span class="kw">let </span>self_relation_prefix = <span class="kw">if </span>is_self_relation { <span class="string">&quot;other_&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
     <span class="kw">if </span>!ambiguous_relations.contains(<span class="kw-2">&amp;</span>sorted_table_ids(fk.table().id, fk.referenced_table().id)) {
@@ -441,7 +441,7 @@
         relation_name.push(<span class="string">&#39;_&#39;</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>cols = fk.constrained_columns().peekable();
         <span class="kw">while let </span><span class="prelude-val">Some</span>(col) = cols.next() {
-            relation_name.push_str(ctx.column_prisma_name(col.id).prisma_name().as_ref());
+            relation_name.push_str(input.column_prisma_name(col.id).prisma_name().as_ref());
             <span class="kw">if </span>cols.peek().is_some() {
                 relation_name.push(<span class="string">&#39;_&#39;</span>);
             }
@@ -457,15 +457,15 @@
 }
 
 <span class="doccomment">/// Relation names are only ambiguous between two given models.
-</span><span class="kw">fn </span>find_ambiguous_relations(ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt; {
+</span><span class="kw">fn </span>find_ambiguous_relations(input: InputContext) -&gt; HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>ambiguous_relations = HashSet::new();
 
-    <span class="kw">for </span>table <span class="kw">in </span>ctx.schema.table_walkers() {
+    <span class="kw">for </span>table <span class="kw">in </span>input.schema.table_walkers() {
         <span class="kw">if </span>is_prisma_join_table(table) {
             m2m_relation_ambiguousness(table, <span class="kw-2">&amp;mut </span>ambiguous_relations)
         } <span class="kw">else </span>{
             <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys() {
-                inline_relation_ambiguousness(fk, <span class="kw-2">&amp;mut </span>ambiguous_relations, ctx)
+                inline_relation_ambiguousness(fk, <span class="kw-2">&amp;mut </span>ambiguous_relations, input)
             }
         }
     }
@@ -501,7 +501,7 @@
 <span class="kw">fn </span>inline_relation_ambiguousness(
     fk: sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
     ambiguous_relations: <span class="kw-2">&amp;mut </span>HashSet&lt;[sql::TableId; <span class="number">2</span>]&gt;,
-    ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    input: InputContext,
 ) {
     <span class="kw">let </span>tables = table_ids_for_inline_relation(fk);
 
@@ -523,10 +523,10 @@
     }
 
     <span class="comment">// ...or because the relation field name conflicts with one of the scalar fields&#39; name.
-    </span><span class="kw">let </span>default_field_name = ctx.table_prisma_name(fk.referenced_table().id).prisma_name();
+    </span><span class="kw">let </span>default_field_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
     <span class="kw">if </span>fk
         .constrained_columns()
-        .any(|col| default_field_name == ctx.column_prisma_name(col.id).prisma_name())
+        .any(|col| default_field_name == input.column_prisma_name(col.id).prisma_name())
     {
         ambiguous_relations.insert(tables);
     }

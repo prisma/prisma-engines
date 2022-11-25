@@ -186,18 +186,27 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use crate</span>::{introspection::Context, introspection_helpers::<span class="kw-2">*</span>, warnings};
+<span class="kw">use crate</span>::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::<span class="kw-2">*</span>,
+    warnings,
+};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, schema_ast::ast::WithDocumentation};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
-        Vec::with_capacity(ctx.schema.tables_count());
+        Vec::with_capacity(input.schema.tables_count());
 
-    <span class="kw">for </span>table <span class="kw">in </span>ctx
+    <span class="kw">for </span>table <span class="kw">in </span>input
         .schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(<span class="kw-2">*</span>table))
@@ -205,9 +214,9 @@
         .filter(|table| !is_prisma_join_table(<span class="kw-2">*</span>table))
         .filter(|table| !is_relay_table(<span class="kw-2">*</span>table))
     {
-        <span class="kw">let </span>existing_model = ctx.existing_model(table.id);
+        <span class="kw">let </span>existing_model = input.existing_model(table.id);
 
-        <span class="kw">let </span>(name, map, docs) = <span class="kw">match </span>ctx.table_prisma_name(table.id) {
+        <span class="kw">let </span>(name, map, docs) = <span class="kw">match </span>input.table_prisma_name(table.id) {
             <span class="kw">crate</span>::ModelName::FromPsl { name, mapped_name } =&gt; (Cow::from(name), mapped_name, <span class="prelude-val">None</span>),
             <span class="kw">crate</span>::ModelName::FromSql { name } =&gt; (Cow::from(name), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             model_name @ <span class="kw">crate</span>::ModelName::RenamedReserved { mapped_name } =&gt; {
@@ -235,23 +244,23 @@
         }
 
         <span class="kw">if </span>table.columns().len() == <span class="number">0 </span>{
-            model.documentation(empty_table_comment(ctx));
+            model.documentation(empty_table_comment(input));
             model.comment_out();
 
-            ctx.models_without_columns.push(warnings::Model {
+            output.warnings.models_without_columns.push(warnings::Model {
                 model: name.to_string(),
             });
         } <span class="kw">else if </span>!table_has_usable_identifier(table) {
             model.documentation(<span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>);
             model.ignore();
 
-            ctx.models_without_identifiers.push(warnings::Model {
+            output.warnings.models_without_identifiers.push(warnings::Model {
                 model: name.to_string(),
             });
         }
 
         <span class="kw">if </span>existing_model.filter(|m| m.mapped_name().is_some()).is_some() {
-            ctx.remapped_models.push(warnings::Model {
+            output.warnings.remapped_models.push(warnings::Model {
                 model: name.to_string(),
             });
         }
@@ -262,9 +271,9 @@
 
         <span class="kw">for </span>column <span class="kw">in </span>table.columns() {
             <span class="kw">if let </span>sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
-                ctx.unsupported_types.push(warnings::ModelAndFieldAndType {
+                output.warnings.unsupported_types.push(warnings::ModelAndFieldAndType {
                     model: name.to_string(),
-                    field: ctx.column_prisma_name(column.id).prisma_name().into_owned(),
+                    field: input.column_prisma_name(column.id).prisma_name().into_owned(),
                     tpe: tpe.to_owned(),
                 })
             }
@@ -280,14 +289,15 @@
                 .filter(|i| i.columns().len() == <span class="number">1</span>)
                 .find(|i| i.contains_column(column.id));
 
-            model.push_field(render_scalar_field(column, pk, unique, ctx));
+            model.push_field(render_scalar_field(column, pk, unique, input, output));
         }
 
-        <span class="kw">super</span>::indexes::render_model_indexes(table, existing_model, <span class="kw-2">&amp;mut </span>model, ctx);
+        <span class="kw">super</span>::indexes::render_model_indexes(table, existing_model, <span class="kw-2">&amp;mut </span>model, input);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = table.primary_key() {
             <span class="kw">let </span>fields = pk.columns().map(|c| {
-                <span class="kw">let </span><span class="kw-2">mut </span>field = renderer::IndexFieldInput::new(ctx.column_prisma_name(c.as_column().id).prisma_name());
+                <span class="kw">let </span><span class="kw-2">mut </span>field =
+                    renderer::IndexFieldInput::new(input.column_prisma_name(c.as_column().id).prisma_name());
 
                 <span class="kw">if </span>c.sort_order()
                     .filter(|o| <span class="macro">matches!</span>(o, sql::SQLSortOrder::Desc))
@@ -312,17 +322,17 @@
                 {
                     id.name(name);
 
-                    ctx.reintrospected_id_names.push(warnings::Model {
-                        model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                    output.warnings.reintrospected_id_names.push(warnings::Model {
+                        model: input.table_prisma_name(table.id).prisma_name().to_string(),
                     });
                 }
 
-                <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(table.name(), ctx.active_connector());
+                <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(table.name(), input.active_connector());
                 <span class="kw">if </span>pk.name() != default_name &amp;&amp; !pk.name().is_empty() {
                     id.map(pk.name());
                 }
 
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, ctx) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, input) {
                     id.clustered(clustered);
                 }
 
@@ -330,7 +340,7 @@
             }
         }
 
-        <span class="kw">match </span>(table.namespace(), ctx.config.datasources.first()) {
+        <span class="kw">match </span>(table.namespace(), input.config.datasources.first()) {
             (<span class="prelude-val">Some</span>(namespace), <span class="prelude-val">Some</span>(ds)) <span class="kw">if </span>!ds.namespaces.is_empty() =&gt; {
                 model.schema(namespace);
             }
@@ -347,14 +357,14 @@
     models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
 
     <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, render)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
-        ctx.rendered_schema.push_model(render);
-        ctx.target_models.insert(table_id, idx);
+        output.rendered_schema.push_model(render);
+        output.target_models.insert(table_id, idx);
     }
 }
 
-<span class="kw">fn </span>empty_table_comment(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+<span class="kw">fn </span>empty_table_comment(input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
     <span class="comment">// On postgres this is allowed, on the other dbs, this could be a symptom of missing privileges.
-    </span><span class="kw">if </span>ctx.sql_family.is_postgres() {
+    </span><span class="kw">if </span>input.sql_family.is_postgres() {
         <span class="string">&quot;We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.&quot;
     </span>} <span class="kw">else </span>{
         <span class="string">&quot;We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges.&quot;

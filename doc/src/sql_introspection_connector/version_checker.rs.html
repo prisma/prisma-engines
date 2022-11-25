@@ -236,7 +236,7 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::InputContext;
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
@@ -291,14 +291,14 @@
     MySqlType::Char(<span class="number">36</span>),
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_prisma_version(ctx: <span class="kw-2">&amp;</span>CalculateDatamodelContext) -&gt; Version {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_prisma_version(input: <span class="kw-2">&amp;</span>InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Version {
     <span class="kw">let </span><span class="kw-2">mut </span>version_checker = VersionChecker {
-        sql_family: ctx.sql_family(),
-        is_cockroachdb: ctx.is_cockroach(),
-        has_migration_table: ctx.schema.table_walkers().any(is_old_migration_table),
-        has_relay_table: ctx.schema.table_walkers().any(is_relay_table),
-        has_prisma_1_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_0_join_table),
-        has_prisma_1_1_or_2_join_table: ctx.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
+        sql_family: input.sql_family(),
+        is_cockroachdb: input.is_cockroach(),
+        has_migration_table: input.schema.table_walkers().any(is_old_migration_table),
+        has_relay_table: input.schema.table_walkers().any(is_relay_table),
+        has_prisma_1_join_table: input.schema.table_walkers().any(is_prisma_1_point_0_join_table),
+        has_prisma_1_1_or_2_join_table: input.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
         uses_on_delete: <span class="bool-val">false</span>,
         uses_default_values: <span class="bool-val">false</span>,
         always_has_created_at_updated_at: <span class="bool-val">true</span>,
@@ -307,7 +307,7 @@
         has_inline_relations: <span class="bool-val">false</span>,
     };
 
-    <span class="kw">for </span>table <span class="kw">in </span>ctx
+    <span class="kw">for </span>table <span class="kw">in </span>input
         .schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(<span class="kw-2">*</span>table))
@@ -335,7 +335,7 @@
     }
 
     <span class="kw">match </span>version_checker.sql_family {
-        <span class="kw">_ if </span>ctx.schema.is_empty() =&gt; Version::NonPrisma,
+        <span class="kw">_ if </span>input.schema.is_empty() =&gt; Version::NonPrisma,
         SqlFamily::Sqlite <span class="kw">if </span>version_checker.is_prisma_2() =&gt; Version::Prisma2,
         SqlFamily::Sqlite =&gt; Version::NonPrisma,
         SqlFamily::Mysql <span class="kw">if </span>version_checker.is_prisma_2() =&gt; Version::Prisma2,

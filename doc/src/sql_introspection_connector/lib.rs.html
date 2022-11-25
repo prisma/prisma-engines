@@ -192,10 +192,12 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::vec_init_then_push)]
 #![allow(clippy::ptr_arg)] </span><span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
-</span><span class="kw">pub mod </span>calculate_datamodel; <span class="comment">// only exported to be able to unit test it
+</span><span class="kw">pub mod </span>calculate_datamodel;
+<span class="kw">mod </span>pair; <span class="comment">// only exported to be able to unit test it
 
 </span><span class="kw">mod </span>defaults;
 <span class="kw">mod </span>error;
@@ -381,7 +383,7 @@
     }
 }
 
-<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>calculate_datamodel::CalculateDatamodelContext&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>calculate_datamodel::InputContext&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
         <span class="self">self</span>.sql_family
     }

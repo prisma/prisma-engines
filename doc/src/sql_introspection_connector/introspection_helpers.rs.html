@@ -559,7 +559,19 @@
 <span id="559">559</span>
 <span id="560">560</span>
 <span id="561">561</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, defaults::render_default, SqlFamilyTrait};
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::{InputContext, OutputContext},
+    defaults::render_default,
+    SqlFamilyTrait,
+};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>psl::{
     datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers,
@@ -701,10 +713,10 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_index&lt;<span class="lifetime">&#39;a</span>&gt;(
     index: sql::IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     existing_index: <span class="prelude-ty">Option</span>&lt;walkers::IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">let </span>fields = index.columns().map(|col| {
-        <span class="kw">let </span>name = ctx.column_prisma_name(col.as_column().id).prisma_name();
+        <span class="kw">let </span>name = input.column_prisma_name(col.as_column().id).prisma_name();
         <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IndexFieldInput::new(name);
 
         <span class="kw">if </span>col
@@ -719,7 +731,7 @@
             definition.length(length);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(ops) = render_opclass(col.id, ctx) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ops) = render_opclass(col.id, input) {
             definition.ops(ops);
         }
 
@@ -732,7 +744,7 @@
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
         sql::IndexType::Unique =&gt; renderer::IndexDefinition::unique(fields),
-        sql::IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
+        sql::IndexType::Fulltext <span class="kw">if </span>input.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
             renderer::IndexDefinition::fulltext(fields)
         }
         sql::IndexType::Normal | sql::IndexType::Fulltext =&gt; renderer::IndexDefinition::index(fields),
@@ -743,11 +755,11 @@
     <span class="kw">let </span>default_constraint_name = <span class="kw">match </span>index.index_type() {
         IndexType::Unique =&gt; {
             <span class="kw">let </span>columns = index.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-            ConstraintNames::unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, ctx.active_connector())
+            ConstraintNames::unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, input.active_connector())
         }
         <span class="kw">_ </span>=&gt; {
             <span class="kw">let </span>columns = index.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-            ConstraintNames::non_unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, ctx.active_connector())
+            ConstraintNames::non_unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, input.active_connector())
         }
     };
 
@@ -759,11 +771,11 @@
         definition.map(index.name());
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(index.id, ctx) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(index.id, input) {
         definition.clustered(clustered);
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(algo) = render_index_algorithm(index, ctx) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(algo) = render_index_algorithm(index, input) {
         definition.index_type(algo);
     }
 
@@ -774,20 +786,24 @@
     column: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
     primary_key: <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     unique: <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+    output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 ) -&gt; renderer::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">let </span>existing_field = ctx.existing_scalar_field(column.id);
+    <span class="kw">let </span>existing_field = input.existing_scalar_field(column.id);
 
     <span class="kw">let </span>(name, database_name, docs_for_commenting_out, is_commented_out) = {
-        <span class="kw">let </span>names = ctx.column_prisma_name(column.id);
+        <span class="kw">let </span>names = input.column_prisma_name(column.id);
         <span class="kw">let </span>prisma_name = names.prisma_name();
         <span class="kw">let </span>mapped_name = names.mapped_name();
 
         <span class="kw">if </span>prisma_name.is_empty() {
-            ctx.fields_with_empty_names.push(<span class="kw">crate</span>::warnings::ModelAndField {
-                model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
-                field: column.name().to_owned(),
-            });
+            output
+                .warnings
+                .fields_with_empty_names
+                .push(<span class="kw">crate</span>::warnings::ModelAndField {
+                    model: input.table_prisma_name(column.table().id).prisma_name().into_owned(),
+                    field: column.name().to_owned(),
+                });
 
             <span class="kw">let </span>docs = <span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>;
 
@@ -803,7 +819,7 @@
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
-        ctx.remapped_fields.push(<span class="kw">crate</span>::warnings::ModelAndField {
+        output.warnings.remapped_fields.push(<span class="kw">crate</span>::warnings::ModelAndField {
             model: field.model().name().to_owned(),
             field: field.name().to_owned(),
         });
@@ -820,7 +836,7 @@
         ColumnTypeFamily::Binary =&gt; Cow::from(<span class="string">&quot;Bytes&quot;</span>),
         ColumnTypeFamily::Json =&gt; Cow::from(<span class="string">&quot;Json&quot;</span>),
         ColumnTypeFamily::Uuid =&gt; Cow::from(<span class="string">&quot;String&quot;</span>),
-        ColumnTypeFamily::Enum(id) =&gt; ctx.enum_prisma_name(<span class="kw-2">*</span>id).prisma_name(),
+        ColumnTypeFamily::Enum(id) =&gt; input.enum_prisma_name(<span class="kw-2">*</span>id).prisma_name(),
         ColumnTypeFamily::Unsupported(<span class="kw-2">ref </span>typ) =&gt; Cow::from(typ),
     };
 
@@ -843,13 +859,13 @@
         calculate_psl_scalar_type(column).and_then(|st| column.column_type().native_type.as_ref().map(|nt| (st, nt)));
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>((scalar_type, native_type)) = types {
-        <span class="kw">let </span>is_default = ctx
+        <span class="kw">let </span>is_default = input
             .active_connector()
             .native_type_is_default_for_scalar_type(native_type, <span class="kw-2">&amp;</span>scalar_type);
 
         <span class="kw">if </span>!is_default {
-            <span class="kw">let </span>(r#type, params) = ctx.active_connector().native_type_to_parts(native_type);
-            <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>ctx.config.datasources.first().unwrap().name;
+            <span class="kw">let </span>(r#type, params) = input.active_connector().native_type_to_parts(native_type);
+            <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>input.config.datasources.first().unwrap().name;
 
             field.native_type(prefix, r#type, params)
         }
@@ -859,7 +875,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>id_field = renderer::IdFieldDefinition::default();
         <span class="kw">let </span>col = pk.columns().next().unwrap();
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, ctx) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, input) {
             id_field.clustered(clustered);
         }
 
@@ -875,7 +891,7 @@
             id_field.length(length);
         }
 
-        <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(column.table().name(), ctx.active_connector());
+        <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(column.table().name(), input.active_connector());
         <span class="kw">if </span>pk.name() != default_name &amp;&amp; !pk.name().is_empty() {
             id_field.map(pk.name());
         }
@@ -888,13 +904,13 @@
         <span class="kw">let </span>col = unique.columns().next().unwrap();
 
         <span class="kw">let </span>default_constraint_name =
-            ConstraintNames::unique_index_name(unique.table().name(), <span class="kw-2">&amp;</span>[col.name()], ctx.active_connector());
+            ConstraintNames::unique_index_name(unique.table().name(), <span class="kw-2">&amp;</span>[col.name()], input.active_connector());
 
         <span class="kw">if </span>unique.name() != default_constraint_name {
             opts.map(unique.name());
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(unique.id, ctx) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index_is_clustered(unique.id, input) {
             opts.clustered(clustered);
         }
 
@@ -925,7 +941,7 @@
         field.commented_out();
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = render_default(column, existing_field, ctx) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = render_default(column, existing_field, input, output) {
         field.default(default);
     }
 
@@ -963,8 +979,8 @@
 
 <span class="comment">// misc
 
-</span><span class="kw">fn </span>render_index_algorithm(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-    <span class="kw">if </span>!ctx.sql_family().is_postgres() {
+</span><span class="kw">fn </span>render_index_algorithm(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    <span class="kw">if </span>!input.sql_family().is_postgres() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
@@ -980,12 +996,12 @@
     }
 }
 
-<span class="kw">fn </span>index_is_clustered(index_id: sql::IndexId, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-    <span class="kw">if </span>!ctx.sql_family().is_mssql() {
+<span class="kw">fn </span>index_is_clustered(index_id: sql::IndexId, input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if </span>!input.sql_family.is_mssql() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = ctx.schema.downcast_connector_data();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = input.schema.downcast_connector_data();
     <span class="kw">let </span>clustered = ext.index_is_clustered(index_id);
 
     <span class="kw">if </span>!clustered {
@@ -995,12 +1011,12 @@
     <span class="prelude-val">Some</span>(clustered)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_is_clustered(pkid: sql::IndexId, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-    <span class="kw">if </span>!ctx.sql_family().is_mssql() {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_is_clustered(pkid: sql::IndexId, input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if </span>!input.sql_family.is_mssql() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = ctx.schema.downcast_connector_data();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = input.schema.downcast_connector_data();
 
     <span class="kw">let </span>clustered = ext.index_is_clustered(pkid);
 
@@ -1011,12 +1027,12 @@
     <span class="prelude-val">Some</span>(clustered)
 }
 
-<span class="kw">fn </span>render_opclass&lt;<span class="lifetime">&#39;a</span>&gt;(index_field_id: sql::IndexColumnId, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;renderer::IndexOps&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-    <span class="kw">if </span>!ctx.sql_family().is_postgres() {
+<span class="kw">fn </span>render_opclass(index_field_id: sql::IndexColumnId, input: InputContext) -&gt; <span class="prelude-ty">Option</span>&lt;renderer::IndexOps&gt; {
+    <span class="kw">if </span>!input.sql_family.is_postgres() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.schema.downcast_connector_data();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = input.schema.downcast_connector_data();
 
     <span class="kw">let </span>opclass = <span class="kw">match </span>ext.get_opclass(index_field_id) {
         <span class="prelude-val">Some</span>(opclass) =&gt; opclass,

@@ -81,21 +81,25 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>render;
 <span class="kw">use </span>psl::parser_database::ast;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render(ctx: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+<span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::{InputContext, OutputContext};
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>reintrospected_relations = Vec::new();
-    <span class="kw">let </span>old_model_to_table: HashMap&lt;ast::ModelId, sql::TableId&gt; = ctx
+    <span class="kw">let </span>old_model_to_table: HashMap&lt;ast::ModelId, sql::TableId&gt; = input
         .introspection_map
         .existing_models
         .iter()
         .map(|(<span class="kw-2">&amp;</span>table, <span class="kw-2">&amp;</span>model)| (model, table))
         .collect();
 
-    <span class="kw">for </span>relation <span class="kw">in </span>ctx
+    <span class="kw">for </span>relation <span class="kw">in </span>input
         .previous_schema
         .db
         .walk_relations()
@@ -150,8 +154,8 @@
                 field.relation(relation);
             }
 
-            <span class="kw">let </span>new_model_idx = ctx.target_models[<span class="kw-2">&amp;</span>old_model_to_table[<span class="kw-2">&amp;</span>rf.model().model_id()]];
-            ctx.rendered_schema.model_at(new_model_idx).push_field(field);
+            <span class="kw">let </span>new_model_idx = output.target_models[<span class="kw-2">&amp;</span>old_model_to_table[<span class="kw-2">&amp;</span>rf.model().model_id()]];
+            output.rendered_schema.model_at(new_model_idx).push_field(field);
 
             reintrospected_relations.push(<span class="kw">crate</span>::warnings::Model {
                 model: rf.model().name().to_owned(),
@@ -161,7 +165,7 @@
 
     <span class="kw">if </span>!reintrospected_relations.is_empty() {
         <span class="kw">let </span>warning = <span class="kw">crate</span>::warnings::warning_relations_added_from_the_previous_data_model(<span class="kw-2">&amp;</span>reintrospected_relations);
-        ctx.warnings.push(warning);
+        output.warnings.push(warning);
     }
 }
 </code></pre></div>
