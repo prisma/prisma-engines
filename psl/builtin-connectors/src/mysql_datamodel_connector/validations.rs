@@ -109,7 +109,7 @@ pub(crate) fn uses_native_referential_action_set_default(
     let warning_msg = || {
         formatdoc!(
             r#"
-            `{connector_name}` does not actually support the `{set_default}` referential action, so using it may result in unexpected errors.
+            {connector_name} does not actually support the `{set_default}` referential action, so using it may result in unexpected errors.
             Read more at https://pris.ly/d/mysql-set-default
             "#,
             connector_name = connector.name(),
