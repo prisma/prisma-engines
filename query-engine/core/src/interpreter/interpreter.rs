@@ -43,7 +43,7 @@ pub struct DiffResult {
 }
 
 impl DiffResult {
-    pub fn has_no_diff(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.left.is_empty() && self.right.is_empty()
     }
 }

@@ -197,7 +197,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         &if_node,
         QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
             let diff_result = result.as_diff_result().unwrap();
-            let should_connect = !diff_result.has_no_diff();
+            let should_connect = !diff_result.is_empty();
 
             if let Node::Flow(Flow::If(_)) = if_node {
                 Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))

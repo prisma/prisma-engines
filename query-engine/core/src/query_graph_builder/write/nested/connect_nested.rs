@@ -391,7 +391,6 @@ fn handle_one_to_one(
         QueryGraphDependency::ProjectedDataDependency(
             child_linking_fields.clone(),
             Box::new(move |mut read_new_child_node, mut child_links| {
-                dbg!(&child_links);
                 // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
                 if relation_inlined_parent && parent_is_create {
                     let child_link = match child_links.pop() {
