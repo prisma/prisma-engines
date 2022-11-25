@@ -1,5 +1,8 @@
 use super::{models::table_has_usable_identifier, relation_names::RelationNames};
-use crate::introspection_helpers::is_prisma_join_table;
+use crate::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::is_prisma_join_table,
+};
 use datamodel_renderer::datamodel as render;
 use psl::datamodel_connector::{constraint_names::ConstraintNames, Connector};
 use sql_schema_describer as sql;
@@ -7,13 +10,13 @@ use std::borrow::Cow;
 
 /// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
-pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
-    for table in ctx.schema.table_walkers().filter(|t| !is_prisma_join_table(*t)) {
+pub(super) fn render<'a>(relation_names: &RelationNames<'a>, input: InputContext<'a>, output: &mut OutputContext<'a>) {
+    for table in input.schema.table_walkers().filter(|t| !is_prisma_join_table(*t)) {
         for (fk, relation_name_from_db) in table
             .foreign_keys()
             .filter_map(|fk| relation_names.inline_relation_name(fk.id).map(|name| (fk, name)))
         {
-            let existing_relation = ctx.existing_inline_relation(fk.id);
+            let existing_relation = input.existing_inline_relation(fk.id);
             let [relation_name, forward_relation_field_name, back_relation_field_name] = existing_relation
                 .and_then(|relation| {
                     Some(relation)
@@ -31,16 +34,16 @@ pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Co
 
             // Forward relation field.
             {
-                let referencing_model_idx: usize = ctx.target_models[&table.id];
-                let field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), ctx);
-                ctx.rendered_schema.model_at(referencing_model_idx).push_field(field);
+                let referencing_model_idx: usize = output.target_models[&table.id];
+                let field = calculate_relation_field(fk, (relation_name.clone(), forward_relation_field_name), input);
+                output.rendered_schema.model_at(referencing_model_idx).push_field(field);
             }
 
             // Back relation field.
             {
-                let referenced_model_idx: usize = ctx.target_models[&fk.referenced_table().id];
-                let field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), ctx);
-                ctx.rendered_schema.model_at(referenced_model_idx).push_field(field);
+                let referenced_model_idx: usize = output.target_models[&fk.referenced_table().id];
+                let field = calculate_backrelation_field(fk, (relation_name, back_relation_field_name), input);
+                output.rendered_schema.model_at(referenced_model_idx).push_field(field);
             }
         }
     }
@@ -49,9 +52,9 @@ pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Co
 fn calculate_relation_field<'a>(
     foreign_key: sql::ForeignKeyWalker<'a>,
     (relation_name, field_name): (Cow<'a, str>, Cow<'a, str>),
-    ctx: &mut super::Context<'a>,
+    input: InputContext<'a>,
 ) -> render::ModelField<'a> {
-    let referenced_model_name = ctx.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
+    let referenced_model_name = input.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
 
     let mut relation = render::Relation::new();
     let mut field = if foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
@@ -69,19 +72,19 @@ fn calculate_relation_field<'a>(
     relation.fields(
         foreign_key
             .constrained_columns()
-            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+            .map(|col| input.column_prisma_name(col.id).prisma_name()),
     );
 
     relation.references(
         foreign_key
             .referenced_columns()
-            .map(|col| ctx.column_prisma_name(col.id).prisma_name()),
+            .map(|col| input.column_prisma_name(col.id).prisma_name()),
     );
 
     match (any_field_required, foreign_key.on_delete_action()) {
         (false, sql::ForeignKeyAction::SetNull) => (),
         (true, sql::ForeignKeyAction::Restrict) => (),
-        (true, sql::ForeignKeyAction::NoAction) if ctx.sql_family.is_mssql() => (),
+        (true, sql::ForeignKeyAction::NoAction) if input.sql_family.is_mssql() => (),
 
         (_, sql::ForeignKeyAction::Cascade) => relation.on_delete("Cascade"),
         (_, sql::ForeignKeyAction::SetDefault) => relation.on_delete("SetDefault"),
@@ -99,7 +102,7 @@ fn calculate_relation_field<'a>(
         sql::ForeignKeyAction::SetDefault => relation.on_update("SetDefault"),
     }
 
-    if let Some(mapped_name) = relation_mapped_name(foreign_key, ctx.active_connector()) {
+    if let Some(mapped_name) = relation_mapped_name(foreign_key, input.active_connector()) {
         relation.map(mapped_name);
     }
 
@@ -118,7 +121,7 @@ fn calculate_relation_field<'a>(
 fn calculate_backrelation_field<'a>(
     fk: sql::ForeignKeyWalker<'a>,
     (relation_name, field_name): (Cow<'a, str>, Cow<'a, str>),
-    ctx: &mut super::Context<'a>,
+    input: InputContext<'a>,
 ) -> render::ModelField<'a> {
     let forward_relation_field_is_unique = fk
         .table()
@@ -131,7 +134,7 @@ fn calculate_backrelation_field<'a>(
             })
         });
 
-    let model_a_name = ctx.table_prisma_name(fk.table().id).prisma_name();
+    let model_a_name = input.table_prisma_name(fk.table().id).prisma_name();
     let mut field = if forward_relation_field_is_unique {
         // 1:1 relation
         render::ModelField::new_optional(field_name, model_a_name)

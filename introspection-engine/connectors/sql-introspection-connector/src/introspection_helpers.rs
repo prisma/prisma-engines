@@ -1,4 +1,8 @@
-use crate::{calculate_datamodel::CalculateDatamodelContext as Context, defaults::render_default, SqlFamilyTrait};
+use crate::{
+    calculate_datamodel::{InputContext, OutputContext},
+    defaults::render_default,
+    SqlFamilyTrait,
+};
 use datamodel_renderer::datamodel as renderer;
 use psl::{
     datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers,
@@ -140,10 +144,10 @@ fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
 pub(crate) fn render_index<'a>(
     index: sql::IndexWalker<'a>,
     existing_index: Option<walkers::IndexWalker<'a>>,
-    ctx: &Context<'a>,
+    input: InputContext<'a>,
 ) -> Option<renderer::IndexDefinition<'a>> {
     let fields = index.columns().map(|col| {
-        let name = ctx.column_prisma_name(col.as_column().id).prisma_name();
+        let name = input.column_prisma_name(col.as_column().id).prisma_name();
         let mut definition = renderer::IndexFieldInput::new(name);
 
         if col
@@ -158,7 +162,7 @@ pub(crate) fn render_index<'a>(
             definition.length(length);
         }
 
-        if let Some(ops) = render_opclass(col.id, ctx) {
+        if let Some(ops) = render_opclass(col.id, input) {
             definition.ops(ops);
         }
 
@@ -171,7 +175,7 @@ pub(crate) fn render_index<'a>(
             return None;
         }
         sql::IndexType::Unique => renderer::IndexDefinition::unique(fields),
-        sql::IndexType::Fulltext if ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
+        sql::IndexType::Fulltext if input.config.preview_features().contains(PreviewFeature::FullTextIndex) => {
             renderer::IndexDefinition::fulltext(fields)
         }
         sql::IndexType::Normal | sql::IndexType::Fulltext => renderer::IndexDefinition::index(fields),
@@ -182,11 +186,11 @@ pub(crate) fn render_index<'a>(
     let default_constraint_name = match index.index_type() {
         IndexType::Unique => {
             let columns = index.column_names().collect::<Vec<_>>();
-            ConstraintNames::unique_index_name(index.table().name(), &columns, ctx.active_connector())
+            ConstraintNames::unique_index_name(index.table().name(), &columns, input.active_connector())
         }
         _ => {
             let columns = index.column_names().collect::<Vec<_>>();
-            ConstraintNames::non_unique_index_name(index.table().name(), &columns, ctx.active_connector())
+            ConstraintNames::non_unique_index_name(index.table().name(), &columns, input.active_connector())
         }
     };
 
@@ -198,11 +202,11 @@ pub(crate) fn render_index<'a>(
         definition.map(index.name());
     }
 
-    if let Some(clustered) = index_is_clustered(index.id, ctx) {
+    if let Some(clustered) = index_is_clustered(index.id, input) {
         definition.clustered(clustered);
     }
 
-    if let Some(algo) = render_index_algorithm(index, ctx) {
+    if let Some(algo) = render_index_algorithm(index, input) {
         definition.index_type(algo);
     }
 
@@ -213,20 +217,24 @@ pub(crate) fn render_scalar_field<'a>(
     column: ColumnWalker<'a>,
     primary_key: Option<IndexWalker<'a>>,
     unique: Option<IndexWalker<'a>>,
-    ctx: &mut Context<'a>,
+    input: InputContext<'a>,
+    output: &mut OutputContext<'a>,
 ) -> renderer::ModelField<'a> {
-    let existing_field = ctx.existing_scalar_field(column.id);
+    let existing_field = input.existing_scalar_field(column.id);
 
     let (name, database_name, docs_for_commenting_out, is_commented_out) = {
-        let names = ctx.column_prisma_name(column.id);
+        let names = input.column_prisma_name(column.id);
         let prisma_name = names.prisma_name();
         let mapped_name = names.mapped_name();
 
         if prisma_name.is_empty() {
-            ctx.fields_with_empty_names.push(crate::warnings::ModelAndField {
-                model: ctx.table_prisma_name(column.table().id).prisma_name().into_owned(),
-                field: column.name().to_owned(),
-            });
+            output
+                .warnings
+                .fields_with_empty_names
+                .push(crate::warnings::ModelAndField {
+                    model: input.table_prisma_name(column.table().id).prisma_name().into_owned(),
+                    field: column.name().to_owned(),
+                });
 
             let docs = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
 
@@ -242,7 +250,7 @@ pub(crate) fn render_scalar_field<'a>(
     };
 
     if let Some(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
-        ctx.remapped_fields.push(crate::warnings::ModelAndField {
+        output.warnings.remapped_fields.push(crate::warnings::ModelAndField {
             model: field.model().name().to_owned(),
             field: field.name().to_owned(),
         });
@@ -259,7 +267,7 @@ pub(crate) fn render_scalar_field<'a>(
         ColumnTypeFamily::Binary => Cow::from("Bytes"),
         ColumnTypeFamily::Json => Cow::from("Json"),
         ColumnTypeFamily::Uuid => Cow::from("String"),
-        ColumnTypeFamily::Enum(id) => ctx.enum_prisma_name(*id).prisma_name(),
+        ColumnTypeFamily::Enum(id) => input.enum_prisma_name(*id).prisma_name(),
         ColumnTypeFamily::Unsupported(ref typ) => Cow::from(typ),
     };
 
@@ -282,13 +290,13 @@ pub(crate) fn render_scalar_field<'a>(
         calculate_psl_scalar_type(column).and_then(|st| column.column_type().native_type.as_ref().map(|nt| (st, nt)));
 
     if let Some((scalar_type, native_type)) = types {
-        let is_default = ctx
+        let is_default = input
             .active_connector()
             .native_type_is_default_for_scalar_type(native_type, &scalar_type);
 
         if !is_default {
-            let (r#type, params) = ctx.active_connector().native_type_to_parts(native_type);
-            let prefix = &ctx.config.datasources.first().unwrap().name;
+            let (r#type, params) = input.active_connector().native_type_to_parts(native_type);
+            let prefix = &input.config.datasources.first().unwrap().name;
 
             field.native_type(prefix, r#type, params)
         }
@@ -298,7 +306,7 @@ pub(crate) fn render_scalar_field<'a>(
         let mut id_field = renderer::IdFieldDefinition::default();
         let col = pk.columns().next().unwrap();
 
-        if let Some(clustered) = primary_key_is_clustered(pk.id, ctx) {
+        if let Some(clustered) = primary_key_is_clustered(pk.id, input) {
             id_field.clustered(clustered);
         }
 
@@ -314,7 +322,7 @@ pub(crate) fn render_scalar_field<'a>(
             id_field.length(length);
         }
 
-        let default_name = ConstraintNames::primary_key_name(column.table().name(), ctx.active_connector());
+        let default_name = ConstraintNames::primary_key_name(column.table().name(), input.active_connector());
         if pk.name() != default_name && !pk.name().is_empty() {
             id_field.map(pk.name());
         }
@@ -327,13 +335,13 @@ pub(crate) fn render_scalar_field<'a>(
         let col = unique.columns().next().unwrap();
 
         let default_constraint_name =
-            ConstraintNames::unique_index_name(unique.table().name(), &[col.name()], ctx.active_connector());
+            ConstraintNames::unique_index_name(unique.table().name(), &[col.name()], input.active_connector());
 
         if unique.name() != default_constraint_name {
             opts.map(unique.name());
         }
 
-        if let Some(clustered) = index_is_clustered(unique.id, ctx) {
+        if let Some(clustered) = index_is_clustered(unique.id, input) {
             opts.clustered(clustered);
         }
 
@@ -364,7 +372,7 @@ pub(crate) fn render_scalar_field<'a>(
         field.commented_out();
     }
 
-    if let Some(default) = render_default(column, existing_field, ctx) {
+    if let Some(default) = render_default(column, existing_field, input, output) {
         field.default(default);
     }
 
@@ -402,8 +410,8 @@ pub(crate) fn calculate_psl_scalar_type(column: ColumnWalker<'_>) -> Option<psl:
 
 // misc
 
-fn render_index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -> Option<&'static str> {
-    if !ctx.sql_family().is_postgres() {
+fn render_index_algorithm(index: sql::walkers::IndexWalker<'_>, input: InputContext<'_>) -> Option<&'static str> {
+    if !input.sql_family().is_postgres() {
         return None;
     }
 
@@ -419,12 +427,12 @@ fn render_index_algorithm(index: sql::walkers::IndexWalker<'_>, ctx: &Context) -
     }
 }
 
-fn index_is_clustered(index_id: sql::IndexId, ctx: &Context) -> Option<bool> {
-    if !ctx.sql_family().is_mssql() {
+fn index_is_clustered(index_id: sql::IndexId, input: InputContext<'_>) -> Option<bool> {
+    if !input.sql_family.is_mssql() {
         return None;
     }
 
-    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = input.schema.downcast_connector_data();
     let clustered = ext.index_is_clustered(index_id);
 
     if !clustered {
@@ -434,12 +442,12 @@ fn index_is_clustered(index_id: sql::IndexId, ctx: &Context) -> Option<bool> {
     Some(clustered)
 }
 
-pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Option<bool> {
-    if !ctx.sql_family().is_mssql() {
+pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, input: InputContext<'_>) -> Option<bool> {
+    if !input.sql_family.is_mssql() {
         return None;
     }
 
-    let ext: &MssqlSchemaExt = ctx.schema.downcast_connector_data();
+    let ext: &MssqlSchemaExt = input.schema.downcast_connector_data();
 
     let clustered = ext.index_is_clustered(pkid);
 
@@ -450,12 +458,12 @@ pub(crate) fn primary_key_is_clustered(pkid: sql::IndexId, ctx: &Context) -> Opt
     Some(clustered)
 }
 
-fn render_opclass<'a>(index_field_id: sql::IndexColumnId, ctx: &Context<'a>) -> Option<renderer::IndexOps<'a>> {
-    if !ctx.sql_family().is_postgres() {
+fn render_opclass(index_field_id: sql::IndexColumnId, input: InputContext) -> Option<renderer::IndexOps> {
+    if !input.sql_family.is_postgres() {
         return None;
     }
 
-    let ext: &PostgresSchemaExt = ctx.schema.downcast_connector_data();
+    let ext: &PostgresSchemaExt = input.schema.downcast_connector_data();
 
     let opclass = match ext.get_opclass(index_field_id) {
         Some(opclass) => opclass,

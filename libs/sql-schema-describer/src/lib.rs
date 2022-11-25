@@ -310,7 +310,7 @@ impl SqlSchema {
         (0..self.user_defined_types.len()).map(move |udt_index| self.walk(UdtId(udt_index as u32)))
     }
 
-    pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
+    pub fn enum_walkers(&self) -> impl ExactSizeIterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| self.walk(EnumId(enum_index as u32)))
     }
 

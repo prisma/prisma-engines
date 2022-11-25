@@ -306,3 +306,69 @@ async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql))]
+async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `User` (
+            id INT NOT NULL AUTO_INCREMENT,
+            color ENUM ('black', 'white') NOT NULL DEFAULT 'black',
+            PRIMARY KEY (id)
+        );
+
+        CREATE TABLE `Unrelated` (
+            id INT NOT NULL AUTO_INCREMENT,
+            PRIMARY KEY (id)
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+        model User {
+          id    Int   @id @default(autoincrement())
+          color color @default(BLACK)
+        }
+
+        enum color {
+          BLACK @map("black")
+          white
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        model User {
+          id    Int   @id @default(autoincrement())
+          color color @default(BLACK)
+        }
+
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+
+        enum color {
+          BLACK @map("black")
+          white
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 10,
+            "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "enm": "color",
+                "value": "BLACK"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
+
+    Ok(())
+}

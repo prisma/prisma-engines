@@ -1,11 +1,14 @@
 use super::relation_names::RelationNames;
-use crate::introspection_helpers::is_prisma_join_table;
+use crate::{
+    calculate_datamodel::{InputContext, OutputContext},
+    introspection_helpers::is_prisma_join_table,
+};
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Context<'a>) {
-    for table in ctx.schema.table_walkers().filter(|t| is_prisma_join_table(*t)) {
-        let existing_relation = ctx.existing_m2m_relation(table.id);
+pub(super) fn render<'a>(relation_names: &RelationNames<'a>, input: InputContext<'a>, output: &mut OutputContext<'a>) {
+    for table in input.schema.table_walkers().filter(|t| is_prisma_join_table(*t)) {
+        let existing_relation = input.existing_m2m_relation(table.id);
         let mut fks = table.foreign_keys();
 
         if let (Some(first_fk), Some(second_fk)) = (fks.next(), fks.next()) {
@@ -35,8 +38,8 @@ pub(super) fn render<'a>(relation_names: &RelationNames<'a>, ctx: &mut super::Co
                 })
                 .unwrap_or_else(|| relation_names.m2m_relation_name(table.id).clone());
 
-            calculate_many_to_many_field(fk_a, fk_b, relation_name.clone(), field_a_name, ctx);
-            calculate_many_to_many_field(fk_b, fk_a, relation_name, field_b_name, ctx);
+            calculate_many_to_many_field(fk_a, fk_b, relation_name.clone(), field_a_name, input, output);
+            calculate_many_to_many_field(fk_b, fk_a, relation_name, field_b_name, input, output);
         }
     }
 }
@@ -46,9 +49,10 @@ fn calculate_many_to_many_field<'a>(
     other_fk: sql::ForeignKeyWalker<'_>,
     relation_name: Cow<'a, str>,
     field_name: Cow<'a, str>,
-    ctx: &mut super::Context<'a>,
+    input: InputContext<'a>,
+    output: &mut OutputContext<'a>,
 ) {
-    let opposite_model_name = ctx.table_prisma_name(other_fk.referenced_table().id).prisma_name();
+    let opposite_model_name = input.table_prisma_name(other_fk.referenced_table().id).prisma_name();
 
     let mut field = datamodel_renderer::datamodel::ModelField::new_array(field_name, opposite_model_name);
 
@@ -58,7 +62,8 @@ fn calculate_many_to_many_field<'a>(
         field.relation(relation);
     }
 
-    ctx.rendered_schema
-        .model_at(ctx.target_models[&fk.referenced_table().id])
+    output
+        .rendered_schema
+        .model_at(output.target_models[&fk.referenced_table().id])
         .push_field(field);
 }
