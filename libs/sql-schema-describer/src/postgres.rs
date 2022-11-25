@@ -761,23 +761,27 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 get_column_type_postgresql(&col, sql_schema)
             };
+
             let default = col
                 .get("column_default")
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
             let auto_increment = is_identity
-                || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
+                || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
                     && matches!(
-                        default.as_ref().map(|d| d.kind()),
+                        default.as_ref().map(|d| &d.kind),
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
+
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             let col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 

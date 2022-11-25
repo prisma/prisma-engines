@@ -230,3 +230,42 @@ async fn invalid_enum_variants_regression(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_variant_that_cannot_be_sanitized_triggers_dbgenerated_in_defaults(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE Type "A" as ENUM ('0', '1');
+
+        CREATE TABLE "B" (
+            id SERIAL PRIMARY KEY,
+            val "A" NOT NULL DEFAULT '0'
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          val A   @default(dbgenerated("0"))
+        }
+
+        enum A {
+          // 0 @map("0")
+          // 1 @map("1")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

@@ -49,7 +49,7 @@ impl MssqlFlavour {
                     Cow::Owned(format!(
                         " CONSTRAINT {} DEFAULT {}",
                         Quoted::mssql_ident(&constraint_name),
-                        render_default(default)
+                        render_default(default.inner())
                     ))
                 })
                 .unwrap_or_default()

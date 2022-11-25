@@ -2,9 +2,12 @@
 
 #![deny(missing_docs)]
 
+use psl::dml::PrismaValue;
+
 use crate::{
-    ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
+    ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey,
+    ForeignKeyAction, ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType,
+    View,
 };
 use std::ops::Range;
 
@@ -63,6 +66,71 @@ pub type UserDefinedTypeWalker<'a> = Walker<'a, UdtId>;
 /// Traverse a view
 pub type ViewWalker<'a> = Walker<'a, ViewId>;
 
+/// Traverse a default value
+pub type DefaultValueWalker<'a> = Walker<'a, DefaultValueId>;
+
+impl<'a> DefaultValueWalker<'a> {
+    /// Return a value if a constant.
+    pub fn as_value(self) -> Option<&'a PrismaValue> {
+        match self.kind() {
+            DefaultKind::Value(ref v) => Some(v),
+            _ => None,
+        }
+    }
+
+    /// If the value is a squence, return it
+    pub fn as_sequence(&self) -> Option<&str> {
+        match self.kind() {
+            DefaultKind::Sequence(name) => Some(name),
+            _ => None,
+        }
+    }
+
+    /// True if a constant value
+    pub fn is_value(&self) -> bool {
+        matches!(self.kind(), DefaultKind::Value(_))
+    }
+
+    /// True if `now()`
+    pub fn is_now(&self) -> bool {
+        matches!(self.kind(), DefaultKind::Now)
+    }
+
+    /// True if referencing a sequence
+    pub fn is_sequence(&self) -> bool {
+        matches!(self.kind(), DefaultKind::Sequence(_))
+    }
+
+    /// True if value generation is handled in the database
+    pub fn is_db_generated(&self) -> bool {
+        matches!(self.kind(), DefaultKind::DbGenerated(_))
+    }
+
+    /// The value kind enumerator
+    pub fn kind(self) -> &'a DefaultKind {
+        &self.get().1.kind
+    }
+
+    /// The name of the default value constraint.
+    pub fn constraint_name(self) -> Option<&'a str> {
+        self.get().1.constraint_name.as_deref()
+    }
+
+    /// The column where the default value is located.
+    pub fn column(&self) -> ColumnWalker<'a> {
+        self.walk(self.get().0)
+    }
+
+    /// The default value data
+    pub fn inner(self) -> &'a DefaultValue {
+        &self.schema.default_values[self.id.0 as usize].1
+    }
+
+    fn get(self) -> &'a (ColumnId, DefaultValue) {
+        &self.schema.default_values[self.id.0 as usize]
+    }
+}
+
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
     pub fn arity(self) -> ColumnArity {
@@ -106,8 +174,11 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// The default value for the column.
-    pub fn default(self) -> Option<&'a DefaultValue> {
-        self.get().1.default.as_ref()
+    pub fn default(self) -> Option<DefaultValueWalker<'a>> {
+        self.get()
+            .1
+            .default_value_id
+            .map(move |default_id| self.walk(default_id))
     }
 
     /// The full column type.

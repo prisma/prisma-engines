@@ -487,10 +487,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+
             let col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 

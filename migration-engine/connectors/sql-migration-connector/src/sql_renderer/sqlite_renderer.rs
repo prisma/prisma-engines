@@ -287,8 +287,13 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.previous.name()),
-                default_value =
-                    render_default(columns.next.default().expect("default on required column with default"),)
+                default_value = render_default(
+                    columns
+                        .next
+                        .default()
+                        .expect("default on required column with default")
+                        .inner()
+                )
             )
         } else {
             Quoted::sqlite_ident(columns.previous.name()).to_string()
@@ -317,6 +322,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
                     DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)
                 )
             })
+            .map(|d| d.inner())
             .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),

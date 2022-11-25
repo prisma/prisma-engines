@@ -1,4 +1,4 @@
-use crate::sanitize_datamodel_names;
+use crate::sanitize_datamodel_names::ModelName;
 use psl::{
     parser_database::walkers,
     schema_ast::ast::{self, WithDocumentation},
@@ -31,33 +31,25 @@ impl<'a> EnumPair<'a> {
     /// contains characters that are not allowed in the PSL
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
-        self.previous
-            .map(|enm| Cow::Borrowed(enm.name()))
-            .unwrap_or_else(|| match self.next.name() {
-                name if psl::is_reserved_type_name(name) => Cow::Owned(format!("Renamed{name}")),
-                name if sanitize_datamodel_names::needs_sanitation(name) => {
-                    let sanitized = sanitize_datamodel_names::sanitize_string(name);
+        if let Some(name) = self.previous.map(|enm| enm.name()) {
+            return Cow::Borrowed(name);
+        }
 
-                    if sanitized.is_empty() {
-                        Cow::Borrowed(name)
-                    } else {
-                        Cow::Owned(sanitized)
-                    }
-                }
-                name => Cow::Borrowed(name),
-            })
+        self.context.enum_prisma_name(self.next.id).prisma_name()
     }
 
     /// The mapped name, if defined, is the actual name of the enum in
     /// the database.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        match self.previous {
-            Some(enm) => enm.mapped_name(),
-            None => match self.next.name() {
-                name if psl::is_reserved_type_name(name) => Some(name),
-                name if sanitize_datamodel_names::needs_sanitation(name) => Some(name),
-                _ => None,
-            },
+        if let Some(name) = self.previous.map(|enm| enm.mapped_name()) {
+            return name;
+        }
+
+        match self.context.enum_prisma_name(self.next.id) {
+            ModelName::FromPsl { mapped_name, .. } => mapped_name,
+            ModelName::RenamedReserved { mapped_name } => Some(mapped_name),
+            ModelName::RenamedSanitized { mapped_name } => Some(mapped_name),
+            ModelName::FromSql { .. } => None,
         }
     }
 
@@ -87,36 +79,24 @@ impl<'a> EnumVariantPair<'a> {
     /// it contains characters that are not allowed in the PSL
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
-        if let Some(name) = self.previous.map(|variant| variant.name()) {
-            return Cow::Borrowed(name);
-        }
+        let name = self.context.enum_variant_name(self.next.id).prisma_name();
 
-        match self.next.name() {
-            name if name.is_empty() => Cow::Borrowed("EMPTY_ENUM_VALUE"),
-            name if sanitize_datamodel_names::needs_sanitation(name) => {
-                let sanitized = sanitize_datamodel_names::sanitize_string(name);
-
-                if sanitized.is_empty() {
-                    Cow::Borrowed(name)
-                } else {
-                    Cow::Owned(sanitized)
-                }
-            }
-            name => Cow::Borrowed(name),
+        // If the variant is sanitized as an empty string, we will
+        // comment the variant out and add a warning.
+        //
+        // The commented out variant cannot have an empty name, so we
+        // just print the non-sanitized one.
+        if name.is_empty() {
+            Cow::Borrowed(self.next.name())
+        } else {
+            name
         }
     }
 
     /// The mapped name, if defined, is the actual name of the variant in
     /// the database.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        match self.previous {
-            Some(variant) => variant.mapped_name(),
-            None => match self.next.name() {
-                name if name.is_empty() => Some(name),
-                name if sanitize_datamodel_names::needs_sanitation(name) => Some(name),
-                _ => None,
-            },
-        }
+        self.context.enum_variant_name(self.next.id).mapped_name()
     }
 
     /// The documentation on top of the enum.

@@ -1,6 +1,7 @@
 use crate::{
     introspection::introspect,
-    pair::{EnumPair, Pair},
+    introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
+    pair::{EnumPair, ModelPair, Pair},
     warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
 use introspection_connector::{IntrospectionContext, IntrospectionResult, Version, Warning};
@@ -113,12 +114,12 @@ pub(crate) struct InputContext<'a> {
     pub(crate) render_config: bool,
     pub(crate) schema: &'a sql::SqlSchema,
     pub(crate) sql_family: SqlFamily,
+    pub(crate) version: Version,
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
     pub(crate) introspection_map: &'a crate::introspection_map::IntrospectionMap,
 }
 
 pub(crate) struct OutputContext<'a> {
-    pub(crate) version: Version,
     pub(crate) rendered_schema: datamodel_renderer::Datamodel<'a>,
     pub(crate) target_models: HashMap<sql::TableId, usize>,
     pub(crate) warnings: Warnings,
@@ -147,10 +148,27 @@ impl<'a> InputContext<'a> {
         self.config.datasources.first().unwrap().active_connector
     }
 
+    /// Iterate over the database enums, combined together with a
+    /// possible existing enum in the PSL.
     pub(crate) fn enum_pairs(self) -> impl ExactSizeIterator<Item = EnumPair<'a>> {
         self.schema
             .enum_walkers()
             .map(move |next| Pair::new(self, self.existing_enum(next.id), next))
+    }
+
+    /// Iterate over the database tables, combined together with a
+    /// possible existing model in the PSL.
+    pub(crate) fn model_pairs(self) -> impl Iterator<Item = ModelPair<'a>> {
+        self.schema
+            .table_walkers()
+            .filter(|table| !is_old_migration_table(*table))
+            .filter(|table| !is_new_migration_table(*table))
+            .filter(|table| !is_prisma_join_table(*table))
+            .filter(|table| !is_relay_table(*table))
+            .map(move |next| {
+                let previous = self.existing_model(next.id);
+                Pair::new(self, previous, next)
+            })
     }
 
     /// Given a SQL enum from the database, this method returns the enum that matches it (by name)
@@ -251,7 +269,8 @@ pub fn calculate_datamodel(
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     let introspection_map = crate::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema());
 
-    let input = InputContext {
+    let mut input = InputContext {
+        version: Version::NonPrisma,
         config: ctx.configuration(),
         render_config: ctx.render_config,
         schema,
@@ -261,13 +280,12 @@ pub fn calculate_datamodel(
     };
 
     let mut output = OutputContext {
-        version: Version::NonPrisma,
         rendered_schema: datamodel_renderer::Datamodel::default(),
         target_models: HashMap::default(),
         warnings: Warnings::new(),
     };
 
-    output.version = crate::version_checker::check_prisma_version(&input);
+    input.version = crate::version_checker::check_prisma_version(&input);
 
     let (schema_string, is_empty) = introspect(input, &mut output)?;
     let warnings = output.finalize_warnings();
@@ -276,7 +294,7 @@ pub fn calculate_datamodel(
     let version = if warnings.iter().any(|w| ![5, 6].contains(&w.code)) {
         Version::NonPrisma
     } else {
-        output.version
+        input.version
     };
 
     Ok(IntrospectionResult {

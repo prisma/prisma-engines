@@ -232,6 +232,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self {
+            PrismaValue::Bytes(s) => Some(s),
+            _ => None,
+        }
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }

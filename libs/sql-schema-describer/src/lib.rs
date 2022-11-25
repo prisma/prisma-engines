@@ -66,6 +66,8 @@ pub struct SqlSchema {
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
+    /// All foreign keys.
+    default_values: Vec<(ColumnId, DefaultValue)>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
@@ -87,6 +89,11 @@ impl SqlSchema {
     #[track_caller]
     pub fn downcast_connector_data<T: 'static>(&self) -> &T {
         self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
+    }
+
+    /// The id of the next column
+    pub fn next_column_id(&self) -> ColumnId {
+        ColumnId(self.columns.len() as u32)
     }
 
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -198,6 +205,13 @@ impl SqlSchema {
             index_name,
             tpe: IndexType::Normal,
         });
+        id
+    }
+
+    /// Add an index to the schema.
+    pub fn push_default_value(&mut self, column_id: ColumnId, value: DefaultValue) -> DefaultValueId {
+        let id = DefaultValueId(self.default_values.len() as u32);
+        self.default_values.push((column_id, value));
         id
     }
 
@@ -433,7 +447,7 @@ pub struct Column {
     /// Column type.
     pub tpe: ColumnType,
     /// Column default.
-    pub default: Option<DefaultValue>,
+    pub default_value_id: Option<DefaultValueId>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -667,6 +681,10 @@ impl DefaultValue {
         Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
+    pub fn constraint_name(&self) -> Option<&str> {
+        self.constraint_name.as_deref()
+    }
+
     pub fn now() -> Self {
         Self::new(DefaultKind::Now)
     }
@@ -679,6 +697,10 @@ impl DefaultValue {
         Self::new(DefaultKind::Sequence(val.to_string()))
     }
 
+    pub fn kind(&self) -> &DefaultKind {
+        &self.kind
+    }
+
     pub fn new(kind: DefaultKind) -> Self {
         Self {
             kind,
@@ -686,49 +708,27 @@ impl DefaultValue {
         }
     }
 
-    pub fn kind(&self) -> &DefaultKind {
-        &self.kind
-    }
-
-    pub fn into_kind(self) -> DefaultKind {
-        self.kind
-    }
-
     pub fn set_constraint_name(&mut self, name: impl ToString) {
         self.constraint_name = Some(name.to_string())
     }
 
-    pub fn constraint_name(&self) -> Option<&str> {
-        self.constraint_name.as_deref()
-    }
-
-    pub fn as_sequence(&self) -> Option<&str> {
-        match &self.kind {
-            DefaultKind::Sequence(name) => Some(name),
-            _ => None,
-        }
-    }
-
-    pub fn as_value(&self) -> Option<&PrismaValue> {
+    pub(crate) fn as_value(&self) -> Option<&PrismaValue> {
         match self.kind {
             DefaultKind::Value(ref v) => Some(v),
             _ => None,
         }
     }
 
-    pub fn is_value(&self) -> bool {
-        matches!(self.kind, DefaultKind::Value(_))
+    #[cfg(test)]
+    pub(crate) fn as_sequence<'a>(&'a self) -> Option<&'a str> {
+        match self.kind {
+            DefaultKind::Sequence(ref name) => Some(name),
+            _ => None,
+        }
     }
 
-    pub fn is_now(&self) -> bool {
-        matches!(self.kind, DefaultKind::Now)
-    }
-
-    pub fn is_sequence(&self) -> bool {
-        matches!(self.kind, DefaultKind::Sequence(_))
-    }
-
-    pub fn is_db_generated(&self) -> bool {
+    #[cfg(test)]
+    pub(crate) fn is_db_generated(&self) -> bool {
         matches!(self.kind, DefaultKind::DbGenerated(_))
     }
 

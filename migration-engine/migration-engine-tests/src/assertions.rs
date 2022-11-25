@@ -533,7 +533,7 @@ impl<'a> ColumnAssertion<'a> {
 
     #[track_caller]
     pub fn assert_default(self, expected: Option<DefaultValue>) -> Self {
-        let this = self.assert_default_kind(expected.clone().map(|val| val.into_kind()));
+        let this = self.assert_default_kind(expected.clone().map(|val| val.kind().clone()));
         let found = this.column.default().map(|d| d.constraint_name());
         let expected = expected.as_ref().map(|d| d.constraint_name());
 

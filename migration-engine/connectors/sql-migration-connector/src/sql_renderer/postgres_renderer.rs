@@ -28,7 +28,7 @@ impl PostgresFlavour {
         let nullability_str = render_nullability(column);
         let default_str = column
             .default()
-            .map(|d| render_default(d, &render_column_type(column, self)))
+            .map(|d| render_default(d.inner(), &render_column_type(column, self)))
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
@@ -760,7 +760,7 @@ fn expand_alter_column(columns: Pair<ColumnWalker<'_>>, column_changes: &ColumnC
     for change in column_changes.iter() {
         match change {
             ColumnChange::Default => match (columns.previous.default(), columns.next.default()) {
-                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((*next_default).clone())),
+                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault(next_default.inner().clone())),
                 (_, None) => changes.push(PostgresAlterColumn::DropDefault),
             },
             ColumnChange::Arity => match (columns.previous.arity(), columns.next.arity()) {
@@ -1008,7 +1008,7 @@ fn render_postgres_alter_enum(
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
             let data_type = render_column_type(columns.next, flavour);
-            let default_str = render_default(next_default, &data_type);
+            let default_str = render_default(next_default.inner(), &data_type);
 
             let set_default = format!(
                 "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}",
@@ -1080,7 +1080,7 @@ fn render_column_identity_str(column: ColumnWalker<'_>, flavour: &PostgresFlavou
         return String::new();
     }
 
-    let sequence = if let Some(seq_name) = column.default().and_then(|d| d.as_sequence()) {
+    let sequence = if let Some(seq_name) = column.default().as_ref().and_then(|d| d.as_sequence()) {
         let connector_data: &PostgresSchemaExt = column.schema.downcast_connector_data();
         connector_data
             .sequences
