@@ -77,44 +77,54 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
     Ok(())
 }
 
-//TODO(matthias) this is not working yet, but this is what it would look like if done ;-)
-// #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
-// async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
-//     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
-//
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//
-//     let create_schema = format!("CREATE Schema \"{other_name}\"",);
-//     let create_table = format!("CREATE TABLE \"{other_name}\".\"A\" (id Text PRIMARY KEY)",);
-//
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//
-//     let expected = expect![[r#"
-//         model first_A {
-//           id String @id
-//
-//           @@map("A")
-//           @@schema("first")
-//         }
-//
-//         model second_A {
-//           id String @id
-//
-//           @@map("A")
-//           @@schema("second")
-//         }
-//     "#]];
-//
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
-//
-//     Ok(())
-// }
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+             CREATE SCHEMA "{schema_name}";
+             CREATE TABLE "{schema_name}"."A" (id TEXT PRIMARY KEY);
+
+             CREATE SCHEMA "{other_name}";
+             CREATE TABLE "{other_name}"."A" (id TEXT PRIMARY KEY);
+         "#
+    };
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second"]
+        }
+
+        model A {
+          id String @id
+
+          @@schema("first")
+        }
+
+        model A {
+          id String @id
+
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
 
 #[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> TestResult {
@@ -157,55 +167,52 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> Test
     Ok(())
 }
 
-//TODO(matthias) this is not working yet, but this is what it would look like if done ;-)
-// #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
-// async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
-//     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
-//     //Todo
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//
-//     let create_schema = format!("CREATE Schema \"{other_name}\"",);
-//     let create_table = format!(
-//         "CREATE TABLE \"{other_name}\".\"A\" (id Text PRIMARY KEY, fk Text References \"{schema_name}\".\"A\"(\"id\"))",
-//     );
-//
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//
-//     let expected = expect![[r#"
-//         model first_A {
-//           id String @id
-//           second_A  second_A[]
-//
-//           @@map("A")
-//           @@schema("first")
-//         }
-//
-//         model second_A {
-//           id String  @id
-//           fk String?
-//           first_A  first_A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
-//
-//           @@map("A")
-//           @@schema("second")
-//         }
-//     "#]];
-//
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
-//
-//     Ok(())
-// }
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
+async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE SCHEMA \"{schema_name}\"",);
+    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
+    //Todo
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let create_schema = format!("CREATE SCHEMA \"{other_name}\"",);
+    let create_table = format!(
+        "CREATE TABLE \"{other_name}\".\"A\" (id TEXT PRIMARY KEY, fk TEXT REFERENCES \"{schema_name}\".\"A\"(\"id\"))",
+    );
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id String @id
+          A  A[]
+
+          @@schema("first")
+        }
+
+        model A {
+          id String  @id
+          fk String?
+          A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("second")
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
+
+    Ok(())
+}
 
 #[test_connector(
     tags(Postgres),
     exclude(CockroachDb),
     preview_features("multiSchema"),
-    db_schemas("first", "second_schema")
+    namespaces("first", "second_schema")
 )]
 async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
@@ -250,74 +257,77 @@ async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-// Todo(matthias) not passing yet due to us not retrieving and passing around the schema information of an enum
-// when it is used in a column type. We only pass the name currently which might not be unique
-// therefore the renaming logic for name clashes is not working for point of use yet
-// #[test_connector(tags(Postgres), preview_features("multiSchema"), db_schemas("first", "second"))]
-// async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> TestResult {
-//     let schema_name = "first";
-//     let other_name = "second";
-//     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
-//     let create_type = format!("CREATE TYPE \"{schema_name}\".\"HappyMood\" AS ENUM ('happy')",);
-//     let create_table =
-//         format!("CREATE TABLE \"{schema_name}\".\"HappyPerson\" (mood \"{schema_name}\".\"HappyMood\" PRIMARY KEY)",);
-//
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_type).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//
-//     let create_schema = format!("CREATE Schema \"{other_name}\"",);
-//     let create_type = format!("CREATE TYPE \"{other_name}\".\"HappyMood\" AS ENUM ('veryHappy')",);
-//     let create_table =
-//         format!("CREATE TABLE \"{other_name}\".\"VeryHappyPerson\" (mood \"{other_name}\".\"HappyMood\" PRIMARY KEY)",);
-//
-//     let create_table_2 =
-//         format!("CREATE TABLE \"{other_name}\".\"HappyPerson\" (mood \"{schema_name}\".\"HappyMood\" PRIMARY KEY)",);
-//
-//     api.database().raw_cmd(&create_schema).await?;
-//     api.database().raw_cmd(&create_type).await?;
-//     api.database().raw_cmd(&create_table).await?;
-//     api.database().raw_cmd(&create_table_2).await?;
-//
-//     let expected = expect![[r#"
-//         model HappyPerson {
-//           mood first_HappyMood @id
-//
-//           @@schema("first")
-//         }
-//
-//         model HappyPerson {
-//           mood first_HappyMood @id
-//
-//           @@schema("second")
-//         }
-//
-//         model VeryHappyPerson {
-//           mood second_HappyMood @id
-//
-//           @@schema("second")
-//         }
-//
-//         enum first_HappyMood {
-//           happy
-//
-//           @@map("HappyMood")
-//           @@schema("first")
-//         }
-//
-//         enum second_HappyMood {
-//           veryHappy
-//
-//           @@map("HappyMood")
-//           @@schema("second")
-//         }
-//     "#]];
-//
-//     let result = api.introspect_dml().await?;
-//     expected.assert_eq(&result);
-//
-//     Ok(())
-// }
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA "{schema_name}";
+            CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('happy');
+            CREATE TABLE "{schema_name}"."HappyPerson" (mood "{schema_name}"."HappyMood" PRIMARY KEY);
+
+            CREATE SCHEMA "{other_name}";
+            CREATE TYPE "{other_name}"."HappyMood" AS ENUM ('veryHappy');
+            CREATE TABLE "{other_name}"."VeryHappyPerson" (mood "{other_name}"."HappyMood" PRIMARY KEY);
+            CREATE TABLE "{other_name}"."HappyPerson" (mood "{schema_name}"."HappyMood" PRIMARY KEY);
+
+        "#
+    };
+
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["first", "second"]
+        }
+
+        model HappyPerson {
+          mood HappyMood @id
+
+          @@schema("first")
+        }
+
+        model HappyPerson {
+          mood HappyMood @id
+
+          @@schema("second")
+        }
+
+        model VeryHappyPerson {
+          mood HappyMood @id
+
+          @@schema("second")
+        }
+
+        enum HappyMood {
+          happy
+
+          @@schema("first")
+        }
+
+        enum HappyMood {
+          veryHappy
+
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
 
 #[test_connector(tags(Postgres))]
 async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &TestApi) -> TestResult {
@@ -349,7 +359,7 @@ async fn multiple_schemas_w_enums_without_schemas_are_not_introspected(api: &Tes
     tags(Postgres),
     exclude(CockroachDb),
     preview_features("multiSchema"),
-    db_schemas("first", "second_schema")
+    namespaces("first", "second_schema")
 )]
 async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResult {
     let sql = r#"
@@ -373,14 +383,17 @@ async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResu
           schemas  = ["first", "second_schema"]
         }
 
-        enum HappyMood {
-          happy
+        model tbl {
+          id  Int   @id @default(autoincrement())
+          tbl tbl[]
 
           @@schema("first")
         }
 
-        enum SadMood {
-          sad
+        model tbl {
+          id  Int  @id @default(autoincrement())
+          fst Int?
+          tbl tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
           @@schema("second_schema")
         }
