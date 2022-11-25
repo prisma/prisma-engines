@@ -36,7 +36,7 @@ impl DatamodelWarning {
             "#,
         )
         .replace('\n', " ");
-        Self::new(message.to_owned(), span)
+        Self::new(message, span)
     }
 
     /// The user-facing warning message.
