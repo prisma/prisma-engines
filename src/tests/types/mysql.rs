@@ -225,7 +225,7 @@ test_type!(time(
     mysql,
     "time",
     Value::Time(None),
-    Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
+    Value::time(chrono::NaiveTime::from_hms_opt(16, 20, 00).unwrap())
 ));
 
 #[cfg(feature = "chrono")]

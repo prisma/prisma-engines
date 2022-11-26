@@ -81,7 +81,7 @@ test_type!(date(
     sqlite,
     "DATE",
     Value::Date(None),
-    Value::date(chrono::NaiveDate::from_ymd(1984, 1, 1))
+    Value::date(chrono::NaiveDate::from_ymd_opt(1984, 1, 1).unwrap())
 ));
 
 #[cfg(feature = "chrono")]

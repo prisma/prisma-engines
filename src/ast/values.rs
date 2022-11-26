@@ -989,7 +989,7 @@ mod tests {
     #[test]
     #[cfg(feature = "chrono")]
     fn display_format_for_time() {
-        let time = NaiveTime::from_hms(16, 17, 00);
+        let time = NaiveTime::from_hms_opt(16, 17, 00).unwrap();
         let pv = Value::time(time);
 
         assert_eq!(format!("{}", pv), "\"16:17:00\"");

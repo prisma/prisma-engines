@@ -337,7 +337,7 @@ test_type!(date(
     postgresql,
     "date",
     Value::Date(None),
-    Value::date(chrono::NaiveDate::from_ymd(2020, 4, 20))
+    Value::date(chrono::NaiveDate::from_ymd_opt(2020, 4, 20).unwrap())
 ));
 
 #[cfg(feature = "chrono")]
@@ -346,7 +346,7 @@ test_type!(date_array(
     "date[]",
     Value::Array(None),
     Value::array(vec![
-        Value::date(chrono::NaiveDate::from_ymd(2020, 4, 20)),
+        Value::date(chrono::NaiveDate::from_ymd_opt(2020, 4, 20).unwrap()),
         Value::Date(None)
     ])
 ));
@@ -356,7 +356,7 @@ test_type!(time(
     postgresql,
     "time",
     Value::Time(None),
-    Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
+    Value::time(chrono::NaiveTime::from_hms_opt(16, 20, 00).unwrap())
 ));
 
 #[cfg(feature = "chrono")]
@@ -365,7 +365,7 @@ test_type!(time_array(
     "time[]",
     Value::Array(None),
     Value::array(vec![
-        Value::time(chrono::NaiveTime::from_hms(16, 20, 00)),
+        Value::time(chrono::NaiveTime::from_hms_opt(16, 20, 00).unwrap()),
         Value::Time(None)
     ])
 ));
