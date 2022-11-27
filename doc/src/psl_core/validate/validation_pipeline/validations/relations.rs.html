@@ -596,6 +596,9 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>many_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_one;
@@ -1152,11 +1155,14 @@
     {
         <span class="comment">// the database allows SetNull on non-nullable fields, we add a validation warning to avoid breaking changes
         </span><span class="kw">let </span>warning_template = |referential_action_type: <span class="kw-2">&amp;</span>str| {
-            <span class="kw">let </span>set_null = ReferentialAction::SetNull.as_str();
-            <span class="kw">let </span>msg = <span class="macro">formatdoc! </span>{<span class="string">r#&quot;
-                The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required. We recommend either to choose another referential action, or to make the referenced fields optional. Read more at https://pris.ly/d/postgres-set-null
-            &quot;#</span>};
-            msg
+            <span class="macro">formatdoc!</span>(
+                    <span class="string">r#&quot;
+                    The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required.
+                    We recommend either to choose another referential action, or to make the referenced fields optional.
+                    Read more at https://pris.ly/d/postgres-set-null
+                    &quot;#</span>,
+                    set_null = ReferentialAction::SetNull.as_str(),
+                ).replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>)
         };
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_delete() {

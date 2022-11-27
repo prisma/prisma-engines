@@ -69,6 +69,9 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     pretty_print::{pretty_print, DiagnosticColorer},
     Span,
@@ -99,12 +102,15 @@
     }
 
     <span class="kw">pub fn </span>new_missing_index_on_emulated_relation(span: Span) -&gt; DatamodelWarning {
-        <span class="kw">let </span>message = <span class="macro">indoc! </span>{
-            <span class="string">r#&quot;With `relationMode = \&quot;prisma\&quot;`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood.
+        <span class="kw">let </span>message = <span class="macro">indoc!</span>(
+            <span class="string">r#&quot;
+            With `relationMode = &quot;prisma&quot;`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood.
             This can lead to poor performance when querying these fields. We recommend adding an index manually.
-            Learn more at https://pris.ly/d/relation-mode#indexes&quot;#
-        </span>};
-        <span class="self">Self</span>::new(message.to_owned(), span)
+            Learn more at https://pris.ly/d/relation-mode-prisma-indexes&quot;
+            &quot;#</span>,
+        )
+        .replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>);
+        <span class="self">Self</span>::new(message, span)
     }
 
     <span class="doccomment">/// The user-facing warning message.

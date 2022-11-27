@@ -124,7 +124,11 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
-</pre><pre class="rust"><code><span class="kw">use </span>psl_core::diagnostics::{DatamodelWarning, Span};
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+</pre><pre class="rust"><code><span class="kw">use </span>indoc::formatdoc;
+<span class="kw">use </span>psl_core::diagnostics::{DatamodelWarning, Span};
 <span class="kw">use </span>psl_core::parser_database::ast::WithSpan;
 <span class="kw">use </span>psl_core::parser_database::ReferentialAction;
 <span class="kw">use </span>psl_core::{
@@ -232,12 +236,14 @@
     };
 
     <span class="kw">let </span>warning_msg = || {
-        <span class="macro">format!</span>(
-            <span class="string">&quot;Using {set_default} on {connector} may yield to unexpected results, as the database will silently change the referential action to `{no_action}`.&quot;</span>,
+        <span class="macro">formatdoc!</span>(
+            <span class="string">r#&quot;
+            {connector_name} does not actually support the `{set_default}` referential action, so using it may result in unexpected errors.
+            Read more at https://pris.ly/d/mysql-set-default
+            &quot;#</span>,
+            connector_name = connector.name(),
             set_default = ReferentialAction::SetDefault.as_str(),
-            connector = connector.name(),
-            no_action = ReferentialAction::NoAction.as_str(),
-        )
+        ).replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>)
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetDefault) = field.explicit_on_delete() {
