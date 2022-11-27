@@ -5,7 +5,11 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
-use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
+use diagnostics::DatamodelWarning;
+use parser_database::{
+    ast::{Expression, WithDocumentation},
+    coerce, coerce_array, coerce_opt,
+};
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -185,33 +189,33 @@ fn lift_datasource(
     })
 }
 
+/// Returns the relation mode for the datasource, validating against invalid relation mode settings and
+/// the deprecated `referentialIntegrity` attribute.
 fn get_relation_mode(
     args: &mut HashMap<&str, (Span, &ast::Expression)>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
     connector: &'static dyn crate::datamodel_connector::Connector,
 ) -> Option<RelationMode> {
-    match (args.remove("relationMode"), args.remove("referentialIntegrity")) {
-        (None, None) => None,
-        (Some(_), Some((span, _))) => {
-            diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
-            None
-        }
-        (Some((_span, rm)), None) | (None, Some((_span, rm))) => {
-            let integrity = match coerce::string(rm, diagnostics)? {
-                "prisma" => RelationMode::Prisma,
-                "foreignKeys" => RelationMode::ForeignKeys,
+    let get_and_validate_relation_mode_value =
+        |rm: &Expression, diagnostics: &mut Diagnostics| -> Option<RelationMode> {
+            match coerce::string(rm, diagnostics)? {
+                "prisma" => Some(RelationMode::Prisma),
+                "foreignKeys" => Some(RelationMode::ForeignKeys),
                 other => {
                     let message = format!(
                         "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
                     );
                     let error = DatamodelError::new_source_validation_error(&message, "relationMode", source.span);
                     diagnostics.push_error(error);
-                    return None;
+                    None
                 }
-            };
+            }
+        };
 
-            if !connector.allowed_relation_mode_settings().contains(integrity) {
+    let validate_allowed_relation_mode_settings =
+        |rm: &Expression, relation_mode: RelationMode, diagnostics: &mut Diagnostics| {
+            if !connector.allowed_relation_mode_settings().contains(relation_mode) {
                 let supported_values = connector
                     .allowed_relation_mode_settings()
                     .iter()
@@ -219,13 +223,43 @@ fn get_relation_mode(
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                let message =
-                    format!("Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",);
+                let message = format!(
+                    "Invalid relation mode setting: \"{relation_mode}\". Supported values: {supported_values}",
+                );
                 let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
                 diagnostics.push_error(error);
             }
+        };
 
-            Some(integrity)
+    // figure out which attribute is used for the "relationMode" feature
+    match (args.remove("relationMode"), args.remove("referentialIntegrity")) {
+        (None, None) => None,
+        (Some(_), Some((span, _))) => {
+            // both possible attributes are used, which is invalid
+            diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
+            None
+        }
+        (None, Some((span, rm))) => {
+            // "referentialIntegrity" is used, which is valid but deprecated
+            diagnostics.push_warning(DatamodelWarning::new_referential_integrity_attr_deprecation_warning(
+                span,
+            ));
+
+            let relation_mode_option = get_and_validate_relation_mode_value(rm, diagnostics);
+            relation_mode_option.iter().for_each(|relation_mode| {
+                validate_allowed_relation_mode_settings(rm, *relation_mode, diagnostics);
+            });
+
+            relation_mode_option
+        }
+        (Some((_span, rm)), None) => {
+            // "relationMode" is used, which is valid
+            let relation_mode_option = get_and_validate_relation_mode_value(rm, diagnostics);
+            relation_mode_option.iter().for_each(|relation_mode| {
+                validate_allowed_relation_mode_settings(rm, *relation_mode, diagnostics);
+            });
+
+            relation_mode_option
         }
     }
 }
