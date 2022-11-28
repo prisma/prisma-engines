@@ -86,6 +86,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
+         | ClientExtensions
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -116,7 +117,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         MultiSchema
-        | ClientExtensions
     }),
 };
 
