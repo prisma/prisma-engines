@@ -1,10 +1,7 @@
 mod relations;
 
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
-use psl::{
-    parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
-    Diagnostics,
-};
+use psl::parser_database::{ast, walkers::RefinedRelationWalker, SourceFile};
 use std::sync::Arc;
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
@@ -16,22 +13,38 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
-    let db = {
-        let mut diag = Diagnostics::new();
-        ParserDatabase::new(file.clone(), &mut diag)
-    };
+    let validated_schema = psl::validate(file);
 
-    for relation in db.walk_relations() {
+    for relation in validated_schema.db.walk_relations() {
         if let RefinedRelationWalker::Inline(relation) = relation.refine() {
             let complete_relation = match relation.as_complete() {
                 Some(relation) => relation,
                 None => continue,
             };
 
-            relations::add_referenced_side_unique(&mut actions, &params, file.as_str(), complete_relation);
+            relations::add_referenced_side_unique(
+                &mut actions,
+                &params,
+                validated_schema.db.source(),
+                complete_relation,
+            );
 
             if relation.is_one_to_one() {
-                relations::add_referencing_side_unique(&mut actions, &params, file.as_str(), complete_relation);
+                relations::add_referencing_side_unique(
+                    &mut actions,
+                    &params,
+                    validated_schema.db.source(),
+                    complete_relation,
+                );
+            }
+
+            if validated_schema.relation_mode().is_prisma() {
+                relations::add_index_for_relation_fields(
+                    &mut actions,
+                    &params,
+                    validated_schema.db.source(),
+                    complete_relation.referencing_field(),
+                );
             }
         }
     }
