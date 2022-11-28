@@ -367,10 +367,18 @@ fn handle_one_to_one(
     // We always start with the read node in a nested connect 1:1 scenario.
     graph.mark_nodes(&parent_node, &read_new_child_node);
 
+    // If the new child is the same as the old child, we stop the execution before performing the update.
+    let idempotent_check_node =
+        utils::insert_1to1_idempotent_connect_checks(graph, &parent_node, &read_new_child_node, parent_relation_field)?;
+
     // Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").
     if parent_side_required || relation_inlined_parent {
-        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
+        let node =
+            utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
+
+        // We do those checks only if the old & new child are different.
+        graph.create_edge(&idempotent_check_node, &node, QueryGraphDependency::ExecutionOrder)?;
     }
 
     let relation_name = parent_relation_field.relation().name.clone();
@@ -409,7 +417,10 @@ fn handle_one_to_one(
     // We only need to do those checks if the parent operation is not a create, the reason being that
     // if the parent is a create, it can't have an existing child already.
     if !parent_is_create && (child_side_required || !relation_inlined_parent) {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
+        let node = utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
+
+        // We do those checks only if the old & new child are different.
+        graph.create_edge(&idempotent_check_node, &node, QueryGraphDependency::ExecutionOrder)?;
     }
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
@@ -449,6 +460,12 @@ fn handle_one_to_one(
         let relation_name = parent_relation_field.relation().name.clone();
         let parent_model_name = parent_relation_field.model().name.clone();
         let child_model_name = child_model.name.clone();
+
+        graph.create_edge(
+            &idempotent_check_node,
+            &update_children_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
 
         graph.create_edge(
              &parent_node,
@@ -507,6 +524,12 @@ fn handle_one_to_one(
         let relation_name = parent_relation_field.relation().name.clone();
         let parent_model_name = parent_model.name.clone();
         let child_model_name = child_model.name.clone();
+
+        graph.create_edge(
+            &idempotent_check_node,
+            &update_parent_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
 
         graph.create_edge(
             &parent_node,

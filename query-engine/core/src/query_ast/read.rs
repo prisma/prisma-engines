@@ -1,5 +1,6 @@
 //! Prisma read query AST
 use super::FilteredQuery;
+use crate::ToGraphviz;
 use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use enumflags2::BitFlags;
 use prisma_models::prelude::*;
@@ -83,6 +84,26 @@ impl Display for ReadQuery {
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
+        }
+    }
+}
+
+impl ToGraphviz for ReadQuery {
+    fn to_graphviz(&self) -> String {
+        match self {
+            Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.selected_fields),
+            Self::ManyRecordsQuery(q) => format!(
+                r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {})"#,
+                q.name, q.model.name, q.selected_fields
+            ),
+            Self::RelatedRecordsQuery(q) => format!(
+                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
+                q.name,
+                q.parent_field.model().name,
+                q.parent_field.name,
+                q.selected_fields
+            ),
+            Self::AggregateRecordsQuery(q) => format!("AggregateRecordsQuery: {}", q.name),
         }
     }
 }

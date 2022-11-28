@@ -40,3 +40,4 @@ dev_datamodel.prisma
 /result
 
 dmmf.json
+graph.dot
