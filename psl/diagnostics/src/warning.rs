@@ -27,6 +27,11 @@ impl DatamodelWarning {
         Self::new(message, span)
     }
 
+    pub fn new_referential_integrity_attr_deprecation_warning(span: Span) -> DatamodelWarning {
+        let message = "The `referentialIntegrity` attribute is deprecated. Please use `relationMode` instead. Learn more at https://pris.ly/d/relation-mode";
+        Self::new(message.to_string(), span)
+    }
+
     pub fn new_missing_index_on_emulated_relation(span: Span) -> DatamodelWarning {
         let message = indoc!(
             r#"

@@ -641,35 +641,6 @@ fn relation_mode_default() {
     assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
 }
 
-#[test]
-fn relation_mode_and_referential_integrity_cannot_cooccur() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlite"
-          url = "sqlite"
-          relationMode = "prisma"
-          referentialIntegrity = "foreignKeys"
-        }
-        generator client {
-          provider = "prisma-client-js"
-        }
-    "#};
-
-    let config = parse_config(schema);
-    let error = config.unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
-        [1;94m   | [0m
-        [1;94m 4 | [0m  relationMode = "prisma"
-        [1;94m 5 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
-        [1;94m 6 | [0m}
-        [1;94m   | [0m
-    "#]];
-    expectation.assert_eq(&error);
-}
-
 fn load_env_var(key: &str) -> Option<String> {
     std::env::var(key).ok()
 }

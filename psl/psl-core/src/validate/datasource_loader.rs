@@ -5,6 +5,7 @@ use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
+use diagnostics::DatamodelWarning;
 use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 use std::{borrow::Cow, collections::HashMap};
 
@@ -185,20 +186,32 @@ fn lift_datasource(
     })
 }
 
+/// Returns the relation mode for the datasource, validating against invalid relation mode settings and
+/// the deprecated `referentialIntegrity` attribute.
 fn get_relation_mode(
     args: &mut HashMap<&str, (Span, &ast::Expression)>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
     connector: &'static dyn crate::datamodel_connector::Connector,
 ) -> Option<RelationMode> {
+    // check for deprecated `referentialIntegrity` attribute.
+    if let Some((span, _)) = args.get("referentialIntegrity") {
+        diagnostics.push_warning(DatamodelWarning::new_referential_integrity_attr_deprecation_warning(
+            *span,
+        ));
+    }
+
+    // figure out which attribute is used for the `relationMode` feature
     match (args.remove("relationMode"), args.remove("referentialIntegrity")) {
         (None, None) => None,
         (Some(_), Some((span, _))) => {
+            // both possible attributes are used, which is invalid
             diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
             None
         }
         (Some((_span, rm)), None) | (None, Some((_span, rm))) => {
-            let integrity = match coerce::string(rm, diagnostics)? {
+            // either `relationMode` or `referentialIntegrity` is used, which is valid
+            let relation_mode = match coerce::string(rm, diagnostics)? {
                 "prisma" => RelationMode::Prisma,
                 "foreignKeys" => RelationMode::ForeignKeys,
                 other => {
@@ -211,7 +224,7 @@ fn get_relation_mode(
                 }
             };
 
-            if !connector.allowed_relation_mode_settings().contains(integrity) {
+            if !connector.allowed_relation_mode_settings().contains(relation_mode) {
                 let supported_values = connector
                     .allowed_relation_mode_settings()
                     .iter()
@@ -219,13 +232,14 @@ fn get_relation_mode(
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                let message =
-                    format!("Invalid relation mode setting: \"{integrity}\". Supported values: {supported_values}",);
+                let message = format!(
+                    "Invalid relation mode setting: \"{relation_mode}\". Supported values: {supported_values}",
+                );
                 let error = DatamodelError::new_source_validation_error(&message, "relationMode", rm.span());
                 diagnostics.push_error(error);
             }
 
-            Some(integrity)
+            Some(relation_mode)
         }
     }
 }
