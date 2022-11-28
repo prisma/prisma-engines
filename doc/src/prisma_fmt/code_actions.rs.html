@@ -58,13 +58,23 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>relations;
 
 <span class="kw">use </span>lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic};
-<span class="kw">use </span>psl::{
-    parser_database::{ast, walkers::RefinedRelationWalker, ParserDatabase, SourceFile},
-    Diagnostics,
-};
+<span class="kw">use </span>psl::parser_database::{ast, walkers::RefinedRelationWalker, SourceFile};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>empty_code_actions() -&gt; Vec&lt;CodeActionOrCommand&gt; {
@@ -76,22 +86,38 @@
 
     <span class="kw">let </span>file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
-    <span class="kw">let </span>db = {
-        <span class="kw">let </span><span class="kw-2">mut </span>diag = Diagnostics::new();
-        ParserDatabase::new(file.clone(), <span class="kw-2">&amp;mut </span>diag)
-    };
+    <span class="kw">let </span>validated_schema = psl::validate(file);
 
-    <span class="kw">for </span>relation <span class="kw">in </span>db.walk_relations() {
+    <span class="kw">for </span>relation <span class="kw">in </span>validated_schema.db.walk_relations() {
         <span class="kw">if let </span>RefinedRelationWalker::Inline(relation) = relation.refine() {
             <span class="kw">let </span>complete_relation = <span class="kw">match </span>relation.as_complete() {
                 <span class="prelude-val">Some</span>(relation) =&gt; relation,
                 <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
             };
 
-            relations::add_referenced_side_unique(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, file.as_str(), complete_relation);
+            relations::add_referenced_side_unique(
+                <span class="kw-2">&amp;mut </span>actions,
+                <span class="kw-2">&amp;</span>params,
+                validated_schema.db.source(),
+                complete_relation,
+            );
 
             <span class="kw">if </span>relation.is_one_to_one() {
-                relations::add_referencing_side_unique(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, file.as_str(), complete_relation);
+                relations::add_referencing_side_unique(
+                    <span class="kw-2">&amp;mut </span>actions,
+                    <span class="kw-2">&amp;</span>params,
+                    validated_schema.db.source(),
+                    complete_relation,
+                );
+            }
+
+            <span class="kw">if </span>validated_schema.relation_mode().is_prisma() {
+                relations::add_index_for_relation_fields(
+                    <span class="kw-2">&amp;mut </span>actions,
+                    <span class="kw-2">&amp;</span>params,
+                    validated_schema.db.source(),
+                    complete_relation.referencing_field(),
+                );
             }
         }
     }
