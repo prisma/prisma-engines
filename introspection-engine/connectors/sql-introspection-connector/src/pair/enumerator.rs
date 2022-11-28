@@ -87,21 +87,23 @@ impl<'a> EnumVariantPair<'a> {
     /// it contains characters that are not allowed in the PSL
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
-        self.previous
-            .map(|variant| Cow::Borrowed(variant.name()))
-            .unwrap_or_else(|| match self.next.name() {
-                name if name.is_empty() => Cow::Borrowed("EMPTY_ENUM_VALUE"),
-                name if sanitize_datamodel_names::needs_sanitation(name) => {
-                    let sanitized = sanitize_datamodel_names::sanitize_string(name);
+        if let Some(name) = self.previous.map(|variant| variant.name()) {
+            return Cow::Borrowed(name);
+        }
 
-                    if sanitized.is_empty() {
-                        Cow::Borrowed(name)
-                    } else {
-                        Cow::Owned(sanitized)
-                    }
+        match self.next.name() {
+            name if name.is_empty() => Cow::Borrowed("EMPTY_ENUM_VALUE"),
+            name if sanitize_datamodel_names::needs_sanitation(name) => {
+                let sanitized = sanitize_datamodel_names::sanitize_string(name);
+
+                if sanitized.is_empty() {
+                    Cow::Borrowed(name)
+                } else {
+                    Cow::Owned(sanitized)
                 }
-                name => Cow::Borrowed(name),
-            })
+            }
+            name => Cow::Borrowed(name),
+        }
     }
 
     /// The mapped name, if defined, is the actual name of the variant in
