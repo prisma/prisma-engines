@@ -291,9 +291,34 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
-<span class="kw">use </span><span class="kw">crate</span>::RecordQuery;
+<span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
 <span class="kw">use </span>connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
@@ -439,7 +464,32 @@
             <span class="self">Self</span>::DisconnectRecords(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DisconnectRecords&quot;</span>),
             <span class="self">Self</span>::ExecuteRaw(r) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ExecuteRaw: {:?}&quot;</span>, r.inputs),
             <span class="self">Self</span>::QueryRaw(r) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;QueryRaw: {:?}&quot;</span>, r.inputs),
-            <span class="self">Self</span>::Upsert(q) =&gt; q.fmt(f),
+            <span class="self">Self</span>::Upsert(q) =&gt; <span class="macro">write!</span>(
+                f,
+                <span class="string">&quot;Upsert(model: {}, filter: {:?}, create: {:?}, update: {:?}&quot;</span>,
+                q.model().name,
+                q.record_filter(),
+                q.create(),
+                q.update()
+            ),
+        }
+    }
+}
+
+<span class="kw">impl </span>ToGraphviz <span class="kw">for </span>WriteQuery {
+    <span class="kw">fn </span>to_graphviz(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::CreateRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CreateRecord(model: {}, args: {:?})&quot;</span>, q.model.name, q.args),
+            <span class="self">Self</span>::CreateManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CreateManyRecord(model: {})&quot;</span>, q.model.name),
+            <span class="self">Self</span>::UpdateRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;UpdateRecord(model: {})&quot;</span>, q.model.name,),
+            <span class="self">Self</span>::DeleteRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteRecord: {}, {:?}&quot;</span>, q.model.name, q.record_filter),
+            <span class="self">Self</span>::UpdateManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;UpdateManyRecords(model: {}, args: {:?})&quot;</span>, q.model.name, q.args),
+            <span class="self">Self</span>::DeleteManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteManyRecords: {}&quot;</span>, q.model.name),
+            <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; <span class="string">&quot;ConnectRecords&quot;</span>.to_string(),
+            <span class="self">Self</span>::DisconnectRecords(<span class="kw">_</span>) =&gt; <span class="string">&quot;DisconnectRecords&quot;</span>.to_string(),
+            <span class="self">Self</span>::ExecuteRaw(r) =&gt; <span class="macro">format!</span>(<span class="string">&quot;ExecuteRaw: {:?}&quot;</span>, r.inputs),
+            <span class="self">Self</span>::QueryRaw(r) =&gt; <span class="macro">format!</span>(<span class="string">&quot;QueryRaw: {:?}&quot;</span>, r.inputs),
+            <span class="self">Self</span>::Upsert(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Upsert(model: {}&quot;</span>, q.model().name),
         }
     }
 }

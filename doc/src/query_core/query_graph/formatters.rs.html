@@ -133,6 +133,17 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display};
 
@@ -210,6 +221,17 @@
             <span class="self">Self</span>::Flow(flow) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, flow),
             <span class="self">Self</span>::Computation(c) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, c),
             <span class="self">Self</span>::Empty =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Empty&quot;</span>),
+        }
+    }
+}
+
+<span class="kw">impl </span>ToGraphviz <span class="kw">for </span>Node {
+    <span class="kw">fn </span>to_graphviz(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            Node::Query(q) =&gt; q.to_graphviz(),
+            Node::Flow(f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, f),
+            Node::Computation(c) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, c),
+            Node::Empty =&gt; <span class="string">&quot;Empty&quot;</span>.to_string(),
         }
     }
 }

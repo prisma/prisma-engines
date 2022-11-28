@@ -304,6 +304,12 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use super</span>::{
@@ -346,6 +352,12 @@
 </span><span class="kw">pub struct </span>DiffResult {
     <span class="kw">pub </span>left: Vec&lt;SelectionResult&gt;,
     <span class="kw">pub </span>right: Vec&lt;SelectionResult&gt;,
+}
+
+<span class="kw">impl </span>DiffResult {
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.left.is_empty() &amp;&amp; <span class="self">self</span>.right.is_empty()
+    }
 }
 
 <span class="kw">impl </span>ExpressionResult {

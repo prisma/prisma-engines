@@ -195,8 +195,30 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Prisma read query AST
 </span><span class="kw">use </span><span class="kw">super</span>::FilteredQuery;
+<span class="kw">use </span><span class="kw">crate</span>::ToGraphviz;
 <span class="kw">use </span>connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
@@ -280,6 +302,26 @@
                 q.selected_fields
             ),
             <span class="self">Self</span>::AggregateRecordsQuery(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;AggregateRecordsQuery: {}&quot;</span>, q.name),
+        }
+    }
+}
+
+<span class="kw">impl </span>ToGraphviz <span class="kw">for </span>ReadQuery {
+    <span class="kw">fn </span>to_graphviz(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::RecordQuery(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;RecordQuery(name: &#39;{}&#39;, selection: {})&quot;</span>, q.name, q.selected_fields),
+            <span class="self">Self</span>::ManyRecordsQuery(q) =&gt; <span class="macro">format!</span>(
+                <span class="string">r#&quot;ManyRecordsQuery(name: &#39;{}&#39;, model: &#39;{}&#39;, selection: {})&quot;#</span>,
+                q.name, q.model.name, q.selected_fields
+            ),
+            <span class="self">Self</span>::RelatedRecordsQuery(q) =&gt; <span class="macro">format!</span>(
+                <span class="string">&quot;RelatedRecordsQuery(name: &#39;{}&#39;, parent model: &#39;{}&#39;, parent relation field: {}, selection: {})&quot;</span>,
+                q.name,
+                q.parent_field.model().name,
+                q.parent_field.name,
+                q.selected_fields
+            ),
+            <span class="self">Self</span>::AggregateRecordsQuery(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;AggregateRecordsQuery: {}&quot;</span>, q.name),
         }
     }
 }

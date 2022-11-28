@@ -85,12 +85,6 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Filter, RecordFilter, WriteArgs};
 <span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
 
@@ -173,15 +167,9 @@
     <span class="kw">pub fn </span>selection_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[String] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.selection_order
     }
-}
 
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>NativeUpsert {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(
-            f,
-            <span class="string">&quot;Upsert(model: {}, filter: {:?}, create: {:?}, update: {:?}&quot;</span>,
-            <span class="self">self</span>.model.name, <span class="self">self</span>.record_filter, <span class="self">self</span>.create, <span class="self">self</span>.update
-        )
+    <span class="kw">pub fn </span>record_filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RecordFilter {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.record_filter
     }
 }
 </code></pre></div>

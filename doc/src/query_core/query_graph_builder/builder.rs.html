@@ -98,10 +98,30 @@
 <span id="98">98</span>
 <span id="99">99</span>
 <span id="100">100</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+</pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>std::{fmt, fs::File, io::Write};
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::<span class="kw-2">*</span>, query_graph::<span class="kw-2">*</span>, schema::<span class="kw-2">*</span>, IrSerializer};
+
+<span class="kw">pub static </span>PRISMA_RENDER_DOT_FILE: Lazy&lt;bool&gt; = Lazy::new(|| <span class="kw">match </span>std::env::var(<span class="string">&quot;PRISMA_RENDER_DOT_FILE&quot;</span>) {
+    <span class="prelude-val">Ok</span>(enabled) =&gt; enabled == <span class="kw-2">*</span>(<span class="string">&quot;true&quot;</span>) || enabled == <span class="kw-2">*</span>(<span class="string">&quot;1&quot;</span>),
+    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+});
 
 <span class="kw">pub struct </span>QueryGraphBuilder {
     <span class="kw">pub </span>query_schema: QuerySchemaRef,
@@ -184,6 +204,14 @@
         <span class="comment">// Run final transformations.
         </span>graph.finalize()<span class="question-mark">?</span>;
         <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, graph);
+
+        <span class="comment">// Used to debug generated graph.
+        </span><span class="kw">if </span><span class="kw-2">*</span>PRISMA_RENDER_DOT_FILE {
+            <span class="kw">let </span><span class="kw-2">mut </span>f = File::create(<span class="string">&quot;graph.dot&quot;</span>).unwrap();
+            <span class="kw">let </span>output = graph.to_graphviz();
+
+            f.write_all(<span class="kw-2">&amp;</span>output.as_bytes()).unwrap();
+        }
 
         <span class="prelude-val">Ok</span>(graph)
     }

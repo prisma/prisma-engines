@@ -533,6 +533,29 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -902,10 +925,18 @@
     <span class="comment">// We always start with the read node in a nested connect 1:1 scenario.
     </span>graph.mark_nodes(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_new_child_node);
 
+    <span class="comment">// If the new child is the same as the old child, we stop the execution before performing the update.
+    </span><span class="kw">let </span>idempotent_check_node =
+        utils::insert_1to1_idempotent_connect_checks(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_new_child_node, parent_relation_field)<span class="question-mark">?</span>;
+
     <span class="comment">// Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side (&quot;backrelation&quot;).
     </span><span class="kw">if </span>parent_side_required || relation_inlined_parent {
-        utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>read_new_child_node, <span class="kw-2">&amp;</span>child_relation_field)<span class="question-mark">?</span>;
+        <span class="kw">let </span>node =
+            utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>read_new_child_node, <span class="kw-2">&amp;</span>child_relation_field)<span class="question-mark">?</span>;
+
+        <span class="comment">// We do those checks only if the old &amp; new child are different.
+        </span>graph.create_edge(<span class="kw-2">&amp;</span>idempotent_check_node, <span class="kw-2">&amp;</span>node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
@@ -944,7 +975,10 @@
     // We only need to do those checks if the parent operation is not a create, the reason being that
     // if the parent is a create, it can&#39;t have an existing child already.
     </span><span class="kw">if </span>!parent_is_create &amp;&amp; (child_side_required || !relation_inlined_parent) {
-        utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field)<span class="question-mark">?</span>;
+        <span class="kw">let </span>node = utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field)<span class="question-mark">?</span>;
+
+        <span class="comment">// We do those checks only if the old &amp; new child are different.
+        </span>graph.create_edge(<span class="kw-2">&amp;</span>idempotent_check_node, <span class="kw-2">&amp;</span>node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
     }
 
     <span class="comment">// If the relation is inlined on the child, we also need to update the child to connect it to the parent.
@@ -984,6 +1018,12 @@
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
         <span class="kw">let </span>child_model_name = child_model.name.clone();
+
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>idempotent_check_node,
+            <span class="kw-2">&amp;</span>update_children_node,
+            QueryGraphDependency::ExecutionOrder,
+        )<span class="question-mark">?</span>;
 
         graph.create_edge(
              <span class="kw-2">&amp;</span>parent_node,
@@ -1042,6 +1082,12 @@
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
         <span class="kw">let </span>parent_model_name = parent_model.name.clone();
         <span class="kw">let </span>child_model_name = child_model.name.clone();
+
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>idempotent_check_node,
+            <span class="kw-2">&amp;</span>update_parent_node,
+            QueryGraphDependency::ExecutionOrder,
+        )<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>parent_node,
