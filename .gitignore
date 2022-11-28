@@ -31,6 +31,7 @@ buildkite-script-*
 
 # Nix specific
 .direnv/
+/.envrc.local
 
 # Dev setup
 datamodel_v2.prisma
