@@ -236,6 +236,20 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, SourceConfig, Span},
     configuration::StringFromEnvVar,
@@ -243,6 +257,7 @@
     diagnostics::{DatamodelError, Diagnostics},
     Datasource,
 };
+<span class="kw">use </span>diagnostics::DatamodelWarning;
 <span class="kw">use </span>parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
@@ -423,20 +438,32 @@
     })
 }
 
-<span class="kw">fn </span>get_relation_mode(
+<span class="doccomment">/// Returns the relation mode for the datasource, validating against invalid relation mode settings and
+/// the deprecated `referentialIntegrity` attribute.
+</span><span class="kw">fn </span>get_relation_mode(
     args: <span class="kw-2">&amp;mut </span>HashMap&lt;<span class="kw-2">&amp;</span>str, (Span, <span class="kw-2">&amp;</span>ast::Expression)&gt;,
     source: <span class="kw-2">&amp;</span>SourceConfig,
     diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
     connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span><span class="kw">crate</span>::datamodel_connector::Connector,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;RelationMode&gt; {
-    <span class="kw">match </span>(args.remove(<span class="string">&quot;relationMode&quot;</span>), args.remove(<span class="string">&quot;referentialIntegrity&quot;</span>)) {
+    <span class="comment">// check for deprecated `referentialIntegrity` attribute.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>((span, <span class="kw">_</span>)) = args.get(<span class="string">&quot;referentialIntegrity&quot;</span>) {
+        diagnostics.push_warning(DatamodelWarning::new_referential_integrity_attr_deprecation_warning(
+            <span class="kw-2">*</span>span,
+        ));
+    }
+
+    <span class="comment">// figure out which attribute is used for the `relationMode` feature
+    </span><span class="kw">match </span>(args.remove(<span class="string">&quot;relationMode&quot;</span>), args.remove(<span class="string">&quot;referentialIntegrity&quot;</span>)) {
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
         (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>((span, <span class="kw">_</span>))) =&gt; {
-            diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
+            <span class="comment">// both possible attributes are used, which is invalid
+            </span>diagnostics.push_error(DatamodelError::new_referential_integrity_and_relation_mode_cooccur_error(span));
             <span class="prelude-val">None
         </span>}
         (<span class="prelude-val">Some</span>((_span, rm)), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((_span, rm))) =&gt; {
-            <span class="kw">let </span>integrity = <span class="kw">match </span>coerce::string(rm, diagnostics)<span class="question-mark">? </span>{
+            <span class="comment">// either `relationMode` or `referentialIntegrity` is used, which is valid
+            </span><span class="kw">let </span>relation_mode = <span class="kw">match </span>coerce::string(rm, diagnostics)<span class="question-mark">? </span>{
                 <span class="string">&quot;prisma&quot; </span>=&gt; RelationMode::Prisma,
                 <span class="string">&quot;foreignKeys&quot; </span>=&gt; RelationMode::ForeignKeys,
                 other =&gt; {
@@ -449,7 +476,7 @@
                 }
             };
 
-            <span class="kw">if </span>!connector.allowed_relation_mode_settings().contains(integrity) {
+            <span class="kw">if </span>!connector.allowed_relation_mode_settings().contains(relation_mode) {
                 <span class="kw">let </span>supported_values = connector
                     .allowed_relation_mode_settings()
                     .iter()
@@ -457,13 +484,14 @@
                     .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                     .join(<span class="string">&quot;, &quot;</span>);
 
-                <span class="kw">let </span>message =
-                    <span class="macro">format!</span>(<span class="string">&quot;Invalid relation mode setting: \&quot;{integrity}\&quot;. Supported values: {supported_values}&quot;</span>,);
+                <span class="kw">let </span>message = <span class="macro">format!</span>(
+                    <span class="string">&quot;Invalid relation mode setting: \&quot;{relation_mode}\&quot;. Supported values: {supported_values}&quot;</span>,
+                );
                 <span class="kw">let </span>error = DatamodelError::new_source_validation_error(<span class="kw-2">&amp;</span>message, <span class="string">&quot;relationMode&quot;</span>, rm.span());
                 diagnostics.push_error(error);
             }
 
-            <span class="prelude-val">Some</span>(integrity)
+            <span class="prelude-val">Some</span>(relation_mode)
         }
     }
 }

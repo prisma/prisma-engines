@@ -72,6 +72,11 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     pretty_print::{pretty_print, DiagnosticColorer},
     Span,
@@ -99,6 +104,11 @@
             <span class="string">&quot;Preview feature \&quot;{feature}\&quot; is deprecated. The functionality can be used without specifying it as a preview feature.&quot;
         </span>);
         <span class="self">Self</span>::new(message, span)
+    }
+
+    <span class="kw">pub fn </span>new_referential_integrity_attr_deprecation_warning(span: Span) -&gt; DatamodelWarning {
+        <span class="kw">let </span>message = <span class="string">&quot;The `referentialIntegrity` attribute is deprecated. Please use `relationMode` instead. Learn more at https://pris.ly/d/relation-mode&quot;</span>;
+        <span class="self">Self</span>::new(message.to_string(), span)
     }
 
     <span class="kw">pub fn </span>new_missing_index_on_emulated_relation(span: Span) -&gt; DatamodelWarning {
