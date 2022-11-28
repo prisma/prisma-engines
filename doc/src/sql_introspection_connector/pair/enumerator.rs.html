@@ -122,6 +122,8 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sanitize_datamodel_names;
 <span class="kw">use </span>psl::{
     parser_database::walkers,
@@ -211,21 +213,23 @@
     /// it contains characters that are not allowed in the PSL
     /// definition.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
-        <span class="self">self</span>.previous
-            .map(|variant| Cow::Borrowed(variant.name()))
-            .unwrap_or_else(|| <span class="kw">match </span><span class="self">self</span>.next.name() {
-                name <span class="kw">if </span>name.is_empty() =&gt; Cow::Borrowed(<span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>),
-                name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; {
-                    <span class="kw">let </span>sanitized = sanitize_datamodel_names::sanitize_string(name);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = <span class="self">self</span>.previous.map(|variant| variant.name()) {
+            <span class="kw">return </span>Cow::Borrowed(name);
+        }
 
-                    <span class="kw">if </span>sanitized.is_empty() {
-                        Cow::Borrowed(name)
-                    } <span class="kw">else </span>{
-                        Cow::Owned(sanitized)
-                    }
+        <span class="kw">match </span><span class="self">self</span>.next.name() {
+            name <span class="kw">if </span>name.is_empty() =&gt; Cow::Borrowed(<span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>),
+            name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; {
+                <span class="kw">let </span>sanitized = sanitize_datamodel_names::sanitize_string(name);
+
+                <span class="kw">if </span>sanitized.is_empty() {
+                    Cow::Borrowed(name)
+                } <span class="kw">else </span>{
+                    Cow::Owned(sanitized)
                 }
-                name =&gt; Cow::Borrowed(name),
-            })
+            }
+            name =&gt; Cow::Borrowed(name),
+        }
     }
 
     <span class="doccomment">/// The mapped name, if defined, is the actual name of the variant in

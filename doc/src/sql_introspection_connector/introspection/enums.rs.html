@@ -97,6 +97,9 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     calculate_datamodel::{InputContext, OutputContext},
     introspection_helpers::<span class="kw-2">*</span>,
@@ -140,11 +143,8 @@
     <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = r#enum.mapped_name() {
         rendered_enum.map(mapped_name);
 
-        output
-            .warnings
-            .push(warnings::warning_enriched_with_map_on_enum(<span class="kw-2">&amp;</span>[warnings::Enum::new(
-                <span class="kw-2">&amp;</span>r#enum.name(),
-            )]));
+        <span class="kw">let </span>warning = warnings::warning_enriched_with_map_on_enum(<span class="kw-2">&amp;</span>[warnings::Enum::new(<span class="kw-2">&amp;</span>r#enum.name())]);
+        output.warnings.push(warning);
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = r#enum.documentation() {
@@ -164,11 +164,6 @@
             };
 
             output.warnings.enum_values_with_empty_names.push(warning);
-        } <span class="kw">else if </span>variant.mapped_name().is_some() {
-            remapped_values.push(warnings::EnumAndValue {
-                value: variant.name().to_string(),
-                enm: r#enum.name().to_string(),
-            });
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>rendered_variant = renderer::EnumVariant::new(variant.name());
@@ -182,7 +177,18 @@
         }
 
         <span class="kw">if </span>variant.name().is_empty() || sanitize_datamodel_names::needs_sanitation(<span class="kw-2">&amp;</span>variant.name()) {
+            <span class="kw">let </span>warning = warnings::EnumAndValue {
+                enm: r#enum.name().to_string(),
+                value: variant.name().to_string(),
+            };
+
+            output.warnings.enum_values_with_empty_names.push(warning);
             rendered_variant.comment_out();
+        } <span class="kw">else if </span>variant.mapped_name().is_some() {
+            remapped_values.push(warnings::EnumAndValue {
+                value: variant.name().to_string(),
+                enm: r#enum.name().to_string(),
+            });
         }
 
         rendered_enum.push_variant(rendered_variant);
