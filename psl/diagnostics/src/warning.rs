@@ -49,6 +49,7 @@ impl DatamodelWarning {
             "Warning validating field `{}` in {} `{}`: {}",
             field, "model", model, message
         );
+
         Self::new(msg, span)
     }
 

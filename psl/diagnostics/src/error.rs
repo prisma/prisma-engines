@@ -233,19 +233,6 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_relation_field_validation_error(
-        message: &str,
-        model: &str,
-        relation_field: &str,
-        span: Span,
-    ) -> DatamodelError {
-        let msg = format!(
-            "Error validating relation `{}` in {} `{}`: {}",
-            relation_field, "model", model, message
-        );
-        Self::new(msg, span)
-    }
-
     pub fn new_source_validation_error(message: &str, source: &str, span: Span) -> DatamodelError {
         Self::new(format!("Error validating datasource `{source}`: {message}"), span)
     }
