@@ -314,3 +314,7 @@ mod tests {
         assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
     }
 }
+
+pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
+    ctx.connector.validate_relation_field(field, ctx.diagnostics)
+}

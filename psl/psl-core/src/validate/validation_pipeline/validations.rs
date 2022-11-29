@@ -98,6 +98,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             relation_fields::referential_actions(field, ctx);
             relation_fields::map(field, ctx);
             relation_fields::validate_missing_relation_indexes(field, ctx);
+            relation_fields::connector_specific(field, ctx);
         }
 
         for index in model.indexes() {
