@@ -3,6 +3,10 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod singular_batch {
     use indoc::indoc;
+    use query_engine_tests::{
+        query_core::{BatchDocument, QueryDocument},
+        run_query, Runner, TestResult,
+    };
 
     fn schema() -> String {
         let schema = indoc! {
@@ -251,6 +255,110 @@ mod singular_batch {
         );
 
         Ok(())
+    }
+
+    fn schema_repro_16548() -> String {
+        let schema = indoc! {
+            r#"
+            model Post {
+              id        String   @id
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/16548
+    #[connector_test(schema(schema_repro_16548))]
+    async fn repro_16548(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOnePost(data: { id: "1" }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOnePost(data: { id: "2" }) { id } }"#);
+
+        // Working case
+        let queries = vec![
+            r#"{ findUniquePostOrThrow(where: { id: "1" }) { id } }"#.to_string(),
+            r#"{ findUniquePostOrThrow(where: { id: "2" }) { id } }"#.to_string(),
+        ];
+        let res = runner.batch(queries.clone(), false, None).await?;
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniquePostOrThrow":{"id":"1"}}},{"data":{"findUniquePostOrThrow":{"id":"2"}}}]}"###
+        );
+        let compact_doc = compact_batch(&runner, queries).await?;
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Failing case
+        let queries = vec![
+            r#"{ findUniquePostOrThrow(where: { id: "2" }) { id } }"#.to_string(),
+            r#"{ findUniquePostOrThrow(where: { id: "3" }) { id } }"#.to_string(),
+        ];
+        let res = runner.batch(queries.clone(), false, None).await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniquePostOrThrow":{"id":"2"}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+        );
+        let compact_doc = compact_batch(&runner, queries).await?;
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let queries = vec![
+            r#"{ findUniquePost(where: { id: "3" }) { id } }"#.to_string(),
+            r#"{ findUniquePostOrThrow(where: { id: "2" }) { id } }"#.to_string(),
+        ];
+        let res = runner.batch(queries.clone(), false, None).await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniquePost":null}},{"data":{"findUniquePostOrThrow":{"id":"2"}}}]}"###
+        );
+        let compact_doc = compact_batch(&runner, queries).await?;
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let queries = vec![
+            r#"{ findUniquePost(where: { id: "2" }) { id } }"#.to_string(),
+            r#"{ findUniquePostOrThrow(where: { id: "4" }) { id } }"#.to_string(),
+        ];
+        let res = runner.batch(queries.clone(), false, None).await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniquePost":{"id":"2"}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+        );
+        let compact_doc = compact_batch(&runner, queries).await?;
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let queries = vec![
+            r#"{ findUniquePostOrThrow(where: { id: "2" }) { id } }"#.to_string(),
+            r#"{ findUniquePost(where: { id: "3" }) { id } }"#.to_string(),
+        ];
+        let res = runner.batch(queries.clone(), false, None).await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniquePostOrThrow":{"id":"2"}}},{"data":{"findUniquePost":null}}]}"###
+        );
+        let compact_doc = compact_batch(&runner, queries).await?;
+        assert_eq!(compact_doc.is_compact(), false);
+
+        Ok(())
+    }
+
+    async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<BatchDocument> {
+        // Ensure batched queries are valid
+        runner.batch(queries.clone(), false, None).await?.assert_success();
+
+        let doc = GraphQlBody::Multi(MultiQuery::new(
+            queries.into_iter().map(Into::into).collect(),
+            false,
+            None,
+        ))
+        .into_doc()
+        .unwrap();
+        let batch = match doc {
+            QueryDocument::Multi(batch) => batch.compact(runner.query_schema()),
+            _ => unreachable!(),
+        };
+
+        Ok(batch.compact(runner.query_schema()))
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
