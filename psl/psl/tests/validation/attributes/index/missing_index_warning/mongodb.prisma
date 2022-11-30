@@ -12,6 +12,6 @@ model SomeUser {
 
 model Post {
     id String @id @map("_id") @default(auto()) @db.ObjectId
-    userId String
+    userId String @db.ObjectId
     user SomeUser @relation(fields: [userId], references: [id])
 }

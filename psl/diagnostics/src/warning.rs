@@ -44,6 +44,15 @@ impl DatamodelWarning {
         Self::new(message, span)
     }
 
+    pub fn new_field_validation(message: &str, model: &str, field: &str, span: Span) -> DatamodelWarning {
+        let msg = format!(
+            "Warning validating field `{}` in {} `{}`: {}",
+            field, "model", model, message
+        );
+
+        Self::new(msg, span)
+    }
+
     /// The user-facing warning message.
     pub fn message(&self) -> &str {
         &self.message

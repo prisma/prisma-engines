@@ -1,5 +1,5 @@
 use psl_core::{
-    diagnostics::{DatamodelError, Diagnostics},
+    diagnostics::{DatamodelError, DatamodelWarning, Diagnostics},
     parser_database::{
         ast::{WithName, WithSpan},
         walkers::{IndexWalker, ModelWalker, PrimaryKeyWalker, ScalarFieldWalker},
@@ -181,4 +181,61 @@ pub(crate) fn field_name_uses_valid_characters(field: ScalarFieldWalker<'_>, err
             span,
         ));
     }
+}
+
+/// Makes sure underlying fields of a relation have the same native types.
+pub(crate) fn relation_same_native_type(
+    field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
+    errors: &mut Diagnostics,
+) {
+    let references = field.referenced_fields();
+    let fields = field.referencing_fields();
+
+    if let (Some(fields), Some(references)) = (fields, references) {
+        for (a_field, b_ref) in fields.into_iter().zip(references) {
+            let field_nt = a_field.raw_native_type().map(|nt| (nt.0, nt.1));
+            let ref_nt = b_ref.raw_native_type().map(|nt| (nt.0, nt.1));
+            let span = a_field.ast_field().span();
+            let a_model_name = a_field.model().name();
+            let a_field_name = a_field.name();
+            let b_model_name = b_ref.model().name();
+            let b_field_name = b_ref.name();
+
+            let msg = match (field_nt, ref_nt) {
+                (Some(a), Some(b)) if a != b => {
+                    format!(
+                        "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider updating those fields to either use '@{}.{}' or '@{}.{}'.",
+                        a.0,
+                        a.1,
+                        b.0,
+                        b.1
+                    )
+                }
+                (None, Some(b)) => {
+                    format!(
+                        "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {b_model_name}.{b_field_name}'s native type attribute or adding '@{}.{}' to {a_model_name}.{a_field_name}.",
+                        b.0,
+                        b.1
+                    )
+                }
+                (Some(a), None) => {
+                    format!(
+                        "Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {a_model_name}.{a_field_name}'s native type attribute or adding '@{}.{}' to {b_model_name}.{b_field_name}.",
+                        a.0,
+                        a.1
+                    )
+                }
+                _ => continue,
+            };
+
+            let msg = format!("{msg} Beware that this will become an error in the future.");
+
+            errors.push_warning(DatamodelWarning::new_field_validation(
+                &msg,
+                field.model().name(),
+                field.name(),
+                span,
+            ));
+        }
+    };
 }
