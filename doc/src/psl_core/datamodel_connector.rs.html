@@ -395,6 +395,7 @@
 <span id="395">395</span>
 <span id="396">396</span>
 <span id="397">397</span>
+<span id="398">398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.
 
 /// Connector capabilities
@@ -555,6 +556,7 @@
 
     <span class="kw">fn </span>validate_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _enum: walkers::EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
     <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, _model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: RelationMode, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
+    <span class="kw">fn </span>validate_relation_field(<span class="kw-2">&amp;</span><span class="self">self</span>, _field: walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
     <span class="kw">fn </span>validate_datasource(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: BitFlags&lt;PreviewFeature&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Datasource, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
 
     <span class="kw">fn </span>validate_scalar_field_unknown_default_functions(

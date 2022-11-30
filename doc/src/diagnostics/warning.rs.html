@@ -77,6 +77,15 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     pretty_print::{pretty_print, DiagnosticColorer},
     Span,
@@ -121,6 +130,15 @@
         )
         .replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>);
         <span class="self">Self</span>::new(message, span)
+    }
+
+    <span class="kw">pub fn </span>new_field_validation(message: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>str, span: Span) -&gt; DatamodelWarning {
+        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+            <span class="string">&quot;Warning validating field `{}` in {} `{}`: {}&quot;</span>,
+            field, <span class="string">&quot;model&quot;</span>, model, message
+        );
+
+        <span class="self">Self</span>::new(msg, span)
     }
 
     <span class="doccomment">/// The user-facing warning message.

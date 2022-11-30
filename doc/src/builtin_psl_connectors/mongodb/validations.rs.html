@@ -182,8 +182,65 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
 </pre><pre class="rust"><code><span class="kw">use </span>psl_core::{
-    diagnostics::{DatamodelError, Diagnostics},
+    diagnostics::{DatamodelError, DatamodelWarning, Diagnostics},
     parser_database::{
         ast::{WithName, WithSpan},
         walkers::{IndexWalker, ModelWalker, PrimaryKeyWalker, ScalarFieldWalker},
@@ -365,6 +422,63 @@
             span,
         ));
     }
+}
+
+<span class="doccomment">/// Makes sure underlying fields of a relation have the same native types.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_same_native_type(
+    field: psl_core::parser_database::walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
+) {
+    <span class="kw">let </span>references = field.referenced_fields();
+    <span class="kw">let </span>fields = field.referencing_fields();
+
+    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(fields), <span class="prelude-val">Some</span>(references)) = (fields, references) {
+        <span class="kw">for </span>(a_field, b_ref) <span class="kw">in </span>fields.into_iter().zip(references) {
+            <span class="kw">let </span>field_nt = a_field.raw_native_type().map(|nt| (nt.<span class="number">0</span>, nt.<span class="number">1</span>));
+            <span class="kw">let </span>ref_nt = b_ref.raw_native_type().map(|nt| (nt.<span class="number">0</span>, nt.<span class="number">1</span>));
+            <span class="kw">let </span>span = a_field.ast_field().span();
+            <span class="kw">let </span>a_model_name = a_field.model().name();
+            <span class="kw">let </span>a_field_name = a_field.name();
+            <span class="kw">let </span>b_model_name = b_ref.model().name();
+            <span class="kw">let </span>b_field_name = b_ref.name();
+
+            <span class="kw">let </span>msg = <span class="kw">match </span>(field_nt, ref_nt) {
+                (<span class="prelude-val">Some</span>(a), <span class="prelude-val">Some</span>(b)) <span class="kw">if </span>a != b =&gt; {
+                    <span class="macro">format!</span>(
+                        <span class="string">&quot;Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider updating those fields to either use &#39;@{}.{}&#39; or &#39;@{}.{}&#39;.&quot;</span>,
+                        a.<span class="number">0</span>,
+                        a.<span class="number">1</span>,
+                        b.<span class="number">0</span>,
+                        b.<span class="number">1
+                    </span>)
+                }
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(b)) =&gt; {
+                    <span class="macro">format!</span>(
+                        <span class="string">&quot;Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {b_model_name}.{b_field_name}&#39;s native type attribute or adding &#39;@{}.{}&#39; to {a_model_name}.{a_field_name}.&quot;</span>,
+                        b.<span class="number">0</span>,
+                        b.<span class="number">1
+                    </span>)
+                }
+                (<span class="prelude-val">Some</span>(a), <span class="prelude-val">None</span>) =&gt; {
+                    <span class="macro">format!</span>(
+                        <span class="string">&quot;Field {a_model_name}.{a_field_name} and {b_model_name}.{b_field_name} must have the same native type for MongoDB to join those collections correctly. Consider either removing {a_model_name}.{a_field_name}&#39;s native type attribute or adding &#39;@{}.{}&#39; to {b_model_name}.{b_field_name}.&quot;</span>,
+                        a.<span class="number">0</span>,
+                        a.<span class="number">1
+                    </span>)
+                }
+                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
+            };
+
+            <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;{msg} Beware that this will become an error in the future.&quot;</span>);
+
+            errors.push_warning(DatamodelWarning::new_field_validation(
+                <span class="kw-2">&amp;</span>msg,
+                field.model().name(),
+                field.name(),
+                span,
+            ));
+        }
+    };
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

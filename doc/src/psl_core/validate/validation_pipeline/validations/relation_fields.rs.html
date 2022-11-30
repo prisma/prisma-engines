@@ -314,6 +314,10 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{database_name::validate_db_name, names::Names};
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName, WithSpan},
@@ -629,6 +633,10 @@
         <span class="kw">let </span>group = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
         <span class="macro">assert_eq!</span>(is_leftwise_included_it(item.iter(), group.iter()), <span class="bool-val">false</span>);
     }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>connector_specific(field: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    ctx.connector.validate_relation_field(field, ctx.diagnostics)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

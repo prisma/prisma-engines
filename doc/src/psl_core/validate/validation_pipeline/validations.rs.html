@@ -195,6 +195,7 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>autoincrement;
 <span class="kw">mod </span>composite_types;
 <span class="kw">mod </span>constraint_namespace;
@@ -295,6 +296,7 @@
             relation_fields::referential_actions(field, ctx);
             relation_fields::map(field, ctx);
             relation_fields::validate_missing_relation_indexes(field, ctx);
+            relation_fields::connector_specific(field, ctx);
         }
 
         <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {

@@ -138,6 +138,14 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>mongodb_types;
 <span class="kw">mod </span>validations;
 
@@ -217,6 +225,14 @@
             validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
             validations::unique_cannot_be_defined_to_id_field(index, errors);
         }
+    }
+
+    <span class="kw">fn </span>validate_relation_field(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        field: psl_core::parser_database::walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+        errors: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) {
+        validations::relation_same_native_type(field, errors);
     }
 
     <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
