@@ -303,6 +303,7 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
+<span id="306">306</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -377,7 +378,7 @@
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
     </span><span class="kw">fn </span>invalid_compact_filter(op: <span class="kw-2">&amp;</span>Operation, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
-        <span class="kw">if </span>!op.is_find_unique() {
+        <span class="kw">if </span>!op.is_find_unique(schema) {
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
@@ -400,10 +401,11 @@
         })
     }
 
-    <span class="kw">fn </span>can_compact(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
+    <span class="doccomment">/// Checks whether a BatchDocument can be compacted.
+    </span><span class="kw">fn </span>can_compact(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Multi(operations, <span class="kw">_</span>) =&gt; <span class="kw">match </span>operations.split_first() {
-                <span class="prelude-val">Some</span>((first, rest)) <span class="kw">if </span>first.is_find_unique() =&gt; {
+                <span class="prelude-val">Some</span>((first, rest)) <span class="kw">if </span>first.is_find_unique(schema) =&gt; {
                     <span class="comment">// If any of the operation has an &quot;invalid&quot; compact filter (see documentation of `invalid_compact_filter`),
                     // we do not compact the queries.
                     </span><span class="kw">let </span>has_invalid_compact_filter =
@@ -414,7 +416,7 @@
                     }
 
                     rest.iter().all(|op| {
-                        op.is_find_unique()
+                        op.is_find_unique(schema)
                             &amp;&amp; first.name() == op.name()
                             &amp;&amp; first.nested_selections().len() == op.nested_selections().len()
                             &amp;&amp; first

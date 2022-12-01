@@ -59,7 +59,9 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Selection;
+<span class="kw">use </span>schema::QuerySchemaRef;
 
 <span class="attribute">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>Operation {
@@ -68,11 +70,11 @@
 }
 
 <span class="kw">impl </span>Operation {
-    <span class="kw">pub fn </span>is_find_unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Read(selection) =&gt; selection.is_find_unique(),
-            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-        }
+    <span class="kw">pub fn </span>is_find_unique(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
+        schema
+            .find_query_field(<span class="self">self</span>.name())
+            .map(|field| field.is_find_unique())
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
     <span class="kw">pub fn </span>into_read(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Selection&gt; {
