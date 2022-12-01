@@ -335,8 +335,6 @@
 <span id="335">335</span>
 <span id="336">336</span>
 <span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ParserDatabase;
 <span class="kw">use </span>parser_database::{ast::WithSpan, walkers};
 <span class="kw">use </span>schema_ast::{ast, SourceFile};
@@ -476,7 +474,7 @@
         content.push(<span class="string">&#39;)&#39;</span>);
 
         ctx.missing_bits.push(MissingBit {
-            position: before_newline(forward.ast_field().span().end, ctx.original_schema),
+            position: after_type(forward.ast_field().field_type.span().end, ctx.original_schema),
             content,
         })
     }
@@ -667,14 +665,12 @@
     <span class="macro">format!</span>(<span class="string">&quot;references: [{}]&quot;</span>, field_names.join(<span class="string">&quot;, &quot;</span>))
 }
 
-<span class="doccomment">/// Assuming the last characters before span_end are newlines. We can fix this more thoroughly by
-/// not including the newline in field spans.
-</span><span class="kw">fn </span>before_newline(span_end: usize, original_schema: <span class="kw-2">&amp;</span>str) -&gt; usize {
-    <span class="macro">assert!</span>(<span class="kw-2">&amp;</span>original_schema[span_end - <span class="number">1</span>..span_end] == <span class="string">&quot;\n&quot;</span>);
-    <span class="kw">match </span><span class="kw-2">&amp;</span>original_schema[span_end - <span class="number">2</span>..span_end - <span class="number">1</span>] {
-        <span class="string">&quot;\r&quot; </span>=&gt; span_end - <span class="number">2</span>,
-        <span class="kw">_ </span>=&gt; span_end - <span class="number">1</span>,
-    }
+<span class="kw">fn </span>after_type(type_span_end: usize, original_schema: <span class="kw-2">&amp;</span>str) -&gt; usize {
+    original_schema[type_span_end..]
+        .chars()
+        .position(|chr| ![<span class="string">&#39;[&#39;</span>, <span class="string">&#39;]&#39;</span>, <span class="string">&#39;?&#39;</span>, <span class="string">&#39;!&#39;</span>].contains(<span class="kw-2">&amp;</span>chr))
+        .map(|pos| type_span_end + pos)
+        .unwrap_or(type_span_end)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
