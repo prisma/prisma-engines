@@ -201,7 +201,7 @@ mod tests {
     // On Windows, a newline is actually two characters.
     #[test]
     fn position_to_offset_with_crlf() {
-        let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
+        let schema = "\r\nmodel Test {\r\n    id Int @id\r\n} ";
         // Let's put the cursor on the "i" in "id Int".
         let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
         let found_offset = super::position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
