@@ -1,4 +1,5 @@
 use super::Selection;
+use schema::QuerySchemaRef;
 
 #[derive(Debug, Clone)]
 pub enum Operation {
@@ -7,11 +8,11 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn is_find_unique(&self) -> bool {
-        match self {
-            Self::Read(selection) => selection.is_find_unique(),
-            _ => false,
-        }
+    pub fn is_find_unique(&self, schema: &QuerySchemaRef) -> bool {
+        schema
+            .find_query_field(self.name())
+            .map(|field| field.is_find_unique())
+            .unwrap_or(false)
     }
 
     pub fn into_read(self) -> Option<Selection> {
