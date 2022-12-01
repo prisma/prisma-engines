@@ -10,7 +10,7 @@ use migration_connector::{
 };
 use quaint::connector::PostgresUrl;
 use sql_schema_describer::SqlSchema;
-use std::{collections::HashMap, future, time};
+use std::{borrow::Cow, collections::HashMap, future, time};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -264,14 +264,25 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
-            let schema_name = params.url.schema();
+            let mut schemas = vec![Cow::Borrowed(params.url.schema())];
 
-            conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
-                .await?;
-            conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
-                .await?;
+            // We reset the namespaces defined in the `schemas` datasource property _in addition to
+            // the schema in the search path_, because the search path is where we create the
+            // migrations table.
+            for namespace in namespaces.into_iter().flatten() {
+                schemas.push(Cow::Owned(namespace))
+            }
+
+            tracing::info!(?schemas, "Resetting schema(s)");
+
+            for schema_name in schemas {
+                conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
+                    .await?;
+                conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
+                    .await?;
+            }
 
             Ok(())
         })
@@ -342,7 +353,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 tracing::info!("Connecting to user-provided shadow database.");
 
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 

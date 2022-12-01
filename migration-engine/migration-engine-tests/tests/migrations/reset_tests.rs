@@ -93,3 +93,53 @@ fn reset_then_diagnostics_with_migrations_directory_works(api: TestApi) {
         .assert_has_table("Cat")
         .assert_has_table("_prisma_migrations");
 }
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    namespaces("felines", "rodents"),
+    preview_features("multiSchema")
+)]
+fn multi_schema_reset(mut api: TestApi) {
+    let prisma_schema = format! {
+        r#"
+            {}
+
+            generator js {{
+                provider = "prisma-client-js"
+                previewFeatures = ["multiSchema"]
+            }}
+
+            model Manul {{
+                id Int @id
+                @@schema("felines")
+            }}
+
+            model Capybara {{
+                id Int @id
+                @@schema("rodents")
+            }}
+        "#, api.datasource_block_with(&[("schemas", r#"["felines", "rodents"]"#)])
+    };
+    api.schema_push(&prisma_schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    let namespaces = Namespaces::from_vec(&mut vec!["felines".into(), "rodents".into()]);
+
+    api.assert_schema_with_namespaces(namespaces.clone())
+        .assert_has_table("Manul")
+        .assert_has_table("Capybara");
+
+    api.reset().send_sync(namespaces.clone());
+
+    api.assert_schema_with_namespaces(namespaces)
+        .assert_has_no_table("Manul")
+        .assert_has_no_table("Capybara");
+
+    // Check that we can migrate from there.
+    api.schema_push(&prisma_schema)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+}
