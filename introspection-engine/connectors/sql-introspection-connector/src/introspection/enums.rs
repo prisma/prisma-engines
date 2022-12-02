@@ -1,6 +1,6 @@
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::*,
+    introspection_helpers as helpers,
     pair::EnumPair,
     sanitize_datamodel_names, warnings,
 };
@@ -15,7 +15,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
         all_enums.push((pair.previous_position(), rendered_enum))
     }
 
-    all_enums.sort_by(|(id_a, _), (id_b, _)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
+    all_enums.sort_by(|(id_a, _), (id_b, _)| helpers::compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
 
     if input.sql_family.is_mysql() {
         // MySQL can have multiple database enums matching one Prisma enum.
