@@ -14,7 +14,7 @@ enum FieldKind<'a> {
 }
 
 impl<'a> FieldKind<'a> {
-    fn into_inner(&mut self) -> Cow<'a, str> {
+    fn take_type(&mut self) -> Cow<'a, str> {
         match self {
             FieldKind::Required(Constant(s)) => std::mem::take(s),
             FieldKind::Optional(Constant(s)) => std::mem::take(s),
@@ -48,10 +48,10 @@ impl<'a> FieldType<'a> {
     /// Convert the field type to optional.
     pub fn into_optional(&mut self) {
         let inner = match self.inner {
-            ref mut s @ FieldKind::Required(_) => FieldKind::Optional(Constant::new_no_validate(s.into_inner())),
-            ref mut s @ FieldKind::Array(_) => FieldKind::Optional(Constant::new_no_validate(s.into_inner())),
-            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.into_inner())),
-            ref mut s @ FieldKind::ArrayUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.into_inner())),
+            ref mut s @ FieldKind::Required(_) => FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::Array(_) => FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::ArrayUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
 
             FieldKind::Optional(_) => return,
             FieldKind::OptionalUnsupported(_) => return,
@@ -63,10 +63,10 @@ impl<'a> FieldType<'a> {
     /// Convert the field type to array.
     pub fn into_array(&mut self) {
         let inner = match self.inner {
-            ref mut s @ FieldKind::Required(_) => FieldKind::Array(Constant::new_no_validate(s.into_inner())),
-            ref mut s @ FieldKind::Optional(_) => FieldKind::Array(Constant::new_no_validate(s.into_inner())),
-            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.into_inner())),
-            ref mut s @ FieldKind::OptionalUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.into_inner())),
+            ref mut s @ FieldKind::Required(_) => FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::Optional(_) => FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::OptionalUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
 
             FieldKind::Array(_) => return,
             FieldKind::ArrayUnsupported(_) => return,
@@ -78,9 +78,9 @@ impl<'a> FieldType<'a> {
     /// Set the field type to be unsupported by Prisma.
     pub fn into_unsupported(&mut self) {
         let inner = match self.inner {
-            ref mut s @ FieldKind::Required(_) => FieldKind::RequiredUnsupported(Text(s.into_inner())),
-            ref mut s @ FieldKind::Optional(_) => FieldKind::OptionalUnsupported(Text(s.into_inner())),
-            ref mut s @ FieldKind::Array(_) => FieldKind::ArrayUnsupported(Text(s.into_inner())),
+            ref mut s @ FieldKind::Required(_) => FieldKind::RequiredUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::Optional(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::Array(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
 
             _ => return,
         };
