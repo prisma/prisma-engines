@@ -241,7 +241,7 @@ pub(crate) trait SqlFlavour:
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Drop the database and recreate it empty.
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
     fn scan_migration_script(&self, _script: &str) {}

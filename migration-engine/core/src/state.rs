@@ -19,7 +19,7 @@ use tracing_futures::Instrument;
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
-    initial_datamodel: Option<String>,
+    initial_datamodel: Option<psl::ValidatedSchema>,
     host: Arc<dyn ConnectorHost>,
     // A map from either:
     //
@@ -46,7 +46,7 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
         EngineState {
-            initial_datamodel,
+            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
             host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
             connectors: Default::default(),
         }
@@ -170,7 +170,7 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema, None, f).await
+        self.with_connector_for_schema(schema.db.source(), None, f).await
     }
 }
 
@@ -366,8 +366,17 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn reset(&self, namespaces: Option<Namespaces>) -> CoreResult<()> {
+    async fn reset(&self) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
+
+        let namespaces: Option<Namespaces> = self
+            .initial_datamodel
+            .as_ref()
+            .and_then(|schema| schema.configuration.datasources.first())
+            .and_then(|ds| {
+                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                Namespaces::from_vec(&mut names)
+            });
 
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(MigrationConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))

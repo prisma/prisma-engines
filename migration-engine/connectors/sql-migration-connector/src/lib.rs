@@ -262,7 +262,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            if soft || self.flavour.reset().await.is_err() {
+            if soft || self.flavour.reset(namespaces.clone()).await.is_err() {
                 best_effort_reset(self.flavour.as_mut(), namespaces).await?;
             }
 

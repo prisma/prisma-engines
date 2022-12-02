@@ -231,7 +231,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, circumstances, connection| async move {
             if circumstances.contains(Circumstances::IsVitess) {
                 return Err(ConnectorError::from_msg(
@@ -307,7 +307,7 @@ impl SqlFlavour for MysqlFlavour {
                 shadow_database.ensure_connection_validity().await?;
 
                 tracing::info!("Connecting to user-provided shadow database.");
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(None).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces).await?;
                 }
 

@@ -10,7 +10,7 @@ use migration_connector::{
 };
 use quaint::connector::PostgresUrl;
 use sql_schema_describer::SqlSchema;
-use std::{collections::HashMap, future, time};
+use std::{borrow::Cow, collections::HashMap, future, time};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -264,14 +264,27 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
-            let schema_name = params.url.schema();
+            let schemas_to_reset = match namespaces {
+                Some(ns) => ns.into_iter().map(Cow::Owned).collect(),
+                None => vec![Cow::Borrowed(params.url.schema())],
+            };
 
-            conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
-                .await?;
-            conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
-                .await?;
+            tracing::info!(?schemas_to_reset, "Resetting schema(s)");
+
+            for schema_name in schemas_to_reset {
+                conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
+                    .await?;
+                conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
+                    .await?;
+            }
+
+            // Drop the migrations table in the main schema, otherwise migrate dev will not
+            // perceive that as a reset, since migrations are still marked as applied.
+            //
+            // We don't care if this fails.
+            conn.raw_cmd("DROP TABLE _prisma_migrations", &params.url).await.ok();
 
             Ok(())
         })
@@ -342,7 +355,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 tracing::info!("Connecting to user-provided shadow database.");
 
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 

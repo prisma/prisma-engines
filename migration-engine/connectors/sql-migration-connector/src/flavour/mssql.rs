@@ -216,7 +216,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, connection| async move {
             let schema_name = params.url.schema();
 
@@ -402,7 +402,7 @@ impl SqlFlavour for MssqlFlavour {
                 shadow_database.set_params(shadow_db_params)?;
                 shadow_database.ensure_connection_validity().await?;
 
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(None).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces).await?;
                 }
 

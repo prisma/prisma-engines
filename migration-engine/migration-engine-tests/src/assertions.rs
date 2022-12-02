@@ -71,6 +71,7 @@ impl SchemaAssertion {
         }
     }
 
+    #[track_caller]
     fn assert_error(&self, table_name: &str, positive: bool) -> ! {
         let method = if positive {
             "assert_table"
