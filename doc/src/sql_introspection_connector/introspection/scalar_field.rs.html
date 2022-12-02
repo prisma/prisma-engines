@@ -112,6 +112,13 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::OutputContext, defaults, pair::ScalarFieldPair};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>sql_schema_describer::ColumnArity;
@@ -199,12 +206,6 @@
         rendered.unique(opts);
     }
 
-    <span class="kw">if </span>field.remapped_name_empty() {
-        <span class="kw">let </span>docs = <span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>;
-        rendered.documentation(docs);
-        rendered.commented_out();
-    }
-
     <span class="kw">if </span>field.remapped_name_from_psl() {
         <span class="kw">let </span>mf = <span class="kw">crate</span>::warnings::ModelAndField {
             model: field.model().name().to_string(),
@@ -222,6 +223,19 @@
         };
 
         output.warnings.unsupported_types.push(mf)
+    }
+
+    <span class="kw">if </span>field.remapped_name_empty() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>;
+        rendered.documentation(docs);
+        rendered.commented_out();
+
+        <span class="kw">let </span>mf = <span class="kw">crate</span>::warnings::ModelAndField {
+            model: field.model().name().to_string(),
+            field: field.name().to_string(),
+        };
+
+        output.warnings.fields_with_empty_names.push(mf);
     }
 
     rendered
