@@ -85,12 +85,6 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
         rendered.unique(opts);
     }
 
-    if field.remapped_name_empty() {
-        let docs = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
-        rendered.documentation(docs);
-        rendered.commented_out();
-    }
-
     if field.remapped_name_from_psl() {
         let mf = crate::warnings::ModelAndField {
             model: field.model().name().to_string(),
@@ -108,6 +102,19 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
         };
 
         output.warnings.unsupported_types.push(mf)
+    }
+
+    if field.remapped_name_empty() {
+        let docs = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+        rendered.documentation(docs);
+        rendered.commented_out();
+
+        let mf = crate::warnings::ModelAndField {
+            model: field.model().name().to_string(),
+            field: field.name().to_string(),
+        };
+
+        output.warnings.fields_with_empty_names.push(mf);
     }
 
     rendered
