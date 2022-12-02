@@ -1,13 +1,17 @@
 use super::relation_names::RelationNames;
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::is_prisma_join_table,
+    introspection_helpers as helpers,
 };
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
 pub(super) fn render<'a>(relation_names: &RelationNames<'a>, input: InputContext<'a>, output: &mut OutputContext<'a>) {
-    for table in input.schema.table_walkers().filter(|t| is_prisma_join_table(*t)) {
+    for table in input
+        .schema
+        .table_walkers()
+        .filter(|t| helpers::is_prisma_join_table(*t))
+    {
         let existing_relation = input.existing_m2m_relation(table.id);
         let mut fks = table.foreign_keys();
 

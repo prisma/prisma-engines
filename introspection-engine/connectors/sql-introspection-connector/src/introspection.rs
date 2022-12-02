@@ -8,6 +8,7 @@ mod models;
 mod postgres;
 mod prisma_relation_mode;
 mod relation_names;
+mod scalar_field;
 
 use crate::calculate_datamodel::{InputContext, OutputContext};
 pub(crate) use crate::SqlError;

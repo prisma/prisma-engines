@@ -1,4 +1,4 @@
-use crate::introspection_helpers::is_prisma_join_table;
+use crate::introspection_helpers as helpers;
 use psl::parser_database::{self, ast};
 use sql_schema_describer as sql;
 use std::collections::HashMap;
@@ -133,7 +133,7 @@ fn match_existing_m2m_relations(
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| is_prisma_join_table(*t))
+        .filter(|t| helpers::is_prisma_join_table(*t))
         .filter_map(|table| {
             prisma_schema
                 .db

@@ -1,7 +1,7 @@
+use super::scalar_field;
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::*,
-    warnings,
+    introspection_helpers as helpers, warnings,
 };
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer as sql;
@@ -101,7 +101,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
         }
 
         for field in model.scalar_fields() {
-            rendered.push_field(render_scalar_field(field, output));
+            rendered.push_field(scalar_field::render(field, output));
         }
 
         indexes::render(model, &mut rendered);
@@ -109,7 +109,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
         models_with_idx.push((model.previous_position(), model.table_id(), rendered));
     }
 
-    models_with_idx.sort_by(|(a, _, _), (b, _, _)| compare_options_none_last(*a, *b));
+    models_with_idx.sort_by(|(a, _, _), (b, _, _)| helpers::compare_options_none_last(*a, *b));
 
     for (idx, (_, table_id, render)) in models_with_idx.into_iter().enumerate() {
         output.rendered_schema.push_model(render);

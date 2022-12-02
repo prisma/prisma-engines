@@ -1,7 +1,7 @@
 use super::relation_names::RelationNames;
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::is_prisma_join_table,
+    introspection_helpers as helpers,
 };
 use datamodel_renderer::datamodel as render;
 use psl::datamodel_connector::{constraint_names::ConstraintNames, Connector};
@@ -11,7 +11,11 @@ use std::borrow::Cow;
 /// For each foreign key in the SQL catalog, produce two relation fields in the resulting Prisma
 /// schema.
 pub(super) fn render<'a>(relation_names: &RelationNames<'a>, input: InputContext<'a>, output: &mut OutputContext<'a>) {
-    for table in input.schema.table_walkers().filter(|t| !is_prisma_join_table(*t)) {
+    for table in input
+        .schema
+        .table_walkers()
+        .filter(|t| !helpers::is_prisma_join_table(*t))
+    {
         for (fk, relation_name_from_db) in table
             .foreign_keys()
             .filter_map(|fk| relation_names.inline_relation_name(fk.id).map(|name| (fk, name)))
