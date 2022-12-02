@@ -1,4 +1,4 @@
-use super::{models::table_has_usable_identifier, relation_names::RelationNames};
+use super::relation_names::RelationNames;
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
     introspection_helpers::is_prisma_join_table,
@@ -116,6 +116,20 @@ fn calculate_relation_field<'a>(
     }
 
     field
+}
+
+fn table_has_usable_identifier(table: sql::TableWalker<'_>) -> bool {
+    table
+        .indexes()
+        .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .any(|idx| {
+            idx.columns().all(|c| {
+                !matches!(
+                    c.as_column().column_type().family,
+                    sql::ColumnTypeFamily::Unsupported(_)
+                ) && c.as_column().arity().is_required()
+            })
+        })
 }
 
 fn calculate_backrelation_field<'a>(

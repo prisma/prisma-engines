@@ -116,6 +116,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .filter_map(|cols| {
                 cols.map(|(col, ext)| {
                     col.default()
+                        .as_ref()
                         .and_then(|d| d.as_sequence())
                         .and_then(|sequence_name| ext.get_sequence(sequence_name))
                 })

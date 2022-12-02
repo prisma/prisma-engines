@@ -58,6 +58,15 @@ impl<'a> ModelName<'a> {
             }
         }
     }
+
+    pub(crate) fn mapped_name(self) -> Option<&'a str> {
+        match self {
+            ModelName::FromPsl { mapped_name, .. } => mapped_name,
+            ModelName::FromSql { .. } => None,
+            ModelName::RenamedReserved { mapped_name } => Some(mapped_name),
+            ModelName::RenamedSanitized { mapped_name } => Some(mapped_name),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -94,10 +103,10 @@ impl<'a> IntrospectedName<'a> {
         }
     }
 
-    pub(crate) fn mapped_name(&self) -> Option<&'a str> {
+    pub(crate) fn mapped_name(self) -> Option<&'a str> {
         match self {
-            IntrospectedName::FromPsl { name: _, mapped_name } => *mapped_name,
-            IntrospectedName::FromSql { name: _ } => None,
+            IntrospectedName::FromPsl { mapped_name, .. } => mapped_name,
+            IntrospectedName::FromSql { .. } => None,
             IntrospectedName::RenamedSanitized { mapped_name } => Some(mapped_name),
         }
     }

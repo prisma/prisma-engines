@@ -277,7 +277,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
         }
 
         if let Some(next_default) = columns.next.default() {
-            changes.push(MsSqlAlterColumn::SetDefault(next_default.clone()));
+            changes.push(MsSqlAlterColumn::SetDefault(next_default.inner().clone()));
         }
     } else {
         changes.push(MsSqlAlterColumn::Modify);

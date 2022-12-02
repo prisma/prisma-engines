@@ -505,15 +505,30 @@ fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) {
             .unwrap());
     } else {
         assert_eq!(
-            sql_schema.walk(table_id).column("sideNames").unwrap().default(),
+            sql_schema
+                .walk(table_id)
+                .column("sideNames")
+                .unwrap()
+                .default()
+                .map(|d| d.inner()),
             Some(&DefaultValue::value(PrismaValue::String("top\ndown".to_string())))
         );
         assert_eq!(
-            sql_schema.walk(table_id).column("contains").unwrap().default(),
+            sql_schema
+                .walk(table_id)
+                .column("contains")
+                .unwrap()
+                .default()
+                .map(|d| d.inner()),
             Some(&DefaultValue::value(PrismaValue::String("'potassium'".to_string())))
         );
         assert_eq!(
-            sql_schema.walk(table_id).column("seasonality").unwrap().default(),
+            sql_schema
+                .walk(table_id)
+                .column("seasonality")
+                .unwrap()
+                .default()
+                .map(|d| d.inner()),
             Some(&DefaultValue::value(PrismaValue::String(r#""summer""#.to_string())))
         );
     }

@@ -20,22 +20,24 @@ use std::{borrow::Cow, fmt::Write as _};
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
-        ddl::Column {
-            column_name: col.name().into(),
-            not_null: col.arity().is_required(),
-            column_type: render_column_type(col),
-            default: col
-                .default()
-                .filter(|default| {
-                    !matches!(default.kind(),  DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None))
+        let default = col
+            .default()
+            .filter(|default| {
+                !matches!(default.kind(),  DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None))
                     // We do not want to render JSON defaults because
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Binary if !default.is_db_generated())
-                })
-                .map(|default| render_default(col, default)),
+            })
+            .map(|default| render_default(col, default.inner()));
+
+        ddl::Column {
+            column_name: col.name().into(),
+            not_null: col.arity().is_required(),
+            column_type: render_column_type(col),
+            default,
             auto_increment: col.is_autoincrement(),
             ..Default::default()
         }
@@ -488,7 +490,7 @@ impl MysqlAlterColumn {
             {
                 Some(DefaultValue::db_generated(previous.clone()))
             }
-            _ => columns.next.default().cloned(),
+            _ => columns.next.default().map(|d| d.inner()).cloned(),
         };
 
         MysqlAlterColumn::Modify { changes, new_default }

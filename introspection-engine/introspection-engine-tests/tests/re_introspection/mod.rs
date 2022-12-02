@@ -1103,28 +1103,28 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
         /// just floating around here
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         /// A really helpful comment about the model
         model User {
-            /// A really helpful comment about the field
-            id         Int @id @default(autoincrement())
+          /// A really helpful comment about the field
+          id Int @id @default(autoincrement())
         }
 
         model User2 {
-            id         Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         /// A really helpful comment about the enum
         enum a {
-            A
+          A
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }

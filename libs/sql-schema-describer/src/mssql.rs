@@ -125,7 +125,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         let table_names = self.get_table_names(schema, &mut sql_schema).await?;
 
-        sql_schema.columns = self.get_all_columns(&table_names, schema).await?;
+        self.get_columns(&table_names, schema, &mut sql_schema).await?;
         self.get_all_indices(schema, &mut mssql_ext, &table_names, &mut sql_schema)
             .await?;
         self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
@@ -239,11 +239,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             .expect("Invariant violation: size is not a valid usize value."))
     }
 
-    async fn get_all_columns(
+    async fn get_columns(
         &self,
         table_ids: &IndexMap<String, TableId>,
         schema: &str,
-    ) -> DescriberResult<Vec<(TableId, Column)>> {
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -270,7 +271,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
-        let mut columns = Vec::new();
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
@@ -365,18 +365,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            columns.push((
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+
+            sql_schema.columns.push((
                 table_id,
                 Column {
                     name,
                     tpe,
-                    default,
+                    default_value_id,
                     auto_increment,
                 },
             ));
         }
 
-        Ok(columns)
+        Ok(())
     }
 
     async fn get_all_indices(
