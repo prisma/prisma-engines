@@ -29,22 +29,58 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-</pre><pre class="rust"><code><span class="kw">mod </span>enumerator;
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+</pre><pre class="rust"><code><span class="kw">mod </span>default;
+<span class="kw">mod </span>enumerator;
+<span class="kw">mod </span>id;
+<span class="kw">mod </span>index;
+<span class="kw">mod </span>index_field;
+<span class="kw">mod </span>model;
+<span class="kw">mod </span>scalar_field;
 
 <span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::InputContext;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>default::{DefaultKind, DefaultValuePair};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>enumerator::EnumPair;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>id::IdPair;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>index::IndexPair;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>index_field::{IndexFieldPair, IndexOps};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>model::ModelPair;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>scalar_field::ScalarFieldPair;
 
 <span class="doccomment">/// Holds the introspected item from the database, and a possible
 /// previous value from the PSL.
+///
+/// Please see the different pair implementations in the module for
+/// details.
 </span><span class="attribute">#[derive(Clone, Copy)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Pair&lt;<span class="lifetime">&#39;a</span>, T, U&gt;
 <span class="kw">where
     </span>T: Copy,
     U: Copy,
 {
-    previous: <span class="prelude-ty">Option</span>&lt;T&gt;,
-    next: U,
-    context: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// The previous state, taken from the PSL.
+    </span>previous: <span class="prelude-ty">Option</span>&lt;T&gt;,
+    <span class="doccomment">/// The next state, taken from the database.
+    </span>next: U,
+    <span class="doccomment">/// The configuration object of the introspection.
+    </span>context: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; Pair&lt;<span class="lifetime">&#39;a</span>, T, U&gt;

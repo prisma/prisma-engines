@@ -125,236 +125,118 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
-
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::scalar_field;
 <span class="kw">use crate</span>::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::<span class="kw-2">*</span>,
-    warnings,
+    introspection_helpers <span class="kw">as </span>helpers, warnings,
 };
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
-<span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, schema_ast::ast::WithDocumentation};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+
+<span class="kw">use </span><span class="kw">super</span>::indexes;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
         Vec::with_capacity(input.schema.tables_count());
 
-    <span class="kw">for </span>table <span class="kw">in </span>input
-        .schema
-        .table_walkers()
-        .filter(|table| !is_old_migration_table(<span class="kw-2">*</span>table))
-        .filter(|table| !is_new_migration_table(<span class="kw-2">*</span>table))
-        .filter(|table| !is_prisma_join_table(<span class="kw-2">*</span>table))
-        .filter(|table| !is_relay_table(<span class="kw-2">*</span>table))
-    {
-        <span class="kw">let </span>existing_model = input.existing_model(table.id);
+    <span class="kw">for </span>model <span class="kw">in </span>input.model_pairs() {
+        <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::Model::new(model.name());
 
-        <span class="kw">let </span>(name, map, docs) = <span class="kw">match </span>input.table_prisma_name(table.id) {
-            <span class="kw">crate</span>::ModelName::FromPsl { name, mapped_name } =&gt; (Cow::from(name), mapped_name, <span class="prelude-val">None</span>),
-            <span class="kw">crate</span>::ModelName::FromSql { name } =&gt; (Cow::from(name), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            model_name @ <span class="kw">crate</span>::ModelName::RenamedReserved { mapped_name } =&gt; {
-                <span class="kw">let </span>docs =  <span class="macro">format!</span>(
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = model.documentation() {
+            rendered.documentation(docs);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = model.mapped_name() {
+            rendered.map(mapped_name);
+
+            <span class="kw">if </span>model.uses_reserved_name() {
+                <span class="kw">let </span>docs = <span class="macro">format!</span>(
                     <span class="string">&quot;This model has been renamed to &#39;{}&#39; during introspection, because the original name &#39;{}&#39; is reserved.&quot;</span>,
-                    model_name.prisma_name(),
+                    model.name(),
                     mapped_name,
                 );
 
-                (model_name.prisma_name(), <span class="prelude-val">Some</span>(mapped_name), <span class="prelude-val">Some</span>(docs))
+                rendered.documentation(docs);
             }
-            model_name @ <span class="kw">crate</span>::ModelName::RenamedSanitized { mapped_name: <span class="kw">_ </span>} =&gt; {
-                (model_name.prisma_name(), <span class="prelude-val">Some</span>(table.name()), <span class="prelude-val">None</span>)
-            }
-        };
-
-        <span class="kw">let </span><span class="kw-2">mut </span>model = renderer::Model::new(name.clone());
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = map {
-            model.map(map);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = docs {
-            model.documentation(docs);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(namespace) = model.namespace() {
+            rendered.schema(namespace);
         }
 
-        <span class="kw">if </span>table.columns().len() == <span class="number">0 </span>{
-            model.documentation(empty_table_comment(input));
-            model.comment_out();
+        <span class="kw">if </span>model.ignored() {
+            rendered.ignore();
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = model.id() {
+            <span class="kw">let </span>fields = id.fields().map(|field| {
+                <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::IndexFieldInput::new(field.name());
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
+                    rendered.sort_order(sort_order);
+                }
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
+                    rendered.length(length);
+                }
+
+                rendered
+            });
+
+            <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IdDefinition::new(fields);
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = id.name() {
+                definition.name(name);
+
+                output.warnings.reintrospected_id_names.push(warnings::Model {
+                    model: model.name().to_string(),
+                });
+            }
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = id.mapped_name() {
+                definition.map(map);
+            }
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = id.clustered() {
+                definition.clustered(clustered);
+            }
+
+            rendered.id(definition);
+        }
+
+        <span class="kw">if </span>model.scalar_fields().len() == <span class="number">0 </span>{
+            rendered.documentation(empty_table_comment(input));
+            rendered.comment_out();
 
             output.warnings.models_without_columns.push(warnings::Model {
-                model: name.to_string(),
+                model: model.name().to_string(),
             });
-        } <span class="kw">else if </span>!table_has_usable_identifier(table) {
-            model.documentation(<span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>);
-            model.ignore();
+        } <span class="kw">else if </span>!model.has_usable_identifier() {
+            <span class="kw">let </span>docs = <span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>;
+
+            rendered.documentation(docs);
 
             output.warnings.models_without_identifiers.push(warnings::Model {
-                model: name.to_string(),
+                model: model.name().to_string(),
             });
         }
 
-        <span class="kw">if </span>existing_model.filter(|m| m.mapped_name().is_some()).is_some() {
+        <span class="kw">if </span>model.remapped_name() {
             output.warnings.remapped_models.push(warnings::Model {
-                model: name.to_string(),
+                model: model.name().to_string(),
             });
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = existing_model.and_then(|m| m.ast_model().documentation()) {
-            model.documentation(docs);
+        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+            rendered.push_field(scalar_field::render(field, output));
         }
 
-        <span class="kw">for </span>column <span class="kw">in </span>table.columns() {
-            <span class="kw">if let </span>sql::ColumnTypeFamily::Unsupported(tpe) = column.column_type_family() {
-                output.warnings.unsupported_types.push(warnings::ModelAndFieldAndType {
-                    model: name.to_string(),
-                    field: input.column_prisma_name(column.id).prisma_name().into_owned(),
-                    tpe: tpe.to_owned(),
-                })
-            }
+        indexes::render(model, <span class="kw-2">&amp;mut </span>rendered);
 
-            <span class="kw">let </span>pk = table
-                .primary_key()
-                .filter(|pk| pk.columns().len() == <span class="number">1</span>)
-                .filter(|pk| pk.contains_column(column.id));
-
-            <span class="kw">let </span>unique = table
-                .indexes()
-                .filter(|i| i.is_unique())
-                .filter(|i| i.columns().len() == <span class="number">1</span>)
-                .find(|i| i.contains_column(column.id));
-
-            model.push_field(render_scalar_field(column, pk, unique, input, output));
-        }
-
-        <span class="kw">super</span>::indexes::render_model_indexes(table, existing_model, <span class="kw-2">&amp;mut </span>model, input);
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = table.primary_key() {
-            <span class="kw">let </span>fields = pk.columns().map(|c| {
-                <span class="kw">let </span><span class="kw-2">mut </span>field =
-                    renderer::IndexFieldInput::new(input.column_prisma_name(c.as_column().id).prisma_name());
-
-                <span class="kw">if </span>c.sort_order()
-                    .filter(|o| <span class="macro">matches!</span>(o, sql::SQLSortOrder::Desc))
-                    .is_some()
-                {
-                    field.sort_order(<span class="string">&quot;Desc&quot;</span>);
-                };
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = c.length() {
-                    field.length(length);
-                }
-
-                field
-            });
-
-            <span class="kw">if </span>fields.len() &gt; <span class="number">1 </span>{
-                <span class="kw">let </span><span class="kw-2">mut </span>id = renderer::IdDefinition::new(fields);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = existing_model
-                    .and_then(|model| model.primary_key())
-                    .and_then(|pk| pk.name())
-                {
-                    id.name(name);
-
-                    output.warnings.reintrospected_id_names.push(warnings::Model {
-                        model: input.table_prisma_name(table.id).prisma_name().to_string(),
-                    });
-                }
-
-                <span class="kw">let </span>default_name = ConstraintNames::primary_key_name(table.name(), input.active_connector());
-                <span class="kw">if </span>pk.name() != default_name &amp;&amp; !pk.name().is_empty() {
-                    id.map(pk.name());
-                }
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = primary_key_is_clustered(pk.id, input) {
-                    id.clustered(clustered);
-                }
-
-                model.id(id);
-            }
-        }
-
-        <span class="kw">match </span>(table.namespace(), input.config.datasources.first()) {
-            (<span class="prelude-val">Some</span>(namespace), <span class="prelude-val">Some</span>(ds)) <span class="kw">if </span>!ds.namespaces.is_empty() =&gt; {
-                model.schema(namespace);
-            }
-            <span class="kw">_ </span>=&gt; (),
-        }
-
-        <span class="kw">if </span>existing_model.map(|model| model.is_ignored()).unwrap_or(<span class="bool-val">false</span>) {
-            model.ignore();
-        }
-
-        models_with_idx.push((existing_model.map(|w| w.id), table.id, model));
+        models_with_idx.push((model.previous_position(), model.table_id(), rendered));
     }
 
-    models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
+    models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| helpers::compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
 
     <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, render)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
         output.rendered_schema.push_model(render);
@@ -369,20 +251,6 @@
     </span>} <span class="kw">else </span>{
         <span class="string">&quot;We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges.&quot;
     </span>}
-}
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>table_has_usable_identifier(table: sql::TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
-    table
-        .indexes()
-        .filter(|idx| idx.is_primary_key() || idx.is_unique())
-        .any(|idx| {
-            idx.columns().all(|c| {
-                !<span class="macro">matches!</span>(
-                    c.as_column().column_type().family,
-                    sql::ColumnTypeFamily::Unsupported(<span class="kw">_</span>)
-                ) &amp;&amp; c.as_column().arity().is_required()
-            })
-        })
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

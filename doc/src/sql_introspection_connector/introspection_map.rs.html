@@ -144,7 +144,7 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::is_prisma_join_table;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::introspection_helpers <span class="kw">as </span>helpers;
 <span class="kw">use </span>psl::parser_database::{<span class="self">self</span>, ast};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::collections::HashMap;
@@ -279,7 +279,7 @@
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| is_prisma_join_table(<span class="kw-2">*</span>t))
+        .filter(|t| helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
         .filter_map(|table| {
             prisma_schema
                 .db

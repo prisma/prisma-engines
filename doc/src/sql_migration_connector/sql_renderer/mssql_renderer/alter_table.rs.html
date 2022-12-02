@@ -564,7 +564,7 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(next_default) = columns.next.default() {
-            changes.push(MsSqlAlterColumn::SetDefault(next_default.clone()));
+            changes.push(MsSqlAlterColumn::SetDefault(next_default.inner().clone()));
         }
     } <span class="kw">else </span>{
         changes.push(MsSqlAlterColumn::Modify);

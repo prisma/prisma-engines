@@ -780,6 +780,9 @@
 <span id="780">780</span>
 <span id="781">781</span>
 <span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL server schema description.
 
 </span><span class="kw">use crate</span>::{
@@ -907,7 +910,7 @@
 
         <span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        sql_schema.columns = <span class="self">self</span>.get_all_columns(<span class="kw-2">&amp;</span>table_names, schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_columns(<span class="kw-2">&amp;</span>table_names, schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_all_indices(schema, <span class="kw-2">&amp;mut </span>mssql_ext, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema)
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_foreign_keys(schema, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1021,11 +1024,12 @@
             .expect(<span class="string">&quot;Invariant violation: size is not a valid usize value.&quot;</span>))
     }
 
-    <span class="kw">async fn </span>get_all_columns(
+    <span class="kw">async fn </span>get_columns(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
         schema: <span class="kw-2">&amp;</span>str,
-    ) -&gt; DescriberResult&lt;Vec&lt;(TableId, Column)&gt;&gt; {
+        sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+    ) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -1052,7 +1056,6 @@
             ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, &#39;ordinal&#39;);
         &quot;#</span>};
 
-        <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::new();
         <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>col <span class="kw">in </span>rows {
@@ -1147,18 +1150,21 @@
                 },
             };
 
-            columns.push((
+            <span class="kw">let </span>column_id = ColumnId(sql_schema.columns.len() <span class="kw">as </span>u32);
+            <span class="kw">let </span>default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+
+            sql_schema.columns.push((
                 table_id,
                 Column {
                     name,
                     tpe,
-                    default,
+                    default_value_id,
                     auto_increment,
                 },
             ));
         }
 
-        <span class="prelude-val">Ok</span>(columns)
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async fn </span>get_all_indices(

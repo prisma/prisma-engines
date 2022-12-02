@@ -515,13 +515,87 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.
 
 </span><span class="attribute">#![deny(missing_docs)]
 
-</span><span class="kw">use crate</span>::{
-    ids::<span class="kw-2">*</span>, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
-    ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
+</span><span class="kw">use </span>psl::dml::PrismaValue;
+
+<span class="kw">use crate</span>::{
+    ids::<span class="kw-2">*</span>, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey,
+    ForeignKeyAction, ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType,
+    View,
 };
 <span class="kw">use </span>std::ops::Range;
 
@@ -580,6 +654,71 @@
 <span class="doccomment">/// Traverse a view
 </span><span class="kw">pub type </span>ViewWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, ViewId&gt;;
 
+<span class="doccomment">/// Traverse a default value
+</span><span class="kw">pub type </span>DefaultValueWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, DefaultValueId&gt;;
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DefaultValueWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Return a value if a constant.
+    </span><span class="kw">pub fn </span>as_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind() {
+            DefaultKind::Value(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// If the value is a squence, return it
+    </span><span class="kw">pub fn </span>as_sequence(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind() {
+            DefaultKind::Sequence(name) =&gt; <span class="prelude-val">Some</span>(name),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// True if a constant value
+    </span><span class="kw">pub fn </span>is_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind(), DefaultKind::Value(<span class="kw">_</span>))
+    }
+
+    <span class="doccomment">/// True if `now()`
+    </span><span class="kw">pub fn </span>is_now(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind(), DefaultKind::Now)
+    }
+
+    <span class="doccomment">/// True if referencing a sequence
+    </span><span class="kw">pub fn </span>is_sequence(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind(), DefaultKind::Sequence(<span class="kw">_</span>))
+    }
+
+    <span class="doccomment">/// True if value generation is handled in the database
+    </span><span class="kw">pub fn </span>is_db_generated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind(), DefaultKind::DbGenerated(<span class="kw">_</span>))
+    }
+
+    <span class="doccomment">/// The value kind enumerator
+    </span><span class="kw">pub fn </span>kind(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DefaultKind {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().<span class="number">1</span>.kind
+    }
+
+    <span class="doccomment">/// The name of the default value constraint.
+    </span><span class="kw">pub fn </span>constraint_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.get().<span class="number">1</span>.constraint_name.as_deref()
+    }
+
+    <span class="doccomment">/// The column where the default value is located.
+    </span><span class="kw">pub fn </span>column(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.get().<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// The default value data
+    </span><span class="kw">pub fn </span>inner(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DefaultValue {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.default_values[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize].<span class="number">1
+    </span>}
+
+    <span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(ColumnId, DefaultValue) {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.default_values[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// The nullability and arity of the column.
     </span><span class="kw">pub fn </span>arity(<span class="self">self</span>) -&gt; ColumnArity {
@@ -623,8 +762,11 @@
     }
 
     <span class="doccomment">/// The default value for the column.
-    </span><span class="kw">pub fn </span>default(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DefaultValue&gt; {
-        <span class="self">self</span>.get().<span class="number">1</span>.default.as_ref()
+    </span><span class="kw">pub fn </span>default(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DefaultValueWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.get()
+            .<span class="number">1
+            </span>.default_value_id
+            .map(<span class="kw">move </span>|default_id| <span class="self">self</span>.walk(default_id))
     }
 
     <span class="doccomment">/// The full column type.

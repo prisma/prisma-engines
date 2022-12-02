@@ -596,6 +596,19 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>sql_schema_calculator_flavour;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
@@ -841,7 +854,7 @@
             sql::Column {
                 name: model_a_column.into(),
                 tpe: column_a_type,
-                default: <span class="prelude-val">None</span>,
+                default_value_id: <span class="prelude-val">None</span>,
                 auto_increment: <span class="bool-val">false</span>,
             },
         );
@@ -850,7 +863,7 @@
             sql::Column {
                 name: model_b_column.into(),
                 tpe: column_b_type,
-                default: <span class="prelude-val">None</span>,
+                default_value_id: <span class="prelude-val">None</span>,
                 auto_increment: <span class="bool-val">false</span>,
             },
         );
@@ -984,18 +997,23 @@
             sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def))
         }),
     });
-    ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            tpe: sql::ColumnType::pure(
-                sql::ColumnTypeFamily::Enum(ctx.enum_ids[<span class="kw-2">&amp;</span>r#enum.id]),
-                column_arity(field.ast_field().arity),
-            ),
-            default,
-            auto_increment: <span class="bool-val">false</span>,
-        },
-    );
+
+    <span class="kw">let </span>default_value_id = default.map(|default| {
+        <span class="kw">let </span>column_id = ctx.schema.describer_schema.next_column_id();
+        ctx.schema.describer_schema.push_default_value(column_id, default)
+    });
+
+    <span class="kw">let </span>column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType::pure(
+            sql::ColumnTypeFamily::Enum(ctx.enum_ids[<span class="kw-2">&amp;</span>r#enum.id]),
+            column_arity(field.ast_field().arity),
+        ),
+        default_value_id,
+        auto_increment: <span class="bool-val">false</span>,
+    };
+
+    ctx.schema.describer_schema.push_column(table_id, column);
 }
 
 <span class="kw">fn </span>push_column_for_model_unsupported_scalar_field(
@@ -1003,28 +1021,34 @@
     table_id: sql::TableId,
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            tpe: ctx.flavour.column_type_for_unsupported_type(
-                field,
-                field.ast_field().field_type.as_unsupported().unwrap().<span class="number">0</span>.to_owned(),
-            ),
-            default: field.default_value().and_then(|def| {
-                <span class="comment">// This is validated as @default(dbgenerated(&quot;...&quot;)), we can unwrap.
-                </span><span class="kw">let </span>dbgenerated_contents = unwrap_dbgenerated(def.value());
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = dbgenerated_contents {
-                    <span class="kw">let </span>default = sql::DefaultValue::db_generated(value)
-                        .with_constraint_name(ctx.flavour.default_constraint_name(def));
-                    <span class="prelude-val">Some</span>(default)
-                } <span class="kw">else </span>{
-                    <span class="prelude-val">None
-                </span>}
-            }),
-            auto_increment: <span class="bool-val">false</span>,
-        },
-    );
+    <span class="kw">let </span>default = field.default_value().and_then(|def| {
+        <span class="comment">// This is validated as @default(dbgenerated(&quot;...&quot;)), we can unwrap.
+        </span><span class="kw">let </span>dbgenerated_contents = unwrap_dbgenerated(def.value());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = dbgenerated_contents {
+            <span class="kw">let </span>default =
+                sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def));
+            <span class="prelude-val">Some</span>(default)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    });
+
+    <span class="kw">let </span>default_value_id = default.map(|default| {
+        <span class="kw">let </span>column_id = ctx.schema.describer_schema.next_column_id();
+        ctx.schema.describer_schema.push_default_value(column_id, default)
+    });
+
+    <span class="kw">let </span>column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: ctx.flavour.column_type_for_unsupported_type(
+            field,
+            field.ast_field().field_type.as_unsupported().unwrap().<span class="number">0</span>.to_owned(),
+        ),
+        default_value_id,
+        auto_increment: <span class="bool-val">false</span>,
+    };
+
+    ctx.schema.describer_schema.push_column(table_id, column);
 }
 
 <span class="kw">fn </span>push_column_for_builtin_scalar_type(
@@ -1092,25 +1116,27 @@
     });
 
     <span class="kw">let </span>default_is_prisma_level = <span class="macro">matches!</span>(default, <span class="prelude-val">Some</span>(ColumnDefault::PrismaGenerated));
-    <span class="kw">let </span>column_id = ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            default: <span class="kw">if let </span><span class="prelude-val">Some</span>(ColumnDefault::Available(d)) = default {
-                <span class="prelude-val">Some</span>(d)
-            } <span class="kw">else </span>{
-                <span class="prelude-val">None
-            </span>},
 
-            tpe: sql::ColumnType {
-                family,
-                full_data_type: String::new(),
-                arity: column_arity(field.ast_field().arity),
-                native_type: <span class="prelude-val">Some</span>(native_type),
-            },
-            auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+    <span class="kw">let </span>default_value_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(ColumnDefault::Available(d)) = default {
+        <span class="kw">let </span>column_id = ctx.schema.describer_schema.next_column_id();
+        <span class="prelude-val">Some</span>(ctx.schema.describer_schema.push_default_value(column_id, d))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
+
+    <span class="kw">let </span>column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType {
+            family,
+            full_data_type: String::new(),
+            arity: column_arity(field.ast_field().arity),
+            native_type: <span class="prelude-val">Some</span>(native_type),
         },
-    );
+        auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        default_value_id,
+    };
+
+    <span class="kw">let </span>column_id = ctx.schema.describer_schema.push_column(table_id, column);
 
     <span class="kw">if </span>default_is_prisma_level {
         ctx.schema.prisma_level_defaults.push(column_id);

@@ -1392,6 +1392,10 @@
 <span id="1392">1392</span>
 <span id="1393">1393</span>
 <span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2155,23 +2159,27 @@
             } <span class="kw">else </span>{
                 get_column_type_postgresql(<span class="kw-2">&amp;</span>col, sql_schema)
             };
+
             <span class="kw">let </span>default = col
                 .get(<span class="string">&quot;column_default&quot;</span>)
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(<span class="kw-2">&amp;</span>raw_default_value, <span class="kw-2">&amp;</span>tpe));
 
             <span class="kw">let </span>auto_increment = is_identity
-                || <span class="macro">matches!</span>(default.as_ref().map(|d| d.kind()), <span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)))
+                || <span class="macro">matches!</span>(default.as_ref().map(|d| <span class="kw-2">&amp;</span>d.kind), <span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)))
                 || (<span class="self">self</span>.is_cockroach()
                     &amp;&amp; <span class="macro">matches!</span>(
-                        default.as_ref().map(|d| d.kind()),
+                        default.as_ref().map(|d| <span class="kw-2">&amp;</span>d.kind),
                         <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(s))) <span class="kw">if </span>s == <span class="string">&quot;unique_rowid()&quot;
                     </span>));
+
+            <span class="kw">let </span>column_id = ColumnId(sql_schema.columns.len() <span class="kw">as </span>u32);
+            <span class="kw">let </span>default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             <span class="kw">let </span>col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 

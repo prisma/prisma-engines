@@ -170,6 +170,12 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 
 <span class="kw">pub use </span>error::{ConnectorError, ErrorKind};
@@ -206,6 +212,12 @@
     Prisma1,
     Prisma11,
     Prisma2,
+}
+
+<span class="kw">impl </span>Version {
+    <span class="kw">pub fn </span>is_prisma1(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Prisma1 | <span class="self">Self</span>::Prisma11)
+    }
 }
 
 <span class="attribute">#[derive(Debug)]

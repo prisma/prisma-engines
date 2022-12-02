@@ -52,59 +52,87 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    calculate_datamodel::InputContext,
-    introspection_helpers::{compare_options_none_last, render_index},
+    introspection_helpers::compare_options_none_last,
+    pair::{IndexOps, ModelPair},
 };
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
-<span class="kw">use </span>psl::{datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_model_indexes&lt;<span class="lifetime">&#39;a</span>&gt;(
-    table: sql::TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
-    existing_model: <span class="prelude-ty">Option</span>&lt;walkers::ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    model: <span class="kw-2">&amp;mut </span>renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;,
-    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
-) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(model: ModelPair&lt;<span class="lifetime">&#39;a</span>&gt;, rendered: <span class="kw-2">&amp;mut </span>renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;) {
     <span class="comment">// (Position in the existing model, index definition)
-    </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_indexes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
-        Vec::with_capacity(table.indexes().len());
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_indexes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, renderer::IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; = Vec::new();
 
-    <span class="kw">for </span>index <span class="kw">in </span>table.indexes() {
-        <span class="kw">let </span>existing_index = existing_model.and_then(|model| {
-            model
-                .indexes()
-                .find(|model_index| existing_index_matches(<span class="kw-2">*</span>model_index, index.name(), input))
+    <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+        <span class="kw">let </span>fields = index.fields().map(|field| {
+            <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IndexFieldInput::new(field.name());
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
+                definition.sort_order(sort_order);
+            }
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
+                definition.length(length);
+            }
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(ops) = field.opclass() {
+                <span class="kw">let </span>ops = <span class="kw">match </span>ops {
+                    IndexOps::Managed(ops) =&gt; renderer::IndexOps::managed(ops),
+                    IndexOps::Raw(ops) =&gt; renderer::IndexOps::raw(ops),
+                };
+
+                definition.ops(ops);
+            }
+
+            definition
         });
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(definition) = render_index(index, existing_index, input) {
-            <span class="kw">let </span>attrid = existing_index.map(|idx| idx.attribute_id());
-            ordered_indexes.push((attrid, definition));
+        <span class="kw">let </span><span class="kw-2">mut </span>definition = <span class="kw">match </span>index.index_type() {
+            sql::IndexType::Unique =&gt; renderer::IndexDefinition::unique(fields),
+            sql::IndexType::Fulltext =&gt; renderer::IndexDefinition::fulltext(fields),
+            sql::IndexType::Normal =&gt; renderer::IndexDefinition::index(fields),
+            <span class="comment">// we filter these out in the pair
+            </span>sql::IndexType::PrimaryKey =&gt; <span class="macro">unreachable!</span>(),
+        };
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = index.name() {
+            definition.name(name);
         }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = index.mapped_name() {
+            definition.map(map);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = index.clustered() {
+            definition.clustered(clustered);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(algo) = index.algorithm() {
+            definition.index_type(algo);
+        }
+
+        ordered_indexes.push((index.previous_position(), definition));
     }
 
     ordered_indexes.sort_by(|(idx, <span class="kw">_</span>), (idx_b, <span class="kw">_</span>)| compare_options_none_last(<span class="kw-2">*</span>idx, <span class="kw-2">*</span>idx_b));
 
     <span class="kw">for </span>(<span class="kw">_</span>, definition) <span class="kw">in </span>ordered_indexes {
-        model.push_index(definition);
+        rendered.push_index(definition);
     }
-}
-
-<span class="kw">fn </span>existing_index_matches(
-    existing_index: walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    sql_constraint_name: <span class="kw-2">&amp;</span>str,
-    input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; bool {
-    <span class="comment">// Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
-    // argument. If we infer that an index in the database was produced using that logic, we
-    // match up the existing index.
-    </span><span class="kw">if </span>existing_index.mapped_name().is_none() &amp;&amp; existing_index.name() == <span class="prelude-val">Some</span>(sql_constraint_name) {
-        <span class="kw">return </span><span class="bool-val">true</span>;
-    }
-
-    <span class="comment">// Compare the constraint name (implicit or mapped name) from the Prisma schema with the
-    // constraint name from the database.
-    </span>existing_index.constraint_name(input.active_connector()) == sql_constraint_name
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

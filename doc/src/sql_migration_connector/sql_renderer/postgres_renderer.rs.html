@@ -1153,7 +1153,7 @@
         <span class="kw">let </span>nullability_str = render_nullability(column);
         <span class="kw">let </span>default_str = column
             .default()
-            .map(|d| render_default(d, <span class="kw-2">&amp;</span>render_column_type(column, <span class="self">self</span>)))
+            .map(|d| render_default(d.inner(), <span class="kw-2">&amp;</span>render_column_type(column, <span class="self">self</span>)))
             .filter(|default| !default.is_empty())
             .map(|default| <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, default))
             .unwrap_or_else(String::new);
@@ -1885,7 +1885,7 @@
     <span class="kw">for </span>change <span class="kw">in </span>column_changes.iter() {
         <span class="kw">match </span>change {
             ColumnChange::Default =&gt; <span class="kw">match </span>(columns.previous.default(), columns.next.default()) {
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(next_default)) =&gt; changes.push(PostgresAlterColumn::SetDefault((<span class="kw-2">*</span>next_default).clone())),
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(next_default)) =&gt; changes.push(PostgresAlterColumn::SetDefault(next_default.inner().clone())),
                 (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; changes.push(PostgresAlterColumn::DropDefault),
             },
             ColumnChange::Arity =&gt; <span class="kw">match </span>(columns.previous.arity(), columns.next.arity()) {
@@ -2133,7 +2133,7 @@
             <span class="kw">let </span>table_name = columns.previous.table().name();
             <span class="kw">let </span>column_name = columns.previous.name();
             <span class="kw">let </span>data_type = render_column_type(columns.next, flavour);
-            <span class="kw">let </span>default_str = render_default(next_default, <span class="kw-2">&amp;</span>data_type);
+            <span class="kw">let </span>default_str = render_default(next_default.inner(), <span class="kw-2">&amp;</span>data_type);
 
             <span class="kw">let </span>set_default = <span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT {default}&quot;</span>,
@@ -2205,7 +2205,7 @@
         <span class="kw">return </span>String::new();
     }
 
-    <span class="kw">let </span>sequence = <span class="kw">if let </span><span class="prelude-val">Some</span>(seq_name) = column.default().and_then(|d| d.as_sequence()) {
+    <span class="kw">let </span>sequence = <span class="kw">if let </span><span class="prelude-val">Some</span>(seq_name) = column.default().as_ref().and_then(|d| d.as_sequence()) {
         <span class="kw">let </span>connector_data: <span class="kw-2">&amp;</span>PostgresSchemaExt = column.schema.downcast_connector_data();
         connector_data
             .sequences

@@ -516,6 +516,8 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, IteratorJoin, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::MysqlFlavour,
@@ -538,22 +540,24 @@
 
 <span class="kw">impl </span>MysqlFlavour {
     <span class="kw">fn </span>render_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, col: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ddl::Column&lt;<span class="lifetime">&#39;a</span>&gt; {
-        ddl::Column {
-            column_name: col.name().into(),
-            not_null: col.arity().is_required(),
-            column_type: render_column_type(col),
-            default: col
-                .default()
-                .filter(|default| {
-                    !<span class="macro">matches!</span>(default.kind(),  DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::DbGenerated(<span class="prelude-val">None</span>))
+        <span class="kw">let </span>default = col
+            .default()
+            .filter(|default| {
+                !<span class="macro">matches!</span>(default.kind(),  DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::DbGenerated(<span class="prelude-val">None</span>))
                     <span class="comment">// We do not want to render JSON defaults because
                     // they are not supported by MySQL.
                     </span>&amp;&amp; !<span class="macro">matches!</span>(col.column_type_family(), ColumnTypeFamily::Json)
                     <span class="comment">// We do not want to render binary defaults because
                     // they are not supported by MySQL.
                     </span>&amp;&amp; !<span class="macro">matches!</span>(col.column_type_family(), ColumnTypeFamily::Binary <span class="kw">if </span>!default.is_db_generated())
-                })
-                .map(|default| render_default(col, default)),
+            })
+            .map(|default| render_default(col, default.inner()));
+
+        ddl::Column {
+            column_name: col.name().into(),
+            not_null: col.arity().is_required(),
+            column_type: render_column_type(col),
+            default,
             auto_increment: col.is_autoincrement(),
             ..Default::default()
         }
@@ -1006,7 +1010,7 @@
             {
                 <span class="prelude-val">Some</span>(DefaultValue::db_generated(previous.clone()))
             }
-            <span class="kw">_ </span>=&gt; columns.next.default().cloned(),
+            <span class="kw">_ </span>=&gt; columns.next.default().map(|d| d.inner()).cloned(),
         };
 
         MysqlAlterColumn::Modify { changes, new_default }

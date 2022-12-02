@@ -342,6 +342,12 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::SqliteFlavour,
@@ -631,8 +637,13 @@
             <span class="macro">format!</span>(
                 <span class="string">&quot;coalesce({column_name}, {default_value}) AS {column_name}&quot;</span>,
                 column_name = Quoted::sqlite_ident(columns.previous.name()),
-                default_value =
-                    render_default(columns.next.default().expect(<span class="string">&quot;default on required column with default&quot;</span>),)
+                default_value = render_default(
+                    columns
+                        .next
+                        .default()
+                        .expect(<span class="string">&quot;default on required column with default&quot;</span>)
+                        .inner()
+                )
             )
         } <span class="kw">else </span>{
             Quoted::sqlite_ident(columns.previous.name()).to_string()
@@ -661,6 +672,7 @@
                     DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::DbGenerated(<span class="prelude-val">None</span>)
                 )
             })
+            .map(|d| d.inner())
             .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),

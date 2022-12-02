@@ -792,6 +792,9 @@
 <span id="792">792</span>
 <span id="793">793</span>
 <span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1281,10 +1284,13 @@
                 },
             };
 
+            <span class="kw">let </span>column_id = ColumnId(sql_schema.columns.len() <span class="kw">as </span>u32);
+            <span class="kw">let </span>default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+
             <span class="kw">let </span>col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 

@@ -102,7 +102,7 @@
 <span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::<span class="kw-2">*</span>,
+    introspection_helpers <span class="kw">as </span>helpers,
     pair::EnumPair,
     sanitize_datamodel_names, warnings,
 };
@@ -117,7 +117,7 @@
         all_enums.push((pair.previous_position(), rendered_enum))
     }
 
-    all_enums.sort_by(|(id_a, <span class="kw">_</span>), (id_b, <span class="kw">_</span>)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
+    all_enums.sort_by(|(id_a, <span class="kw">_</span>), (id_b, <span class="kw">_</span>)| helpers::compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
 
     <span class="kw">if </span>input.sql_family.is_mysql() {
         <span class="comment">// MySQL can have multiple database enums matching one Prisma enum.

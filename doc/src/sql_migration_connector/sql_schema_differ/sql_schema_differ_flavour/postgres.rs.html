@@ -706,6 +706,7 @@
 <span id="706">706</span>
 <span id="707">707</span>
 <span id="708">708</span>
+<span id="709">709</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
 <span class="kw">use crate</span>::{
     database_schema::SqlDatabaseSchema,
@@ -824,6 +825,7 @@
             .filter_map(|cols| {
                 cols.map(|(col, ext)| {
                     col.default()
+                        .as_ref()
                         .and_then(|d| d.as_sequence())
                         .and_then(|sequence_name| ext.get_sequence(sequence_name))
                 })

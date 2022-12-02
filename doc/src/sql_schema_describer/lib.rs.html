@@ -841,6 +841,8 @@
     </span>columns: Vec&lt;(TableId, Column)&gt;,
     <span class="doccomment">/// All foreign keys.
     </span>foreign_keys: Vec&lt;ForeignKey&gt;,
+    <span class="doccomment">/// All default values.
+    </span>default_values: Vec&lt;(ColumnId, DefaultValue)&gt;,
     <span class="doccomment">/// Constrained and referenced columns of foreign keys.
     </span>foreign_key_columns: Vec&lt;ForeignKeyColumn&gt;,
     <span class="doccomment">/// All indexes and unique constraints.
@@ -862,6 +864,11 @@
     </span><span class="attribute">#[track_caller]
     </span><span class="kw">pub fn </span>downcast_connector_data&lt;T: <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
         <span class="self">self</span>.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
+    }
+
+    <span class="doccomment">/// The id of the next column
+    </span><span class="kw">pub fn </span>next_column_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColumnId {
+        ColumnId(<span class="self">self</span>.columns.len() <span class="kw">as </span>u32)
     }
 
     <span class="doccomment">/// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -973,6 +980,13 @@
             index_name,
             tpe: IndexType::Normal,
         });
+        id
+    }
+
+    <span class="doccomment">/// Add an index to the schema.
+    </span><span class="kw">pub fn </span>push_default_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column_id: ColumnId, value: DefaultValue) -&gt; DefaultValueId {
+        <span class="kw">let </span>id = DefaultValueId(<span class="self">self</span>.default_values.len() <span class="kw">as </span>u32);
+        <span class="self">self</span>.default_values.push((column_id, value));
         id
     }
 
@@ -1208,7 +1222,7 @@
     <span class="doccomment">/// Column type.
     </span><span class="kw">pub </span>tpe: ColumnType,
     <span class="doccomment">/// Column default.
-    </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
+    </span><span class="kw">pub </span>default_value_id: <span class="prelude-ty">Option</span>&lt;DefaultValueId&gt;,
     <span class="doccomment">/// Is the column auto-incrementing?
     </span><span class="kw">pub </span>auto_increment: bool,
 }
@@ -1442,6 +1456,10 @@
         <span class="self">Self</span>::new(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(val.into())))
     }
 
+    <span class="kw">pub fn </span>constraint_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.constraint_name.as_deref()
+    }
+
     <span class="kw">pub fn </span>now() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(DefaultKind::Now)
     }
@@ -1454,6 +1472,10 @@
         <span class="self">Self</span>::new(DefaultKind::Sequence(val.to_string()))
     }
 
+    <span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DefaultKind {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
+    }
+
     <span class="kw">pub fn </span>new(kind: DefaultKind) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             kind,
@@ -1461,49 +1483,27 @@
         }
     }
 
-    <span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DefaultKind {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
-    }
-
-    <span class="kw">pub fn </span>into_kind(<span class="self">self</span>) -&gt; DefaultKind {
-        <span class="self">self</span>.kind
-    }
-
     <span class="kw">pub fn </span>set_constraint_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) {
         <span class="self">self</span>.constraint_name = <span class="prelude-val">Some</span>(name.to_string())
     }
 
-    <span class="kw">pub fn </span>constraint_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-        <span class="self">self</span>.constraint_name.as_deref()
-    }
-
-    <span class="kw">pub fn </span>as_sequence(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
-            DefaultKind::Sequence(name) =&gt; <span class="prelude-val">Some</span>(name),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub fn </span>as_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrismaValue&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrismaValue&gt; {
         <span class="kw">match </span><span class="self">self</span>.kind {
             DefaultKind::Value(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub fn </span>is_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.kind, DefaultKind::Value(<span class="kw">_</span>))
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_sequence&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            DefaultKind::Sequence(<span class="kw-2">ref </span>name) =&gt; <span class="prelude-val">Some</span>(name),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
     }
 
-    <span class="kw">pub fn </span>is_now(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.kind, DefaultKind::Now)
-    }
-
-    <span class="kw">pub fn </span>is_sequence(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.kind, DefaultKind::Sequence(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub fn </span>is_db_generated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_db_generated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.kind, DefaultKind::DbGenerated(<span class="kw">_</span>))
     }
 

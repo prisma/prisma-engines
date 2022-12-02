@@ -582,7 +582,7 @@
                     Cow::Owned(<span class="macro">format!</span>(
                         <span class="string">&quot; CONSTRAINT {} DEFAULT {}&quot;</span>,
                         Quoted::mssql_ident(<span class="kw-2">&amp;</span>constraint_name),
-                        render_default(default)
+                        render_default(default.inner())
                     ))
                 })
                 .unwrap_or_default()

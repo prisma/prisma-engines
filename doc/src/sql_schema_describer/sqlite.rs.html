@@ -592,6 +592,8 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.
 
 </span><span class="kw">use crate</span>::{
@@ -986,13 +988,15 @@
         };
 
         <span class="kw">let </span>pk_col = row.get(<span class="string">&quot;pk&quot;</span>).and_then(|x| x.as_integer()).expect(<span class="string">&quot;primary key&quot;</span>);
+        <span class="kw">let </span>column_id = ColumnId(schema.columns.len() <span class="kw">as </span>u32);
+        <span class="kw">let </span>default_value_id = default.map(|default| schema.push_default_value(column_id, default));
 
         <span class="kw">let </span>column_id = schema.push_column(
             table_id,
             Column {
                 name: row.get_expect_string(<span class="string">&quot;name&quot;</span>),
                 tpe,
-                default,
+                default_value_id,
                 auto_increment: <span class="bool-val">false</span>,
             },
         );

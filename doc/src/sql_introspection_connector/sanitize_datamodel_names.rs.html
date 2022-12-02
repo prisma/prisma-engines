@@ -147,6 +147,15 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
 </pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>std::borrow::Cow;
@@ -207,6 +216,15 @@
             }
         }
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ModelName::FromPsl { mapped_name, .. } =&gt; mapped_name,
+            ModelName::FromSql { .. } =&gt; <span class="prelude-val">None</span>,
+            ModelName::RenamedReserved { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+            ModelName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+        }
+    }
 }
 
 <span class="attribute">#[derive(Clone, Copy, Debug)]
@@ -243,10 +261,10 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            IntrospectedName::FromPsl { name: <span class="kw">_</span>, mapped_name } =&gt; <span class="kw-2">*</span>mapped_name,
-            IntrospectedName::FromSql { name: <span class="kw">_ </span>} =&gt; <span class="prelude-val">None</span>,
+            IntrospectedName::FromPsl { mapped_name, .. } =&gt; mapped_name,
+            IntrospectedName::FromSql { .. } =&gt; <span class="prelude-val">None</span>,
             IntrospectedName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
         }
     }

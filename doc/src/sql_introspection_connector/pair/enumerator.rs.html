@@ -96,35 +96,7 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sanitize_datamodel_names;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sanitize_datamodel_names::ModelName;
 <span class="kw">use </span>psl::{
     parser_database::walkers,
     schema_ast::ast::{<span class="self">self</span>, WithDocumentation},
@@ -157,33 +129,17 @@
     /// contains characters that are not allowed in the PSL
     /// definition.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
-        <span class="self">self</span>.previous
-            .map(|enm| Cow::Borrowed(enm.name()))
-            .unwrap_or_else(|| <span class="kw">match </span><span class="self">self</span>.next.name() {
-                name <span class="kw">if </span>psl::is_reserved_type_name(name) =&gt; Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;Renamed{name}&quot;</span>)),
-                name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; {
-                    <span class="kw">let </span>sanitized = sanitize_datamodel_names::sanitize_string(name);
-
-                    <span class="kw">if </span>sanitized.is_empty() {
-                        Cow::Borrowed(name)
-                    } <span class="kw">else </span>{
-                        Cow::Owned(sanitized)
-                    }
-                }
-                name =&gt; Cow::Borrowed(name),
-            })
+        <span class="self">self</span>.context.enum_prisma_name(<span class="self">self</span>.next.id).prisma_name()
     }
 
     <span class="doccomment">/// The mapped name, if defined, is the actual name of the enum in
     /// the database.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
-        <span class="kw">match </span><span class="self">self</span>.previous {
-            <span class="prelude-val">Some</span>(enm) =&gt; enm.mapped_name(),
-            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span><span class="self">self</span>.next.name() {
-                name <span class="kw">if </span>psl::is_reserved_type_name(name) =&gt; <span class="prelude-val">Some</span>(name),
-                name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; <span class="prelude-val">Some</span>(name),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-            },
+        <span class="kw">match </span><span class="self">self</span>.context.enum_prisma_name(<span class="self">self</span>.next.id) {
+            ModelName::FromPsl { mapped_name, .. } =&gt; mapped_name,
+            ModelName::RenamedReserved { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+            ModelName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),
+            ModelName::FromSql { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -213,36 +169,24 @@
     /// it contains characters that are not allowed in the PSL
     /// definition.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = <span class="self">self</span>.previous.map(|variant| variant.name()) {
-            <span class="kw">return </span>Cow::Borrowed(name);
-        }
+        <span class="kw">let </span>name = <span class="self">self</span>.context.enum_variant_name(<span class="self">self</span>.next.id).prisma_name();
 
-        <span class="kw">match </span><span class="self">self</span>.next.name() {
-            name <span class="kw">if </span>name.is_empty() =&gt; Cow::Borrowed(<span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>),
-            name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; {
-                <span class="kw">let </span>sanitized = sanitize_datamodel_names::sanitize_string(name);
-
-                <span class="kw">if </span>sanitized.is_empty() {
-                    Cow::Borrowed(name)
-                } <span class="kw">else </span>{
-                    Cow::Owned(sanitized)
-                }
-            }
-            name =&gt; Cow::Borrowed(name),
+        <span class="comment">// If the variant is sanitized as an empty string, we will
+        // comment the variant out and add a warning.
+        //
+        // The commented out variant cannot have an empty name, so we
+        // just print the non-sanitized one.
+        </span><span class="kw">if </span>name.is_empty() {
+            Cow::Borrowed(<span class="self">self</span>.next.name())
+        } <span class="kw">else </span>{
+            name
         }
     }
 
     <span class="doccomment">/// The mapped name, if defined, is the actual name of the variant in
     /// the database.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
-        <span class="kw">match </span><span class="self">self</span>.previous {
-            <span class="prelude-val">Some</span>(variant) =&gt; variant.mapped_name(),
-            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span><span class="self">self</span>.next.name() {
-                name <span class="kw">if </span>name.is_empty() =&gt; <span class="prelude-val">Some</span>(name),
-                name <span class="kw">if </span>sanitize_datamodel_names::needs_sanitation(name) =&gt; <span class="prelude-val">Some</span>(name),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-            },
-        }
+        <span class="self">self</span>.context.enum_variant_name(<span class="self">self</span>.next.id).mapped_name()
     }
 
     <span class="doccomment">/// The documentation on top of the enum.

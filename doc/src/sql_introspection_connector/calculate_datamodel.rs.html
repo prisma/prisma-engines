@@ -286,9 +286,28 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection::introspect,
-    pair::{EnumPair, Pair},
+    introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
+    pair::{EnumPair, ModelPair, Pair},
     warnings, EnumVariantName, IntrospectedName, ModelName, SqlFamilyTrait, SqlIntrospectionResult,
 };
 <span class="kw">use </span>introspection_connector::{IntrospectionContext, IntrospectionResult, Version, Warning};
@@ -401,12 +420,12 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
     <span class="kw">pub</span>(<span class="kw">crate</span>) sql_family: SqlFamily,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
     <span class="kw">pub</span>(<span class="kw">crate</span>) previous_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
     <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">crate</span>::introspection_map::IntrospectionMap,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
     <span class="kw">pub</span>(<span class="kw">crate</span>) rendered_schema: datamodel_renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) target_models: HashMap&lt;sql::TableId, usize&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) warnings: Warnings,
@@ -435,10 +454,27 @@
         <span class="self">self</span>.config.datasources.first().unwrap().active_connector
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="doccomment">/// Iterate over the database enums, combined together with a
+    /// possible existing enum in the PSL.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.schema
             .enum_walkers()
             .map(<span class="kw">move </span>|next| Pair::new(<span class="self">self</span>, <span class="self">self</span>.existing_enum(next.id), next))
+    }
+
+    <span class="doccomment">/// Iterate over the database tables, combined together with a
+    /// possible existing model in the PSL.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_pairs(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ModelPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.schema
+            .table_walkers()
+            .filter(|table| !is_old_migration_table(<span class="kw-2">*</span>table))
+            .filter(|table| !is_new_migration_table(<span class="kw-2">*</span>table))
+            .filter(|table| !is_prisma_join_table(<span class="kw-2">*</span>table))
+            .filter(|table| !is_relay_table(<span class="kw-2">*</span>table))
+            .map(<span class="kw">move </span>|next| {
+                <span class="kw">let </span>previous = <span class="self">self</span>.existing_model(next.id);
+                Pair::new(<span class="self">self</span>, previous, next)
+            })
     }
 
     <span class="doccomment">/// Given a SQL enum from the database, this method returns the enum that matches it (by name)
@@ -539,7 +575,8 @@
 ) -&gt; SqlIntrospectionResult&lt;IntrospectionResult&gt; {
     <span class="kw">let </span>introspection_map = <span class="kw">crate</span>::introspection_map::IntrospectionMap::new(schema, ctx.previous_schema());
 
-    <span class="kw">let </span>input = InputContext {
+    <span class="kw">let </span><span class="kw-2">mut </span>input = InputContext {
+        version: Version::NonPrisma,
         config: ctx.configuration(),
         render_config: ctx.render_config,
         schema,
@@ -549,13 +586,12 @@
     };
 
     <span class="kw">let </span><span class="kw-2">mut </span>output = OutputContext {
-        version: Version::NonPrisma,
         rendered_schema: datamodel_renderer::Datamodel::default(),
         target_models: HashMap::default(),
         warnings: Warnings::new(),
     };
 
-    output.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>input);
+    input.version = <span class="kw">crate</span>::version_checker::check_prisma_version(<span class="kw-2">&amp;</span>input);
 
     <span class="kw">let </span>(schema_string, is_empty) = introspect(input, <span class="kw-2">&amp;mut </span>output)<span class="question-mark">?</span>;
     <span class="kw">let </span>warnings = output.finalize_warnings();
@@ -564,7 +600,7 @@
     </span><span class="kw">let </span>version = <span class="kw">if </span>warnings.iter().any(|w| ![<span class="number">5</span>, <span class="number">6</span>].contains(<span class="kw-2">&amp;</span>w.code)) {
         Version::NonPrisma
     } <span class="kw">else </span>{
-        output.version
+        input.version
     };
 
     <span class="prelude-val">Ok</span>(IntrospectionResult {
