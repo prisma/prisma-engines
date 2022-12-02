@@ -574,6 +574,19 @@
 <span id="574">574</span>
 <span id="575">575</span>
 <span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -586,7 +599,7 @@
 };
 <span class="kw">use </span>quaint::connector::PostgresUrl;
 <span class="kw">use </span>sql_schema_describer::SqlSchema;
-<span class="kw">use </span>std::{collections::HashMap, future, time};
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap, future, time};
 <span class="kw">use </span>url::Url;
 <span class="kw">use </span>user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -840,14 +853,27 @@ SET enable_experimental_alter_column_type_general = true;
         </span>})
     }
 
-    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
         with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, _circumstances, conn| <span class="kw">async move </span>{
-            <span class="kw">let </span>schema_name = params.url.schema();
+            <span class="kw">let </span>schemas_to_reset = <span class="kw">match </span>namespaces {
+                <span class="prelude-val">Some</span>(ns) =&gt; ns.into_iter().map(Cow::Owned).collect(),
+                <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[Cow::Borrowed(params.url.schema())],
+            };
 
-            conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="macro">tracing::info!</span>(<span class="question-mark">?</span>schemas_to_reset, <span class="string">&quot;Resetting schema(s)&quot;</span>);
+
+            <span class="kw">for </span>schema_name <span class="kw">in </span>schemas_to_reset {
+                conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+            }
+
+            <span class="comment">// Drop the migrations table in the main schema, otherwise migrate dev will not
+            // perceive that as a reset, since migrations are still marked as applied.
+            //
+            // We don&#39;t care if this fails.
+            </span>conn.raw_cmd(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span>.ok();
 
             <span class="prelude-val">Ok</span>(())
         })
@@ -918,7 +944,7 @@ SET enable_experimental_alter_column_type_general = true;
 
                 <span class="macro">tracing::info!</span>(<span class="string">&quot;Connecting to user-provided shadow database.&quot;</span>);
 
-                <span class="kw">if </span>shadow_database.reset().<span class="kw">await</span>.is_err() {
+                <span class="kw">if </span>shadow_database.reset(namespaces.clone()).<span class="kw">await</span>.is_err() {
                     <span class="kw">crate</span>::best_effort_reset(<span class="kw-2">&amp;mut </span>shadow_database, namespaces.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 

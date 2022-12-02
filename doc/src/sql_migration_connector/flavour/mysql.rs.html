@@ -766,7 +766,7 @@
         </span>})
     }
 
-    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
         with_connection(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, <span class="kw">move </span>|params, circumstances, connection| <span class="kw">async move </span>{
             <span class="kw">if </span>circumstances.contains(Circumstances::IsVitess) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(
@@ -842,7 +842,7 @@
                 shadow_database.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="macro">tracing::info!</span>(<span class="string">&quot;Connecting to user-provided shadow database.&quot;</span>);
-                <span class="kw">if </span>shadow_database.reset().<span class="kw">await</span>.is_err() {
+                <span class="kw">if </span>shadow_database.reset(<span class="prelude-val">None</span>).<span class="kw">await</span>.is_err() {
                     <span class="kw">crate</span>::best_effort_reset(<span class="kw-2">&amp;mut </span>shadow_database, namespaces).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 

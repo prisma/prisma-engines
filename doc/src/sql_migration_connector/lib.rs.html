@@ -653,7 +653,7 @@
 
     <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, soft: bool, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">if </span>soft || <span class="self">self</span>.flavour.reset().<span class="kw">await</span>.is_err() {
+            <span class="kw">if </span>soft || <span class="self">self</span>.flavour.reset(namespaces.clone()).<span class="kw">await</span>.is_err() {
                 best_effort_reset(<span class="self">self</span>.flavour.as_mut(), namespaces).<span class="kw">await</span><span class="question-mark">?</span>;
             }
 

@@ -465,7 +465,6 @@
 <span id="465">465</span>
 <span id="466">466</span>
 <span id="467">467</span>
-<span id="468">468</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(clippy::print_literal)] </span><span class="comment">// it is just wrong in this case
 
 </span><span class="kw">mod </span>diagnose_migration_history;
@@ -704,8 +703,7 @@
             <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="comment">// TODO(MultiSchema): Perhaps read namespaces from the schema somehow.
-            </span>api.reset(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            api.reset().<span class="kw">await</span><span class="question-mark">?</span>;
         }
         Command::CreateDatabase(cmd) =&gt; {
             <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;

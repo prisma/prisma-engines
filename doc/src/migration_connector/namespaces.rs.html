@@ -28,6 +28,15 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Namespaces are used in conjunction with the MultiSchema preview feature.
 
 /// A nonempty set of namespaces.
@@ -56,6 +65,15 @@
             }
             <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[default_namespace],
         }
+    }
+}
+
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>Namespaces {
+    <span class="kw">type </span>Item = String;
+    <span class="kw">type </span>IntoIter = std::iter::Chain&lt;std::iter::Once&lt;String&gt;, &lt;Vec&lt;String&gt; <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        std::iter::once(<span class="self">self</span>.<span class="number">0</span>).chain(<span class="self">self</span>.<span class="number">1</span>.into_iter())
     }
 }
 </code></pre></div>

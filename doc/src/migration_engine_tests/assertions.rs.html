@@ -1051,6 +1051,7 @@
 <span id="1051">1051</span>
 <span id="1052">1052</span>
 <span id="1053">1053</span>
+<span id="1054">1054</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>migration_assertions;
 <span class="kw">mod </span>quaint_result_set_ext;
 
@@ -1124,7 +1125,8 @@
         }
     }
 
-    <span class="kw">fn </span>assert_error(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str, positive: bool) -&gt; ! {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>assert_error(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str, positive: bool) -&gt; ! {
         <span class="kw">let </span>method = <span class="kw">if </span>positive {
             <span class="string">&quot;assert_table&quot;
         </span>} <span class="kw">else </span>{

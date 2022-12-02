@@ -550,7 +550,7 @@
     <span class="kw">fn </span>raw_cmd&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt;;
 
     <span class="doccomment">/// Drop the database and recreate it empty.
-    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt;;
 
     <span class="doccomment">/// Optionally scan a migration script that could have been altered by users and emit warnings.
     </span><span class="kw">fn </span>scan_migration_script(<span class="kw-2">&amp;</span><span class="self">self</span>, _script: <span class="kw-2">&amp;</span>str) {}

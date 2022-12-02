@@ -415,10 +415,16 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
 </pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 <span class="kw">pub use </span>expect_test::expect;
-<span class="kw">pub use </span>migration_core::json_rpc::types::{
-    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+<span class="kw">pub use </span>migration_core::{
+    json_rpc::types::{
+        DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+    },
+    migration_connector::Namespaces,
 };
 <span class="kw">pub use </span>test_macros::test_connector;
 <span class="kw">pub use </span>test_setup::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, BitFlags, Capabilities, Tags};
@@ -427,7 +433,7 @@
 <span class="kw">use </span>migration_core::{
     commands::diff,
     migration_connector::{
-        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
     },
 };
 <span class="kw">use </span>psl::parser_database::SourceFile;

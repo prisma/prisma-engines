@@ -69,9 +69,9 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Initialize a JSON-RPC ready migration engine API.
-</span><span class="kw">pub fn </span>rpc_api(datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;, host: Arc&lt;<span class="kw">dyn </span>migration_connector::ConnectorHost&gt;) -&gt; IoHandler {
+</span><span class="kw">pub fn </span>rpc_api(prisma_schema: <span class="prelude-ty">Option</span>&lt;String&gt;, host: Arc&lt;<span class="kw">dyn </span>migration_connector::ConnectorHost&gt;) -&gt; IoHandler {
     <span class="kw">let </span><span class="kw-2">mut </span>io_handler = IoHandler::default();
-    <span class="kw">let </span>api = Arc::new(<span class="kw">crate</span>::state::EngineState::new(datamodel, <span class="prelude-val">Some</span>(host)));
+    <span class="kw">let </span>api = Arc::new(<span class="kw">crate</span>::state::EngineState::new(prisma_schema, <span class="prelude-val">Some</span>(host)));
 
     <span class="kw">for </span>cmd <span class="kw">in </span>METHOD_NAMES {
         <span class="kw">let </span>api = api.clone();
@@ -107,7 +107,7 @@
         MARK_MIGRATION_APPLIED =&gt; render(executor.mark_migration_applied(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         MARK_MIGRATION_ROLLED_BACK =&gt; render(executor.mark_migration_rolled_back(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="comment">// TODO(MultiSchema): we probably need to grab the namespaces from the params
-        </span>RESET =&gt; render(executor.reset(<span class="prelude-val">None</span>).<span class="kw">await</span>),
+        </span>RESET =&gt; render(executor.reset().<span class="kw">await</span>),
         SCHEMA_PUSH =&gt; render(executor.schema_push(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unknown command {}&quot;</span>, other),
     }
