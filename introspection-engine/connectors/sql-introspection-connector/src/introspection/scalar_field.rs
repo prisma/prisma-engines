@@ -3,20 +3,17 @@ use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer::ColumnArity;
 
 pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<'a>) -> renderer::ModelField<'a> {
-    let mut rendered = match field.arity() {
-        ColumnArity::Required if field.is_unsupported() => {
-            renderer::ModelField::new_required_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::Nullable if field.is_unsupported() => {
-            renderer::ModelField::new_optional_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::List if field.is_unsupported() => {
-            renderer::ModelField::new_array_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::Required => renderer::ModelField::new_required(field.name(), field.prisma_type()),
-        ColumnArity::Nullable => renderer::ModelField::new_optional(field.name(), field.prisma_type()),
-        ColumnArity::List => renderer::ModelField::new_array(field.name(), field.prisma_type()),
-    };
+    let mut rendered = renderer::ModelField::new(field.name(), field.prisma_type());
+
+    match field.arity() {
+        ColumnArity::Nullable => rendered.optional(),
+        ColumnArity::List => rendered.array(),
+        ColumnArity::Required => (),
+    }
+
+    if field.is_unsupported() {
+        rendered.unsupported();
+    }
 
     if let Some(map) = field.mapped_name() {
         rendered.map(map);

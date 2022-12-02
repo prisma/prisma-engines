@@ -412,7 +412,7 @@ mod tests {
         model.map("1Country");
         model.documentation("Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!");
 
-        let mut field = ModelField::new_required("id", "String");
+        let mut field = ModelField::new("id", "String");
 
         let mut opts = IdFieldDefinition::default();
 
@@ -426,21 +426,24 @@ mod tests {
 
         model.push_field(field);
 
-        let mut field = ModelField::new_optional("value", "Bytes");
+        let mut field = ModelField::new("value", "Bytes");
+        field.optional();
         field.documentation("NOPEUSKUNINGAS");
         field.default(DefaultValue::bytes(&[1u8, 2, 3, 4] as &[u8]));
         model.push_field(field);
 
-        let mut field = ModelField::new_array("array", "Int");
+        let mut field = ModelField::new("array", "Int");
+        field.array();
         field.map("1array");
         field.default(DefaultValue::array(vec![1, 2, 3, 4]));
         model.push_field(field);
 
-        let mut field = ModelField::new_required_unsupported("konig", "King");
+        let mut field = ModelField::new("konig", "King");
+        field.unsupported();
         field.ignore();
         model.push_field(field);
 
-        let mut field = ModelField::new_required("information", "Int");
+        let mut field = ModelField::new("information", "Int");
         let mut opts = IndexFieldOptions::default();
 
         opts.sort_order("Desc");
@@ -457,7 +460,7 @@ mod tests {
         relation.on_delete("Cascade");
         relation.on_update("Restrict");
 
-        let mut field = ModelField::new_required("relfield", "Planet");
+        let mut field = ModelField::new("relfield", "Planet");
         field.relation(relation);
 
         model.push_field(field);
@@ -531,7 +534,7 @@ mod tests {
     fn commented_out() {
         let mut model = Model::new("Country");
 
-        let mut field = ModelField::new_required("id", "String");
+        let mut field = ModelField::new("id", "String");
         field.id(IdFieldDefinition::default());
         field.native_type("db", "VarChar", vec![String::from("255")]);
         field.default(DefaultValue::function(Function::new("uuid")));

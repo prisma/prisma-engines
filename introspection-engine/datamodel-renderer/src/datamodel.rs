@@ -121,14 +121,14 @@ mod tests {
         let mut data_model = Datamodel::new();
 
         let mut composite = CompositeType::new("Address");
-        let field = CompositeTypeField::new_required("street", "String");
+        let field = CompositeTypeField::new("street", "String");
         composite.push_field(field);
 
         data_model.push_composite_type(composite);
 
         let mut model = Model::new("User");
 
-        let mut field = ModelField::new_required("id", "Int");
+        let mut field = ModelField::new("id", "Int");
         field.id(IdFieldDefinition::default());
 
         let dv = DefaultValue::function(Function::new("autoincrement"));
