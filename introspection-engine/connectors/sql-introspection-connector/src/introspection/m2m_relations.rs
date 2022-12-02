@@ -58,7 +58,8 @@ fn calculate_many_to_many_field<'a>(
 ) {
     let opposite_model_name = input.table_prisma_name(other_fk.referenced_table().id).prisma_name();
 
-    let mut field = datamodel_renderer::datamodel::ModelField::new_array(field_name, opposite_model_name);
+    let mut field = datamodel_renderer::datamodel::ModelField::new(field_name, opposite_model_name);
+    field.array();
 
     if !relation_name.is_empty() {
         let mut relation = datamodel_renderer::datamodel::Relation::new();

@@ -61,10 +61,11 @@ fn calculate_relation_field<'a>(
     let referenced_model_name = input.table_prisma_name(foreign_key.referenced_table().id).prisma_name();
 
     let mut relation = render::Relation::new();
-    let mut field = if foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
-        render::ModelField::new_optional(field_name, referenced_model_name)
-    } else {
-        render::ModelField::new_required(field_name, referenced_model_name)
+
+    let mut field = render::ModelField::new(field_name, referenced_model_name);
+
+    if foreign_key.constrained_columns().any(|c| !c.arity().is_required()) {
+        field.optional();
     };
 
     let any_field_required = foreign_key.constrained_columns().any(|c| c.arity().is_required());
@@ -153,11 +154,13 @@ fn calculate_backrelation_field<'a>(
         });
 
     let model_a_name = input.table_prisma_name(fk.table().id).prisma_name();
-    let mut field = if forward_relation_field_is_unique {
+    let mut field = render::ModelField::new(field_name, model_a_name);
+
+    if forward_relation_field_is_unique {
         // 1:1 relation
-        render::ModelField::new_optional(field_name, model_a_name)
+        field.optional();
     } else {
-        render::ModelField::new_array(field_name, model_a_name)
+        field.array();
     };
 
     if !relation_name.is_empty() {

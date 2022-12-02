@@ -35,73 +35,59 @@ impl<'a> ModelField<'a> {
     /// //^^^^ name
     /// }
     /// ```
-    pub fn new_required(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name, FieldType::required(type_name))
+    pub fn new(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
+
+        Self {
+            name,
+            commented_out: false,
+            r#type: FieldType::required(type_name),
+            map: None,
+            documentation: None,
+            updated_at: None,
+            unique: None,
+            id: None,
+            default: None,
+            relation: None,
+            native_type: None,
+            ignore: None,
+        }
     }
 
-    /// Create a new optional model field declaration.
+    /// Sets the field as optional.
     ///
     /// ```ignore
     /// model Address {
     ///   street String?
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^ this
     /// }
     /// ```
-    pub fn new_optional(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name, FieldType::optional(type_name))
+    pub fn optional(&mut self) {
+        self.r#type.into_optional();
     }
 
-    /// Create a new array model field declaration.
+    /// Sets the field to be an array.
     ///
     /// ```ignore
     /// model Address {
     ///   street String[]
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^^ this
     /// }
     /// ```
-    pub fn new_array(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name, FieldType::array(type_name))
+    pub fn array(&mut self) {
+        self.r#type.into_array();
     }
 
-    /// Create a new required unsupported model field declaration.
+    /// Sets the field to be unsupported.
     ///
     /// ```ignore
     /// model Address {
     ///   street Unsupported("foo")
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
+    /// //       ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn new_required_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name, FieldType::required_unsupported(type_name))
-    }
-
-    /// Create a new optional unsupported model field declaration.
-    ///
-    /// ```ignore
-    /// model Address {
-    ///   street Unsupported("foo")?
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    pub fn new_optional_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name, FieldType::optional_unsupported(type_name))
-    }
-
-    /// Create a new array unsupported model field declaration.
-    ///
-    /// ```ignore
-    /// model Address {
-    ///   street Unsupported("foo")[]
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    pub fn new_array_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::array_unsupported(type_name.into()))
+    pub fn unsupported(&mut self) {
+        self.r#type.into_unsupported();
     }
 
     /// Sets the field map attribute.
@@ -258,25 +244,6 @@ impl<'a> ModelField<'a> {
         self.commented_out = true;
     }
 
-    fn new(name: impl Into<Cow<'a, str>>, r#type: FieldType<'a>) -> Self {
-        let name = Constant::new_no_validate(name.into());
-
-        Self {
-            name,
-            commented_out: false,
-            r#type,
-            map: None,
-            documentation: None,
-            updated_at: None,
-            unique: None,
-            id: None,
-            default: None,
-            relation: None,
-            native_type: None,
-            ignore: None,
-        }
-    }
-
     /// Generate a model field rendering from the deprecated DML structure.
     ///
     /// Remove when destroying the DML. This API cannot really be
@@ -291,7 +258,6 @@ impl<'a> ModelField<'a> {
     ) -> ModelField<'a> {
         match dml_field {
             dml::Field::ScalarField(ref sf) => {
-                let field_name = sf.name.clone();
                 let (r#type, native_type): (String, _) = match sf.field_type {
                     dml::FieldType::Enum(ref ct) => (ct.clone(), None),
                     dml::FieldType::Relation(ref info) => (info.referenced_model.clone(), None),
@@ -302,20 +268,21 @@ impl<'a> ModelField<'a> {
                     dml::FieldType::CompositeType(ref ct) => (ct.clone(), None),
                 };
 
-                let mut field = match sf.arity {
-                    dml::FieldArity::Required if sf.field_type.is_unsupported() => {
-                        Self::new_required_unsupported(sf.name.clone(), r#type)
+                let mut field = Self::new(sf.name.clone(), r#type);
+
+                match sf.arity {
+                    dml::FieldArity::Optional => {
+                        field.optional();
                     }
-                    dml::FieldArity::Optional if sf.field_type.is_unsupported() => {
-                        Self::new_optional_unsupported(sf.name.clone(), r#type)
+                    dml::FieldArity::List => {
+                        field.array();
                     }
-                    dml::FieldArity::List if sf.field_type.is_unsupported() => {
-                        Self::new_array_unsupported(sf.name.clone(), r#type)
-                    }
-                    dml::FieldArity::Required => Self::new_required(field_name, r#type),
-                    dml::FieldArity::Optional => Self::new_optional(field_name, r#type),
-                    dml::FieldArity::List => Self::new_array(field_name, r#type),
+                    _ => (),
                 };
+
+                if sf.field_type.is_unsupported() {
+                    field.unsupported();
+                }
 
                 if let Some(ref docs) = sf.documentation {
                     field.documentation(docs.clone());
@@ -358,11 +325,14 @@ impl<'a> ModelField<'a> {
             dml::Field::RelationField(rf) => {
                 let field_name = rf.name.clone();
                 let referenced_model = rf.relation_info.referenced_model.clone();
-                let mut field = match rf.arity {
-                    dml::FieldArity::Required => Self::new_required(field_name, referenced_model),
-                    dml::FieldArity::Optional => Self::new_optional(field_name, referenced_model),
-                    dml::FieldArity::List => Self::new_array(field_name, referenced_model),
-                };
+
+                let mut field = Self::new(field_name, referenced_model);
+
+                match rf.arity {
+                    dml::FieldArity::Optional => field.optional(),
+                    dml::FieldArity::List => field.array(),
+                    dml::FieldArity::Required => (),
+                }
 
                 if let Some(ref docs) = rf.documentation {
                     field.documentation(docs.clone());
@@ -406,11 +376,14 @@ impl<'a> ModelField<'a> {
             dml::Field::CompositeField(cf) => {
                 let name = cf.name.clone();
                 let ct = cf.composite_type.clone();
-                let mut field = match cf.arity {
-                    dml::FieldArity::Required => Self::new_required(name, ct),
-                    dml::FieldArity::Optional => Self::new_optional(name, ct),
-                    dml::FieldArity::List => Self::new_array(name, ct),
-                };
+
+                let mut field = Self::new(name, ct);
+
+                match cf.arity {
+                    dml::FieldArity::Required => (),
+                    dml::FieldArity::Optional => field.optional(),
+                    dml::FieldArity::List => field.array(),
+                }
 
                 if let Some(ref docs) = cf.documentation {
                     field.documentation(docs.clone());

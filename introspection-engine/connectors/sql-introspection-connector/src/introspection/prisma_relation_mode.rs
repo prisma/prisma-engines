@@ -37,10 +37,12 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
         }
 
         for rf in fields {
-            let mut field = match rf.ast_field().arity {
-                ast::FieldArity::Required => render::ModelField::new_required(rf.name(), rf.related_model().name()),
-                ast::FieldArity::Optional => render::ModelField::new_optional(rf.name(), rf.related_model().name()),
-                ast::FieldArity::List => render::ModelField::new_array(rf.name(), rf.related_model().name()),
+            let mut field = render::ModelField::new(rf.name(), rf.related_model().name());
+
+            match rf.ast_field().arity {
+                ast::FieldArity::Required => (),
+                ast::FieldArity::Optional => field.optional(),
+                ast::FieldArity::List => field.array(),
             };
 
             if rf.relation_attribute().is_some() {
