@@ -266,23 +266,25 @@ impl SqlFlavour for PostgresFlavour {
 
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
-            let mut schemas = vec![Cow::Borrowed(params.url.schema())];
+            let schemas_to_reset = match namespaces {
+                Some(ns) => ns.into_iter().map(Cow::Owned).collect(),
+                None => vec![Cow::Borrowed(params.url.schema())],
+            };
 
-            // We reset the namespaces defined in the `schemas` datasource property _in addition to
-            // the schema in the search path_, because the search path is where we create the
-            // migrations table.
-            for namespace in namespaces.into_iter().flatten() {
-                schemas.push(Cow::Owned(namespace))
-            }
+            tracing::info!(?schemas_to_reset, "Resetting schema(s)");
 
-            tracing::info!(?schemas, "Resetting schema(s)");
-
-            for schema_name in schemas {
+            for schema_name in schemas_to_reset {
                 conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
                     .await?;
                 conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
                     .await?;
             }
+
+            // Drop the migrations table in the main schema, otherwise migrate dev will not
+            // perceive that as a reset, since migrations are still marked as applied.
+            //
+            // We don't care if this fails.
+            conn.raw_cmd("DROP TABLE _prisma_migrations", &params.url).await.ok();
 
             Ok(())
         })
