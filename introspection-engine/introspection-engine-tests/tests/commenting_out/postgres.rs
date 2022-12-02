@@ -42,6 +42,55 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "Test" (
+            "id" SERIAL PRIMARY KEY,
+            "12" INT NOT NULL
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Test {
+          id Int @id @default(autoincrement())
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 12 Int @map("12")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 2,
+            "message": "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
+            "affected": [
+              {
+                "model": "Test",
+                "field": "12"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
