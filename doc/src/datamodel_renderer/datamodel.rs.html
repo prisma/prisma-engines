@@ -298,14 +298,14 @@
         <span class="kw">let </span><span class="kw-2">mut </span>data_model = Datamodel::new();
 
         <span class="kw">let </span><span class="kw-2">mut </span>composite = CompositeType::new(<span class="string">&quot;Address&quot;</span>);
-        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;street&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new(<span class="string">&quot;street&quot;</span>, <span class="string">&quot;String&quot;</span>);
         composite.push_field(field);
 
         data_model.push_composite_type(composite);
 
         <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="string">&quot;User&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;Int&quot;</span>);
         field.id(IdFieldDefinition::default());
 
         <span class="kw">let </span>dv = DefaultValue::function(Function::new(<span class="string">&quot;autoincrement&quot;</span>));

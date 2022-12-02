@@ -551,6 +551,9 @@
 <span id="551">551</span>
 <span id="552">552</span>
 <span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>field;
 <span class="kw">mod </span>id;
 <span class="kw">mod </span>index;
@@ -965,7 +968,7 @@
         model.map(<span class="string">&quot;1Country&quot;</span>);
         model.documentation(<span class="string">&quot;Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>opts = IdFieldDefinition::default();
 
@@ -979,21 +982,24 @@
 
         model.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_optional(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;Bytes&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;Bytes&quot;</span>);
+        field.optional();
         field.documentation(<span class="string">&quot;NOPEUSKUNINGAS&quot;</span>);
         field.default(DefaultValue::bytes(<span class="kw-2">&amp;</span>[<span class="number">1u8</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>] <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]));
         model.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_array(<span class="string">&quot;array&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;array&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        field.array();
         field.map(<span class="string">&quot;1array&quot;</span>);
         field.default(DefaultValue::array(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));
         model.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required_unsupported(<span class="string">&quot;konig&quot;</span>, <span class="string">&quot;King&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;konig&quot;</span>, <span class="string">&quot;King&quot;</span>);
+        field.unsupported();
         field.ignore();
         model.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;information&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;information&quot;</span>, <span class="string">&quot;Int&quot;</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>opts = IndexFieldOptions::default();
 
         opts.sort_order(<span class="string">&quot;Desc&quot;</span>);
@@ -1010,7 +1016,7 @@
         relation.on_delete(<span class="string">&quot;Cascade&quot;</span>);
         relation.on_update(<span class="string">&quot;Restrict&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;relfield&quot;</span>, <span class="string">&quot;Planet&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;relfield&quot;</span>, <span class="string">&quot;Planet&quot;</span>);
         field.relation(relation);
 
         model.push_field(field);
@@ -1084,7 +1090,7 @@
     </span><span class="kw">fn </span>commented_out() {
         <span class="kw">let </span><span class="kw-2">mut </span>model = Model::new(<span class="string">&quot;Country&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new_required(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ModelField::new(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
         field.id(IdFieldDefinition::default());
         field.native_type(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[String::from(<span class="string">&quot;255&quot;</span>)]);
         field.default(DefaultValue::function(Function::new(<span class="string">&quot;uuid&quot;</span>)));

@@ -229,42 +229,6 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel::attributes::FieldAttribute;
 <span class="kw">use </span><span class="kw">crate</span>::datamodel::FieldType;
 <span class="kw">use crate</span>::{
@@ -296,73 +260,54 @@
     /// //^^^^^^ name
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_required(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::required(type_name))
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(name, map, commented_out) = (Constant::new_no_validate(name.into()), <span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+
+        <span class="self">Self </span>{
+            name,
+            r#type: FieldType::required(type_name),
+            map,
+            default: <span class="prelude-val">None</span>,
+            native_type: <span class="prelude-val">None</span>,
+            documentation: <span class="prelude-val">None</span>,
+            commented_out,
+        }
     }
 
-    <span class="doccomment">/// Create a new optional composite field declaration.
+    <span class="doccomment">/// Sets the field as optional.
     ///
     /// ```ignore
     /// type Address {
     ///   street String?
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_optional(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::optional(type_name))
+    </span><span class="kw">pub fn </span>optional(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.r#type.into_optional();
     }
 
-    <span class="doccomment">/// Create a new array composite field declaration.
+    <span class="doccomment">/// Sets the field to be an array.
     ///
     /// ```ignore
     /// type Address {
     ///   street String[]
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_array(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::array(type_name))
+    </span><span class="kw">pub fn </span>array(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.r#type.into_array();
     }
 
-    <span class="doccomment">/// Create a new required unsupported composite field declaration.
+    <span class="doccomment">/// Sets the field to be unsupported.
     ///
     /// ```ignore
     /// type Address {
     ///   street Unsupported(&quot;foo&quot;)
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
+    /// //       ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>new_required_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::required_unsupported(type_name.into()))
-    }
-
-    <span class="doccomment">/// Create a new optional unsupported composite field declaration.
-    ///
-    /// ```ignore
-    /// type Address {
-    ///   street Unsupported(&quot;foo&quot;)?
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    </span><span class="kw">pub fn </span>new_optional_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::optional_unsupported(type_name))
-    }
-
-    <span class="doccomment">/// Create a new array unsupported composite field declaration.
-    ///
-    /// ```ignore
-    /// type Address {
-    ///   street Unsupported(&quot;foo&quot;)[]
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    </span><span class="kw">pub fn </span>new_array_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(name.into(), FieldType::array_unsupported(type_name))
+    </span><span class="kw">pub fn </span>unsupported(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.r#type.into_unsupported();
     }
 
     <span class="doccomment">/// Sets the field map attribute.
@@ -447,20 +392,17 @@
         };
         <span class="kw">let </span>field_name = dml_field.name.clone();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>dml_field.arity {
-            dml::FieldArity::Required <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
-                CompositeTypeField::new_required_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::Optional <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
-                CompositeTypeField::new_optional_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::List <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
-                CompositeTypeField::new_array_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::Required =&gt; CompositeTypeField::new_required(field_name, r#type),
-            dml::FieldArity::Optional =&gt; CompositeTypeField::new_optional(field_name, r#type),
-            dml::FieldArity::List =&gt; CompositeTypeField::new_array(field_name, r#type),
-        };
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(field_name, r#type);
+
+        <span class="kw">match </span>dml_field.arity {
+            dml::FieldArity::Optional =&gt; field.optional(),
+            dml::FieldArity::List =&gt; field.array(),
+            dml::FieldArity::Required =&gt; (),
+        }
+
+        <span class="kw">if </span>dml_field.r#type.is_unsupported() {
+            field.unsupported();
+        }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_field.documentation {
             field.documentation(docs.clone());
@@ -483,20 +425,6 @@
         }
 
         field
-    }
-
-    <span class="kw">fn </span>new(name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, r#type: FieldType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>(name, map, commented_out) = (Constant::new_no_validate(name), <span class="prelude-val">None</span>, <span class="bool-val">false</span>);
-
-        <span class="self">Self </span>{
-            name,
-            r#type,
-            map,
-            default: <span class="prelude-val">None</span>,
-            native_type: <span class="prelude-val">None</span>,
-            documentation: <span class="prelude-val">None</span>,
-            commented_out,
-        }
     }
 }
 

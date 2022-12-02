@@ -109,6 +109,16 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
 <span class="kw">use </span>std::borrow::Cow;
 
@@ -122,6 +132,19 @@
     RequiredUnsupported(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
     OptionalUnsupported(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
     ArrayUnsupported(Text&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FieldKind&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>take_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldKind::Required(Constant(s)) =&gt; std::mem::take(s),
+            FieldKind::Optional(Constant(s)) =&gt; std::mem::take(s),
+            FieldKind::Array(Constant(s)) =&gt; std::mem::take(s),
+            FieldKind::RequiredUnsupported(Text(s)) =&gt; std::mem::take(s),
+            FieldKind::OptionalUnsupported(Text(s)) =&gt; std::mem::take(s),
+            FieldKind::ArrayUnsupported(Text(s)) =&gt; std::mem::take(s),
+        }
+    }
 }
 
 <span class="doccomment">/// A type of a field in the datamodel.
@@ -143,50 +166,47 @@
         }
     }
 
-    <span class="doccomment">/// The field is optional, rendered with a question mark after the
-    /// type name. For example: `Int?`.
-    ///
-    /// The name will be sanitized, removing unsupported characters.
-    </span><span class="kw">pub fn </span>optional(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>name = Constant::new_no_validate(name.into());
-        <span class="self">Self </span>{
-            inner: FieldKind::Optional(name),
-        }
+    <span class="doccomment">/// Convert the field type to optional.
+    </span><span class="kw">pub fn </span>into_optional(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>inner = <span class="kw">match </span><span class="self">self</span>.inner {
+            <span class="kw-2">ref mut </span>s @ FieldKind::Required(<span class="kw">_</span>) =&gt; FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::Array(<span class="kw">_</span>) =&gt; FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::RequiredUnsupported(<span class="kw">_</span>) =&gt; FieldKind::OptionalUnsupported(Text(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::ArrayUnsupported(<span class="kw">_</span>) =&gt; FieldKind::OptionalUnsupported(Text(s.take_type())),
+
+            FieldKind::Optional(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+            FieldKind::OptionalUnsupported(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+        };
+
+        <span class="self">self</span>.inner = inner;
     }
 
-    <span class="doccomment">/// The field is an array, rendered with square brackets after the
-    /// type name. For example: `Int[]`.
-    ///
-    /// The name will be sanitized, removing unsupported characters.
-    </span><span class="kw">pub fn </span>array(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>name = Constant::new_no_validate(name.into());
-        <span class="self">Self </span>{
-            inner: FieldKind::Array(name),
-        }
+    <span class="doccomment">/// Convert the field type to array.
+    </span><span class="kw">pub fn </span>into_array(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>inner = <span class="kw">match </span><span class="self">self</span>.inner {
+            <span class="kw-2">ref mut </span>s @ FieldKind::Required(<span class="kw">_</span>) =&gt; FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::Optional(<span class="kw">_</span>) =&gt; FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::RequiredUnsupported(<span class="kw">_</span>) =&gt; FieldKind::ArrayUnsupported(Text(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::OptionalUnsupported(<span class="kw">_</span>) =&gt; FieldKind::ArrayUnsupported(Text(s.take_type())),
+
+            FieldKind::Array(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+            FieldKind::ArrayUnsupported(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+        };
+
+        <span class="self">self</span>.inner = inner;
     }
 
-    <span class="doccomment">/// The field is required, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)`.
-    </span><span class="kw">pub fn </span>required_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: FieldKind::RequiredUnsupported(Text(name.into())),
-        }
-    }
+    <span class="doccomment">/// Set the field type to be unsupported by Prisma.
+    </span><span class="kw">pub fn </span>into_unsupported(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>inner = <span class="kw">match </span><span class="self">self</span>.inner {
+            <span class="kw-2">ref mut </span>s @ FieldKind::Required(<span class="kw">_</span>) =&gt; FieldKind::RequiredUnsupported(Text(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::Optional(<span class="kw">_</span>) =&gt; FieldKind::OptionalUnsupported(Text(s.take_type())),
+            <span class="kw-2">ref mut </span>s @ FieldKind::Array(<span class="kw">_</span>) =&gt; FieldKind::ArrayUnsupported(Text(s.take_type())),
 
-    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)?`.
-    </span><span class="kw">pub fn </span>optional_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: FieldKind::OptionalUnsupported(Text(name.into())),
-        }
-    }
+            <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
+        };
 
-    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)?`.
-    </span><span class="kw">pub fn </span>array_unsupported(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: FieldKind::ArrayUnsupported(Text(name.into())),
-        }
+        <span class="self">self</span>.inner = inner;
     }
 }
 

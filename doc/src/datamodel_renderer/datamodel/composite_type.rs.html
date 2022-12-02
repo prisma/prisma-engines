@@ -141,6 +141,8 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>field;
 
 <span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Documentation};
@@ -242,27 +244,29 @@
         <span class="kw">let </span><span class="kw-2">mut </span>composite_type = CompositeType::new(<span class="string">&quot;Address&quot;</span>);
         composite_type.documentation(<span class="string">&quot;...so many tears 🎵&quot;</span>);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;Street&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(<span class="string">&quot;Street&quot;</span>, <span class="string">&quot;String&quot;</span>);
         field.native_type(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;255&quot;</span>.into()]);
         field.default(DefaultValue::text(<span class="string">&quot;Prenzlauer Allee 193&quot;</span>));
         field.map(<span class="string">&quot;Shield&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;Number&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new(<span class="string">&quot;Number&quot;</span>, <span class="string">&quot;Int&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_optional(<span class="string">&quot;City&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(<span class="string">&quot;City&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        field.optional();
         field.documentation(<span class="string">&quot;...soooooooo many tears 🎵&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span>field = CompositeTypeField::new_array(<span class="string">&quot;Other&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(<span class="string">&quot;Other&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        field.array();
         composite_type.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(<span class="string">&quot;Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
         field.map(<span class="string">&quot;1Invalid&quot;</span>);
         composite_type.push_field(field);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
         field.commented_out();
         field.map(<span class="string">&quot;11111&quot;</span>);
         composite_type.push_field(field);

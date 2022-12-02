@@ -112,28 +112,22 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::OutputContext, defaults, pair::ScalarFieldPair};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>sql_schema_describer::ColumnArity;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(field: ScalarFieldPair&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; renderer::ModelField&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>rendered = <span class="kw">match </span>field.arity() {
-        ColumnArity::Required <span class="kw">if </span>field.is_unsupported() =&gt; {
-            renderer::ModelField::new_required_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::Nullable <span class="kw">if </span>field.is_unsupported() =&gt; {
-            renderer::ModelField::new_optional_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::List <span class="kw">if </span>field.is_unsupported() =&gt; {
-            renderer::ModelField::new_array_unsupported(field.name(), field.prisma_type())
-        }
-        ColumnArity::Required =&gt; renderer::ModelField::new_required(field.name(), field.prisma_type()),
-        ColumnArity::Nullable =&gt; renderer::ModelField::new_optional(field.name(), field.prisma_type()),
-        ColumnArity::List =&gt; renderer::ModelField::new_array(field.name(), field.prisma_type()),
-    };
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::ModelField::new(field.name(), field.prisma_type());
+
+    <span class="kw">match </span>field.arity() {
+        ColumnArity::Nullable =&gt; rendered.optional(),
+        ColumnArity::List =&gt; rendered.array(),
+        ColumnArity::Required =&gt; (),
+    }
+
+    <span class="kw">if </span>field.is_unsupported() {
+        rendered.unsupported();
+    }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = field.mapped_name() {
         rendered.map(map);

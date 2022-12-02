@@ -71,6 +71,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::relation_names::RelationNames;
 <span class="kw">use crate</span>::{
     calculate_datamodel::{InputContext, OutputContext},
@@ -131,7 +132,8 @@
 ) {
     <span class="kw">let </span>opposite_model_name = input.table_prisma_name(other_fk.referenced_table().id).prisma_name();
 
-    <span class="kw">let </span><span class="kw-2">mut </span>field = datamodel_renderer::datamodel::ModelField::new_array(field_name, opposite_model_name);
+    <span class="kw">let </span><span class="kw-2">mut </span>field = datamodel_renderer::datamodel::ModelField::new(field_name, opposite_model_name);
+    field.array();
 
     <span class="kw">if </span>!relation_name.is_empty() {
         <span class="kw">let </span><span class="kw-2">mut </span>relation = datamodel_renderer::datamodel::Relation::new();

@@ -58,7 +58,7 @@
 
 <span class="doccomment">/// A unquoted identifier. Should be used if a value has certain naming standards.
 </span><span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>Constant&lt;T: fmt::Display&gt;(T);
+</span><span class="kw">pub struct </span>Constant&lt;T: fmt::Display&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) T);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Clone <span class="kw">for </span>Constant&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
