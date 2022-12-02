@@ -66,7 +66,7 @@ pub struct SqlSchema {
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
-    /// All foreign keys.
+    /// All default values.
     default_values: Vec<(ColumnId, DefaultValue)>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,

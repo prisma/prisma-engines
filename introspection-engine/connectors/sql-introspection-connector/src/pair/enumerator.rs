@@ -31,20 +31,12 @@ impl<'a> EnumPair<'a> {
     /// contains characters that are not allowed in the PSL
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
-        if let Some(name) = self.previous.map(|enm| enm.name()) {
-            return Cow::Borrowed(name);
-        }
-
         self.context.enum_prisma_name(self.next.id).prisma_name()
     }
 
     /// The mapped name, if defined, is the actual name of the enum in
     /// the database.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        if let Some(name) = self.previous.map(|enm| enm.mapped_name()) {
-            return name;
-        }
-
         match self.context.enum_prisma_name(self.next.id) {
             ModelName::FromPsl { mapped_name, .. } => mapped_name,
             ModelName::RenamedReserved { mapped_name } => Some(mapped_name),
