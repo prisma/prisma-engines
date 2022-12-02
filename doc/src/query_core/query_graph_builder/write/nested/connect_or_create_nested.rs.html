@@ -1009,6 +1009,11 @@
 <span id="1009">1009</span>
 <span id="1010">1010</span>
 <span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -1982,6 +1987,7 @@
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
         <span class="kw">let </span>child_model_name = child_model.name.clone();
+        <span class="kw">let </span>rf = Arc::clone(<span class="kw-2">&amp;</span>parent_relation_field);
 
         <span class="comment">// Edge: Read old child node -&gt; update old child
         </span>graph.create_edge(
@@ -1989,8 +1995,12 @@
             <span class="kw-2">&amp;</span>update_old_child_node,
             QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_old_child_node, <span class="kw-2">mut </span>old_child_ids| {
                 <span class="kw">if </span>child_relation_field.is_required() &amp;&amp; !old_child_ids.is_empty() {
-                    <span class="comment">// Error out, this violates the relation because we&#39;d disconnect the old relation, but it&#39;s required.
-                    </span><span class="macro">todo!</span>()
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation(rf.into()));
+                }
+
+                <span class="comment">// If there&#39;s no child connected, don&#39;t attempt to disconnect it.
+                </span><span class="kw">if </span>old_child_ids.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(update_old_child_node);
                 }
 
                 <span class="kw">let </span>old_child_id = <span class="kw">match </span>old_child_ids.pop() {
