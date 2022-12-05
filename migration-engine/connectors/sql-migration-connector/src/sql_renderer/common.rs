@@ -4,6 +4,7 @@ use std::fmt::{Display, Write as _};
 pub(super) const SQL_INDENTATION: &str = "    ";
 
 /// A quoted identifier with an optional schema prefix.
+#[derive(Clone, Copy)]
 pub(crate) struct QuotedWithPrefix<T>(pub(crate) Option<Quoted<T>>, pub(crate) Quoted<T>);
 
 impl QuotedWithPrefix<&str> {
@@ -32,7 +33,7 @@ where
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) enum Quoted<T> {
     Double(T),
     Single(T),

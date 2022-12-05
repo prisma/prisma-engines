@@ -217,7 +217,7 @@ impl SqlRenderer for SqliteFlavour {
         result
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
         format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
     }
 

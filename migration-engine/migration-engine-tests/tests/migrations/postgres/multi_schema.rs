@@ -84,12 +84,7 @@ struct TestData {
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
-#[test_connector(
-    tags(Postgres),
-    exclude(CockroachDb),
-    preview_features("multiSchema"),
-    namespaces("one", "two")
-)]
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
 fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
@@ -352,9 +347,8 @@ fn multi_schema_tests(_api: TestApi) {
             assertion: Box::new(|assert| {
                 assert.assert_has_table_with_ns("one", "First")
                       .assert_table_with_ns("two", "Second", |table|
-                          table.assert_column("id", |column|
-                              column.assert_is_required()
-                                    .assert_auto_increments()
+                          table.assert_pk(|pk|
+                              pk.assert_has_autoincrement()
                           ));
             }),
             skip: None,
