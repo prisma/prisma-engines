@@ -399,7 +399,7 @@ fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(
     });
 }
 
-// Ignoring TiDB, we can't drop column id with composite index covered or Primary Key covered now.
+// Ignoring TiDB, unsupported drop primary key when the table is using clustered index.
 #[test_connector(exclude(CockroachDb, TiDB))]
 fn migrating_a_unique_constraint_to_a_primary_key_works(api: TestApi) {
     let dm = r#"

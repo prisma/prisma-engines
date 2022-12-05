@@ -284,6 +284,8 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
     api.schema_push_w_datasource(dm).send().assert_green();
 }
 
+// Ignore TiDB, unsupported drop primary key when the table's pkIsHandle is true,
+// which means we can't drop primary key when the table is using clustered index.
 #[test_connector(exclude(CockroachDb, TiDB))]
 fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
     let dm1 = r#"

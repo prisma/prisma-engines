@@ -693,19 +693,29 @@ fn type_is_unsupported_mysql_5_6(ty: &str) -> bool {
 }
 
 fn type_cast_is_unsupported_tidb(from_type: &str, to_type: &str) -> bool {
+    // Unsupported modify charset from utf8mb4 to binary.
+    if type_is_binary(from_type) && type_is_text(to_type) {
+        return true;
+    }
+
+    if type_is_text(from_type) && type_is_binary(to_type) {
+        return true;
+    }
+
+    // Unsupported modify column: change from original type date / year / binary to bit(64) is
+    // currently unsupported yet.
     (from_type == "Binary(8)" && to_type == "Bit(64)")
-        || (from_type == "Binary(8)" && to_type == "Char(64)")
-        || (from_type == "Binary(8)" && to_type == "VarChar(20)")
-        || (from_type == "Binary(8)" && to_type == "LongText")
-        || (from_type == "Binary(8)" && to_type == "MediumText")
-        || (from_type == "Binary(8)" && to_type == "TinyText")
-        || (from_type == "Binary(8)" && to_type == "Text")
-        || (from_type == "Char(10)" && to_type == "Blob")
-        || (from_type == "Char(10)" && to_type == "LongBlob")
-        || (from_type == "Char(10)" && to_type == "MediumBlob")
-        || (from_type == "Char(10)" && to_type == "TinyBlob")
+        || (from_type == "Binary(8)" && to_type == "Bit(32)")
         || (from_type == "Date" && to_type == "Bit(64)")
         || (from_type == "Year" && to_type == "Bit(64)")
+}
+
+fn type_is_text(ty: &str) -> bool {
+    return ty.contains("Char") || ty.contains("Text")
+}
+
+fn type_is_binary(ty: &str) -> bool {
+    return ty.contains("Blob") || ty.contains("Binary")
 }
 
 fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
