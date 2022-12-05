@@ -839,7 +839,7 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_redefine_table on MySQL&quot;</span>)
     }
 
-    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
         sql_ddl::mysql::AlterTable {
             table_name: name.into(),
             changes: <span class="macro">vec!</span>[sql_ddl::mysql::AlterTableClause::RenameTo {

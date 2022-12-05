@@ -567,7 +567,7 @@
         result
     }
 
-    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
         <span class="macro">format!</span>(<span class="string">r#&quot;ALTER TABLE &quot;{}&quot; RENAME TO &quot;{}&quot;&quot;#</span>, name, new_name)
     }
 

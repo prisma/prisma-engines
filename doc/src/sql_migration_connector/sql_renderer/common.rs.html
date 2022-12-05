@@ -189,12 +189,14 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, <span class="kw-2">*</span>};
 <span class="kw">use </span>std::fmt::{Display, Write <span class="kw">as _</span>};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>SQL_INDENTATION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;    &quot;</span>;
 
 <span class="doccomment">/// A quoted identifier with an optional schema prefix.
+</span><span class="attribute">#[derive(Clone, Copy)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QuotedWithPrefix&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;Quoted&lt;T&gt;&gt;, <span class="kw">pub</span>(<span class="kw">crate</span>) Quoted&lt;T&gt;);
 
 <span class="kw">impl </span>QuotedWithPrefix&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -223,7 +225,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug)]
+<span class="attribute">#[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Quoted&lt;T&gt; {
     Double(T),
     Single(T),

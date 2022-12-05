@@ -1123,6 +1123,9 @@
 <span id="1123">1123</span>
 <span id="1124">1124</span>
 <span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
@@ -1325,8 +1328,7 @@
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_str(<span class="string">&quot;ALTER TABLE &quot;</span>);
-                <span class="comment">// TODO(MultiSchema): This only matters for CockroachDB.
-                </span>stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_ident(tables.previous.name()));
+                stmt.push_display(<span class="kw-2">&amp;</span>QuotedWithPrefix::pg_from_table_walker(tables.previous));
                 stmt.push_str(<span class="string">&quot; ALTER PRIMARY KEY USING COLUMNS (&quot;</span>);
                 <span class="kw">let </span>column_names = tables
                     .next
@@ -1439,8 +1441,11 @@
             <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements.into_iter());
             <span class="kw">for </span>line <span class="kw">in </span>lines {
-                <span class="comment">// TODO(MultiSchema): This will need qualifying when implementing CockroachDB.
-                </span>out.push(<span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE \&quot;{}\&quot; {}&quot;</span>, tables.previous.name(), line))
+                out.push(<span class="macro">format!</span>(
+                    <span class="string">&quot;ALTER TABLE {} {}&quot;</span>,
+                    QuotedWithPrefix::pg_from_table_walker(tables.previous),
+                    line
+                ))
             }
             out.extend(after_statements.into_iter());
             out
@@ -1584,12 +1589,11 @@
         <span class="kw">for </span>redefine_table <span class="kw">in </span>tables {
             <span class="kw">let </span>tables = schemas.walk(redefine_table.table_ids);
             <span class="kw">let </span>temporary_table_name = <span class="macro">format!</span>(<span class="string">&quot;_prisma_new_{}&quot;</span>, <span class="kw-2">&amp;</span>tables.next.name());
-            result.push(<span class="self">self</span>.render_create_table_as(
-                tables.next,
-                <span class="comment">// TODO(MultiSchema): This only matters for CockroachDB, which is not currently
-                // supported by MultiSchema.
-                </span>QuotedWithPrefix(<span class="prelude-val">None</span>, Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name)),
-            ));
+            <span class="kw">let </span>quoted_temporary_table = QuotedWithPrefix(
+                tables.next.namespace().map(Quoted::postgres_ident),
+                Quoted::postgres_ident(<span class="kw-2">&amp;</span>temporary_table_name),
+            );
+            result.push(<span class="self">self</span>.render_create_table_as(tables.next, quoted_temporary_table));
 
             <span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = redefine_table
                 .column_pairs
@@ -1607,19 +1611,19 @@
             <span class="kw">if </span>!columns.is_empty() {
                 <span class="kw">let </span>column_names = columns.join(<span class="string">&quot;,&quot;</span>);
                 result.push(<span class="macro">format!</span>(
-                    <span class="string">r#&quot;INSERT INTO &quot;{temporary_table_name}&quot; ({column_names}) SELECT {column_names} FROM &quot;{table}&quot;&quot;#
-                </span>));
+                    <span class="string">r#&quot;INSERT INTO {quoted_temporary_table} ({column_names}) SELECT {column_names} FROM &quot;{table}&quot;&quot;#</span>,
+                ));
             }
 
             result.push(
                 ddl::DropTable {
-                    table_name: tables.previous.name().into(),
+                    table_name: PostgresIdentifier::new(tables.previous.namespace(), tables.previous.name()),
                     cascade: <span class="bool-val">true</span>,
                 }
                 .to_string(),
             );
 
-            result.push(<span class="self">self</span>.render_rename_table(<span class="kw-2">&amp;</span>temporary_table_name, tables.next.name()));
+            result.push(<span class="self">self</span>.render_rename_table(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name, tables.next.name()));
 
             <span class="kw">for </span>index <span class="kw">in </span>tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(<span class="self">self</span>.render_create_index(index));
@@ -1633,11 +1637,10 @@
         result
     }
 
-    <span class="comment">// TODO(MultiSchema): I _think_ this only exists for CockroachDB.
-    </span><span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {} RENAME TO {}&quot;</span>,
-            Quoted::postgres_ident(name),
+            QuotedWithPrefix::pg_new(namespace, name),
             Quoted::postgres_ident(new_name)
         )
     }
@@ -2154,9 +2157,12 @@
 <span class="kw">fn </span>render_cockroach_alter_enum(alter_enum: <span class="kw-2">&amp;</span>AlterEnum, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;, renderer: <span class="kw-2">&amp;mut </span>StepRenderer) {
     <span class="kw">let </span>enums = schemas.walk(alter_enum.id);
     <span class="kw">let </span><span class="kw-2">mut </span>prefix = String::new();
-    prefix.push_str(<span class="string">&quot;ALTER TYPE \&quot;&quot;</span>);
-    prefix.push_str(enums.previous.name());
-    prefix.push_str(<span class="string">&quot;\&quot; &quot;</span>);
+    prefix.push_str(<span class="string">&quot;ALTER TYPE &quot;</span>);
+    prefix.push_str(
+        QuotedWithPrefix::pg_new(enums.previous.namespace(), enums.previous.name())
+            .to_string()
+            .as_str(),
+    );
 
     <span class="comment">// Defaults that use a dropped value will need to be recreated after the alter enum.
     </span><span class="kw">let </span>defaults_to_drop = alter_enum
@@ -2174,7 +2180,7 @@
     <span class="kw">for </span>(col, <span class="kw">_</span>) <span class="kw">in </span>defaults_to_drop {
         renderer.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
             stmt.push_str(<span class="string">&quot;ALTER TABLE &quot;</span>);
-            stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_ident(col.table().name()));
+            stmt.push_display(<span class="kw-2">&amp;</span>QuotedWithPrefix::pg_from_table_walker(col.table()));
             stmt.push_str(<span class="string">&quot; ALTER COLUMN &quot;</span>);
             stmt.push_display(<span class="kw-2">&amp;</span>Quoted::postgres_ident(col.name()));
             stmt.push_str(<span class="string">&quot; DROP DEFAULT&quot;</span>);
