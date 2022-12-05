@@ -35,6 +35,9 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
+          - name: "tidb"
+            single_threaded: false
+            connector: "tidb"
 
     env:
       LOG_LEVEL: "info"

@@ -172,7 +172,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   tidb:
-    image: pingcap/tidb:6.3
+    image: pingcap/tidb:v6.5.0-pre
     restart: always
     platform: linux/x86_64
     ports:
