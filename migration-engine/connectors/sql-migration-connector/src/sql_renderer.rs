@@ -91,7 +91,7 @@ pub(crate) trait SqlRenderer {
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String>;
 
     /// Render a table renaming step.
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String;
+    fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String;
 
     /// Render a drop view step.
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String;

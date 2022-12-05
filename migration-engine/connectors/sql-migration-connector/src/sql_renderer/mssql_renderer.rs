@@ -334,7 +334,7 @@ impl SqlRenderer for MssqlFlavour {
             result.extend(self.render_drop_table(None, tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
-            result.push(self.render_rename_table(&temporary_table_name, tables.next.name()));
+            result.push(self.render_rename_table(tables.next.namespace(), &temporary_table_name, tables.next.name()));
 
             // Recreate the indexes.
             for index in tables.next.indexes().filter(|i| !i.is_unique() && !i.is_primary_key()) {
@@ -347,7 +347,7 @@ impl SqlRenderer for MssqlFlavour {
         result
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
         let with_schema = format!("{}.{}", self.schema_name(), name);
 
         format!(

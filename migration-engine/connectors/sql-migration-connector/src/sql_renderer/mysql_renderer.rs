@@ -319,7 +319,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_redefine_table on MySQL")
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
         sql_ddl::mysql::AlterTable {
             table_name: name.into(),
             changes: vec![sql_ddl::mysql::AlterTableClause::RenameTo {
