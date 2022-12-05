@@ -6,7 +6,7 @@ use psl::{
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-use super::{IdPair, IndexPair, Pair, ScalarFieldPair};
+use super::{IdPair, IndexPair, Pair, RelationFieldDirection, RelationFieldPair, ScalarFieldPair};
 
 pub(crate) type ModelPair<'a> = Pair<'a, walkers::ModelWalker<'a>, sql::TableWalker<'a>>;
 
@@ -61,6 +61,45 @@ impl<'a> ModelPair<'a> {
             let previous = self.context.existing_scalar_field(next.id);
             Pair::new(self.context, previous, next)
         })
+    }
+
+    /// Iterating over the relation fields.
+    pub(crate) fn relation_fields(self) -> Box<dyn Iterator<Item = RelationFieldPair<'a>> + 'a> {
+        if self.context.foreign_keys_enabled() {
+            let inline = self
+                .context
+                .inline_relations_for_table(self.table_id())
+                .map(move |(direction, fk)| {
+                    let previous = self
+                        .context
+                        .existing_inline_relation(fk.id)
+                        .and_then(|rel| match direction {
+                            RelationFieldDirection::Forward => rel.forward_relation_field(),
+                            RelationFieldDirection::Back => rel.back_relation_field(),
+                        });
+
+                    RelationFieldPair::inline(self.context, previous, fk, direction)
+                });
+
+            let m2m = self
+                .context
+                .m2m_relations_for_table(self.table_id())
+                .map(move |(direction, next)| RelationFieldPair::m2m(self.context, next, direction));
+
+            Box::new(inline.chain(m2m))
+        } else {
+            match self.previous {
+                Some(prev) => {
+                    let fields = prev
+                        .relation_fields()
+                        .filter(move |rf| !self.context.table_missing_for_model(&rf.related_model().id))
+                        .map(move |previous| RelationFieldPair::emulated(self.context, previous));
+
+                    Box::new(fields)
+                }
+                None => Box::new(std::iter::empty()),
+            }
+        }
     }
 
     /// True, if the user has explicitly mapped the model's name in

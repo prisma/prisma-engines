@@ -325,12 +325,11 @@ impl<'a> TableWalker<'a> {
 
     /// Traverse foreign keys from other tables, referencing current table.
     pub fn referencing_foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
-        let table_id = self.id;
         self.schema
             .table_walkers()
-            .filter(move |t| t.id != table_id)
+            .filter(move |t| t.id != self.id)
             .flat_map(|t| t.foreign_keys())
-            .filter(move |fk| fk.referenced_table().id == table_id)
+            .filter(move |fk| fk.referenced_table().id == self.id)
     }
 
     /// The table name.

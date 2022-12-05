@@ -1,4 +1,8 @@
-use crate::{calculate_datamodel::OutputContext, defaults, pair::ScalarFieldPair};
+use crate::{
+    calculate_datamodel::OutputContext,
+    defaults,
+    pair::{IdPair, IndexPair, ScalarFieldPair},
+};
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer::ColumnArity;
 
@@ -40,49 +44,11 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
     }
 
     if let Some(pk) = field.id() {
-        let field = pk.field().unwrap();
-        let mut definition = renderer::IdFieldDefinition::default();
-
-        if let Some(clustered) = pk.clustered() {
-            definition.clustered(clustered);
-        }
-
-        if let Some(sort_order) = field.sort_order() {
-            definition.sort_order(sort_order);
-        }
-
-        if let Some(length) = field.length() {
-            definition.length(length);
-        }
-
-        if let Some(map) = pk.mapped_name() {
-            definition.map(map);
-        }
-
-        rendered.id(definition);
+        rendered.id(render_id(pk));
     }
 
     if let Some(unique) = field.unique() {
-        let mut opts = renderer::IndexFieldOptions::default();
-        let field = unique.field().unwrap();
-
-        if let Some(map) = unique.mapped_name() {
-            opts.map(map);
-        }
-
-        if let Some(clustered) = unique.clustered() {
-            opts.clustered(clustered);
-        }
-
-        if let Some(sort_order) = field.sort_order() {
-            opts.sort_order(sort_order);
-        }
-
-        if let Some(length) = field.length() {
-            opts.length(length);
-        }
-
-        rendered.unique(opts);
+        rendered.unique(render_unique(unique));
     }
 
     if field.remapped_name_from_psl() {
@@ -118,4 +84,50 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
     }
 
     rendered
+}
+
+fn render_id(pk: IdPair<'_>) -> renderer::IdFieldDefinition<'_> {
+    let field = pk.field().unwrap();
+    let mut definition = renderer::IdFieldDefinition::default();
+
+    if let Some(clustered) = pk.clustered() {
+        definition.clustered(clustered);
+    }
+
+    if let Some(sort_order) = field.sort_order() {
+        definition.sort_order(sort_order);
+    }
+
+    if let Some(length) = field.length() {
+        definition.length(length);
+    }
+
+    if let Some(map) = pk.mapped_name() {
+        definition.map(map);
+    }
+
+    definition
+}
+
+fn render_unique(unique: IndexPair<'_>) -> renderer::IndexFieldOptions<'_> {
+    let mut opts = renderer::IndexFieldOptions::default();
+    let field = unique.field().unwrap();
+
+    if let Some(map) = unique.mapped_name() {
+        opts.map(map);
+    }
+
+    if let Some(clustered) = unique.clustered() {
+        opts.clustered(clustered);
+    }
+
+    if let Some(sort_order) = field.sort_order() {
+        opts.sort_order(sort_order);
+    }
+
+    if let Some(length) = field.length() {
+        opts.length(length);
+    }
+
+    opts
 }

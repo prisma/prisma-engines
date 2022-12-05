@@ -1510,15 +1510,15 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model User {
-          id            Int         @id @default(autoincrement())
-          User_A        User[]      @relation("FollowRelation")
-          User_B        User[]      @relation("FollowRelation")
+          id     Int    @id @default(autoincrement())
+          User_A User[] @relation("FollowRelation")
+          User_B User[] @relation("FollowRelation")
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }

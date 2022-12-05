@@ -277,7 +277,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Vitess, CockroachDb))]
+#[test_connector(exclude(Postgres, Vitess, CockroachDb))]
 async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
