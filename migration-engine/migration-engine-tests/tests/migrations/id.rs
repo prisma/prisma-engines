@@ -109,7 +109,7 @@ fn length_prefixed_compound_primary_key(api: TestApi) {
 
 // Ignoring TiDB, unsupported drop primary key when the table's pkIsHandle is true.
 // TODO: ignore because not possible on cockroachdb. We would need a multi-step process there.
-#[test_connector(exclude(Vitess), exclude(CockroachDb, TiDB))]
+#[test_connector(exclude(Vitess, CockroachDb, TiDB))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
