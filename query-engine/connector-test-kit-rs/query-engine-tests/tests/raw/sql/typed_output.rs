@@ -196,6 +196,64 @@ mod typed_output {
         Ok(())
     }
 
+    fn schema_native_types_pg() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              oid Int? @test.Oid
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_native_types_pg), only(Postgres))]
+    async fn native_types_pg(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1,
+              oid: 4294967295
+            }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query_pretty!(&runner, fmt_query_raw(r#"SELECT * FROM "TestModel";"#, vec![])),
+          @r###"
+        {
+          "data": {
+            "queryRaw": [
+              {
+                "id": {
+                  "prisma__type": "int",
+                  "prisma__value": 1
+                },
+                "oid": {
+                  "prisma__type": "uint32",
+                  "prisma__value": 4294967295
+                }
+              },
+              {
+                "id": {
+                  "prisma__type": "int",
+                  "prisma__value": 2
+                },
+                "oid": {
+                  "prisma__type": "null",
+                  "prisma__value": null
+                }
+              }
+            ]
+          }
+        }
+        "###
+        );
+
+        Ok(())
+    }
+
     fn schema_mysql() -> String {
         let schema = indoc! {
             r#"model TestModel {
@@ -336,6 +394,53 @@ mod typed_output {
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
           @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_uint() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+            #id(id, Int, @id)
+            uint Int @test.UnsignedInt
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_uint), only(MySql))]
+    async fn uint_as_int_mysql(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+            id: 1,
+            uint: 4294967295,
+          }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query_pretty!(&runner, fmt_query_raw(r#"SELECT * FROM TestModel;"#, vec![])),
+          @r###"
+        {
+          "data": {
+            "queryRaw": [
+              {
+                "id": {
+                  "prisma__type": "int",
+                  "prisma__value": 1
+                },
+                "uint": {
+                  "prisma__type": "uint32",
+                  "prisma__value": 4294967295
+                }
+              }
+            ]
+          }
+        }
+        "###
         );
 
         Ok(())

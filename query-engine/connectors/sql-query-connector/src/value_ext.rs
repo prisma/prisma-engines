@@ -14,6 +14,7 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
         let type_name = match self {
             quaint::Value::Int32(_) => "int",
             quaint::Value::Int64(_) => "bigint",
+            quaint::Value::UnsignedInt32(_) => "uint32",
             quaint::Value::Float(_) => "float",
             quaint::Value::Double(_) => "double",
             quaint::Value::Text(_) => "string",
