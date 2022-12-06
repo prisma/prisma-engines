@@ -574,6 +574,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
@@ -622,9 +623,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let names = rows
             .into_iter()
             .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
+
         let mut map = IndexMap::default();
 
         for (table_name, namespace) in names {
@@ -738,6 +741,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         for col in rows {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
+
             let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
                 Some(t_walker) => t_walker.id,
                 None => continue, // we only care about columns in tables we have access to

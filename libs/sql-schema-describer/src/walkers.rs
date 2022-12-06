@@ -271,6 +271,14 @@ impl<'a> UserDefinedTypeWalker<'a> {
         self.udt().definition.as_deref()
     }
 
+    /// The namespace of the type
+    pub fn namespace(self) -> Option<&'a str> {
+        self.schema
+            .namespaces
+            .get(self.udt().namespace_id.0 as usize)
+            .map(|s| s.as_str())
+    }
+
     fn udt(self) -> &'a UserDefinedType {
         &self.schema.user_defined_types[self.id.0 as usize]
     }

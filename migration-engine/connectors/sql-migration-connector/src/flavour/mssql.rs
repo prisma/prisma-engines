@@ -82,9 +82,9 @@ impl SqlFlavour for MssqlFlavour {
         psl::builtin_connectors::MSSQL
     }
 
-    fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, connection| async move {
-            connection.describe_schema(params).await
+            connection.describe_schema(params, namespaces).await
         })
     }
 

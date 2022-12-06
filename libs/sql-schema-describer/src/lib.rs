@@ -434,6 +434,8 @@ pub struct Procedure {
 /// A user-defined type. Can map to another type, or be declared as assembly.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct UserDefinedType {
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Type name
     pub name: String,
     /// Type mapping
