@@ -52,6 +52,16 @@ impl EngineState {
         }
     }
 
+    fn namespaces(&self) -> Option<Namespaces> {
+        self.initial_datamodel
+            .as_ref()
+            .and_then(|schema| schema.configuration.datasources.first())
+            .and_then(|ds| {
+                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                Namespaces::from_vec(&mut names)
+            })
+    }
+
     async fn with_connector_from_schema_path<O: Send + 'static>(
         &self,
         path: &str,
@@ -247,8 +257,13 @@ impl GenericApi for EngineState {
     }
 
     async fn dev_diagnostic(&self, input: DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
-        self.with_default_connector(Box::new(|connector| {
-            Box::pin(commands::dev_diagnostic(input, connector).instrument(tracing::info_span!("DevDiagnostic")))
+        let namespaces = self.namespaces();
+        self.with_default_connector(Box::new(move |connector| {
+            Box::pin(async move {
+                commands::dev_diagnostic(input, namespaces, connector)
+                    .instrument(tracing::info_span!("DevDiagnostic"))
+                    .await
+            })
         }))
         .await
     }
@@ -266,11 +281,13 @@ impl GenericApi for EngineState {
         &self,
         input: commands::DiagnoseMigrationHistoryInput,
     ) -> CoreResult<commands::DiagnoseMigrationHistoryOutput> {
-        self.with_default_connector(Box::new(|connector| {
-            Box::pin(
-                commands::diagnose_migration_history(input, connector)
-                    .instrument(tracing::info_span!("DiagnoseMigrationHistory")),
-            )
+        let namespaces = self.namespaces();
+        self.with_default_connector(Box::new(move |connector| {
+            Box::pin(async move {
+                commands::diagnose_migration_history(input, namespaces, connector)
+                    .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
+                    .await
+            })
         }))
         .await
     }
@@ -368,16 +385,7 @@ impl GenericApi for EngineState {
 
     async fn reset(&self) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
-
-        let namespaces: Option<Namespaces> = self
-            .initial_datamodel
-            .as_ref()
-            .and_then(|schema| schema.configuration.datasources.first())
-            .and_then(|ds| {
-                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
-                Namespaces::from_vec(&mut names)
-            });
-
+        let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(MigrationConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))
         }))

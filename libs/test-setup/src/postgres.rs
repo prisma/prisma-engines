@@ -44,7 +44,7 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
     tok(fut)
 }
 
-pub(crate) async fn create_postgres_database(database_url: &str, db_name: &str) -> Result<(Quaint, String), AnyError> {
+pub async fn create_postgres_database(database_url: &str, db_name: &str) -> Result<(Quaint, String), AnyError> {
     let mut url: Url = database_url.parse()?;
     let mut postgres_db_url = url.clone();
 

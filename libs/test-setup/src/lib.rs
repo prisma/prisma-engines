@@ -5,6 +5,7 @@
 //! engines.
 
 pub mod mysql;
+pub mod postgres;
 /// Tokio test runtime utils.
 pub mod runtime;
 
@@ -12,7 +13,6 @@ mod capabilities;
 mod diff;
 mod logging;
 mod mssql;
-mod postgres;
 mod sqlite;
 mod tags;
 mod test_api_args;
@@ -47,6 +47,12 @@ macro_rules! only {
 }
 
 pub struct TestDb(&'static test_api_args::DbUnderTest);
+
+impl TestDb {
+    pub fn url(&self) -> &'static str {
+        &self.0.database_url
+    }
+}
 
 #[doc(hidden)]
 #[inline(never)]

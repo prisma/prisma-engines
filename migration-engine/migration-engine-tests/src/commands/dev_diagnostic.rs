@@ -22,6 +22,7 @@ impl<'a> DevDiagnostic<'a> {
             DevDiagnosticInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             },
+            None,
             self.api,
         );
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
