@@ -586,6 +586,14 @@
 <span id="586">586</span>
 <span id="587">587</span>
 <span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.
 
 </span><span class="attribute">#![deny(missing_docs)]
@@ -857,6 +865,14 @@
     <span class="doccomment">/// The SQL definition of the type
     </span><span class="kw">pub fn </span>definition(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="self">self</span>.udt().definition.as_deref()
+    }
+
+    <span class="doccomment">/// The namespace of the type
+    </span><span class="kw">pub fn </span>namespace(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.schema
+            .namespaces
+            .get(<span class="self">self</span>.udt().namespace_id.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(|s| s.as_str())
     }
 
     <span class="kw">fn </span>udt(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserDefinedType {

@@ -1396,6 +1396,10 @@
 <span id="1396">1396</span>
 <span id="1397">1397</span>
 <span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1972,6 +1976,7 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">let </span><span class="kw-2">mut </span>procedures = Vec::with_capacity(rows.len());
 
         <span class="kw">for </span>row <span class="kw">in </span>rows.into_iter() {
@@ -2020,9 +2025,11 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">let </span>names = rows
             .into_iter()
             .map(|row| (row.get_expect_string(<span class="string">&quot;table_name&quot;</span>), row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)));
+
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
         <span class="kw">for </span>(table_name, namespace) <span class="kw">in </span>names {
@@ -2136,6 +2143,7 @@
         <span class="kw">for </span>col <span class="kw">in </span>rows {
             <span class="kw">let </span>namespace = col.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let </span>table_name = col.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+
             <span class="kw">let </span>table_id = <span class="kw">match </span>sql_schema.table_walker_ns(<span class="kw-2">&amp;</span>namespace, <span class="kw-2">&amp;</span>table_name) {
                 <span class="prelude-val">Some</span>(t_walker) =&gt; t_walker.id,
                 <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>, <span class="comment">// we only care about columns in tables we have access to

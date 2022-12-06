@@ -773,6 +773,8 @@
 <span id="773">773</span>
 <span id="774">774</span>
 <span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attribute">#![deny(rust_2018_idioms, unsafe_code)]
@@ -1209,6 +1211,8 @@
 <span class="doccomment">/// A user-defined type. Can map to another type, or be declared as assembly.
 </span><span class="attribute">#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 </span><span class="kw">pub struct </span>UserDefinedType {
+    <span class="doccomment">///Namespace of the procedure
+    </span>namespace_id: NamespaceId,
     <span class="doccomment">/// Type name
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Type mapping

@@ -783,6 +783,70 @@
 <span id="783">783</span>
 <span id="784">784</span>
 <span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL server schema description.
 
 </span><span class="kw">use crate</span>::{
@@ -894,7 +958,10 @@
 
     <span class="kw">async fn </span>get_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; DescriberResult&lt;SqlMetadata&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>sql_schema = SqlSchema::default();
-        <span class="kw">let </span>table_count = <span class="self">self</span>.get_table_names(schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>.len();
+
+        <span class="self">self</span>.get_namespaces(<span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;</span>[schema]).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>table_count = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>.len();
         <span class="kw">let </span>size_in_bytes = <span class="self">self</span>.get_size(schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(SqlMetadata {
@@ -904,20 +971,22 @@
     }
 
     <span class="kw">async fn </span>describe(<span class="kw-2">&amp;</span><span class="self">self</span>, schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; DescriberResult&lt;SqlSchema&gt; {
-        <span class="kw">let </span>schema = schemas[<span class="number">0</span>];
         <span class="kw">let </span><span class="kw-2">mut </span>sql_schema = SqlSchema::default();
         <span class="kw">let </span><span class="kw-2">mut </span>mssql_ext = MssqlSchemaExt::default();
 
-        <span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_namespaces(<span class="kw-2">&amp;mut </span>sql_schema, schemas).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.get_columns(<span class="kw-2">&amp;</span>table_names, schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.get_all_indices(schema, <span class="kw-2">&amp;mut </span>mssql_ext, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema)
+        <span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="self">self</span>.get_columns(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_all_indices(<span class="kw-2">&amp;mut </span>mssql_ext, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema)
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.get_foreign_keys(schema, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_foreign_keys(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        sql_schema.views = <span class="self">self</span>.get_views(schema).<span class="kw">await</span><span class="question-mark">?</span>;
-        sql_schema.procedures = <span class="self">self</span>.get_procedures(schema).<span class="kw">await</span><span class="question-mark">?</span>;
-        sql_schema.user_defined_types = <span class="self">self</span>.get_user_defined_types(schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_views(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_procedures(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_user_defined_types(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+
         sql_schema.connector_data = <span class="kw">crate</span>::connector_data::ConnectorData {
             data: <span class="prelude-val">Some</span>(Box::new(mssql_ext)),
         };
@@ -943,52 +1012,65 @@
         <span class="prelude-val">Ok</span>(rows.into_iter().map(|row| row.get_expect_string(<span class="string">&quot;name&quot;</span>)).collect())
     }
 
-    <span class="kw">async fn </span>get_procedures(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; DescriberResult&lt;Vec&lt;Procedure&gt;&gt; {
+    <span class="kw">async fn </span>get_procedures(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="string">r#&quot;
-            SELECT name, OBJECT_DEFINITION(object_id) AS definition
+            SELECT
+                name,
+                OBJECT_DEFINITION(object_id) AS definition,
+                SCHEMA_NAME(schema_id) AS namespace
             FROM sys.objects
-            WHERE SCHEMA_NAME(schema_id) = @P1
-                AND is_ms_shipped = 0
-                AND type = &#39;P&#39;
+            WHERE is_ms_shipped = 0 AND type = &#39;P&#39;
             ORDER BY name;
         &quot;#</span>;
 
-        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>procedures = Vec::with_capacity(rows.len());
 
         <span class="kw">for </span>row <span class="kw">in </span>rows.into_iter() {
+            <span class="kw">let </span>namespace_id = <span class="kw">match </span>sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)) {
+                <span class="prelude-val">Some</span>(id) =&gt; id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+
             procedures.push(Procedure {
-                namespace_id: NamespaceId(<span class="number">0</span>),
+                namespace_id,
                 name: row.get_expect_string(<span class="string">&quot;name&quot;</span>),
                 definition: row.get_string(<span class="string">&quot;definition&quot;</span>),
             });
         }
 
-        <span class="prelude-val">Ok</span>(procedures)
+        sql_schema.procedures = procedures;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async fn </span>get_table_names(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        schema: <span class="kw-2">&amp;</span>str,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
-    ) -&gt; DescriberResult&lt;IndexMap&lt;String, TableId&gt;&gt; {
+    ) -&gt; DescriberResult&lt;IndexMap&lt;(String, String), TableId&gt;&gt; {
         <span class="kw">let </span>select = <span class="string">r#&quot;
-            SELECT tbl.name AS table_name
+            SELECT
+                tbl.name AS table_name,
+                SCHEMA_NAME(tbl.schema_id) AS namespace
             FROM sys.tables tbl
-            WHERE SCHEMA_NAME(tbl.schema_id) = @P1
-                AND tbl.is_ms_shipped = 0
-                AND tbl.type = &#39;U&#39;
+            WHERE tbl.is_ms_shipped = 0 AND tbl.type = &#39;U&#39;
             ORDER BY tbl.name;
         &quot;#</span>;
 
-        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(select, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>names = rows.into_iter().map(|row| row.get_expect_string(<span class="string">&quot;table_name&quot;</span>));
+        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(select, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>names = rows
+            .into_iter()
+            .filter(|row| sql_schema.namespaces.contains(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)))
+            .map(|row| (row.get_expect_string(<span class="string">&quot;table_name&quot;</span>), row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)))
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::new();
 
-        <span class="kw">for </span>name <span class="kw">in </span>names {
-            <span class="kw">let </span>cloned_name = name.clone();
-            <span class="kw">let </span>id = sql_schema.push_table(name, Default::default());
-            map.insert(cloned_name, id);
+        <span class="kw">for </span>(table_name, namespace) <span class="kw">in </span>names {
+            <span class="kw">let </span>cloned_name = table_name.clone();
+            <span class="kw">let </span>id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap());
+            map.insert((namespace, cloned_name), id);
         }
 
         <span class="prelude-val">Ok</span>(map)
@@ -1024,12 +1106,7 @@
             .expect(<span class="string">&quot;Invariant violation: size is not a valid usize value.&quot;</span>))
     }
 
-    <span class="kw">async fn </span>get_columns(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
-        schema: <span class="kw-2">&amp;</span>str,
-        sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
-    ) -&gt; DescriberResult&lt;()&gt; {
+    <span class="kw">async fn </span>get_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -1047,24 +1124,25 @@
                     END) AS numeric_precision,
                 convert(int, CASE
                     WHEN c.system_type_id IN (40, 41, 42, 43, 58, 61) THEN NULL
-                    ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale
+                    ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale,
+                OBJECT_SCHEMA_NAME(c.object_id) AS namespace
             FROM sys.columns c
                     INNER JOIN sys.tables t ON c.object_id = t.object_id
                     INNER JOIN sys.types typ ON c.user_type_id = typ.user_type_id
-            WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
-            AND t.is_ms_shipped = 0
+            WHERE t.is_ms_shipped = 0
             ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, &#39;ordinal&#39;);
         &quot;#</span>};
 
-        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>col <span class="kw">in </span>rows {
+            <span class="kw">let </span>namespace = col.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let </span>table_name = col.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let </span>table_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(table_id) = table_ids.get(<span class="kw-2">&amp;</span>table_name) {
-                <span class="kw-2">*</span>table_id
-            } <span class="kw">else </span>{
-                <span class="kw">continue</span>;
-            };
+
+            <span class="kw">let </span>table_id = <span class="kw">match </span>sql_schema.table_walker_ns(<span class="kw-2">&amp;</span>namespace, <span class="kw-2">&amp;</span>table_name) {
+                <span class="prelude-val">Some</span>(t_walker) =&gt; t_walker.id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>, <span class="comment">// we only care about columns in tables we have access to
+            </span>};
 
             <span class="kw">let </span>name = col.get_expect_string(<span class="string">&quot;column_name&quot;</span>);
             <span class="kw">let </span>data_type = col.get_expect_string(<span class="string">&quot;data_type&quot;</span>);
@@ -1153,15 +1231,14 @@
             <span class="kw">let </span>column_id = ColumnId(sql_schema.columns.len() <span class="kw">as </span>u32);
             <span class="kw">let </span>default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
-            sql_schema.columns.push((
-                table_id,
-                Column {
-                    name,
-                    tpe,
-                    default_value_id,
-                    auto_increment,
-                },
-            ));
+            <span class="kw">let </span>column = Column {
+                name,
+                tpe,
+                default_value_id,
+                auto_increment,
+            };
+
+            sql_schema.columns.push((table_id, column));
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1169,9 +1246,8 @@
 
     <span class="kw">async fn </span>get_all_indices(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        schema: <span class="kw-2">&amp;</span>str,
         mssql_ext: <span class="kw-2">&amp;mut </span>MssqlSchemaExt,
-        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     ) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
@@ -1184,7 +1260,8 @@
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
-                t.name AS table_name
+                t.name AS table_name,
+                SCHEMA_NAME(t.schema_id) AS namespace
             FROM
                 sys.indexes ind
             INNER JOIN sys.index_columns ic
@@ -1193,10 +1270,9 @@
                 ON ic.object_id = col.object_id AND ic.column_id = col.column_id
             INNER JOIN
                 sys.tables t ON ind.object_id = t.object_id
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
+            WHERE t.is_ms_shipped = 0
                 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-index-columns-transact-sql?view=sql-server-ver16
                 AND ic.key_ordinal != 0
-                AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
                 AND ind.type_desc IN (
@@ -1208,12 +1284,18 @@
             ORDER BY table_name, index_name, seq_in_index
         &quot;#</span>};
 
-        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>current_index: <span class="prelude-ty">Option</span>&lt;IndexId&gt; = <span class="prelude-val">None</span>;
 
         <span class="kw">for </span>row <span class="kw">in </span>rows {
+            <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
             <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let </span>table_id = table_ids[table_name.as_str()];
+
+            <span class="kw">let </span>table_id: TableId = <span class="kw">match </span>table_ids.get(<span class="kw-2">&amp;</span>(namespace, table_name)) {
+                <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+
             <span class="kw">let </span>index_name = row.get_expect_string(<span class="string">&quot;index_name&quot;</span>);
 
             <span class="kw">let </span>sort_order = <span class="kw">match </span>row.get_expect_bool(<span class="string">&quot;is_descending&quot;</span>) {
@@ -1269,29 +1351,56 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async fn </span>get_views(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; DescriberResult&lt;Vec&lt;View&gt;&gt; {
+    <span class="kw">async fn </span>get_namespaces(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema, namespaces: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; DescriberResult&lt;()&gt; {
+        <span class="kw">let </span>rows = <span class="self">self
+            </span>.conn
+            .query_raw(<span class="string">&quot;SELECT name FROM sys.schemas ORDER BY name&quot;</span>, <span class="kw-2">&amp;</span>[])
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>names = rows
+            .into_iter()
+            .map(|row| row.get_expect_string(<span class="string">&quot;name&quot;</span>))
+            .filter(|name| namespaces.contains(<span class="kw-2">&amp;</span>name.as_str()));
+
+        <span class="kw">for </span>name <span class="kw">in </span>names {
+            sql_schema.push_namespace(name);
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async fn </span>get_views(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
-            SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql
+            SELECT
+                name AS view_name,
+                OBJECT_DEFINITION(object_id) AS view_sql,
+                SCHEMA_NAME(schema_id) AS namespace
             FROM sys.views
             WHERE is_ms_shipped = 0
-            AND SCHEMA_NAME(schema_id) = @P1
         &quot;#</span>};
 
-        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>views = Vec::with_capacity(result_set.len());
 
         <span class="kw">for </span>row <span class="kw">in </span>result_set.into_iter() {
+            <span class="kw">let </span>namespace_id = <span class="kw">match </span>sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)) {
+                <span class="prelude-val">Some</span>(id) =&gt; id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+
             views.push(View {
-                namespace_id: NamespaceId(<span class="number">0</span>),
+                namespace_id,
                 name: row.get_expect_string(<span class="string">&quot;view_name&quot;</span>),
                 definition: row.get_string(<span class="string">&quot;view_sql&quot;</span>),
             })
         }
 
-        <span class="prelude-val">Ok</span>(views)
+        sql_schema.views = views;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async fn </span>get_user_defined_types(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; DescriberResult&lt;Vec&lt;UserDefinedType&gt;&gt; {
+    <span class="kw">async fn </span>get_user_defined_types(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
             SELECT
                 udt.name AS user_type_name,
@@ -1317,19 +1426,24 @@
                             -- numeric, decimal
                             WHEN udt.system_type_id IN (106, 108) THEN udt.scale
                             ELSE null
-                            END) AS scale
+                            END) AS scale,
+                SCHEMA_NAME(udt.schema_id) AS namespace
             FROM sys.types udt
                     LEFT JOIN sys.types systyp
                             ON udt.system_type_id = systyp.user_type_id
-            WHERE SCHEMA_NAME(udt.schema_id) = @P1
-            AND udt.is_user_defined = 1
+            WHERE udt.is_user_defined = 1
         &quot;#</span>};
 
-        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>types: Vec&lt;UserDefinedType&gt; = result_set
+        sql_schema.user_defined_types = result_set
             .into_iter()
-            .map(|row| {
+            .flat_map(|row| {
+                <span class="kw">let </span>namespace_id = <span class="kw">match </span>sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)) {
+                    <span class="prelude-val">Some</span>(id) =&gt; id,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                };
+
                 <span class="kw">let </span>name = row.get_expect_string(<span class="string">&quot;user_type_name&quot;</span>);
                 <span class="kw">let </span>max_length = row.get_i64(<span class="string">&quot;max_length&quot;</span>);
                 <span class="kw">let </span>precision = row.get_u32(<span class="string">&quot;precision&quot;</span>);
@@ -1344,29 +1458,33 @@
                         <span class="kw">_ </span>=&gt; name,
                     });
 
-                UserDefinedType { name, definition }
+                <span class="prelude-val">Some</span>(UserDefinedType {
+                    namespace_id,
+                    name,
+                    definition,
+                })
             })
             .collect();
 
-        <span class="prelude-val">Ok</span>(types)
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async fn </span>get_foreign_keys(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        schema: <span class="kw-2">&amp;</span>str,
-        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     ) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
-                parent_table.name                       AS table_name,
-                referenced_table.name                   AS referenced_table_name,
-                SCHEMA_NAME(referenced_table.schema_id) AS referenced_schema_name,
-                parent_column.name                      AS column_name,
-                referenced_column.name                  AS referenced_column_name,
-                fk.delete_referential_action            AS delete_referential_action,
-                fk.update_referential_action            AS update_referential_action,
-                fkc.constraint_column_id                AS ordinal_position
+                parent_table.name                        AS table_name,
+                referenced_table.name                    AS referenced_table_name,
+                SCHEMA_NAME(referenced_table.schema_id)  AS referenced_schema_name,
+                parent_column.name                       AS column_name,
+                referenced_column.name                   AS referenced_column_name,
+                fk.delete_referential_action             AS delete_referential_action,
+                fk.update_referential_action             AS update_referential_action,
+                fkc.constraint_column_id                 AS ordinal_position,
+                OBJECT_SCHEMA_NAME(fkc.parent_object_id) AS schema_name
             FROM sys.foreign_key_columns AS fkc
                     INNER JOIN sys.tables AS parent_table
                                 ON fkc.parent_object_id = parent_table.object_id
@@ -1383,30 +1501,38 @@
                                     AND fkc.parent_object_id = fk.parent_object_id
             WHERE parent_table.is_ms_shipped = 0
             AND referenced_table.is_ms_shipped = 0
-            AND OBJECT_SCHEMA_NAME(fkc.parent_object_id) = @P1
             ORDER BY table_name, constraint_name, ordinal_position
         &quot;#</span>};
 
-        <span class="kw">fn </span>get_ids(
-            table_name: <span class="kw-2">&amp;</span>str,
+        <span class="attribute">#[allow(clippy::too_many_arguments)]
+        </span><span class="kw">fn </span>get_ids(
+            namespace: String,
+            table_name: String,
             column_name: <span class="kw-2">&amp;</span>str,
-            referenced_table_name: <span class="kw-2">&amp;</span>str,
+            referenced_schema_name: String,
+            referenced_table_name: String,
             referenced_column_name: <span class="kw-2">&amp;</span>str,
-            table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+            table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
             sql_schema: <span class="kw-2">&amp;</span>SqlSchema,
         ) -&gt; <span class="prelude-ty">Option</span>&lt;(TableId, ColumnId, TableId, ColumnId)&gt; {
-            <span class="kw">let </span>table_id = <span class="kw-2">*</span>table_ids.get(table_name)<span class="question-mark">?</span>;
-            <span class="kw">let </span>referenced_table_id = <span class="kw-2">*</span>table_ids.get(referenced_table_name)<span class="question-mark">?</span>;
+            <span class="kw">let </span>table_id = <span class="kw-2">*</span>table_ids.get(<span class="kw-2">&amp;</span>(namespace, table_name))<span class="question-mark">?</span>;
+            <span class="kw">let </span>referenced_table_id = <span class="kw-2">*</span>table_ids.get(<span class="kw-2">&amp;</span>(referenced_schema_name, referenced_table_name))<span class="question-mark">?</span>;
             <span class="kw">let </span>column_id = sql_schema.walk(table_id).column(column_name)<span class="question-mark">?</span>.id;
             <span class="kw">let </span>referenced_column_id = sql_schema.walk(referenced_table_id).column(referenced_column_name)<span class="question-mark">?</span>.id;
 
             <span class="prelude-val">Some</span>((table_id, column_id, referenced_table_id, referenced_column_id))
         }
 
-        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>current_fk: <span class="prelude-ty">Option</span>&lt;(String, ForeignKeyId)&gt; = <span class="prelude-val">None</span>;
 
         <span class="kw">for </span>row <span class="kw">in </span>result_set.into_iter() {
+            <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;schema_name&quot;</span>);
+
+            <span class="kw">if </span>!sql_schema.namespaces.contains(<span class="kw-2">&amp;</span>namespace) {
+                <span class="kw">continue</span>;
+            }
+
             <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
             <span class="kw">let </span>constraint_name = row.get_expect_string(<span class="string">&quot;constraint_name&quot;</span>);
             <span class="kw">let </span>column = row.get_expect_string(<span class="string">&quot;column_name&quot;</span>);
@@ -1414,18 +1540,20 @@
             <span class="kw">let </span>referenced_column = row.get_expect_string(<span class="string">&quot;referenced_column_name&quot;</span>);
             <span class="kw">let </span>referenced_table = row.get_expect_string(<span class="string">&quot;referenced_table_name&quot;</span>);
 
-            <span class="kw">if </span>schema != referenced_schema_name {
+            <span class="kw">if </span>!sql_schema.namespaces.contains(<span class="kw-2">&amp;</span>referenced_schema_name) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: <span class="macro">format!</span>(<span class="string">&quot;{schema}.{table_name}&quot;</span>),
+                    from: <span class="macro">format!</span>(<span class="string">&quot;{namespace}.{table_name}&quot;</span>),
                     to: <span class="macro">format!</span>(<span class="string">&quot;{referenced_schema_name}.{referenced_table}&quot;</span>),
                     constraint: constraint_name,
                 }));
             }
 
             <span class="kw">let </span>(table_id, column_id, referenced_table_id, referenced_column_id) = <span class="kw">if let </span><span class="prelude-val">Some</span>(ids) = get_ids(
-                <span class="kw-2">&amp;</span>table_name,
+                namespace,
+                table_name,
                 <span class="kw-2">&amp;</span>column,
-                <span class="kw-2">&amp;</span>referenced_table,
+                referenced_schema_name,
+                referenced_table,
                 <span class="kw-2">&amp;</span>referenced_column,
                 table_ids,
                 sql_schema,

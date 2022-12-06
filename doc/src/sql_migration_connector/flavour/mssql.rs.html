@@ -612,9 +612,9 @@
         psl::builtin_connectors::MSSQL
     }
 
-    <span class="kw">fn </span>describe_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;SqlSchema&gt;&gt; {
+    <span class="kw">fn </span>describe_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;SqlSchema&gt;&gt; {
         with_connection(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, |params, connection| <span class="kw">async move </span>{
-            connection.describe_schema(params).<span class="kw">await
+            connection.describe_schema(params, namespaces).<span class="kw">await
         </span>})
     }
 

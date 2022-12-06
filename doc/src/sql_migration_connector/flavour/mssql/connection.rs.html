@@ -101,9 +101,16 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the mssql connector should happen here.
 
-</span><span class="kw">use </span>migration_connector::{ConnectorError, ConnectorResult};
+</span><span class="kw">use </span>migration_connector::{ConnectorError, ConnectorResult, Namespaces};
 <span class="kw">use </span>quaint::{
     connector::{<span class="self">self</span>, MssqlUrl},
     prelude::{ConnectionInfo, Queryable},
@@ -128,9 +135,16 @@
     }
 
     <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, params))]
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>describe_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="kw">super</span>::Params) -&gt; ConnectorResult&lt;SqlSchema&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>describe_schema(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        params: <span class="kw-2">&amp;</span><span class="kw">super</span>::Params,
+        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    ) -&gt; ConnectorResult&lt;SqlSchema&gt; {
+        <span class="kw">let </span>namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
+        <span class="kw">let </span>namespaces_str: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = namespaces_vec.iter().map(AsRef::as_ref).collect();
+
         <span class="kw">let </span><span class="kw-2">mut </span>schema = describer::SqlSchemaDescriber::new(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
-            .describe(<span class="kw-2">&amp;</span>[params.url.schema()])
+            .describe(namespaces_str.as_slice())
             .<span class="kw">await
             </span>.map_err(|err| <span class="kw">match </span>err.into_kind() {
                 DescriberErrorKind::QuaintError(err) =&gt; quaint_err_url(<span class="kw-2">&amp;</span>params.url)(err),

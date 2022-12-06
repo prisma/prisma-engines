@@ -83,6 +83,10 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions for fetching from quaint result rows
 
 </span><span class="kw">use </span>quaint::connector::ResultRow;
@@ -101,28 +105,32 @@
 }
 
 <span class="kw">impl </span>Getter <span class="kw">for </span>ResultRow {
-    <span class="kw">fn </span>get_expect_string(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>get_expect_string(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; String {
         <span class="self">self</span>.get(name)
             .and_then(|x| x.to_string())
             .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Getting {} from Resultrow {:?} as String failed&quot;</span>, name, <span class="kw-2">&amp;</span><span class="self">self</span>))
             .unwrap()
     }
 
-    <span class="kw">fn </span>get_expect_char(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; char {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>get_expect_char(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; char {
         <span class="self">self</span>.get(name)
             .and_then(|x| x.as_char())
             .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Getting {} from Resultrow {:?} as char failed&quot;</span>, name, <span class="kw-2">&amp;</span><span class="self">self</span>))
             .unwrap()
     }
 
-    <span class="kw">fn </span>get_expect_i64(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; i64 {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>get_expect_i64(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; i64 {
         <span class="self">self</span>.get(name)
             .and_then(|x| x.as_integer())
             .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Getting {} from Resultrow {:?} as i64 failed&quot;</span>, name, <span class="kw-2">&amp;</span><span class="self">self</span>))
             .unwrap()
     }
 
-    <span class="kw">fn </span>get_expect_bool(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">fn </span>get_expect_bool(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="self">self</span>.get_bool(name)
             .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Getting {} from Resultrow {:?} as bool failed&quot;</span>, name, <span class="kw-2">&amp;</span><span class="self">self</span>))
             .unwrap()
