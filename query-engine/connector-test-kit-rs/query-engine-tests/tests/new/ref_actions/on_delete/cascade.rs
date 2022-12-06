@@ -351,3 +351,210 @@ mod multiple_cascading_paths {
         Ok(())
     }
 }
+
+///
+/// This test suite is for testing the behaviour of cascading deletes on implicit m2m when
+/// relation_mode is prisma (i.e. cascade deletion is emulated)
+///
+#[test_suite(
+    suite = "cascade_on_im2m_prisma_rm",
+    schema(implicit_m2m::schema),
+    relation_mode = "prisma",
+    capabilities(ImplicitManyToManyRelation),
+    exclude(MongoDB)
+)]
+mod implicit_m2m_prisma {
+    #[connector_test]
+    async fn should_remove_intermediate_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::run(runner, "cascade_on_im2m_prisma_rm_should_remove_intermediate_records").await
+    }
+}
+
+///
+/// This test suite is for testing the behaviour of cascading deletes on implicit m2m when
+/// relation_mode is the default (i.e. foreing keys are used)
+///
+#[test_suite(
+    suite = "cascade_on_im2m_fk_rm",
+    schema(implicit_m2m::schema),
+    capabilities(ImplicitManyToManyRelation, NamedForeignKeys)
+)]
+mod implicit_m2m_fk {
+
+    #[connector_test]
+    async fn should_remove_intermediate_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::run(runner, "cascade_on_im2m_fk_rm_should_remove_intermediate_records").await
+    }
+}
+
+mod implicit_m2m {
+    use indoc::indoc;
+    use query_engine_tests::utils::*;
+    use query_engine_tests::*;
+
+    pub fn schema() -> String {
+        let schema = indoc! {
+            r#"model Item {
+                #id(id, Int, @id)
+                categories Category[]
+            }
+
+            model Category {
+                #id(id, Int, @id)              
+                items Item[]
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    pub async fn run(runner: Runner, db_name: &str) -> TestResult<()> {
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤                            ├────────┤
+        // │   id   │◀┐                       ┌─▶│   id   │
+        // ├────────┤ │                       │  ├────────┤
+        // │   1    │ │                       │  │   1    │
+        // └────────┘ │                       │  ├────────┤
+        //            │                       │  │   2    │
+        //            │                       │  └────────┘
+        //            │                       │
+        //            │  ┌──────────────────┐ │
+        //            │  │ _CategoryToItem  │ │
+        //            │  ├─────────┬────────┤ │
+        //            └──│    A    │   B    │─┘
+        //               ├─────────┼────────┤
+        //               │    1    │   1    │
+        //               ├─────────┼────────┤
+        //               │    1    │   2    │
+        //               └─────────┴────────┘
+        run_query!(
+            &runner,
+            r#"
+            mutation {
+              createOneCategory(data: {
+                id: 1,
+                items: {
+                  create: [
+                    { id: 1 },
+                    { id: 2 }
+                  ]
+                }
+              }) {
+                id
+              }
+            }"#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                fmt_query_raw(
+                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "B" = 2"#, db_name).as_str(),
+                    vec![]
+                )
+            ),
+            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"1"}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                fmt_query_raw(
+                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
+                    vec![]
+                )
+            ),
+            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
+        );
+
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤                            ├────────┤
+        // │   id   │◀┐                       ┌─▶│   id   │
+        // ├────────┤ │                       │  ├────────┤
+        // │   1    │ │                       │  │   1    │
+        // └────────┘ │                       │  └────────┘
+        //            │                       │
+        //            │                       │
+        //            │                       │
+        //            │  ┌──────────────────┐ │
+        //            │  │ _CategoryToItem  │ │
+        //            │  ├─────────┬────────┤ │
+        //            └──│    A    │   B    │─┘
+        //               ├─────────┼────────┤
+        //               │    1    │   1    │
+        //               └─────────┴────────┘
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteOneItem(where: { id: 1 }) {
+                  id
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                fmt_query_raw(
+                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "B" = 2"#, db_name).as_str(),
+                    vec![]
+                )
+            ),
+            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"0"}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                fmt_query_raw(
+                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
+                    vec![]
+                )
+            ),
+            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"1"}}]}}"###
+        );
+
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤                            ├────────┤
+        // │   id   │◀┐                       ┌─▶│   id   │
+        // └────────┘ │                       │  ├────────┤
+        //            │                       │  │   1    │
+        //            │                       │  └────────┘
+        //            │                       │
+        //            │                       │
+        //            │                       │
+        //            │  ┌──────────────────┐ │
+        //            │  │ _CategoryToItem  │ │
+        //            │  ├─────────┬────────┤ │
+        //            └──│    A    │   B    │─┘
+        //               └─────────┴────────┘
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteOneCategory(where: { id: 1 }) {
+                  id
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                fmt_query_raw(
+                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
+                    vec![]
+                )
+            ),
+            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"0"}}]}}"###
+        );
+
+        Ok(())
+    }
+}
