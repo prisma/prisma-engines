@@ -83,6 +83,72 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
     preview_features("multiSchema"),
     namespaces("first", "second")
 )]
+async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE Schema \"{schema_name}\"",);
+    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX \"A_idx\" ON \"{schema_name}\".\"A\" (\"data\")",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
+
+    let create_schema = format!("CREATE Schema \"{other_name}\"",);
+    let create_table = format!("CREATE TABLE \"{other_name}\".\"B\" (id Text PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX \"B_idx\" ON \"{other_name}\".\"B\" (\"data\")",);
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_primary).await?;
+
+    let input = indoc! {r#"
+        model A {
+          id   String  @id
+          data String?
+
+          @@index([data], map: "A_idx")
+          @@schema("first")
+        }
+
+        model B {
+          id   String  @id
+          data String?
+
+          @@index([data], map: "B_idx")
+          @@schema("first")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model A {
+          id   String  @id
+          data String?
+
+          @@index([data], map: "A_idx")
+          @@schema("first")
+        }
+
+        model B {
+          id   String  @id
+          data String?
+
+          @@index([data], map: "B_idx")
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
 async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
@@ -163,6 +229,68 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> Test
 
     let result = api.introspect_dml().await?;
     expected.assert_eq(&result);
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let create_schema = format!("CREATE Schema \"{schema_name}\"",);
+    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id Text PRIMARY KEY)",);
+    //Todo
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let create_schema = format!("CREATE Schema \"{other_name}\"",);
+    let create_table = format!(
+        "CREATE TABLE \"{other_name}\".\"B\" (id Text PRIMARY KEY, fk Text References \"{schema_name}\".\"A\"(\"id\"))",
+    );
+
+    api.database().raw_cmd(&create_schema).await?;
+    api.database().raw_cmd(&create_table).await?;
+
+    let input = indoc! {r#"
+        model A {
+          id String @id
+          B  B[]
+
+          @@schema("first")
+        }
+
+        model B {
+          id String  @id
+          fk String?
+          A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("first")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model A {
+          id String @id
+          B  B[]
+
+          @@schema("first")
+        }
+
+        model B {
+          id String  @id
+          fk String?
+          A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
 
     Ok(())
 }
@@ -400,22 +528,6 @@ async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResu
     "#]];
 
     api.expect_datamodel(&expected).await;
+
     Ok(())
 }
-
-//cross schema
-// fks
-// enums
-
-//Edge cases
-//name conflicts
-// what if the names are used somewhere???
-// table
-// enum
-//invalid names
-// schema
-// table
-// enum
-// re-introspection
-// table
-// enum
