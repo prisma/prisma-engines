@@ -1,12 +1,10 @@
 use super::*;
-use crate::IntoDarlingError;
-use darling::FromMeta;
-use proc_macro::TokenStream;
+use darling::{FromMeta, ToTokens};
 use proc_macro2::Span;
-use query_tests_setup::ConnectorTag;
 use quote::quote;
-use std::convert::TryFrom;
 use syn::{spanned::Spanned, Ident, Meta, Path};
+
+type ConnectorTag = (String, Option<String>);
 
 #[derive(Debug, FromMeta)]
 pub struct ConnectorTestArgs {
@@ -17,10 +15,10 @@ pub struct ConnectorTestArgs {
     pub schema: Option<SchemaHandler>,
 
     #[darling(default)]
-    pub only: OnlyConnectorTags,
+    pub only: ConnectorTags,
 
     #[darling(default)]
-    pub exclude: ExcludeConnectorTags,
+    pub exclude: ConnectorTags,
 
     #[darling(default)]
     pub exclude_features: ExcludeFeatures,
@@ -41,7 +39,7 @@ pub struct ConnectorTestArgs {
 
 impl ConnectorTestArgs {
     pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        validate_suite(&self.suite, on_module)?;
+        utils::validate_suite(&self.suite, on_module)?;
 
         if self.schema.is_none() && !on_module {
             return Err(darling::Error::custom(
@@ -50,11 +48,6 @@ impl ConnectorTestArgs {
         }
 
         Ok(())
-    }
-
-    /// Returns all the connectors that the test is valid for.
-    pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        connectors_to_test(&self.only, &self.exclude)
     }
 }
 
@@ -113,18 +106,16 @@ impl darling::FromMeta for SchemaHandler {
 }
 
 #[derive(Debug, Default)]
-pub struct OnlyConnectorTags {
+pub struct ConnectorTags {
     tags: Vec<ConnectorTag>,
-    _token_stream: TokenStream,
 }
 
-impl OnlyConnectorTags {
-    pub fn is_empty(&self) -> bool {
-        self.tags.is_empty()
-    }
-
-    pub fn tags(&self) -> &[ConnectorTag] {
-        self.tags.as_slice()
+impl ToTokens for ConnectorTags {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        tokens.extend(self.tags.iter().map(|(connector, version)| match version {
+            Some(v) => quote!((#connector, Some(#v)),),
+            None => quote!((#connector, None),),
+        }))
     }
 }
 
@@ -136,21 +127,6 @@ pub struct ExcludeFeatures {
 impl ExcludeFeatures {
     pub fn features(&self) -> &[String] {
         self.features.as_ref()
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct ExcludeConnectorTags {
-    tags: Vec<ConnectorTag>,
-}
-
-impl ExcludeConnectorTags {
-    pub fn is_empty(&self) -> bool {
-        self.tags.is_empty()
-    }
-
-    pub fn tags(&self) -> &[ConnectorTag] {
-        &self.tags
     }
 }
 
@@ -194,19 +170,10 @@ fn strings_to_list(name: &str, items: &[syn::NestedMeta]) -> Result<Vec<String>,
         .collect::<Result<Vec<_>, _>>()
 }
 
-impl darling::FromMeta for OnlyConnectorTags {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        let _token_stream = quote! { #(#items),* }.into();
-        let tags = tags_from_list(items)?;
-
-        Ok(OnlyConnectorTags { tags, _token_stream })
-    }
-}
-
-impl darling::FromMeta for ExcludeConnectorTags {
+impl darling::FromMeta for ConnectorTags {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
         let tags = tags_from_list(items)?;
-        Ok(ExcludeConnectorTags { tags })
+        Ok(ConnectorTags { tags })
     }
 }
 
@@ -215,7 +182,7 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
         return Err(darling::Error::custom("At least one connector tag is required."));
     }
 
-    let mut tags: Vec<ConnectorTag> = vec![];
+    let mut tags: Vec<ConnectorTag> = Vec::with_capacity(items.len());
 
     for item in items {
         match item {
@@ -224,7 +191,7 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
                     // A single variant without version, like `Postgres`.
                     Meta::Path(p) => {
                         let tag = tag_string_from_path(p)?;
-                        tags.push(ConnectorTag::try_from(tag.as_str()).into_darling_error(&p.span())?);
+                        tags.push((tag, None));
                     }
                     Meta::List(l) => {
                         let tag = tag_string_from_path(&l.path)?;
@@ -244,10 +211,7 @@ fn tags_from_list(items: &[syn::NestedMeta]) -> Result<Vec<ConnectorTag>, darlin
                                         }
                                     };
 
-                                    tags.push(
-                                        ConnectorTag::try_from((tag.as_str(), Some(version_str.as_str())))
-                                            .into_darling_error(&l.span())?,
-                                    );
+                                    tags.push((tag.clone(), Some(version_str)));
                                 }
                                 syn::NestedMeta::Meta(meta) => {
                                     return Err(darling::Error::unexpected_type(

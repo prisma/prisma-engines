@@ -3390,9 +3390,7 @@ version = "0.1.0"
 dependencies = [
  "darling",
  "indoc",
- "itertools",
  "proc-macro2",
- "query-tests-setup",
  "quote",
  "syn",
 ]

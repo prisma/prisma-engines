@@ -4,7 +4,7 @@ mod sql_renderer;
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
 use indoc::indoc;
 use itertools::Itertools;
 use lazy_static::lazy_static;
@@ -31,7 +31,6 @@ pub trait DatamodelRenderer {
 
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(
-    config: &TestConfig,
     test_database: &str,
     template: String,
     excluded_features: &[&str],
@@ -39,7 +38,7 @@ pub fn render_test_datamodel(
     db_schemas: &[&str],
     isolation_level: Option<&'static str>,
 ) -> String {
-    let tag = config.test_connector_tag().unwrap();
+    let tag = CONFIG.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
 
     let is_multi_schema = !db_schemas.is_empty();
@@ -65,7 +64,7 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
+        tag.connection_string(test_database, CONFIG.is_ci(), is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features

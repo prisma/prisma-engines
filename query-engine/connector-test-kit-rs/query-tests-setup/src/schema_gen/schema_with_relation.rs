@@ -45,7 +45,7 @@ impl TryFrom<DatamodelWithParams> for String {
 
 pub type DatamodelsAndCapabilities = (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>);
 
-pub fn schema_with_relation(
+pub(crate) fn schema_with_relation(
     on_parent: &RelationField,
     on_child: &RelationField,
     id_only: bool,

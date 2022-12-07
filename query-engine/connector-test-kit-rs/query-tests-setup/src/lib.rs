@@ -93,13 +93,13 @@ type BoxFuture<'a, O> = std::pin::Pin<Box<dyn std::future::Future<Output = O> + 
 
 #[allow(clippy::too_many_arguments)]
 pub fn run_relation_link_test<F>(
-    enabled_connectors: &[ConnectorTag],
-    capabilities: &mut Vec<ConnectorCapability>,
-    required_capabilities: &[&str],
-    datamodel: &str,
-    dm_with_params: &str,
-    test_name: &str,
-    test_database: &str,
+    on_parent: &RelationField,
+    on_child: &RelationField,
+    id_only: bool,
+    only: &[(&str, Option<&str>)],
+    exclude: &[(&str, Option<&str>)],
+    required_capabilities: &[ConnectorCapability],
+    (suite_name, test_name): (&str, &str),
     test_fn: F,
 ) where
     F: (for<'a> AsyncFn<'a, Runner, DatamodelWithParams, TestResult<()>>) + 'static,
@@ -116,13 +116,13 @@ pub fn run_relation_link_test<F>(
     }
 
     run_relation_link_test_impl(
-        enabled_connectors,
-        capabilities,
+        on_parent,
+        on_child,
+        id_only,
+        only,
+        exclude,
         required_capabilities,
-        datamodel,
-        dm_with_params,
-        test_name,
-        test_database,
+        (suite_name, test_name),
         &boxify(test_fn),
     )
 }
@@ -130,31 +130,32 @@ pub fn run_relation_link_test<F>(
 #[allow(clippy::too_many_arguments)]
 #[inline(never)] // currently not inlined, but let's make sure it doesn't change
 fn run_relation_link_test_impl(
-    enabled_connectors: &[ConnectorTag],
-    capabilities: &mut Vec<ConnectorCapability>,
-    required_capabilities: &[&str],
-    datamodel: &str,
-    dm_with_params: &str,
-    test_name: &str,
-    test_database: &str,
+    on_parent: &RelationField,
+    on_child: &RelationField,
+    id_only: bool,
+    only: &[(&str, Option<&str>)],
+    exclude: &[(&str, Option<&str>)],
+    required_capabilities: &[ConnectorCapability],
+    (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
 ) {
-    let config = &CONFIG;
-    let mut required_capabilities = required_capabilities
-        .iter()
-        .map(|cap| cap.parse::<ConnectorCapability>().unwrap())
-        .collect::<Vec<_>>();
+    let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
+    let mut required_capabilities_for_test = Vec::with_capacity(required_capabilities.len());
 
-    if !required_capabilities.is_empty() {
-        capabilities.append(&mut required_capabilities);
-    }
+    for (i, (dm, caps)) in dms.into_iter().zip(capabilities.into_iter()).enumerate() {
+        required_capabilities_for_test.clear();
+        required_capabilities_for_test.extend(required_capabilities.iter());
+        required_capabilities_for_test.extend(caps);
 
-    let template = datamodel.to_string();
-    let dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
+        let test_db_name = format!("{suite_name}_{test_name}_{i}");
+        let template = dm.datamodel().to_owned();
 
-    if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
-        let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
-        let connector = config.test_connector_tag().unwrap();
+        if !ConnectorTag::should_run(only, exclude, &required_capabilities_for_test) {
+            continue;
+        }
+
+        let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
+        let connector = CONFIG.test_connector_tag().unwrap();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
         let (log_capture, log_tx) = TestLogCapture::new();
@@ -164,11 +165,11 @@ fn run_relation_link_test_impl(
                 println!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
-                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
+                let runner = Runner::load(CONFIG.runner(), datamodel.clone(), connector, metrics, log_capture)
                     .await
                     .unwrap();
 
-                test_fn(&runner, &dm_with_params_json).await.unwrap();
+                test_fn(&runner, &dm).await.unwrap();
 
                 teardown_project(&datamodel, Default::default()).await.unwrap();
             }
@@ -197,9 +198,9 @@ where
 
 #[allow(clippy::too_many_arguments)]
 pub fn run_connector_test<T>(
-    test_name: &'static str,
     test_database_name: &str,
-    enabled_connectors: &[ConnectorTag],
+    only: &[(&str, Option<&str>)],
+    exclude: &[(&str, Option<&str>)],
     capabilities: &[ConnectorCapability],
     excluded_features: &[&str],
     handler: fn() -> String,
@@ -217,9 +218,9 @@ pub fn run_connector_test<T>(
     }
 
     run_connector_test_impl(
-        test_name,
         test_database_name,
-        enabled_connectors,
+        only,
+        exclude,
         capabilities,
         excluded_features,
         handler,
@@ -231,10 +232,10 @@ pub fn run_connector_test<T>(
 
 #[allow(clippy::too_many_arguments)]
 #[inline(never)]
-pub fn run_connector_test_impl(
-    test_name: &'static str,
+fn run_connector_test_impl(
     test_database_name: &str,
-    enabled_connectors: &[ConnectorTag],
+    only: &[(&str, Option<&str>)],
+    exclude: &[(&str, Option<&str>)],
     capabilities: &[ConnectorCapability],
     excluded_features: &[&str],
     handler: fn() -> String,
@@ -242,14 +243,12 @@ pub fn run_connector_test_impl(
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
-    let config: &'static _ = &crate::CONFIG;
-    if !ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
+    if !ConnectorTag::should_run(only, exclude, capabilities) {
         return;
     }
 
     let template = handler();
     let datamodel = crate::render_test_datamodel(
-        config,
         test_database_name,
         template,
         excluded_features,
@@ -257,7 +256,7 @@ pub fn run_connector_test_impl(
         db_schemas,
         None,
     );
-    let connector = config.test_connector_tag().unwrap();
+    let connector = CONFIG.test_connector_tag().unwrap();
     let metrics = crate::setup_metrics();
     let metrics_for_subscriber = metrics.clone();
 
