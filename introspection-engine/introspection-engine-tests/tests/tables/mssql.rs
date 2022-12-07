@@ -131,7 +131,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
            b  INTEGER NOT NULL,
            CONSTRAINT [A_pkey] PRIMARY KEY (id),
            CONSTRAINT [A_a_b_key] UNIQUE (a ASC, b DESC)
-       ) 
+       )
    "#, api.schema_name()};
 
     api.raw_cmd(&setup).await;
