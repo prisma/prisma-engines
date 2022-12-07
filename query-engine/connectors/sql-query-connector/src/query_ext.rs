@@ -8,7 +8,6 @@ use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
-use psl::PreviewFeature;
 use quaint::{
     ast::*,
     connector::{self, Queryable},
@@ -70,7 +69,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_json<'a>(
         &'a self,
         _sql_info: SqlInfo,
-        _features: &[PreviewFeature],
+        _features: psl::PreviewFeatures,
         mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
@@ -105,7 +104,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-        _features: &[PreviewFeature],
+        _features: psl::PreviewFeatures,
     ) -> std::result::Result<usize, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();

@@ -3,7 +3,7 @@ use crate::CoreError;
 use connection_string::JdbcString;
 use connector::Connector;
 use mongodb_client::MongoConnectionString;
-use psl::{builtin_connectors::*, Datasource, PreviewFeature};
+use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use sql_connector::*;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -17,7 +17,7 @@ const DEFAULT_SQLITE_DB_NAME: &str = "main";
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
     source: &Datasource,
-    features: &[PreviewFeature],
+    features: PreviewFeatures,
     url: &str,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider {
@@ -96,7 +96,7 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
 async fn sqlite(
     source: &Datasource,
     url: &str,
-    features: &[PreviewFeature],
+    features: PreviewFeatures,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQLite query connector...");
 
@@ -111,7 +111,7 @@ async fn sqlite(
 async fn postgres(
     source: &Datasource,
     url: &str,
-    features: &[PreviewFeature],
+    features: PreviewFeatures,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading Postgres query connector...");
 
@@ -135,7 +135,7 @@ async fn postgres(
 async fn mysql(
     source: &Datasource,
     url: &str,
-    features: &[PreviewFeature],
+    features: PreviewFeatures,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MySQL query connector...");
 
@@ -150,7 +150,7 @@ async fn mysql(
 async fn mssql(
     source: &Datasource,
     url: &str,
-    features: &[PreviewFeature],
+    features: PreviewFeatures,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading SQL Server query connector...");
 
@@ -173,7 +173,7 @@ where
 async fn mongodb(
     source: &Datasource,
     url: &str,
-    _features: &[PreviewFeature],
+    _features: PreviewFeatures,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     trace!("Loading MongoDB query connector...");
 

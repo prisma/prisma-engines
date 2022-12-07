@@ -14,7 +14,7 @@ mod reformat;
 mod validate;
 
 pub use crate::{
-    common::{PreviewFeature, ALL_PREVIEW_FEATURES},
+    common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
     configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
     reformat::reformat,
 };
