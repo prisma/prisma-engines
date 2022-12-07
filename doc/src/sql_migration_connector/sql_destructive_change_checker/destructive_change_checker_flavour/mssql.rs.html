@@ -144,8 +144,6 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{MssqlFlavour, SqlFlavour},
@@ -270,8 +268,7 @@
     <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Table) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
             <span class="kw">let </span>query = {
-                <span class="comment">// TODO(MultiSchema): replace this when implementing MSSQL.
-                </span><span class="kw">let </span>schema_name = <span class="self">self</span>.schema_name();
+                <span class="kw">let </span>schema_name = table.namespace.as_deref().unwrap_or_else(|| <span class="self">self</span>.schema_name());
                 <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM [{}].[{}]&quot;</span>, schema_name, table.table)
             };
             <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -282,8 +279,7 @@
     <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, column: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Column) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
             <span class="kw">let </span>query = {
-                <span class="comment">// TODO(MultiSchema): replace this when implementing MSSQL.
-                </span><span class="kw">let </span>schema_name = <span class="self">self</span>.schema_name();
+                <span class="kw">let </span>schema_name = column.namespace.as_deref().unwrap_or_else(|| <span class="self">self</span>.schema_name());
                 <span class="macro">format!</span>(
                     <span class="string">&quot;SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL&quot;</span>,
                     schema_name, column.table, column.column

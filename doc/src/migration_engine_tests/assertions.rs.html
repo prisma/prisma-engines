@@ -1589,8 +1589,8 @@
     <span class="attribute">#[track_caller]
     </span><span class="kw">pub fn </span>assert_default(<span class="self">self</span>, expected: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>this = <span class="self">self</span>.assert_default_kind(expected.clone().map(|val| val.kind().clone()));
-        <span class="kw">let </span>found = this.column.default().map(|d| d.constraint_name());
-        <span class="kw">let </span>expected = expected.as_ref().map(|d| d.constraint_name());
+        <span class="kw">let </span>found = this.column.default().and_then(|d| d.constraint_name());
+        <span class="kw">let </span>expected = expected.as_ref().and_then(|d| d.constraint_name());
 
         <span class="macro">assert!</span>(
             found == expected,

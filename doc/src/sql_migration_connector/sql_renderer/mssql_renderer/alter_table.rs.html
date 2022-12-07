@@ -285,6 +285,9 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::render_default;
 <span class="kw">use crate</span>::{
     flavour::MssqlFlavour,
@@ -379,7 +382,7 @@
         <span class="kw">if </span>!<span class="self">self</span>.drop_constraints.is_empty() {
             statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} DROP CONSTRAINT {}&quot;</span>,
-                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.renderer.table_name(<span class="self">self</span>.tables.previous),
                 <span class="self">self</span>.drop_constraints.iter().join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
@@ -387,7 +390,10 @@
         <span class="kw">if </span><span class="self">self</span>.rename_primary_key {
             <span class="kw">let </span>with_schema = <span class="macro">format!</span>(
                 <span class="string">&quot;{}.{}&quot;</span>,
-                <span class="self">self</span>.renderer.schema_name(),
+                <span class="self">self</span>.tables
+                    .previous
+                    .namespace()
+                    .unwrap_or_else(|| <span class="self">self</span>.renderer.schema_name()),
                 <span class="self">self</span>.tables.previous.primary_key().unwrap().name()
             );
 
@@ -405,7 +411,7 @@
         <span class="kw">if </span>!<span class="self">self</span>.drop_columns.is_empty() {
             statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} DROP COLUMN {}&quot;</span>,
-                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.renderer.table_name(<span class="self">self</span>.tables.previous),
                 <span class="self">self</span>.drop_columns.join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
@@ -413,7 +419,7 @@
         <span class="kw">if </span>!<span class="self">self</span>.add_constraints.is_empty() {
             statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} ADD {}&quot;</span>,
-                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.renderer.table_name(<span class="self">self</span>.tables.previous),
                 <span class="self">self</span>.add_constraints.iter().join(<span class="string">&quot;, &quot;</span>)
             ));
         }
@@ -421,7 +427,7 @@
         <span class="kw">if </span>!<span class="self">self</span>.add_columns.is_empty() {
             statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} ADD {}&quot;</span>,
-                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.renderer.table_name(<span class="self">self</span>.tables.previous),
                 <span class="self">self</span>.add_columns.join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
@@ -527,7 +533,7 @@
 
                     <span class="self">self</span>.column_mods.push(<span class="macro">format!</span>(
                         <span class="string">&quot;ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}&quot;</span>,
-                        table = <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                        table = <span class="self">self</span>.renderer.table_name(<span class="self">self</span>.tables.previous),
                         column_name = <span class="self">self</span>.renderer.quote(columns.next.name()),
                         column_type = <span class="kw">super</span>::render_column_type(columns.next),
                         nullability = nullability,

@@ -531,6 +531,17 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>alter_table;
 
 <span class="kw">use super</span>::{common::<span class="kw-2">*</span>, IteratorJoin, Quoted, SqlRenderer};
@@ -555,8 +566,9 @@
         )
     }
 
-    <span class="kw">fn </span>quote_with_schema&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; QuotedWithPrefix&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
-        QuotedWithPrefix(<span class="prelude-val">Some</span>(Quoted::mssql_ident(<span class="self">self</span>.schema_name())), Quoted::mssql_ident(name))
+    <span class="kw">fn </span>quote_with_schema&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; QuotedWithPrefix&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">let </span>ns = namespace.unwrap_or_else(|| <span class="self">self</span>.schema_name());
+        QuotedWithPrefix(<span class="prelude-val">Some</span>(Quoted::mssql_ident(ns)), Quoted::mssql_ident(name))
     }
 
     <span class="kw">fn </span>render_column(<span class="kw-2">&amp;</span><span class="self">self</span>, column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
@@ -625,7 +637,11 @@
     <span class="kw">fn </span>render_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;sql::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span>index_with_table = <span class="macro">format!</span>(
             <span class="string">&quot;{}.{}.{}&quot;</span>,
-            <span class="self">self</span>.schema_name(),
+            indexes
+                .previous
+                .table()
+                .namespace()
+                .unwrap_or_else(|| <span class="self">self</span>.schema_name()),
             indexes.previous.table().name(),
             indexes.previous.name()
         );
@@ -831,10 +847,15 @@
                     AND OBJECT_NAME(PARENT_OBJECT_ID) = &#39;{table}&#39;
                     AND SCHEMA_NAME(SCHEMA_ID) = &#39;{schema}&#39;
                 EXEC sp_executesql @SQL
-            &quot;#</span>, table = tables.previous.name(), schema = <span class="self">self</span>.schema_name()});
+            &quot;#</span>,
+            table = tables.previous.name(),
+            schema = tables.previous.namespace().unwrap_or_else(|| <span class="self">self</span>.schema_name())});
 
             <span class="comment">// Create the new table.
-            </span>result.push(<span class="self">self</span>.render_create_table_as(tables.next, <span class="self">self</span>.quote_with_schema(<span class="kw-2">&amp;</span>temporary_table_name)));
+            </span>result.push(<span class="self">self</span>.render_create_table_as(
+                tables.next,
+                <span class="self">self</span>.quote_with_schema(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name),
+            ));
 
             <span class="comment">// We cannot insert into autoincrement columns by default. If we
             // have `IDENTITY` in any of the columns, we&#39;ll allow inserting
@@ -842,7 +863,7 @@
             </span><span class="kw">if </span>needs_autoincrement {
                 result.push(<span class="macro">format!</span>(
                     <span class="string">r#&quot;SET IDENTITY_INSERT {} ON&quot;#</span>,
-                    <span class="self">self</span>.quote_with_schema(<span class="kw-2">&amp;</span>temporary_table_name)
+                    <span class="self">self</span>.quote_with_schema(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name)
                 ));
             }
 
@@ -851,20 +872,20 @@
                 IF EXISTS(SELECT * FROM {table})
                     EXEC(&#39;INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)&#39;)&quot;#</span>,
                                     columns = columns.join(<span class="string">&quot;,&quot;</span>),
-                                    table = <span class="self">self</span>.quote_with_schema(tables.previous.name()),
-                                    tmp_table = <span class="self">self</span>.quote_with_schema(<span class="kw-2">&amp;</span>temporary_table_name),
+                                    table = <span class="self">self</span>.table_name(tables.previous),
+                                    tmp_table = <span class="self">self</span>.quote_with_schema(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name),
             });
 
             <span class="comment">// When done copying, disallow identity inserts again if needed.
             </span><span class="kw">if </span>needs_autoincrement {
                 result.push(<span class="macro">format!</span>(
                     <span class="string">r#&quot;SET IDENTITY_INSERT {} OFF&quot;#</span>,
-                    <span class="self">self</span>.quote_with_schema(<span class="kw-2">&amp;</span>temporary_table_name)
+                    <span class="self">self</span>.quote_with_schema(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name)
                 ));
             }
 
             <span class="comment">// Drop the old, now empty table.
-            </span>result.extend(<span class="self">self</span>.render_drop_table(<span class="prelude-val">None</span>, tables.previous.name()));
+            </span>result.extend(<span class="self">self</span>.render_drop_table(tables.previous.namespace(), tables.previous.name()));
 
             <span class="comment">// Rename the temporary table with the name defined in the migration.
             </span>result.push(<span class="self">self</span>.render_rename_table(tables.next.namespace(), <span class="kw-2">&amp;</span>temporary_table_name, tables.next.name()));
@@ -880,8 +901,9 @@
         result
     }
 
-    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
-        <span class="kw">let </span>with_schema = <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.schema_name(), name);
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span>ns = namespace.unwrap_or_else(|| <span class="self">self</span>.schema_name());
+        <span class="kw">let </span>with_schema = <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, ns, name);
 
         <span class="macro">format!</span>(
             <span class="string">&quot;EXEC SP_RENAME N{}, N{}&quot;</span>,
@@ -927,16 +949,16 @@
         add_constraint
     }
 
-    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
-        <span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}&quot;</span>, <span class="self">self</span>.quote_with_schema(table_name))]
+    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, namespace: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+        <span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}&quot;</span>, <span class="self">self</span>.quote_with_schema(namespace, table_name))]
     }
 
     <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: sql::ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP VIEW {}&quot;</span>, <span class="self">self</span>.quote_with_schema(view.name()))
+        <span class="macro">format!</span>(<span class="string">&quot;DROP VIEW {}&quot;</span>, <span class="self">self</span>.quote_with_schema(view.namespace(), view.name()))
     }
 
     <span class="kw">fn </span>render_drop_user_defined_type(<span class="kw-2">&amp;</span><span class="self">self</span>, udt: <span class="kw-2">&amp;</span>sql::UserDefinedTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP TYPE {}&quot;</span>, <span class="self">self</span>.quote_with_schema(udt.name()))
+        <span class="macro">format!</span>(<span class="string">&quot;DROP TYPE {}&quot;</span>, <span class="self">self</span>.quote_with_schema(udt.namespace(), udt.name()))
     }
 
     <span class="kw">fn </span>render_begin_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
@@ -978,7 +1000,7 @@
     <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, fks: Pair&lt;sql::ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">r#&quot;EXEC sp_rename &#39;{schema}.{previous}&#39;, &#39;{next}&#39;, &#39;OBJECT&#39;&quot;#</span>,
-            schema = <span class="self">self</span>.schema_name(),
+            schema = fks.previous.table().namespace().unwrap_or_else(|| <span class="self">self</span>.schema_name()),
             previous = fks.previous.constraint_name().unwrap(),
             next = fks.next.constraint_name().unwrap(),
         )
