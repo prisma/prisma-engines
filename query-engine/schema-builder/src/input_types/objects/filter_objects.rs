@@ -133,7 +133,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     let mut x = init_input_object_type(ident.clone());
 
-    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         x.require_at_least_one_field();
         x.apply_constraints_on_fields(constrained_fields);
     } else {
@@ -189,7 +189,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
 
-    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         fields.extend(boolean_operators);
         fields.extend(rest_fields);
     }

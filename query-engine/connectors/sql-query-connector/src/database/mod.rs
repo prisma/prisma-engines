@@ -9,7 +9,6 @@ pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
-use psl::{Datasource, PreviewFeature};
 
 pub use mssql::*;
 pub use mysql::*;
@@ -29,9 +28,9 @@ pub trait FromSource {
     ///
     /// 2. The url may be modified with the config dir, in the case of Node-API.
     async fn from_source(
-        source: &Datasource,
+        source: &psl::Datasource,
         url: &str,
-        features: &[PreviewFeature],
+        features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;

@@ -15,21 +15,16 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 // enable raw param?
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = psl::parse_schema(schema).unwrap();
-    let config = &schema.configuration;
     let dml = psl::lift(&schema);
-
-    // We only support one data source at the moment, so take the first one (default not exposed yet).
-    let data_source = config.datasources.first().unwrap();
-    let preview_features: Vec<_> = config.preview_features().iter().collect();
     let internal_data_model = prisma_models::convert(&schema, "dummy".to_owned());
 
     // Construct query schema
     let query_schema = Arc::new(schema_builder::build(
         internal_data_model,
         true, // todo
-        data_source.active_connector,
-        preview_features,
-        data_source.relation_mode(),
+        schema.connector,
+        schema.configuration.preview_features(),
+        schema.relation_mode(),
     ));
 
     from_precomputed_parts(&dml, query_schema)

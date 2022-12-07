@@ -42,10 +42,12 @@ mod utils;
 
 use cache::TypeRefCache;
 use prisma_models::{
-    psl::PreviewFeature, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef,
-    RelationFieldRef, TypeIdentifier,
+    CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
-use psl::datamodel_connector::{Connector, ConnectorCapability, RelationMode};
+use psl::{
+    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    PreviewFeature, PreviewFeatures,
+};
 use schema::*;
 use std::sync::Arc;
 
@@ -56,7 +58,7 @@ pub(crate) struct BuilderContext {
     enable_raw_queries: bool,
     cache: TypeCache,
     connector: &'static dyn Connector,
-    preview_features: Vec<PreviewFeature>,
+    preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
     // enums?
@@ -67,7 +69,7 @@ impl BuilderContext {
         internal_data_model: InternalDataModelRef,
         enable_raw_queries: bool,
         connector: &'static dyn Connector,
-        preview_features: Vec<PreviewFeature>,
+        preview_features: PreviewFeatures,
     ) -> Self {
         Self {
             internal_data_model,
@@ -80,7 +82,7 @@ impl BuilderContext {
         }
     }
 
-    pub fn has_feature(&self, feature: &PreviewFeature) -> bool {
+    pub fn has_feature(&self, feature: PreviewFeature) -> bool {
         self.preview_features.contains(feature)
     }
 
@@ -119,7 +121,7 @@ impl BuilderContext {
     }
 
     pub fn can_full_text_search(&self) -> bool {
-        self.has_feature(&PreviewFeature::FullTextSearch)
+        self.has_feature(PreviewFeature::FullTextSearch)
             && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
@@ -176,15 +178,10 @@ pub fn build(
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
     connector: &'static dyn Connector,
-    preview_features: Vec<PreviewFeature>,
+    preview_features: PreviewFeatures,
     relation_mode: RelationMode,
 ) -> QuerySchema {
-    let mut ctx = BuilderContext::new(
-        internal_data_model,
-        enable_raw_queries,
-        connector,
-        preview_features.clone(),
-    );
+    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries, connector, preview_features);
 
     output_types::objects::initialize_caches(&mut ctx);
 

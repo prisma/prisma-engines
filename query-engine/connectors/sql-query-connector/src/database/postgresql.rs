@@ -5,29 +5,28 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::{Datasource, PreviewFeature};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct PostgreSql {
     pool: Quaint,
     connection_info: ConnectionInfo,
-    features: Vec<PreviewFeature>,
+    features: psl::PreviewFeatures,
 }
 
 impl PostgreSql {
     /// Get PostgreSQL's preview features.
-    pub fn features(&self) -> &[PreviewFeature] {
-        self.features.as_ref()
+    pub fn features(&self) -> psl::PreviewFeatures {
+        self.features
     }
 }
 
 #[async_trait]
 impl FromSource for PostgreSql {
     async fn from_source(
-        _source: &Datasource,
+        _source: &psl::Datasource,
         url: &str,
-        features: &[PreviewFeature],
+        features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
@@ -60,7 +59,7 @@ impl Connector for PostgreSql {
     async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features.clone());
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await

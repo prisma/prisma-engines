@@ -6,7 +6,6 @@ use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
 use psl::dml::prisma_value::PrismaValue;
-use psl::PreviewFeature;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -460,7 +459,7 @@ pub async fn m2m_disconnect(
 /// affected rows.
 pub async fn execute_raw(
     conn: &dyn QueryExt,
-    features: &[PreviewFeature],
+    features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<usize> {
     let value = conn.raw_count(inputs, features).await?;
@@ -473,7 +472,7 @@ pub async fn execute_raw(
 pub async fn query_raw(
     conn: &dyn QueryExt,
     sql_info: SqlInfo,
-    features: &[PreviewFeature],
+    features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
     let value = conn.raw_json(sql_info, features, inputs).await?;

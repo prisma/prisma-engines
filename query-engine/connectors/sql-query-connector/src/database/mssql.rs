@@ -6,20 +6,20 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::{Datasource, PreviewFeature};
+use psl::{Datasource, PreviewFeatures};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct Mssql {
     pool: Quaint,
     connection_info: ConnectionInfo,
-    features: Vec<PreviewFeature>,
+    features: PreviewFeatures,
 }
 
 impl Mssql {
     /// Get MSSQL's preview features.
-    pub fn features(&self) -> &[PreviewFeature] {
-        self.features.as_ref()
+    pub fn features(&self) -> PreviewFeatures {
+        self.features
     }
 }
 
@@ -28,7 +28,7 @@ impl FromSource for Mssql {
     async fn from_source(
         _source: &Datasource,
         url: &str,
-        features: &[PreviewFeature],
+        features: PreviewFeatures,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
@@ -62,7 +62,7 @@ impl Connector for Mssql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features.clone());
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

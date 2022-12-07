@@ -1,7 +1,10 @@
 use super::*;
 use fmt::Debug;
-use prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
-use psl::datamodel_connector::{ConnectorCapability, RelationMode};
+use prisma_models::{InternalDataModelRef, ModelRef};
+use psl::{
+    datamodel_connector::{ConnectorCapability, RelationMode},
+    PreviewFeatures,
+};
 use std::{borrow::Borrow, fmt};
 
 /// The query schema.
@@ -48,18 +51,14 @@ pub struct ConnectorContext {
     pub capabilities: Vec<ConnectorCapability>,
 
     /// Enabled preview features.
-    pub features: Vec<PreviewFeature>,
+    pub features: PreviewFeatures,
 
     /// Relation mode of the provider
     pub relation_mode: RelationMode,
 }
 
 impl ConnectorContext {
-    pub fn new(
-        capabilities: Vec<ConnectorCapability>,
-        features: Vec<PreviewFeature>,
-        relation_mode: RelationMode,
-    ) -> Self {
+    pub fn new(capabilities: Vec<ConnectorCapability>, features: PreviewFeatures, relation_mode: RelationMode) -> Self {
         Self {
             capabilities,
             features,
@@ -82,7 +81,7 @@ impl QuerySchema {
         _enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
-        features: Vec<PreviewFeature>,
+        features: PreviewFeatures,
         relation_mode: RelationMode,
     ) -> Self {
         QuerySchema {

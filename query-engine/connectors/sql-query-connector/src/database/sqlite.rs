@@ -6,14 +6,13 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::{Datasource, PreviewFeature};
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
 pub struct Sqlite {
     pool: Quaint,
     file_path: String,
-    features: Vec<PreviewFeature>,
+    features: psl::PreviewFeatures,
 }
 
 impl Sqlite {
@@ -26,17 +25,17 @@ impl Sqlite {
     }
 
     /// Get SQLite's preview features.
-    pub fn features(&self) -> &[PreviewFeature] {
-        self.features.as_ref()
+    pub fn features(&self) -> psl::PreviewFeatures {
+        self.features
     }
 }
 
 #[async_trait]
 impl FromSource for Sqlite {
     async fn from_source(
-        _source: &Datasource,
+        _source: &psl::Datasource,
         url: &str,
-        features: &[PreviewFeature],
+        features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Sqlite> {
         let database_str = url;
 
@@ -84,7 +83,7 @@ impl Connector for Sqlite {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info().clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, self.connection_info(), self.features.clone());
+            let conn = SqlConnection::new(conn, self.connection_info(), self.features);
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

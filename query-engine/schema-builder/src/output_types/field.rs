@@ -119,7 +119,7 @@ where
         .map(|rf| {
             let mut args = vec![];
 
-            if ctx.has_feature(&PreviewFeature::FilteredRelationCount) {
+            if ctx.has_feature(PreviewFeature::FilteredRelationCount) {
                 args.push(arguments::where_argument(ctx, &rf.related_model()))
             }
 

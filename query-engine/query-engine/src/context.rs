@@ -61,8 +61,7 @@ impl PrismaContext {
         let url = data_source.load_url(|key| env::var(key).ok())?;
 
         // Load executor
-        let preview_features: Vec<_> = config.preview_features().iter().collect();
-        let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
+        let (db_name, executor) = executor::load(data_source, config.preview_features(), &url).await?;
 
         // Build internal data model
         let internal_data_model = prisma_models::convert(&schema, db_name);
@@ -72,7 +71,7 @@ impl PrismaContext {
             internal_data_model,
             enable_raw_queries,
             data_source.active_connector,
-            preview_features,
+            config.preview_features(),
             data_source.relation_mode(),
         ));
 
