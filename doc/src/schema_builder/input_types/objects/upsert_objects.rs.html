@@ -188,7 +188,7 @@
                 input_field(args::CREATE, create_types, <span class="prelude-val">None</span>),
             ];
 
-            <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::ExtendedWhereUnique) {
+            <span class="kw">if </span>ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
                 fields.push(where_argument(ctx, <span class="kw-2">&amp;</span>related_model));
             }
 

@@ -69,7 +69,6 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-<span id="72">72</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
@@ -77,29 +76,28 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>psl::{Datasource, PreviewFeature};
 <span class="kw">use </span>quaint::{pooled::Quaint, prelude::ConnectionInfo};
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">pub struct </span>PostgreSql {
     pool: Quaint,
     connection_info: ConnectionInfo,
-    features: Vec&lt;PreviewFeature&gt;,
+    features: psl::PreviewFeatures,
 }
 
 <span class="kw">impl </span>PostgreSql {
     <span class="doccomment">/// Get PostgreSQL&#39;s preview features.
-    </span><span class="kw">pub fn </span>features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[PreviewFeature] {
-        <span class="self">self</span>.features.as_ref()
+    </span><span class="kw">pub fn </span>features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; psl::PreviewFeatures {
+        <span class="self">self</span>.features
     }
 }
 
 <span class="attribute">#[async_trait]
 </span><span class="kw">impl </span>FromSource <span class="kw">for </span>PostgreSql {
     <span class="kw">async fn </span>from_source(
-        _source: <span class="kw-2">&amp;</span>Datasource,
+        _source: <span class="kw-2">&amp;</span>psl::Datasource,
         url: <span class="kw-2">&amp;</span>str,
-        features: <span class="kw-2">&amp;</span>[PreviewFeature],
+        features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>database_str = url;
 
@@ -132,7 +130,7 @@
     <span class="kw">async fn </span>get_connection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; connector_interface::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
         <span class="kw">super</span>::catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
             <span class="kw">let </span>conn = <span class="self">self</span>.pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
-            <span class="kw">let </span>conn = SqlConnection::new(conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features.clone());
+            <span class="kw">let </span>conn = SqlConnection::new(conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features);
             <span class="prelude-val">Ok</span>(Box::new(conn) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;)
         })
         .<span class="kw">await

@@ -45,7 +45,6 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>mssql;
 <span class="kw">mod </span>mysql;
@@ -57,7 +56,6 @@
 
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{error::ConnectorError, Connector};
-<span class="kw">use </span>psl::{Datasource, PreviewFeature};
 
 <span class="kw">pub use </span>mssql::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>mysql::<span class="kw-2">*</span>;
@@ -77,9 +75,9 @@
     ///
     /// 2. The url may be modified with the config dir, in the case of Node-API.
     </span><span class="kw">async fn </span>from_source(
-        source: <span class="kw-2">&amp;</span>Datasource,
+        source: <span class="kw-2">&amp;</span>psl::Datasource,
         url: <span class="kw-2">&amp;</span>str,
-        features: <span class="kw-2">&amp;</span>[PreviewFeature],
+        features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt;
     <span class="kw">where
         </span><span class="self">Self</span>: Connector + Sized;

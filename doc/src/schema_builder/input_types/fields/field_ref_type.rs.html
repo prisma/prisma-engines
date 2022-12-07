@@ -46,9 +46,7 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
-<span id="49">49</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-
 <span class="kw">use </span><span class="kw">crate</span>::constants::filters;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>WithFieldRefInputExt {
@@ -59,7 +57,7 @@
     <span class="kw">fn </span>with_field_ref_input(<span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; Vec&lt;InputType&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>field_types: Vec&lt;InputType&gt; = <span class="macro">vec!</span>[<span class="self">self</span>.clone()];
 
-        <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::FieldReference) {
+        <span class="kw">if </span>ctx.has_feature(PreviewFeature::FieldReference) {
             field_types.push(InputType::object(field_ref_input_object_type(ctx, <span class="self">self</span>)));
         }
 

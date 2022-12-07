@@ -255,7 +255,7 @@
         .map(|rf| {
             <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="macro">vec!</span>[];
 
-            <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::FilteredRelationCount) {
+            <span class="kw">if </span>ctx.has_feature(PreviewFeature::FilteredRelationCount) {
                 args.push(arguments::where_argument(ctx, <span class="kw-2">&amp;</span>rf.related_model()))
             }
 

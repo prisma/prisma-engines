@@ -258,11 +258,13 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
-<span id="261">261</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
-<span class="kw">use </span>prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
-<span class="kw">use </span>psl::datamodel_connector::{ConnectorCapability, RelationMode};
+<span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
+<span class="kw">use </span>psl::{
+    datamodel_connector::{ConnectorCapability, RelationMode},
+    PreviewFeatures,
+};
 <span class="kw">use </span>std::{borrow::Borrow, fmt};
 
 <span class="doccomment">/// The query schema.
@@ -309,18 +311,14 @@
     </span><span class="kw">pub </span>capabilities: Vec&lt;ConnectorCapability&gt;,
 
     <span class="doccomment">/// Enabled preview features.
-    </span><span class="kw">pub </span>features: Vec&lt;PreviewFeature&gt;,
+    </span><span class="kw">pub </span>features: PreviewFeatures,
 
     <span class="doccomment">/// Relation mode of the provider
     </span><span class="kw">pub </span>relation_mode: RelationMode,
 }
 
 <span class="kw">impl </span>ConnectorContext {
-    <span class="kw">pub fn </span>new(
-        capabilities: Vec&lt;ConnectorCapability&gt;,
-        features: Vec&lt;PreviewFeature&gt;,
-        relation_mode: RelationMode,
-    ) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(capabilities: Vec&lt;ConnectorCapability&gt;, features: PreviewFeatures, relation_mode: RelationMode) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             capabilities,
             features,
@@ -343,7 +341,7 @@
         _enum_types: Vec&lt;EnumTypeRef&gt;,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec&lt;ConnectorCapability&gt;,
-        features: Vec&lt;PreviewFeature&gt;,
+        features: PreviewFeatures,
         relation_mode: RelationMode,
     ) -&gt; <span class="self">Self </span>{
         QuerySchema {

@@ -215,9 +215,6 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.
 //!
 //! The schema builder creates all builders necessary for the process,
@@ -262,10 +259,12 @@
 
 <span class="kw">use </span>cache::TypeRefCache;
 <span class="kw">use </span>prisma_models::{
-    psl::PreviewFeature, CompositeTypeRef, Field <span class="kw">as </span>ModelField, Index, InternalDataModelRef, ModelRef,
-    RelationFieldRef, TypeIdentifier,
+    CompositeTypeRef, Field <span class="kw">as </span>ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
-<span class="kw">use </span>psl::datamodel_connector::{Connector, ConnectorCapability, RelationMode};
+<span class="kw">use </span>psl::{
+    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    PreviewFeature, PreviewFeatures,
+};
 <span class="kw">use </span>schema::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -276,7 +275,7 @@
     enable_raw_queries: bool,
     cache: TypeCache,
     connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
-    preview_features: Vec&lt;PreviewFeature&gt;,
+    preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
     <span class="comment">// enums?
@@ -287,7 +286,7 @@
         internal_data_model: InternalDataModelRef,
         enable_raw_queries: bool,
         connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
-        preview_features: Vec&lt;PreviewFeature&gt;,
+        preview_features: PreviewFeatures,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             internal_data_model,
@@ -300,7 +299,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>has_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, feature: <span class="kw-2">&amp;</span>PreviewFeature) -&gt; bool {
+    <span class="kw">pub fn </span>has_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, feature: PreviewFeature) -&gt; bool {
         <span class="self">self</span>.preview_features.contains(feature)
     }
 
@@ -339,7 +338,7 @@
     }
 
     <span class="kw">pub fn </span>can_full_text_search(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::FullTextSearch)
+        <span class="self">self</span>.has_feature(PreviewFeature::FullTextSearch)
             &amp;&amp; (<span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
                 || <span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
@@ -396,15 +395,10 @@
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
     connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
-    preview_features: Vec&lt;PreviewFeature&gt;,
+    preview_features: PreviewFeatures,
     relation_mode: RelationMode,
 ) -&gt; QuerySchema {
-    <span class="kw">let </span><span class="kw-2">mut </span>ctx = BuilderContext::new(
-        internal_data_model,
-        enable_raw_queries,
-        connector,
-        preview_features.clone(),
-    );
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = BuilderContext::new(internal_data_model, enable_raw_queries, connector, preview_features);
 
     output_types::objects::initialize_caches(<span class="kw-2">&amp;mut </span>ctx);
 

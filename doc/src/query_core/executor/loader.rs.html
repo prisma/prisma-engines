@@ -188,7 +188,7 @@
 <span class="kw">use </span>connection_string::JdbcString;
 <span class="kw">use </span>connector::Connector;
 <span class="kw">use </span>mongodb_client::MongoConnectionString;
-<span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeature};
+<span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeatures};
 <span class="kw">use </span>sql_connector::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::str::FromStr;
@@ -202,7 +202,7 @@
 <span class="doccomment">/// Loads a query executor based on the parsed Prisma schema (datasource).
 </span><span class="kw">pub async fn </span>load(
     source: <span class="kw-2">&amp;</span>Datasource,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: PreviewFeatures,
     url: <span class="kw-2">&amp;</span>str,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="kw">match </span>source.active_provider {
@@ -281,7 +281,7 @@
 <span class="kw">async fn </span>sqlite(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: PreviewFeatures,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading SQLite query connector...&quot;</span>);
 
@@ -296,7 +296,7 @@
 <span class="kw">async fn </span>postgres(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: PreviewFeatures,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading Postgres query connector...&quot;</span>);
 
@@ -320,7 +320,7 @@
 <span class="kw">async fn </span>mysql(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: PreviewFeatures,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading MySQL query connector...&quot;</span>);
 
@@ -335,7 +335,7 @@
 <span class="kw">async fn </span>mssql(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: PreviewFeatures,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading SQL Server query connector...&quot;</span>);
 
@@ -358,7 +358,7 @@
 </span><span class="kw">async fn </span>mongodb(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
-    _features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    _features: PreviewFeatures,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(String, Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;)&gt; {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading MongoDB query connector...&quot;</span>);
 

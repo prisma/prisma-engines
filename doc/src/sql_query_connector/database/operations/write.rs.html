@@ -479,7 +479,6 @@
 <span id="479">479</span>
 <span id="480">480</span>
 <span id="481">481</span>
-<span id="482">482</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 <span class="kw">use </span><span class="kw">crate</span>::sql_trace::SqlTraceComment;
@@ -488,7 +487,6 @@
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::dml::prisma_value::PrismaValue;
-<span class="kw">use </span>psl::PreviewFeature;
 <span class="kw">use </span>quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -942,7 +940,7 @@
 /// affected rows.
 </span><span class="kw">pub async fn </span>execute_raw(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: psl::PreviewFeatures,
     inputs: HashMap&lt;String, PrismaValue&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
     <span class="kw">let </span>value = conn.raw_count(inputs, features).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -955,7 +953,7 @@
 </span><span class="kw">pub async fn </span>query_raw(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
     sql_info: SqlInfo,
-    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    features: psl::PreviewFeatures,
     inputs: HashMap&lt;String, PrismaValue&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
     <span class="kw">let </span>value = conn.raw_json(sql_info, features, inputs).<span class="kw">await</span><span class="question-mark">?</span>;

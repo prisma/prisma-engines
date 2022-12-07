@@ -81,20 +81,20 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>psl::{Datasource, PreviewFeature};
+<span class="kw">use </span>psl::{Datasource, PreviewFeatures};
 <span class="kw">use </span>quaint::{pooled::Quaint, prelude::ConnectionInfo};
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">pub struct </span>Mssql {
     pool: Quaint,
     connection_info: ConnectionInfo,
-    features: Vec&lt;PreviewFeature&gt;,
+    features: PreviewFeatures,
 }
 
 <span class="kw">impl </span>Mssql {
     <span class="doccomment">/// Get MSSQL&#39;s preview features.
-    </span><span class="kw">pub fn </span>features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[PreviewFeature] {
-        <span class="self">self</span>.features.as_ref()
+    </span><span class="kw">pub fn </span>features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PreviewFeatures {
+        <span class="self">self</span>.features
     }
 }
 
@@ -103,7 +103,7 @@
     <span class="kw">async fn </span>from_source(
         _source: <span class="kw-2">&amp;</span>Datasource,
         url: <span class="kw-2">&amp;</span>str,
-        features: <span class="kw-2">&amp;</span>[PreviewFeature],
+        features: PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>database_str = url;
 
@@ -137,7 +137,7 @@
     <span class="kw">async fn </span>get_connection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; connector::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
         <span class="kw">super</span>::catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
             <span class="kw">let </span>conn = <span class="self">self</span>.pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
-            <span class="kw">let </span>conn = SqlConnection::new(conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features.clone());
+            <span class="kw">let </span>conn = SqlConnection::new(conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features);
 
             <span class="prelude-val">Ok</span>(Box::new(conn) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;)
         })

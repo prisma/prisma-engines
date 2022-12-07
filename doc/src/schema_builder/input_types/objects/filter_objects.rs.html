@@ -407,7 +407,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>x = init_input_object_type(ident.clone());
 
-    <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::ExtendedWhereUnique) {
+    <span class="kw">if </span>ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         x.require_at_least_one_field();
         x.apply_constraints_on_fields(constrained_fields);
     } <span class="kw">else </span>{
@@ -463,7 +463,7 @@
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
 
-    <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::ExtendedWhereUnique) {
+    <span class="kw">if </span>ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         fields.extend(boolean_operators);
         fields.extend(rest_fields);
     }

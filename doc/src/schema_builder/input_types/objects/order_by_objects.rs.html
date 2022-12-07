@@ -460,7 +460,7 @@
         </span>ModelField::Scalar(sf) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>types = <span class="macro">vec!</span>[InputType::Enum(sort_order_enum(ctx))];
 
-            <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::OrderByNulls)
+            <span class="kw">if </span>ctx.has_feature(PreviewFeature::OrderByNulls)
                 &amp;&amp; ctx.has_capability(ConnectorCapability::OrderByNullsFirstLast)
                 &amp;&amp; !sf.is_required()
                 &amp;&amp; !sf.is_list()

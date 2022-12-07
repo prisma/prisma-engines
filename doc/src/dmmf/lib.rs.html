@@ -40,11 +40,6 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>ast_builders;
 <span class="kw">mod </span>serialization_ast;
 
@@ -62,21 +57,16 @@
 <span class="comment">// enable raw param?
 </span><span class="kw">pub fn </span>dmmf_from_schema(schema: <span class="kw-2">&amp;</span>str) -&gt; DataModelMetaFormat {
     <span class="kw">let </span>schema = psl::parse_schema(schema).unwrap();
-    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>schema.configuration;
     <span class="kw">let </span>dml = psl::lift(<span class="kw-2">&amp;</span>schema);
-
-    <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).
-    </span><span class="kw">let </span>data_source = config.datasources.first().unwrap();
-    <span class="kw">let </span>preview_features: Vec&lt;<span class="kw">_</span>&gt; = config.preview_features().iter().collect();
     <span class="kw">let </span>internal_data_model = prisma_models::convert(<span class="kw-2">&amp;</span>schema, <span class="string">&quot;dummy&quot;</span>.to_owned());
 
     <span class="comment">// Construct query schema
     </span><span class="kw">let </span>query_schema = Arc::new(schema_builder::build(
         internal_data_model,
         <span class="bool-val">true</span>, <span class="comment">// todo
-        </span>data_source.active_connector,
-        preview_features,
-        data_source.relation_mode(),
+        </span>schema.connector,
+        schema.configuration.preview_features(),
+        schema.relation_mode(),
     ));
 
     from_precomputed_parts(<span class="kw-2">&amp;</span>dml, query_schema)

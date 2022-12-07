@@ -122,7 +122,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 <span class="kw">use </span>query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
@@ -145,16 +144,15 @@
     <span class="kw">async fn </span>load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>schema = psl::parse_schema(datamodel).unwrap();
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
-        <span class="kw">let </span>preview_features: Vec&lt;<span class="kw">_</span>&gt; = schema.configuration.preview_features().iter().collect();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        <span class="kw">let </span>(db_name, executor) = executor::load(data_source, <span class="kw-2">&amp;</span>preview_features, <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>(db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>internal_data_model = prisma_models::convert(<span class="kw-2">&amp;</span>schema, db_name);
 
         <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             <span class="bool-val">true</span>,
             data_source.active_connector,
-            preview_features,
+            schema.configuration.preview_features(),
             data_source.relation_mode(),
         ));
 

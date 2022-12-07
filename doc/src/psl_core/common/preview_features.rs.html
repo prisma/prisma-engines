@@ -159,9 +159,13 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-</pre><pre class="rust"><code><span class="kw">use </span>enumflags2::BitFlags;
-<span class="kw">use </span>serde::{Serialize, Serializer};
+<span id="162">162</span>
+<span id="163">163</span>
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{Serialize, Serializer};
 <span class="kw">use </span>std::fmt;
+
+<span class="doccomment">/// A set of preview features.
+</span><span class="kw">pub type </span>PreviewFeatures = enumflags2::BitFlags&lt;PreviewFeature&gt;;
 
 <span class="macro">macro_rules! </span>features {
     ($( <span class="macro-nonterminal">$variant</span>:ident $(,)<span class="question-mark">? </span>),<span class="kw-2">*</span>) =&gt; {
@@ -284,22 +288,22 @@
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>FeatureMap {
     <span class="doccomment">/// Valid, visible features.
-    </span>active: BitFlags&lt;PreviewFeature&gt;,
+    </span>active: PreviewFeatures,
 
     <span class="doccomment">/// Deprecated features.
-    </span>deprecated: BitFlags&lt;PreviewFeature&gt;,
+    </span>deprecated: PreviewFeatures,
 
     <span class="doccomment">/// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
-    </span>hidden: BitFlags&lt;PreviewFeature&gt;,
+    </span>hidden: PreviewFeatures,
 }
 
 <span class="kw">impl </span>FeatureMap {
-    <span class="kw">pub const fn </span>active_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;PreviewFeature&gt; {
+    <span class="kw">pub const fn </span>active_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PreviewFeatures {
         <span class="self">self</span>.active
     }
 
-    <span class="kw">pub const fn </span>hidden_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;PreviewFeature&gt; {
+    <span class="kw">pub const fn </span>hidden_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PreviewFeatures {
         <span class="self">self</span>.hidden
     }
 
