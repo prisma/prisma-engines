@@ -2,6 +2,8 @@ use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use psl::parser_database::SourceFile;
 
+mod multi_schema;
+
 #[test_connector(tags(Mssql))]
 fn reset_clears_udts(api: TestApi) {
     let schema = api.schema_name();

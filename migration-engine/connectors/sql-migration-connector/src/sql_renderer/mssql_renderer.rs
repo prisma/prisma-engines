@@ -22,8 +22,9 @@ impl MssqlFlavour {
         )
     }
 
-    fn quote_with_schema<'a>(&'a self, name: &'a str) -> QuotedWithPrefix<&'a str> {
-        QuotedWithPrefix(Some(Quoted::mssql_ident(self.schema_name())), Quoted::mssql_ident(name))
+    fn quote_with_schema<'a>(&'a self, namespace: Option<&'a str>, name: &'a str) -> QuotedWithPrefix<&'a str> {
+        let ns = namespace.unwrap_or_else(|| self.schema_name());
+        QuotedWithPrefix(Some(Quoted::mssql_ident(ns)), Quoted::mssql_ident(name))
     }
 
     fn render_column(&self, column: sql::ColumnWalker<'_>) -> String {
@@ -92,7 +93,11 @@ impl SqlRenderer for MssqlFlavour {
     fn render_rename_index(&self, indexes: Pair<sql::IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
-            self.schema_name(),
+            indexes
+                .previous
+                .table()
+                .namespace()
+                .unwrap_or_else(|| self.schema_name()),
             indexes.previous.table().name(),
             indexes.previous.name()
         );
@@ -298,10 +303,15 @@ impl SqlRenderer for MssqlFlavour {
                     AND OBJECT_NAME(PARENT_OBJECT_ID) = '{table}'
                     AND SCHEMA_NAME(SCHEMA_ID) = '{schema}'
                 EXEC sp_executesql @SQL
-            "#, table = tables.previous.name(), schema = self.schema_name()});
+            "#,
+            table = tables.previous.name(),
+            schema = tables.previous.namespace().unwrap_or_else(|| self.schema_name())});
 
             // Create the new table.
-            result.push(self.render_create_table_as(tables.next, self.quote_with_schema(&temporary_table_name)));
+            result.push(self.render_create_table_as(
+                tables.next,
+                self.quote_with_schema(tables.next.namespace(), &temporary_table_name),
+            ));
 
             // We cannot insert into autoincrement columns by default. If we
             // have `IDENTITY` in any of the columns, we'll allow inserting
@@ -309,7 +319,7 @@ impl SqlRenderer for MssqlFlavour {
             if needs_autoincrement {
                 result.push(format!(
                     r#"SET IDENTITY_INSERT {} ON"#,
-                    self.quote_with_schema(&temporary_table_name)
+                    self.quote_with_schema(tables.next.namespace(), &temporary_table_name)
                 ));
             }
 
@@ -318,20 +328,20 @@ impl SqlRenderer for MssqlFlavour {
                 IF EXISTS(SELECT * FROM {table})
                     EXEC('INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)')"#,
                                     columns = columns.join(","),
-                                    table = self.quote_with_schema(tables.previous.name()),
-                                    tmp_table = self.quote_with_schema(&temporary_table_name),
+                                    table = self.table_name(tables.previous),
+                                    tmp_table = self.quote_with_schema(tables.next.namespace(), &temporary_table_name),
             });
 
             // When done copying, disallow identity inserts again if needed.
             if needs_autoincrement {
                 result.push(format!(
                     r#"SET IDENTITY_INSERT {} OFF"#,
-                    self.quote_with_schema(&temporary_table_name)
+                    self.quote_with_schema(tables.next.namespace(), &temporary_table_name)
                 ));
             }
 
             // Drop the old, now empty table.
-            result.extend(self.render_drop_table(None, tables.previous.name()));
+            result.extend(self.render_drop_table(tables.previous.namespace(), tables.previous.name()));
 
             // Rename the temporary table with the name defined in the migration.
             result.push(self.render_rename_table(tables.next.namespace(), &temporary_table_name, tables.next.name()));
@@ -347,8 +357,9 @@ impl SqlRenderer for MssqlFlavour {
         result
     }
 
-    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        let with_schema = format!("{}.{}", self.schema_name(), name);
+    fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String {
+        let ns = namespace.unwrap_or_else(|| self.schema_name());
+        let with_schema = format!("{}.{}", ns, name);
 
         format!(
             "EXEC SP_RENAME N{}, N{}",
@@ -394,16 +405,16 @@ impl SqlRenderer for MssqlFlavour {
         add_constraint
     }
 
-    fn render_drop_table(&self, _namespace: Option<&str>, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
+    fn render_drop_table(&self, namespace: Option<&str>, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote_with_schema(namespace, table_name))]
     }
 
     fn render_drop_view(&self, view: sql::ViewWalker<'_>) -> String {
-        format!("DROP VIEW {}", self.quote_with_schema(view.name()))
+        format!("DROP VIEW {}", self.quote_with_schema(view.namespace(), view.name()))
     }
 
     fn render_drop_user_defined_type(&self, udt: &sql::UserDefinedTypeWalker<'_>) -> String {
-        format!("DROP TYPE {}", self.quote_with_schema(udt.name()))
+        format!("DROP TYPE {}", self.quote_with_schema(udt.namespace(), udt.name()))
     }
 
     fn render_begin_transaction(&self) -> Option<&'static str> {
@@ -445,7 +456,7 @@ impl SqlRenderer for MssqlFlavour {
     fn render_rename_foreign_key(&self, fks: Pair<sql::ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
-            schema = self.schema_name(),
+            schema = fks.previous.table().namespace().unwrap_or_else(|| self.schema_name()),
             previous = fks.previous.constraint_name().unwrap(),
             next = fks.next.constraint_name().unwrap(),
         )

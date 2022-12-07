@@ -122,8 +122,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
-                // TODO(MultiSchema): replace this when implementing MSSQL.
-                let schema_name = self.schema_name();
+                let schema_name = table.namespace.as_deref().unwrap_or_else(|| self.schema_name());
                 format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table.table)
             };
             let result_set = self.query_raw(&query, &[]).await?;
@@ -134,8 +133,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
-                // TODO(MultiSchema): replace this when implementing MSSQL.
-                let schema_name = self.schema_name();
+                let schema_name = column.namespace.as_deref().unwrap_or_else(|| self.schema_name());
                 format!(
                     "SELECT COUNT(*) FROM [{}].[{}] WHERE [{}] IS NOT NULL",
                     schema_name, column.table, column.column
