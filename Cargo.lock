@@ -2544,7 +2544,7 @@ dependencies = [
  "prost",
  "thiserror",
  "tokio",
- "tonic 0.6.2",
+ "tonic",
  "tonic-build",
 ]
 
@@ -3245,7 +3245,6 @@ dependencies = [
  "structopt",
  "thiserror",
  "tokio",
- "tonic 0.4.3",
  "tracing",
  "tracing-futures",
  "tracing-opentelemetry",
@@ -4573,27 +4572,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d82e1a7758622a465f8cee077614c73484dac5b836c02ff6a40d5d1010324d7"
 dependencies = [
  "serde",
-]
-
-[[package]]
-name = "tonic"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ac42cd97ac6bd2339af5bcabf105540e21e45636ec6fa6aae5e85d44db31be0"
-dependencies = [
- "async-stream",
- "base64 0.13.1",
- "bytes",
- "futures-core",
- "futures-util",
- "http",
- "http-body",
- "percent-encoding",
- "pin-project",
- "tokio-stream",
- "tokio-util 0.6.10",
- "tower-service",
- "tracing",
 ]
 
 [[package]]
