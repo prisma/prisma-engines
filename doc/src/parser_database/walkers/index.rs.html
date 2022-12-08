@@ -325,15 +325,13 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
-<span id="328">328</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::CompositeTypeFieldWalker;
+<span class="kw">use crate</span>::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase, ScalarFieldType,
 };
-
-<span class="kw">use </span><span class="kw">super</span>::CompositeTypeFieldWalker;
 
 <span class="doccomment">/// An index, unique or fulltext attribute.
 </span><span class="attribute">#[derive(Copy, Clone)]
@@ -440,7 +438,7 @@
 
             <span class="kw">match </span>path.type_holding_the_indexed_field() {
                 <span class="prelude-val">Some</span>(ctid) =&gt; {
-                    <span class="kw">let </span>walker = <span class="self">self</span>.db.walk_composite_type(ctid).field(field_id);
+                    <span class="kw">let </span>walker = <span class="self">self</span>.db.walk((ctid, field_id));
                     IndexFieldWalker::new(walker)
                 }
                 <span class="prelude-val">None </span>=&gt; {

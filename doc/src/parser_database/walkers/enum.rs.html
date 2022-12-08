@@ -139,7 +139,7 @@
 
     <span class="doccomment">/// The values of the enum.
     </span><span class="kw">pub fn </span>values(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumValueWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
-        (<span class="number">0</span>..<span class="self">self</span>.ast_enum().values.len()).map(<span class="kw">move </span>|idx| <span class="self">self</span>.db.walk((<span class="self">self</span>.id, idx)))
+        (<span class="number">0</span>..<span class="self">self</span>.ast_enum().values.len()).map(<span class="kw">move </span>|idx| <span class="self">self</span>.walk((<span class="self">self</span>.id, idx)))
     }
 
     <span class="doccomment">/// The name of the schema the enum belongs to.
@@ -155,7 +155,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; EnumValueWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>r#enum(<span class="self">self</span>) -&gt; EnumWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
+        <span class="self">self</span>.walk(<span class="self">self</span>.id.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// The enum documentation

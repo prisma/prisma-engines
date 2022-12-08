@@ -773,7 +773,7 @@
                 IndexFieldWalker::new(walker)
             }
             <span class="prelude-val">Some</span>(ctid) =&gt; {
-                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk_composite_type(ctid).field(field_id);
+                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk((ctid, field_id));
                 IndexFieldWalker::new(walker)
             }
         }
