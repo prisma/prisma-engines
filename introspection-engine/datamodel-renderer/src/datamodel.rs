@@ -34,11 +34,6 @@ impl<'a> Datamodel<'a> {
         Self::default()
     }
 
-    /// Get the model at the following index.
-    pub fn model_at(&mut self, idx: usize) -> &mut Model<'a> {
-        &mut self.models[idx]
-    }
-
     /// Add a model block to the data model.
     ///
     /// ```ignore

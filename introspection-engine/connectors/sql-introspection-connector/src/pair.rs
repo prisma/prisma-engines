@@ -4,6 +4,7 @@ mod id;
 mod index;
 mod index_field;
 mod model;
+mod relation_field;
 mod scalar_field;
 
 use crate::calculate_datamodel::InputContext;
@@ -13,6 +14,7 @@ pub(crate) use id::IdPair;
 pub(crate) use index::IndexPair;
 pub(crate) use index_field::{IndexFieldPair, IndexOps};
 pub(crate) use model::ModelPair;
+pub(crate) use relation_field::{RelationFieldDirection, RelationFieldPair};
 pub(crate) use scalar_field::ScalarFieldPair;
 
 /// Holds the introspected item from the database, and a possible

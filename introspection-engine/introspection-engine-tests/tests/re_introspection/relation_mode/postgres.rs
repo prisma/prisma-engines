@@ -8,16 +8,16 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
             "bar_id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Foo_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE TABLE "Bar" (
             "id" INTEGER NOT NULL,
-        
+
             CONSTRAINT "Bar_pkey" PRIMARY KEY ("id")
         );
-        
+
         CREATE UNIQUE INDEX "Foo_bar_id_key" ON "Foo"("bar_id");
     "#};
 
@@ -313,16 +313,16 @@ mod at_at_map {
             CREATE TABLE "foo_table" (
                 "id" INTEGER NOT NULL,
                 "bar_id" INTEGER NOT NULL,
-            
+
                 CONSTRAINT "foo_table_pkey" PRIMARY KEY ("id")
             );
-            
+
             CREATE TABLE "bar_table" (
                 "id" INTEGER NOT NULL,
-            
+
                 CONSTRAINT "bar_table_pkey" PRIMARY KEY ("id")
             );
-            
+
             CREATE UNIQUE INDEX "foo_table_bar_id_key" ON "foo_table"("bar_id");
         "#};
 
