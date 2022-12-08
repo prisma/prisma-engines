@@ -22,15 +22,9 @@ impl RunnerInterface for DirectRunner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
-        let internal_data_model = prisma_models::convert(&schema, db_name);
+        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-            internal_data_model,
-            true,
-            data_source.active_connector,
-            schema.configuration.preview_features(),
-            data_source.relation_mode(),
-        ));
+        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
 
         Ok(Self {
             executor,

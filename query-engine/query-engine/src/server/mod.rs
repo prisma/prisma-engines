@@ -152,7 +152,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(state.cx.datamodel(), Arc::clone(state.cx.query_schema()));
+            let schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)

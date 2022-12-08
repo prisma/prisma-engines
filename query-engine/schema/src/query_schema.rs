@@ -81,9 +81,9 @@ impl QuerySchema {
         _enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
-        features: PreviewFeatures,
-        relation_mode: RelationMode,
     ) -> Self {
+        let features = internal_data_model.schema.configuration.preview_features();
+        let relation_mode = internal_data_model.schema.relation_mode();
         QuerySchema {
             query,
             mutation,

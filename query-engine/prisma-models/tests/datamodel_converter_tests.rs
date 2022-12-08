@@ -538,8 +538,7 @@ fn duplicate_relation_name() {
           
         "#;
 
-    let dml = psl::parse_schema(schema).unwrap();
-    prisma_models::convert(&dml, String::new());
+    convert(schema);
 }
 
 #[test]
@@ -562,7 +561,7 @@ fn implicit_many_to_many_relation() {
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let schema = psl::parse_schema(datamodel).unwrap();
-    prisma_models::convert(&schema, "not_important".to_string())
+    prisma_models::convert(Arc::new(schema), "not_important".to_string())
 }
 
 trait DatamodelAssertions {

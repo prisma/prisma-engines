@@ -7,26 +7,10 @@ use query_core::{schema::QuerySchema, schema_builder};
 use serial_test::serial;
 use std::sync::Arc;
 
-pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
-    let config = psl::parse_configuration(datamodel_string).unwrap();
+pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
     let dm = psl::parse_schema(datamodel_string).unwrap();
-    let datasource = config.datasources.first();
-
-    let connector = datasource
-        .map(|ds| ds.active_connector)
-        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
-    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
-
-    let internal_ref = prisma_models::convert(&dm, "db".to_owned());
-    let schema = schema_builder::build(
-        internal_ref,
-        false,
-        connector,
-        config.preview_features().iter().collect(),
-        relation_mode,
-    );
-
-    (schema, psl::lift(&dm))
+    let internal_ref = prisma_models::convert(Arc::new(dm), "db".to_owned());
+    schema_builder::build(internal_ref, false)
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
@@ -44,8 +28,8 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
             blogId String @id
         }
     "#;
-    let (query_schema, datamodel) = get_query_schema(dm);
-    let dmmf = request_handlers::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+    let query_schema = get_query_schema(dm);
+    let dmmf = request_handlers::dmmf::render_dmmf(Arc::new(query_schema));
     let inputs = &dmmf.schema.input_object_types;
 
     assert!(!inputs.is_empty());
