@@ -3,7 +3,7 @@ use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use pretty_assertions::assert_eq;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 async fn metadata_for_mysql_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.db_name()).await?;
 

@@ -711,11 +711,11 @@ fn type_cast_is_unsupported_tidb(from_type: &str, to_type: &str) -> bool {
 }
 
 fn type_is_text(ty: &str) -> bool {
-    return ty.contains("Char") || ty.contains("Text")
+    return ty.contains("Char") || ty.contains("Text");
 }
 
 fn type_is_binary(ty: &str) -> bool {
-    return ty.contains("Blob") || ty.contains("Binary")
+    return ty.contains("Blob") || ty.contains("Binary");
 }
 
 fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
