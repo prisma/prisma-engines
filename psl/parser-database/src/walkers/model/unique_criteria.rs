@@ -27,7 +27,7 @@ impl<'db> UniqueCriteriaWalker<'db> {
                     IndexFieldWalker::new(walker)
                 }
                 Some(ctid) => {
-                    let walker = self.db.walk_composite_type(ctid).field(field_id);
+                    let walker = self.db.walk((ctid, field_id));
                     IndexFieldWalker::new(walker)
                 }
             }

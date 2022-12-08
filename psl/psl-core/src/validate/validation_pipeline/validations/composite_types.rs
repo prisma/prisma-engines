@@ -63,12 +63,7 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
             ScalarFieldType::CompositeType(ctid) => {
                 visited.push(*ctid);
 
-                for field in ctx
-                    .db
-                    .walk_composite_type(*ctid)
-                    .fields()
-                    .filter(|f| f.arity().is_required())
-                {
+                for field in ctx.db.walk(*ctid).fields().filter(|f| f.arity().is_required()) {
                     let path = Rc::new(path.link(field.composite_type()));
                     fields_to_traverse.push((field, Some(path)));
                 }
