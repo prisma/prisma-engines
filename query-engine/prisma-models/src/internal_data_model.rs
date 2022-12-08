@@ -19,6 +19,7 @@ pub struct InternalDataModel {
     /// influence the `database` part instead.
     pub db_name: String,
     pub enums: Vec<InternalEnumRef>,
+    pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {

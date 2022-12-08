@@ -45,7 +45,7 @@ use prisma_models::{
     CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 use psl::{
-    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    datamodel_connector::{Connector, ConnectorCapability},
     PreviewFeature, PreviewFeatures,
 };
 use schema::*;
@@ -65,12 +65,9 @@ pub(crate) struct BuilderContext {
 }
 
 impl BuilderContext {
-    pub fn new(
-        internal_data_model: InternalDataModelRef,
-        enable_raw_queries: bool,
-        connector: &'static dyn Connector,
-        preview_features: PreviewFeatures,
-    ) -> Self {
+    pub fn new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
+        let connector = internal_data_model.schema.connector;
+        let preview_features = internal_data_model.schema.configuration.preview_features();
         Self {
             internal_data_model,
             enable_raw_queries,
@@ -174,14 +171,8 @@ impl TypeCache {
     }
 }
 
-pub fn build(
-    internal_data_model: InternalDataModelRef,
-    enable_raw_queries: bool,
-    connector: &'static dyn Connector,
-    preview_features: PreviewFeatures,
-    relation_mode: RelationMode,
-) -> QuerySchema {
-    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries, connector, preview_features);
+pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> QuerySchema {
+    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries);
 
     output_types::objects::initialize_caches(&mut ctx);
 
@@ -209,8 +200,6 @@ pub fn build(
         enum_types,
         ctx.internal_data_model,
         ctx.connector.capabilities().to_owned(),
-        preview_features,
-        relation_mode,
     )
 }
 

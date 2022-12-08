@@ -32,26 +32,9 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let datasource = schema.configuration.datasources.first();
-    let datamodel = psl::lift(&schema);
-
-    let connector = datasource
-        .map(|ds| ds.active_connector)
-        .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
-
-    let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
-
-    let internal_data_model = prisma_models::convert(&schema, "".into());
-
-    let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-        internal_data_model,
-        true,
-        connector,
-        schema.configuration.preview_features().iter().collect(),
-        relation_mode,
-    ));
-
-    let dmmf = dmmf::render_dmmf(&datamodel, query_schema);
+    let internal_data_model = prisma_models::convert(Arc::new(schema), "".into());
+    let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
+    let dmmf = dmmf::render_dmmf(query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
 }

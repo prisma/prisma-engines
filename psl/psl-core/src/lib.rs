@@ -37,6 +37,12 @@ pub struct ValidatedSchema {
     relation_mode: datamodel_connector::RelationMode,
 }
 
+impl std::fmt::Debug for ValidatedSchema {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<Prisma schema>")
+    }
+}
+
 impl ValidatedSchema {
     pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
         self.relation_mode
