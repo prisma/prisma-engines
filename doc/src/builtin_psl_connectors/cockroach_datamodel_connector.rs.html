@@ -317,6 +317,7 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -370,6 +371,7 @@
     ConnectorCapability::OrderByNullsFirstLast,
     ConnectorCapability::SupportsTxIsolationSerializable,
     ConnectorCapability::NativeUpsert,
+    ConnectorCapability::MultiSchema,
 ];
 
 <span class="kw">const </span>SCALAR_TYPE_DEFAULTS: <span class="kw-2">&amp;</span>[(ScalarType, CockroachType)] = <span class="kw-2">&amp;</span>[
