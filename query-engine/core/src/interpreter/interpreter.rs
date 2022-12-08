@@ -1,5 +1,3 @@
-use std::fmt;
-
 use super::{
     expression::*,
     query_interpreters::{read, write},
@@ -9,8 +7,8 @@ use crate::{Query, QueryResult};
 use connector::ConnectionLike;
 use crossbeam_queue::SegQueue;
 use futures::future::BoxFuture;
-use im::HashMap;
 use prisma_models::prelude::*;
+use std::{collections::HashMap, fmt};
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]

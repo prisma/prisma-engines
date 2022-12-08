@@ -20,7 +20,6 @@ crossbeam-queue = "0.3.5"
 mongodb-client = { path = "../../libs/mongodb-client/" }
 psl.workspace = true
 futures = "0.3"
-im = "15.1.0"
 indexmap = { version = "1.7", features = ["serde-1"] }
 itertools = "0.10"
 mongodb-connector = { path = "../connectors/mongodb-query-connector", package = "mongodb-query-connector", optional = true }
