@@ -593,7 +593,6 @@
 <span id="593">593</span>
 <span id="594">594</span>
 <span id="595">595</span>
-<span id="596">596</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.
 
 </span><span class="attribute">#![deny(missing_docs)]
@@ -921,12 +920,11 @@
 
     <span class="doccomment">/// Traverse foreign keys from other tables, referencing current table.
     </span><span class="kw">pub fn </span>referencing_foreign_keys(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="kw">let </span>table_id = <span class="self">self</span>.id;
         <span class="self">self</span>.schema
             .table_walkers()
-            .filter(<span class="kw">move </span>|t| t.id != table_id)
+            .filter(<span class="kw">move </span>|t| t.id != <span class="self">self</span>.id)
             .flat_map(|t| t.foreign_keys())
-            .filter(<span class="kw">move </span>|fk| fk.referenced_table().id == table_id)
+            .filter(<span class="kw">move </span>|fk| fk.referenced_table().id == <span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// The table name.

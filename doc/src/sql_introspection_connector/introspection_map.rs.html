@@ -144,32 +144,148 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::introspection_helpers <span class="kw">as </span>helpers;
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+</pre><pre class="rust"><code><span class="kw">mod </span>relation_names;
+
+<span class="kw">use crate</span>::{calculate_datamodel::InputContext, introspection_helpers <span class="kw">as </span>helpers, pair::RelationFieldDirection};
 <span class="kw">use </span>psl::parser_database::{<span class="self">self</span>, ast};
+<span class="kw">use </span>relation_names::RelationNames;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
-<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>relation_names::RelationName;
 
 <span class="doccomment">/// This container is responsible for matching schema items (enums, models and tables, columns and
 /// fields, foreign keys and relations...) between a SQL catalog from a database and a Prisma
 /// schema.
 </span><span class="attribute">#[derive(Default)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IntrospectionMap {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IntrospectionMap&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_enums: HashMap&lt;sql::EnumId, ast::EnumId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_models: HashMap&lt;sql::TableId, ast::ModelId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) missing_tables_for_previous_models: HashSet&lt;ast::ModelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_scalar_fields: HashMap&lt;sql::ColumnId, (ast::ModelId, ast::FieldId)&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_inline_relations: HashMap&lt;sql::ForeignKeyId, parser_database::RelationId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_m2m_relations: HashMap&lt;sql::TableId, parser_database::ManyToManyRelationId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_names: RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inline_relation_positions: Vec&lt;(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) m2m_relation_positions: Vec&lt;(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)&gt;,
 }
 
-<span class="kw">impl </span>IntrospectionMap {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntrospectionMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>sql_schema = input.schema;
+        <span class="kw">let </span>prisma_schema = input.previous_schema;
         <span class="kw">let </span><span class="kw-2">mut </span>map = Default::default();
+
         match_existing_models(sql_schema, prisma_schema, <span class="kw-2">&amp;mut </span>map);
         match_enums(sql_schema, prisma_schema, <span class="kw-2">&amp;mut </span>map);
         match_existing_scalar_fields(sql_schema, prisma_schema, <span class="kw-2">&amp;mut </span>map);
         match_existing_inline_relations(sql_schema, prisma_schema, <span class="kw-2">&amp;mut </span>map);
         match_existing_m2m_relations(sql_schema, prisma_schema, <span class="kw-2">&amp;mut </span>map);
+        relation_names::introspect(input, <span class="kw-2">&amp;mut </span>map);
+        position_inline_relation_fields(sql_schema, <span class="kw-2">&amp;mut </span>map);
+        position_m2m_relation_fields(sql_schema, <span class="kw-2">&amp;mut </span>map);
+
         map
+    }
+}
+
+<span class="kw">fn </span>position_inline_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+    <span class="kw">for </span>table <span class="kw">in </span>sql_schema
+        .table_walkers()
+        .filter(|t| !helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
+    {
+        <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys() {
+            map.inline_relation_positions
+                .push((fk.table().id, fk.id, RelationFieldDirection::Forward));
+
+            map.inline_relation_positions
+                .push((fk.referenced_table().id, fk.id, RelationFieldDirection::Back));
+        }
+    }
+}
+
+<span class="kw">fn </span>position_m2m_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+    <span class="kw">for </span>table <span class="kw">in </span>sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(<span class="kw-2">*</span>t)) {
+        <span class="kw">let </span><span class="kw-2">mut </span>fks = table.foreign_keys();
+
+        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first_fk), <span class="prelude-val">Some</span>(second_fk)) = (fks.next(), fks.next()) {
+            <span class="kw">let </span>(fk_a, fk_b) = <span class="kw">if </span>first_fk
+                .constrained_columns()
+                .next()
+                .map(|c| c.name().eq_ignore_ascii_case(<span class="string">&quot;a&quot;</span>))
+                .unwrap_or(<span class="bool-val">false</span>)
+            {
+                (first_fk, second_fk)
+            } <span class="kw">else </span>{
+                (second_fk, first_fk)
+            };
+
+            map.m2m_relation_positions
+                .push((fk_a.referenced_table().id, fk_b.id, RelationFieldDirection::Forward));
+
+            map.m2m_relation_positions
+                .push((fk_b.referenced_table().id, fk_a.id, RelationFieldDirection::Back));
+        }
     }
 }
 
@@ -210,15 +326,17 @@
 }
 
 <span class="kw">fn </span>match_existing_models(schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
-    map.existing_models = prisma_schema
-        .db
-        .walk_models()
-        .filter_map(|model| {
-            schema
-                .find_table(model.database_name())
-                .map(|sql_id| (sql_id, model.id))
-        })
-        .collect()
+    <span class="kw">for </span>model <span class="kw">in </span>prisma_schema.db.walk_models() {
+        <span class="kw">match </span>schema.find_table(model.database_name()) {
+            <span class="prelude-val">Some</span>(sql_id) =&gt; {
+                map.existing_models.insert(sql_id, model.id);
+            }
+
+            <span class="prelude-val">None </span>=&gt; {
+                map.missing_tables_for_previous_models.insert(model.id);
+            }
+        }
+    }
 }
 
 <span class="kw">fn </span>match_existing_scalar_fields(
@@ -226,19 +344,21 @@
     prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema,
     map: <span class="kw-2">&amp;mut </span>IntrospectionMap,
 ) {
-    map.existing_scalar_fields = sql_schema
-        .walk_columns()
-        .filter_map(|col| {
-            <span class="kw">let </span>model_id = map.existing_models.get(<span class="kw-2">&amp;</span>col.table().id)<span class="question-mark">?</span>;
-            <span class="kw">let </span>field_id = prisma_schema
-                .db
-                .walk(<span class="kw-2">*</span>model_id)
+    <span class="kw">for </span>col <span class="kw">in </span>sql_schema.walk_columns() {
+        <span class="kw">let </span>ids = map.existing_models.get(<span class="kw-2">&amp;</span>col.table().id).and_then(|model_id| {
+            <span class="kw">let </span>model = prisma_schema.db.walk(<span class="kw-2">*</span>model_id);
+
+            <span class="kw">let </span>field = model
                 .scalar_fields()
-                .find(|field| field.database_name() == col.name())
-                .map(|field| field.field_id())<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>((col.id, (<span class="kw-2">*</span>model_id, field_id)))
-        })
-        .collect()
+                .find(|field| field.database_name() == col.name())<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Some</span>((model, field))
+        });
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((model, field)) = ids {
+            map.existing_scalar_fields.insert(col.id, (model.id, field.field_id()));
+        }
+    }
 }
 
 <span class="kw">fn </span>match_existing_inline_relations&lt;<span class="lifetime">&#39;a</span>&gt;(

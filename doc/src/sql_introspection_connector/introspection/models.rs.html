@@ -125,123 +125,153 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::scalar_field;
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+</pre><pre class="rust"><code><span class="kw">use super</span>::{relation_field, scalar_field};
 <span class="kw">use crate</span>::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers <span class="kw">as </span>helpers, warnings,
+    introspection_helpers <span class="kw">as </span>helpers,
+    pair::{IdPair, ModelPair},
+    warnings,
 };
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
-<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
 <span class="kw">use </span><span class="kw">super</span>::indexes;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>&gt;(input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;) {
-    <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, sql::TableId, renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; =
-        Vec::with_capacity(input.schema.tables_count());
+    <span class="kw">let </span><span class="kw-2">mut </span>models_with_idx: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;, renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; = Vec::with_capacity(input.schema.tables_count());
 
     <span class="kw">for </span>model <span class="kw">in </span>input.model_pairs() {
-        <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::Model::new(model.name());
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = model.documentation() {
-            rendered.documentation(docs);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = model.mapped_name() {
-            rendered.map(mapped_name);
-
-            <span class="kw">if </span>model.uses_reserved_name() {
-                <span class="kw">let </span>docs = <span class="macro">format!</span>(
-                    <span class="string">&quot;This model has been renamed to &#39;{}&#39; during introspection, because the original name &#39;{}&#39; is reserved.&quot;</span>,
-                    model.name(),
-                    mapped_name,
-                );
-
-                rendered.documentation(docs);
-            }
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(namespace) = model.namespace() {
-            rendered.schema(namespace);
-        }
-
-        <span class="kw">if </span>model.ignored() {
-            rendered.ignore();
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = model.id() {
-            <span class="kw">let </span>fields = id.fields().map(|field| {
-                <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::IndexFieldInput::new(field.name());
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
-                    rendered.sort_order(sort_order);
-                }
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
-                    rendered.length(length);
-                }
-
-                rendered
-            });
-
-            <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IdDefinition::new(fields);
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = id.name() {
-                definition.name(name);
-
-                output.warnings.reintrospected_id_names.push(warnings::Model {
-                    model: model.name().to_string(),
-                });
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = id.mapped_name() {
-                definition.map(map);
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = id.clustered() {
-                definition.clustered(clustered);
-            }
-
-            rendered.id(definition);
-        }
-
-        <span class="kw">if </span>model.scalar_fields().len() == <span class="number">0 </span>{
-            rendered.documentation(empty_table_comment(input));
-            rendered.comment_out();
-
-            output.warnings.models_without_columns.push(warnings::Model {
-                model: model.name().to_string(),
-            });
-        } <span class="kw">else if </span>!model.has_usable_identifier() {
-            <span class="kw">let </span>docs = <span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>;
-
-            rendered.documentation(docs);
-
-            output.warnings.models_without_identifiers.push(warnings::Model {
-                model: model.name().to_string(),
-            });
-        }
-
-        <span class="kw">if </span>model.remapped_name() {
-            output.warnings.remapped_models.push(warnings::Model {
-                model: model.name().to_string(),
-            });
-        }
-
-        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
-            rendered.push_field(scalar_field::render(field, output));
-        }
-
-        indexes::render(model, <span class="kw-2">&amp;mut </span>rendered);
-
-        models_with_idx.push((model.previous_position(), model.table_id(), rendered));
+        models_with_idx.push((model.previous_position(), render_model(model, input, output)));
     }
 
-    models_with_idx.sort_by(|(a, <span class="kw">_</span>, <span class="kw">_</span>), (b, <span class="kw">_</span>, <span class="kw">_</span>)| helpers::compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
+    models_with_idx.sort_by(|(a, <span class="kw">_</span>), (b, <span class="kw">_</span>)| helpers::compare_options_none_last(<span class="kw-2">*</span>a, <span class="kw-2">*</span>b));
 
-    <span class="kw">for </span>(idx, (<span class="kw">_</span>, table_id, render)) <span class="kw">in </span>models_with_idx.into_iter().enumerate() {
+    <span class="kw">for </span>(<span class="kw">_</span>, render) <span class="kw">in </span>models_with_idx.into_iter() {
         output.rendered_schema.push_model(render);
-        output.target_models.insert(table_id, idx);
     }
+}
+
+<span class="kw">fn </span>render_model&lt;<span class="lifetime">&#39;a</span>&gt;(
+    model: ModelPair&lt;<span class="lifetime">&#39;a</span>&gt;,
+    input: InputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+    output: <span class="kw-2">&amp;mut </span>OutputContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; renderer::Model&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::Model::new(model.name());
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = model.documentation() {
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = model.mapped_name() {
+        rendered.map(mapped_name);
+
+        <span class="kw">if </span>model.uses_reserved_name() {
+            <span class="kw">let </span>docs = <span class="macro">format!</span>(
+                <span class="string">&quot;This model has been renamed to &#39;{}&#39; during introspection, because the original name &#39;{}&#39; is reserved.&quot;</span>,
+                model.name(),
+                mapped_name,
+            );
+
+            rendered.documentation(docs);
+        }
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(namespace) = model.namespace() {
+        rendered.schema(namespace);
+    }
+
+    <span class="kw">if </span>model.ignored() {
+        rendered.ignore();
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = model.id() {
+        rendered.id(render_id(model, id, output));
+    }
+
+    <span class="kw">if </span>model.scalar_fields().len() == <span class="number">0 </span>{
+        rendered.documentation(empty_table_comment(input));
+        rendered.comment_out();
+
+        output.warnings.models_without_columns.push(warnings::Model {
+            model: model.name().to_string(),
+        });
+    } <span class="kw">else if </span>!model.has_usable_identifier() {
+        <span class="kw">let </span>docs = <span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>;
+
+        rendered.documentation(docs);
+
+        output.warnings.models_without_identifiers.push(warnings::Model {
+            model: model.name().to_string(),
+        });
+    }
+
+    <span class="kw">if </span>model.remapped_name() {
+        output.warnings.remapped_models.push(warnings::Model {
+            model: model.name().to_string(),
+        });
+    }
+
+    <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+        rendered.push_field(scalar_field::render(field, output));
+    }
+
+    <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
+        rendered.push_field(relation_field::render(field, output));
+    }
+
+    indexes::render(model, <span class="kw-2">&amp;mut </span>rendered);
+
+    rendered
+}
+
+<span class="kw">fn </span>render_id&lt;<span class="lifetime">&#39;a</span>&gt;(model: ModelPair&lt;<span class="lifetime">&#39;a</span>&gt;, id: IdPair&lt;<span class="lifetime">&#39;a</span>&gt;, output: <span class="kw-2">&amp;mut </span>OutputContext) -&gt; renderer::IdDefinition&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">let </span>fields = id.fields().map(|field| {
+        <span class="kw">let </span><span class="kw-2">mut </span>rendered = renderer::IndexFieldInput::new(field.name());
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
+            rendered.sort_order(sort_order);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
+            rendered.length(length);
+        }
+
+        rendered
+    });
+
+    <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IdDefinition::new(fields);
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = id.name() {
+        definition.name(name);
+
+        output.warnings.reintrospected_id_names.push(warnings::Model {
+            model: model.name().to_string(),
+        });
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = id.mapped_name() {
+        definition.map(map);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = id.clustered() {
+        definition.clustered(clustered);
+    }
+
+    definition
 }
 
 <span class="kw">fn </span>empty_table_comment(input: InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {

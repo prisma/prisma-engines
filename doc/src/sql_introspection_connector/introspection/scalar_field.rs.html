@@ -119,7 +119,23 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::OutputContext, defaults, pair::ScalarFieldPair};
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::OutputContext,
+    defaults,
+    pair::{IdPair, IndexPair, ScalarFieldPair},
+};
 <span class="kw">use </span>datamodel_renderer::datamodel <span class="kw">as </span>renderer;
 <span class="kw">use </span>sql_schema_describer::ColumnArity;
 
@@ -161,49 +177,11 @@
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = field.id() {
-        <span class="kw">let </span>field = pk.field().unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IdFieldDefinition::default();
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = pk.clustered() {
-            definition.clustered(clustered);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
-            definition.sort_order(sort_order);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
-            definition.length(length);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = pk.mapped_name() {
-            definition.map(map);
-        }
-
-        rendered.id(definition);
+        rendered.id(render_id(pk));
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(unique) = field.unique() {
-        <span class="kw">let </span><span class="kw-2">mut </span>opts = renderer::IndexFieldOptions::default();
-        <span class="kw">let </span>field = unique.field().unwrap();
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = unique.mapped_name() {
-            opts.map(map);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = unique.clustered() {
-            opts.clustered(clustered);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
-            opts.sort_order(sort_order);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
-            opts.length(length);
-        }
-
-        rendered.unique(opts);
+        rendered.unique(render_unique(unique));
     }
 
     <span class="kw">if </span>field.remapped_name_from_psl() {
@@ -239,6 +217,52 @@
     }
 
     rendered
+}
+
+<span class="kw">fn </span>render_id(pk: IdPair&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; renderer::IdFieldDefinition&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">let </span>field = pk.field().unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>definition = renderer::IdFieldDefinition::default();
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = pk.clustered() {
+        definition.clustered(clustered);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
+        definition.sort_order(sort_order);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
+        definition.length(length);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = pk.mapped_name() {
+        definition.map(map);
+    }
+
+    definition
+}
+
+<span class="kw">fn </span>render_unique(unique: IndexPair&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; renderer::IndexFieldOptions&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>opts = renderer::IndexFieldOptions::default();
+    <span class="kw">let </span>field = unique.field().unwrap();
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = unique.mapped_name() {
+        opts.map(map);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(clustered) = unique.clustered() {
+        opts.clustered(clustered);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = field.sort_order() {
+        opts.sort_order(sort_order);
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = field.length() {
+        opts.length(length);
+    }
+
+    opts
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
