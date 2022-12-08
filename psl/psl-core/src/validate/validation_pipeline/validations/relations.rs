@@ -146,9 +146,9 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
     let model = relation.referenced_model().name();
 
     let message = if fields.len() == 1 {
-        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
+        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
     } else {
-        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
+        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
     };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -200,7 +200,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
 
     ctx.push_error(DatamodelError::new_validation_error(
         &format!(
-            "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
+            "The argument `references` must refer to a unique criterion in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
