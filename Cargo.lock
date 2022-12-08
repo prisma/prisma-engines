@@ -3237,7 +3237,6 @@ dependencies = [
  "query-engine-metrics",
  "rand 0.8.5",
  "request-handlers",
- "rustc_version",
  "serde",
  "serde_json",
  "serial_test",
