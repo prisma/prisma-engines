@@ -20,7 +20,6 @@ var sourcesIndex = JSON.parse('{\
 "bigdecimal":["",[],["lib.rs","macros.rs"]],\
 "bit_vec":["",[],["lib.rs"]],\
 "bitflags":["",[],["lib.rs"]],\
-"bitmaps":["",[],["bitmap.rs","lib.rs","types.rs"]],\
 "bitvec":["",[["array",[],["api.rs","iter.rs","ops.rs","traits.rs"]],["boxed",[],["api.rs","iter.rs","ops.rs","traits.rs"]],["field",[],["io.rs"]],["macros",[],["internal.rs"]],["ptr",[],["addr.rs","proxy.rs","range.rs","single.rs","span.rs"]],["slice",[["specialization",[],["lsb0.rs","msb0.rs"]]],["api.rs","iter.rs","ops.rs","specialization.rs","traits.rs"]],["vec",[],["api.rs","iter.rs","ops.rs","traits.rs"]]],["access.rs","array.rs","boxed.rs","devel.rs","domain.rs","field.rs","index.rs","lib.rs","macros.rs","mem.rs","order.rs","ptr.rs","slice.rs","store.rs","vec.rs","view.rs"]],\
 "block_buffer":["",[],["lib.rs","sealed.rs"]],\
 "bson":["",[["datetime",[],["builder.rs"]],["de",[],["error.rs","mod.rs","raw.rs","serde.rs"]],["extjson",[],["de.rs","mod.rs","models.rs"]],["raw",[],["array.rs","array_buf.rs","bson.rs","bson_ref.rs","document.rs","document_buf.rs","error.rs","iter.rs","mod.rs","serde.rs"]],["ser",[["raw",[],["document_serializer.rs","mod.rs","value_serializer.rs"]]],["error.rs","mod.rs","serde.rs"]],["uuid",[],["mod.rs"]]],["bson.rs","datetime.rs","decimal128.rs","document.rs","lib.rs","macros.rs","oid.rs","serde_helpers.rs","spec.rs"]],\
@@ -112,7 +111,6 @@ var sourcesIndex = JSON.parse('{\
 "hyper":["",[["body",[],["aggregate.rs","body.rs","length.rs","mod.rs","to_bytes.rs"]],["client",[["connect",[],["dns.rs","http.rs","mod.rs"]]],["client.rs","conn.rs","dispatch.rs","mod.rs","pool.rs","service.rs"]],["common",[["io",[],["mod.rs","rewind.rs"]]],["buf.rs","date.rs","drain.rs","exec.rs","lazy.rs","mod.rs","never.rs","sync_wrapper.rs","task.rs","watch.rs"]],["ext",[],["h1_reason_phrase.rs"]],["proto",[["h1",[],["conn.rs","decode.rs","dispatch.rs","encode.rs","io.rs","mod.rs","role.rs"]],["h2",[],["client.rs","mod.rs","ping.rs","server.rs"]]],["mod.rs"]],["server",[],["accept.rs","conn.rs","mod.rs","server.rs","shutdown.rs","tcp.rs"]],["service",[],["http.rs","make.rs","mod.rs","oneshot.rs","util.rs"]]],["cfg.rs","error.rs","ext.rs","headers.rs","lib.rs","rt.rs","upgrade.rs"]],\
 "hyper_timeout":["",[],["lib.rs","stream.rs"]],\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
-"im":["",[["hash",[],["map.rs","mod.rs","set.rs"]],["nodes",[],["btree.rs","hamt.rs","mod.rs","rrb.rs"]],["ord",[],["map.rs","mod.rs","set.rs"]],["vector",[],["focus.rs","mod.rs","pool.rs"]]],["config.rs","fakepool.rs","iter.rs","lib.rs","sort.rs","sync.rs","util.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","serde.rs","serde_seq.rs","set.rs","util.rs"]],\
 "indoc":["",[],["error.rs","expr.rs","lib.rs","unindent.rs"]],\
 "introspection_connector":["",[],["error.rs","lib.rs"]],\
@@ -239,7 +237,6 @@ var sourcesIndex = JSON.parse('{\
 "rand":["",[["distributions",[],["bernoulli.rs","distribution.rs","float.rs","integer.rs","mod.rs","other.rs","slice.rs","uniform.rs","utils.rs","weighted.rs","weighted_index.rs"]],["rngs",[["adapter",[],["mod.rs","read.rs","reseeding.rs"]]],["mock.rs","mod.rs","small.rs","std.rs","thread.rs","xoshiro256plusplus.rs"]],["seq",[],["index.rs","mod.rs"]]],["lib.rs","prelude.rs","rng.rs"]],\
 "rand_chacha":["",[],["chacha.rs","guts.rs","lib.rs"]],\
 "rand_core":["",[],["block.rs","error.rs","impls.rs","le.rs","lib.rs","os.rs"]],\
-"rand_xoshiro":["",[],["common.rs","lib.rs","splitmix64.rs","xoroshiro128plus.rs","xoroshiro128plusplus.rs","xoroshiro128starstar.rs","xoroshiro64star.rs","xoroshiro64starstar.rs","xoshiro128plus.rs","xoshiro128plusplus.rs","xoshiro128starstar.rs","xoshiro256plus.rs","xoshiro256plusplus.rs","xoshiro256starstar.rs","xoshiro512plus.rs","xoshiro512plusplus.rs","xoshiro512starstar.rs"]],\
 "raw_cpuid":["",[],["extended.rs","lib.rs"]],\
 "regex":["",[["literal",[],["imp.rs","mod.rs"]]],["backtrack.rs","compile.rs","dfa.rs","error.rs","exec.rs","expand.rs","find_byte.rs","input.rs","lib.rs","pikevm.rs","pool.rs","prog.rs","re_builder.rs","re_bytes.rs","re_set.rs","re_trait.rs","re_unicode.rs","sparse.rs","utf8.rs"]],\
 "regex_automata":["",[["nfa",[],["compiler.rs","map.rs","mod.rs","range_trie.rs"]]],["byteorder.rs","classes.rs","dense.rs","determinize.rs","dfa.rs","error.rs","lib.rs","minimize.rs","regex.rs","sparse.rs","sparse_set.rs","state_id.rs"]],\
@@ -277,7 +274,6 @@ var sourcesIndex = JSON.parse('{\
 "sharded_slab":["",[["page",[],["mod.rs","slot.rs","stack.rs"]]],["cfg.rs","clear.rs","implementation.rs","iter.rs","lib.rs","macros.rs","pool.rs","shard.rs","sync.rs","tid.rs"]],\
 "signal_hook_registry":["",[],["half_lock.rs","lib.rs"]],\
 "siphasher":["",[],["lib.rs","sip.rs","sip128.rs"]],\
-"sized_chunks":["",[["inline_array",[],["iter.rs","mod.rs"]],["sized_chunk",[],["iter.rs","mod.rs"]],["sparse_chunk",[],["iter.rs","mod.rs"]]],["lib.rs","types.rs"]],\
 "sketches_ddsketch":["",[],["config.rs","ddsketch.rs","lib.rs","store.rs"]],\
 "slab":["",[],["lib.rs"]],\
 "smallvec":["",[],["lib.rs"]],\
