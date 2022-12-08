@@ -141,6 +141,7 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::{Arc, Weak};
@@ -162,6 +163,7 @@
     /// influence the `database` part instead.
     </span><span class="kw">pub </span>db_name: String,
     <span class="kw">pub </span>enums: Vec&lt;InternalEnumRef&gt;,
+    <span class="kw">pub </span>schema: Arc&lt;psl::ValidatedSchema&gt;,
 }
 
 <span class="kw">impl </span>InternalDataModel {

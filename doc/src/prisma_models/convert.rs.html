@@ -48,12 +48,13 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub fn </span>convert(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, db_name: String) -&gt; InternalDataModelRef {
-    <span class="kw">let </span>datamodel = psl::lift(schema);
+<span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;, db_name: String) -&gt; InternalDataModelRef {
+    <span class="kw">let </span>datamodel = psl::lift(<span class="kw-2">&amp;</span>schema);
     <span class="kw">let </span>relation_mode = schema.relation_mode();
 
     <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel);
@@ -72,6 +73,7 @@
         relation_fields: OnceCell::new(),
         db_name,
         enums: enums.into_iter().map(Arc::new).collect(),
+        schema,
     });
 
     <span class="kw">let </span>composite_types = builders::build_composites(composite_types, Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model));

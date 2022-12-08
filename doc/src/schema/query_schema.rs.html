@@ -341,9 +341,9 @@
         _enum_types: Vec&lt;EnumTypeRef&gt;,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec&lt;ConnectorCapability&gt;,
-        features: PreviewFeatures,
-        relation_mode: RelationMode,
     ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>features = internal_data_model.schema.configuration.preview_features();
+        <span class="kw">let </span>relation_mode = internal_data_model.schema.relation_mode();
         QuerySchema {
             query,
             mutation,

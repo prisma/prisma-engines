@@ -98,22 +98,7 @@
 <span id="98">98</span>
 <span id="99">99</span>
 <span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{PrismaError, PrismaResult};
-<span class="kw">use </span>psl::dml::Datamodel;
 <span class="kw">use </span>query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>std::{env, fmt, sync::Arc};
@@ -123,8 +108,6 @@
 </span><span class="kw">pub struct </span>PrismaContext {
     <span class="doccomment">/// The api query schema.
     </span>query_schema: QuerySchemaRef,
-    <span class="doccomment">/// DML-based v2 datamodel.
-    </span>dm: Datamodel,
     <span class="kw">pub </span>metrics: MetricRegistry,
     <span class="doccomment">/// Central query executor.
     </span><span class="kw">pub </span>executor: Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
@@ -178,20 +161,13 @@
         </span><span class="kw">let </span>(db_name, executor) = executor::load(data_source, config.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Build internal data model
-        </span><span class="kw">let </span>internal_data_model = prisma_models::convert(<span class="kw-2">&amp;</span>schema, db_name);
+        </span><span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
         <span class="comment">// Construct query schema
-        </span><span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-            internal_data_model,
-            enable_raw_queries,
-            data_source.active_connector,
-            config.preview_features(),
-            data_source.relation_mode(),
-        ));
+        </span><span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, enable_raw_queries));
 
         <span class="kw">let </span>context = <span class="self">Self </span>{
             query_schema,
-            dm: psl::lift(<span class="kw-2">&amp;</span>schema),
             executor,
             metrics,
         };
@@ -216,10 +192,6 @@
 
     <span class="kw">pub fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
         <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema
-    }
-
-    <span class="kw">pub fn </span>datamodel(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Datamodel {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.dm
     }
 
     <span class="kw">pub fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {

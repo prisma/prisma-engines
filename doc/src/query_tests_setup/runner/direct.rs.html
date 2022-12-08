@@ -116,12 +116,6 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 <span class="kw">use </span>query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
@@ -146,15 +140,9 @@
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         <span class="kw">let </span>(db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>internal_data_model = prisma_models::convert(<span class="kw-2">&amp;</span>schema, db_name);
+        <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
-        <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-            internal_data_model,
-            <span class="bool-val">true</span>,
-            data_source.active_connector,
-            schema.configuration.preview_features(),
-            data_source.relation_mode(),
-        ));
+        <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>));
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             executor,

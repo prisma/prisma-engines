@@ -619,7 +619,7 @@
         }
 
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/dmmf&quot;</span>) =&gt; {
-            <span class="kw">let </span>schema = dmmf::render_dmmf(state.cx.datamodel(), Arc::clone(state.cx.query_schema()));
+            <span class="kw">let </span>schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)

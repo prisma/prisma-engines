@@ -204,17 +204,6 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.
 //!
 //! The schema builder creates all builders necessary for the process,
@@ -262,7 +251,7 @@
     CompositeTypeRef, Field <span class="kw">as </span>ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 <span class="kw">use </span>psl::{
-    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    datamodel_connector::{Connector, ConnectorCapability},
     PreviewFeature, PreviewFeatures,
 };
 <span class="kw">use </span>schema::<span class="kw-2">*</span>;
@@ -282,12 +271,9 @@
 </span>}
 
 <span class="kw">impl </span>BuilderContext {
-    <span class="kw">pub fn </span>new(
-        internal_data_model: InternalDataModelRef,
-        enable_raw_queries: bool,
-        connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
-        preview_features: PreviewFeatures,
-    ) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>connector = internal_data_model.schema.connector;
+        <span class="kw">let </span>preview_features = internal_data_model.schema.configuration.preview_features();
         <span class="self">Self </span>{
             internal_data_model,
             enable_raw_queries,
@@ -391,14 +377,8 @@
     }
 }
 
-<span class="kw">pub fn </span>build(
-    internal_data_model: InternalDataModelRef,
-    enable_raw_queries: bool,
-    connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
-    preview_features: PreviewFeatures,
-    relation_mode: RelationMode,
-) -&gt; QuerySchema {
-    <span class="kw">let </span><span class="kw-2">mut </span>ctx = BuilderContext::new(internal_data_model, enable_raw_queries, connector, preview_features);
+<span class="kw">pub fn </span>build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -&gt; QuerySchema {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = BuilderContext::new(internal_data_model, enable_raw_queries);
 
     output_types::objects::initialize_caches(<span class="kw-2">&amp;mut </span>ctx);
 
@@ -426,8 +406,6 @@
         enum_types,
         ctx.internal_data_model,
         ctx.connector.capabilities().to_owned(),
-        preview_features,
-        relation_mode,
     )
 }
 
