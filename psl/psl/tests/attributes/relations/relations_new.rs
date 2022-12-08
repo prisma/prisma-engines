@@ -326,7 +326,7 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `firstName` in the model `User`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `firstName` in the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m        userName String
@@ -358,7 +358,7 @@ fn relation_must_error_when_referenced_compound_fields_are_not_a_unique_criteria
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([firstName, lastName])` attribute to the model `User`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([firstName, lastName])` attribute to the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m  lastName String
@@ -412,7 +412,7 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([id, firstName])` attribute to the model `User`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([id, firstName])` attribute to the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m        // the relation is referencing two uniques. That is too much.
