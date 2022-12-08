@@ -654,6 +654,8 @@
 <span id="654">654</span>
 <span id="655">655</span>
 <span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::default_value::DefaultKind;
 <span class="kw">use </span><span class="kw">crate</span>::field::{Field, FieldType, RelationField, ScalarField};
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
@@ -900,7 +902,7 @@
     }
 }
 
-<span class="doccomment">///A field in an index that optionally defines a sort order and length limit.
+<span class="doccomment">/// A field in an index that optionally defines a sort order and length limit.
 </span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
 </span><span class="kw">pub struct </span>IndexField {
     <span class="kw">pub </span>path: Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;String&gt;)&gt;,
@@ -947,7 +949,7 @@
     <span class="kw">pub </span>clustered: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">///A field in a Primary Key that optionally defines a sort order and length limit.
+<span class="doccomment">/// A field in a Primary Key that optionally defines a sort order and length limit.
 </span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
 </span><span class="kw">pub struct </span>PrimaryKeyField {
     <span class="kw">pub </span>name: String,
@@ -981,15 +983,15 @@
     }
 }
 
-<span class="doccomment">/// A unique criteria is a set of fields through which a record can be uniquely identified.
+<span class="doccomment">/// A unique criterion is a set of fields through which a record can be uniquely identified.
 </span><span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>UniqueCriterion&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>fields: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarField&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(fields: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarField&gt;) -&gt; UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
-        UniqueCriteria { fields }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UniqueCriterion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(fields: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarField&gt;) -&gt; UniqueCriterion&lt;<span class="lifetime">&#39;a</span>&gt; {
+        UniqueCriterion { fields }
     }
 }
 
@@ -1108,20 +1110,22 @@
         }
     }
 
-    <span class="doccomment">/// optional unique fields are NOT considered a unique criteria
-    /// used for: A Model must have at least one STRICT unique criteria.
-    </span><span class="kw">pub fn </span>strict_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriteria&gt; {
+    <span class="doccomment">/// Optional unique fields are NOT considered a unique criterion.
+    ///
+    /// Used for: A Model must have at least one STRICT unique criteria.
+    </span><span class="kw">pub fn </span>strict_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriterion&gt; {
         <span class="self">self</span>.unique_criterias(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// optional unique fields are considered a unique criteria
-    /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
-    </span><span class="kw">pub fn </span>loose_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriteria&gt; {
+    <span class="doccomment">/// Optional unique fields are considered a unique criterion
+    ///
+    /// Used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
+    </span><span class="kw">pub fn </span>loose_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriterion&gt; {
         <span class="self">self</span>.unique_criterias(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// returns the order of unique criterias ordered based on their precedence
-    </span><span class="kw">fn </span>unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>, allow_optional: bool) -&gt; Vec&lt;UniqueCriteria&gt; {
+    <span class="doccomment">/// Returns the order of unique criterias ordered based on their precedence
+    </span><span class="kw">fn </span>unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>, allow_optional: bool) -&gt; Vec&lt;UniqueCriterion&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
         <span class="comment">// first candidate: primary key
@@ -1156,14 +1160,14 @@
                         .iter()
                         .any(|f| f.is_commented_out || (f.is_optional() &amp;&amp; !allow_optional))
                 {
-                    result.push(UniqueCriteria::new(id_fields));
+                    result.push(UniqueCriterion::new(id_fields));
                 }
             }
         }
 
         <span class="comment">// second candidate: any unique constraint where all fields are required
         </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>unique_field_combi: Vec&lt;UniqueCriteria&gt; = <span class="self">self
+            <span class="kw">let </span><span class="kw-2">mut </span>unique_field_combi: Vec&lt;UniqueCriterion&gt; = <span class="self">self
                 </span>.indices
                 .iter()
                 .filter(|id| id.is_unique())
@@ -1179,7 +1183,7 @@
                     <span class="kw">let </span>no_fields_are_ineligible = !fields.iter().any(|f| f.is_commented_out);
                     <span class="kw">let </span>all_fields_are_required = fields.iter().all(|f| f.is_required());
                     ((all_fields_are_required || allow_optional) &amp;&amp; no_fields_are_ineligible)
-                        .then(|| UniqueCriteria::new(fields))
+                        .then(|| UniqueCriterion::new(fields))
                 })
                 .collect();
 

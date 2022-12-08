@@ -747,9 +747,9 @@
     <span class="kw">let </span>model = relation.referenced_model().name();
 
     <span class="kw">let </span>message = <span class="kw">if </span>fields.len() == <span class="number">1 </span>{
-        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
+        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
     } <span class="kw">else </span>{
-        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
+        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
     };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -801,7 +801,7 @@
 
     ctx.push_error(DatamodelError::new_validation_error(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.&quot;</span>,
+            <span class="string">&quot;The argument `references` must refer to a unique criterion in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.&quot;</span>,
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(<span class="string">&quot;, &quot;</span>)
         ),

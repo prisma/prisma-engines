@@ -422,7 +422,7 @@
 <span class="kw">use </span>parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
-<span class="doccomment">/// A model must have either a primary key, or a unique criteria
+<span class="doccomment">/// A model must have either a primary key, or a unique criterion
 /// with no optional, commented-out or unsupported fields.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_strict_unique_criteria(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">if </span>model.is_ignored() {
