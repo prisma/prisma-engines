@@ -1,5 +1,7 @@
+//! The `@default` attribute rendering.
+
 use crate::{
-    calculate_datamodel::OutputContext,
+    datamodel_calculator::OutputContext,
     pair::{DefaultKind, ScalarFieldPair},
 };
 use datamodel_renderer::{
@@ -7,6 +9,7 @@ use datamodel_renderer::{
     value::{Constant, Function, Text, Value},
 };
 
+/// Render a default value for the given scalar field.
 pub(crate) fn render<'a>(
     field: ScalarFieldPair<'a>,
     output: &mut OutputContext<'a>,

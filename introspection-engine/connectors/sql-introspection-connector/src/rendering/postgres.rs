@@ -1,9 +1,12 @@
+//! PostgreSQL-specific rendering.
+
 use datamodel_renderer as render;
 use psl::{builtin_connectors::PostgresDatasourceProperties, Configuration, PreviewFeature};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 
 const EXTENSION_ALLOW_LIST: &[&str] = &["citext", "postgis", "pg_crypto", "uuid-ossp"];
 
+/// Renders PostgreSQL extensions definition to the datasource.
 pub(super) fn add_extensions<'a>(
     datasource: &mut render::configuration::Datasource<'a>,
     schema: &'a SqlSchema,

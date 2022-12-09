@@ -1,6 +1,8 @@
+//! Matching PSL and database schema information together.
+
 mod relation_names;
 
-use crate::{calculate_datamodel::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
+use crate::{datamodel_calculator::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
 use psl::parser_database::{self, ast};
 use relation_names::RelationNames;
 use sql_schema_describer as sql;
@@ -43,6 +45,8 @@ impl<'a> IntrospectionMap<'a> {
     }
 }
 
+/// Inlined relation fields (foreign key is defined in a model) are
+/// sorted in a specific way. We handle the sorting here.
 fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap) {
     for table in sql_schema
         .table_walkers()
@@ -58,6 +62,9 @@ fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut Intros
     }
 }
 
+/// Many to many relation fields (foreign keys are defined in a hidden
+/// join table) are sorted in a specific way. We handle the sorting
+/// here.
 fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap) {
     for table in sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(*t)) {
         let mut fks = table.foreign_keys();
@@ -83,6 +90,8 @@ fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut Introspec
     }
 }
 
+/// Finding enums from the existing PSL definition, matching the
+/// ones found in the database.
 fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
     map.existing_enums = if prisma_schema.connector.is_provider("mysql") {
         sql_schema
@@ -119,6 +128,8 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
     }
 }
 
+/// Finding models from the existing PSL definition, matching the
+/// ones found in the database.
 fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
     for model in prisma_schema.db.walk_models() {
         match schema.find_table(model.database_name()) {
@@ -133,6 +144,8 @@ fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::Validated
     }
 }
 
+/// Finding scalar fields from the existing PSL definition, matching
+/// the ones found in the database.
 fn match_existing_scalar_fields(
     sql_schema: &sql::SqlSchema,
     prisma_schema: &psl::ValidatedSchema,
@@ -155,6 +168,8 @@ fn match_existing_scalar_fields(
     }
 }
 
+/// Finding inlined relations from the existing PSL definition,
+/// matching the ones found in the database.
 fn match_existing_inline_relations<'a>(
     sql_schema: &'a sql::SqlSchema,
     prisma_schema: &'a psl::ValidatedSchema,
@@ -186,6 +201,8 @@ fn match_existing_inline_relations<'a>(
         .collect()
 }
 
+/// Finding many to many relations from the existing PSL definition,
+/// matching the ones found in the database.
 fn match_existing_m2m_relations(
     sql_schema: &sql::SqlSchema,
     prisma_schema: &psl::ValidatedSchema,

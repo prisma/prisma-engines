@@ -1,4 +1,7 @@
+//! Tooling to go from PSL and database schema to a PSL string.
+
 mod configuration;
+mod defaults;
 mod enums;
 mod indexes;
 mod models;
@@ -6,10 +9,12 @@ mod postgres;
 mod relation_field;
 mod scalar_field;
 
-use crate::calculate_datamodel::{InputContext, OutputContext};
+use crate::datamodel_calculator::{InputContext, OutputContext};
 pub(crate) use crate::SqlError;
 
-pub(crate) fn introspect<'a>(
+/// Combines the SQL database schema and an existing PSL schema to a
+/// PSL schema definition string.
+pub(crate) fn to_psl_string<'a>(
     input: InputContext<'a>,
     output: &mut OutputContext<'a>,
 ) -> Result<(String, bool), SqlError> {

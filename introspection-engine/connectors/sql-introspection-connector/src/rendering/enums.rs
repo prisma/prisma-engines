@@ -1,5 +1,7 @@
+//! Rendering of enumerators.
+
 use crate::{
-    calculate_datamodel::{InputContext, OutputContext},
+    datamodel_calculator::{InputContext, OutputContext},
     introspection_helpers as helpers,
     pair::EnumPair,
     sanitize_datamodel_names, warnings,
@@ -7,6 +9,7 @@ use crate::{
 use datamodel_renderer::datamodel as renderer;
 use psl::parser_database::ast;
 
+/// Render all enums.
 pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
     let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum)> = Vec::new();
 
@@ -30,6 +33,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
     }
 }
 
+/// Render a single enum.
 fn render_enum<'a>(r#enum: EnumPair<'a>, output: &mut OutputContext<'a>) -> renderer::Enum<'a> {
     let mut remapped_values = Vec::new();
     let mut rendered_enum = renderer::Enum::new(r#enum.name());

@@ -1,3 +1,8 @@
+//! A combination of PSL and a database definition.
+//!
+//! These modules are to be used to determine things such as field
+//! names, attributes and so on.
+
 mod default;
 mod enumerator;
 mod id;
@@ -7,7 +12,7 @@ mod model;
 mod relation_field;
 mod scalar_field;
 
-use crate::calculate_datamodel::InputContext;
+use crate::datamodel_calculator::InputContext;
 pub(crate) use default::{DefaultKind, DefaultValuePair};
 pub(crate) use enumerator::EnumPair;
 pub(crate) use id::IdPair;

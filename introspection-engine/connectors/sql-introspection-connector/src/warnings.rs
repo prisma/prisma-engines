@@ -1,5 +1,128 @@
+//! Definition of warnings, which are displayed to the user during `db
+//! pull`.
+
 use introspection_connector::Warning;
 use serde::Serialize;
+
+/// Collections used for warning generation. These should be preferred
+/// over directly creating warnings from the code, to prevent spamming
+/// the user.
+#[derive(Debug, Default)]
+pub(crate) struct Warnings {
+    /// Store final warnings to this vector.
+    pub(crate) warnings: Vec<Warning>,
+    /// Fields that are using Prisma 1 UUID defaults.
+    pub(crate) prisma_1_uuid_defaults: Vec<ModelAndField>,
+    /// Fields that are using Prisma 1 CUID defaults.
+    pub(crate) prisma_1_cuid_defaults: Vec<ModelAndField>,
+    /// Fields having an empty name.
+    pub(crate) fields_with_empty_names: Vec<ModelAndField>,
+    /// Field names we remapped during introspection.
+    pub(crate) remapped_fields: Vec<ModelAndField>,
+    /// Enum values that are empty strings.
+    pub(crate) enum_values_with_empty_names: Vec<EnumAndValue>,
+    /// Models that have no fields.
+    pub(crate) models_without_columns: Vec<Model>,
+    /// Models missing a id or unique constraint.
+    pub(crate) models_without_identifiers: Vec<Model>,
+    /// If the id attribute has a name taken from a previous data
+    /// model.
+    pub(crate) reintrospected_id_names: Vec<Model>,
+    /// The field has a type we do not currently support in Prisma.
+    pub(crate) unsupported_types: Vec<ModelAndFieldAndType>,
+    /// The name of the model is taken from a previous data model.
+    pub(crate) remapped_models: Vec<Model>,
+    /// The relation is copied from a previous data model, only if
+    /// `relationMode` is `prisma`.
+    pub(crate) reintrospected_relations: Vec<Model>,
+}
+
+impl Warnings {
+    pub(crate) fn new() -> Self {
+        Self {
+            warnings: Vec::new(),
+            ..Default::default()
+        }
+    }
+
+    pub(crate) fn push(&mut self, warning: Warning) {
+        self.warnings.push(warning);
+    }
+
+    /// Generate warnings from all indicators. Must be called after
+    /// introspection.
+    pub(crate) fn finalize(&mut self) -> Vec<Warning> {
+        fn maybe_warn<T>(elems: &[T], warning: impl Fn(&[T]) -> Warning, warnings: &mut Vec<Warning>) {
+            if !elems.is_empty() {
+                warnings.push(warning(elems))
+            }
+        }
+
+        maybe_warn(
+            &self.models_without_identifiers,
+            warning_models_without_identifier,
+            &mut self.warnings,
+        );
+
+        maybe_warn(&self.unsupported_types, warning_unsupported_types, &mut self.warnings);
+
+        maybe_warn(
+            &self.remapped_models,
+            warning_enriched_with_map_on_model,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.remapped_fields,
+            warning_enriched_with_map_on_field,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.models_without_columns,
+            warning_models_without_columns,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.reintrospected_id_names,
+            warning_enriched_with_custom_primary_key_names,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.prisma_1_uuid_defaults,
+            warning_default_uuid_warning,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.prisma_1_cuid_defaults,
+            warning_default_cuid_warning,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.enum_values_with_empty_names,
+            warning_enum_values_with_empty_names,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.fields_with_empty_names,
+            warning_fields_with_empty_names,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.reintrospected_relations,
+            warning_relations_added_from_the_previous_data_model,
+            &mut self.warnings,
+        );
+
+        std::mem::take(&mut self.warnings)
+    }
+}
 
 #[derive(Serialize, Debug, Clone)]
 pub(crate) struct Model {

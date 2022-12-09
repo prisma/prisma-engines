@@ -1,6 +1,9 @@
-use crate::{calculate_datamodel::OutputContext, pair::RelationFieldPair};
+//! Rendering of relation fields.
+
+use crate::{datamodel_calculator::OutputContext, pair::RelationFieldPair};
 use datamodel_renderer::datamodel as renderer;
 
+/// Render a relation field to be added in a model.
 pub(super) fn render<'a>(field: RelationFieldPair<'a>, output: &mut OutputContext<'a>) -> renderer::ModelField<'a> {
     let mut rendered = renderer::ModelField::new(field.field_name(), field.prisma_type());
 

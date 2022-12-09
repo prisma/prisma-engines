@@ -1,7 +1,10 @@
+//! Rendering of the datasource and generator parts of the PSL.
+
 use datamodel_renderer as render;
 use psl::Configuration;
 use sql_schema_describer::SqlSchema;
 
+/// Render a configuration block.
 pub(super) fn render<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
     let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
