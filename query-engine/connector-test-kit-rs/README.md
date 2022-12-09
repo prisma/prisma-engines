@@ -15,7 +15,7 @@ The test kit is a combination of three crates, from which two are "lower level" 
 ```
 
 ### `query-engine-tests`
-The actual integration tests can be found in the `query-engine-tests` crate, specifically the `tests/` folder. The `src/` folder contains general utilities like time rendering, common schemas, string rendering, so everythign that makes writing tests less painful.
+The actual integration tests can be found in the `query-engine-tests` crate, specifically the `tests/` folder. The `src/` folder contains general utilities like time rendering, common schemas, string rendering, so everything that makes writing tests less painful.
 
 Tests follow a `mod` tree like regular source files, with `query_engine_tests.rs` being the root. Ideally, the modules carry semantics on what is tested in the name and form coherent units that make it easy to spot and extend areas to test.
 
@@ -274,7 +274,7 @@ If you haven't installed `cargo-insta`, use `cargo test` as usual.
 
 ##### With `cargo-insta`
 
-> ⚠️ **Important**: While automatic snapshot updates are extremely convienent, it is also an easy way to miss unintended changes. **Please, don't ever just update all your snapshots to make the CI green without carefully checking what was changed and whether that was the intended change.**
+> ⚠️ **Important**: While automatic snapshot updates are extremely convenient, it is also an easy way to miss unintended changes. **Please, don't ever just update all your snapshots to make the CI green without carefully checking what was changed and whether that was the intended change.**
 
 Run `cargo insta review` to be prompted with an interactive view that lets you accept or reject the snapshots changes if there are any. Below is an example of a failing snapshot:
 
