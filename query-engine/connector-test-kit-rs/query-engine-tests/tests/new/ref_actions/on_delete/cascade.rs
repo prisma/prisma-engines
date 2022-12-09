@@ -361,7 +361,7 @@ mod multiple_cascading_paths {
     schema(implicit_m2m::schema),
     relation_mode = "prisma",
     capabilities(ImplicitManyToManyRelation),
-    exclude(MongoDB)
+    exclude(MongoDB, SqlServer)
 )]
 mod implicit_m2m_prisma {
     #[connector_test]
@@ -377,7 +377,9 @@ mod implicit_m2m_prisma {
 #[test_suite(
     suite = "cascade_on_im2m_fk_rm",
     schema(implicit_m2m::schema),
-    capabilities(ImplicitManyToManyRelation, NamedForeignKeys)
+    relation_mode = "foreignkeys",
+    capabilities(ImplicitManyToManyRelation, NamedForeignKeys),
+    exclude(MongoDB, SqlServer)
 )]
 mod implicit_m2m_fk {
 
@@ -409,6 +411,40 @@ mod implicit_m2m {
     }
 
     pub async fn run(runner: Runner, db_name: &str) -> TestResult<()> {
+        macro_rules! assert_pivot_row_count {
+            ($db_name:expr, $col:literal, $val:literal, $count:literal) => {
+               let raw_query = match runner.connector_version() {
+                    ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb => {
+                        format!(
+                            r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "{}" = $1"#,
+                            db_name, $col
+                        )
+                    },
+                    ConnectorVersion::MySql(_) => {
+                        format!(
+                            r#"SELECT COUNT(*) as count FROM `{}`.`_CategoryToItem` where `{}` = ?"#,
+                            db_name, $col
+                        )
+                    },
+                    ConnectorVersion::Sqlite => {
+                        format!(
+                            r#"SELECT COUNT(*) as count FROM _CategoryToItem where `{}` = ?"#,
+                            $col
+                        )
+                    },
+                   _ => todo!(),
+                };
+                let query = fmt_query_raw(&raw_query, vec![$val.into()]);
+                let snapshot = format!("{{\"data\":{{\"queryRaw\":[{{\"count\":{{\"prisma__type\":\"bigint\",\"prisma__value\":\"{}\"}}}}]}}}}", $count);
+
+                insta::assert_snapshot!(
+                    insta::_macro_support::ReferenceValue::Inline(&snapshot),
+                    run_query!(&runner, query),
+                    &snapshot
+                );
+            };
+          }
+
         // ┌────────┐                            ┌────────┐
         // │Category│                            │  Item  │
         // ├────────┤                            ├────────┤
@@ -445,28 +481,8 @@ mod implicit_m2m {
               }
             }"#
         );
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                fmt_query_raw(
-                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "B" = 2"#, db_name).as_str(),
-                    vec![]
-                )
-            ),
-            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"1"}}]}}"###
-        );
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                fmt_query_raw(
-                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
-                    vec![]
-                )
-            ),
-            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
-        );
+        assert_pivot_row_count!(db_name, "B", 2, 1);
+        assert_pivot_row_count!(db_name, "A", 1, 2);
 
         // ┌────────┐                            ┌────────┐
         // │Category│                            │  Item  │
@@ -489,34 +505,14 @@ mod implicit_m2m {
             &runner,
             r#"
               mutation {
-                deleteOneItem(where: { id: 1 }) {
+                deleteOneItem(where: { id: 2 }) {
                   id
                 }
               }
             "#
         );
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                fmt_query_raw(
-                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "B" = 2"#, db_name).as_str(),
-                    vec![]
-                )
-            ),
-            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"0"}}]}}"###
-        );
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                fmt_query_raw(
-                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
-                    vec![]
-                )
-            ),
-            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"1"}}]}}"###
-        );
+        assert_pivot_row_count!(db_name, "B", 2, 0);
+        assert_pivot_row_count!(db_name, "B", 1, 1);
 
         // ┌────────┐                            ┌────────┐
         // │Category│                            │  Item  │
@@ -543,17 +539,7 @@ mod implicit_m2m {
               }
             "#
         );
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                fmt_query_raw(
-                    format!(r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "A" = 1"#, db_name).as_str(),
-                    vec![]
-                )
-            ),
-            @r###"{"data":{"queryRaw":[{"count":{"prisma__type":"bigint","prisma__value":"0"}}]}}"###
-        );
+        assert_pivot_row_count!(db_name, "B", 1, 0);
 
         Ok(())
     }
