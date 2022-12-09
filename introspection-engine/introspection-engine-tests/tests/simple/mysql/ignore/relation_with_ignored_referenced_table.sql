@@ -1,7 +1,7 @@
 -- tags=mysql
--- exclude=vitess
+-- exclude=vitess,tidb
 
--- Excluding Vitess because of foreign
+-- Excluding Vitess/TiDB because of foreign
 -- keys.
 
 -- This table has no unique criteria, it will be ignored.
