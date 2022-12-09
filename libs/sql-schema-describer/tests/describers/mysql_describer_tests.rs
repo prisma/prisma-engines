@@ -3188,7 +3188,7 @@ fn all_tidb_column_types_must_work(api: TestApi) {
     api.expect_schema(expectation);
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(TiDB))]
 fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
     // NB: We don't test the SET DEFAULT variety since it isn't supported on InnoDB and will
     // just cause an error
