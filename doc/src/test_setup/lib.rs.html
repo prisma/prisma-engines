@@ -89,6 +89,12 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
 </pre><pre class="rust"><code><span class="attribute">#![deny(unsafe_code, rust_2018_idioms)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -96,6 +102,7 @@
 //! engines.
 
 </span><span class="kw">pub mod </span>mysql;
+<span class="kw">pub mod </span>postgres;
 <span class="doccomment">/// Tokio test runtime utils.
 </span><span class="kw">pub mod </span>runtime;
 
@@ -103,7 +110,6 @@
 <span class="kw">mod </span>diff;
 <span class="kw">mod </span>logging;
 <span class="kw">mod </span>mssql;
-<span class="kw">mod </span>postgres;
 <span class="kw">mod </span>sqlite;
 <span class="kw">mod </span>tags;
 <span class="kw">mod </span>test_api_args;
@@ -138,6 +144,12 @@
 }
 
 <span class="kw">pub struct </span>TestDb(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>test_api_args::DbUnderTest);
+
+<span class="kw">impl </span>TestDb {
+    <span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.database_url
+    }
+}
 
 <span class="attribute">#[doc(hidden)]
 #[inline(never)]

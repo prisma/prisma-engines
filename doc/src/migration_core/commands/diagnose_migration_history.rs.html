@@ -313,9 +313,10 @@
 <span id="313">313</span>
 <span id="314">314</span>
 <span id="315">315</span>
+<span id="316">316</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreResult;
 <span class="kw">use </span>migration_connector::{
-    migrations_directory::<span class="kw-2">*</span>, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord,
+    migrations_directory::<span class="kw-2">*</span>, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord, Namespaces,
     PersistenceNotInitializedError,
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -380,6 +381,7 @@
 /// reads, it does not write to the dev database nor the migrations directory.
 </span><span class="kw">pub async fn </span>diagnose_migration_history(
     input: DiagnoseMigrationHistoryInput,
+    namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
     connector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>MigrationConnector,
 ) -&gt; CoreResult&lt;DiagnoseMigrationHistoryOutput&gt; {
     <span class="macro">tracing::debug!</span>(<span class="string">&quot;Diagnosing migration history&quot;</span>);
@@ -447,10 +449,10 @@
             <span class="comment">// TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             </span><span class="kw">let </span>from = connector
-                .database_schema_from_diff_target(DiffTarget::Migrations(<span class="kw-2">&amp;</span>applied_migrations), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+                .database_schema_from_diff_target(DiffTarget::Migrations(<span class="kw-2">&amp;</span>applied_migrations), <span class="prelude-val">None</span>, namespaces.clone())
                 .<span class="kw">await</span>;
             <span class="kw">let </span>to = connector
-                .database_schema_from_diff_target(DiffTarget::Database, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+                .database_schema_from_diff_target(DiffTarget::Database, <span class="prelude-val">None</span>, namespaces)
                 .<span class="kw">await</span>;
             <span class="kw">let </span>drift = <span class="kw">match </span>from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
                 <span class="kw">if </span>connector.migration_is_empty(<span class="kw-2">&amp;</span>mig) {

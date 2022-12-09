@@ -71,6 +71,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use </span>migration_core::{
     commands::DiagnoseMigrationHistoryOutput,
     commands::{diagnose_migration_history, DiagnoseMigrationHistoryInput},
@@ -107,6 +108,7 @@
                 migrations_directory_path: <span class="self">self</span>.migrations_directory.path().to_str().unwrap().to_owned(),
                 opt_in_to_shadow_database: <span class="self">self</span>.opt_in_to_shadow_database,
             },
+            <span class="prelude-val">None</span>,
             <span class="self">self</span>.api,
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;

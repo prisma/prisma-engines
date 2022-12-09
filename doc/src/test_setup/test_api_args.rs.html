@@ -256,7 +256,7 @@
 <span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DbUnderTest {
     <span class="kw">pub</span>(<span class="kw">crate</span>) capabilities: BitFlags&lt;Capabilities&gt;,
-    database_url: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) database_url: String,
     shadow_database_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     provider: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub</span>(<span class="kw">crate</span>) tags: BitFlags&lt;Tags&gt;,

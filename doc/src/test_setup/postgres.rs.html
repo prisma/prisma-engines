@@ -129,7 +129,7 @@
     tok(fut)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_postgres_database(database_url: <span class="kw-2">&amp;</span>str, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(Quaint, String), AnyError&gt; {
+<span class="kw">pub async fn </span>create_postgres_database(database_url: <span class="kw-2">&amp;</span>str, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(Quaint, String), AnyError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>url: Url = database_url.parse()<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>postgres_db_url = url.clone();
 

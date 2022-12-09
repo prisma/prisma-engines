@@ -392,6 +392,14 @@
 <span id="392">392</span>
 <span id="393">393</span>
 <span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the migration engine
@@ -444,6 +452,16 @@
             host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
             connectors: Default::default(),
         }
+    }
+
+    <span class="kw">fn </span>namespaces(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Namespaces&gt; {
+        <span class="self">self</span>.initial_datamodel
+            .as_ref()
+            .and_then(|schema| schema.configuration.datasources.first())
+            .and_then(|ds| {
+                <span class="kw">let </span><span class="kw-2">mut </span>names = ds.namespaces.iter().map(|(ns, <span class="kw">_</span>)| ns.to_owned()).collect();
+                Namespaces::from_vec(<span class="kw-2">&amp;mut </span>names)
+            })
     }
 
     <span class="kw">async fn </span>with_connector_from_schema_path&lt;O: Send + <span class="lifetime">&#39;static</span>&gt;(
@@ -641,8 +659,13 @@
     }
 
     <span class="kw">async fn </span>dev_diagnostic(<span class="kw-2">&amp;</span><span class="self">self</span>, input: DevDiagnosticInput) -&gt; CoreResult&lt;DevDiagnosticOutput&gt; {
-        <span class="self">self</span>.with_default_connector(Box::new(|connector| {
-            Box::pin(commands::dev_diagnostic(input, connector).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DevDiagnostic&quot;</span>)))
+        <span class="kw">let </span>namespaces = <span class="self">self</span>.namespaces();
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(<span class="kw">async move </span>{
+                commands::dev_diagnostic(input, namespaces, connector)
+                    .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DevDiagnostic&quot;</span>))
+                    .<span class="kw">await
+            </span>})
         }))
         .<span class="kw">await
     </span>}
@@ -660,11 +683,13 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         input: commands::DiagnoseMigrationHistoryInput,
     ) -&gt; CoreResult&lt;commands::DiagnoseMigrationHistoryOutput&gt; {
-        <span class="self">self</span>.with_default_connector(Box::new(|connector| {
-            Box::pin(
-                commands::diagnose_migration_history(input, connector)
-                    .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DiagnoseMigrationHistory&quot;</span>)),
-            )
+        <span class="kw">let </span>namespaces = <span class="self">self</span>.namespaces();
+        <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
+            Box::pin(<span class="kw">async move </span>{
+                commands::diagnose_migration_history(input, namespaces, connector)
+                    .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DiagnoseMigrationHistory&quot;</span>))
+                    .<span class="kw">await
+            </span>})
         }))
         .<span class="kw">await
     </span>}
@@ -762,16 +787,7 @@
 
     <span class="kw">async fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoreResult&lt;()&gt; {
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Resetting the database.&quot;</span>);
-
-        <span class="kw">let </span>namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt; = <span class="self">self
-            </span>.initial_datamodel
-            .as_ref()
-            .and_then(|schema| schema.configuration.datasources.first())
-            .and_then(|ds| {
-                <span class="kw">let </span><span class="kw-2">mut </span>names = ds.namespaces.iter().map(|(ns, <span class="kw">_</span>)| ns.to_owned()).collect();
-                Namespaces::from_vec(<span class="kw-2">&amp;mut </span>names)
-            });
-
+        <span class="kw">let </span>namespaces = <span class="self">self</span>.namespaces();
         <span class="self">self</span>.with_default_connector(Box::new(<span class="kw">move </span>|connector| {
             Box::pin(MigrationConnector::reset(connector, <span class="bool-val">false</span>, namespaces).instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Reset&quot;</span>)))
         }))

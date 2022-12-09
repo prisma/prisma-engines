@@ -133,17 +133,19 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     diagnose_migration_history, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic,
 };
 <span class="kw">use </span><span class="kw">crate</span>::json_rpc::types::{DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput};
-<span class="kw">use </span>migration_connector::{migrations_directory, ConnectorResult, MigrationConnector};
+<span class="kw">use </span>migration_connector::{migrations_directory, ConnectorResult, MigrationConnector, Namespaces};
 
 <span class="doccomment">/// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
 </span><span class="kw">pub async fn </span>dev_diagnostic(
     input: DevDiagnosticInput,
+    namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
     connector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>MigrationConnector,
 ) -&gt; ConnectorResult&lt;DevDiagnosticOutput&gt; {
     migrations_directory::error_on_changed_provider(<span class="kw-2">&amp;</span>input.migrations_directory_path, connector.connector_type())<span class="question-mark">?</span>;
@@ -153,7 +155,7 @@
         opt_in_to_shadow_database: <span class="bool-val">true</span>,
     };
 
-    <span class="kw">let </span>diagnose_migration_history_output = diagnose_migration_history(diagnose_input, connector).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>diagnose_migration_history_output = diagnose_migration_history(diagnose_input, namespaces, connector).<span class="kw">await</span><span class="question-mark">?</span>;
 
     check_for_broken_migrations(<span class="kw-2">&amp;</span>diagnose_migration_history_output)<span class="question-mark">?</span>;
 
