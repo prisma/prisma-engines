@@ -306,6 +306,14 @@ impl TestApi {
     }
 
     #[track_caller]
+    pub async fn expect_warnings(&self, expectation: &expect_test::Expect) {
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
+
+        expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
+    }
+
+    #[track_caller]
     pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();

@@ -1029,7 +1029,7 @@ fn should_fail_if_not_using_unique_constraint_with_single_one_to_many() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `custom_id` in the model `A`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `custom_id` in the model `A`.[0m
           [1;94m-->[0m  [4mschema.prisma:22[0m
         [1;94m   | [0m
         [1;94m21 | [0m  a_id String
@@ -1087,14 +1087,14 @@ fn multiple_relation_validation_errors_do_not_prevent_each_other_across_models()
     "#;
 
     let expected_error = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `USER_NON_UNIQUE_ID` in the model `User`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `USER_NON_UNIQUE_ID` in the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
         [1;94m14 | [0m          USER_NON_UNIQUE_ID Int  @db.UnsignedInt
         [1;94m15 | [0m          [1;91mUser               User @relation(fields: [USER_NON_UNIQUE_ID], references: [USER_NON_UNIQUE_ID], onUpdate: Restrict, map: "FK_USER_NON_UNIQUE_ID")[0m
         [1;94m16 | [0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `STOCK_NON_UNIQUE_ID` in the model `stock`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `STOCK_NON_UNIQUE_ID` in the model `stock`.[0m
           [1;94m-->[0m  [4mschema.prisma:38[0m
         [1;94m   | [0m
         [1;94m37 | [0m          STOCK_ID Int   @id @db.UnsignedInt

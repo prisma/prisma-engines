@@ -165,7 +165,7 @@ pub(crate) fn nested_disconnect_input_field(
         (false, false) => {
             let mut types = vec![InputType::boolean()];
 
-            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
                 types.push(InputType::object(filter_objects::where_object_type(
                     ctx,
                     &parent_field.related_model(),
@@ -188,7 +188,7 @@ pub(crate) fn nested_delete_input_field(
         (false, false) => {
             let mut types = vec![InputType::boolean()];
 
-            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
                 types.push(InputType::object(filter_objects::where_object_type(
                     ctx,
                     &parent_field.related_model(),
@@ -215,7 +215,7 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
             update_one_objects::update_one_where_combination_object(ctx, update_shorthand_types.clone(), parent_field);
 
         list_union_object_type(to_many_update_full_type, true)
-    } else if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+    } else if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         let to_one_update_full_type = update_one_objects::update_to_one_rel_where_combination_object(
             ctx,
             update_shorthand_types.clone(),

@@ -245,7 +245,7 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.raw_cmd(sql)))
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, move |params, connection| {
             let file_path = &params.file_path;
 

@@ -10,7 +10,7 @@ use crate::{
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
 
-/// A model must have either a primary key, or a unique criteria
+/// A model must have either a primary key, or a unique criterion
 /// with no optional, commented-out or unsupported fields.
 pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
     if model.is_ignored() {

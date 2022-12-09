@@ -3,9 +3,9 @@ use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
 /// Initialize a JSON-RPC ready migration engine API.
-pub fn rpc_api(datamodel: Option<String>, host: Arc<dyn migration_connector::ConnectorHost>) -> IoHandler {
+pub fn rpc_api(prisma_schema: Option<String>, host: Arc<dyn migration_connector::ConnectorHost>) -> IoHandler {
     let mut io_handler = IoHandler::default();
-    let api = Arc::new(crate::state::EngineState::new(datamodel, Some(host)));
+    let api = Arc::new(crate::state::EngineState::new(prisma_schema, Some(host)));
 
     for cmd in METHOD_NAMES {
         let api = api.clone();
@@ -41,7 +41,7 @@ async fn run_command(
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),
         // TODO(MultiSchema): we probably need to grab the namespaces from the params
-        RESET => render(executor.reset(None).await),
+        RESET => render(executor.reset().await),
         SCHEMA_PUSH => render(executor.schema_push(params.parse()?).await),
         other => unreachable!("Unknown command {}", other),
     }

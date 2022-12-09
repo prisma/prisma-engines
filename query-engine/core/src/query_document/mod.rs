@@ -72,7 +72,7 @@ impl BatchDocument {
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
     fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
-        if !op.is_find_unique() {
+        if !op.is_find_unique(schema) {
             return true;
         }
 
@@ -95,10 +95,11 @@ impl BatchDocument {
         })
     }
 
+    /// Checks whether a BatchDocument can be compacted.
     fn can_compact(&self, schema: &QuerySchemaRef) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_unique() => {
+                Some((first, rest)) if first.is_find_unique(schema) => {
                     // If any of the operation has an "invalid" compact filter (see documentation of `invalid_compact_filter`),
                     // we do not compact the queries.
                     let has_invalid_compact_filter =
@@ -109,7 +110,7 @@ impl BatchDocument {
                     }
 
                     rest.iter().all(|op| {
-                        op.is_find_unique()
+                        op.is_find_unique(schema)
                             && first.name() == op.name()
                             && first.nested_selections().len() == op.nested_selections().len()
                             && first

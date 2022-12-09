@@ -1,7 +1,5 @@
 //! The external facing programmatic API to the migration engine.
 
-use migration_connector::Namespaces;
-
 use crate::{commands, json_rpc::types::*, CoreResult};
 
 /// The programmatic, generic, fantastic migration engine API.
@@ -70,7 +68,7 @@ pub trait GenericApi: Send + Sync + 'static {
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
 
     /// Reset a database to an empty state (no data, no schema).
-    async fn reset(&self, namespaces: Option<Namespaces>) -> CoreResult<()>;
+    async fn reset(&self) -> CoreResult<()>;
 
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput>;

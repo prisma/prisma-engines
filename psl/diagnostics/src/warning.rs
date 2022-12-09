@@ -27,13 +27,30 @@ impl DatamodelWarning {
         Self::new(message, span)
     }
 
+    pub fn new_referential_integrity_attr_deprecation_warning(span: Span) -> DatamodelWarning {
+        let message = "The `referentialIntegrity` attribute is deprecated. Please use `relationMode` instead. Learn more at https://pris.ly/d/relation-mode";
+        Self::new(message.to_string(), span)
+    }
+
     pub fn new_missing_index_on_emulated_relation(span: Span) -> DatamodelWarning {
-        let message = indoc! {
-            r#"With `relationMode = \"prisma\"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood.
+        let message = indoc!(
+            r#"
+            With `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood.
             This can lead to poor performance when querying these fields. We recommend adding an index manually.
-            Learn more at https://pris.ly/d/relation-mode#indexes"#
-        };
-        Self::new(message.to_owned(), span)
+            Learn more at https://pris.ly/d/relation-mode-prisma-indexes"
+            "#,
+        )
+        .replace('\n', " ");
+        Self::new(message, span)
+    }
+
+    pub fn new_field_validation(message: &str, model: &str, field: &str, span: Span) -> DatamodelWarning {
+        let msg = format!(
+            "Warning validating field `{}` in {} `{}`: {}",
+            field, "model", model, message
+        );
+
+        Self::new(msg, span)
     }
 
     /// The user-facing warning message.

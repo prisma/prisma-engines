@@ -88,7 +88,7 @@ fn nested_upsert_nonlist_input_object(
                 input_field(args::CREATE, create_types, None),
             ];
 
-            if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
                 fields.push(where_argument(ctx, &related_model));
             }
 

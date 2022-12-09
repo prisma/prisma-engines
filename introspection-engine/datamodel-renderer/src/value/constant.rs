@@ -2,7 +2,7 @@ use std::{borrow::Cow, fmt};
 
 /// A unquoted identifier. Should be used if a value has certain naming standards.
 #[derive(Debug)]
-pub struct Constant<T: fmt::Display>(T);
+pub struct Constant<T: fmt::Display>(pub(crate) T);
 
 impl<'a> Clone for Constant<&'a str> {
     fn clone(&self) -> Self {

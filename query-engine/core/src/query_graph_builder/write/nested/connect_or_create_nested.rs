@@ -971,6 +971,7 @@ fn one_to_one_inlined_child(
         let relation_name = parent_relation_field.relation().name.clone();
         let parent_model_name = parent_relation_field.model().name.clone();
         let child_model_name = child_model.name.clone();
+        let rf = Arc::clone(&parent_relation_field);
 
         // Edge: Read old child node -> update old child
         graph.create_edge(
@@ -978,8 +979,12 @@ fn one_to_one_inlined_child(
             &update_old_child_node,
             QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(move |mut update_old_child_node, mut old_child_ids| {
                 if child_relation_field.is_required() && !old_child_ids.is_empty() {
-                    // Error out, this violates the relation because we'd disconnect the old relation, but it's required.
-                    todo!()
+                    return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
+                }
+
+                // If there's no child connected, don't attempt to disconnect it.
+                if old_child_ids.is_empty() {
+                    return Ok(update_old_child_node);
                 }
 
                 let old_child_id = match old_child_ids.pop() {

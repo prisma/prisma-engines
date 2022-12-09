@@ -1,6 +1,8 @@
-use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
+
+/// A set of preview features.
+pub type PreviewFeatures = enumflags2::BitFlags<PreviewFeature>;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
@@ -86,6 +88,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
+         | ClientExtensions
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -116,29 +119,28 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         MultiSchema
-        | ClientExtensions
     }),
 };
 
 #[derive(Debug)]
 pub struct FeatureMap {
     /// Valid, visible features.
-    active: BitFlags<PreviewFeature>,
+    active: PreviewFeatures,
 
     /// Deprecated features.
-    deprecated: BitFlags<PreviewFeature>,
+    deprecated: PreviewFeatures,
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
-    hidden: BitFlags<PreviewFeature>,
+    hidden: PreviewFeatures,
 }
 
 impl FeatureMap {
-    pub const fn active_features(&self) -> BitFlags<PreviewFeature> {
+    pub const fn active_features(&self) -> PreviewFeatures {
         self.active
     }
 
-    pub const fn hidden_features(&self) -> BitFlags<PreviewFeature> {
+    pub const fn hidden_features(&self) -> PreviewFeatures {
         self.hidden
     }
 

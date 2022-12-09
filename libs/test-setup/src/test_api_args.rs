@@ -7,7 +7,7 @@ use std::{fmt::Display, io::Write as _};
 #[derive(Debug)]
 pub(crate) struct DbUnderTest {
     pub(crate) capabilities: BitFlags<Capabilities>,
-    database_url: String,
+    pub(crate) database_url: String,
     shadow_database_url: Option<String>,
     provider: &'static str,
     pub(crate) tags: BitFlags<Tags>,

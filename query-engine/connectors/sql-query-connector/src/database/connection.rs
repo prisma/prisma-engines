@@ -8,7 +8,6 @@ use connector_interface::{
 };
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
-use psl::PreviewFeature;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::ConnectionInfo,
@@ -18,14 +17,14 @@ use std::{collections::HashMap, str::FromStr};
 pub struct SqlConnection<C> {
     inner: C,
     connection_info: ConnectionInfo,
-    features: Vec<PreviewFeature>,
+    features: psl::PreviewFeatures,
 }
 
 impl<C> SqlConnection<C>
 where
     C: QueryExt + Send + Sync + 'static,
 {
-    pub fn new(inner: C, connection_info: &ConnectionInfo, features: Vec<PreviewFeature>) -> Self {
+    pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         let connection_info = connection_info.clone();
 
         Self {
@@ -48,7 +47,7 @@ where
         isolation_level: Option<String>,
     ) -> connector::Result<Box<dyn Transaction + 'a>> {
         let connection_info = &self.connection_info;
-        let features = self.features.clone();
+        let features = self.features;
         let isolation_level = match isolation_level {
             Some(level) => {
                 let transformed = IsolationLevel::from_str(&level)
@@ -278,7 +277,7 @@ where
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::execute_raw(&self.inner, &self.features, inputs).await
+            write::execute_raw(&self.inner, self.features, inputs).await
         })
         .await
     }
@@ -290,13 +289,7 @@ where
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(
-                &self.inner,
-                SqlInfo::from(&self.connection_info),
-                &self.features,
-                inputs,
-            )
-            .await
+            write::query_raw(&self.inner, SqlInfo::from(&self.connection_info), self.features, inputs).await
         })
         .await
     }

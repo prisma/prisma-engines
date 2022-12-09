@@ -1,7 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+    Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
@@ -134,6 +134,81 @@ where
     )?;
 
     Ok(read_children_node)
+}
+
+/// Adds a node to read the old child, compare it to the new child and continues the graph execution only if there are diffences between the old & the new child.
+/// This function is tailored for 1-1 nested connect.
+pub fn insert_1to1_idempotent_connect_checks(
+    graph: &mut QueryGraph,
+    parent_node: &NodeRef,
+    read_new_child_node: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+) -> QueryGraphBuilderResult<NodeRef> {
+    let child_model = parent_relation_field.related_model();
+    let child_model_identifier = child_model.primary_identifier();
+    let relation_name = parent_relation_field.relation().name.clone();
+
+    let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
+
+    graph.create_edge(
+        read_new_child_node,
+        &diff_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(move |mut diff_node, child_ids| {
+                if child_ids.is_empty() {
+                    return Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "No '{}' record to connect was found was found for a nested connect on one-to-one relation '{}'.",
+                        &child_model.name, relation_name
+                    )))
+                }
+
+                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
+                    diff.right = child_ids.into_iter().collect();
+                }
+
+                Ok(diff_node)
+            }),
+        ),
+    )?;
+    let read_old_child_node =
+        insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
+
+    graph.create_edge(
+        &read_old_child_node,
+        &diff_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_identifier.clone(),
+            Box::new(move |mut diff_node, child_ids| {
+                if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
+                    diff.left = child_ids.into_iter().collect();
+                }
+
+                Ok(diff_node)
+            }),
+        ),
+    )?;
+    let if_node = graph.create_node(Flow::default_if());
+
+    graph.create_edge(
+        &diff_node,
+        &if_node,
+        QueryGraphDependency::DataDependency(Box::new(move |if_node, result| {
+            let diff_result = result.as_diff_result().unwrap();
+            let should_connect = !diff_result.is_empty();
+
+            if let Node::Flow(Flow::If(_)) = if_node {
+                Ok(Node::Flow(Flow::If(Box::new(move || should_connect))))
+            } else {
+                unreachable!()
+            }
+        })),
+    )?;
+    let empty_node = graph.create_node(Node::Empty);
+
+    graph.create_edge(&if_node, &empty_node, QueryGraphDependency::Then)?;
+
+    Ok(empty_node)
 }
 
 /// Creates an update many records query node and adds it to the query graph.

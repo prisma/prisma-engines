@@ -1,5 +1,4 @@
 use super::*;
-
 use crate::constants::filters;
 
 pub(crate) trait WithFieldRefInputExt {
@@ -10,7 +9,7 @@ impl WithFieldRefInputExt for InputType {
     fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType> {
         let mut field_types: Vec<InputType> = vec![self.clone()];
 
-        if ctx.has_feature(&PreviewFeature::FieldReference) {
+        if ctx.has_feature(PreviewFeature::FieldReference) {
             field_types.push(InputType::object(field_ref_input_object_type(ctx, self)));
         }
 

@@ -9,9 +9,10 @@ use std::{
 };
 
 /// [relation name, model A relation field name, model B relation field name]
-pub(super) type RelationName<'a> = [Cow<'a, str>; 3];
+pub(crate) type RelationName<'a> = [Cow<'a, str>; 3];
 
-pub(super) struct RelationNames<'a> {
+#[derive(Default)]
+pub(crate) struct RelationNames<'a> {
     inline_relation_names: HashMap<sql::ForeignKeyId, RelationName<'a>>,
     m2m_relation_names: HashMap<sql::TableId, RelationName<'a>>,
 }
@@ -21,7 +22,8 @@ impl<'a> RelationNames<'a> {
         self.inline_relation_names.get(&id)
     }
 
-    pub(crate) fn m2m_relation_name(&self, id: sql::TableId) -> &[Cow<'a, str>; 3] {
+    #[track_caller]
+    pub(crate) fn m2m_relation_name(&self, id: sql::TableId) -> &RelationName<'a> {
         &self.m2m_relation_names[&id]
     }
 }
@@ -60,7 +62,7 @@ impl<'a> RelationNames<'a> {
 ///
 /// Additionally, in self-relations, the names of the two relation fields are disambiguated by
 /// prefixing the name of the backrelation field with "other_".
-pub(super) fn introspect(input: InputContext) -> RelationNames {
+pub(super) fn introspect<'a>(input: InputContext<'a>, map: &mut super::IntrospectionMap<'a>) {
     let mut names = RelationNames {
         inline_relation_names: Default::default(),
         m2m_relation_names: Default::default(),
@@ -83,7 +85,7 @@ pub(super) fn introspect(input: InputContext) -> RelationNames {
         }
     }
 
-    names
+    map.relation_names = names;
 }
 
 fn prisma_m2m_relation_name<'a>(
@@ -133,7 +135,9 @@ fn inline_relation_name<'a>(
     let referenced_model_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
     let self_relation_prefix = if is_self_relation { "other_" } else { "" };
 
-    if !ambiguous_relations.contains(&sorted_table_ids(fk.table().id, fk.referenced_table().id)) {
+    let is_ambiguous_name = ambiguous_relations.contains(&sorted_table_ids(fk.table().id, fk.referenced_table().id));
+
+    if !is_ambiguous_name {
         let relation_name = if is_self_relation {
             Cow::Owned(format!("{referencing_model_name}To{referenced_model_name}"))
         } else {

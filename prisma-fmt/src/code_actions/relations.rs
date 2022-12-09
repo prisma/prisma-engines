@@ -1,7 +1,9 @@
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
+use lsp_types::{
+    CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit,
+};
 use psl::parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
+    walkers::{CompleteInlineRelationWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker},
 };
 use std::collections::HashMap;
 
@@ -65,7 +67,13 @@ pub(super) fn add_referencing_side_unique(
         _ => (),
     }
 
-    let text = create_missing_unique(schema, relation.referencing_model(), relation.referencing_fields());
+    let attribute_name = "unique";
+    let text = create_missing_attribute(
+        schema,
+        relation.referencing_model(),
+        relation.referencing_fields(),
+        attribute_name,
+    );
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -151,7 +159,13 @@ pub(super) fn add_referenced_side_unique(
         _ => (),
     }
 
-    let text = create_missing_unique(schema, relation.referenced_model(), relation.referenced_fields());
+    let attribute_name = "unique";
+    let text = create_missing_attribute(
+        schema,
+        relation.referenced_model(),
+        relation.referenced_fields(),
+        attribute_name,
+    );
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -180,13 +194,115 @@ pub(super) fn add_referenced_side_unique(
     actions.push(CodeActionOrCommand::CodeAction(action));
 }
 
-fn create_missing_unique<'a>(
+/// For schema's with emulated relations,
+/// If the referenced side of the relation does not point to a unique
+/// constraint, the action adds the attribute.
+///
+/// If referencing a single field:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId], references: [id])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId     Int
+///
+///     // <- suggest @@index([bId]) here
+/// }
+///
+/// model B {
+///     id Int @id
+///     as A[]
+/// }
+/// ```
+///
+/// If referencing multiple fields:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId1, bId2, bId3], references: [id1, id2, id3])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId1    Int
+///     bId2    Int
+///     bId3    Int
+///
+///     // <- suggest @@index([bId1, bId2, bId3]) here
+/// }
+///
+/// model B {
+///     id1 Int
+///     id2 Int
+///     id3 Int
+///     as  A[]
+///
+///     @@id([id1, id2, id3])
+/// }
+/// ```
+pub(super) fn add_index_for_relation_fields(
+    actions: &mut Vec<CodeActionOrCommand>,
+    params: &CodeActionParams,
+    schema: &str,
+    relation: RelationFieldWalker<'_>,
+) {
+    let fields = match relation.fields() {
+        Some(fields) => fields,
+        None => return,
+    };
+    if relation.model().indexes().any(|index| {
+        index
+            .fields()
+            .zip(fields.clone())
+            .all(|(index_field, relation_field)| index_field.field_id() == relation_field.field_id())
+    }) {
+        return;
+    }
+
+    let attribute_name = "index";
+    let (new_text, range) = create_block_attribute(schema, relation.model(), fields, attribute_name);
+    let text = TextEdit { range, new_text };
+
+    let mut changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), vec![text]);
+
+    let edit = WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    };
+
+    let span_diagnostics = match super::diagnostics_for_span(
+        schema,
+        &params.context.diagnostics,
+        relation.relation_attribute().unwrap().span(),
+    ) {
+        Some(sd) => sd,
+        None => return,
+    };
+
+    let diagnostics = span_diagnostics
+        .into_iter()
+        .filter(|diag| diag.message.contains("relationMode = \"prisma\""))
+        .collect::<Vec<Diagnostic>>();
+
+    let action = CodeAction {
+        title: String::from("Add an index for the relation's field(s)"),
+        kind: Some(CodeActionKind::QUICKFIX),
+        edit: Some(edit),
+        diagnostics: Some(diagnostics),
+        ..Default::default()
+    };
+
+    actions.push(CodeActionOrCommand::CodeAction(action))
+}
+
+fn create_missing_attribute<'a>(
     schema: &str,
     model: ModelWalker<'a>,
     mut fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
+    attribute_name: &str,
 ) -> TextEdit {
     let (new_text, range) = if fields.len() == 1 {
-        let new_text = String::from(" @unique");
+        let new_text = format!(" @{attribute_name}");
 
         let field = fields.next().unwrap();
         let position = crate::position_after_span(field.ast_field().span(), schema);
@@ -198,26 +314,34 @@ fn create_missing_unique<'a>(
 
         (new_text, range)
     } else {
-        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-
-        let indentation = model.indentation();
-        let newline = model.newline();
-
-        let separator = if model.ast_model().attributes.is_empty() {
-            newline.as_ref()
-        } else {
-            ""
-        };
-
-        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
-
-        let start = crate::offset_to_position(model.ast_model().span().end - 1, schema);
-        let end = crate::offset_to_position(model.ast_model().span().end, schema);
-
-        let range = Range { start, end };
-
+        let (new_text, range) = create_block_attribute(schema, model, fields, attribute_name);
         (new_text, range)
     };
 
     TextEdit { range, new_text }
+}
+
+fn create_block_attribute<'a>(
+    schema: &str,
+    model: ModelWalker<'a>,
+    fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
+    attribute_name: &str,
+) -> (String, Range) {
+    let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
+
+    let indentation = model.indentation();
+    let newline = model.newline();
+    let separator = if model.ast_model().attributes.is_empty() {
+        newline.as_ref()
+    } else {
+        ""
+    };
+    let new_text = format!("{separator}{indentation}@@{attribute_name}([{fields}]){newline}}}");
+
+    let start = crate::offset_to_position(model.ast_model().span().end - 1, schema);
+    let end = crate::offset_to_position(model.ast_model().span().end, schema);
+
+    let range = Range { start, end };
+
+    (new_text, range)
 }

@@ -768,3 +768,77 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
 
 //
 // }
+
+#[test]
+fn dev_diagnostic_multi_schema_does_not_panic() {
+    let db = test_setup::only!(Postgres);
+    let (_, url) = tok(test_setup::postgres::create_postgres_database(
+        db.url(),
+        "dev_diagnostic_multi_schema",
+    ))
+    .unwrap();
+
+    let schema = format! {r#"
+        datasource db {{
+            provider = "postgresql"
+            url = "{url}"
+            schemas = ["prisma-tests", "auth"]
+        }}
+
+        generator js {{
+            provider = "prisma-client-js"
+            previewFeatures = ["multiSchema"]
+        }}
+
+        model users {{
+          id       String    @id @db.Uuid
+          profiles profiles?
+
+          @@schema("auth")
+        }}
+
+        model profiles {{
+          id    String @id @db.Uuid
+          users users  @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("prisma-tests")
+        }}
+    "#};
+
+    let setup = r#"
+-- ./sql/ddl.sql
+
+CREATE SCHEMA auth;
+
+-- auth.users definition
+CREATE TABLE auth.users (
+    id uuid NOT NULL,
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+
+-- "prisma-tests".profiles definition
+CREATE TABLE "prisma-tests".profiles (
+    id uuid NOT NULL,
+    CONSTRAINT profiles_pkey PRIMARY KEY (id)
+);
+
+-- "prisma-tests".profiles foreign keys
+ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id);
+    "#;
+
+    let tempdir = tempfile::tempdir().unwrap();
+    std::fs::write(tempdir.path().join("schema.prisma"), &schema).unwrap();
+
+    let api = migration_core::migration_api(Some(schema), None).unwrap();
+
+    tok(api.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url }),
+        script: setup.to_owned(),
+    }))
+    .unwrap();
+
+    tok(api.dev_diagnostic(DevDiagnosticInput {
+        migrations_directory_path: tempdir.path().join("migrations").to_string_lossy().into_owned(),
+    }))
+    .unwrap();
+}

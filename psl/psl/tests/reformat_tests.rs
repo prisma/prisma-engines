@@ -28,6 +28,8 @@ fn run_reformat_test(test_file_path: &str) {
     }
 
     if reformat(&reformatted_text) != reformatted_text {
+        println!("=== reformatted ===\n{reformatted_text}");
+        println!("=== reformatted again ===\n{}", reformat(&reformatted_text));
         panic!("Reformatting this schema is not idempotent.");
     }
 }

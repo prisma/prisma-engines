@@ -169,3 +169,103 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn invalid_enum_variants_regression(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TYPE invalid_enum AS ENUM ('Y','N','123','$§!');
+
+        CREATE TABLE invalid_enum_value_name (
+          field1 SERIAL PRIMARY KEY NOT NULL,
+          here_be_enum invalid_enum DEFAULT NULL
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model invalid_enum_value_name {
+          field1       Int           @id @default(autoincrement())
+          here_be_enum invalid_enum?
+        }
+
+        enum invalid_enum {
+          Y
+          N
+          // 123 @map("123")
+          // $§! @map("$§!")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 4,
+            "message": "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
+            "affected": [
+              {
+                "enm": "invalid_enum",
+                "value": "123"
+              },
+              {
+                "enm": "invalid_enum",
+                "value": "$§!"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_variant_that_cannot_be_sanitized_triggers_dbgenerated_in_defaults(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE Type "A" as ENUM ('0', '1');
+
+        CREATE TABLE "B" (
+            id SERIAL PRIMARY KEY,
+            val "A" NOT NULL DEFAULT '0'
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          val A   @default(dbgenerated("0"))
+        }
+
+        enum A {
+          // 0 @map("0")
+          // 1 @map("1")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    Ok(())
+}

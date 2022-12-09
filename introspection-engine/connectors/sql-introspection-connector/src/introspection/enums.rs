@@ -1,6 +1,6 @@
 use crate::{
     calculate_datamodel::{InputContext, OutputContext},
-    introspection_helpers::*,
+    introspection_helpers as helpers,
     pair::EnumPair,
     sanitize_datamodel_names, warnings,
 };
@@ -15,7 +15,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
         all_enums.push((pair.previous_position(), rendered_enum))
     }
 
-    all_enums.sort_by(|(id_a, _), (id_b, _)| compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
+    all_enums.sort_by(|(id_a, _), (id_b, _)| helpers::compare_options_none_last(id_a.as_ref(), id_b.as_ref()));
 
     if input.sql_family.is_mysql() {
         // MySQL can have multiple database enums matching one Prisma enum.
@@ -41,11 +41,8 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, output: &mut OutputContext<'a>) -> rend
     if let Some(mapped_name) = r#enum.mapped_name() {
         rendered_enum.map(mapped_name);
 
-        output
-            .warnings
-            .push(warnings::warning_enriched_with_map_on_enum(&[warnings::Enum::new(
-                &r#enum.name(),
-            )]));
+        let warning = warnings::warning_enriched_with_map_on_enum(&[warnings::Enum::new(&r#enum.name())]);
+        output.warnings.push(warning);
     }
 
     if let Some(docs) = r#enum.documentation() {
@@ -65,11 +62,6 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, output: &mut OutputContext<'a>) -> rend
             };
 
             output.warnings.enum_values_with_empty_names.push(warning);
-        } else if variant.mapped_name().is_some() {
-            remapped_values.push(warnings::EnumAndValue {
-                value: variant.name().to_string(),
-                enm: r#enum.name().to_string(),
-            });
         }
 
         let mut rendered_variant = renderer::EnumVariant::new(variant.name());
@@ -83,7 +75,18 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, output: &mut OutputContext<'a>) -> rend
         }
 
         if variant.name().is_empty() || sanitize_datamodel_names::needs_sanitation(&variant.name()) {
+            let warning = warnings::EnumAndValue {
+                enm: r#enum.name().to_string(),
+                value: variant.name().to_string(),
+            };
+
+            output.warnings.enum_values_with_empty_names.push(warning);
             rendered_variant.comment_out();
+        } else if variant.mapped_name().is_some() {
+            remapped_values.push(warnings::EnumAndValue {
+                value: variant.name().to_string(),
+                enm: r#enum.name().to_string(),
+            });
         }
 
         rendered_enum.push_variant(rendered_variant);

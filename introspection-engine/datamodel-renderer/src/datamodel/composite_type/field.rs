@@ -29,73 +29,54 @@ impl<'a> CompositeTypeField<'a> {
     /// //^^^^^^ name
     /// }
     /// ```
-    pub fn new_required(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::required(type_name))
+    pub fn new(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
+        let (name, map, commented_out) = (Constant::new_no_validate(name.into()), None, false);
+
+        Self {
+            name,
+            r#type: FieldType::required(type_name),
+            map,
+            default: None,
+            native_type: None,
+            documentation: None,
+            commented_out,
+        }
     }
 
-    /// Create a new optional composite field declaration.
+    /// Sets the field as optional.
     ///
     /// ```ignore
     /// type Address {
     ///   street String?
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^ this
     /// }
     /// ```
-    pub fn new_optional(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::optional(type_name))
+    pub fn optional(&mut self) {
+        self.r#type.into_optional();
     }
 
-    /// Create a new array composite field declaration.
+    /// Sets the field to be an array.
     ///
     /// ```ignore
     /// type Address {
     ///   street String[]
-    /// //       ^^^^^^ type_name
-    /// //^^^^^^ name
+    /// //             ^^ this
     /// }
     /// ```
-    pub fn new_array(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::array(type_name))
+    pub fn array(&mut self) {
+        self.r#type.into_array();
     }
 
-    /// Create a new required unsupported composite field declaration.
+    /// Sets the field to be unsupported.
     ///
     /// ```ignore
     /// type Address {
     ///   street Unsupported("foo")
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
+    /// //       ^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn new_required_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::required_unsupported(type_name.into()))
-    }
-
-    /// Create a new optional unsupported composite field declaration.
-    ///
-    /// ```ignore
-    /// type Address {
-    ///   street Unsupported("foo")?
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    pub fn new_optional_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::optional_unsupported(type_name))
-    }
-
-    /// Create a new array unsupported composite field declaration.
-    ///
-    /// ```ignore
-    /// type Address {
-    ///   street Unsupported("foo")[]
-    /// //                    ^^^ type_name
-    /// //^^^^^^ name
-    /// }
-    /// ```
-    pub fn new_array_unsupported(name: impl Into<Cow<'a, str>>, type_name: impl Into<Cow<'a, str>>) -> Self {
-        Self::new(name.into(), FieldType::array_unsupported(type_name))
+    pub fn unsupported(&mut self) {
+        self.r#type.into_unsupported();
     }
 
     /// Sets the field map attribute.
@@ -180,20 +161,17 @@ impl<'a> CompositeTypeField<'a> {
         };
         let field_name = dml_field.name.clone();
 
-        let mut field = match dml_field.arity {
-            dml::FieldArity::Required if dml_field.r#type.is_unsupported() => {
-                CompositeTypeField::new_required_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::Optional if dml_field.r#type.is_unsupported() => {
-                CompositeTypeField::new_optional_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::List if dml_field.r#type.is_unsupported() => {
-                CompositeTypeField::new_array_unsupported(field_name, r#type)
-            }
-            dml::FieldArity::Required => CompositeTypeField::new_required(field_name, r#type),
-            dml::FieldArity::Optional => CompositeTypeField::new_optional(field_name, r#type),
-            dml::FieldArity::List => CompositeTypeField::new_array(field_name, r#type),
-        };
+        let mut field = CompositeTypeField::new(field_name, r#type);
+
+        match dml_field.arity {
+            dml::FieldArity::Optional => field.optional(),
+            dml::FieldArity::List => field.array(),
+            dml::FieldArity::Required => (),
+        }
+
+        if dml_field.r#type.is_unsupported() {
+            field.unsupported();
+        }
 
         if let Some(ref docs) = dml_field.documentation {
             field.documentation(docs.clone());
@@ -216,20 +194,6 @@ impl<'a> CompositeTypeField<'a> {
         }
 
         field
-    }
-
-    fn new(name: Cow<'a, str>, r#type: FieldType<'a>) -> Self {
-        let (name, map, commented_out) = (Constant::new_no_validate(name), None, false);
-
-        Self {
-            name,
-            r#type,
-            map,
-            default: None,
-            native_type: None,
-            documentation: None,
-            commented_out,
-        }
     }
 }
 

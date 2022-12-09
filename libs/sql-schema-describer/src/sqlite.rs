@@ -392,13 +392,15 @@ async fn push_columns(
         };
 
         let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
+        let column_id = ColumnId(schema.columns.len() as u32);
+        let default_value_id = default.map(|default| schema.push_default_value(column_id, default));
 
         let column_id = schema.push_column(
             table_id,
             Column {
                 name: row.get_expect_string("name"),
                 tpe,
-                default,
+                default_value_id,
                 auto_increment: false,
             },
         );

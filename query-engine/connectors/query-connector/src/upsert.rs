@@ -80,14 +80,8 @@ impl NativeUpsert {
     pub fn selection_order(&self) -> &[String] {
         &self.selection_order
     }
-}
 
-impl std::fmt::Display for NativeUpsert {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "Upsert(model: {}, filter: {:?}, create: {:?}, update: {:?}",
-            self.model.name, self.record_filter, self.create, self.update
-        )
+    pub fn record_filter(&self) -> &RecordFilter {
+        &self.record_filter
     }
 }

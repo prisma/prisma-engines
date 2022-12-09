@@ -99,27 +99,29 @@ mod tests {
         let mut composite_type = CompositeType::new("Address");
         composite_type.documentation("...so many tears 🎵");
 
-        let mut field = CompositeTypeField::new_required("Street", "String");
+        let mut field = CompositeTypeField::new("Street", "String");
         field.native_type("db", "VarChar", vec!["255".into()]);
         field.default(DefaultValue::text("Prenzlauer Allee 193"));
         field.map("Shield");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("Number", "Int");
+        let field = CompositeTypeField::new("Number", "Int");
         composite_type.push_field(field);
 
-        let mut field = CompositeTypeField::new_optional("City", "String");
+        let mut field = CompositeTypeField::new("City", "String");
+        field.optional();
         field.documentation("...soooooooo many tears 🎵");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_array("Other", "String");
+        let mut field = CompositeTypeField::new("Other", "String");
+        field.array();
         composite_type.push_field(field);
 
-        let mut field = CompositeTypeField::new_required("Invalid", "Float");
+        let mut field = CompositeTypeField::new("Invalid", "Float");
         field.map("1Invalid");
         composite_type.push_field(field);
 
-        let mut field = CompositeTypeField::new_required("11111", "Float");
+        let mut field = CompositeTypeField::new("11111", "Float");
         field.commented_out();
         field.map("11111");
         composite_type.push_field(field);

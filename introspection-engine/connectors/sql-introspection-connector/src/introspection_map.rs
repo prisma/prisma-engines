@@ -1,29 +1,85 @@
-use crate::introspection_helpers::is_prisma_join_table;
+mod relation_names;
+
+use crate::{calculate_datamodel::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
 use psl::parser_database::{self, ast};
+use relation_names::RelationNames;
 use sql_schema_describer as sql;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+
+pub(crate) use relation_names::RelationName;
 
 /// This container is responsible for matching schema items (enums, models and tables, columns and
 /// fields, foreign keys and relations...) between a SQL catalog from a database and a Prisma
 /// schema.
 #[derive(Default)]
-pub(crate) struct IntrospectionMap {
+pub(crate) struct IntrospectionMap<'a> {
     pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
     pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
+    pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
     pub(crate) existing_scalar_fields: HashMap<sql::ColumnId, (ast::ModelId, ast::FieldId)>,
     pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
     pub(crate) existing_m2m_relations: HashMap<sql::TableId, parser_database::ManyToManyRelationId>,
+    pub(crate) relation_names: RelationNames<'a>,
+    pub(crate) inline_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
+    pub(crate) m2m_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
 }
 
-impl IntrospectionMap {
-    pub(crate) fn new(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema) -> Self {
+impl<'a> IntrospectionMap<'a> {
+    pub(crate) fn new(input: InputContext<'a>) -> Self {
+        let sql_schema = input.schema;
+        let prisma_schema = input.previous_schema;
         let mut map = Default::default();
+
         match_existing_models(sql_schema, prisma_schema, &mut map);
         match_enums(sql_schema, prisma_schema, &mut map);
         match_existing_scalar_fields(sql_schema, prisma_schema, &mut map);
         match_existing_inline_relations(sql_schema, prisma_schema, &mut map);
         match_existing_m2m_relations(sql_schema, prisma_schema, &mut map);
+        relation_names::introspect(input, &mut map);
+        position_inline_relation_fields(sql_schema, &mut map);
+        position_m2m_relation_fields(sql_schema, &mut map);
+
         map
+    }
+}
+
+fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap) {
+    for table in sql_schema
+        .table_walkers()
+        .filter(|t| !helpers::is_prisma_join_table(*t))
+    {
+        for fk in table.foreign_keys() {
+            map.inline_relation_positions
+                .push((fk.table().id, fk.id, RelationFieldDirection::Forward));
+
+            map.inline_relation_positions
+                .push((fk.referenced_table().id, fk.id, RelationFieldDirection::Back));
+        }
+    }
+}
+
+fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap) {
+    for table in sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(*t)) {
+        let mut fks = table.foreign_keys();
+
+        if let (Some(first_fk), Some(second_fk)) = (fks.next(), fks.next()) {
+            let (fk_a, fk_b) = if first_fk
+                .constrained_columns()
+                .next()
+                .map(|c| c.name().eq_ignore_ascii_case("a"))
+                .unwrap_or(false)
+            {
+                (first_fk, second_fk)
+            } else {
+                (second_fk, first_fk)
+            };
+
+            map.m2m_relation_positions
+                .push((fk_a.referenced_table().id, fk_b.id, RelationFieldDirection::Forward));
+
+            map.m2m_relation_positions
+                .push((fk_b.referenced_table().id, fk_a.id, RelationFieldDirection::Back));
+        }
     }
 }
 
@@ -64,15 +120,17 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
 }
 
 fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
-    map.existing_models = prisma_schema
-        .db
-        .walk_models()
-        .filter_map(|model| {
-            schema
-                .find_table(model.database_name())
-                .map(|sql_id| (sql_id, model.id))
-        })
-        .collect()
+    for model in prisma_schema.db.walk_models() {
+        match schema.find_table(model.database_name()) {
+            Some(sql_id) => {
+                map.existing_models.insert(sql_id, model.id);
+            }
+
+            None => {
+                map.missing_tables_for_previous_models.insert(model.id);
+            }
+        }
+    }
 }
 
 fn match_existing_scalar_fields(
@@ -80,19 +138,21 @@ fn match_existing_scalar_fields(
     prisma_schema: &psl::ValidatedSchema,
     map: &mut IntrospectionMap,
 ) {
-    map.existing_scalar_fields = sql_schema
-        .walk_columns()
-        .filter_map(|col| {
-            let model_id = map.existing_models.get(&col.table().id)?;
-            let field_id = prisma_schema
-                .db
-                .walk(*model_id)
+    for col in sql_schema.walk_columns() {
+        let ids = map.existing_models.get(&col.table().id).and_then(|model_id| {
+            let model = prisma_schema.db.walk(*model_id);
+
+            let field = model
                 .scalar_fields()
-                .find(|field| field.database_name() == col.name())
-                .map(|field| field.field_id())?;
-            Some((col.id, (*model_id, field_id)))
-        })
-        .collect()
+                .find(|field| field.database_name() == col.name())?;
+
+            Some((model, field))
+        });
+
+        if let Some((model, field)) = ids {
+            map.existing_scalar_fields.insert(col.id, (model.id, field.field_id()));
+        }
+    }
 }
 
 fn match_existing_inline_relations<'a>(
@@ -133,7 +193,7 @@ fn match_existing_m2m_relations(
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| is_prisma_join_table(*t))
+        .filter(|t| helpers::is_prisma_join_table(*t))
         .filter_map(|table| {
             prisma_schema
                 .db

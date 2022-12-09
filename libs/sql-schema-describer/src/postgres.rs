@@ -574,6 +574,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
@@ -622,9 +623,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let names = rows
             .into_iter()
             .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
+
         let mut map = IndexMap::default();
 
         for (table_name, namespace) in names {
@@ -738,6 +741,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         for col in rows {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
+
             let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
                 Some(t_walker) => t_walker.id,
                 None => continue, // we only care about columns in tables we have access to
@@ -761,23 +765,27 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 get_column_type_postgresql(&col, sql_schema)
             };
+
             let default = col
                 .get("column_default")
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
             let auto_increment = is_identity
-                || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
+                || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
                     && matches!(
-                        default.as_ref().map(|d| d.kind()),
+                        default.as_ref().map(|d| &d.kind),
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
+
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             let col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 

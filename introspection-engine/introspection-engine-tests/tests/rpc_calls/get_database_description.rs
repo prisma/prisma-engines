@@ -41,7 +41,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                   "family": "Int",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": true
               }
             ],
@@ -54,12 +54,13 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
                   "family": "String",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": false
               }
             ]
           ],
           "foreign_keys": [],
+          "default_values": [],
           "foreign_key_columns": [],
           "indexes": [
             {
@@ -112,7 +113,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                   "family": "Int",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": true
               }
             ],
@@ -125,12 +126,13 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
                   "family": "String",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": false
               }
             ]
           ],
           "foreign_keys": [],
+          "default_values": [],
           "foreign_key_columns": [],
           "indexes": [
             {
@@ -185,12 +187,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                   "family": "Int",
                   "arity": "Required"
                 },
-                "default": {
-                  "kind": {
-                    "Sequence": "Blog_id_seq"
-                  },
-                  "constraint_name": null
-                },
+                "default_value_id": 0,
                 "auto_increment": true
               }
             ],
@@ -203,12 +200,23 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                   "family": "String",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": false
               }
             ]
           ],
           "foreign_keys": [],
+          "default_values": [
+            [
+              0,
+              {
+                "kind": {
+                  "Sequence": "Blog_id_seq"
+                },
+                "constraint_name": null
+              }
+            ]
+          ],
           "foreign_key_columns": [],
           "indexes": [
             {
@@ -261,7 +269,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                   "family": "Int",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": true
               }
             ],
@@ -274,12 +282,13 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
                   "family": "String",
                   "arity": "Required"
                 },
-                "default": null,
+                "default_value_id": null,
                 "auto_increment": false
               }
             ]
           ],
           "foreign_keys": [],
+          "default_values": [],
           "foreign_key_columns": [],
           "indexes": [
             {

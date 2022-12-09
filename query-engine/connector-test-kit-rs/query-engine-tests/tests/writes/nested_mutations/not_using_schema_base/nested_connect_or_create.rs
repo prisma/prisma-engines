@@ -461,4 +461,102 @@ mod connect_or_create {
 
         Ok(())
     }
+
+    fn schema_5() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+          
+            child Child?
+          }
+          
+          model Child {
+            #id(id, Int, @id)
+
+            parentId Int?   @unique          
+            parent Parent? @relation(fields: [parentId], references: [id])
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/16090
+    #[connector_test(schema(schema_5))]
+    async fn one2one_update_if_no_child_connected_yet(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneChild(data: { id: 1 }) { id } }"#);
+
+        // connect (without child connected yet)
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: {
+            child: {
+              connectOrCreate: { where: { id: 1 }, create: { id: 1 } }
+            }
+          }) {
+            id
+            child { id }
+          } }"#),
+          @r###"{"data":{"updateOneParent":{"id":1,"child":{"id":1}}}}"###
+        );
+
+        // connect (child already connected)
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneParent(where: { id: 1 }, data: {
+            child: {
+              connectOrCreate: { where: { id: 1 }, create: { id: 1 } }
+            }
+          }) {
+            id
+            child { id }
+          } }"#),
+          @r###"{"data":{"updateOneParent":{"id":1,"child":{"id":1}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/16090
+    #[connector_test(schema(schema_5))]
+    async fn one2one_upsert_if_no_child_connected_yet(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneChild(data: { id: 1 }) { id } }"#);
+
+        // connect (without child connected yet)
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { upsertOneParent(
+            where: { id: 1 },
+            create: { id: 1 },
+            update: {
+              child: {
+                connectOrCreate: { where: { id: 1 }, create: { id: 1 } }
+              }
+            }
+          ) {
+            id
+            child { id }
+          } }"#),
+          @r###"{"data":{"upsertOneParent":{"id":1,"child":{"id":1}}}}"###
+        );
+
+        // connect (child already connected)
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { upsertOneParent(
+            where: { id: 1 },
+            create: { id: 1 },
+            update: {
+              child: {
+                connectOrCreate: { where: { id: 1 }, create: { id: 1 } }
+              }
+            }
+          ) {
+            id
+            child { id }
+          } }"#),
+          @r###"{"data":{"upsertOneParent":{"id":1,"child":{"id":1}}}}"###
+        );
+
+        Ok(())
+    }
 }

@@ -34,6 +34,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
             },
+            None,
             self.api,
         )
         .await?;

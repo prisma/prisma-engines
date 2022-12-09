@@ -16,6 +16,7 @@ pub trait Getter {
 }
 
 impl Getter for ResultRow {
+    #[track_caller]
     fn get_expect_string(&self, name: &str) -> String {
         self.get(name)
             .and_then(|x| x.to_string())
@@ -23,6 +24,7 @@ impl Getter for ResultRow {
             .unwrap()
     }
 
+    #[track_caller]
     fn get_expect_char(&self, name: &str) -> char {
         self.get(name)
             .and_then(|x| x.as_char())
@@ -30,6 +32,7 @@ impl Getter for ResultRow {
             .unwrap()
     }
 
+    #[track_caller]
     fn get_expect_i64(&self, name: &str) -> i64 {
         self.get(name)
             .and_then(|x| x.as_integer())
@@ -37,6 +40,7 @@ impl Getter for ResultRow {
             .unwrap()
     }
 
+    #[track_caller]
     fn get_expect_bool(&self, name: &str) -> bool {
         self.get_bool(name)
             .ok_or_else(|| format!("Getting {} from Resultrow {:?} as bool failed", name, &self))

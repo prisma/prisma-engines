@@ -13,6 +13,19 @@ enum FieldKind<'a> {
     ArrayUnsupported(Text<Cow<'a, str>>),
 }
 
+impl<'a> FieldKind<'a> {
+    fn take_type(&mut self) -> Cow<'a, str> {
+        match self {
+            FieldKind::Required(Constant(s)) => std::mem::take(s),
+            FieldKind::Optional(Constant(s)) => std::mem::take(s),
+            FieldKind::Array(Constant(s)) => std::mem::take(s),
+            FieldKind::RequiredUnsupported(Text(s)) => std::mem::take(s),
+            FieldKind::OptionalUnsupported(Text(s)) => std::mem::take(s),
+            FieldKind::ArrayUnsupported(Text(s)) => std::mem::take(s),
+        }
+    }
+}
+
 /// A type of a field in the datamodel.
 #[derive(Debug)]
 pub struct FieldType<'a> {
@@ -32,50 +45,47 @@ impl<'a> FieldType<'a> {
         }
     }
 
-    /// The field is optional, rendered with a question mark after the
-    /// type name. For example: `Int?`.
-    ///
-    /// The name will be sanitized, removing unsupported characters.
-    pub fn optional(name: impl Into<Cow<'a, str>>) -> Self {
-        let name = Constant::new_no_validate(name.into());
-        Self {
-            inner: FieldKind::Optional(name),
-        }
+    /// Convert the field type to optional.
+    pub fn into_optional(&mut self) {
+        let inner = match self.inner {
+            ref mut s @ FieldKind::Required(_) => FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::Array(_) => FieldKind::Optional(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::ArrayUnsupported(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
+
+            FieldKind::Optional(_) => return,
+            FieldKind::OptionalUnsupported(_) => return,
+        };
+
+        self.inner = inner;
     }
 
-    /// The field is an array, rendered with square brackets after the
-    /// type name. For example: `Int[]`.
-    ///
-    /// The name will be sanitized, removing unsupported characters.
-    pub fn array(name: impl Into<Cow<'a, str>>) -> Self {
-        let name = Constant::new_no_validate(name.into());
-        Self {
-            inner: FieldKind::Array(name),
-        }
+    /// Convert the field type to array.
+    pub fn into_array(&mut self) {
+        let inner = match self.inner {
+            ref mut s @ FieldKind::Required(_) => FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::Optional(_) => FieldKind::Array(Constant::new_no_validate(s.take_type())),
+            ref mut s @ FieldKind::RequiredUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::OptionalUnsupported(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
+
+            FieldKind::Array(_) => return,
+            FieldKind::ArrayUnsupported(_) => return,
+        };
+
+        self.inner = inner;
     }
 
-    /// The field is required, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)`.
-    pub fn required_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
-        Self {
-            inner: FieldKind::RequiredUnsupported(Text(name.into())),
-        }
-    }
+    /// Set the field type to be unsupported by Prisma.
+    pub fn into_unsupported(&mut self) {
+        let inner = match self.inner {
+            ref mut s @ FieldKind::Required(_) => FieldKind::RequiredUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::Optional(_) => FieldKind::OptionalUnsupported(Text(s.take_type())),
+            ref mut s @ FieldKind::Array(_) => FieldKind::ArrayUnsupported(Text(s.take_type())),
 
-    /// The field is optional, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)?`.
-    pub fn optional_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
-        Self {
-            inner: FieldKind::OptionalUnsupported(Text(name.into())),
-        }
-    }
+            _ => return,
+        };
 
-    /// The field is optional, but not supported by Prisma, rendered
-    /// as `Unsupported(ts_vector)?`.
-    pub fn array_unsupported(name: impl Into<Cow<'a, str>>) -> Self {
-        Self {
-            inner: FieldKind::ArrayUnsupported(Text(name.into())),
-        }
+        self.inner = inner;
     }
 }
 

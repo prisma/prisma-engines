@@ -1,7 +1,10 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
-pub use migration_core::json_rpc::types::{
-    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+pub use migration_core::{
+    json_rpc::types::{
+        DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+    },
+    migration_connector::Namespaces,
 };
 pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
@@ -10,7 +13,7 @@ use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_core::{
     commands::diff,
     migration_connector::{
-        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
     },
 };
 use psl::parser_database::SourceFile;

@@ -24,8 +24,6 @@ pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 
-use crate::{ast, ParserDatabase};
-
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
 pub struct Walker<'db, I> {
@@ -35,7 +33,23 @@ pub struct Walker<'db, I> {
     pub id: I,
 }
 
-impl ParserDatabase {
+impl<'db, I> Walker<'db, I> {
+    /// Traverse something else in the same schema.
+    pub fn walk<J>(self, other: J) -> Walker<'db, J> {
+        self.db.walk(other)
+    }
+}
+
+impl<'db, I> PartialEq for Walker<'db, I>
+where
+    I: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.id.eq(&other.id)
+    }
+}
+
+impl crate::ParserDatabase {
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }
@@ -57,17 +71,12 @@ impl ParserDatabase {
             .map(move |model_id| self.walk(model_id))
     }
 
-    /// Walk a specific composite type by ID.
-    pub fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'_> {
-        CompositeTypeWalker { ctid, db: self }
-    }
-
     /// Walk all the composite types in the schema.
     pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_composite_type_id())
-            .map(move |ctid| CompositeTypeWalker { ctid, db: self })
+            .map(|id| self.walk(id))
     }
 
     /// Walk all scalar field defaults with a function not part of the common ones.

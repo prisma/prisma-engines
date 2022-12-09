@@ -31,6 +31,7 @@ buildkite-script-*
 
 # Nix specific
 .direnv/
+/.envrc.local
 
 # Dev setup
 datamodel_v2.prisma
@@ -40,3 +41,4 @@ dev_datamodel.prisma
 /result
 
 dmmf.json
+graph.dot

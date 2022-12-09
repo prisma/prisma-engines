@@ -1,7 +1,13 @@
-use std::fmt;
+use once_cell::sync::Lazy;
+use std::{fmt, fs::File, io::Write};
 
 use super::*;
 use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
+
+pub static PRISMA_RENDER_DOT_FILE: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_RENDER_DOT_FILE") {
+    Ok(enabled) => enabled == *("true") || enabled == *("1"),
+    Err(_) => false,
+});
 
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
@@ -84,6 +90,14 @@ impl QueryGraphBuilder {
         // Run final transformations.
         graph.finalize()?;
         trace!("{}", graph);
+
+        // Used to debug generated graph.
+        if *PRISMA_RENDER_DOT_FILE {
+            let mut f = File::create("graph.dot").unwrap();
+            let output = graph.to_graphviz();
+
+            f.write_all(&output.as_bytes()).unwrap();
+        }
 
         Ok(graph)
     }

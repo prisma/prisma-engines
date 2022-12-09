@@ -1,11 +1,10 @@
+use super::CompositeTypeFieldWalker;
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase, ScalarFieldType,
 };
-
-use super::CompositeTypeFieldWalker;
 
 /// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
@@ -112,7 +111,7 @@ impl<'db> IndexWalker<'db> {
 
             match path.type_holding_the_indexed_field() {
                 Some(ctid) => {
-                    let walker = self.db.walk_composite_type(ctid).field(field_id);
+                    let walker = self.db.walk((ctid, field_id));
                     IndexFieldWalker::new(walker)
                 }
                 None => {

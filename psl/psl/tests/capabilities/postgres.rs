@@ -123,7 +123,7 @@ fn non_unique_relation_criteria_support() {
     let error = parse_unwrap_err(dml);
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `name` in the model `User`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `name` in the model `User`.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  assigneeName String

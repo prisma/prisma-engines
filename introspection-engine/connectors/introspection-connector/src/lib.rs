@@ -36,6 +36,12 @@ pub enum Version {
     Prisma2,
 }
 
+impl Version {
+    pub fn is_prisma1(self) -> bool {
+        matches!(self, Self::Prisma1 | Self::Prisma11)
+    }
+}
+
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel

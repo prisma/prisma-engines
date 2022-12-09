@@ -39,3 +39,7 @@ pub struct UdtId(pub(crate) u32);
 /// The identifier for a view in the database.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ViewId(pub(crate) u32);
+
+/// The identifier for a default value in the database.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Serialize, Deserialize, Ord, Hash)]
+pub struct DefaultValueId(pub(crate) u32);

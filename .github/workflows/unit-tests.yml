@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: buildjet-16vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
