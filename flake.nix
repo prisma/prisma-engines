@@ -19,9 +19,9 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
   };
 
-  outputs = inputs@{ self, nixpkgs, rust-overlay, flake-parts, crane, ... }:
+  outputs = inputs@{ self, nixpkgs, rust-overlay, flake-parts, flake-utils, crane, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
-      systems = [ "x86_64-linux" ];
+      systems = flake-utils.lib.defaultSystems;
       perSystem = { config, system, pkgs, craneLib, ... }: {
         config._module.args.inputs = inputs;
         imports = [
