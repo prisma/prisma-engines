@@ -1,3 +1,5 @@
+//! Small utility functions.
+
 use sql::walkers::TableWalker;
 use sql_schema_describer::{self as sql, ColumnTypeFamily, IndexType};
 use std::cmp;
@@ -13,6 +15,8 @@ pub(crate) fn compare_options_none_last<T: cmp::Ord>(a: Option<T>, b: Option<T>)
     }
 }
 
+/// True if the table is a legacy migrations table, which we do not
+/// want in the PSL.
 pub(crate) fn is_old_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_Migration"
         && table.columns().any(|c| c.name() == "revision")
@@ -28,6 +32,8 @@ pub(crate) fn is_old_migration_table(table: TableWalker<'_>) -> bool {
         && table.columns().any(|c| c.name() == "finished_at")
 }
 
+/// True if the table is a migrations table, which we do not want in
+/// the PSL.
 pub(crate) fn is_new_migration_table(table: TableWalker<'_>) -> bool {
     table.name() == "_prisma_migrations"
         && table.columns().any(|c| c.name() == "id")
@@ -40,6 +46,7 @@ pub(crate) fn is_new_migration_table(table: TableWalker<'_>) -> bool {
         && table.columns().any(|c| c.name() == "applied_steps_count")
 }
 
+/// A legacy Prisma1 table, not to be rendered in the PSL.
 pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
     table.name() == "_RelayId"
         && table.column("id").is_some()
@@ -48,6 +55,7 @@ pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
             .any(|col| col.name().eq_ignore_ascii_case("stablemodelidentifier"))
 }
 
+/// If the table has `createdAt` and `updatedAt` fields.
 pub(crate) fn has_created_at_and_updated_at(table: TableWalker<'_>) -> bool {
     let has_created_at = table.columns().any(|col| {
         col.name().eq_ignore_ascii_case("createdat") && col.column_type().family == ColumnTypeFamily::DateTime
@@ -60,10 +68,12 @@ pub(crate) fn has_created_at_and_updated_at(table: TableWalker<'_>) -> bool {
     has_created_at && has_updated_at
 }
 
+/// A special table to handle many to many relations in Prisma.
 pub(crate) fn is_prisma_join_table(t: TableWalker<'_>) -> bool {
     is_prisma_1_point_0_join_table(t) || is_prisma_1_point_1_or_2_join_table(t)
 }
 
+/// A legacy Prisma 1 list table.
 pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
     table.columns().len() == 3
         && table.columns().any(|col| col.name().eq_ignore_ascii_case("nodeid"))
@@ -71,10 +81,12 @@ pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
         && table.column("value").is_some()
 }
 
+/// A special legacy join table, seen in Prisma 1.1 and 1.2.
 pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: TableWalker<'_>) -> bool {
     table.columns().len() == 2 && table.indexes().len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 
+/// A special legacy join table, seen in Prisma 1.0.
 pub(crate) fn is_prisma_1_point_0_join_table(table: TableWalker<'_>) -> bool {
     table.columns().len() == 3
         && table.indexes().len() >= 2
@@ -82,6 +94,7 @@ pub(crate) fn is_prisma_1_point_0_join_table(table: TableWalker<'_>) -> bool {
         && common_prisma_m_to_n_relation_conditions(table)
 }
 
+/// If a relation defines a Prisma many to many relation.
 fn common_prisma_m_to_n_relation_conditions(table: TableWalker<'_>) -> bool {
     fn is_a(column: &str) -> bool {
         column.eq_ignore_ascii_case("a")

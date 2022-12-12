@@ -1,5 +1,5 @@
 use crate::{
-    calculate_datamodel::InputContext,
+    datamodel_calculator::InputContext,
     pair::{ModelPair, Pair},
 };
 use psl::{

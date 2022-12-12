@@ -21,6 +21,7 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use psl::ValidatedSchema;
+use sql_introspection_connector::datamodel_calculator;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::sync::Arc;
@@ -238,7 +239,7 @@ impl MigrationConnector for SqlMigrationConnector {
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let sql_schema = self.flavour.describe_schema(namespaces).await?;
-            let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
+            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
         })

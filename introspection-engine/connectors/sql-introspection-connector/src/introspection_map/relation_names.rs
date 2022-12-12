@@ -1,7 +1,7 @@
 //! This module is responsible for defining the relation names and the relation field names in an
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
-use crate::{calculate_datamodel::InputContext, introspection_helpers::is_prisma_join_table};
+use crate::{datamodel_calculator::InputContext, introspection_helpers::is_prisma_join_table};
 use sql_schema_describer as sql;
 use std::{
     borrow::Cow,

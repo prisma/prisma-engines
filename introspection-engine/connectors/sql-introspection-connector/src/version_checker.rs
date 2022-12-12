@@ -1,4 +1,6 @@
-use crate::calculate_datamodel::InputContext;
+//! Prisma version information lookup.
+
+use crate::datamodel_calculator::InputContext;
 use crate::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
@@ -13,6 +15,7 @@ use sql_schema_describer::{
     ForeignKeyAction,
 };
 
+/// A list of indicators to be used determining Prisma version.
 #[derive(Debug)]
 struct VersionChecker {
     sql_family: SqlFamily,
@@ -29,8 +32,10 @@ struct VersionChecker {
     has_inline_relations: bool,
 }
 
+/// Allowed types in SQLite.
 const SQLITE_TYPES: &[&str] = &["boolean", "date", "real", "integer", "text"];
 
+/// Allowed types in PostgreSQL.
 const POSTGRES_TYPES: &[PostgresType] = &[
     PostgresType::Boolean,
     PostgresType::Timestamp(Some(3)),
@@ -42,6 +47,7 @@ const POSTGRES_TYPES: &[PostgresType] = &[
     PostgresType::VarChar(Some(191)),
 ];
 
+/// Allowed types in MySQL.
 const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::TinyInt,
     MySqlType::DateTime(Some(3)),
@@ -53,6 +59,8 @@ const MYSQL_TYPES: &[MySqlType] = &[
     MySqlType::Char(36),
 ];
 
+/// Find out if the database is created with a specific version of
+/// Prisma.
 pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
     let mut version_checker = VersionChecker {
         sql_family: input.sql_family(),
@@ -113,6 +121,7 @@ pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
 }
 
 impl VersionChecker {
+    /// Check if using only types supported by a legacy version of Prisma.
     fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
         match self.sql_family {
             SqlFamily::Postgres if self.is_cockroachdb => {
@@ -147,12 +156,14 @@ impl VersionChecker {
         };
     }
 
+    /// If relations are created with list tables.
     fn has_inline_relations(&mut self, table: TableWalker<'_>) {
         if !is_prisma_1_or_11_list_table(table) {
             self.has_inline_relations = true;
         }
     }
 
+    /// If the database has an explicit `onDelete` column.
     #[allow(clippy::nonminimal_bool)] // more readable this way
     fn uses_on_delete(&mut self, fk: ForeignKeyWalker<'_>) {
         let action = fk.on_delete_action();
@@ -164,12 +175,15 @@ impl VersionChecker {
         }
     }
 
+    /// If the table always has `createdAt` and `updatedAt` columns.
     fn always_has_created_at_updated_at(&mut self, table: TableWalker<'_>) {
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !has_created_at_and_updated_at(table) {
             self.always_has_created_at_updated_at = false
         }
     }
 
+    /// If the primary key is defined in a way how Prisma 1 defined
+    /// them.
     fn has_p1_compatible_primary_key_column(&mut self, table: TableWalker<'_>) {
         if self.is_cockroachdb {
             // we rule out crdb + P1
@@ -210,10 +224,12 @@ impl VersionChecker {
         }
     }
 
+    /// If we're running a "modern" Prisma.
     fn is_prisma_2(&self) -> bool {
         !self.has_relay_table && !self.uses_on_delete && !self.uses_non_prisma_types && self.has_migration_table
     }
 
+    /// If the database is from Prisma 1.1
     fn is_prisma_1_1(&self) -> bool {
         !self.has_migration_table
             && !self.has_relay_table
@@ -224,6 +240,7 @@ impl VersionChecker {
             && self.always_has_p1_or_p_1_1_compatible_id
     }
 
+    /// If the database is from Prisma 1.0
     fn is_prisma_1(&self) -> bool {
         !self.has_migration_table
             && !self.uses_on_delete

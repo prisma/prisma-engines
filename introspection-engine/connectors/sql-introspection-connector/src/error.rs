@@ -1,3 +1,5 @@
+//! Introspection error handling.
+
 use introspection_connector::{ConnectorError, ErrorKind};
 use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
 use thiserror::Error;

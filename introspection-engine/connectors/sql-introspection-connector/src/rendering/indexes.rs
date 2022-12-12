@@ -1,3 +1,5 @@
+//! Rendering of model level index definitions.
+
 use crate::{
     introspection_helpers::compare_options_none_last,
     pair::{IndexOps, ModelPair},
@@ -5,6 +7,8 @@ use crate::{
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer as sql;
 
+/// Renders `@@index`, `@@unique` and `@@fulltext` model level index
+/// definitions.
 pub(super) fn render<'a>(model: ModelPair<'a>, rendered: &mut renderer::Model<'a>) {
     // (Position in the existing model, index definition)
     let mut ordered_indexes: Vec<(Option<_>, renderer::IndexDefinition<'a>)> = Vec::new();

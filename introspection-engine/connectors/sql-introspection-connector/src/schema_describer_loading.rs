@@ -1,7 +1,10 @@
+//! Creation of a describer instance.
+
 use psl::builtin_connectors::POSTGRES;
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::{postgres::Circumstances, SqlSchemaDescriberBackend};
 
+/// Create a correct describer instance for the given database.
 pub async fn load_describer<'a>(
     connection: &'a quaint::single::Quaint,
     connection_info: &ConnectionInfo,

@@ -1,11 +1,14 @@
+//! Rendering of model scalar fields.
+
 use crate::{
-    calculate_datamodel::OutputContext,
-    defaults,
+    datamodel_calculator::OutputContext,
     pair::{IdPair, IndexPair, ScalarFieldPair},
+    rendering::defaults,
 };
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer::ColumnArity;
 
+/// Render a scalar field to be added in a model.
 pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<'a>) -> renderer::ModelField<'a> {
     let mut rendered = renderer::ModelField::new(field.name(), field.prisma_type());
 
@@ -86,6 +89,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
     rendered
 }
 
+/// Render a `@id` definition to a field.
 fn render_id(pk: IdPair<'_>) -> renderer::IdFieldDefinition<'_> {
     let field = pk.field().unwrap();
     let mut definition = renderer::IdFieldDefinition::default();
@@ -109,6 +113,7 @@ fn render_id(pk: IdPair<'_>) -> renderer::IdFieldDefinition<'_> {
     definition
 }
 
+/// Render a `@unique` definition to a field.
 fn render_unique(unique: IndexPair<'_>) -> renderer::IndexFieldOptions<'_> {
     let mut opts = renderer::IndexFieldOptions::default();
     let field = unique.field().unwrap();

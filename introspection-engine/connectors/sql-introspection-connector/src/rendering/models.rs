@@ -1,6 +1,8 @@
+//! Rendering of model blocks.
+
 use super::{relation_field, scalar_field};
 use crate::{
-    calculate_datamodel::{InputContext, OutputContext},
+    datamodel_calculator::{InputContext, OutputContext},
     introspection_helpers as helpers,
     pair::{IdPair, ModelPair},
     warnings,
@@ -9,6 +11,7 @@ use datamodel_renderer::datamodel as renderer;
 
 use super::indexes;
 
+/// Render all model blocks to the PSL.
 pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
     let mut models_with_idx: Vec<(Option<_>, renderer::Model<'a>)> = Vec::with_capacity(input.schema.tables_count());
 
@@ -23,6 +26,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
     }
 }
 
+/// Render a single model.
 fn render_model<'a>(
     model: ModelPair<'a>,
     input: InputContext<'a>,
@@ -96,6 +100,7 @@ fn render_model<'a>(
     rendered
 }
 
+/// Render a model level `@@id` definition.
 fn render_id<'a>(model: ModelPair<'a>, id: IdPair<'a>, output: &mut OutputContext) -> renderer::IdDefinition<'a> {
     let fields = id.fields().map(|field| {
         let mut rendered = renderer::IndexFieldInput::new(field.name());
