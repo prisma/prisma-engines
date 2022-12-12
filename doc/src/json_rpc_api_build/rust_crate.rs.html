@@ -160,6 +160,7 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Api, CrateResult};
 <span class="kw">use </span>heck::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::{borrow::Cow, fs::File, io::Write <span class="kw">as _</span>, path::Path};
@@ -318,6 +319,7 @@
     <span class="kw">match </span>name {
         <span class="string">&quot;bool&quot; </span>=&gt; Cow::Borrowed(<span class="string">&quot;bool&quot;</span>),
         <span class="string">&quot;u32&quot; </span>=&gt; Cow::Borrowed(<span class="string">&quot;u32&quot;</span>),
+        <span class="string">&quot;isize&quot; </span>=&gt; Cow::Borrowed(<span class="string">&quot;isize&quot;</span>),
         <span class="string">&quot;string&quot; </span>=&gt; Cow::Borrowed(<span class="string">&quot;String&quot;</span>),
         other =&gt; other.to_camel_case().into(),
     }

@@ -724,7 +724,7 @@
             <span class="kw-2">&amp;</span>params.schema,
             <span class="prelude-val">None</span>,
             Box::new(<span class="kw">move </span>|connector| {
-                <span class="kw">let </span>composite_type_depth = From::from(params.composite_type_depth <span class="kw">as </span>isize);
+                <span class="kw">let </span>composite_type_depth = From::from(params.composite_type_depth);
                 <span class="kw">let </span>ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(<span class="kw">async move </span>{
                     <span class="comment">// TODO(MultiSchema): Grab namespaces from introspect params?
