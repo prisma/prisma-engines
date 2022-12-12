@@ -221,7 +221,11 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::{ConnectorError, ErrorKind};
+<span id="224">224</span>
+<span id="225">225</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Introspection error handling.
+
+</span><span class="kw">use </span>introspection_connector::{ConnectorError, ErrorKind};
 <span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, ErrorKind <span class="kw">as </span>QuaintKind};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>user_facing_errors::introspection_engine::DatabaseSchemaInconsistent;

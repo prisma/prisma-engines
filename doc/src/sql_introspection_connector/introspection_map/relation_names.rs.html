@@ -297,7 +297,7 @@
 </pre><pre class="rust"><code><span class="doccomment">//! This module is responsible for defining the relation names and the relation field names in an
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
-</span><span class="kw">use crate</span>::{calculate_datamodel::InputContext, introspection_helpers::is_prisma_join_table};
+</span><span class="kw">use crate</span>::{datamodel_calculator::InputContext, introspection_helpers::is_prisma_join_table};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{
     borrow::Cow,

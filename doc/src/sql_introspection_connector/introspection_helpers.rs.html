@@ -123,7 +123,22 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-</pre><pre class="rust"><code><span class="kw">use </span>sql::walkers::TableWalker;
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Small utility functions.
+
+</span><span class="kw">use </span>sql::walkers::TableWalker;
 <span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, ColumnTypeFamily, IndexType};
 <span class="kw">use </span>std::cmp;
 
@@ -138,7 +153,9 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_old_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// True if the table is a legacy migrations table, which we do not
+/// want in the PSL.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_old_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.name() == <span class="string">&quot;_Migration&quot;
         </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;revision&quot;</span>)
         &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;name&quot;</span>)
@@ -153,7 +170,9 @@
         &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;finished_at&quot;</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_new_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// True if the table is a migrations table, which we do not want in
+/// the PSL.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_new_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.name() == <span class="string">&quot;_prisma_migrations&quot;
         </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;id&quot;</span>)
         &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;checksum&quot;</span>)
@@ -165,7 +184,8 @@
         &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;applied_steps_count&quot;</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_relay_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// A legacy Prisma1 table, not to be rendered in the PSL.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_relay_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.name() == <span class="string">&quot;_RelayId&quot;
         </span>&amp;&amp; table.column(<span class="string">&quot;id&quot;</span>).is_some()
         &amp;&amp; table
@@ -173,7 +193,8 @@
             .any(|col| col.name().eq_ignore_ascii_case(<span class="string">&quot;stablemodelidentifier&quot;</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_created_at_and_updated_at(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// If the table has `createdAt` and `updatedAt` fields.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_created_at_and_updated_at(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     <span class="kw">let </span>has_created_at = table.columns().any(|col| {
         col.name().eq_ignore_ascii_case(<span class="string">&quot;createdat&quot;</span>) &amp;&amp; col.column_type().family == ColumnTypeFamily::DateTime
     });
@@ -185,29 +206,34 @@
     has_created_at &amp;&amp; has_updated_at
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_join_table(t: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// A special table to handle many to many relations in Prisma.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_join_table(t: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     is_prisma_1_point_0_join_table(t) || is_prisma_1_point_1_or_2_join_table(t)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_or_11_list_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// A legacy Prisma 1 list table.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_or_11_list_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.columns().len() == <span class="number">3
         </span>&amp;&amp; table.columns().any(|col| col.name().eq_ignore_ascii_case(<span class="string">&quot;nodeid&quot;</span>))
         &amp;&amp; table.column(<span class="string">&quot;position&quot;</span>).is_some()
         &amp;&amp; table.column(<span class="string">&quot;value&quot;</span>).is_some()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_1_or_2_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// A special legacy join table, seen in Prisma 1.1 and 1.2.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_1_or_2_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.columns().len() == <span class="number">2 </span>&amp;&amp; table.indexes().len() &gt;= <span class="number">2 </span>&amp;&amp; common_prisma_m_to_n_relation_conditions(table)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_0_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// A special legacy join table, seen in Prisma 1.0.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_0_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     table.columns().len() == <span class="number">3
         </span>&amp;&amp; table.indexes().len() &gt;= <span class="number">2
         </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;id&quot;</span>)
         &amp;&amp; common_prisma_m_to_n_relation_conditions(table)
 }
 
-<span class="kw">fn </span>common_prisma_m_to_n_relation_conditions(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="doccomment">/// If a relation defines a Prisma many to many relation.
+</span><span class="kw">fn </span>common_prisma_m_to_n_relation_conditions(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     <span class="kw">fn </span>is_a(column: <span class="kw-2">&amp;</span>str) -&gt; bool {
         column.eq_ignore_ascii_case(<span class="string">&quot;a&quot;</span>)
     }

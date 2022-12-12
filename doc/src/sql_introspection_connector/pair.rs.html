@@ -49,7 +49,17 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-</pre><pre class="rust"><code><span class="kw">mod </span>default;
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A combination of PSL and a database definition.
+//!
+//! These modules are to be used to determine things such as field
+//! names, attributes and so on.
+
+</span><span class="kw">mod </span>default;
 <span class="kw">mod </span>enumerator;
 <span class="kw">mod </span>id;
 <span class="kw">mod </span>index;
@@ -58,7 +68,7 @@
 <span class="kw">mod </span>relation_field;
 <span class="kw">mod </span>scalar_field;
 
-<span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::InputContext;
+<span class="kw">use </span><span class="kw">crate</span>::datamodel_calculator::InputContext;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>default::{DefaultKind, DefaultValuePair};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>enumerator::EnumPair;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>id::IdPair;

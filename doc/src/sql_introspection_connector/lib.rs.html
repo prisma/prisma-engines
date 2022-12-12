@@ -193,17 +193,56 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::vec_init_then_push)]
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Handles the introspection from SQL database schema definition to
+//! the Prisma Schema Language (PSL).
+//!
+//! The introspection consists the following parts:
+//!
+//! - Describe the database schema using the `sql-schema-describer`.
+//! - Combine the describe result with a parsed and validated PSL
+//!   definition, happens in [`introspection_map::IntrospectionMap`]
+//! - Using the `Pair` apis, provide information about the
+//!   data model for rendering, see [`pair::Pair`] and its submodules.
+//! - By using the `Pair` apis, create a rendering structure together
+//!   with possible warnings utilizing the `datamodel-renderer`
+//!   crate in the [`rendering`] module.
+//! - Check the Prisma version to warn and guide people upgrading
+//!   from older versions of Prisma.
+//! - Convert the rendering structure into a string. Reformat the
+//!   string using the `psl::reformat` module.
+//!
+//! A good place to start digging into the mechanics of this crate is
+//! to start reading from the
+//! [`SqlIntrospectionConnector::introspect`] method.
+
+</span><span class="attribute">#![allow(clippy::vec_init_then_push)]
 #![allow(clippy::ptr_arg)] </span><span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
-</span><span class="kw">pub mod </span>calculate_datamodel;
-<span class="kw">mod </span>pair; <span class="comment">// only exported to be able to unit test it
+</span><span class="kw">pub mod </span>datamodel_calculator; <span class="comment">// only exported to be able to unit test it
+</span><span class="kw">mod </span>pair;
 
-</span><span class="kw">mod </span>defaults;
 <span class="kw">mod </span>error;
-<span class="kw">mod </span>introspection;
 <span class="kw">mod </span>introspection_helpers;
 <span class="kw">mod </span>introspection_map;
+<span class="kw">mod </span>rendering;
 <span class="kw">mod </span>sanitize_datamodel_names;
 <span class="kw">mod </span>schema_describer_loading;
 <span class="kw">mod </span>version_checker;
@@ -342,13 +381,13 @@
     }
 
     <span class="kw">async fn </span>introspect(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>IntrospectionContext) -&gt; ConnectorResult&lt;IntrospectionResult&gt; {
-        <span class="comment">//TODO(matthias) do we even need extra preview flagging here?
-        </span><span class="kw">let </span>namespaces = <span class="kw-2">&amp;mut </span>ctx
+        <span class="kw">let </span>namespaces = <span class="kw-2">&amp;mut </span>ctx
             .datasource()
             .namespaces
             .iter()
             .map(|(ns, <span class="kw">_</span>)| ns.as_ref())
             .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;();
+
         <span class="kw">if </span>namespaces.is_empty() {
             namespaces.push(<span class="self">self</span>.connection.connection_info().schema_name())
         }
@@ -357,12 +396,9 @@
             </span>.catch(<span class="self">self</span>.describe(<span class="prelude-val">Some</span>(ctx.datasource().active_provider), namespaces))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>introspection_result =
-            calculate_datamodel::calculate_datamodel(<span class="kw-2">&amp;</span>sql_schema, ctx).map_err(|sql_introspection_error| {
-                sql_introspection_error.into_connector_error(<span class="self">self</span>.connection.connection_info())
-            })<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(introspection_result)
+        datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx).map_err(|sql_introspection_error| {
+            sql_introspection_error.into_connector_error(<span class="self">self</span>.connection.connection_info())
+        })
     }
 }
 
@@ -383,7 +419,7 @@
     }
 }
 
-<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>calculate_datamodel::InputContext&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>datamodel_calculator::InputContext&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
         <span class="self">self</span>.sql_family
     }

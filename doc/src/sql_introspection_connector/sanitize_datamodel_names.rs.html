@@ -156,28 +156,60 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
-</pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::Lazy;
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Some SQL identifiers are not presentable in PSL. The sanitization
+//! of these strings happens in this module.
+
+</span><span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">static </span>RE_START: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;^[^a-zA-Z]+&quot;</span>).unwrap());
-<span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;[^_a-zA-Z0-9]&quot;</span>).unwrap());
+<span class="doccomment">/// Regex to determine if an identifier starts with a character that
+/// is not supported.
+</span><span class="kw">static </span>RE_START: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;^[^a-zA-Z]+&quot;</span>).unwrap());
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>needs_sanitation(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
+<span class="doccomment">/// Regex to determine if an identifier contains a character that is not
+/// supported.
+</span><span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">&quot;[^_a-zA-Z0-9]&quot;</span>).unwrap());
+
+<span class="doccomment">/// If a string has to be sanitized to the PSL.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>needs_sanitation(s: <span class="kw-2">&amp;</span>str) -&gt; bool {
     RE_START.is_match(s) || RE.is_match(s)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; String {
+<span class="doccomment">/// Sanitize the string to be used in the PSL.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sanitize_string(s: <span class="kw-2">&amp;</span>str) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
     <span class="kw">if </span>needs_sanitation(s) {
         <span class="kw">let </span>start_cleaned = RE_START.replace_all(s, <span class="string">&quot;&quot;</span>);
-        RE.replace_all(start_cleaned.as_ref(), <span class="string">&quot;_&quot;</span>).into_owned()
+        Cow::Owned(RE.replace_all(start_cleaned.as_ref(), <span class="string">&quot;_&quot;</span>).into_owned())
     } <span class="kw">else </span>{
-        s.to_owned()
+        Cow::Borrowed(s)
     }
 }
 
-<span class="doccomment">/// Names that correspond to _types_ in the generated client. Concretely, enums, models and
-/// composite types.
+<span class="doccomment">/// Names that correspond to _types_ in the generated client.
+/// Concretely, enums, models and composite types.
 </span><span class="attribute">#[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
     FromPsl {
@@ -196,7 +228,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ModelName&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Create a name from an SQL identifier.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>name {
             <span class="kw">_ if </span>psl::is_reserved_type_name(name) =&gt; ModelName::RenamedReserved { mapped_name: name },
             <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
@@ -206,18 +239,20 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="doccomment">/// Output name to the PSL.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ModelName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
             ModelName::FromSql { name } =&gt; Cow::Borrowed(name),
             ModelName::RenamedReserved { mapped_name } =&gt; Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;Renamed{mapped_name}&quot;</span>)),
             ModelName::RenamedSanitized { mapped_name } =&gt; {
-                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+                <span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name)
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="doccomment">/// The original name to be used in the `@@map` attribute.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ModelName::FromPsl { mapped_name, .. } =&gt; mapped_name,
             ModelName::FromSql { .. } =&gt; <span class="prelude-val">None</span>,
@@ -227,7 +262,9 @@
     }
 }
 
-<span class="attribute">#[derive(Clone, Copy, Debug)]
+<span class="doccomment">/// Names that correspond to _identifiers_ in the generated client.
+/// Concretely, columns.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
     FromPsl {
         name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -242,7 +279,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntrospectedName&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Create a name from an SQL identifier.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>name {
             <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
                 IntrospectedName::RenamedSanitized { mapped_name: name }
@@ -251,17 +289,19 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="doccomment">/// Output name to the PSL.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             IntrospectedName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
             IntrospectedName::FromSql { name } =&gt; Cow::Borrowed(name),
             IntrospectedName::RenamedSanitized { mapped_name } =&gt; {
-                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+                <span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name)
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="doccomment">/// The original name to be used in the `@map` attribute.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             IntrospectedName::FromPsl { mapped_name, .. } =&gt; mapped_name,
             IntrospectedName::FromSql { .. } =&gt; <span class="prelude-val">None</span>,
@@ -270,7 +310,8 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="doccomment">/// Names that correspond to _enum variants_ in the generated client.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
     Empty,
     RenamedSanitized {
         mapped_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -285,7 +326,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumVariantName&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Create a name from an SQL identifier.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_sql(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>name {
             <span class="string">&quot;&quot; </span>=&gt; EnumVariantName::Empty,
             <span class="kw">_ if </span><span class="kw">crate</span>::sanitize_datamodel_names::needs_sanitation(name) =&gt; {
@@ -295,17 +337,19 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="doccomment">/// Output name to the PSL.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             EnumVariantName::Empty =&gt; Cow::Borrowed(<span class="string">&quot;EMPTY_ENUM_VALUE&quot;</span>),
             EnumVariantName::RenamedSanitized { mapped_name } =&gt; {
-                Cow::Owned(<span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name))
+                <span class="kw">crate</span>::sanitize_datamodel_names::sanitize_string(mapped_name)
             }
             EnumVariantName::FromSql { name } | EnumVariantName::FromPsl { name, .. } =&gt; Cow::Borrowed(name),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="doccomment">/// The original name to be used in the `@map` attribute.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mapped_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             EnumVariantName::Empty =&gt; <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>),
             EnumVariantName::RenamedSanitized { mapped_name } =&gt; <span class="prelude-val">Some</span>(mapped_name),

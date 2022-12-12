@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["SqlError",""]],"mod":[["calculate_datamodel",""]],"struct":[["SqlIntrospectionConnector",""]],"type":[["SqlIntrospectionResult",""],["SqlResult",""]]};
+window.SIDEBAR_ITEMS = {"enum":[["SqlError",""]],"mod":[["datamodel_calculator","Calculate a PSL data model, together with warnings."]],"struct":[["SqlIntrospectionConnector",""]],"type":[["SqlIntrospectionResult",""],["SqlResult",""]]};

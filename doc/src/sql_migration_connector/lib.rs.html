@@ -389,6 +389,7 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
+<span id="392">392</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attribute">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -412,6 +413,7 @@
 <span class="kw">use </span>migration_connector::{migrations_directory::MigrationDirectory, <span class="kw-2">*</span>};
 <span class="kw">use </span>pair::Pair;
 <span class="kw">use </span>psl::ValidatedSchema;
+<span class="kw">use </span>sql_introspection_connector::datamodel_calculator;
 <span class="kw">use </span>sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::sync::Arc;
@@ -629,7 +631,7 @@
     ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;IntrospectionResult&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
             <span class="kw">let </span>sql_schema = <span class="self">self</span>.flavour.describe_schema(namespaces).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(<span class="kw-2">&amp;</span>sql_schema, ctx)
+            <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(datamodel)
         })

@@ -236,7 +236,26 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::InputContext;
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Prisma version information lookup.
+
+</span><span class="kw">use </span><span class="kw">crate</span>::datamodel_calculator::InputContext;
 <span class="kw">use </span><span class="kw">crate</span>::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
@@ -251,7 +270,8 @@
     ForeignKeyAction,
 };
 
-<span class="attribute">#[derive(Debug)]
+<span class="doccomment">/// A list of indicators to be used determining Prisma version.
+</span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">struct </span>VersionChecker {
     sql_family: SqlFamily,
     is_cockroachdb: bool,
@@ -267,9 +287,11 @@
     has_inline_relations: bool,
 }
 
-<span class="kw">const </span>SQLITE_TYPES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;boolean&quot;</span>, <span class="string">&quot;date&quot;</span>, <span class="string">&quot;real&quot;</span>, <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;text&quot;</span>];
+<span class="doccomment">/// Allowed types in SQLite.
+</span><span class="kw">const </span>SQLITE_TYPES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;boolean&quot;</span>, <span class="string">&quot;date&quot;</span>, <span class="string">&quot;real&quot;</span>, <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;text&quot;</span>];
 
-<span class="kw">const </span>POSTGRES_TYPES: <span class="kw-2">&amp;</span>[PostgresType] = <span class="kw-2">&amp;</span>[
+<span class="doccomment">/// Allowed types in PostgreSQL.
+</span><span class="kw">const </span>POSTGRES_TYPES: <span class="kw-2">&amp;</span>[PostgresType] = <span class="kw-2">&amp;</span>[
     PostgresType::Boolean,
     PostgresType::Timestamp(<span class="prelude-val">Some</span>(<span class="number">3</span>)),
     PostgresType::Decimal(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>))),
@@ -280,7 +302,8 @@
     PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">191</span>)),
 ];
 
-<span class="kw">const </span>MYSQL_TYPES: <span class="kw-2">&amp;</span>[MySqlType] = <span class="kw-2">&amp;</span>[
+<span class="doccomment">/// Allowed types in MySQL.
+</span><span class="kw">const </span>MYSQL_TYPES: <span class="kw-2">&amp;</span>[MySqlType] = <span class="kw-2">&amp;</span>[
     MySqlType::TinyInt,
     MySqlType::DateTime(<span class="prelude-val">Some</span>(<span class="number">3</span>)),
     MySqlType::Decimal(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>))),
@@ -291,7 +314,9 @@
     MySqlType::Char(<span class="number">36</span>),
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_prisma_version(input: <span class="kw-2">&amp;</span>InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Version {
+<span class="doccomment">/// Find out if the database is created with a specific version of
+/// Prisma.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_prisma_version(input: <span class="kw-2">&amp;</span>InputContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Version {
     <span class="kw">let </span><span class="kw-2">mut </span>version_checker = VersionChecker {
         sql_family: input.sql_family(),
         is_cockroachdb: input.is_cockroach(),
@@ -351,7 +376,8 @@
 }
 
 <span class="kw">impl </span>VersionChecker {
-    <span class="kw">fn </span>check_column_for_type_and_default_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="doccomment">/// Check if using only types supported by a legacy version of Prisma.
+    </span><span class="kw">fn </span>check_column_for_type_and_default_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">match </span><span class="self">self</span>.sql_family {
             SqlFamily::Postgres <span class="kw">if </span><span class="self">self</span>.is_cockroachdb =&gt; {
                 <span class="self">self</span>.uses_non_prisma_types = <span class="bool-val">true</span>; <span class="comment">// we can be sure it&#39;s not prisma 1
@@ -385,13 +411,15 @@
         };
     }
 
-    <span class="kw">fn </span>has_inline_relations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="doccomment">/// If relations are created with list tables.
+    </span><span class="kw">fn </span>has_inline_relations(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">if </span>!is_prisma_1_or_11_list_table(table) {
             <span class="self">self</span>.has_inline_relations = <span class="bool-val">true</span>;
         }
     }
 
-    <span class="attribute">#[allow(clippy::nonminimal_bool)] </span><span class="comment">// more readable this way
+    <span class="doccomment">/// If the database has an explicit `onDelete` column.
+    </span><span class="attribute">#[allow(clippy::nonminimal_bool)] </span><span class="comment">// more readable this way
     </span><span class="kw">fn </span>uses_on_delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fk: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">let </span>action = fk.on_delete_action();
         <span class="kw">if </span>!(action == ForeignKeyAction::NoAction || action == ForeignKeyAction::SetNull)
@@ -402,13 +430,16 @@
         </span>}
     }
 
-    <span class="kw">fn </span>always_has_created_at_updated_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="doccomment">/// If the table always has `createdAt` and `updatedAt` columns.
+    </span><span class="kw">fn </span>always_has_created_at_updated_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">if </span>!is_prisma_1_or_11_list_table(table) &amp;&amp; !is_relay_table(table) &amp;&amp; !has_created_at_and_updated_at(table) {
             <span class="self">self</span>.always_has_created_at_updated_at = <span class="bool-val">false
         </span>}
     }
 
-    <span class="kw">fn </span>has_p1_compatible_primary_key_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="doccomment">/// If the primary key is defined in a way how Prisma 1 defined
+    /// them.
+    </span><span class="kw">fn </span>has_p1_compatible_primary_key_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="kw">if </span><span class="self">self</span>.is_cockroachdb {
             <span class="comment">// we rule out crdb + P1
             </span><span class="kw">return</span>;
@@ -448,11 +479,13 @@
         }
     }
 
-    <span class="kw">fn </span>is_prisma_2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// If we&#39;re running a &quot;modern&quot; Prisma.
+    </span><span class="kw">fn </span>is_prisma_2(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         !<span class="self">self</span>.has_relay_table &amp;&amp; !<span class="self">self</span>.uses_on_delete &amp;&amp; !<span class="self">self</span>.uses_non_prisma_types &amp;&amp; <span class="self">self</span>.has_migration_table
     }
 
-    <span class="kw">fn </span>is_prisma_1_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// If the database is from Prisma 1.1
+    </span><span class="kw">fn </span>is_prisma_1_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         !<span class="self">self</span>.has_migration_table
             &amp;&amp; !<span class="self">self</span>.has_relay_table
             &amp;&amp; !<span class="self">self</span>.uses_on_delete
@@ -462,7 +495,8 @@
             &amp;&amp; <span class="self">self</span>.always_has_p1_or_p_1_1_compatible_id
     }
 
-    <span class="kw">fn </span>is_prisma_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// If the database is from Prisma 1.0
+    </span><span class="kw">fn </span>is_prisma_1(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         !<span class="self">self</span>.has_migration_table
             &amp;&amp; !<span class="self">self</span>.uses_on_delete
             &amp;&amp; !<span class="self">self</span>.uses_default_values

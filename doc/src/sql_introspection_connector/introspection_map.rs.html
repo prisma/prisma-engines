@@ -204,9 +204,28 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-</pre><pre class="rust"><code><span class="kw">mod </span>relation_names;
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Matching PSL and database schema information together.
 
-<span class="kw">use crate</span>::{calculate_datamodel::InputContext, introspection_helpers <span class="kw">as </span>helpers, pair::RelationFieldDirection};
+</span><span class="kw">mod </span>relation_names;
+
+<span class="kw">use crate</span>::{datamodel_calculator::InputContext, introspection_helpers <span class="kw">as </span>helpers, pair::RelationFieldDirection};
 <span class="kw">use </span>psl::parser_database::{<span class="self">self</span>, ast};
 <span class="kw">use </span>relation_names::RelationNames;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
@@ -249,7 +268,9 @@
     }
 }
 
-<span class="kw">fn </span>position_inline_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+<span class="doccomment">/// Inlined relation fields (foreign key is defined in a model) are
+/// sorted in a specific way. We handle the sorting here.
+</span><span class="kw">fn </span>position_inline_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
     <span class="kw">for </span>table <span class="kw">in </span>sql_schema
         .table_walkers()
         .filter(|t| !helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
@@ -264,7 +285,10 @@
     }
 }
 
-<span class="kw">fn </span>position_m2m_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+<span class="doccomment">/// Many to many relation fields (foreign keys are defined in a hidden
+/// join table) are sorted in a specific way. We handle the sorting
+/// here.
+</span><span class="kw">fn </span>position_m2m_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
     <span class="kw">for </span>table <span class="kw">in </span>sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(<span class="kw-2">*</span>t)) {
         <span class="kw">let </span><span class="kw-2">mut </span>fks = table.foreign_keys();
 
@@ -289,7 +313,9 @@
     }
 }
 
-<span class="kw">fn </span>match_enums(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+<span class="doccomment">/// Finding enums from the existing PSL definition, matching the
+/// ones found in the database.
+</span><span class="kw">fn </span>match_enums(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
     map.existing_enums = <span class="kw">if </span>prisma_schema.connector.is_provider(<span class="string">&quot;mysql&quot;</span>) {
         sql_schema
             .walk_columns()
@@ -325,7 +351,9 @@
     }
 }
 
-<span class="kw">fn </span>match_existing_models(schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
+<span class="doccomment">/// Finding models from the existing PSL definition, matching the
+/// ones found in the database.
+</span><span class="kw">fn </span>match_existing_models(schema: <span class="kw-2">&amp;</span>sql::SqlSchema, prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap) {
     <span class="kw">for </span>model <span class="kw">in </span>prisma_schema.db.walk_models() {
         <span class="kw">match </span>schema.find_table(model.database_name()) {
             <span class="prelude-val">Some</span>(sql_id) =&gt; {
@@ -339,7 +367,9 @@
     }
 }
 
-<span class="kw">fn </span>match_existing_scalar_fields(
+<span class="doccomment">/// Finding scalar fields from the existing PSL definition, matching
+/// the ones found in the database.
+</span><span class="kw">fn </span>match_existing_scalar_fields(
     sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema,
     prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema,
     map: <span class="kw-2">&amp;mut </span>IntrospectionMap,
@@ -361,7 +391,9 @@
     }
 }
 
-<span class="kw">fn </span>match_existing_inline_relations&lt;<span class="lifetime">&#39;a</span>&gt;(
+<span class="doccomment">/// Finding inlined relations from the existing PSL definition,
+/// matching the ones found in the database.
+</span><span class="kw">fn </span>match_existing_inline_relations&lt;<span class="lifetime">&#39;a</span>&gt;(
     sql_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema,
     prisma_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
     map: <span class="kw-2">&amp;mut </span>IntrospectionMap,
@@ -392,7 +424,9 @@
         .collect()
 }
 
-<span class="kw">fn </span>match_existing_m2m_relations(
+<span class="doccomment">/// Finding many to many relations from the existing PSL definition,
+/// matching the ones found in the database.
+</span><span class="kw">fn </span>match_existing_m2m_relations(
     sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema,
     prisma_schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema,
     map: <span class="kw-2">&amp;mut </span>IntrospectionMap,
