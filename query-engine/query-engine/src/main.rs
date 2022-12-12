@@ -5,13 +5,13 @@ extern crate tracing;
 
 use query_engine::cli::CliCommand;
 use query_engine::error::PrismaError;
-use query_engine::logger::Logger;
 use query_engine::opt::PrismaOpt;
 use query_engine::server;
+use query_engine::state::init_state;
 use query_engine::LogFormat;
-use query_engine_metrics::MetricRegistry;
 use std::{error::Error, process};
 use structopt::StructOpt;
+use tracing::Instrument;
 
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
@@ -26,26 +26,13 @@ async fn main() -> Result<(), AnyError> {
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
 
-        let metrics = MetricRegistry::new();
-
-        let mut logger = Logger::new("prisma-engine-http");
-        logger.log_format(opts.log_format());
-        logger.log_queries(opts.log_queries());
-        logger.enable_telemetry(opts.enable_open_telemetry);
-        logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
-        logger.enable_metrics(metrics.clone());
-
-        logger.install().unwrap();
-
-        if opts.enable_metrics || opts.dataproxy_metric_override {
-            query_engine_metrics::setup();
-        }
-
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
+                let span = tracing::info_span!("prisma:engine:connect");
+                let state = init_state(&opts, true, None).instrument(span).await?;
                 set_panic_hook(opts.log_format());
-                server::listen(opts, metrics).await?;
+                server::listen(&opts, state).await?;
             }
         }
 

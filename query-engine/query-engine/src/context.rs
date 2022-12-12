@@ -1,7 +1,10 @@
-use crate::{PrismaError, PrismaResult};
+use crate::{capture_tracer::CaptureExporter, PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
-use std::{env, fmt, sync::Arc};
+use std::{
+    env, fmt,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -11,6 +14,8 @@ pub struct PrismaContext {
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+    pub inflight_tracer: Option<CaptureExporter>,
+    pub counter: AtomicUsize,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -23,6 +28,7 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
+    logs_capture_tracer: Option<CaptureExporter>,
 }
 
 impl ContextBuilder {
@@ -36,17 +42,29 @@ impl ContextBuilder {
         self
     }
 
+    pub fn set_logs_capture_tracer(mut self, tracer: Option<CaptureExporter>) -> Self {
+        self.logs_capture_tracer = tracer;
+        self
+    }
+
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.schema, self.enable_raw_queries, self.metrics.unwrap_or_default()).await
+        PrismaContext::new(
+            self.schema,
+            self.enable_raw_queries,
+            self.metrics.unwrap_or_default(),
+            self.logs_capture_tracer,
+        )
+        .await
     }
 }
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    async fn new(
+    pub async fn new(
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
+        inflight_tracer: Option<CaptureExporter>,
     ) -> PrismaResult<Self> {
         let config = &schema.configuration;
         // We only support one data source at the moment, so take the first one (default not exposed yet).
@@ -70,6 +88,8 @@ impl PrismaContext {
             query_schema,
             executor,
             metrics,
+            inflight_tracer,
+            counter: AtomicUsize::new(0),
         };
 
         context.verify_connection().await?;
@@ -87,6 +107,7 @@ impl PrismaContext {
             enable_raw_queries: false,
             schema,
             metrics: None,
+            logs_capture_tracer: None,
         }
     }
 
