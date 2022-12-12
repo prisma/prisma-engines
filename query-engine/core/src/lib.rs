@@ -11,13 +11,14 @@ extern crate tracing;
 pub mod executor;
 pub mod query_document;
 pub mod response_ir;
+pub mod telemetry;
 
 pub use self::{
     error::{CoreError, FieldConversionError},
-    executor::QueryExecutor,
+    executor::{QueryExecutor, TransactionOptions},
     interactive_transactions::{TransactionError, TxId},
     query_document::*,
-    trace_helpers::*,
+    telemetry::*,
 };
 
 mod error;
@@ -27,7 +28,6 @@ mod query_ast;
 mod query_graph;
 mod query_graph_builder;
 mod result_ast;
-mod trace_helpers;
 
 use self::{
     executor::*,
