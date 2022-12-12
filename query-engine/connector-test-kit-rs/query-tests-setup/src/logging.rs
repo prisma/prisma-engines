@@ -1,6 +1,7 @@
+use query_core::telemetry::helpers as telemetry_helpers;
 use query_engine_metrics::MetricRegistry;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{layer::Layered, prelude::*, EnvFilter, Layer, Registry};
+use tracing_subscriber::{layer::Layered, prelude::*, Layer, Registry};
 
 use crate::LogEmit;
 
@@ -27,8 +28,8 @@ type Sub = Layered<
     >,
 >;
 
-pub fn test_tracing_subscriber(log_config: &str, metrics: MetricRegistry, log_tx: LogEmit) -> Sub {
-    let filter = create_env_filter(true, log_config);
+pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_tx: LogEmit) -> Sub {
+    let filter = telemetry_helpers::env_filter(true, telemetry_helpers::QueryEngineLogLevel::Override(log_config));
 
     let fmt_layer = tracing_subscriber::fmt::layer()
         .with_writer(PrintWriter::new(log_tx))
@@ -38,28 +39,6 @@ pub fn test_tracing_subscriber(log_config: &str, metrics: MetricRegistry, log_tx
         .with(fmt_layer.boxed())
         .with(metrics.boxed())
         .with(ErrorLayer::default())
-}
-
-fn create_env_filter(log_queries: bool, qe_log_level: &str) -> EnvFilter {
-    let mut filter = EnvFilter::from_default_env()
-        .add_directive("tide=error".parse().unwrap())
-        .add_directive("tonic=error".parse().unwrap())
-        .add_directive("h2=error".parse().unwrap())
-        .add_directive("hyper=error".parse().unwrap())
-        .add_directive("tower=error".parse().unwrap());
-
-    filter = filter
-        .add_directive(format!("query_engine={}", &qe_log_level).parse().unwrap())
-        .add_directive(format!("query_core={}", &qe_log_level).parse().unwrap())
-        .add_directive(format!("query_connector={}", &qe_log_level).parse().unwrap())
-        .add_directive(format!("sql_query_connector={}", &qe_log_level).parse().unwrap())
-        .add_directive("mongodb_query_connector=debug".parse().unwrap());
-
-    if log_queries {
-        filter = filter.add_directive("quaint[{is_query}]=trace".parse().unwrap());
-    }
-
-    filter
 }
 
 /// This is a temporary implementation detail for `tracing` logs in tests.
