@@ -245,7 +245,10 @@ pub(super) fn add_index_for_relation_fields(
     schema: &str,
     relation: RelationFieldWalker<'_>,
 ) {
-    let Some(fields) = relation.fields() else { return; };
+    let fields = match relation.fields() {
+        Some(fields) => fields,
+        None => return,
+    };
     if relation.model().indexes().any(|index| {
         index
             .fields()
@@ -267,11 +270,14 @@ pub(super) fn add_index_for_relation_fields(
         ..Default::default()
     };
 
-    let Some(span_diagnostics) = super::diagnostics_for_span(
+    let span_diagnostics = match super::diagnostics_for_span(
         schema,
         &params.context.diagnostics,
         relation.relation_attribute().unwrap().span(),
-    ) else { return; };
+    ) {
+        Some(sd) => sd,
+        None => return,
+    };
 
     let diagnostics = span_diagnostics
         .into_iter()
