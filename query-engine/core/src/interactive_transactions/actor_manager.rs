@@ -114,22 +114,22 @@ impl TransactionActorManager {
         &self,
         tx_id: &TxId,
         operation: Operation,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let client = self.get_client(tx_id, "query").await?;
 
-        client.execute(operation, trace_id).await
+        client.execute(operation, traceparent).await
     }
 
     pub async fn batch_execute(
         &self,
         tx_id: &TxId,
         operations: Vec<Operation>,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let client = self.get_client(tx_id, "batch query").await?;
 
-        client.batch_execute(operations, trace_id).await
+        client.batch_execute(operations, traceparent).await
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {

@@ -7,6 +7,7 @@ use opentelemetry::{
     },
     trace::{TraceError, TracerProvider},
 };
+use query_core::telemetry;
 use std::{
     fmt::{self, Debug},
     sync::Arc,
@@ -83,7 +84,7 @@ impl Debug for ClientSpanExporter {
 impl SpanExporter for ClientSpanExporter {
     /// Export spans to stdout
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        let result = query_core::spans_to_json(&batch);
+        let result = telemetry::helpers::spans_to_json(batch);
         self.callback
             .call(result)
             .map_err(|err| TraceError::from(format!("Could not call JS callback: {}", &err.reason)))

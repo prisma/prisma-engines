@@ -1,17 +1,12 @@
 use opentelemetry::{
-    global,
-    sdk::{
-        propagation::TraceContextPropagator,
-        trace::{Config, Tracer},
-        Resource,
-    },
+    sdk::{trace::Config, Resource},
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use query_core::is_user_facing_trace_filter;
+use query_core::telemetry;
 use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
+use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, Layer};
 
 use crate::LogFormat;
 
@@ -19,25 +14,34 @@ type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
 /// An installer for a global logger.
 #[derive(Debug, Clone)]
-pub struct Logger<'a> {
+pub struct Logger {
     service_name: &'static str,
     log_format: LogFormat,
-    enable_telemetry: bool,
     log_queries: bool,
-    telemetry_endpoint: Option<&'a str>,
+    tracing_config: TracingConfig,
     metrics: Option<MetricRegistry>,
 }
 
-impl<'a> Logger<'a> {
+// TracingConfig specifies how tracing will be exposed by the logger facility
+#[derive(Debug, Clone)]
+enum TracingConfig {
+    // exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
+    Exposed(String),
+    // stdout means that traces will be printed to standard output
+    Stdout,
+    // disabled means that tracing will be disabled
+    Disabled,
+}
+
+impl Logger {
     /// Initialize a new global logger installer.
     pub fn new(service_name: &'static str) -> Self {
         Self {
             service_name,
             log_format: LogFormat::Json,
-            enable_telemetry: false,
             log_queries: false,
-            telemetry_endpoint: None,
             metrics: None,
+            tracing_config: TracingConfig::Disabled,
         }
     }
 
@@ -51,40 +55,34 @@ impl<'a> Logger<'a> {
         self.log_queries = log_queries;
     }
 
-    /// Enables Jaeger telemetry.
-    pub fn enable_telemetry(&mut self, enable_telemetry: bool) {
-        self.enable_telemetry = enable_telemetry;
-    }
-
-    /// Sets a custom telemetry endpoint
-    pub fn telemetry_endpoint(&mut self, endpoint: &'a str) {
-        if endpoint.is_empty() {
-            self.telemetry_endpoint = None
-        } else {
-            self.telemetry_endpoint = Some(endpoint);
-        }
-    }
-
     pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
         self.metrics = Some(metrics);
+    }
+
+    pub fn setup_telemetry(&mut self, enable_telemetry: bool, endpoint: &str) {
+        let endpoint = if endpoint.is_empty() {
+            None
+        } else {
+            Some(endpoint.to_owned())
+        };
+
+        self.tracing_config = match (enable_telemetry, endpoint) {
+            (true, Some(endpoint)) => TracingConfig::Exposed(endpoint),
+            (true, None) => TracingConfig::Stdout,
+            _ => TracingConfig::Disabled,
+        };
+    }
+
+    pub fn is_metrics_enabled(&self) -> bool {
+        self.metrics.is_some()
     }
 
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
-    pub fn install(self) -> LoggerResult<()> {
-        let filter = create_env_filter(self.log_queries);
-
-        let is_user_trace = filter_fn(is_user_facing_trace_filter);
-
-        let telemetry = if self.enable_telemetry {
-            let tracer = create_otel_tracer(self.service_name, self.telemetry_endpoint);
-            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-            let telemetry = telemetry.with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
+    pub fn install(&self) -> LoggerResult<()> {
+        let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
+        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -99,54 +97,39 @@ impl<'a> Logger<'a> {
 
         let subscriber = tracing_subscriber::registry()
             .with(fmt_layer)
-            .with(self.metrics)
-            .with(telemetry);
+            .with(self.metrics.clone());
 
-        subscriber::set_global_default(subscriber)?;
+        match self.tracing_config {
+            TracingConfig::Exposed(ref endpoint) => {
+                // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
+                // the traces to.
+                let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);
+                let config = Config::default().with_resource(resource);
+                let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+                let exporter = opentelemetry_otlp::new_exporter().tonic().with_endpoint(endpoint);
+                let tracer = builder.with_exporter(exporter).install_simple().unwrap();
+                let telemetry_layer = tracing_opentelemetry::layer()
+                    .with_tracer(tracer)
+                    .with_filter(is_user_trace);
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
+            TracingConfig::Stdout => {
+                // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
+                // export traces too. We export it to stdout
+                let exporter = crate::tracer::ClientSpanExporter::default();
+                let tracer = crate::tracer::install(Some(exporter), None);
+                let telemetry_layer = tracing_opentelemetry::layer()
+                    .with_tracer(tracer)
+                    .with_filter(is_user_trace);
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
+            TracingConfig::Disabled => {
+                subscriber::set_global_default(subscriber)?;
+            }
+        }
 
         Ok(())
     }
-}
-
-fn create_otel_tracer(service_name: &'static str, collector_endpoint: Option<&str>) -> Tracer {
-    global::set_text_map_propagator(TraceContextPropagator::new());
-
-    if let Some(endpoint) = collector_endpoint {
-        // A special parameter for Jaeger to set the service name in spans.
-        let resource = Resource::new(vec![KeyValue::new("service.name", service_name)]);
-        let config = Config::default().with_resource(resource);
-
-        let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
-        let exporter = opentelemetry_otlp::new_exporter().tonic().with_endpoint(endpoint);
-        builder.with_exporter(exporter).install_simple().unwrap()
-    } else {
-        crate::tracer::new_pipeline().install_simple()
-    }
-}
-
-fn create_env_filter(log_queries: bool) -> EnvFilter {
-    let mut filter = EnvFilter::from_default_env()
-        .add_directive("tide=error".parse().unwrap())
-        .add_directive("tonic=error".parse().unwrap())
-        .add_directive("h2=error".parse().unwrap())
-        .add_directive("hyper=error".parse().unwrap())
-        .add_directive("tower=error".parse().unwrap());
-
-    if let Ok(qe_log_level) = std::env::var("QE_LOG_LEVEL") {
-        filter = filter
-            .add_directive(format!("query_engine={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("query_core={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("query_connector={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("sql_query_connector={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("mongodb_query_connector={}", &qe_log_level).parse().unwrap());
-    }
-
-    if log_queries {
-        // even when mongo queries are logged in debug mode, we want to log them if the log level is higher
-        filter = filter
-            .add_directive("quaint[{is_query}]=trace".parse().unwrap())
-            .add_directive("mongodb_query_connector=debug".parse().unwrap());
-    }
-
-    filter
 }

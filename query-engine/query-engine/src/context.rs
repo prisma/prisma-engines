@@ -8,6 +8,7 @@ use std::{env, fmt, sync::Arc};
 pub struct PrismaContext {
     /// The api query schema.
     query_schema: QuerySchemaRef,
+    /// The metrics registry
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
@@ -43,7 +44,7 @@ impl ContextBuilder {
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    async fn new(
+    pub async fn new(
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,

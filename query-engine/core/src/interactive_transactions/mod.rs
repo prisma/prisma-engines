@@ -43,6 +43,8 @@ pub(crate) use messages::*;
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct TxId(String);
 
+const MINIMUM_TX_ID_LENGTH: usize = 24;
+
 impl Default for TxId {
     fn default() -> Self {
         Self(cuid::cuid().unwrap())
@@ -54,7 +56,15 @@ where
     T: Into<String>,
 {
     fn from(s: T) -> Self {
-        Self(s.into())
+        let contents = s.into();
+        assert!(
+            contents.len() >= MINIMUM_TX_ID_LENGTH,
+            "minimum length for a TxId ({}) is {}, but was {}",
+            contents,
+            MINIMUM_TX_ID_LENGTH,
+            contents.len()
+        );
+        Self(contents)
     }
 }
 

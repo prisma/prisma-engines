@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, ClosedTx, OpenTx, Operation,
-    ResponseData, TxId,
+    execute_many_operations, execute_single_operation, telemetry::helpers::set_span_link_from_traceparent, ClosedTx,
+    OpenTx, Operation, ResponseData, TxId,
 };
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
@@ -51,13 +51,13 @@ impl ITXServer {
     // RunState is used to tell if the run loop should continue
     async fn process_msg(&mut self, op: TxOpRequest) -> RunState {
         match op.msg {
-            TxOpRequestMsg::Single(ref operation, trace_id) => {
-                let result = self.execute_single(&operation, trace_id).await;
+            TxOpRequestMsg::Single(ref operation, traceparent) => {
+                let result = self.execute_single(&operation, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Single(result));
                 RunState::Continue
             }
-            TxOpRequestMsg::Batch(ref operations, trace_id) => {
-                let result = self.execute_batch(&operations, trace_id).await;
+            TxOpRequestMsg::Batch(ref operations, traceparent) => {
+                let result = self.execute_batch(&operations, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Batch(result));
                 RunState::Continue
             }
@@ -74,16 +74,20 @@ impl ITXServer {
         }
     }
 
-    async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
+    async fn execute_single(
+        &mut self,
+        operation: &Operation,
+        traceparent: Option<String>,
+    ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
-        set_span_link_from_trace_id(&span, trace_id.clone());
+        set_span_link_from_traceparent(&span, traceparent.clone());
 
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
             self.query_schema.clone(),
             conn.as_connection_like(),
             operation,
-            trace_id,
+            traceparent,
         )
         .instrument(span)
         .await
@@ -92,7 +96,7 @@ impl ITXServer {
     async fn execute_batch(
         &mut self,
         operations: &[Operation],
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let span = info_span!("prisma:engine:itx_execute", user_facing = true);
 
@@ -101,7 +105,7 @@ impl ITXServer {
             self.query_schema.clone(),
             conn.as_connection_like(),
             operations,
-            trace_id,
+            traceparent,
         )
         .instrument(span)
         .await
@@ -168,8 +172,8 @@ impl ITXClient {
         }
     }
 
-    pub async fn execute(&self, operation: Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
-        let msg_req = TxOpRequestMsg::Single(operation, trace_id);
+    pub async fn execute(&self, operation: Operation, traceparent: Option<String>) -> crate::Result<ResponseData> {
+        let msg_req = TxOpRequestMsg::Single(operation, traceparent);
         let msg = self.send_and_receive(msg_req).await?;
 
         if let TxOpResponse::Single(resp) = msg {
@@ -182,9 +186,9 @@ impl ITXClient {
     pub async fn batch_execute(
         &self,
         operations: Vec<Operation>,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        let msg_req = TxOpRequestMsg::Batch(operations, trace_id);
+        let msg_req = TxOpRequestMsg::Batch(operations, traceparent);
 
         let msg = self.send_and_receive(msg_req).await?;
 

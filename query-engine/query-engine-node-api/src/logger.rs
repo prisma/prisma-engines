@@ -1,5 +1,5 @@
 use core::fmt;
-use query_core::is_user_facing_trace_filter;
+use query_core::telemetry;
 use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -31,24 +31,19 @@ impl Logger {
         enable_metrics: bool,
         enable_tracing: bool,
     ) -> Self {
-        let is_sql_query = filter_fn(|meta| {
-            meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
-        });
-
-        // is a mongodb query?
-        let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
+        let is_user_facing = filter_fn(telemetry::helpers::user_facing_filter);
 
         // We need to filter the messages to send to our callback logging mechanism
         let filters = if log_queries {
             // Filter trace query events (for query log) or based in the defined log level
-            is_sql_query.or(is_mongo_query).or(log_level).boxed()
+            is_user_facing.or(log_level).boxed()
         } else {
             // Filter based in the defined log level
             FilterExt::boxed(log_level)
         };
 
         let log_callback_arc = Arc::new(log_callback);
-        let is_user_trace = filter_fn(is_user_facing_trace_filter);
+        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
