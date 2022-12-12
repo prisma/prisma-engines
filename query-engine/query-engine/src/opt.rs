@@ -103,6 +103,10 @@ pub struct PrismaOpt {
     #[structopt(long)]
     pub enable_open_telemetry: bool,
 
+    #[structopt(long)]
+    /// Enable tracer to capture logs and return in the response
+    pub enable_logs_in_response: bool,
+
     /// The url to the OpenTelemetry collector.
     /// Enabling this will send the OpenTelemtry tracing to a collector
     /// and not via our custom stdout tracer

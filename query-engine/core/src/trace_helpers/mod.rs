@@ -1,6 +1,7 @@
 use once_cell::sync::Lazy;
 use opentelemetry::sdk::export::trace::SpanData;
-use opentelemetry::trace::TraceContextExt;
+use opentelemetry::trace::{TraceContextExt, TraceId};
+use opentelemetry::Context;
 use serde_json::{json, Value};
 use std::borrow::Cow;
 
@@ -93,6 +94,11 @@ pub fn set_span_link_from_trace_id(span: &Span, trace_id: Option<String>) {
         let context_span = cx.span();
         span.add_link(context_span.span_context().clone());
     }
+}
+
+pub fn get_trace_id_from_context(context: &Context) -> TraceId {
+    let context_span = context.span();
+    context_span.span_context().trace_id()
 }
 
 pub fn is_user_facing_trace_filter(meta: &Metadata) -> bool {

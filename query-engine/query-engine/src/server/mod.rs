@@ -1,11 +1,13 @@
-use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
+use crate::state::State;
+use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
+use opentelemetry::trace::TraceId;
 use opentelemetry::{global, propagation::Extractor, Context};
-use psl::PreviewFeature;
-use query_core::schema::QuerySchemaRef;
+
+use query_core::get_trace_id_from_context;
 use query_core::{schema::QuerySchemaRenderer, TxId};
-use query_engine_metrics::{MetricFormat, MetricRegistry};
+use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde_json::json;
 use std::collections::HashMap;
@@ -17,88 +19,8 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
 
-//// Shared application state.
-pub struct State {
-    cx: Arc<PrismaContext>,
-    enable_playground: bool,
-    enable_debug_mode: bool,
-    enable_metrics: bool,
-}
-
-impl State {
-    /// Create a new instance of `State`.
-    fn new(cx: PrismaContext) -> Self {
-        Self {
-            cx: Arc::new(cx),
-            enable_playground: false,
-            enable_debug_mode: false,
-            enable_metrics: false,
-        }
-    }
-
-    pub fn enable_playground(mut self, enable: bool) -> Self {
-        self.enable_playground = enable;
-        self
-    }
-
-    pub fn enable_debug_mode(mut self, enable: bool) -> Self {
-        self.enable_debug_mode = enable;
-        self
-    }
-
-    pub fn enable_metrics(mut self, enable: bool) -> Self {
-        self.enable_metrics = enable;
-        self
-    }
-
-    pub fn get_metrics(&self) -> MetricRegistry {
-        self.cx.metrics.clone()
-    }
-
-    pub fn query_schema(&self) -> &QuerySchemaRef {
-        self.cx.query_schema()
-    }
-}
-
-impl Clone for State {
-    fn clone(&self) -> Self {
-        Self {
-            cx: self.cx.clone(),
-            enable_playground: self.enable_playground,
-            enable_debug_mode: self.enable_debug_mode,
-            enable_metrics: self.enable_metrics,
-        }
-    }
-}
-
-pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let datamodel = opts.schema(false)?;
-    let config = &datamodel.configuration;
-    config.validate_that_one_datasource_is_provided()?;
-
-    let span = tracing::info_span!("prisma:engine:connect");
-
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
-
-    let cx = PrismaContext::builder(datamodel)
-        .set_metrics(metrics)
-        .enable_raw_queries(opts.enable_raw_queries)
-        .build()
-        .instrument(span)
-        .await?;
-
-    let state = State::new(cx)
-        .enable_playground(opts.enable_playground)
-        .enable_debug_mode(opts.enable_debug_mode)
-        .enable_metrics(enable_metrics);
-
-    Ok(state)
-}
-
 /// Starts up the graphql query engine server
-pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()> {
-    let state = setup(&opts, metrics).await?;
-
+pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
     let query_engine = make_service_fn(move |_| {
         let state = state.clone();
         async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(state.clone(), req))) }
@@ -194,24 +116,17 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let tx_id = get_transaction_id_from_header(&req);
+    let (tx_id, span, log_capture, trace_id) = process_gql_req_headers(&req);
 
-    let span = if tx_id.is_none() {
-        let cx = get_parent_span_context(&req);
-        let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
-        span
-    } else {
-        Span::none()
-    };
-
-    let trace_id = match req.headers().get("traceparent") {
-        Some(traceparent) => {
-            let s = traceparent.to_str().unwrap_or_default().to_string();
-            Some(s)
-        }
-        _ => None,
-    };
+    if log_capture.should_capture() {
+        state
+            .cx
+            .inflight_tracer
+            .as_ref()
+            .unwrap()
+            .capture(log_capture.id())
+            .await;
+    }
 
     let work = async move {
         let body_start = req.into_body();
@@ -221,9 +136,18 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
+                let result = handler.handle(body, tx_id, trace_id.clone()).instrument(span).await;
 
-                let result_bytes = serde_json::to_vec(&result).unwrap();
+                let result_bytes = if log_capture.should_capture() {
+                    let logs = state.cx.inflight_tracer.as_ref().unwrap().get(log_capture.id()).await;
+                    let json = json!({
+                        "result": result,
+                        "logs": logs
+                    });
+                    serde_json::to_vec(&json).unwrap()
+                } else {
+                    serde_json::to_vec(&result).unwrap()
+                };
 
                 let res = Response::builder()
                     .status(StatusCode::OK)
@@ -464,4 +388,77 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
     let body = Body::from(serde_json::to_vec(&user_error).unwrap());
 
     Response::builder().status(status).body(body).unwrap()
+}
+
+struct LogCapture {
+    id: TraceId,
+    capture: bool,
+}
+
+impl LogCapture {
+    fn new(id: TraceId, capture: bool) -> Self {
+        Self { id, capture }
+    }
+
+    fn new_from_req(id: TraceId, req: &Request<Body>) -> Self {
+        let should_capture = Self::get_capture_from_header(req);
+        Self::new(id, should_capture)
+    }
+
+    fn id(&self) -> TraceId {
+        self.id
+    }
+
+    fn should_capture(&self) -> bool {
+        self.capture
+    }
+
+    fn get_capture_from_header(req: &Request<Body>) -> bool {
+        match req.headers().get("PRISMA-CAPTURE-LOGS") {
+            Some(header) => {
+                if let Ok(capture_logs) = header.to_str() {
+                    capture_logs == "true"
+                } else {
+                    false
+                }
+            }
+            None => false,
+        }
+    }
+}
+
+impl Default for LogCapture {
+    fn default() -> Self {
+        Self {
+            id: TraceId::from_hex("0").unwrap(),
+            capture: false,
+        }
+    }
+}
+
+fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCapture, Option<String>) {
+    let tx_id = get_transaction_id_from_header(req);
+    let (span, log_capture) = if tx_id.is_none() {
+        let cx = get_parent_span_context(req);
+        let trace_id = get_trace_id_from_context(&cx);
+
+        let span = info_span!("prisma:engine", user_facing = true);
+        span.set_parent(cx);
+
+        let log_capture = LogCapture::new_from_req(trace_id, req);
+
+        (span, log_capture)
+    } else {
+        (Span::none(), LogCapture::default())
+    };
+
+    let traceparent = match req.headers().get("traceparent") {
+        Some(traceparent) => {
+            let s = traceparent.to_str().unwrap_or_default().to_string();
+            Some(s)
+        }
+        _ => None,
+    };
+
+    (tx_id, span, log_capture, traceparent)
 }
