@@ -31,4 +31,4 @@ name = "migration-engine"
 path = "src/main.rs"
 
 [features]
-vendored-openssl = []
+vendored-openssl = ["migration-core/vendored-openssl"]

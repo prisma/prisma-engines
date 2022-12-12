@@ -3,6 +3,9 @@ edition = "2021"
 name = "sql-migration-connector"
 version = "0.1.0"
 
+[features]
+vendored-openssl = ["quaint/vendored-openssl"]
+
 [dependencies]
 psl.workspace = true
 migration-connector = { path = "../migration-connector" }
