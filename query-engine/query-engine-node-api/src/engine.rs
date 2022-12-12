@@ -7,7 +7,7 @@ use query_core::{
     schema_builder, set_parent_context_from_json_str, QueryExecutor, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -373,6 +373,18 @@ impl QueryEngine {
             }
             .with_subscriber(dispatcher)
             .await
+        })
+        .await
+    }
+
+    #[napi]
+    pub async fn dmmf(&self) -> napi::Result<String> {
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
+
+            Ok(serde_json::to_string(&dmmf)?)
         })
         .await
     }
