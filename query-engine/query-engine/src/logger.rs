@@ -1,7 +1,5 @@
 use opentelemetry::{
-    global,
     sdk::{
-        propagation::TraceContextPropagator,
         trace::{Config, Tracer},
         Resource,
     },
@@ -13,7 +11,7 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
-use crate::LogFormat;
+use crate::{capture_tracer::CaptureExporter, LogFormat};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
@@ -26,6 +24,7 @@ pub struct Logger<'a> {
     log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
     metrics: Option<MetricRegistry>,
+    log_capture_exporter: Option<CaptureExporter>,
 }
 
 impl<'a> Logger<'a> {
@@ -38,6 +37,7 @@ impl<'a> Logger<'a> {
             log_queries: false,
             telemetry_endpoint: None,
             metrics: None,
+            log_capture_exporter: None,
         }
     }
 
@@ -69,6 +69,12 @@ impl<'a> Logger<'a> {
         self.metrics = Some(metrics);
     }
 
+    pub fn enable_logs_capture(&mut self) -> CaptureExporter {
+        let capture = CaptureExporter::new();
+        self.log_capture_exporter = Some(capture.clone());
+        capture
+    }
+
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
@@ -79,7 +85,13 @@ impl<'a> Logger<'a> {
 
         let telemetry = if self.enable_telemetry {
             let tracer = create_otel_tracer(self.service_name, self.telemetry_endpoint);
-            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+            let mut telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+
+            if let Some(log_capture_exporter) = self.log_capture_exporter {
+                let tracer = crate::capture_tracer::new_pipeline().install_simple(log_capture_exporter);
+                telemetry = telemetry.with_tracer(tracer);
+            }
+
             let telemetry = telemetry.with_filter(is_user_trace);
             Some(telemetry)
         } else {
@@ -109,8 +121,6 @@ impl<'a> Logger<'a> {
 }
 
 fn create_otel_tracer(service_name: &'static str, collector_endpoint: Option<&str>) -> Tracer {
-    global::set_text_map_propagator(TraceContextPropagator::new());
-
     if let Some(endpoint) = collector_endpoint {
         // A special parameter for Jaeger to set the service name in spans.
         let resource = Resource::new(vec![KeyValue::new("service.name", service_name)]);
