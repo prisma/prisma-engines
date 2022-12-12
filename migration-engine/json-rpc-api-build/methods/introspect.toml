@@ -13,7 +13,7 @@ shape = "string"
 shape = "bool"
 
 [recordShapes.introspectParams.fields.compositeTypeDepth]
-shape = "u32"
+shape = "isize"
 
 [recordShapes.introspectResult]
 description = "Result type for the introspect method."
