@@ -339,12 +339,6 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
 </pre><pre class="rust"><code><span class="kw">use </span>lsp_types::{
     CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit,
 };
@@ -592,10 +586,7 @@
     schema: <span class="kw-2">&amp;</span>str,
     relation: RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let </span>fields = <span class="kw">match </span>relation.fields() {
-        <span class="prelude-val">Some</span>(fields) =&gt; fields,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
-    };
+    <span class="kw">let </span><span class="prelude-val">Some</span>(fields) = relation.fields() <span class="kw">else </span>{ <span class="kw">return</span>; };
     <span class="kw">if </span>relation.model().indexes().any(|index| {
         index
             .fields()
@@ -617,14 +608,11 @@
         ..Default::default()
     };
 
-    <span class="kw">let </span>span_diagnostics = <span class="kw">match </span><span class="kw">super</span>::diagnostics_for_span(
+    <span class="kw">let </span><span class="prelude-val">Some</span>(span_diagnostics) = <span class="kw">super</span>::diagnostics_for_span(
         schema,
         <span class="kw-2">&amp;</span>params.context.diagnostics,
         relation.relation_attribute().unwrap().span(),
-    ) {
-        <span class="prelude-val">Some</span>(sd) =&gt; sd,
-        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
-    };
+    ) <span class="kw">else </span>{ <span class="kw">return</span>; };
 
     <span class="kw">let </span>diagnostics = span_diagnostics
         .into_iter()
