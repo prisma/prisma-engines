@@ -11,7 +11,6 @@ sql = ["sql-connector"]
 vendored-openssl = ["quaint/vendored-openssl"]
 
 [dependencies]
-futures = "0.3"
 tokio.workspace = true
 anyhow = "1.0"
 async-trait = "0.1"
@@ -20,10 +19,7 @@ connection-string = "0.1.10"
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 psl.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
-indexmap = { version = "1.7", features = ["serde-1"] }
-itertools = "0.10"
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
-once_cell = "1.3"
 prisma-models = { path = "../prisma-models" }
 query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
@@ -37,18 +33,13 @@ hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing = "0.1"
 tracing-opentelemetry = "0.17.3"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
-tracing-futures = "0.2"
 opentelemetry = { version = "0.17.0", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.10", features = ["tls", "tls-roots"] }
 query-engine-metrics = {path = "../metrics"}
 
-rand = "0.8"
-
 user-facing-errors = {path = "../../libs/user-facing-errors"}
 
 [dev-dependencies]
-anyhow = "1"
-chrono = "0.4"
 indoc = "1"
 serial_test = "*"
 quaint.workspace = true
