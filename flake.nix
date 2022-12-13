@@ -27,6 +27,7 @@
         imports = [
           ./nix/all-engines.nix
           ./nix/args.nix
+          ./nix/cli-shell.nix
           ./nix/shell.nix
           ./prisma-fmt-wasm
         ];
