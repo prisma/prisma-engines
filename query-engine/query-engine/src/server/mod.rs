@@ -13,7 +13,7 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -139,6 +139,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let result = handler.handle(body, tx_id, trace_id.clone()).instrument(span).await;
 
                 let result_bytes = if log_capture.should_capture() {
+                    tokio::time::sleep(Duration::from_millis(1)).await;
                     let logs = state.cx.inflight_tracer.as_ref().unwrap().get(log_capture.id()).await;
                     let json = json!({
                         "result": result,
@@ -286,7 +287,8 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
     let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-    span.set_parent(cx);
+    // todo treat option
+    span.set_parent(cx.unwrap());
 
     match state
         .cx
