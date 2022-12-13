@@ -2,7 +2,7 @@ use crate::state::State;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
-use opentelemetry::trace::TraceId;
+use opentelemetry::trace::{SpanId, TraceContextExt, TraceId};
 use opentelemetry::{global, propagation::Extractor, Context};
 
 use query_core::get_trace_id_from_context;
@@ -364,10 +364,21 @@ impl<'a> Extractor for HeaderExtractor<'a> {
 }
 
 /// If the client sends us a trace and span id, extracting a new context if the
-/// headers are set. If not, returns current context.
-fn get_parent_span_context(req: &Request<Body>) -> Context {
+/// headers are set. If not, returns None.
+fn get_parent_span_context(req: &Request<Body>) -> Option<Context> {
     let extractor = HeaderExtractor(req.headers());
-    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+    let context = global::get_text_map_propagator(|propagator| propagator.extract(&extractor));
+
+    // because getting the context is infallible, we can be returning a context that's not
+    // useful for our purposes, for that reason we validate it and return None in case
+    // it's set with an invalid TraceId
+    let trace_id = get_trace_id_from_context(&context);
+    let span_id = context.span().span_context().span_id();
+    if trace_id == TraceId::INVALID || span_id == SpanId::INVALID {
+        None
+    } else {
+        Some(context)
+    }
 }
 
 fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
@@ -438,17 +449,32 @@ impl Default for LogCapture {
 
 fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCapture, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
+    // this is the case no transaction is in flight. What do we do when there's an ongoing transaction?
     let (span, log_capture) = if tx_id.is_none() {
-        let cx = get_parent_span_context(req);
-        let trace_id = get_trace_id_from_context(&cx);
-
         let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
+        let cx = get_parent_span_context(req);
+        if let Some(context) = cx.clone() {
+            let span_ctx = span.context();
+            dbg!(get_trace_id_from_context(&span_ctx));
+            span.set_parent(context);
+        }
 
+        let context = span.context();
+        let trace_id = get_trace_id_from_context(&context);
+        dbg!(trace_id);
+
+        if let Some(context) = cx.clone() {
+            let parent_trace_id = get_trace_id_from_context(&context);
+            dbg!(parent_trace_id);
+        }
+
+        // Here trace_id is 0 (Invalid, there's no previous trace, we might want to create one)
+        // however when spans are created it assigns a new trace_id to them. Let me check were
         let log_capture = LogCapture::new_from_req(trace_id, req);
 
         (span, log_capture)
     } else {
+        // Is this case unimplemented yet? ask alexey.
         (Span::none(), LogCapture::default())
     };
 
