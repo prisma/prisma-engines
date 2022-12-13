@@ -140,7 +140,13 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
                 let result_bytes = if log_capture.should_capture() {
                     tokio::time::sleep(Duration::from_millis(1)).await;
-                    let logs = state.cx.inflight_tracer.as_ref().unwrap().get(log_capture.id()).await;
+                    let logs = state
+                        .cx
+                        .inflight_tracer
+                        .as_ref()
+                        .unwrap()
+                        .get_logs(log_capture.id())
+                        .await;
                     let json = json!({
                         "result": result,
                         "logs": logs
@@ -451,32 +457,21 @@ impl Default for LogCapture {
 
 fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCapture, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
-    // this is the case no transaction is in flight. What do we do when there's an ongoing transaction?
+    // TODO: this is the case no transaction is in flight. What do we do when there's an ongoing transaction?
     let (span, log_capture) = if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
         let cx = get_parent_span_context(req);
         if let Some(context) = cx.clone() {
-            let span_ctx = span.context();
-            dbg!(get_trace_id_from_context(&span_ctx));
             span.set_parent(context);
         }
 
         let context = span.context();
         let trace_id = get_trace_id_from_context(&context);
-        dbg!(trace_id);
-
-        if let Some(context) = cx.clone() {
-            let parent_trace_id = get_trace_id_from_context(&context);
-            dbg!(parent_trace_id);
-        }
-
-        // Here trace_id is 0 (Invalid, there's no previous trace, we might want to create one)
-        // however when spans are created it assigns a new trace_id to them. Let me check were
         let log_capture = LogCapture::new_from_req(trace_id, req);
 
         (span, log_capture)
     } else {
-        // Is this case unimplemented yet? ask alexey.
+        // TODO: Is this case unimplemented yet? ask alexey.
         (Span::none(), LogCapture::default())
     };
 
