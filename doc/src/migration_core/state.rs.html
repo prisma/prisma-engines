@@ -400,6 +400,7 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
+<span id="403">403</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the migration engine
@@ -739,6 +740,7 @@
                             .map(|warning| <span class="kw">crate</span>::json_rpc::types::IntrospectionWarning {
                                 code: warning.code <span class="kw">as </span>u32,
                                 message: warning.message,
+                                affected: warning.affected,
                             })
                             .collect(),
                     })
