@@ -2,6 +2,7 @@ use once_cell::sync::Lazy;
 use opentelemetry::sdk::export::trace::SpanData;
 use opentelemetry::trace::{TraceContextExt, TraceId};
 use opentelemetry::Context;
+use serde::Serialize;
 use serde_json::{json, Value};
 use std::borrow::Cow;
 
@@ -31,51 +32,73 @@ pub fn spans_to_json(spans: &[SpanData]) -> String {
 }
 
 fn span_to_json(span: &SpanData) -> Value {
-    let attributes: HashMap<String, String> =
-        span.attributes
-            .iter()
-            .fold(HashMap::default(), |mut map, (key, value)| {
-                if ACCEPT_ATTRIBUTES.contains(&key.as_str()) {
-                    map.insert(key.to_string(), value.to_string());
-                }
-
-                map
-            });
-
-    // Override the name of quaint. It will be confusing for users to see quaint instead of
-    // Prisma in the spans.
-    let name: Cow<str> = match span.name {
-        Cow::Borrowed("quaint:query") => "prisma:engine:db_query".into(),
-        _ => span.name.clone(),
-    };
-
-    let hr_start_time = convert_to_high_res_time(span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
-    let hr_end_time = convert_to_high_res_time(span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
-
-    json!({
-        "span": true,
-        "trace_id": span.span_context.trace_id().to_string(),
-        "span_id": span.span_context.span_id().to_string(),
-        "parent_span_id": span.parent_span_id.to_string(),
-        "name": name,
-        "start_time": hr_start_time,
-        "end_time": hr_end_time,
-        "attributes": attributes,
-        "links": create_link_json(span)
-    })
+    json!(CapturedLog::from(span))
 }
 
-fn create_link_json(span: &SpanData) -> Vec<Value> {
-    span.links
-        .iter()
-        .map(|link| {
-            let ctx = link.span_context();
-            json!({
-                "trace_id": ctx.trace_id().to_string(),
-                "span_id": ctx.span_id().to_string(),
+#[derive(Serialize, Debug, Clone)]
+pub struct CapturedLog {
+    trace_id: String,
+    span_id: String,
+    parent_span_id: String,
+    name: String,
+    start_time: [u64; 2],
+    end_time: [u64; 2],
+    attributes: HashMap<String, String>,
+    links: Vec<Link>,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct Link {
+    trace_id: String,
+    span_id: String,
+}
+
+impl From<&SpanData> for CapturedLog {
+    fn from(span: &SpanData) -> Self {
+        let attributes: HashMap<String, String> =
+            span.attributes
+                .iter()
+                .fold(HashMap::default(), |mut map, (key, value)| {
+                    if ACCEPT_ATTRIBUTES.contains(&key.as_str()) {
+                        map.insert(key.to_string(), value.to_string());
+                    }
+
+                    map
+                });
+
+        // Override the name of quaint. It will be confusing for users to see quaint instead of
+        // Prisma in the spans.
+        let name: Cow<str> = match span.name {
+            Cow::Borrowed("quaint:query") => "prisma:engine:db_query".into(),
+            _ => span.name.clone(),
+        };
+
+        let hr_start_time = convert_to_high_res_time(span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
+        let hr_end_time = convert_to_high_res_time(span.end_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
+
+        let links = span
+            .links
+            .iter()
+            .map(|link| {
+                let ctx = link.span_context();
+                Link {
+                    trace_id: ctx.trace_id().to_string(),
+                    span_id: ctx.span_id().to_string(),
+                }
             })
-        })
-        .collect()
+            .collect();
+
+        Self {
+            trace_id: span.span_context.trace_id().to_string(),
+            span_id: span.span_context.span_id().to_string(),
+            parent_span_id: span.parent_span_id.to_string(),
+            name: name.into_owned(),
+            start_time: hr_start_time,
+            end_time: hr_end_time,
+            attributes,
+            links,
+        }
+    }
 }
 
 // set the parent context and return the traceparent

@@ -8,7 +8,7 @@ use opentelemetry::{
     },
     trace::{TraceId, TracerProvider},
 };
-use query_core::spans_to_json;
+use query_core::CapturedLog;
 use std::fmt::Debug;
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
@@ -73,12 +73,12 @@ impl CaptureExporter {
         logs.insert(trace_id, Vec::new());
     }
 
-    pub async fn get(&self, trace_id: TraceId) -> String {
+    pub async fn get_logs(&self, trace_id: TraceId) -> Vec<CapturedLog> {
         let mut logs = self.logs.lock().await;
         if let Some(spans) = logs.remove(&trace_id) {
-            spans_to_json(&spans)
+            spans.iter().map(CapturedLog::from).collect()
         } else {
-            String::new()
+            vec![]
         }
     }
 }

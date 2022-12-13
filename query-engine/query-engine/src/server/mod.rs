@@ -140,7 +140,13 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
                 let result_bytes = if log_capture.should_capture() {
                     tokio::time::sleep(Duration::from_millis(1)).await;
-                    let logs = state.cx.inflight_tracer.as_ref().unwrap().get(log_capture.id()).await;
+                    let logs = state
+                        .cx
+                        .inflight_tracer
+                        .as_ref()
+                        .unwrap()
+                        .get_logs(log_capture.id())
+                        .await;
                     let json = json!({
                         "result": result,
                         "logs": logs
