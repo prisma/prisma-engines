@@ -123,6 +123,7 @@ impl SqlMigrationConnector {
         match target {
             DiffTarget::Datamodel(schema) => {
                 let schema = psl::parse_schema(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                self.flavour.check_schema_features(&schema)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
                     self.flavour.as_ref(),

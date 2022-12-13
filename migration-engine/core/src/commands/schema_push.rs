@@ -33,7 +33,7 @@ pub async fn schema_push(
 
     let to = connector
         .database_schema_from_diff_target(DiffTarget::Datamodel(source), None, None)
-        .instrument(tracing::debug_span!("Calculate `to`"))
+        .instrument(tracing::info_span!("Calculate `to`"))
         .await?;
 
     let namespaces = connector.extract_namespaces(&to);
@@ -43,7 +43,7 @@ pub async fn schema_push(
     // particulalry if it's not correctly setting the preview features flags.
     let from = connector
         .database_schema_from_diff_target(DiffTarget::Database, None, namespaces)
-        .instrument(tracing::debug_span!("Calculate `from`"))
+        .instrument(tracing::info_span!("Calculate `from`"))
         .await?;
     let database_migration = connector.diff(from, to);
 
