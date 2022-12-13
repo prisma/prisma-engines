@@ -35,3 +35,6 @@ shape = "u32"
 
 [recordShapes.introspectionWarning.fields.message]
 shape = "string"
+
+[recordShapes.introspectionWarning.fields.affected]
+shape = "serde_json::Value"
