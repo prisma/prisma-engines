@@ -19,7 +19,7 @@ pub struct PipelineBuilder {
     trace_config: Option<sdk::trace::Config>,
 }
 
-/// Create a new stdout exporter pipeline builder.
+/// Create a new in memory expoter
 pub fn new_pipeline() -> PipelineBuilder {
     PipelineBuilder::default()
 }
@@ -40,7 +40,7 @@ impl PipelineBuilder {
 }
 
 impl PipelineBuilder {
-    pub fn install_batched(mut self, exporter: CaptureExporter) -> sdk::trace::Tracer {
+    pub fn install(mut self, exporter: LogExporter) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
         let processor = sdk::trace::BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
@@ -59,25 +59,25 @@ impl PipelineBuilder {
     }
 }
 
-/// A [`CaptureExporter`] that sends spans to stdout.
+/// A [`SpanExporter`] that stores spans in memory in a synchronized dictionary
 #[derive(Debug, Clone)]
-pub struct CaptureExporter {
+pub struct LogExporter {
     logs: Arc<Mutex<HashMap<TraceId, Vec<SpanData>>>>,
 }
 
-impl CaptureExporter {
+impl LogExporter {
     pub fn new() -> Self {
         Self {
             logs: Default::default(),
         }
     }
 
-    pub async fn capture(&self, trace_id: TraceId) {
+    pub async fn capture_logs(&self, trace_id: TraceId) {
         let mut logs = self.logs.lock().await;
         logs.insert(trace_id, Vec::new());
     }
 
-    pub async fn get_logs(&self, trace_id: TraceId) -> Vec<CapturedLog> {
+    pub async fn get_captured_logs(&self, trace_id: TraceId) -> Vec<CapturedLog> {
         let mut logs = self.logs.lock().await;
         if let Some(spans) = logs.remove(&trace_id) {
             spans.iter().map(CapturedLog::from).collect()
@@ -87,14 +87,14 @@ impl CaptureExporter {
     }
 }
 
-impl Default for CaptureExporter {
+impl Default for LogExporter {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[async_trait]
-impl SpanExporter for CaptureExporter {
+impl SpanExporter for LogExporter {
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
         let batch = batch.into_iter().filter(|span| span.name == "quaint:query");
 
