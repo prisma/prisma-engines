@@ -124,7 +124,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
             .inflight_tracer
             .as_ref()
             .unwrap()
-            .capture(log_capture.id())
+            .capture_logs(log_capture.id())
             .await;
     }
 
@@ -146,7 +146,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                         .inflight_tracer
                         .as_ref()
                         .unwrap()
-                        .get_logs(log_capture.id())
+                        .get_captured_logs(log_capture.id())
                         .await;
 
                     let json = json!({
