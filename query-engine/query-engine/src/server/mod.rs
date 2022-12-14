@@ -13,7 +13,7 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -139,7 +139,8 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let result = handler.handle(body, tx_id, trace_id.clone()).instrument(span).await;
 
                 let result_bytes = if log_capture.should_capture() {
-                    tokio::time::sleep(Duration::from_millis(1)).await;
+                    global::force_flush_tracer_provider();
+
                     let logs = state
                         .cx
                         .inflight_tracer
@@ -147,6 +148,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                         .unwrap()
                         .get_logs(log_capture.id())
                         .await;
+
                     let json = json!({
                         "result": result,
                         "logs": logs
