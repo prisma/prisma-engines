@@ -8,10 +8,6 @@
           let toolchain = super.rust-bin.stable.latest; in
           { cargo = toolchain.minimal; rustc = toolchain.minimal; rustToolchain = toolchain; })
       ];
-
-      pkgs = import inputs.nixpkgs { inherit system overlays; };
-
-      craneLib = inputs.crane.mkLib pkgs;
     in
-    { inherit craneLib pkgs; };
+    { pkgs = import inputs.nixpkgs { inherit system overlays; }; };
 }
