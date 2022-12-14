@@ -166,7 +166,6 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
-        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
             let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {

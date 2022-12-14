@@ -208,7 +208,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a introspection_connector::IntrospectionContext,
-        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<introspection_connector::IntrospectionResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
