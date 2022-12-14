@@ -9,8 +9,8 @@ use opentelemetry::{
     trace::{TraceId, TracerProvider},
 };
 use query_core::CapturedLog;
-use std::fmt::Debug;
 use std::{collections::HashMap, sync::Arc};
+use std::{fmt::Debug, time::Duration};
 use tokio::sync::Mutex;
 
 /// Pipeline builder
@@ -40,10 +40,14 @@ impl PipelineBuilder {
 }
 
 impl PipelineBuilder {
-    pub fn install_simple(mut self, exporter: CaptureExporter) -> sdk::trace::Tracer {
+    pub fn install_batched(mut self, exporter: CaptureExporter) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
-        let mut provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+        let processor = sdk::trace::BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
+            .with_scheduled_delay(Duration::new(0, 0))
+            .build();
+        let mut provider_builder = sdk::trace::TracerProvider::builder().with_span_processor(processor);
+
         if let Some(config) = self.trace_config.take() {
             provider_builder = provider_builder.with_config(config);
         }

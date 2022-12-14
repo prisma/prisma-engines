@@ -43,7 +43,9 @@ pub struct CapturedLog {
     name: String,
     start_time: [u64; 2],
     end_time: [u64; 2],
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
     attributes: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     links: Vec<Link>,
 }
 
