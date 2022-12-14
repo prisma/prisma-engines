@@ -226,7 +226,6 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
-<span id="229">229</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB migration connector.
 //!
 //! It is intentionally structured after sql-migration-connector and implements the same
@@ -395,7 +394,6 @@
     <span class="kw">fn </span>introspect&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext,
-        _namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
     ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;IntrospectionResult&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
             <span class="kw">let </span>url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {

@@ -390,6 +390,7 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
+<span id="393">393</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attribute">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -627,9 +628,10 @@
     <span class="kw">fn </span>introspect&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext,
-        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
     ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;IntrospectionResult&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>namespace_names = ctx.datasource().namespaces.iter().map(|(s, <span class="kw">_</span>)| s.clone()).collect();
+            <span class="kw">let </span>namespaces = Namespaces::from_vec(<span class="kw-2">&amp;mut </span>namespace_names);
             <span class="kw">let </span>sql_schema = <span class="self">self</span>.flavour.describe_schema(namespaces).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))<span class="question-mark">?</span>;
