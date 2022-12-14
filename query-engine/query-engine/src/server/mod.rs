@@ -13,7 +13,7 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -139,7 +139,8 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let result = handler.handle(body, tx_id, trace_id.clone()).instrument(span).await;
 
                 let result_bytes = if log_capture.should_capture() {
-                    tokio::time::sleep(Duration::from_millis(1)).await;
+                    global::force_flush_tracer_provider();
+
                     let logs = state
                         .cx
                         .inflight_tracer
@@ -147,6 +148,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                         .unwrap()
                         .get_logs(log_capture.id())
                         .await;
+
                     let json = json!({
                         "result": result,
                         "logs": logs
@@ -293,8 +295,9 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
     let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-    // todo treat option
-    span.set_parent(cx.unwrap());
+    if let Some(context) = cx {
+        span.set_parent(context);
+    }
 
     match state
         .cx
@@ -461,7 +464,7 @@ fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCaptu
     let (span, log_capture) = if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
         let cx = get_parent_span_context(req);
-        if let Some(context) = cx.clone() {
+        if let Some(context) = cx {
             span.set_parent(context);
         }
 

@@ -81,17 +81,16 @@ impl<'a> Logger<'a> {
     pub fn install(self) -> LoggerResult<()> {
         let filter = create_env_filter(self.log_queries);
 
-        let is_user_trace = filter_fn(is_user_facing_trace_filter);
-
         let telemetry = if self.enable_telemetry {
             let tracer = create_otel_tracer(self.service_name, self.telemetry_endpoint);
             let mut telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
             if let Some(log_capture_exporter) = self.log_capture_exporter {
-                let tracer = crate::capture_tracer::new_pipeline().install_simple(log_capture_exporter);
+                let tracer = crate::capture_tracer::new_pipeline().install_batched(log_capture_exporter);
                 telemetry = telemetry.with_tracer(tracer);
             }
 
+            let is_user_trace = filter_fn(is_user_facing_trace_filter);
             let telemetry = telemetry.with_filter(is_user_trace);
             Some(telemetry)
         } else {
@@ -115,7 +114,6 @@ impl<'a> Logger<'a> {
             .with(telemetry);
 
         subscriber::set_global_default(subscriber)?;
-
         Ok(())
     }
 }
