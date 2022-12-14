@@ -463,7 +463,7 @@ fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCaptu
     let (span, log_capture) = if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
         let cx = get_parent_span_context(req);
-        if let Some(context) = cx.clone() {
+        if let Some(context) = cx {
             span.set_parent(context);
         }
 
