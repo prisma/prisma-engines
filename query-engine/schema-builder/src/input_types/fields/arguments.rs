@@ -81,7 +81,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &mut BuilderContext, fiel
         }
 
         // To-one optional relation.
-        ModelField::Relation(rf) if !rf.is_required() && ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) => {
+        ModelField::Relation(rf) if !rf.is_required() && ctx.has_feature(PreviewFeature::ExtendedWhereUnique) => {
             relation_to_one_selection_arguments(ctx, &rf.related_model())
         }
 
