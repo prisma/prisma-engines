@@ -1,4 +1,8 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
+<<<<<<< HEAD
+=======
+use hyper::{Body, HeaderMap, Method, Request, Response};
+>>>>>>> 608455ced7 (Prepare the code for metrics capturing)
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::routes;
@@ -6,7 +10,7 @@ use query_engine::state::{self, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
-use hyper::{Body, HeaderMap, Method, Request, Response};
+use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
 use std::env;
 

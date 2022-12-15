@@ -6,7 +6,7 @@ use query_engine::state::{self, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
-use hyper::{Body, HeaderMap, Method, Request, Response};
+use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
 use std::env;
 

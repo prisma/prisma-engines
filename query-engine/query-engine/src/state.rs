@@ -44,11 +44,7 @@ impl Clone for State {
     }
 }
 
-pub async fn init_state(
-    opts: &PrismaOpt,
-    install_logger: bool,
-    metrics: Option<MetricRegistry>,
-) -> PrismaResult<State> {
+pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<MetricRegistry>) -> PrismaResult<State> {
     let metrics = if metrics.is_none() {
         MetricRegistry::new()
     } else {
@@ -62,12 +58,7 @@ pub async fn init_state(
     logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
     logger.enable_metrics(metrics.clone());
 
-    let logs_capture = if opts.enable_logs_in_response {
-        let exporter = logger.enable_logs_capture();
-        Some(exporter)
-    } else {
-        None
-    };
+    let trace_capturer = logger.enable_trace_capturer(opts.enable_logs_in_response);
 
     if install_logger {
         logger.install().unwrap();
@@ -86,7 +77,7 @@ pub async fn init_state(
 
     let cx = PrismaContext::builder(datamodel) //  opts.enable_raw_queries, metrics, logs_capture)
         .set_metrics(metrics)
-        .set_logs_capture_tracer(logs_capture)
+        .set_trace_capturer(trace_capturer)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
         .instrument(span)
