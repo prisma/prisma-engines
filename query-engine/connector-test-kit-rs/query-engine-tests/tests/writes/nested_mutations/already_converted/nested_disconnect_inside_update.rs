@@ -132,7 +132,7 @@ mod disconnect_inside_update {
             where: {parent}
             data:{{
               p: {{ set: "p2" }}
-              childOpt: {{disconnect: {{ non_unique: "1" }} }}
+              childOpt: {{ disconnect: {{ non_unique: "1" }} }}
           }}){{
             childOpt {{
               c

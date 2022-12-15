@@ -141,9 +141,9 @@ mod connect_inside_create {
         )?;
 
         assert_error!(
-          runner,
-          format!(
-              r#"mutation {{
+            runner,
+            format!(
+                r#"mutation {{
                 createOneParent(data:{{
                   p: "p2"
                   p_1: "p2_1"
@@ -155,11 +155,11 @@ mod connect_inside_create {
                   }}
                 }}
               }}"#,
-              child = child
-          ),
-          2025,
-          "An operation failed because it depends on one or more records that were required but not found. No 'Child' record to connect was found was found for a nested connect on one-to-one relation 'ChildToParent'."
-      );
+                child = child
+            ),
+            2025,
+            "An operation failed because it depends on one or more records that were required but not found."
+        );
 
         Ok(())
     }

@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::Filter;
+use connector::{Filter, RelationCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
@@ -165,14 +165,16 @@ fn handle_one_to_x(
     }
 
     // Depending on where the relation is inlined, we update the parent or the child nodes.
-    let (node_to_attach, model_to_update, extractor_model_id, null_record_id) =
+    let (node_to_attach, model_to_update, extractor_model_id, null_record_id, filter) =
         if parent_relation_field.is_inlined_on_enclosing_model() {
             // Inlined on parent
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
+            // If the relation is inlined on the parent and a filter is applied on the child, we need to join to apply this filter
+            let filter = parent_relation_field.to_one_related(filter);
 
-            (parent_node, parent_model, extractor_model_id, null_record_id)
+            (parent_node, parent_model, extractor_model_id, null_record_id, filter)
         } else {
             // Inlined on child
             let child_model = child_relation_field.model();
@@ -184,6 +186,7 @@ fn handle_one_to_x(
                 child_model,
                 extractor_model_id,
                 null_record_id,
+                filter,
             )
         };
 

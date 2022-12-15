@@ -25,6 +25,10 @@ impl RelationField {
         }
     }
 
+    pub fn is_to_one_opt(&self) -> bool {
+        matches!(self, Self::ToOneOpt { .. })
+    }
+
     pub fn field_name(&self) -> String {
         match self {
             RelationField::ToOneOpt { child } => match child {
