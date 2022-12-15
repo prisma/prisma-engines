@@ -171,7 +171,8 @@ fn handle_one_to_x(
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
-            // If the relation is inlined on the parent and a filter is applied on the child, we need to join to apply this filter
+            // If the relation is inlined on the parent and a filter is applied on the child then it means the update will be done on the parent table.
+            // Therefore, the filter applied on the child needs to be converted to a "relational" filter so that the connector renders the adequate SQL to join the Child table.
             let filter = if !filter.is_empty() {
                 parent_relation_field.to_one_related(filter)
             } else {
