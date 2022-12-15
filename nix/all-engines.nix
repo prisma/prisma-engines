@@ -17,13 +17,13 @@ in
     name = "prisma-engines";
     inherit src;
 
-    buildInputs = [ pkgs.openssl ];
+    buildInputs = [ pkgs.openssl.out ];
     nativeBuildInputs = with pkgs; [
-      git # for our build scripts that bake in the git hash
-      perl # for openssl-sys
-      pkg-config
-      protobuf # for tonic
       cargo
+      git # for our build scripts that bake in the git hash
+      protobuf # for tonic
+      openssl.dev
+      pkg-config
     ];
 
     buildPhase = ''

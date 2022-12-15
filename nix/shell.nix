@@ -1,8 +1,12 @@
 { config, pkgs, ... }:
 
+let
+  devToolchain = pkgs.rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; };
+in
 {
   devShells.default = pkgs.mkShell {
-    packages = [ (pkgs.rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; }) ];
-    inputsFrom = [ config.packages.prisma-engines-deps ];
+    packages = [ devToolchain pkgs.llvmPackages.bintools ];
+    inputsFrom = [ config.packages.prisma-engines ];
+    shellHook = "export RUSTFLAGS='-C link-arg=-fuse-ld=lld'";
   };
 }
