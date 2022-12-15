@@ -57,9 +57,11 @@ features = [
 [profile.dev.package.backtrace]
 opt-level = 3
 
-[profile.release.package.introspection-core]
-codegen-units = 1
-opt-level = 'z' # Optimize for size.
+[profile.release.package.query-engine-node-api]
+strip = "symbols"
+
+[profile.release.package.query-engine]
+strip = "symbols"
 
 [profile.release]
 lto = "fat"
