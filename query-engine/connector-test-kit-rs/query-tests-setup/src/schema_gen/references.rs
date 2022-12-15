@@ -153,6 +153,10 @@ pub fn full_child_references<'a>(
     if !is_m2m {
         match *parent_id {
             _ if on_child.is_list() && !on_parent.is_list() => vec![RelationReference::NoRef],
+            Identifier::Simple if on_child.is_to_one_opt() && on_parent.is_to_one_opt() => {
+                vec![RelationReference::SimpleParentId(on_child), RelationReference::NoRef]
+                    .clone_append(&mut common_parent_references(on_child))
+            }
             Identifier::Simple => {
                 vec![RelationReference::SimpleParentId(on_child)].clone_append(&mut common_parent_references(on_child))
             }
