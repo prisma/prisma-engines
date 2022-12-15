@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use hyper::http::HeaderValue;
 use opentelemetry::{
     global,
     sdk::{
@@ -12,6 +13,40 @@ use query_core::CapturedLog;
 use std::{collections::HashMap, sync::Arc};
 use std::{fmt::Debug, time::Duration};
 use tokio::sync::Mutex;
+
+#[derive(Debug, Clone)]
+pub enum Config {
+    Enabled(ConfiguredCapturer),
+    Disabled,
+}
+
+/// A ConfiguredCapturer is ready to capture spans for a particular trace
+#[derive(Debug, Clone)]
+pub struct ConfiguredCapturer {
+    capturer: TraceCapturer,
+    trace_id: TraceId,
+}
+
+impl ConfiguredCapturer {
+    pub async fn start_capturing(&self) {
+        self.capturer.start_capturing(self.trace_id.clone()).await
+    }
+
+    pub async fn fetch_captures(&self) -> Captures {
+        self.capturer.fetch_captures(self.trace_id.clone()).await
+    }
+}
+
+impl Config {
+    pub fn new_from_header(header: Option<&HeaderValue>, capturer: Option<TraceCapturer>, trace_id: TraceId) -> Self {
+        if header.is_some_and(|val| val.to_str().unwrap_or("false") == "true") {
+            let c = capturer.unwrap();
+            Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
+        } else {
+            Config::Disabled
+        }
+    }
+}
 
 /// Pipeline builder
 #[derive(Debug)]
