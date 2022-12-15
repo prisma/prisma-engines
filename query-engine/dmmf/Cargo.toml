@@ -16,4 +16,4 @@ prisma-models = { path = "../prisma-models" }
 [dev-dependencies]
 expect-test = "1.2.2"
 indoc = "1.0.3"
-pretty_assertions = "0.6.1"
+pretty_assertions = "1"
