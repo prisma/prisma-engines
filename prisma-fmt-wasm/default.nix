@@ -1,24 +1,19 @@
-args@{ pkgs, system, craneLib, ... }:
+{ pkgs, system, self', ... }:
 
 let
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-  craneLib = args.craneLib.overrideToolchain toolchain;
-
-  inherit (pkgs) jq nodejs coreutils wasm-bindgen-cli;
+  deps = self'.packages.prisma-engines-deps;
+  inherit (pkgs) jq nodejs coreutils wasm-bindgen-cli stdenv;
   inherit (builtins) readFile replaceStrings;
 in
-rec {
-  packages.prisma-fmt-wasm = craneLib.buildPackage {
-    pname = "prisma-fmt-wasm";
-    version = "0.1.0";
-
+{
+  packages.prisma-fmt-wasm = stdenv.mkDerivation {
+    name = "prisma-fmt-wasm";
     src = ../.;
-    nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli ];
+    nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
 
-    cargoBuildCommand = "cargo build --release --target=wasm32-unknown-unknown --manifest-path=prisma-fmt-wasm/Cargo.toml";
-    cargoCheckCommand = "cargo check --target=wasm32-unknown-unknown --manifest-path=prisma-fmt-wasm/Cargo.toml";
-    cargoArtifacts = null; # do not cache dependencies
-    doCheck = false; # do not run tests
+    configurePhase = "mkdir .cargo && ln -s ${deps}/config.toml .cargo/config.toml";
+    buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-fmt-build";
     installPhase = readFile ./scripts/install.sh;
   };
 
@@ -33,9 +28,9 @@ rec {
         set -euxo pipefail
 
         PACKAGE_DIR=$(mktemp -d)
-        cp -r --no-target-directory ${packages.prisma-fmt-wasm} "$PACKAGE_DIR"
+        cp -r --no-target-directory ${self'.packages.prisma-fmt-wasm} "$PACKAGE_DIR"
         rm -f "$PACKAGE_DIR/package.json"
-        jq ".version = \"$1\"" ${packages.prisma-fmt-wasm}/package.json > "$PACKAGE_DIR/package.json"
+        jq ".version = \"$1\"" ${self'.packages.prisma-fmt-wasm}/package.json > "$PACKAGE_DIR/package.json"
         echo "$PACKAGE_DIR"
       '';
     };
@@ -48,6 +43,6 @@ rec {
     };
 
   checks.prismaFmtWasmE2E = pkgs.runCommand "prismaFmtWasmE2E"
-    { PRISMA_FMT_WASM = packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
+    { PRISMA_FMT_WASM = self'.packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
     (readFile ./scripts/check.sh);
 }

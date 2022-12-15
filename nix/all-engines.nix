@@ -1,8 +1,9 @@
-{ craneLib, pkgs, ... }:
+{ craneLib, pkgs, inputs, ... }:
 
 let
   srcPath = builtins.path { path = ../.; name = "prisma-engines-workspace-root-path"; };
   src = pkgs.lib.cleanSourceWith { filter = enginesSourceFilter; src = srcPath; };
+  craneLib = inputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
 
   enginesSourceFilter = path: type: (builtins.match "\\.pest$" path != null) ||
