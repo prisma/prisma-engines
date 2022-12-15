@@ -32,11 +32,11 @@ pub fn spans_to_json(spans: &[SpanData]) -> String {
 }
 
 fn span_to_json(span: &SpanData) -> Value {
-    json!(CapturedLog::from(span))
+    json!(UserFacingSpan::from(span))
 }
 
 #[derive(Serialize, Debug, Clone)]
-pub struct CapturedLog {
+pub struct UserFacingSpan {
     trace_id: String,
     span_id: String,
     parent_span_id: String,
@@ -55,7 +55,7 @@ pub struct Link {
     span_id: String,
 }
 
-impl From<&SpanData> for CapturedLog {
+impl From<&SpanData> for UserFacingSpan {
     fn from(span: &SpanData) -> Self {
         let attributes: HashMap<String, String> =
             span.attributes

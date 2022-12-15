@@ -1,22 +1,19 @@
 use crate::{capture_tracer::TraceCapturer, PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
-use std::{
-    env, fmt,
-    sync::{atomic::AtomicUsize, Arc},
-};
+use std::{env, fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
 pub struct PrismaContext {
     /// The api query schema.
     query_schema: QuerySchemaRef,
+    /// The metrics registry
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
-    // Inflight tracer
+    // The trace capturer being in flight.
     pub trace_capturer: Option<TraceCapturer>,
-    pub counter: AtomicUsize,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -90,7 +87,6 @@ impl PrismaContext {
             executor,
             metrics,
             trace_capturer,
-            counter: AtomicUsize::new(0),
         };
 
         context.verify_connection().await?;

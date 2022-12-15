@@ -20,7 +20,6 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
 const TRACE_CAPTURE_HEADER: &str = "X-capture-traces";
-const TRACEPARENT_HEADER: &str = "traceparent";
 
 /// Starts up the graphql query engine server
 pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
@@ -138,11 +137,11 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let result_bytes = if let capture_tracer::Config::Enabled(capturer) = capture_config {
                     global::force_flush_tracer_provider();
 
-                    let captures = capturer.fetch_captures().await;
+                    let traces = capturer.fetch_captures().await;
 
                     let json = json!({
                         "result": result,
-                        "logs": captures.logs,
+                        "traces": traces,
                     });
                     serde_json::to_vec(&json).unwrap()
                 } else {
