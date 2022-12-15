@@ -410,6 +410,7 @@
 <span id="410">410</span>
 <span id="411">411</span>
 <span id="412">412</span>
+<span id="413">413</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::database_name::validate_db_name;
 <span class="kw">use crate</span>::{
     ast,
@@ -745,11 +746,12 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if </span>!ctx
-        .db
-        .schema_flags()
-        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
-    {
+    <span class="kw">let </span>datasource = <span class="kw">match </span>ctx.datasource {
+        <span class="prelude-val">Some</span>(datasource) =&gt; datasource,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">if </span>datasource.schemas_span.is_none() {
         <span class="kw">return</span>;
     }
 

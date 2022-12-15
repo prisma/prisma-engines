@@ -124,10 +124,11 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel_connector::ConnectorCapability,
     diagnostics::DatamodelError,
-    parser_database::{<span class="self">self</span>, ast::WithSpan, walkers::EnumWalker},
+    parser_database::{ast::WithSpan, walkers::EnumWalker},
     validate::validation_pipeline::context::Context,
 };
 <span class="kw">use </span>std::collections::HashSet;
@@ -202,11 +203,12 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if </span>!ctx
-        .db
-        .schema_flags()
-        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
-    {
+    <span class="kw">let </span>datasource = <span class="kw">match </span>ctx.datasource {
+        <span class="prelude-val">Some</span>(datasource) =&gt; datasource,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">if </span>datasource.schemas_span.is_none() {
         <span class="kw">return</span>;
     }
 
