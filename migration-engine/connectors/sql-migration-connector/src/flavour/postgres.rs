@@ -250,7 +250,7 @@ impl SqlFlavour for PostgresFlavour {
 
     fn empty_database_schema(&self) -> SqlSchema {
         let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
         schema
     }
 

@@ -38,7 +38,7 @@ impl SqlMigrationConnector {
     /// Initialize a PostgreSQL migration connector.
     pub fn new_postgres() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(PostgresFlavour::default()),
+            flavour: Box::<PostgresFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -54,7 +54,7 @@ impl SqlMigrationConnector {
     /// Initialize a SQLite migration connector.
     pub fn new_sqlite() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(SqliteFlavour::default()),
+            flavour: Box::<SqliteFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -62,7 +62,7 @@ impl SqlMigrationConnector {
     /// Initialize a MySQL migration connector.
     pub fn new_mysql() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(MysqlFlavour::default()),
+            flavour: Box::<MysqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -70,7 +70,7 @@ impl SqlMigrationConnector {
     /// Initialize a MSSQL migration connector.
     pub fn new_mssql() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(MssqlFlavour::default()),
+            flavour: Box::<MssqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }

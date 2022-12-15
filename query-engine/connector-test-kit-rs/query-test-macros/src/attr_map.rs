@@ -70,7 +70,7 @@ impl From<&AttributeArgs> for NestedAttrMap {
 
 impl ToTokens for NestedAttrMap {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let metas: Vec<_> = self.inner.iter().map(|(_, meta)| meta).collect();
+        let metas: Vec<_> = self.inner.values().collect();
         tokens.append_all(quote! { #(#metas),* });
     }
 

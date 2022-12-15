@@ -336,7 +336,7 @@ impl SqlFlavour for MssqlFlavour {
 
     fn empty_database_schema(&self) -> SqlSchema {
         let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::new(sql_schema_describer::mssql::MssqlSchemaExt::default()));
+        schema.set_connector_data(Box::<sql_schema_describer::mssql::MssqlSchemaExt>::default());
         schema
     }
 

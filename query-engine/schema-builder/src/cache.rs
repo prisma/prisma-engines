@@ -54,7 +54,7 @@ impl<T> Into<Vec<Arc<T>>> for TypeRefCache<T> {
     fn into(self) -> Vec<Arc<T>> {
         let mut vec: Vec<Arc<T>> = vec![];
 
-        vec.extend(self.cache.into_iter().map(|(_, t)| t));
+        vec.extend(self.cache.into_values());
         vec
     }
 }
