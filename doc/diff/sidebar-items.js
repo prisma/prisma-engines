@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Result","A fragment of a computed diff."]],"fn":[["chars","Computes the diff between the chars of two strings."],["lines","Computes the diff between the lines of two strings."],["slice","Computes the diff between two slices."]]};

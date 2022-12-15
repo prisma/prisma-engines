@@ -48,7 +48,7 @@ var sourcesIndex = JSON.parse('{\
 "datamodel_renderer":["",[["configuration",[],["datasource.rs","generator.rs"]],["datamodel",[["composite_type",[],["field.rs"]],["model",[],["field.rs","id.rs","index.rs","index_field_input.rs","relation.rs"]]],["attributes.rs","composite_type.rs","default.rs","enumerator.rs","field_type.rs","model.rs"]],["value",[],["array.rs","constant.rs","documentation.rs","env.rs","function.rs","text.rs"]]],["configuration.rs","datamodel.rs","lib.rs","value.rs"]],\
 "derivative":["",[],["ast.rs","attr.rs","bound.rs","clone.rs","cmp.rs","debug.rs","default.rs","hash.rs","lib.rs","matcher.rs","paths.rs","utils.rs"]],\
 "diagnostics":["",[],["collection.rs","error.rs","lib.rs","native_type_error_factory.rs","pretty_print.rs","span.rs","warning.rs"]],\
-"difference":["",[],["display.rs","lcs.rs","lib.rs","merge.rs"]],\
+"diff":["",[],["lib.rs"]],\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
 "dml":["",[],["composite_type.rs","datamodel.rs","default_value.rs","enum.rs","field.rs","lib.rs","lift.rs","model.rs","native_type_instance.rs","relation_info.rs","scalars.rs","traits.rs"]],\
@@ -206,7 +206,7 @@ var sourcesIndex = JSON.parse('{\
 "postgres_protocol":["",[["authentication",[],["mod.rs","sasl.rs"]],["escape",[],["mod.rs"]],["message",[],["backend.rs","frontend.rs","mod.rs"]],["password",[],["mod.rs"]],["types",[],["mod.rs"]]],["lib.rs"]],\
 "postgres_types":["",[],["bit_vec_06.rs","chrono_04.rs","lib.rs","pg_lsn.rs","private.rs","serde_json_1.rs","special.rs","type_gen.rs","uuid_1.rs"]],\
 "ppv_lite86":["",[["x86_64",[],["mod.rs","sse2.rs"]]],["lib.rs","soft.rs","types.rs"]],\
-"pretty_assertions":["",[],["format_changeset.rs","lib.rs"]],\
+"pretty_assertions":["",[],["lib.rs","printer.rs"]],\
 "pretty_hex":["",[],["lib.rs","pretty_hex.rs"]],\
 "prisma_fmt":["",[["code_actions",[],["relations.rs"]]],["actions.rs","code_actions.rs","get_config.rs","lib.rs","lint.rs","native.rs","preview.rs","text_document_completion.rs"]],\
 "prisma_fmt_build":["",[],["lib.rs"]],\
@@ -363,6 +363,7 @@ var sourcesIndex = JSON.parse('{\
 "wasm_bindgen_shared":["",[],["lib.rs"]],\
 "webpki":["",[["name",[],["dns_name.rs","ip_address.rs","verify.rs"]]],["calendar.rs","cert.rs","der.rs","end_entity.rs","error.rs","lib.rs","name.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs"]],\
 "webpki_roots":["",[],["lib.rs"]],\
-"wyz":["",[],["bidi.rs","comu.rs","fmt.rs","lib.rs","range.rs"]]\
+"wyz":["",[],["bidi.rs","comu.rs","fmt.rs","lib.rs","range.rs"]],\
+"yansi":["",[],["color.rs","lib.rs","macros.rs","paint.rs","style.rs","windows.rs"]]\
 }');
 createSourceSidebar();
