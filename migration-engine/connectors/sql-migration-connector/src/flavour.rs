@@ -124,6 +124,11 @@ pub(crate) trait SqlFlavour:
         None
     }
 
+    /// Check a schema for preview features not implemented in migrate/introspection.
+    fn check_schema_features(&self, _schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     /// The connection string received in set_params().
     fn connection_string(&self) -> Option<&str>;
 

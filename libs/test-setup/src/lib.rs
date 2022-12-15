@@ -30,10 +30,10 @@ type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 #[macro_export]
 macro_rules! only {
     ($($tag:ident),*) => {
-        ::test_setup::only!($($tag,)* ; exclude: )
+        ::test_setup::only!($($tag),* ; exclude: )
     };
 
-    ($($tag:ident,)* ; exclude: $($excludeTag:ident),*) => {
+    ($($tag:ident),* ; exclude: $($excludeTag:ident),*) => {
         {
             use ::test_setup::Tags;
             let (skip, db) = ::test_setup::only_impl(

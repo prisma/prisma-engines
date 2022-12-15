@@ -139,6 +139,21 @@ impl SqlFlavour for MysqlFlavour {
         }
     }
 
+    fn check_schema_features(&self, schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
+        let has_namespaces = schema
+            .configuration
+            .datasources
+            .first()
+            .map(|ds| !ds.namespaces.is_empty());
+        if let Some(true) = has_namespaces {
+            Err(ConnectorError::from_msg(
+                "multiSchema migrations and introspection are not implemented on MySQL yet".to_owned(),
+            ))
+        } else {
+            Ok(())
+        }
+    }
+
     fn connection_string(&self) -> Option<&str> {
         self.state
             .params()

@@ -454,3 +454,43 @@ fn issue_repro_extended_indexes(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_executable();
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
+
+#[test]
+fn multi_schema_not_implemented_on_mysql() {
+    test_setup::only!(Mysql ; exclude: Vitess);
+
+    if cfg!(windows) {
+        return;
+    }
+
+    let schema = r#"
+generator client {
+    provider = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    schemas = ["s1", "s2"]
+}
+
+model m1 {
+  id Int @id
+  @@schema("s2")
+}
+    "#;
+
+    let api = migration_core::migration_api(Some(schema.to_owned()), None).unwrap();
+    let err = tok(api.schema_push(migration_core::json_rpc::types::SchemaPushInput {
+        force: false,
+        schema: schema.to_owned(),
+    }))
+    .unwrap_err();
+
+    let expected = expect_test::expect![[r#"
+        The `mysql` database is a system database, it should not be altered with prisma migrate. Please connect to another database.
+           0: migration_core::state::SchemaPush
+                     at migration-engine/core/src/state.rs:398"#]];
+    expected.assert_eq(&err.to_string());
+}
