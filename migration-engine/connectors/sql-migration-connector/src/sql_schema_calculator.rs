@@ -9,7 +9,7 @@ use psl::{
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ReferentialAction, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
     ValidatedSchema,
 };
@@ -28,13 +28,11 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if datamodel.db.schema_flags().contains(SchemaFlags::UsesSchemaAttribute) {
-        if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
-            for (schema, _) in &ds.namespaces {
-                context
-                    .schemas
-                    .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
-            }
+    if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
+        for (schema, _) in &ds.namespaces {
+            context
+                .schemas
+                .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
         }
     }
 
