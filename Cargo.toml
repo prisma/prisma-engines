@@ -66,3 +66,4 @@ strip = "symbols"
 [profile.release]
 lto = "fat"
 codegen-units = 1
+opt-level = "z"
