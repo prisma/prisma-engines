@@ -1027,7 +1027,7 @@ fn typescript_starter_schema_with_different_native_types_is_idempotent(api: Test
 }
 
 #[test_connector(tags(Mysql))]
-fn time_zero_is_indepodent(api: TestApi) {
+fn time_zero_is_idempotent(api: TestApi) {
     let dm1 = indoc::indoc! {r#"
         model Class {
           id    Int      @id
@@ -1043,7 +1043,7 @@ fn time_zero_is_indepodent(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql))]
-fn time_is_indepodent(api: TestApi) {
+fn time_is_idempotent(api: TestApi) {
     let dm1 = indoc::indoc! {r#"
         model Class {
           id    Int      @id
