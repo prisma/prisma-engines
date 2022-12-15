@@ -47,11 +47,11 @@ pub struct ConfiguredCapturer {
 
 impl ConfiguredCapturer {
     pub async fn start_capturing(&self) {
-        self.capturer.start_capturing(self.trace_id.clone()).await
+        self.capturer.start_capturing(self.trace_id).await
     }
 
     pub async fn fetch_captures(&self) -> Vec<UserFacingSpan> {
-        self.capturer.fetch_captures(self.trace_id.clone()).await
+        self.capturer.fetch_captures(self.trace_id).await
     }
 }
 

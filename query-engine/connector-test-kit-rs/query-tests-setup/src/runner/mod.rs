@@ -4,7 +4,6 @@ mod node_api;
 
 pub use binary::*;
 pub use direct::*;
-use hyper::HeaderMap;
 pub use node_api::*;
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine_metrics::MetricRegistry;
@@ -178,18 +177,6 @@ impl Runner {
             RunnerType::NodeApi(_) => todo!(),
             RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level).await,
         }
-    }
-
-    pub fn set_headers(&mut self, headers: Option<HeaderMap>) {
-        match &mut self.inner {
-            RunnerType::Direct(_) => todo!(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.set_additional_headers(headers),
-        }
-    }
-
-    pub fn clear_headers(&mut self) {
-        self.set_headers(None)
     }
 
     async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
