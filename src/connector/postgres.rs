@@ -21,7 +21,10 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
-use tokio_postgres::{config::SslMode, Client, Config, Statement};
+use tokio_postgres::{
+    config::{ChannelBinding, SslMode},
+    Client, Config, Statement,
+};
 use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
@@ -258,6 +261,10 @@ impl PostgresUrl {
         self.query_params.application_name.as_deref()
     }
 
+    pub fn channel_binding(&self) -> ChannelBinding {
+        self.query_params.channel_binding
+    }
+
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
         if self.query_params.pg_bouncer {
             LruCache::new(0)
@@ -280,6 +287,7 @@ impl PostgresUrl {
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
         let mut application_name = None;
+        let mut channel_binding = ChannelBinding::Prefer;
         let mut socket_timeout = None;
         let mut connect_timeout = Some(Duration::from_secs(5));
         let mut pool_timeout = Some(Duration::from_secs(10));
@@ -403,6 +411,19 @@ impl PostgresUrl {
                 "application_name" => {
                     application_name = Some(v.to_string());
                 }
+                "channel_binding" => {
+                    match v.as_ref() {
+                        "disable" => channel_binding = ChannelBinding::Disable,
+                        "prefer" => channel_binding = ChannelBinding::Prefer,
+                        "require" => channel_binding = ChannelBinding::Require,
+                        _ => {
+                            tracing::debug!(
+                                message = "Unsupported Channel Binding {channel_binding}, defaulting to `prefer`",
+                                channel_binding = &*v
+                            );
+                        }
+                    };
+                }
                 "options" => {
                     options = Some(v.to_string());
                 }
@@ -431,6 +452,7 @@ impl PostgresUrl {
             max_connection_lifetime,
             max_idle_connection_lifetime,
             application_name,
+            channel_binding,
             options,
         })
     }
@@ -468,6 +490,8 @@ impl PostgresUrl {
 
         config.ssl_mode(self.query_params.ssl_mode);
 
+        config.channel_binding(self.query_params.channel_binding);
+
         config
     }
 }
@@ -487,6 +511,7 @@ pub(crate) struct PostgresUrlQueryParams {
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
     application_name: Option<String>,
+    channel_binding: ChannelBinding,
     options: Option<String>,
 }
 
@@ -841,6 +866,23 @@ mod tests {
         let url =
             PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap()).unwrap();
         assert_eq!(Some("test"), url.application_name());
+    }
+
+    #[test]
+    fn should_have_channel_binding() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Require, url.channel_binding());
+    }
+
+    #[test]
+    fn should_have_default_channel_binding() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Prefer, url.channel_binding());
+
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Prefer, url.channel_binding());
     }
 
     #[test]
