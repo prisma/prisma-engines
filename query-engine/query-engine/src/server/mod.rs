@@ -143,6 +143,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                         "result": result,
                         "traces": traces,
                     });
+                    dbg!(&json);
                     serde_json::to_vec(&json).unwrap()
                 } else {
                     serde_json::to_vec(&result).unwrap()

@@ -1,42 +1,28 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
-use hyper::{Body, HeaderMap, Method, Request, Response};
+use hyper::{Body, Method, Request, Response};
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::routes;
-use query_engine::state::{self, State};
+use query_engine::state::{setup, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
-    additional_headers: Option<HeaderMap>,
     state: State,
-}
-
-impl BinaryRunner {
-    pub(crate) fn set_additional_headers(&mut self, headers: Option<HeaderMap>) {
-        self.additional_headers = headers;
-    }
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
-        let opts = PrismaOpt::from_list(&[
-            "binary",
-            "--enable-raw-queries",
-            "--enable-logs-in-response",
-            "--datamodel",
-            &datamodel,
-        ]);
-        let state = state::setup(&opts, false, Some(metrics)).await.unwrap();
+        let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
+        let state = setup(&opts, false, Some(metrics)).await.unwrap();
 
         Ok(BinaryRunner {
             state,
             connector_tag,
             current_tx_id: None,
-            additional_headers: None,
         })
     }
 
@@ -49,12 +35,6 @@ impl RunnerInterface for BinaryRunner {
         if self.current_tx_id.is_some() {
             let tx_id: String = self.current_tx_id.clone().unwrap().to_string();
             builder = builder.header("X-transaction-id", tx_id);
-        }
-
-        if let Some(headers) = &self.additional_headers {
-            for (key, value) in headers {
-                builder = builder.header(key, value);
-            }
         }
 
         let req = builder.body(Body::from(body)).unwrap();
@@ -83,15 +63,11 @@ impl RunnerInterface for BinaryRunner {
 
         let mut builder = Request::builder().method(Method::POST);
 
+        // Garren: basically if there is a current_tx_id we run it as a transaction
+        // I don't fully understand how ITX works and I need to do this to pass the tests
         if self.current_tx_id.is_some() {
-            let tx_id: String = self.current_tx_id.clone().unwrap().to_string();
+            let tx_id: String = self.current_tx_id.as_ref().unwrap().clone().to_string();
             builder = builder.header("X-transaction-id", tx_id);
-        }
-
-        if let Some(headers) = &self.additional_headers {
-            for (key, value) in headers {
-                builder = builder.header(key, value);
-            }
         }
 
         let req = builder.body(Body::from(body)).unwrap();
