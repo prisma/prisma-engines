@@ -9,7 +9,7 @@ use opentelemetry::{
     },
     trace::{TraceId, TracerProvider},
 };
-use query_core::CapturedLog;
+use query_core::UserFacingSpan;
 use std::{collections::HashMap, sync::Arc};
 use std::{fmt::Debug, time::Duration};
 use tokio::sync::Mutex;
@@ -20,7 +20,19 @@ pub enum Config {
     Disabled,
 }
 
-/// A ConfiguredCapturer is ready to capture spans for a particular trace
+// An object representing capturing configuration, which is either enabled with a configured capturer
+// or disabled
+impl Config {
+    pub fn new_from_header(header: Option<&HeaderValue>, capturer: Option<TraceCapturer>, trace_id: TraceId) -> Self {
+        if header.is_some_and(|val| val.to_str().unwrap_or("false") == "true") {
+            let c = capturer.unwrap();
+            Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
+        } else {
+            Config::Disabled
+        }
+    }
+}
+/// A ConfiguredCapturer is ready to capture spans for a particular trace and is built from
 #[derive(Debug, Clone)]
 pub struct ConfiguredCapturer {
     capturer: TraceCapturer,
@@ -32,19 +44,8 @@ impl ConfiguredCapturer {
         self.capturer.start_capturing(self.trace_id.clone()).await
     }
 
-    pub async fn fetch_captures(&self) -> Captures {
+    pub async fn fetch_captures(&self) -> Vec<UserFacingSpan> {
         self.capturer.fetch_captures(self.trace_id.clone()).await
-    }
-}
-
-impl Config {
-    pub fn new_from_header(header: Option<&HeaderValue>, capturer: Option<TraceCapturer>, trace_id: TraceId) -> Self {
-        if header.is_some_and(|val| val.to_str().unwrap_or("false") == "true") {
-            let c = capturer.unwrap();
-            Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
-        } else {
-            Config::Disabled
-        }
     }
 }
 
@@ -79,7 +80,7 @@ impl PipelineBuilder {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
         let processor = sdk::trace::BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
-            .with_scheduled_delay(Duration::new(0, 0))
+            .with_scheduled_delay(Duration::new(0, 1))
             .build();
         let mut provider_builder = sdk::trace::TracerProvider::builder().with_span_processor(processor);
 
@@ -98,56 +99,50 @@ impl PipelineBuilder {
 /// later retrieval
 #[derive(Debug, Clone)]
 pub struct TraceCapturer {
-    logs: Arc<Mutex<HashMap<TraceId, Vec<SpanData>>>>,
+    traces: Arc<Mutex<HashMap<TraceId, Vec<SpanData>>>>,
 }
 
 impl TraceCapturer {
-    pub fn new(capture_logs: bool) -> Option<Self> {
-        if !capture_logs {
+    pub fn new(enable: bool) -> Option<Self> {
+        if !enable {
             return None;
         }
 
         Some(Self {
-            logs: Default::default(),
+            traces: Default::default(),
         })
     }
 
     pub async fn start_capturing(&self, trace_id: TraceId) {
-        let mut logs = self.logs.lock().await;
-        logs.insert(trace_id, Vec::new());
+        let mut traces = self.traces.lock().await;
+        traces.insert(trace_id, Vec::new());
     }
 
-    pub async fn fetch_captures(&self, trace_id: TraceId) -> Captures {
-        let mut logs = self.logs.lock().await;
+    pub async fn fetch_captures(&self, trace_id: TraceId) -> Vec<UserFacingSpan> {
+        let mut traces = self.traces.lock().await;
 
-        let logs = match logs.remove(&trace_id) {
-            Some(spans) => spans.iter().map(CapturedLog::from).collect(),
+        match traces.remove(&trace_id) {
+            Some(spans) => spans.iter().map(UserFacingSpan::from).collect(),
             None => vec![],
-        };
-
-        Captures { logs }
+        }
     }
 }
 
 #[async_trait]
 impl SpanExporter for TraceCapturer {
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
+        // we are only exporting logs in here
         let batch = batch.into_iter().filter(|span| span.name == "quaint:query");
 
-        let mut logs = self.logs.lock().await;
+        let mut traces = self.traces.lock().await;
         for span in batch {
             let trace_id = span.span_context.trace_id();
 
-            if let Some(spans) = logs.get_mut(&trace_id) {
+            if let Some(spans) = traces.get_mut(&trace_id) {
                 spans.push(span)
             }
         }
 
         Ok(())
     }
-}
-
-/// A wrapper for the things that can be captured by the [`TraceCapturer`]
-pub struct Captures {
-    pub logs: Vec<CapturedLog>,
 }
