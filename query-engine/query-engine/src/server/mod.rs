@@ -1,3 +1,4 @@
+use crate::capture_tracer::{self};
 use crate::state::State;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
@@ -18,6 +19,8 @@ use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
+const TRACE_CAPTURE_HEADER: &str = "X-capture-traces";
+const TRACEPARENT_HEADER: &str = "traceparent";
 
 /// Starts up the graphql query engine server
 pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
@@ -116,16 +119,10 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let (tx_id, span, log_capture, trace_id) = process_gql_req_headers(&req);
+    let (tx_id, span, capture_config, trace_id) = process_gql_req_headers(&req, state.cx.trace_capturer.clone());
 
-    if log_capture.should_capture() {
-        state
-            .cx
-            .trace_capturer
-            .as_ref()
-            .unwrap()
-            .start_capturing(log_capture.id())
-            .await;
+    if let capture_tracer::Config::Enabled(capturer) = capture_config.clone() {
+        capturer.start_capturing().await;
     }
 
     let work = async move {
@@ -136,18 +133,12 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, trace_id.clone()).instrument(span).await;
+                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
-                let result_bytes = if log_capture.should_capture() {
+                let result_bytes = if let capture_tracer::Config::Enabled(capturer) = capture_config {
                     global::force_flush_tracer_provider();
 
-                    let captures = state
-                        .cx
-                        .trace_capturer
-                        .as_ref()
-                        .unwrap()
-                        .fetch_captures(log_capture.id())
-                        .await;
+                    let captures = capturer.fetch_captures().await;
 
                     let json = json!({
                         "result": result,
@@ -412,79 +403,29 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
     Response::builder().status(status).body(body).unwrap()
 }
 
-struct LogCapture {
-    id: TraceId,
-    capture: bool,
-}
-
-impl LogCapture {
-    fn new(id: TraceId, capture: bool) -> Self {
-        Self { id, capture }
-    }
-
-    fn new_from_req(id: TraceId, req: &Request<Body>) -> Self {
-        let should_capture = Self::get_capture_from_header(req);
-        Self::new(id, should_capture)
-    }
-
-    fn id(&self) -> TraceId {
-        self.id
-    }
-
-    fn should_capture(&self) -> bool {
-        self.capture
-    }
-
-    fn get_capture_from_header(req: &Request<Body>) -> bool {
-        match req.headers().get("PRISMA-CAPTURE-LOGS") {
-            Some(header) => {
-                if let Ok(capture_logs) = header.to_str() {
-                    capture_logs == "true"
-                } else {
-                    false
-                }
-            }
-            None => false,
-        }
-    }
-}
-
-impl Default for LogCapture {
-    fn default() -> Self {
-        Self {
-            id: TraceId::from_hex("0").unwrap(),
-            capture: false,
-        }
-    }
-}
-
-fn process_gql_req_headers(req: &Request<Body>) -> (Option<TxId>, Span, LogCapture, Option<String>) {
+pub(crate) fn process_gql_req_headers(
+    req: &Request<Body>,
+    capturer: Option<capture_tracer::TraceCapturer>,
+) -> (Option<TxId>, Span, capture_tracer::Config, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
-    // TODO: this is the case no transaction is in flight. What do we do when there's an ongoing transaction?
-    let (span, log_capture) = if tx_id.is_none() {
+
+    if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
+        // TODO: does this configure the trace parent?
         let cx = get_parent_span_context(req);
         if let Some(context) = cx {
             span.set_parent(context);
         }
 
         let context = span.context();
-        let trace_id = get_trace_id_from_context(&context);
-        let log_capture = LogCapture::new_from_req(trace_id, req);
 
-        (span, log_capture)
+        let trace_id = get_trace_id_from_context(&context);
+        let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
+        let trace_capture = capture_tracer::Config::new_from_header(trace_capture_header, capturer, trace_id);
+
+        (tx_id, span, trace_capture, Some(trace_id.to_string()))
     } else {
         // TODO: Is this case unimplemented yet? ask alexey.
-        (Span::none(), LogCapture::default())
-    };
-
-    let traceparent = match req.headers().get("traceparent") {
-        Some(traceparent) => {
-            let s = traceparent.to_str().unwrap_or_default().to_string();
-            Some(s)
-        }
-        _ => None,
-    };
-
-    (tx_id, span, log_capture, traceparent)
+        (tx_id, Span::none(), capture_tracer::Config::Disabled, None)
+    }
 }
