@@ -172,7 +172,11 @@ fn handle_one_to_x(
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
             // If the relation is inlined on the parent and a filter is applied on the child, we need to join to apply this filter
-            let filter = parent_relation_field.to_one_related(filter);
+            let filter = if !filter.is_empty() {
+                parent_relation_field.to_one_related(filter)
+            } else {
+                filter
+            };
 
             (parent_node, parent_model, extractor_model_id, null_record_id, filter)
         } else {
