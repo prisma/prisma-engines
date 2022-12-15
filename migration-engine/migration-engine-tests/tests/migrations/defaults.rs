@@ -299,6 +299,24 @@ fn schemas_with_dbgenerated_work(api: TestApi) {
         .assert_no_steps();
 }
 
+#[test_connector(tags(Mysql))]
+fn schemas_with_empty_dbgenerated_work_together_with_time_native_type(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/16340
+
+    let dm1 = indoc::indoc! {r#"
+        model Class {
+          id    Int      @id
+          when  DateTime @default(dbgenerated()) @db.Time
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+    api.schema_push_w_datasource(dm1)
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
 #[test_connector(tags(Mysql8, Mariadb), exclude(Vitess))]
 fn schemas_with_dbgenerated_expressions_work(api: TestApi) {
     let dm1 = r#"
