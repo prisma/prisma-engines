@@ -40,7 +40,7 @@ impl PipelineBuilder {
 }
 
 impl PipelineBuilder {
-    pub fn install(mut self, exporter: LogExporter) -> sdk::trace::Tracer {
+    pub fn install(mut self, exporter: TraceCapturer) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
         let processor = sdk::trace::BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
@@ -59,42 +59,43 @@ impl PipelineBuilder {
     }
 }
 
-/// A [`SpanExporter`] that stores spans in memory in a synchronized dictionary
+/// A [`SpanExporter`] that captures and stores spans in memory in a synchronized dictionary for
+/// later retrieval
 #[derive(Debug, Clone)]
-pub struct LogExporter {
+pub struct TraceCapturer {
     logs: Arc<Mutex<HashMap<TraceId, Vec<SpanData>>>>,
 }
 
-impl LogExporter {
-    pub fn new() -> Self {
-        Self {
-            logs: Default::default(),
+impl TraceCapturer {
+    pub fn new(capture_logs: bool) -> Option<Self> {
+        if !capture_logs {
+            return None;
         }
+
+        Some(Self {
+            logs: Default::default(),
+        })
     }
 
-    pub async fn capture_logs(&self, trace_id: TraceId) {
+    pub async fn start_capturing(&self, trace_id: TraceId) {
         let mut logs = self.logs.lock().await;
         logs.insert(trace_id, Vec::new());
     }
 
-    pub async fn get_captured_logs(&self, trace_id: TraceId) -> Vec<CapturedLog> {
+    pub async fn fetch_captures(&self, trace_id: TraceId) -> Captures {
         let mut logs = self.logs.lock().await;
-        if let Some(spans) = logs.remove(&trace_id) {
-            spans.iter().map(CapturedLog::from).collect()
-        } else {
-            vec![]
-        }
-    }
-}
 
-impl Default for LogExporter {
-    fn default() -> Self {
-        Self::new()
+        let logs = match logs.remove(&trace_id) {
+            Some(spans) => spans.iter().map(CapturedLog::from).collect(),
+            None => vec![],
+        };
+
+        Captures { logs }
     }
 }
 
 #[async_trait]
-impl SpanExporter for LogExporter {
+impl SpanExporter for TraceCapturer {
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
         let batch = batch.into_iter().filter(|span| span.name == "quaint:query");
 
@@ -109,4 +110,9 @@ impl SpanExporter for LogExporter {
 
         Ok(())
     }
+}
+
+/// A wrapper for the things that can be captured by the [`TraceCapturer`]
+pub struct Captures {
+    pub logs: Vec<CapturedLog>,
 }

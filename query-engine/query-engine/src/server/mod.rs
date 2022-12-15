@@ -121,10 +121,10 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     if log_capture.should_capture() {
         state
             .cx
-            .inflight_tracer
+            .trace_capturer
             .as_ref()
             .unwrap()
-            .capture_logs(log_capture.id())
+            .start_capturing(log_capture.id())
             .await;
     }
 
@@ -141,17 +141,17 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let result_bytes = if log_capture.should_capture() {
                     global::force_flush_tracer_provider();
 
-                    let logs = state
+                    let captures = state
                         .cx
-                        .inflight_tracer
+                        .trace_capturer
                         .as_ref()
                         .unwrap()
-                        .get_captured_logs(log_capture.id())
+                        .fetch_captures(log_capture.id())
                         .await;
 
                     let json = json!({
                         "result": result,
-                        "logs": logs
+                        "logs": captures.logs,
                     });
                     serde_json::to_vec(&json).unwrap()
                 } else {

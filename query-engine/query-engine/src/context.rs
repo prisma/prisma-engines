@@ -1,4 +1,4 @@
-use crate::{capture_tracer::LogExporter, PrismaError, PrismaResult};
+use crate::{capture_tracer::TraceCapturer, PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{
@@ -14,7 +14,8 @@ pub struct PrismaContext {
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
-    pub inflight_tracer: Option<LogExporter>,
+    // Inflight tracer
+    pub trace_capturer: Option<TraceCapturer>,
     pub counter: AtomicUsize,
 }
 
@@ -28,7 +29,7 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
-    logs_capture_tracer: Option<LogExporter>,
+    trace_capturer: Option<TraceCapturer>,
 }
 
 impl ContextBuilder {
@@ -42,8 +43,8 @@ impl ContextBuilder {
         self
     }
 
-    pub fn set_logs_capture_tracer(mut self, tracer: Option<LogExporter>) -> Self {
-        self.logs_capture_tracer = tracer;
+    pub fn set_trace_capturer(mut self, trace_capturer: Option<TraceCapturer>) -> Self {
+        self.trace_capturer = trace_capturer;
         self
     }
 
@@ -52,7 +53,7 @@ impl ContextBuilder {
             self.schema,
             self.enable_raw_queries,
             self.metrics.unwrap_or_default(),
-            self.logs_capture_tracer,
+            self.trace_capturer,
         )
         .await
     }
@@ -64,7 +65,7 @@ impl PrismaContext {
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
-        inflight_tracer: Option<LogExporter>,
+        trace_capturer: Option<TraceCapturer>,
     ) -> PrismaResult<Self> {
         let config = &schema.configuration;
         // We only support one data source at the moment, so take the first one (default not exposed yet).
@@ -88,7 +89,7 @@ impl PrismaContext {
             query_schema,
             executor,
             metrics,
-            inflight_tracer,
+            trace_capturer,
             counter: AtomicUsize::new(0),
         };
 
@@ -107,7 +108,7 @@ impl PrismaContext {
             enable_raw_queries: false,
             schema,
             metrics: None,
-            logs_capture_tracer: None,
+            trace_capturer: None,
         }
     }
 
