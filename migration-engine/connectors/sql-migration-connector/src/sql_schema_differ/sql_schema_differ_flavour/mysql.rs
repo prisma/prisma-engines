@@ -863,6 +863,7 @@ fn native_type_change(types: Pair<&MySqlType>) -> Option<ColumnTypeChange> {
         },
 
         MySqlType::Time(n) => match next {
+            MySqlType::Time(None) if n.unwrap_or(0) == 0 => return None,
             MySqlType::Time(m) if n == m => return None,
             MySqlType::Time(_) => safe(),
 

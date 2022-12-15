@@ -742,6 +742,12 @@ impl DefaultValue {
         self.constraint_name = constraint_name;
         self
     }
+
+    /// If the default value is the deprecated `dbgenerated()`
+    /// variant.
+    pub fn is_empty_dbgenerated(&self) -> bool {
+        matches!(self.kind, DefaultKind::DbGenerated(None))
+    }
 }
 
 fn unquote_string(val: &str) -> String {

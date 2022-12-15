@@ -363,6 +363,7 @@ fn render_mysql_modify(
         .unwrap_or_else(|| render_column_type(next_column));
 
     let default = new_default
+        .filter(|default| !default.is_empty_dbgenerated())
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {}", expression))
