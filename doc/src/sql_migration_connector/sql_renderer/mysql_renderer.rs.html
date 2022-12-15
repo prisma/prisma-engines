@@ -518,6 +518,7 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, IteratorJoin, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::MysqlFlavour,
@@ -883,6 +884,7 @@
         .unwrap_or_else(|| render_column_type(next_column));
 
     <span class="kw">let </span>default = new_default
+        .filter(|default| !default.is_empty_dbgenerated())
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, expression))

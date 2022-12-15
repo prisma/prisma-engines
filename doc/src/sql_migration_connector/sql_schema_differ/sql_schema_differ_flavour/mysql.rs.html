@@ -1370,6 +1370,7 @@
 <span id="1370">1370</span>
 <span id="1371">1371</span>
 <span id="1372">1372</span>
+<span id="1373">1373</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
 <span class="kw">use crate</span>::{
     flavour::MysqlFlavour,
@@ -2235,6 +2236,7 @@
         },
 
         MySqlType::Time(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Time(<span class="prelude-val">None</span>) <span class="kw">if </span>n.unwrap_or(<span class="number">0</span>) == <span class="number">0 </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             MySqlType::Time(m) <span class="kw">if </span>n == m =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             MySqlType::Time(<span class="kw">_</span>) =&gt; safe(),
 
