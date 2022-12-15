@@ -24,7 +24,13 @@ pub enum Config {
 // or disabled
 impl Config {
     pub fn new_from_header(header: Option<&HeaderValue>, capturer: Option<TraceCapturer>, trace_id: TraceId) -> Self {
-        if header.is_some_and(|val| val.to_str().unwrap_or("false") == "true") {
+        let enabled = if let Some(h) = header {
+            h.to_str().unwrap_or("false") == "true"
+        } else {
+            false
+        };
+
+        if enabled {
             let c = capturer.unwrap();
             Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
         } else {

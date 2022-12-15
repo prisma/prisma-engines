@@ -1,5 +1,4 @@
 #![allow(clippy::derive_partial_eq_without_eq)]
-#![feature(is_some_with)]
 
 pub mod capture_tracer;
 pub mod cli;
