@@ -533,6 +533,21 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
 </pre><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -672,6 +687,21 @@
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
+    }
+
+    <span class="kw">fn </span>check_schema_features(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="kw">let </span>has_namespaces = schema
+            .configuration
+            .datasources
+            .first()
+            .map(|ds| !ds.namespaces.is_empty());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = has_namespaces {
+            <span class="prelude-val">Err</span>(ConnectorError::from_msg(
+                <span class="string">&quot;multiSchema migrations and introspection are not implemented on MySQL yet&quot;</span>.to_owned(),
+            ))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(())
+        }
     }
 
     <span class="kw">fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {

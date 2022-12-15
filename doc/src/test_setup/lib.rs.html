@@ -127,10 +127,10 @@
 <span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>only {
     ($(<span class="macro-nonterminal">$tag</span>:ident),<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">::test_setup::only!</span>($(<span class="macro-nonterminal">$tag</span>,)* ; exclude: )
+        <span class="macro">::test_setup::only!</span>($(<span class="macro-nonterminal">$tag</span>),* ; exclude: )
     };
 
-    ($(<span class="macro-nonterminal">$tag</span>:ident,)* ; exclude: $(<span class="macro-nonterminal">$excludeTag</span>:ident),<span class="kw-2">*</span>) =&gt; {
+    ($(<span class="macro-nonterminal">$tag</span>:ident),* ; exclude: $(<span class="macro-nonterminal">$excludeTag</span>:ident),<span class="kw-2">*</span>) =&gt; {
         {
             <span class="kw">use </span>::test_setup::Tags;
             <span class="kw">let </span>(skip, db) = ::test_setup::only_impl(

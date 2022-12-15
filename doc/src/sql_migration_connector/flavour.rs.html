@@ -307,6 +307,11 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
@@ -432,6 +437,11 @@
     ) -&gt; <span class="prelude-ty">Option</span>&lt;user_facing_errors::common::DatabaseVersionIncompatibility&gt; {
         <span class="prelude-val">None
     </span>}
+
+    <span class="doccomment">/// Check a schema for preview features not implemented in migrate/introspection.
+    </span><span class="kw">fn </span>check_schema_features(<span class="kw-2">&amp;</span><span class="self">self</span>, _schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="prelude-val">Ok</span>(())
+    }
 
     <span class="doccomment">/// The connection string received in set_params().
     </span><span class="kw">fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;;
