@@ -1336,21 +1336,11 @@
 <span id="1336">1336</span>
 <span id="1337">1337</span>
 <span id="1338">1338</span>
-<span id="1339">1339</span>
-<span id="1340">1340</span>
-<span id="1341">1341</span>
-<span id="1342">1342</span>
-<span id="1343">1343</span>
-<span id="1344">1344</span>
-<span id="1345">1345</span>
-<span id="1346">1346</span>
-<span id="1347">1347</span>
-<span id="1348">1348</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 <span class="kw">use </span>either::Either;
-<span class="kw">use </span>enumflags2::{bitflags, BitFlags};
+<span class="kw">use </span>enumflags2::bitflags;
 <span class="kw">use </span>schema_ast::ast::{<span class="self">self</span>, WithName};
 <span class="kw">use </span>std::{
     collections::{BTreeMap, HashMap},
@@ -1371,7 +1361,6 @@
 
 <span class="attribute">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Types {
-    <span class="kw">pub</span>(<span class="kw">super</span>) flags: BitFlags&lt;SchemaFlags&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) composite_type_fields: BTreeMap&lt;(ast::CompositeTypeId, ast::FieldId), CompositeTypeField&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) scalar_fields: BTreeMap&lt;(ast::ModelId, ast::FieldId), ScalarField&gt;,
     <span class="doccomment">/// This contains only the relation fields actually present in the schema
@@ -1406,15 +1395,6 @@
     ) -&gt; <span class="prelude-ty">Option</span>&lt;RelationField&gt; {
         <span class="self">self</span>.relation_fields.remove(<span class="kw-2">&amp;</span>(model_id, field_id))
     }
-}
-
-<span class="doccomment">/// Global properties of a PSL document.
-</span><span class="attribute">#[derive(Debug, Clone, Copy)]
-#[bitflags]
-#[repr(u8)]
-</span><span class="kw">pub enum </span>SchemaFlags {
-    <span class="doccomment">/// Is there at least one `@@schema` in the schema?
-    </span>UsesSchemaAttribute = <span class="number">0b1</span>,
 }
 
 <span class="attribute">#[derive(Debug, Clone)]

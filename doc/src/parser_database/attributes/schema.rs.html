@@ -19,7 +19,6 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
-<span id="22">22</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, coerce, context::<span class="kw-2">*</span>, types::<span class="kw-2">*</span>, StringId};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>model(model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
@@ -39,7 +38,6 @@
         }
     };
     <span class="kw">let </span>name = coerce::string(arg, ctx.diagnostics)<span class="question-mark">?</span>;
-    ctx.types.flags |= <span class="kw">crate</span>::types::SchemaFlags::UsesSchemaAttribute;
     <span class="prelude-val">Some</span>((ctx.interner.intern(name), arg.span()))
 }
 </code></pre></div>

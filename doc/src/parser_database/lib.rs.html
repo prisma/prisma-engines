@@ -167,13 +167,6 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
 </pre><pre class="rust"><code><span class="attribute">#![deny(unsafe_code, rust_2018_idioms, missing_docs)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -216,9 +209,7 @@
 <span class="kw">pub use </span>names::is_reserved_type_name;
 <span class="kw">pub use </span>relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 <span class="kw">pub use </span>schema_ast::{ast, SourceFile};
-<span class="kw">pub use </span>types::{
-    IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
-};
+<span class="kw">pub use </span>types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 
 <span class="kw">use </span><span class="self">self</span>::{context::Context, interner::StringId, relations::Relations, types::Types};
 <span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
@@ -329,11 +320,6 @@
     <span class="doccomment">/// The source file contents.
     </span><span class="kw">pub fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.file.as_str()
-    }
-
-    <span class="doccomment">/// Global properties of the schema.
-    </span><span class="kw">pub fn </span>schema_flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; enumflags2::BitFlags&lt;types::SchemaFlags&gt; {
-        <span class="self">self</span>.types.flags
     }
 }
 
