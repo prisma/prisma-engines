@@ -171,10 +171,14 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResu
     let input = indoc! {r#"
         model A {
           id   Int  @id @default(autoincrement())
+
+          @@schema("first")
         }
 
         model B {
           id   Int  @id @default(autoincrement())
+
+          @@schema("second")
         }
     "#};
 

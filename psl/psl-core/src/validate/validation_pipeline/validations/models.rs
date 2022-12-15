@@ -333,11 +333,12 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx
-        .db
-        .schema_flags()
-        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
-    {
+    let datasource = match ctx.datasource {
+        Some(datasource) => datasource,
+        None => return,
+    };
+
+    if datasource.schemas_span.is_none() {
         return;
     }
 

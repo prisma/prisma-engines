@@ -1,0 +1,53 @@
+// This is _not_ valid: once @@schema is specified once, it has to be
+// specified for every model and enum.
+
+datasource testds {
+    provider = "postgresql"
+    url      = env("TEST_DATABASE_URL")
+    schemas  = ["public", "security", "users"]
+}
+
+generator js {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+model Test {
+    id Int @id
+}
+
+model Test2 {
+    id Int @id
+}
+
+enum UserType {
+    Bacteria
+    Archea
+    Eukaryote
+}
+// [1;91merror[0m: [1mThis model is missing an `@@schema` attribute.[0m
+//   [1;94m-->[0m  [4mschema.prisma:15[0m
+// [1;94m   | [0m
+// [1;94m14 | [0m
+// [1;94m15 | [0m[1;91mmodel Test {[0m
+// [1;94m16 | [0m    id Int @id
+// [1;94m17 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mThis model is missing an `@@schema` attribute.[0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m
+// [1;94m19 | [0m[1;91mmodel Test2 {[0m
+// [1;94m20 | [0m    id Int @id
+// [1;94m21 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mThis enum is missing an `@@schema` attribute.[0m
+//   [1;94m-->[0m  [4mschema.prisma:23[0m
+// [1;94m   | [0m
+// [1;94m22 | [0m
+// [1;94m23 | [0m[1;91menum UserType {[0m
+// [1;94m24 | [0m    Bacteria
+// [1;94m25 | [0m    Archea
+// [1;94m26 | [0m    Eukaryote
+// [1;94m27 | [0m}
+// [1;94m   | [0m
