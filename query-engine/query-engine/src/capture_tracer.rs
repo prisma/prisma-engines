@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use hyper::http::HeaderValue;
 use opentelemetry::{
     global,
     sdk::{
@@ -20,23 +19,12 @@ pub enum Config {
     Disabled,
 }
 
-// An object representing capturing configuration, which is either enabled with a configured capturer
-// or disabled
-impl Config {
-    pub fn new_from_header(header: Option<&HeaderValue>, capturer: Option<TraceCapturer>, trace_id: TraceId) -> Self {
-        let enabled = if let Some(h) = header {
-            h.to_str().unwrap_or("false") == "true"
-        } else {
-            false
-        };
+pub(crate) fn enabled(c: TraceCapturer, trace_id: TraceId) -> Config {
+    Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
+}
 
-        if enabled {
-            let c = capturer.unwrap();
-            Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
-        } else {
-            Config::Disabled
-        }
-    }
+pub fn disabled() -> Config {
+    Config::Disabled
 }
 /// A ConfiguredCapturer is ready to capture spans for a particular trace and is built from
 #[derive(Debug, Clone)]
