@@ -1,9 +1,7 @@
-use lsp_types::{
-    CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit,
-};
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, TextEdit, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker},
+    walkers::{CompleteInlineRelationWalker, RelationFieldWalker},
 };
 use std::collections::HashMap;
 
@@ -68,7 +66,7 @@ pub(super) fn add_referencing_side_unique(
     }
 
     let attribute_name = "unique";
-    let text = create_missing_attribute(
+    let text = super::create_missing_attribute(
         schema,
         relation.referencing_model(),
         relation.referencing_fields(),
@@ -160,7 +158,7 @@ pub(super) fn add_referenced_side_unique(
     }
 
     let attribute_name = "unique";
-    let text = create_missing_attribute(
+    let text = super::create_missing_attribute(
         schema,
         relation.referenced_model(),
         relation.referenced_fields(),
@@ -259,7 +257,7 @@ pub(super) fn add_index_for_relation_fields(
     }
 
     let attribute_name = "index";
-    let (new_text, range) = create_block_attribute(schema, relation.model(), fields, attribute_name);
+    let (new_text, range) = super::create_block_attribute(schema, relation.model(), fields, attribute_name);
     let text = TextEdit { range, new_text };
 
     let mut changes = HashMap::new();
@@ -279,10 +277,10 @@ pub(super) fn add_index_for_relation_fields(
         None => return,
     };
 
-    let diagnostics = span_diagnostics
-        .into_iter()
-        .filter(|diag| diag.message.contains("relationMode = \"prisma\""))
-        .collect::<Vec<Diagnostic>>();
+    let diagnostics = match super::filter_diagnostics(span_diagnostics, "relationMode = \"prisma\"") {
+        Some(value) => value,
+        None => return,
+    };
 
     let action = CodeAction {
         title: String::from("Add an index for the relation's field(s)"),
@@ -293,55 +291,4 @@ pub(super) fn add_index_for_relation_fields(
     };
 
     actions.push(CodeActionOrCommand::CodeAction(action))
-}
-
-fn create_missing_attribute<'a>(
-    schema: &str,
-    model: ModelWalker<'a>,
-    mut fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
-    attribute_name: &str,
-) -> TextEdit {
-    let (new_text, range) = if fields.len() == 1 {
-        let new_text = format!(" @{attribute_name}");
-
-        let field = fields.next().unwrap();
-        let position = crate::position_after_span(field.ast_field().span(), schema);
-
-        let range = Range {
-            start: position,
-            end: position,
-        };
-
-        (new_text, range)
-    } else {
-        let (new_text, range) = create_block_attribute(schema, model, fields, attribute_name);
-        (new_text, range)
-    };
-
-    TextEdit { range, new_text }
-}
-
-fn create_block_attribute<'a>(
-    schema: &str,
-    model: ModelWalker<'a>,
-    fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
-    attribute_name: &str,
-) -> (String, Range) {
-    let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-
-    let indentation = model.indentation();
-    let newline = model.newline();
-    let separator = if model.ast_model().attributes.is_empty() {
-        newline.as_ref()
-    } else {
-        ""
-    };
-    let new_text = format!("{separator}{indentation}@@{attribute_name}([{fields}]){newline}}}");
-
-    let start = crate::offset_to_position(model.ast_model().span().end - 1, schema);
-    let end = crate::offset_to_position(model.ast_model().span().end, schema);
-
-    let range = Range { start, end };
-
-    (new_text, range)
 }
