@@ -25,6 +25,26 @@ mod multi_schema {
         schema.to_owned()
     }
 
+    pub fn multi_schema_implicit_m2m() -> String {
+        let schema = indoc! {
+            r#"
+                model Loop {
+                    id Int @id
+                    fruits Fruit[]
+                    @@schema("shapes")
+                }
+
+                model Fruit {
+                    id Int @id
+                    loops Loop[]
+                    @@schema("objects")
+                }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
     #[connector_test(schema(multi_schema_simple), db_schemas("schema1", "schema2"))]
     async fn crud_simple(runner: Runner) -> TestResult<()> {
         // CREATE
@@ -514,6 +534,20 @@ mod multi_schema {
             r#"{"data":{"findManyFoo":[{"id":"2"}]}}"#
         );
 
+        Ok(())
+    }
+
+    #[connector_test(schema(multi_schema_implicit_m2m), db_schemas("shapes", "objects"))]
+    async fn implicit_m2m_simple(runner: Runner) -> TestResult<()> {
+        let result = runner
+            .query(r#"mutation { createOneFruit(data: { id: 1, loops: { create: [{ id: 11 }, { id: 12 }] }}) { id loops { id } } }"#)
+            .await?;
+        result.assert_success();
+        let result = result.to_string();
+        assert_eq!(
+            result,
+            "{\"data\":{\"createOneFruit\":{\"id\":1,\"loops\":[{\"id\":11},{\"id\":12}]}}}"
+        );
         Ok(())
     }
 }

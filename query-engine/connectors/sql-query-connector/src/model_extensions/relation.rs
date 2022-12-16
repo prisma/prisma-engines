@@ -67,8 +67,11 @@ impl AsTable for Relation {
             // table, so MSSQL can convert the `INSERT .. ON CONFLICT IGNORE` into
             // a `MERGE` statement.
             RelationLinkManifestation::RelationTable(ref m) => {
-                let db = self.model_a().internal_data_model().db_name.clone();
-                let table: Table = (db, m.table.clone()).into();
+                let model_a = self.model_a();
+                let prefix = model_a
+                    .schema_name()
+                    .unwrap_or_else(|| model_a.internal_data_model().db_name.clone());
+                let table: Table = (prefix, m.table.clone()).into();
 
                 table.add_unique_index(vec![Column::from("A"), Column::from("B")])
             }
