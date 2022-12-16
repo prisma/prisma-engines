@@ -20,7 +20,13 @@ pub struct BinaryRunner {
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
-        let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
+        let opts = PrismaOpt::from_list(&[
+            "binary",
+            "--enable-raw-queries",
+            "--enable-traces-in-response",
+            "--datamodel",
+            &datamodel,
+        ]);
         let state = setup(&opts, false, Some(metrics)).await.unwrap();
 
         let configuration = opts.configuration(true).unwrap();
