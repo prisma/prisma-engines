@@ -177,7 +177,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             value if value.is_integer() => {
                 let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
-                let secs = (ts / 1000) as i64;
+                let secs = ts / 1000;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
                 let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
 

@@ -334,7 +334,7 @@ impl GenericApi for EngineState {
                             .warnings
                             .into_iter()
                             .map(|warning| crate::json_rpc::types::IntrospectionWarning {
-                                code: warning.code as u32,
+                                code: warning.code,
                                 message: warning.message,
                                 affected: warning.affected,
                             })

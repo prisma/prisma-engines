@@ -101,9 +101,9 @@ impl MetricRegistry {
         self.inner
             .register
             .get_or_create_gauge(&metric.name, |c| match metric.action {
-                MetricAction::GaugeInc(val) => GaugeFn::increment(c, val as f64),
-                MetricAction::GaugeSet(val) => GaugeFn::set(c, val as f64),
-                MetricAction::GaugeDec(val) => GaugeFn::decrement(c, val as f64),
+                MetricAction::GaugeInc(val) => GaugeFn::increment(c, val),
+                MetricAction::GaugeSet(val) => GaugeFn::set(c, val),
+                MetricAction::GaugeDec(val) => GaugeFn::decrement(c, val),
                 _ => (),
             });
     }

@@ -13,7 +13,7 @@ pub struct SourceConfig {
 
 pub fn render_sources_to_json_value(sources: &[configuration::Datasource]) -> serde_json::Value {
     let res = sources_to_json_structs(sources);
-    serde_json::to_value(&res).expect("Failed to render JSON.")
+    serde_json::to_value(res).expect("Failed to render JSON.")
 }
 
 pub fn render_sources_to_json(sources: &[configuration::Datasource]) -> String {

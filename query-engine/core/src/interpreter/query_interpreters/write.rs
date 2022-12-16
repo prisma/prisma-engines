@@ -113,7 +113,7 @@ async fn update_many(
 ) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(&q.model, q.record_filter, q.args, trace_id).await?;
 
-    Ok(QueryResult::Count(res as usize))
+    Ok(QueryResult::Count(res))
 }
 
 async fn delete_many(

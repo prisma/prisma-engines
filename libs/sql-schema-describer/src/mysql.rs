@@ -311,7 +311,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         trace!("Found db size: {:?}", size);
 
-        Ok(size as usize)
+        Ok(size)
     }
 
     async fn get_all_columns(
