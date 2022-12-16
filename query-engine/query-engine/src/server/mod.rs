@@ -1,6 +1,7 @@
 use crate::capture_tracer::{self};
 use crate::state::State;
 use crate::{opt::PrismaOpt, PrismaResult};
+use hyper::http::HeaderValue;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::trace::{SpanId, TraceContextExt, TraceId};
@@ -421,11 +422,30 @@ pub(crate) fn process_gql_req_headers(
 
         let trace_id = get_trace_id_from_context(&context);
         let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
-        let trace_capture = capture_tracer::Config::new_from_header(trace_capture_header, capturer, trace_id);
+        let trace_capture = create_capture_config(trace_capture_header, capturer, trace_id);
 
         (tx_id, span, trace_capture, Some(trace_id.to_string()))
     } else {
         // TODO: Is this case unimplemented yet? ask alexey.
         (tx_id, Span::none(), capture_tracer::Config::Disabled, None)
     }
+}
+
+pub fn create_capture_config(
+    header: Option<&HeaderValue>,
+    capturer: Option<capture_tracer::TraceCapturer>,
+    trace_id: TraceId,
+) -> capture_tracer::Config {
+    let enabled = if let Some(h) = header {
+        h.to_str().unwrap_or("false") == "true"
+    } else {
+        false
+    };
+
+    if !enabled || capturer.is_none() {
+        return capture_tracer::disabled();
+    }
+
+    let c = capturer.unwrap();
+    capture_tracer::enabled(c, trace_id)
 }
