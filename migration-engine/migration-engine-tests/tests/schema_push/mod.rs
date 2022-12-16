@@ -491,6 +491,6 @@ model m1 {
     let expected = expect_test::expect![[r#"
         The `mysql` database is a system database, it should not be altered with prisma migrate. Please connect to another database.
            0: migration_core::state::SchemaPush
-                     at migration-engine/core/src/state.rs:398"#]];
+                     at migration-engine/core/src/state.rs:402"#]];
     expected.assert_eq(&err.to_string());
 }
