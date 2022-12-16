@@ -410,25 +410,19 @@ pub(crate) fn process_gql_req_headers(
 ) -> (Option<TxId>, Span, capture_tracer::Config, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
 
-    if tx_id.is_none() {
-        let span = info_span!("prisma:engine", user_facing = true);
-        // TODO: does this configure the trace parent?
-        let cx = get_parent_span_context(req);
-        if let Some(context) = cx {
-            span.set_parent(context);
-        }
-
-        let context = span.context();
-
-        let trace_id = get_trace_id_from_context(&context);
-        let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
-        let trace_capture = create_capture_config(trace_capture_header, capturer, trace_id);
-
-        (tx_id, span, trace_capture, Some(trace_id.to_string()))
-    } else {
-        // TODO: Is this case unimplemented yet? ask alexey.
-        (tx_id, Span::none(), capture_tracer::Config::Disabled, None)
+    let span = info_span!("prisma:engine", user_facing = true);
+    let cx = get_parent_span_context(req);
+    if let Some(context) = cx {
+        span.set_parent(context);
     }
+
+    let context = span.context();
+
+    let trace_id = get_trace_id_from_context(&context);
+    let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
+    let trace_capture = create_capture_config(trace_capture_header, capturer, trace_id);
+
+    (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
 pub fn create_capture_config(
