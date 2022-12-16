@@ -1901,6 +1901,7 @@ dependencies = [
  "backtrace",
  "base64 0.13.1",
  "connection-string",
+ "indoc",
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",

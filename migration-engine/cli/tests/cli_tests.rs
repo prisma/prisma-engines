@@ -1,4 +1,5 @@
 use connection_string::JdbcString;
+use indoc::formatdoc;
 use std::process::{Command, Output};
 use test_macros::test_connector;
 use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
@@ -305,6 +306,44 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
 
         let mut response = String::new();
         stdout.read_line(&mut response).unwrap();
+
+        assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+    }
+}
+
+#[test_connector(tags(Postgres))]
+fn get_database_version_works_without_datamodel_init_arg(_api: TestApi) {
+    use std::io::{BufRead, BufReader, Write as _};
+    let schema = r#"
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
+    let mut process = Command::new(migration_engine_bin_path())
+        .env("RUST_LOG", "INFO")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+    let mut stderr = BufReader::new(process.stderr.as_mut().unwrap());
+
+    for _ in 0..2 {
+        let json_rpc_request = formatdoc! {
+            r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ "datasource": {schema} }}, "id": 1 }}"#
+        };
+        writeln!(stdin, "{}", json_rpc_request).unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+        dbg!("response: {}", &response); // ""
+
+        let mut error = String::new();
+        stderr.read_line(&mut error).unwrap();
+        dbg!("error: {}", &error); // Just a "Starting migration engine RPC server" JSON message
 
         assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
     }
