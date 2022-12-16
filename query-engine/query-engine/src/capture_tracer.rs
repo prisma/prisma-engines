@@ -125,9 +125,6 @@ impl TraceCapturer {
 #[async_trait]
 impl SpanExporter for TraceCapturer {
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        // we are only exporting logs in here
-        let batch = batch.into_iter().filter(|span| span.name == "quaint:query");
-
         let mut traces = self.traces.lock().await;
         for span in batch {
             let trace_id = span.span_context.trace_id();
