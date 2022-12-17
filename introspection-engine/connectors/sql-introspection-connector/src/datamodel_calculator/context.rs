@@ -54,6 +54,10 @@ impl<'a> InputContext<'a> {
         self.config.datasources.first().unwrap().active_connector
     }
 
+    pub(crate) fn uses_namespaces(self) -> bool {
+        matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty())
+    }
+
     /// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
     pub(crate) fn enum_pairs(self) -> impl ExactSizeIterator<Item = EnumPair<'a>> {

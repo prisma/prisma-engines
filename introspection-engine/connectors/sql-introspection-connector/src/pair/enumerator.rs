@@ -12,26 +12,9 @@ pub(crate) type EnumPair<'a> = Pair<'a, walkers::EnumWalker<'a>, sql::EnumWalker
 pub(crate) type EnumVariantPair<'a> = Pair<'a, walkers::EnumValueWalker<'a>, sql::EnumVariantWalker<'a>>;
 
 impl<'a> EnumPair<'a> {
-    /// The position of the enum from the PSL, if existing. Used for
-    /// sorting the enums in the final introspected data model.
-    pub(crate) fn previous_position(self) -> Option<ast::EnumId> {
-        self.previous.map(|e| e.id)
-    }
-
-    /// The namespace of the enumerator, if using the multi-schema feature.
-    pub(crate) fn namespace(self) -> Option<&'a str> {
-        if matches!(self.context.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
-            self.next.namespace()
-        } else {
-            None
-        }
-    }
-
-    /// Name of the enum in the PSL. The value can be sanitized if it
-    /// contains characters that are not allowed in the PSL
-    /// definition.
-    pub(crate) fn name(self) -> Cow<'a, str> {
-        self.context.enum_prisma_name(self.next.id).prisma_name()
+    /// The documentation on top of the enum.
+    pub(crate) fn documentation(self) -> Option<&'a str> {
+        self.previous.and_then(|enm| enm.ast_enum().documentation())
     }
 
     /// The mapped name, if defined, is the actual name of the enum in
@@ -45,9 +28,26 @@ impl<'a> EnumPair<'a> {
         }
     }
 
-    /// The documentation on top of the enum.
-    pub(crate) fn documentation(self) -> Option<&'a str> {
-        self.previous.and_then(|enm| enm.ast_enum().documentation())
+    /// Name of the enum in the PSL. The value can be sanitized if it
+    /// contains characters that are not allowed in the PSL
+    /// definition.
+    pub(crate) fn name(self) -> Cow<'a, str> {
+        self.context.enum_prisma_name(self.next.id).prisma_name()
+    }
+
+    /// The namespace of the enumerator, if using the multi-schema feature.
+    pub(crate) fn namespace(self) -> Option<&'a str> {
+        if self.context.uses_namespaces() {
+            self.next.namespace()
+        } else {
+            None
+        }
+    }
+
+    /// The position of the enum from the PSL, if existing. Used for
+    /// sorting the enums in the final introspected data model.
+    pub(crate) fn previous_position(self) -> Option<ast::EnumId> {
+        self.previous.map(|e| e.id)
     }
 
     /// Iterates all of the variants that are part of the enum.
@@ -67,6 +67,17 @@ impl<'a> EnumPair<'a> {
 }
 
 impl<'a> EnumVariantPair<'a> {
+    /// The documentation on top of the enum.
+    pub(crate) fn documentation(self) -> Option<&'a str> {
+        self.previous.and_then(|variant| variant.documentation())
+    }
+
+    /// The mapped name, if defined, is the actual name of the variant in
+    /// the database.
+    pub(crate) fn mapped_name(self) -> Option<&'a str> {
+        self.context.enum_variant_name(self.next.id).mapped_name()
+    }
+
     /// Name of the variant in the PSL. The value can be sanitized if
     /// it contains characters that are not allowed in the PSL
     /// definition.
@@ -83,16 +94,5 @@ impl<'a> EnumVariantPair<'a> {
         } else {
             name
         }
-    }
-
-    /// The mapped name, if defined, is the actual name of the variant in
-    /// the database.
-    pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        self.context.enum_variant_name(self.next.id).mapped_name()
-    }
-
-    /// The documentation on top of the enum.
-    pub(crate) fn documentation(self) -> Option<&'a str> {
-        self.previous.and_then(|variant| variant.documentation())
     }
 }
