@@ -1,8 +1,8 @@
 //! The `@default` attribute rendering.
 
 use crate::{
-    datamodel_calculator::OutputContext,
     pair::{DefaultKind, ScalarFieldPair},
+    warnings::Warnings,
 };
 use datamodel_renderer::{
     datamodel as renderer,
@@ -10,10 +10,7 @@ use datamodel_renderer::{
 };
 
 /// Render a default value for the given scalar field.
-pub(crate) fn render<'a>(
-    field: ScalarFieldPair<'a>,
-    output: &mut OutputContext<'a>,
-) -> Option<renderer::DefaultValue<'a>> {
+pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> Option<renderer::DefaultValue<'a>> {
     let mut rendered = match field.default().kind() {
         Some(kind) => match kind {
             DefaultKind::Sequence(sequence) => {
@@ -73,7 +70,7 @@ pub(crate) fn render<'a>(
                     field: field.name().to_string(),
                 };
 
-                output.warnings.prisma_1_uuid_defaults.push(warn);
+                warnings.prisma_1_uuid_defaults.push(warn);
                 Some(renderer::DefaultValue::function(Function::new("uuid")))
             }
             DefaultKind::Prisma1Cuid => {
@@ -82,7 +79,7 @@ pub(crate) fn render<'a>(
                     field: field.name().to_string(),
                 };
 
-                output.warnings.prisma_1_cuid_defaults.push(warn);
+                warnings.prisma_1_cuid_defaults.push(warn);
                 Some(renderer::DefaultValue::function(Function::new("cuid")))
             }
         },
