@@ -216,119 +216,126 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
-    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, connection| async move {
-            let schema_name = params.url.schema();
+            let ns_vec = Namespaces::to_vec(namespaces, params.url.schema().to_string());
+            for schema_name in &ns_vec {
+                let drop_procedures = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_procedures = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'DROP PROCEDURE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
+                    FROM sys.objects
+                    WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'P'
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'DROP PROCEDURE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
-                FROM sys.objects
-                WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'P'
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                let drop_shared_defaults = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_shared_defaults = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'DROP DEFAULT [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
+                    FROM sys.objects
+                    WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'D' AND parent_object_id = 0
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'DROP DEFAULT [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
-                FROM sys.objects
-                WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'D' AND parent_object_id = 0
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                let drop_views = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_views = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'DROP VIEW [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+                    FROM sys.views
+                    WHERE SCHEMA_NAME(schema_id) = '{0}'
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'DROP VIEW [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
-                FROM sys.views
-                WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                let drop_fks = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_fks = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
+                    FROM sys.foreign_keys
+                    WHERE SCHEMA_NAME(schema_id) = '{0}'
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
-                FROM sys.foreign_keys
-                WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                let drop_tables = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_tables = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+                    FROM sys.tables
+                    WHERE SCHEMA_NAME(schema_id) = '{0}'
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
-                FROM sys.tables
-                WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                let drop_types = format!(
+                    r#"
+                    DECLARE @stmt NVARCHAR(max)
+                    DECLARE @n CHAR(1)
 
-            let drop_types = format!(
-                r#"
-                DECLARE @stmt NVARCHAR(max)
-                DECLARE @n CHAR(1)
+                    SET @n = CHAR(10)
 
-                SET @n = CHAR(10)
+                    SELECT @stmt = ISNULL(@stmt + @n, '') +
+                        'DROP TYPE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+                    FROM sys.types
+                    WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    AND is_user_defined = 1
 
-                SELECT @stmt = ISNULL(@stmt + @n, '') +
-                    'DROP TYPE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
-                FROM sys.types
-                WHERE SCHEMA_NAME(schema_id) = '{0}'
-                AND is_user_defined = 1
+                    EXEC SP_EXECUTESQL @stmt
+                    "#,
+                    schema_name
+                );
 
-                EXEC SP_EXECUTESQL @stmt
-                "#,
-                schema_name
-            );
+                connection.raw_cmd(&drop_procedures, params).await?;
+                connection.raw_cmd(&drop_views, params).await?;
+                connection.raw_cmd(&drop_shared_defaults, params).await?;
+                connection.raw_cmd(&drop_fks, params).await?;
+                connection.raw_cmd(&drop_tables, params).await?;
+                connection.raw_cmd(&drop_types, params).await?;
+            }
 
-            connection.raw_cmd(&drop_procedures, params).await?;
-            connection.raw_cmd(&drop_views, params).await?;
-            connection.raw_cmd(&drop_shared_defaults, params).await?;
-            connection.raw_cmd(&drop_fks, params).await?;
-            connection.raw_cmd(&drop_tables, params).await?;
-            connection.raw_cmd(&drop_types, params).await?;
+            // We need to drop namespaces after we've dropped everything else.
+            for schema_name in ns_vec {
+                let drop_namespace = format!("DROP SCHEMA '{0}'", schema_name);
+                connection.raw_cmd(&drop_namespace, params).await?;
+            }
 
             Ok(())
         })
@@ -403,7 +410,7 @@ impl SqlFlavour for MssqlFlavour {
                 shadow_database.ensure_connection_validity().await?;
 
                 if shadow_database.reset(None).await.is_err() {
-                    crate::best_effort_reset(&mut shadow_database, namespaces).await?;
+                    crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 
                 match self.state.params().map(|p| p.url.schema()) {
@@ -414,7 +421,7 @@ impl SqlFlavour for MssqlFlavour {
                     }
                 }
 
-                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
+                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
             })
         } else {
             with_connection(&mut self.state, move |params, main_connection| async move {
@@ -461,7 +468,7 @@ impl SqlFlavour for MssqlFlavour {
                 // the shadow database, and only then return the result. This avoids
                 // leaving shadow databases behind in case of e.g. faulty
                 // migrations.
-                let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
+                let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
                 clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
                 ret
             })
