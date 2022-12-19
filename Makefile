@@ -2,7 +2,13 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-LIBRARY_EXT := $(shell [[ "$$(uname -s)" == "Darwin" ]] && echo "dylib" || echo "so")
+
+LIBRARY_EXT := $(shell                            \
+    case "$$(uname -s)" in                        \
+        (Darwin)               echo "dylib" ;;    \
+        (MINGW*|MSYS*|CYGWIN*) echo "dll"   ;;    \
+        (*)                    echo "so"    ;;    \
+    esac)
 
 default: build
 
