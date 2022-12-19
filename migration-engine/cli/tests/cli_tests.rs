@@ -356,3 +356,52 @@ fn introspect_e2e() {
         assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DB_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
     }
 }
+
+// TODO: this test succeeds, but it should fail. Introspecting a non-existing database file
+// should throw an error.
+#[test]
+fn introspect_e2e_fail_when_missing_db() {
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:missing.db"
+        }
+
+    "#;
+    let mut process = Command::new(migration_engine_bin_path())
+        .env("RUST_LOG", "INFO")
+        .env(
+            "TEST_DB_URL",
+            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
+        )
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    for iteration in 0..2 {
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": iteration,
+            "params": {
+                "schema": schema,
+                "force": true,
+                "compositeTypeDepth": 5,
+            }
+        }))
+        .unwrap();
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = \"file:missing.db\"\n}\n","version":"NonPrisma","warnings":[]},"##));
+    }
+}
