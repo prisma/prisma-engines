@@ -136,7 +136,7 @@ pub async fn diagnose_migration_history(
                 .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, namespaces.clone())
                 .await;
             let to = connector
-                .database_schema_from_diff_target(DiffTarget::Database, None, namespaces)
+                .database_schema_from_diff_target(DiffTarget::Database, None, namespaces.clone())
                 .await;
             let drift = match from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
                 if connector.migration_is_empty(&mig) {
@@ -157,7 +157,7 @@ pub async fn diagnose_migration_history(
                 // TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
                 // also grab this as a CLI argument.
                 connector
-                    .validate_migrations(&migrations_from_filesystem, None)
+                    .validate_migrations(&migrations_from_filesystem, namespaces)
                     .await
                     .err()
             } else {
