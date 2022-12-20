@@ -11,6 +11,7 @@ pub struct Datamodel {
 #[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: String,
+    pub db_name: Option<String>,
     pub kind: String,
     pub is_list: bool,
     pub is_required: bool,
