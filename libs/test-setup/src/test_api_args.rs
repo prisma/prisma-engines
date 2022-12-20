@@ -117,8 +117,6 @@ pub struct TestApiArgs {
     db: &'static DbUnderTest,
 }
 
-const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
-
 impl TestApiArgs {
     pub fn new(
         test_function_name: &'static str,
@@ -172,12 +170,17 @@ impl TestApiArgs {
         self.db.database_url.as_str()
     }
 
-    pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+    pub fn datasource_block<'a>(
+        &'a self,
+        url: &'a str,
+        params: &'a [(&'a str, &'a str)],
+        preview_features: &'static [&'static str],
+    ) -> DatasourceBlock<'a> {
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
-            preview_features: EMPTY_PREVIEW_FEATURES,
+            preview_features,
         }
     }
 

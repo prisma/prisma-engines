@@ -105,7 +105,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(self.args.database_url(), &[])
+        self.args.datasource_block(self.args.database_url(), &[], &[])
     }
 
     /// Returns true only when testing on MSSQL.
@@ -227,7 +227,12 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        write!(out, "{}", self.args.datasource_block(self.args.database_url(), &[])).unwrap()
+        write!(
+            out,
+            "{}",
+            self.args.datasource_block(self.args.database_url(), &[], &[])
+        )
+        .unwrap()
     }
 
     /// Currently enabled preview features.

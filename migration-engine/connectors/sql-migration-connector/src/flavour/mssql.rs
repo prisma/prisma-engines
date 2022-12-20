@@ -409,7 +409,7 @@ impl SqlFlavour for MssqlFlavour {
                 shadow_database.set_params(shadow_db_params)?;
                 shadow_database.ensure_connection_validity().await?;
 
-                if shadow_database.reset(None).await.is_err() {
+                if shadow_database.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 
@@ -459,16 +459,12 @@ impl SqlFlavour for MssqlFlavour {
                 };
                 shadow_database.set_params(shadow_db_params)?;
 
-                if params.url.schema() != "dbo" {
-                    let create_schema = format!("CREATE SCHEMA [{schema}]", schema = params.url.schema());
-                    shadow_database.raw_cmd(&create_schema).await?;
-                }
-
                 // We go through the whole process without early return, then clean up
                 // the shadow database, and only then return the result. This avoids
                 // leaving shadow databases behind in case of e.g. faulty
                 // migrations.
                 let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
+
                 clean_up_shadow_database(&shadow_database_name, main_connection, params).await?;
                 ret
             })
