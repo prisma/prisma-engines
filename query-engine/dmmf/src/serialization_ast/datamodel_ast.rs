@@ -1,5 +1,5 @@
 // Datamodel serialization AST for the DMMF.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Datamodel {
     pub enums: Vec<Enum>,
@@ -7,7 +7,7 @@ pub struct Datamodel {
     pub types: Vec<Model>, // composite types
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: String,
@@ -49,14 +49,14 @@ pub struct Field {
     pub documentation: Option<String>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Function {
     pub name: String,
     pub args: Vec<serde_json::Value>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
     pub name: String,
@@ -73,7 +73,7 @@ pub struct Model {
     pub documentation: Option<String>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UniqueIndex {
     pub name: Option<String>,
@@ -81,14 +81,14 @@ pub struct UniqueIndex {
 }
 
 // TODO(extended indices) add field options here
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryKey {
     pub name: Option<String>,
     pub fields: Vec<String>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Enum {
     pub name: String,
@@ -99,7 +99,7 @@ pub struct Enum {
     pub documentation: Option<String>,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EnumValue {
     pub name: String,
