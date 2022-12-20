@@ -119,9 +119,9 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
     api.create_migration("second-migration", &dm2, &migrations_directory)
         .send_sync();
 
-    api.raw_cmd("INSERT INTO [one].[First] (id, name, r2_secondId) VALUES(1, 'first', NULL)");
-    api.raw_cmd("INSERT INTO [two].[Second] (id, name, r1_firstId) VALUES(1, 'second', 1)");
-    api.raw_cmd("INSERT INTO [one].[First] (id, name, r2_secondId) VALUES(2, 'other', 1)");
+    api.raw_cmd("INSERT INTO one.First (id, name, r2_secondId) VALUES(1, 'first', NULL)");
+    api.raw_cmd("INSERT INTO two.Second (id, name, r1_firstId) VALUES(1, 'second', 1)");
+    api.raw_cmd("INSERT INTO one.First (id, name, r2_secondId) VALUES(2, 'other', 1)");
 
     api.apply_migrations(&migrations_directory)
         .send_sync()
