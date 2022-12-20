@@ -249,7 +249,7 @@ show-metrics:
 otel:
 	docker compose up --remove-orphans -d otel
 
-# Building debug version of Query Engine Node-API library ready to be consumed by Node.js
+# Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
 .PHONY: qe-node-api
 qe-node-api: build target/debug/libquery_engine.node
 
