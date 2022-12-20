@@ -65,6 +65,7 @@
         },
         {
           "name": "name",
+          "dbName": "NAME",
           "kind": "scalar",
           "isList": false,
           "isRequired": false,
