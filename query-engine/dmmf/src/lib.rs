@@ -15,7 +15,7 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 // enable raw param?
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = Arc::new(psl::parse_schema(schema).unwrap());
-    let internal_data_model = prisma_models::convert(schema, "dummy".to_owned());
+    let internal_data_model = prisma_models::convert(schema);
     from_precomputed_parts(Arc::new(schema_builder::build(internal_data_model, true)))
 }
 

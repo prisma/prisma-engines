@@ -58,10 +58,10 @@ impl PrismaContext {
         let url = data_source.load_url(|key| env::var(key).ok())?;
 
         // Load executor
-        let (db_name, executor) = executor::load(data_source, config.preview_features(), &url).await?;
+        let executor = executor::load(data_source, config.preview_features(), &url).await?;
 
         // Build internal data model
-        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
+        let internal_data_model = prisma_models::convert(Arc::new(schema));
 
         // Construct query schema
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, enable_raw_queries));

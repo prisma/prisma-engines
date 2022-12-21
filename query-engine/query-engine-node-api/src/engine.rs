@@ -225,12 +225,12 @@ impl QueryEngine {
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
                     .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
 
-                let (db_name, executor) = executor::load(data_source, preview_features, &url).await?;
+                let executor = executor::load(data_source, preview_features, &url).await?;
                 let connector = executor.primary_connector();
                 connector.get_connection().await?;
 
                 // Build internal data model
-                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema), db_name);
+                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
 
                 let enable_raw_queries = true;
                 let query_schema = schema_builder::build(internal_data_model, enable_raw_queries);

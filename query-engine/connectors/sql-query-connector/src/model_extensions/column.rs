@@ -1,7 +1,7 @@
 use crate::model_extensions::ScalarFieldExt;
 use itertools::Itertools;
 use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
-use quaint::ast::{Column, Row};
+use quaint::ast::{Column, Row, Table};
 use std::convert::AsRef;
 
 pub struct ColumnIterator {
@@ -99,7 +99,10 @@ where
         let sf = self.as_ref();
 
         // Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        let full_table_name = sf.container.as_model().unwrap().db_name_with_schema();
+        let full_table_name: Table<'static> = match sf.container.as_model().unwrap().db_name_with_schema() {
+            (Some(s), t) => (s.to_owned(), t.to_owned()).into(),
+            (None, t) => t.to_owned().into(),
+        };
         let col = sf.db_name().to_string();
 
         let column = Column::from((full_table_name, col)).type_family(sf.type_family());

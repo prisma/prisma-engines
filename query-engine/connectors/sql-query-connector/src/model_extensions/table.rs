@@ -8,7 +8,10 @@ pub trait AsTable {
 
 impl AsTable for Model {
     fn as_table(&self) -> Table<'static> {
-        let table: Table<'static> = self.db_name_with_schema().into();
+        let table: Table<'static> = match self.db_name_with_schema() {
+            (Some(s), t) => (s.to_owned(), t.to_owned()).into(),
+            (None, t) => t.to_owned().into(),
+        };
 
         let id_cols: Vec<Column<'static>> = self
             .primary_identifier()
