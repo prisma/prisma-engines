@@ -182,6 +182,7 @@ services:
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
       FOREIGN_KEY_MODE: "disallow"
+      TABLET_REFRESH_INTERVAL: '1s'
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:8ee70873b387ff79258f61daecb5ab7653c3f91f15ee6f80ed72554592b50be8
@@ -194,6 +195,7 @@ services:
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
       FOREIGN_KEY_MODE: "disallow"
+      TABLET_REFRESH_INTERVAL: '1s'
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57@sha256:5dab20009395b9670c179d97c1995f7f0fe8efab2e0f79e2b5fadd78ac66098c
@@ -206,6 +208,7 @@ services:
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
       FOREIGN_KEY_MODE: "disallow"
+      TABLET_REFRESH_INTERVAL: '1s'
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80@sha256:8ee70873b387ff79258f61daecb5ab7653c3f91f15ee6f80ed72554592b50be8
@@ -218,6 +221,7 @@ services:
       NUM_SHARDS: "1"
       MYSQL_BIND_HOST: "0.0.0.0"
       FOREIGN_KEY_MODE: "disallow"
+      TABLET_REFRESH_INTERVAL: '1s'
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
