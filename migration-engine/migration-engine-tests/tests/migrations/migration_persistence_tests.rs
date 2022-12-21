@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 fn starting_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    tok(persistence.initialize()).unwrap();
+    tok(persistence.initialize(None)).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -39,7 +39,7 @@ fn starting_a_migration_works(api: TestApi) {
 fn finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    tok(persistence.initialize()).unwrap();
+    tok(persistence.initialize(None)).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -76,7 +76,7 @@ fn finishing_a_migration_works(api: TestApi) {
 fn updating_then_finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    tok(persistence.initialize()).unwrap();
+    tok(persistence.initialize(None)).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -114,7 +114,7 @@ fn updating_then_finishing_a_migration_works(api: TestApi) {
 fn multiple_successive_migrations_work(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    tok(persistence.initialize()).unwrap();
+    tok(persistence.initialize(None)).unwrap();
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 

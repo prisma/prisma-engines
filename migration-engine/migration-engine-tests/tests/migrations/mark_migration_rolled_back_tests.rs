@@ -13,7 +13,7 @@ fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
 
 #[test_connector]
 fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: TestApi) {
-    tok(api.migration_persistence().initialize()).unwrap();
+    tok(api.migration_persistence().initialize(None)).unwrap();
 
     let err = api
         .mark_migration_rolled_back("anything")
