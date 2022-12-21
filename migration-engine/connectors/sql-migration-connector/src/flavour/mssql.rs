@@ -333,7 +333,7 @@ impl SqlFlavour for MssqlFlavour {
 
             // We need to drop namespaces after we've dropped everything else.
             for schema_name in ns_vec {
-                let drop_namespace = format!("DROP SCHEMA '{0}'", schema_name);
+                let drop_namespace = format!("DROP SCHEMA IF EXISTS [{0}]", schema_name);
                 connection.raw_cmd(&drop_namespace, params).await?;
             }
 
@@ -411,14 +411,6 @@ impl SqlFlavour for MssqlFlavour {
 
                 if shadow_database.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
-                }
-
-                match self.state.params().map(|p| p.url.schema()) {
-                    Some("dbo") | None => (),
-                    Some(other) => {
-                        let create_schema = format!("CREATE SCHEMA [{schema}]", schema = other);
-                        shadow_database.raw_cmd(&create_schema).await?;
-                    }
                 }
 
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await

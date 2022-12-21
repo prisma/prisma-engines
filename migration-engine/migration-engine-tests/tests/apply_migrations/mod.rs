@@ -114,14 +114,37 @@ fn multi_schema_two_migrations_drop_fks(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["initial"]);
 
-    let dm2 = api.datamodel_with_provider_and_features("", &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
-
-    api.create_migration("second-migration", &dm2, &migrations_directory)
-        .send_sync();
-
     api.raw_cmd("INSERT INTO one.First (id, name, r2_secondId) VALUES(1, 'first', NULL)");
     api.raw_cmd("INSERT INTO two.Second (id, name, r1_firstId) VALUES(1, 'second', 1)");
     api.raw_cmd("INSERT INTO one.First (id, name, r2_secondId) VALUES(2, 'other', 1)");
+
+    let dm2 = api.datamodel_with_provider_and_features(r#"
+        model First {
+            id      Int @id
+            name    String
+
+            r1_second Second? @relation("r1")
+
+            r2_second Second? @relation("r2", fields: [r2_secondId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+            r2_secondId Int? @unique
+
+            @@schema("two")
+        }
+        model Second {
+            id      Int @id
+            name    String
+
+            r1_first First @relation("r1", fields: [r1_firstId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+            r1_firstId Int @unique
+
+            r2_first First? @relation("r2")
+
+            @@schema("one")
+        }
+      "#, &[("schemas", "[\"one\", \"two\"]")], &["multiSchema"]);
+
+    api.create_migration("second-migration", &dm2, &migrations_directory)
+        .send_sync();
 
     api.apply_migrations(&migrations_directory)
         .send_sync()
