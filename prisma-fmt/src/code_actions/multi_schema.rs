@@ -25,8 +25,6 @@ pub(super) fn add_schema_block_attribute_model<'a>(
         return;
     }
 
-    let edit = super::create_schema_attribute_edit_model(schema, model, params);
-
     let span_diagnostics =
         match super::diagnostics_for_span(schema, &params.context.diagnostics, model.ast_model().span()) {
             Some(sd) => sd,
@@ -38,6 +36,8 @@ pub(super) fn add_schema_block_attribute_model<'a>(
             Some(value) => value,
             None => return,
         };
+
+    let edit = super::create_schema_attribute_edit_model(schema, model, params);
 
     let action = CodeAction {
         title: String::from("Add `@@schema` attribute"),
@@ -70,8 +70,6 @@ pub(super) fn add_schema_block_attribute_enum<'a>(
         return;
     }
 
-    let edit = super::create_schema_attribute_edit_enum(schema, enumerator, params);
-
     let span_diagnostics =
         match super::diagnostics_for_span(schema, &params.context.diagnostics, enumerator.ast_enum().span()) {
             Some(sd) => sd,
@@ -83,6 +81,8 @@ pub(super) fn add_schema_block_attribute_enum<'a>(
             Some(value) => value,
             None => return,
         };
+
+    let edit = super::create_schema_attribute_edit_enum(schema, enumerator, params);
 
     let action = CodeAction {
         title: String::from("Add `@@schema` attribute"),
