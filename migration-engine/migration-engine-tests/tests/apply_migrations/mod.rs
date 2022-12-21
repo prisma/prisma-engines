@@ -75,7 +75,7 @@ fn multi_schema_applying_two_migrations_works(api: TestApi) {
         .assert_applied_migrations(&[]);
 }
 
-#[test_connector(tags(Mssql, Postgres), preview_features("multiSchema"), namespaces("one", "two"))]
+#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
 fn multi_schema_two_migrations_drop_fks(api: TestApi) {
     let dm1 = api.datamodel_with_provider_and_features(
         r#"
