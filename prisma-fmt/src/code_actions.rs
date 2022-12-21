@@ -6,7 +6,7 @@ use psl::{
     diagnostics::Span,
     parser_database::{
         ast,
-        walkers::{EnumWalker, ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
+        walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
         SourceFile,
     },
     schema_ast::ast::{Attribute, IndentationType, NewlineType, WithSpan},
@@ -124,6 +124,7 @@ fn filter_diagnostics(span_diagnostics: Vec<Diagnostic>, diagnostic_message: &st
     if diagnostics.is_empty() {
         return None;
     }
+
     Some(diagnostics)
 }
 
@@ -146,91 +147,65 @@ fn create_missing_attribute<'a>(
 
         (new_text, range)
     } else {
-        let (new_text, range) = create_block_attribute(schema, model, fields, attribute_name);
-        (new_text, range)
+        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
+
+        let attribute = format!("{attribute_name}([{fields}])");
+
+        let formatted_attribute = format_attribute(
+            &attribute,
+            model.indentation(),
+            model.newline(),
+            &model.ast_model().attributes,
+        );
+
+        let range = span_to_range(schema, model.ast_model().span());
+        (formatted_attribute, range)
     };
 
     TextEdit { range, new_text }
 }
 
-fn create_block_attribute<'a>(
-    schema: &str,
-    model: ModelWalker<'a>,
-    fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
-    attribute_name: &str,
-) -> (String, Range) {
-    let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-
-    let indentation = model.indentation();
-    let newline = model.newline();
-    let separator = if model.ast_model().attributes.is_empty() {
-        newline.as_ref()
-    } else {
-        ""
-    };
-    let new_text = format!("{separator}{indentation}@@{attribute_name}([{fields}]){newline}}}");
-
-    let start = crate::offset_to_position(model.ast_model().span().end - 1, schema);
-    let end = crate::offset_to_position(model.ast_model().span().end, schema);
-
-    let range = Range { start, end };
-
-    (new_text, range)
-}
-
-fn create_schema_attribute_edit_model(schema: &str, model: ModelWalker, params: &CodeActionParams) -> WorkspaceEdit {
-    let (new_text, range) = create_schema_attribute(
-        schema,
-        model.indentation(),
-        &model.ast_model().attributes,
-        model.newline(),
-        model.ast_model().span(),
-    );
-    let text = TextEdit { range, new_text };
-
-    let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
-
-    WorkspaceEdit {
-        changes: Some(changes),
-        ..Default::default()
-    }
-}
-
-fn create_schema_attribute_edit_enum(schema: &str, enumerator: EnumWalker, params: &CodeActionParams) -> WorkspaceEdit {
-    let (new_text, range) = create_schema_attribute(
-        schema,
-        enumerator.indentation(),
-        &enumerator.ast_enum().attributes,
-        enumerator.newline(),
-        enumerator.ast_enum().span(),
-    );
-    let text = TextEdit { range, new_text };
-
-    let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
-
-    WorkspaceEdit {
-        changes: Some(changes),
-        ..Default::default()
-    }
-}
-
-fn create_schema_attribute(
-    schema: &str,
-    indentation: IndentationType,
-    attributes: &Vec<Attribute>,
-    newline: NewlineType,
-    span: Span,
-) -> (String, Range) {
-    let seperator = if attributes.is_empty() { newline.as_ref() } else { "" };
-
-    let new_text = format!("{seperator}{indentation}@@schema(\"\"){newline}}}");
-
+fn span_to_range(schema: &str, span: Span) -> Range {
     let start = crate::offset_to_position(span.end - 1, schema);
     let end = crate::offset_to_position(span.end, schema);
 
-    let range = Range { start, end };
+    Range { start, end }
+}
 
-    (new_text, range)
+fn format_attribute(
+    attribute: &str,
+    indentation: IndentationType,
+    newline: NewlineType,
+    attributes: &Vec<Attribute>,
+) -> String {
+    let separator = if attributes.is_empty() { newline.as_ref() } else { "" };
+
+    let formatted_attribute = format!("{separator}{indentation}@@{attribute}{newline}}}");
+
+    formatted_attribute
+}
+
+fn create_schema_attribute_edit(
+    schema: &str,
+    indentation: IndentationType,
+    newline: NewlineType,
+    attributes: &Vec<Attribute>,
+    span: Span,
+    params: &CodeActionParams,
+) -> WorkspaceEdit {
+    let formatted_attribute = format_attribute("schema()", indentation, newline, attributes);
+
+    let range = span_to_range(schema, span);
+    let text = TextEdit {
+        range,
+        new_text: formatted_attribute,
+    };
+
+    let mut changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), vec![text]);
+
+    WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    }
 }

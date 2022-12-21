@@ -5,6 +5,8 @@ use psl::parser_database::{
 };
 use std::collections::HashMap;
 
+use super::format_attribute;
+
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
 ///
@@ -256,9 +258,22 @@ pub(super) fn add_index_for_relation_fields(
         return;
     }
 
+    let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
+
     let attribute_name = "index";
-    let (new_text, range) = super::create_block_attribute(schema, relation.model(), fields, attribute_name);
-    let text = TextEdit { range, new_text };
+    let attribute = format!("{attribute_name}([{fields}])");
+    let formatted_attribute = format_attribute(
+        &attribute,
+        relation.model().indentation(),
+        relation.model().newline(),
+        &relation.model().ast_model().attributes,
+    );
+
+    let range = super::span_to_range(schema, relation.model().ast_model().span());
+    let text = TextEdit {
+        range,
+        new_text: formatted_attribute,
+    };
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);

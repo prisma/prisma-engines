@@ -32,7 +32,7 @@
                 "character": 1
               }
             },
-            "newText": "\n    @@schema(\"\")\n}"
+            "newText": "\n    @@schema()\n}"
           }
         ]
       }
