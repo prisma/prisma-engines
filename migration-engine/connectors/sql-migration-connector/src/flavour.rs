@@ -232,6 +232,10 @@ pub(crate) trait SqlFlavour:
         })
     }
 
+    fn pre_introspect_hook(&self) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
