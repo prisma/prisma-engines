@@ -11,7 +11,7 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
-use crate::{telemetry_capturing::CaptureExporter, LogFormat};
+use crate::{telemetry_capturing, LogFormat};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
@@ -24,7 +24,7 @@ pub struct Logger<'a> {
     log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
     metrics: Option<MetricRegistry>,
-    trace_capturer: Option<CaptureExporter>,
+    trace_capturer: Option<telemetry_capturing::traces::Exporter>,
 }
 
 impl<'a> Logger<'a> {
@@ -69,9 +69,9 @@ impl<'a> Logger<'a> {
         self.metrics = Some(metrics);
     }
 
-    pub fn enable_trace_capturer(&mut self, capture_logs: bool) -> Option<CaptureExporter> {
+    pub fn enable_trace_capturer(&mut self, capture_logs: bool) -> Option<telemetry_capturing::traces::Exporter> {
         let capturer = if capture_logs {
-            Some(CaptureExporter::new())
+            Some(telemetry_capturing::traces::Exporter::new())
         } else {
             None
         };
@@ -91,7 +91,7 @@ impl<'a> Logger<'a> {
 
             // todo: This is replacing the telemetry tracer used by the otel tracer
             if let Some(exporter) = self.trace_capturer {
-                let tracer = crate::telemetry_capturing::new_pipeline().install(exporter);
+                let tracer = crate::telemetry_capturing::traces::setup_and_install_tracer_globally(exporter);
                 telemetry = telemetry.with_tracer(tracer);
             }
 

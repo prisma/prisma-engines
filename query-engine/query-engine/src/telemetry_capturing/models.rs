@@ -62,9 +62,6 @@ impl From<SpanData> for ExportedSpan {
             })
             .collect();
 
-        dbg!(span.events.clone());
-        println!("\n\n\n\n\n\n\n");
-
         let events = span
             .events
             .into_iter()
