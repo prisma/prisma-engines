@@ -11,7 +11,7 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
-use crate::{capture_tracer::CaptureExporter, LogFormat};
+use crate::{telemetry_capturing::CaptureExporter, LogFormat};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
@@ -91,7 +91,7 @@ impl<'a> Logger<'a> {
 
             // todo: This is replacing the telemetry tracer used by the otel tracer
             if let Some(exporter) = self.trace_capturer {
-                let tracer = crate::capture_tracer::new_pipeline().install(exporter);
+                let tracer = crate::telemetry_capturing::new_pipeline().install(exporter);
                 telemetry = telemetry.with_tracer(tracer);
             }
 
