@@ -399,7 +399,7 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
 
 pub(crate) fn process_gql_req_headers(
     req: &Request<Body>,
-    capturer: Option<capture_tracer::TraceCapturer>,
+    capturer: Option<capture_tracer::CaptureExporter>,
 ) -> (Option<TxId>, Span, capture_tracer::Config, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
 
@@ -420,7 +420,7 @@ pub(crate) fn process_gql_req_headers(
 
 pub fn create_capture_config(
     header: Option<&HeaderValue>,
-    capturer: Option<capture_tracer::TraceCapturer>,
+    capturer: Option<capture_tracer::CaptureExporter>,
     trace_id: TraceId,
 ) -> capture_tracer::Config {
     let enabled = if let Some(h) = header {

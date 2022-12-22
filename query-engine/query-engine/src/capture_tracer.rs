@@ -19,7 +19,7 @@ pub enum Config {
     Disabled,
 }
 
-pub(crate) fn enabled(c: TraceCapturer, trace_id: TraceId) -> Config {
+pub(crate) fn enabled(c: CaptureExporter, trace_id: TraceId) -> Config {
     Config::Enabled(ConfiguredCapturer { capturer: c, trace_id })
 }
 
@@ -29,13 +29,15 @@ pub fn disabled() -> Config {
 /// A ConfiguredCapturer is ready to capture spans for a particular trace and is built from
 #[derive(Debug, Clone)]
 pub struct ConfiguredCapturer {
-    capturer: TraceCapturer,
+    capturer: CaptureExporter,
     trace_id: TraceId,
 }
 
 impl ConfiguredCapturer {
     pub async fn start_capturing(&self) {
-        self.capturer.start_capturing(self.trace_id).await
+        self.capturer
+            .start_capturing(self.trace_id, CaptureTimeout::Default)
+            .await
     }
 
     pub async fn fetch_captures(&self) -> Vec<UserFacingSpan> {
@@ -70,7 +72,7 @@ impl PipelineBuilder {
 }
 
 impl PipelineBuilder {
-    pub fn install(mut self, exporter: TraceCapturer) -> sdk::trace::Tracer {
+    pub fn install(mut self, exporter: CaptureExporter) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
 
         let processor = sdk::trace::BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
@@ -92,48 +94,100 @@ impl PipelineBuilder {
 /// A [`SpanExporter`] that captures and stores spans in memory in a synchronized dictionary for
 /// later retrieval
 #[derive(Debug, Clone)]
-pub struct TraceCapturer {
-    traces: Arc<Mutex<HashMap<TraceId, Vec<SpanData>>>>,
+pub struct CaptureExporter {
+    pub(crate) traces: Arc<Mutex<HashMap<TraceId, Vec<UserFacingSpan>>>>,
 }
 
-impl TraceCapturer {
-    pub fn new(enable: bool) -> Option<Self> {
-        if !enable {
-            return None;
-        }
+pub(crate) enum CaptureTimeout {
+    #[allow(dead_code)]
+    Duration(Duration),
+    Default,
+}
 
-        Some(Self {
+impl CaptureExporter {
+    const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1800);
+
+    pub fn new() -> Self {
+        Self {
             traces: Default::default(),
-        })
-    }
-
-    pub async fn start_capturing(&self, trace_id: TraceId) {
-        let mut traces = self.traces.lock().await;
-        traces.insert(trace_id, Vec::new());
-    }
-
-    pub async fn fetch_captures(&self, trace_id: TraceId) -> Vec<UserFacingSpan> {
-        let mut traces = self.traces.lock().await;
-
-        match traces.remove(&trace_id) {
-            Some(spans) => spans.iter().map(UserFacingSpan::from).collect(),
-            None => vec![],
         }
+    }
+
+    pub(crate) async fn start_capturing(&self, trace_id: TraceId, timeout: CaptureTimeout) {
+        let mut locked_traces = self.traces.lock().await;
+        locked_traces.insert(trace_id, Vec::new());
+        drop(locked_traces);
+
+        let when = match timeout {
+            CaptureTimeout::Duration(d) => d,
+            CaptureTimeout::Default => Self::DEFAULT_TIMEOUT,
+        };
+
+        let traces = self.traces.clone();
+        tokio::spawn(async move {
+            tokio::time::sleep(when).await;
+            let mut locked_traces = traces.lock().await;
+            if locked_traces.remove(&trace_id).is_some() {
+                warn!("Timeout waiting for spans to be captured. trace_id{}", trace_id)
+            }
+        });
+    }
+
+    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Vec<UserFacingSpan> {
+        let mut traces = self.traces.lock().await;
+
+        if let Some(spans) = traces.remove(&trace_id) {
+            spans
+        } else {
+            vec![]
+        }
+    }
+}
+
+impl Default for CaptureExporter {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 #[async_trait]
-impl SpanExporter for TraceCapturer {
+impl SpanExporter for CaptureExporter {
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
         let mut traces = self.traces.lock().await;
         for span in batch {
             let trace_id = span.span_context.trace_id();
 
             if let Some(spans) = traces.get_mut(&trace_id) {
-                spans.push(span)
+                spans.push(UserFacingSpan::from(&span))
             }
         }
 
         Ok(())
+    }
+}
+
+// tests for capture exporter
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[tokio::test]
+    async fn test_garbage_collection() {
+        let exporter = CaptureExporter::new();
+
+        let trace_id = TraceId::from_hex("1").unwrap();
+        let one_ms = Duration::from_millis(1);
+        exporter
+            .start_capturing(trace_id, CaptureTimeout::Duration(one_ms))
+            .await;
+        let traces = exporter.traces.lock().await;
+        assert!(traces.get(&trace_id).is_some());
+        drop(traces);
+
+        tokio::time::sleep(10 * one_ms).await;
+
+        let traces = exporter.traces.lock().await;
+        assert!(traces.get(&trace_id).is_none());
     }
 }
