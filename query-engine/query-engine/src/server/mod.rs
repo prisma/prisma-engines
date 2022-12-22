@@ -133,22 +133,15 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
+                let mut result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
-                let result_bytes = if let capture_tracer::Config::Enabled(capturer) = capture_config {
+                if let capture_tracer::Config::Enabled(capturer) = capture_config {
                     global::force_flush_tracer_provider();
-
                     let traces = capturer.fetch_captures().await;
+                    result.set_extension("traces".to_owned(), json!(traces));
+                }
 
-                    let json = json!({
-                        "result": result,
-                        "traces": traces,
-                    });
-                    dbg!(&json);
-                    serde_json::to_vec(&json).unwrap()
-                } else {
-                    serde_json::to_vec(&result).unwrap()
-                };
+                let result_bytes = serde_json::to_vec(&result).unwrap();
 
                 let res = Response::builder()
                     .status(StatusCode::OK)
