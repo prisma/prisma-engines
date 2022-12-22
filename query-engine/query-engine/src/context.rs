@@ -1,4 +1,4 @@
-use crate::{capture_tracer::TraceCapturer, PrismaError, PrismaResult};
+use crate::{capture_tracer::CaptureExporter, PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};
@@ -13,7 +13,7 @@ pub struct PrismaContext {
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
     // The trace capturer being in flight.
-    pub trace_capturer: Option<TraceCapturer>,
+    pub trace_capturer: Option<CaptureExporter>,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -26,7 +26,7 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
-    trace_capturer: Option<TraceCapturer>,
+    trace_capturer: Option<CaptureExporter>,
 }
 
 impl ContextBuilder {
@@ -40,7 +40,7 @@ impl ContextBuilder {
         self
     }
 
-    pub fn set_trace_capturer(mut self, trace_capturer: Option<TraceCapturer>) -> Self {
+    pub fn set_trace_capturer(mut self, trace_capturer: Option<CaptureExporter>) -> Self {
         self.trace_capturer = trace_capturer;
         self
     }
@@ -62,7 +62,7 @@ impl PrismaContext {
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
-        trace_capturer: Option<TraceCapturer>,
+        trace_capturer: Option<CaptureExporter>,
     ) -> PrismaResult<Self> {
         let config = &schema.configuration;
         // We only support one data source at the moment, so take the first one (default not exposed yet).
