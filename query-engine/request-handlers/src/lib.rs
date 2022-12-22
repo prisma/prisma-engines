@@ -23,10 +23,10 @@ pub enum PrismaResponse {
 }
 
 impl PrismaResponse {
-    pub fn errors(&self) -> Vec<&GQLError> {
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
         match self {
-            PrismaResponse::Single(ref s) => s.errors().collect(),
-            PrismaResponse::Multi(ref m) => m.errors().collect(),
+            Self::Single(r) => r.set_extension(key, val),
+            Self::Multi(r) => r.set_extension(key, val),
         }
     }
 }
