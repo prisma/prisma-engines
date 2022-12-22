@@ -1,7 +1,10 @@
 use crate::model_extensions::ScalarFieldExt;
 use itertools::Itertools;
 use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
-use quaint::ast::{Column, Row};
+use quaint::{
+    ast::{Column, Row},
+    prelude::Table,
+};
 use std::convert::AsRef;
 
 pub struct ColumnIterator {
@@ -102,7 +105,11 @@ where
         let full_table_name = sf.container.as_model().unwrap().db_name_with_schema();
         let col = sf.db_name().to_string();
 
-        let column = Column::from((full_table_name, col)).type_family(sf.type_family());
+        let table: Table<'static> = match full_table_name {
+            (Some(s), t) => (s, t).into(),
+            (None, t) => t.into(),
+        };
+        let column = Column::from((table, col)).type_family(sf.type_family());
         column.default(quaint::ast::DefaultValue::Generated)
     }
 }

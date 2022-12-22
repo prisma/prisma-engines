@@ -37,6 +37,11 @@ pub const EXTENSIONS_KEY: &str = "extensions";
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
+    /// Any prefix that should be added to table names when a more specific namespace is missing.
+    fn table_prefix(&self, _url: &str) -> Option<String> {
+        None
+    }
+
     /// The name of the provider, for string comparisons determining which connector we are on.
     fn provider_name(&self) -> &'static str;
 

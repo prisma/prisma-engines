@@ -561,7 +561,7 @@ fn implicit_many_to_many_relation() {
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let schema = psl::parse_schema(datamodel).unwrap();
-    prisma_models::convert(Arc::new(schema), "not_important".to_string())
+    prisma_models::convert(Arc::new(schema))
 }
 
 trait DatamodelAssertions {

@@ -14,7 +14,6 @@ use psl_core::{
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
 };
 use std::borrow::Cow;
-
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -71,6 +70,18 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
+    fn table_prefix(&self, url: &str) -> Option<String> {
+        url.parse::<connection_string::JdbcString>()
+            .ok()
+            .and_then(|mut url| url.properties_mut().remove("schema"))
+            .or_else(|| {
+                url.parse::<connection_string::AdoNetString>()
+                    .ok()
+                    .and_then(|mut url| url.remove("schema"))
+            })
+            .or_else(|| Some(String::from("dbo")))
+    }
+
     fn provider_name(&self) -> &'static str {
         "sqlserver"
     }

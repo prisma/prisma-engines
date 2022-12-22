@@ -17,7 +17,7 @@ pub struct InternalDataModel {
     /// E.g. this influences the schema part of a postgres query: `database`.`schema`.`table`.
     /// Other connectors do not use `schema`, like postgres does, and this variable would
     /// influence the `database` part instead.
-    pub db_name: String,
+    pub db_name: Option<String>,
     pub enums: Vec<InternalEnumRef>,
     pub schema: Arc<psl::ValidatedSchema>,
 }

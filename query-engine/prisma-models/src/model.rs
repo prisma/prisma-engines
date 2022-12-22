@@ -28,10 +28,10 @@ impl Model {
         self.dml_model.schema.clone()
     }
 
-    pub fn db_name_with_schema(&self) -> (String, String) {
+    pub fn db_name_with_schema(&self) -> (Option<String>, String) {
         let schema_prefix = self
             .schema_name()
-            .unwrap_or_else(|| self.internal_data_model().db_name.clone());
+            .or_else(|| self.internal_data_model().db_name.clone());
 
         let model_db_name = self.db_name().to_string();
 

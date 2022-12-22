@@ -2,7 +2,13 @@ use crate::{builders, InternalDataModel, InternalDataModelRef};
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
-pub fn convert(schema: Arc<psl::ValidatedSchema>, db_name: String) -> InternalDataModelRef {
+pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
+    let db_name = schema
+        .configuration
+        .datasources
+        .first()
+        .and_then(|ds| ds.load_url(|v| std::env::var(v).ok()).ok())
+        .and_then(|url| schema.connector.table_prefix(&url));
     let datamodel = psl::lift(&schema);
     let relation_mode = schema.relation_mode();
 
