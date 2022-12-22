@@ -461,6 +461,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection
 #[repr(u8)]
 pub(crate) enum Circumstances {
     IsCockroachDb,
+    CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
 }
 
 #[allow(clippy::needless_collect)] // clippy is wrong
@@ -524,10 +525,13 @@ where
                             let db_is_cockroach = version.contains("CockroachDB");
 
                             // We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
-                            // if db_is_cockroach && !provider_is_cockroachdb  {
+                            if db_is_cockroach && !provider_is_cockroachdb  {
+                                circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
+
                             //     let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
 
                             //     return Err(ConnectorError::from_msg(msg.to_owned()));
+                            }
 
                             if !db_is_cockroach && provider_is_cockroachdb {
                                 let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
