@@ -11,7 +11,7 @@ model User {
   id        Int      @id
   createdAt DateTime
   email     String   @unique
-  name      String?
+  name      String?  @map("NAME")
   posts     Post[]   @relation("author")
   profile   Profile?
 

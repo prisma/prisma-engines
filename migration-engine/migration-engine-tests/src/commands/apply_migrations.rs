@@ -1,5 +1,8 @@
 use migration_core::{
-    commands::apply_migrations, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
+    commands::apply_migrations,
+    json_rpc::types::*,
+    migration_connector::{MigrationConnector, Namespaces},
+    CoreError, CoreResult,
 };
 use tempfile::TempDir;
 
@@ -7,13 +10,21 @@ use tempfile::TempDir;
 pub struct ApplyMigrations<'a> {
     api: &'a mut dyn MigrationConnector,
     migrations_directory: &'a TempDir,
+    namespaces: Option<Namespaces>,
 }
 
 impl<'a> ApplyMigrations<'a> {
-    pub fn new(api: &'a mut dyn MigrationConnector, migrations_directory: &'a TempDir) -> Self {
+    pub fn new(
+        api: &'a mut dyn MigrationConnector,
+        migrations_directory: &'a TempDir,
+        mut namespaces: Vec<String>,
+    ) -> Self {
+        let namespaces = Namespaces::from_vec(&mut namespaces);
+
         ApplyMigrations {
             api,
             migrations_directory,
+            namespaces,
         }
     }
 
@@ -23,6 +34,7 @@ impl<'a> ApplyMigrations<'a> {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             },
             self.api,
+            self.namespaces,
         )
         .await?;
 

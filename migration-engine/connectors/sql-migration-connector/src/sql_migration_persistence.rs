@@ -1,6 +1,7 @@
 use crate::SqlMigrationConnector;
 use migration_connector::{
-    BoxFuture, ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, PersistenceNotInitializedError,
+    BoxFuture, ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, Namespaces,
+    PersistenceNotInitializedError,
 };
 use quaint::ast::*;
 use uuid::Uuid;
@@ -10,10 +11,9 @@ impl MigrationPersistence for SqlMigrationConnector {
         self.flavour.create_migrations_table()
     }
 
-    fn initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn initialize(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            // TODO(MultiSchema): We may need to change this too.
-            let schema = self.flavour.describe_schema(None).await?;
+            let schema = self.flavour.describe_schema(namespaces).await?;
 
             if schema
                 .table_walkers()

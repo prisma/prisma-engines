@@ -1,7 +1,7 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationConnector, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, MigrationConnector, MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use std::{path::Path, time::Instant};
 use tracing::Instrument;
@@ -10,14 +10,14 @@ use user_facing_errors::migration_engine::FoundFailedMigrations;
 pub async fn apply_migrations(
     input: ApplyMigrationsInput,
     connector: &mut dyn MigrationConnector,
+    namespaces: Option<Namespaces>,
 ) -> CoreResult<ApplyMigrationsOutput> {
     let start = Instant::now();
 
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     connector.acquire_lock().await?;
-
-    connector.migration_persistence().initialize().await?;
+    connector.migration_persistence().initialize(namespaces).await?;
 
     let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
     let migrations_from_database = connector

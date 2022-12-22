@@ -1,5 +1,6 @@
 #![deny(warnings)]
 #![allow(clippy::derive_partial_eq_without_eq)]
+#![allow(rustdoc::invalid_html_tags)]
 
 pub mod error;
 pub mod filter;

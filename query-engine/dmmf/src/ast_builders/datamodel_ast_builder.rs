@@ -2,7 +2,7 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use psl::dml::{self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType};
+use psl::dml::{self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName};
 
 pub fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -75,6 +75,7 @@ fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
             CompositeTypeFieldType::Scalar(_, _) => String::from("scalar"),
             CompositeTypeFieldType::Unsupported(_) => String::from("unsupported"),
         },
+        db_name: field.database_name.clone(),
         is_required: field.arity == dml::FieldArity::Required || field.arity == dml::FieldArity::List,
         is_list: field.arity == dml::FieldArity::List,
         is_id: false,
@@ -160,6 +161,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
 
     Field {
         name: field.name().to_string(),
+        db_name: field.database_name().map(|f| f.to_string()),
         kind: get_field_kind(field),
         is_required: *field.arity() == dml::FieldArity::Required || *field.arity() == dml::FieldArity::List,
         is_list: *field.arity() == dml::FieldArity::List,

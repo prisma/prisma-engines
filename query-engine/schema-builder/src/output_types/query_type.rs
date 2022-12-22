@@ -73,7 +73,7 @@ fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Opt
 
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, model, true);
+    let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
     let field_name = format!("findFirst{}", model.name);
 
     field(
@@ -91,7 +91,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 /// Builds a find first item field for given model that throws a NotFoundError in case the item does
 /// not exist
 fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, model, true);
+    let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
     let field_name = format!("findFirst{}OrThrow", model.name);
 
     field(
@@ -108,7 +108,7 @@ fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Outp
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::relation_selection_arguments(ctx, model, true);
+    let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
     let field_name = format!("findMany{}", model.name);
     let object_type = objects::model::map_type(ctx, model);
 
@@ -127,7 +127,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("aggregate{}", model.name),
-        arguments::relation_selection_arguments(ctx, model, false),
+        arguments::relation_to_many_selection_arguments(ctx, model, false),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(Arc::clone(model)),
