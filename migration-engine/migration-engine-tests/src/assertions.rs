@@ -207,7 +207,7 @@ impl SchemaAssertion {
     where
         F: for<'a> FnOnce(EnumAssertion<'a>) -> EnumAssertion<'a>,
     {
-        let r#enum = match self.schema.find_enum(enum_name) {
+        let r#enum = match self.schema.find_enum(enum_name, None) {
             Some(enm) => self.schema.walk(enm),
             None => {
                 self.print_context();
@@ -681,6 +681,7 @@ impl<'a> ColumnAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_type_is_enum(self) -> Self {
         let found = &self.column.column_type_family();
 

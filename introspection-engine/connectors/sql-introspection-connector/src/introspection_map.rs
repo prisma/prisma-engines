@@ -24,6 +24,7 @@ pub(crate) struct IntrospectionMap<'a> {
     pub(crate) relation_names: RelationNames<'a>,
     pub(crate) inline_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
     pub(crate) m2m_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
+    pub(crate) top_level_names: HashMap<&'a str, usize>,
 }
 
 impl<'a> IntrospectionMap<'a> {
@@ -40,8 +41,42 @@ impl<'a> IntrospectionMap<'a> {
         relation_names::introspect(input, &mut map);
         position_inline_relation_fields(sql_schema, &mut map);
         position_m2m_relation_fields(sql_schema, &mut map);
+        populate_top_level_names(sql_schema, prisma_schema, &mut map);
 
         map
+    }
+}
+
+fn populate_top_level_names<'a>(
+    sql_schema: &'a sql::SqlSchema,
+    prisma_schema: &'a psl::ValidatedSchema,
+    map: &mut IntrospectionMap<'a>,
+) {
+    for table in sql_schema
+        .table_walkers()
+        .filter(|t| !helpers::is_prisma_join_table(*t))
+    {
+        let name = map
+            .existing_models
+            .get(&table.id)
+            .map(|id| prisma_schema.db.walk(*id))
+            .map(|m| m.name())
+            .unwrap_or_else(|| table.name());
+
+        let count = map.top_level_names.entry(name).or_default();
+        *count += 1;
+    }
+
+    for r#enum in sql_schema.enum_walkers() {
+        let name = map
+            .existing_enums
+            .get(&r#enum.id)
+            .map(|id| prisma_schema.db.walk(*id))
+            .map(|m| m.name())
+            .unwrap_or_else(|| r#enum.name());
+
+        let count = map.top_level_names.entry(name).or_default();
+        *count += 1;
     }
 }
 
@@ -121,7 +156,7 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
             .walk_enums()
             .filter_map(|prisma_enum| {
                 sql_schema
-                    .find_enum(prisma_enum.database_name())
+                    .find_enum(prisma_enum.database_name(), prisma_enum.schema().map(|s| s.0))
                     .map(|sql_id| (sql_id, prisma_enum.id))
             })
             .collect()
@@ -132,7 +167,7 @@ fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema
 /// ones found in the database.
 fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
     for model in prisma_schema.db.walk_models() {
-        match schema.find_table(model.database_name()) {
+        match schema.find_table(model.database_name(), model.schema_name()) {
             Some(sql_id) => {
                 map.existing_models.insert(sql_id, model.id);
             }

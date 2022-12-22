@@ -88,15 +88,17 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
           schemas  = ["first", "second"]
         }
 
-        model A {
+        model first_A {
           id String @id
 
+          @@map("A")
           @@schema("first")
         }
 
-        model A {
+        model second_A {
           id String @id
 
+          @@map("A")
           @@schema("second")
         }
     "#]];
@@ -242,33 +244,37 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> T
           schemas  = ["first", "second"]
         }
 
-        model HappyPerson {
-          mood HappyMood @id
+        model first_HappyPerson {
+          mood first_HappyMood @id
 
+          @@map("HappyPerson")
           @@schema("first")
         }
 
-        model HappyPerson {
-          mood HappyMood @id
+        model second_HappyPerson {
+          mood first_HappyMood @id
 
+          @@map("HappyPerson")
           @@schema("second")
         }
 
         model VeryHappyPerson {
-          mood HappyMood @id
+          mood second_HappyMood @id
 
           @@schema("second")
         }
 
-        enum HappyMood {
+        enum first_HappyMood {
           happy
 
+          @@map("HappyMood")
           @@schema("first")
         }
 
-        enum HappyMood {
+        enum second_HappyMood {
           veryHappy
 
+          @@map("HappyMood")
           @@schema("second")
         }
     "#]];
@@ -304,18 +310,20 @@ async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResu
           schemas  = ["first", "second_schema"]
         }
 
-        model tbl {
-          id  BigInt @id @default(autoincrement())
-          tbl tbl[]
+        model first_tbl {
+          id  BigInt              @id @default(autoincrement())
+          tbl second_schema_tbl[]
 
+          @@map("tbl")
           @@schema("first")
         }
 
-        model tbl {
-          id  BigInt @id @default(autoincrement())
+        model second_schema_tbl {
+          id  BigInt     @id @default(autoincrement())
           fst Int?
-          tbl tbl?   @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          tbl first_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+          @@map("tbl")
           @@schema("second_schema")
         }
     "#]];

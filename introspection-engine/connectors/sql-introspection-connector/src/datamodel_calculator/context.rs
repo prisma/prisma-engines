@@ -94,12 +94,15 @@ impl<'a> InputContext<'a> {
     /// introspected schema. If it matches a remapped enum in the Prisma schema, it is taken into
     /// account.
     pub(crate) fn enum_prisma_name(self, id: sql::EnumId) -> ModelName<'a> {
-        self.existing_enum(id)
-            .map(|enm| ModelName::FromPsl {
-                name: enm.name(),
-                mapped_name: enm.mapped_name(),
-            })
-            .unwrap_or_else(|| ModelName::new_from_sql(self.schema.walk(id).name()))
+        if let Some(r#enum) = self.existing_enum(id) {
+            return ModelName::FromPsl {
+                name: r#enum.name(),
+                mapped_name: r#enum.mapped_name(),
+            };
+        }
+
+        let r#enum = self.schema.walk(id);
+        ModelName::new_from_sql(r#enum.name(), r#enum.namespace(), self)
     }
 
     /// Given a SQL enum variant from the database catalog, this method returns the name it will be
@@ -162,13 +165,23 @@ impl<'a> InputContext<'a> {
 
     // Use the existing model name when available.
     pub(crate) fn table_prisma_name(self, id: sql::TableId) -> crate::ModelName<'a> {
-        self.existing_model(id)
-            .map(|model| ModelName::FromPsl {
+        if let Some(model) = self.existing_model(id) {
+            return ModelName::FromPsl {
                 name: model.name(),
                 mapped_name: model.mapped_name(),
-            })
-            // Failing that, potentially sanitize the table name.
-            .unwrap_or_else(|| ModelName::new_from_sql(self.schema.walk(id).name()))
+            };
+        }
+
+        let table = self.schema.walk(id);
+        ModelName::new_from_sql(table.name(), table.namespace(), self)
+    }
+
+    pub(crate) fn name_is_unique(self, name: &'a str) -> bool {
+        self.introspection_map
+            .top_level_names
+            .get(name)
+            .map(|val| *val <= 1)
+            .unwrap_or(true)
     }
 
     pub(crate) fn forward_inline_relation_field_prisma_name(self, id: sql::ForeignKeyId) -> &'a str {

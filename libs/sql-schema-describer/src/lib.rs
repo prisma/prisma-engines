@@ -118,15 +118,29 @@ impl SqlSchema {
     }
 
     /// Try to find an enum by name.
-    pub fn find_enum(&self, name: &str) -> Option<EnumId> {
-        self.enums.iter().position(|e| e.name == name).map(|i| EnumId(i as u32))
+    pub fn find_enum(&self, name: &str, namespace: Option<&str>) -> Option<EnumId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.enums
+            .iter()
+            .position(|e| e.name == name && ns_id.map(|id| id == e.namespace_id).unwrap_or(true))
+            .map(|i| EnumId(i as u32))
+    }
+
+    fn get_namespace(&self, name: &str) -> Option<NamespaceId> {
+        self.namespaces
+            .iter()
+            .position(|ns| ns == name)
+            .map(|i| NamespaceId(i as u32))
     }
 
     /// Try to find a table by name.
-    pub fn find_table(&self, name: &str) -> Option<TableId> {
+    pub fn find_table(&self, name: &str, namespace: Option<&str>) -> Option<TableId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
         self.tables
             .iter()
-            .position(|t| t.name == name)
+            .position(|t| t.name == name && ns_id.map(|id| id == t.namespace_id).unwrap_or(true))
             .map(|i| TableId(i as u32))
     }
 
