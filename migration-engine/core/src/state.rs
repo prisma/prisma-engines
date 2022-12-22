@@ -192,8 +192,12 @@ impl GenericApi for EngineState {
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
+        let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(commands::apply_migrations(input, connector).instrument(tracing::info_span!("ApplyMigrations")))
+            Box::pin(
+                commands::apply_migrations(input, connector, namespaces)
+                    .instrument(tracing::info_span!("ApplyMigrations")),
+            )
         }))
         .await
     }

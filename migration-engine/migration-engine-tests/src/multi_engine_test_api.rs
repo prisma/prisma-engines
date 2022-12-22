@@ -202,6 +202,7 @@ impl TestApi {
             connector,
             connection_info,
             tags: self.args.tags(),
+            namespaces: self.args.namespaces(),
         }
     }
 
@@ -265,12 +266,19 @@ pub struct EngineTestApi {
     pub(crate) connector: SqlMigrationConnector,
     connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
+    namespaces: &'static [&'static str],
 }
 
 impl EngineTestApi {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&mut self.connector, migrations_directory)
+        let mut namespaces = vec![self.connection_info.schema_name().to_string()];
+
+        for namespace in self.namespaces {
+            namespaces.push(namespace.to_string());
+        }
+
+        ApplyMigrations::new(&mut self.connector, migrations_directory, namespaces)
     }
 
     /// Plan a `createMigration` command

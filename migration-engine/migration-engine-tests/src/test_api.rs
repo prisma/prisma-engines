@@ -64,7 +64,14 @@ impl TestApi {
 
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&mut self.connector, migrations_directory)
+        let search_path = self.root.admin_conn.connection_info().schema_name();
+        let mut namespaces = vec![search_path.to_string()];
+
+        for namespace in self.root.args.namespaces() {
+            namespaces.push(namespace.to_string());
+        }
+
+        ApplyMigrations::new(&mut self.connector, migrations_directory, namespaces)
     }
 
     pub fn connection_string(&self) -> &str {
@@ -339,7 +346,7 @@ impl TestApi {
         .unwrap()
     }
 
-    fn generator_block(&self) -> String {
+    pub fn generator_block(&self) -> String {
         let preview_feature_string = if self.root.preview_features().is_empty() {
             "".to_string()
         } else {
