@@ -83,11 +83,11 @@ pub(super) fn add_schema_block_attribute_enum<'a>(
             None => return,
         };
 
-    let diagnostics =
-        match super::filter_diagnostics(span_diagnostics, "This model is missing an `@@schema` attribute.") {
-            Some(value) => value,
-            None => return,
-        };
+    let diagnostics = match super::filter_diagnostics(span_diagnostics, "This enum is missing an `@@schema` attribute.")
+    {
+        Some(value) => value,
+        None => return,
+    };
 
     let edit = super::create_schema_attribute_edit(
         schema,
