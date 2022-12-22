@@ -94,7 +94,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
         enable_open_telemetry: false,
         open_telemetry_endpoint: String::new(),
-        enable_logs_in_response: false,
+        enable_telemetry_in_response: false,
         dataproxy_metric_override: false,
     };
 

@@ -58,7 +58,7 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
     logger.enable_metrics(metrics.clone());
 
-    let trace_capturer = logger.enable_trace_capturer(opts.enable_logs_in_response);
+    let trace_capturer = logger.enable_trace_capturer(opts.enable_telemetry_in_response);
 
     if install_logger {
         logger.install().unwrap();
