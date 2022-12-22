@@ -1,4 +1,4 @@
-use crate::{capture_tracer::CaptureExporter, PrismaError, PrismaResult};
+use crate::{telemetry_capturing::CaptureExporter, PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};
