@@ -23,7 +23,7 @@ impl RunnerInterface for BinaryRunner {
         let opts = PrismaOpt::from_list(&[
             "binary",
             "--enable-raw-queries",
-            "--enable-traces-in-response",
+            "--enable-telemetry-in-response",
             "--datamodel",
             &datamodel,
         ]);
