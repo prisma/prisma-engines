@@ -1,3 +1,5 @@
+mod models;
+
 use async_trait::async_trait;
 use opentelemetry::{
     global,
@@ -8,7 +10,6 @@ use opentelemetry::{
     },
     trace::{TraceId, TracerProvider},
 };
-use query_core::UserFacingSpan;
 use std::{collections::HashMap, sync::Arc};
 use std::{fmt::Debug, time::Duration};
 use tokio::sync::Mutex;
@@ -40,7 +41,7 @@ impl ConfiguredCapturer {
             .await
     }
 
-    pub async fn fetch_captures(&self) -> Vec<UserFacingSpan> {
+    pub async fn fetch_captures(&self) -> Vec<models::ExportedSpan> {
         self.capturer.fetch_captures(self.trace_id).await
     }
 }
@@ -95,7 +96,7 @@ impl PipelineBuilder {
 /// later retrieval
 #[derive(Debug, Clone)]
 pub struct CaptureExporter {
-    pub(crate) traces: Arc<Mutex<HashMap<TraceId, Vec<UserFacingSpan>>>>,
+    pub(crate) traces: Arc<Mutex<HashMap<TraceId, Vec<models::ExportedSpan>>>>,
 }
 
 pub(crate) enum CaptureTimeout {
@@ -133,7 +134,7 @@ impl CaptureExporter {
         });
     }
 
-    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Vec<UserFacingSpan> {
+    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Vec<models::ExportedSpan> {
         let mut traces = self.traces.lock().await;
 
         if let Some(spans) = traces.remove(&trace_id) {
@@ -158,7 +159,7 @@ impl SpanExporter for CaptureExporter {
             let trace_id = span.span_context.trace_id();
 
             if let Some(spans) = traces.get_mut(&trace_id) {
-                spans.push(UserFacingSpan::from(&span))
+                spans.push(models::ExportedSpan::from(span))
             }
         }
 
