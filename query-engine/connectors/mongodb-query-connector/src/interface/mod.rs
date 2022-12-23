@@ -1,5 +1,6 @@
 mod connection;
 mod transaction;
+mod utils;
 
 pub use connection::*;
 pub use transaction::*;

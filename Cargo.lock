@@ -3255,6 +3255,7 @@ dependencies = [
  "base64 0.13.1",
  "chrono",
  "colored",
+ "futures",
  "indoc",
  "insta",
  "once_cell",

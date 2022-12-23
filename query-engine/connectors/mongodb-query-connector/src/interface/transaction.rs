@@ -42,9 +42,8 @@ impl<'conn> MongoDbTransaction<'conn> {
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
-        self.connection
-            .session
-            .commit_transaction()
+
+        utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
@@ -53,6 +52,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
+
         self.connection
             .session
             .abort_transaction()
@@ -64,6 +64,10 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
 
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
+    }
+
+    fn should_retry_on_transient_transaction(&self) -> bool {
+        true
     }
 }
 

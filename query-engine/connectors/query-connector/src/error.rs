@@ -230,6 +230,10 @@ pub enum ErrorKind {
     #[error("Transaction write conflict")]
     TransactionWriteConflict,
 
+    // Internal error - Should be handled by the query execution layer.
+    #[error("Transient transaction error.")]
+    TransientTransaction,
+
     #[error("ROLLBACK statement has no corresponding BEGIN statement")]
     RollbackWithoutBegin,
 

@@ -2,7 +2,7 @@ use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
 use mongodb::{
     bson::{self, extjson},
-    error::{CommandError, Error as DriverError},
+    error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
 use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
@@ -119,6 +119,9 @@ impl MongoError {
             }
 
             MongoError::DriverError(err) => match err.kind.as_ref() {
+                _ if err.contains_label(TRANSIENT_TRANSACTION_ERROR) => {
+                    ConnectorError::from_kind(ErrorKind::TransientTransaction)
+                }
                 mongodb::error::ErrorKind::InvalidArgument { .. } => {
                     ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone())))
                 }

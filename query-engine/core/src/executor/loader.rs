@@ -166,7 +166,7 @@ fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecu
 where
     T: Connector + Send + Sync + 'static,
 {
-    Box::new(InterpretingExecutor::new(connector, force_transactions))
+    Box::new(InterpretingExecutor::new(connector, force_transactions, false))
 }
 
 #[cfg(feature = "mongodb")]
@@ -181,5 +181,8 @@ async fn mongodb(
     let db_name = db_name(source, url)?;
 
     trace!("Loaded MongoDB query connector.");
-    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
+    Ok((
+        db_name.to_owned(),
+        Box::new(InterpretingExecutor::new(mongo, false, true)),
+    ))
 }
