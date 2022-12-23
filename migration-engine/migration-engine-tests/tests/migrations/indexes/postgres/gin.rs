@@ -64,6 +64,31 @@ fn gin_array_ops(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+fn gin_array_default_ops(api: TestApi) {
+    let dm = r#"
+        model A {
+          id   Int      @id @default(autoincrement())
+          data String[] @db.Uuid
+
+          @@index([data], type: Gin)
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_has_column("data")
+            .assert_index_on_columns(&["data"], |idx| {
+                idx.assert_algorithm(SqlIndexAlgorithm::Gin)
+                    .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::ArrayOps))
+            })
+    });
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
 fn gin_array_ops_default(api: TestApi) {
     let dm = r#"
         model A {

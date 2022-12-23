@@ -5,7 +5,7 @@ use crate::{
     datamodel_calculator::{InputContext, OutputContext},
     introspection_helpers as helpers,
     pair::{IdPair, ModelPair},
-    warnings,
+    warnings::{self, Warnings},
 };
 use datamodel_renderer::datamodel as renderer;
 
@@ -16,7 +16,10 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
     let mut models_with_idx: Vec<(Option<_>, renderer::Model<'a>)> = Vec::with_capacity(input.schema.tables_count());
 
     for model in input.model_pairs() {
-        models_with_idx.push((model.previous_position(), render_model(model, input, output)));
+        models_with_idx.push((
+            model.previous_position(),
+            render_model(model, input, &mut output.warnings),
+        ));
     }
 
     models_with_idx.sort_by(|(a, _), (b, _)| helpers::compare_options_none_last(*a, *b));
@@ -27,11 +30,7 @@ pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>
 }
 
 /// Render a single model.
-fn render_model<'a>(
-    model: ModelPair<'a>,
-    input: InputContext<'a>,
-    output: &mut OutputContext<'a>,
-) -> renderer::Model<'a> {
+fn render_model<'a>(model: ModelPair<'a>, input: InputContext<'a>, warnings: &mut Warnings) -> renderer::Model<'a> {
     let mut rendered = renderer::Model::new(model.name());
 
     if let Some(docs) = model.documentation() {
@@ -61,14 +60,14 @@ fn render_model<'a>(
     }
 
     if let Some(id) = model.id() {
-        rendered.id(render_id(model, id, output));
+        rendered.id(render_id(model, id, warnings));
     }
 
     if model.scalar_fields().len() == 0 {
         rendered.documentation(empty_table_comment(input));
         rendered.comment_out();
 
-        output.warnings.models_without_columns.push(warnings::Model {
+        warnings.models_without_columns.push(warnings::Model {
             model: model.name().to_string(),
         });
     } else if !model.has_usable_identifier() {
@@ -76,23 +75,30 @@ fn render_model<'a>(
 
         rendered.documentation(docs);
 
-        output.warnings.models_without_identifiers.push(warnings::Model {
+        warnings.models_without_identifiers.push(warnings::Model {
             model: model.name().to_string(),
         });
     }
 
+    if model.uses_duplicate_name() {
+        warnings.duplicate_names.push(warnings::TopLevelItem {
+            r#type: warnings::TopLevelType::Model,
+            name: model.name().to_string(),
+        })
+    }
+
     if model.remapped_name() {
-        output.warnings.remapped_models.push(warnings::Model {
+        warnings.remapped_models.push(warnings::Model {
             model: model.name().to_string(),
         });
     }
 
     for field in model.scalar_fields() {
-        rendered.push_field(scalar_field::render(field, output));
+        rendered.push_field(scalar_field::render(field, warnings));
     }
 
     for field in model.relation_fields() {
-        rendered.push_field(relation_field::render(field, output));
+        rendered.push_field(relation_field::render(field, warnings));
     }
 
     indexes::render(model, &mut rendered);
@@ -101,7 +107,7 @@ fn render_model<'a>(
 }
 
 /// Render a model level `@@id` definition.
-fn render_id<'a>(model: ModelPair<'a>, id: IdPair<'a>, output: &mut OutputContext) -> renderer::IdDefinition<'a> {
+fn render_id<'a>(model: ModelPair<'a>, id: IdPair<'a>, warnings: &mut Warnings) -> renderer::IdDefinition<'a> {
     let fields = id.fields().map(|field| {
         let mut rendered = renderer::IndexFieldInput::new(field.name());
 
@@ -121,7 +127,7 @@ fn render_id<'a>(model: ModelPair<'a>, id: IdPair<'a>, output: &mut OutputContex
     if let Some(name) = id.name() {
         definition.name(name);
 
-        output.warnings.reintrospected_id_names.push(warnings::Model {
+        warnings.reintrospected_id_names.push(warnings::Model {
             model: model.name().to_string(),
         });
     }

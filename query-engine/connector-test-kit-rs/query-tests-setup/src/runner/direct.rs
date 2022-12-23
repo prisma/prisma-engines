@@ -1,4 +1,5 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
+use colored::Colorize;
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
@@ -36,6 +37,8 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn query(&self, query: String) -> TestResult<crate::QueryResult> {
+        println!("{}", query.bright_green());
+
         let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
         let query = GraphQlBody::Single(query.into());
 

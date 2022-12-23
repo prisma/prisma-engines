@@ -1,15 +1,15 @@
 //! Rendering of model scalar fields.
 
 use crate::{
-    datamodel_calculator::OutputContext,
     pair::{IdPair, IndexPair, ScalarFieldPair},
     rendering::defaults,
+    warnings::Warnings,
 };
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer::ColumnArity;
 
 /// Render a scalar field to be added in a model.
-pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<'a>) -> renderer::ModelField<'a> {
+pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> renderer::ModelField<'a> {
     let mut rendered = renderer::ModelField::new(field.name(), field.prisma_type());
 
     match field.arity() {
@@ -34,7 +34,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
         rendered.documentation(docs);
     }
 
-    if let Some(default) = defaults::render(field, output) {
+    if let Some(default) = defaults::render(field, warnings) {
         rendered.default(default);
     }
 
@@ -60,7 +60,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
             field: field.name().to_string(),
         };
 
-        output.warnings.remapped_fields.push(mf);
+        warnings.remapped_fields.push(mf);
     }
 
     if field.is_unsupported() {
@@ -70,7 +70,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
             tpe: field.prisma_type().to_string(),
         };
 
-        output.warnings.unsupported_types.push(mf)
+        warnings.unsupported_types.push(mf)
     }
 
     if field.remapped_name_empty() {
@@ -83,7 +83,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, output: &mut OutputContext<
             field: field.name().to_string(),
         };
 
-        output.warnings.fields_with_empty_names.push(mf);
+        warnings.fields_with_empty_names.push(mf);
     }
 
     rendered

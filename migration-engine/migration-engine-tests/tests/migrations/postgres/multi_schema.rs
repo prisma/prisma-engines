@@ -4,6 +4,43 @@ use crate::migrations::multi_schema::*;
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
+#[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "prisma-tests"))]
+fn apply_migrations_with_multiple_schemas_where_one_is_search_path_with_a_foreign_key(api: TestApi) {
+    let datasource = api.datasource_block_with(&[("schemas", r#"["one", "prisma-tests"]"#)]);
+    let generator = api.generator_block();
+
+    let dm = indoc::formatdoc! {r#"
+        {datasource}
+
+        {generator}
+
+        model A {{
+           id Int @id
+           bs B[]
+
+           @@schema("one")
+        }}
+
+        model B {{
+           id  Int  @id
+           aId Int
+           a   A    @relation(fields: [aId], references: [id])
+
+           @@schema("prisma-tests")
+        }}
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("init", &dm, &dir).send_sync();
+
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
+
+    api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
+}
+
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
 // If you want to look at the tests, see the `tests` variable below.
 #[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "two"))]

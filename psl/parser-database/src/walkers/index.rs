@@ -231,6 +231,14 @@ impl<'db> IndexFieldWalker<'db> {
         }
     }
 
+    /// Is the field a list?
+    pub fn is_list(self) -> bool {
+        match self.inner {
+            InnerIndexFieldWalker::Scalar(sf) => sf.is_list(),
+            InnerIndexFieldWalker::Composite(cf) => cf.arity().is_list(),
+        }
+    }
+
     /// Is the type of the field `Unsupported("...")`?
     pub fn is_unsupported(self) -> bool {
         match self.inner {

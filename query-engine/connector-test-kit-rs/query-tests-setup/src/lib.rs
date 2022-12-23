@@ -162,7 +162,7 @@ fn run_relation_link_test_impl(
 
         run_with_tokio(
             async move {
-                tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                println!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
                 let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)

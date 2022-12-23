@@ -75,6 +75,30 @@ async fn array_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn array_ops_with_native_type(api: &TestApi) -> TestResult {
+    let schema_name = api.schema_name();
+    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int[] not null)",);
+    let create_idx = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING GIN (data);",);
+
+    api.database().raw_cmd(&create_table).await?;
+    api.database().raw_cmd(&create_idx).await?;
+
+    let expected = expect![[r#"
+        model A {
+          id   Int   @id @default(autoincrement())
+          data Int[]
+
+          @@index([data], type: Gin)
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn jsonb_ops(api: &TestApi) -> TestResult {
     let schema_name = api.schema_name();
 

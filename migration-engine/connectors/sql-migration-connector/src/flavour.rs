@@ -19,7 +19,7 @@ use crate::{
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError,
+    IntrospectionContext, MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
@@ -162,6 +162,15 @@ pub(crate) trait SqlFlavour:
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+
+    /// Same as [describe_schema], but only called for introspection.
+    fn introspect<'a>(
+        &'a mut self,
+        namespaces: Option<Namespaces>,
+        _ctx: &'a IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+        self.describe_schema(namespaces)
+    }
 
     fn load_migrations_table(
         &mut self,

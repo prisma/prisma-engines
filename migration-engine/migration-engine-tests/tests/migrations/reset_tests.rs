@@ -121,12 +121,10 @@ fn multi_schema_reset(mut api: TestApi) {
             }}
         "#, api.datasource_block_with(&[("schemas", r#"["felines", "rodents"]"#)])
     };
-    api.schema_push(&prisma_schema)
-        .send()
-        .assert_green()
-        .assert_has_executed_steps();
 
     let migrations_dir = api.create_migrations_directory();
+    api.create_migration("0-init", &prisma_schema, &migrations_dir)
+        .send_sync();
     api.apply_migrations(&migrations_dir).send_sync();
     api.raw_cmd("CREATE TABLE randomTable (id INTEGER PRIMARY KEY);");
 

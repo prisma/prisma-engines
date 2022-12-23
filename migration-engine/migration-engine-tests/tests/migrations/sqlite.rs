@@ -190,3 +190,28 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
         }"#]];
     expected_json.assert_eq(&serde_json::to_string_pretty(&res).unwrap())
 }
+
+#[test]
+fn introspecting_a_non_existing_db_fails() {
+    test_setup::only!(Sqlite);
+
+    let dm = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:/tmp/definitelies-does-not-exist.sqlite"
+        }
+    "#;
+
+    let api = migration_core::migration_api(None, None).unwrap();
+    let err = tok(api.introspect(migration_core::json_rpc::types::IntrospectParams {
+        composite_type_depth: -1,
+        force: false,
+        schema: dm.to_owned(),
+    }))
+    .unwrap_err();
+
+    let expected = expect![[r#"
+        Database definitelies-does-not-exist.sqlite does not exist at /tmp/definitelies-does-not-exist.sqlite
+    "#]];
+    expected.assert_eq(&err.to_string());
+}

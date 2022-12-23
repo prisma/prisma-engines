@@ -356,14 +356,14 @@ fn introspect_e2e() {
     let schema = r#"
         datasource db {
             provider = "sqlite"
-            url = env("TEST_DB_URL")
+            url = env("TEST_DATABASE_URL")
         }
 
     "#;
+    std::fs::File::create(tmpdir.path().join("dev.db")).unwrap();
     let mut process = Command::new(migration_engine_bin_path())
-        .env("RUST_LOG", "INFO")
         .env(
-            "TEST_DB_URL",
+            "TEST_DATABASE_URL",
             format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
         )
         .stdin(std::process::Stdio::piped())
@@ -374,24 +374,22 @@ fn introspect_e2e() {
     let stdin = process.stdin.as_mut().unwrap();
     let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
 
-    for iteration in 0..2 {
-        let msg = serde_json::to_string(&serde_json::json!({
-            "jsonrpc": "2.0",
-            "method": "introspect",
-            "id": iteration,
-            "params": {
-                "schema": schema,
-                "force": true,
-                "compositeTypeDepth": 5,
-            }
-        }))
-        .unwrap();
-        stdin.write_all(msg.as_bytes()).unwrap();
-        stdin.write_all(b"\n").unwrap();
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "introspect",
+        "id": 1,
+        "params": {
+            "schema": schema,
+            "force": true,
+            "compositeTypeDepth": 5,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
 
-        let mut response = String::new();
-        stdout.read_line(&mut response).unwrap();
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
 
-        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DB_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
-    }
+    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
 }

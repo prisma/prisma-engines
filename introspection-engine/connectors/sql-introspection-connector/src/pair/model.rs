@@ -125,6 +125,12 @@ impl<'a> ModelPair<'a> {
             })
     }
 
+    /// True, if the model uses the same name as another top-level item from
+    /// a different namespace.
+    pub(crate) fn uses_duplicate_name(self) -> bool {
+        self.previous.is_none() && !self.context.name_is_unique(self.next.name())
+    }
+
     /// If the model is marked as ignored. Can happen either if user
     /// explicitly sets the model attribute, or if the model has no
     /// usable identifiers.

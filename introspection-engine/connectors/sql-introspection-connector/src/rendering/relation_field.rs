@@ -1,10 +1,10 @@
 //! Rendering of relation fields.
 
-use crate::{datamodel_calculator::OutputContext, pair::RelationFieldPair};
+use crate::{pair::RelationFieldPair, warnings::Warnings};
 use datamodel_renderer::datamodel as renderer;
 
 /// Render a relation field to be added in a model.
-pub(super) fn render<'a>(field: RelationFieldPair<'a>, output: &mut OutputContext<'a>) -> renderer::ModelField<'a> {
+pub(super) fn render<'a>(field: RelationFieldPair<'a>, warnings: &mut Warnings) -> renderer::ModelField<'a> {
     let mut rendered = renderer::ModelField::new(field.field_name(), field.prisma_type());
 
     if field.is_optional() {
@@ -48,7 +48,7 @@ pub(super) fn render<'a>(field: RelationFieldPair<'a>, output: &mut OutputContex
     }
 
     if field.reintrospected_relation() {
-        output.warnings.reintrospected_relations.push(crate::warnings::Model {
+        warnings.reintrospected_relations.push(crate::warnings::Model {
             model: field.prisma_type().into_owned(),
         });
     }
