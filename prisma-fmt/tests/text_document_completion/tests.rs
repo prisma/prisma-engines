@@ -36,4 +36,8 @@ scenarios! {
     referential_actions_middle_of_args_list
     referential_actions_mssql
     referential_actions_with_trailing_comma
+    source_schemas_postgres
+    source_schemas_mongodb
+    source_schemas_no_preview
+    source_schemas_already_defined
 }

@@ -107,9 +107,17 @@ impl std::ops::Index<EnumId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GeneratorId(u32);
 
-/// An opaque identifier for a datasource blèck in a schema AST.
+/// An opaque identifier for a datasource block in a schema AST.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SourceId(u32);
+
+impl std::ops::Index<SourceId> for SchemaAst {
+    type Output = SourceConfig;
+
+    fn index(&self, index: SourceId) -> &Self::Output {
+        self.tops[index.0 as usize].as_source().unwrap()
+    }
+}
 
 /// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`
 /// syntax to resolve the id to an `ast::Top`.

@@ -1,0 +1,11 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "schemas",
+      "kind": 10,
+      "documentation": "The list of database schemas.",
+      "insertText": "schemas = []"
+    }
+  ]
+}
