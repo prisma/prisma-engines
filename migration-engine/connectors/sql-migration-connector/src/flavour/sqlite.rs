@@ -241,23 +241,29 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.query_raw(sql, params)))
     }
 
-    fn pre_introspect_hook(&self) -> ConnectorResult<()> {
-        if let Some(params) = self.state.params() {
-            let path = std::path::Path::new(&params.file_path);
-            if std::fs::metadata(path).is_err() {
-                return Err(ConnectorError::user_facing(
-                    user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                        database_file_name: path
-                            .file_name()
-                            .map(|name| name.to_string_lossy().into_owned())
-                            .unwrap_or_default(),
-                        database_file_path: params.file_path.clone(),
-                    },
-                ));
+    fn introspect(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        _ctx: &migration_connector::IntrospectionContext,
+    ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+        Box::pin(async move {
+            if let Some(params) = self.state.params() {
+                let path = std::path::Path::new(&params.file_path);
+                if std::fs::metadata(path).is_err() {
+                    return Err(ConnectorError::user_facing(
+                        user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                            database_file_name: path
+                                .file_name()
+                                .map(|name| name.to_string_lossy().into_owned())
+                                .unwrap_or_default(),
+                            database_file_path: params.file_path.clone(),
+                        },
+                    ));
+                }
             }
-        }
 
-        Ok(())
+            self.describe_schema(namespaces).await
+        })
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
