@@ -6,7 +6,10 @@ use crate::{datamodel_calculator::InputContext, introspection_helpers as helpers
 use psl::parser_database::{self, ast};
 use relation_names::RelationNames;
 use sql_schema_describer as sql;
-use std::collections::{HashMap, HashSet};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+};
 
 pub(crate) use relation_names::RelationName;
 
@@ -24,7 +27,7 @@ pub(crate) struct IntrospectionMap<'a> {
     pub(crate) relation_names: RelationNames<'a>,
     pub(crate) inline_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
     pub(crate) m2m_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
-    pub(crate) top_level_names: HashMap<&'a str, usize>,
+    pub(crate) top_level_names: HashMap<Cow<'a, str>, usize>,
 }
 
 impl<'a> IntrospectionMap<'a> {
@@ -60,8 +63,8 @@ fn populate_top_level_names<'a>(
             .existing_models
             .get(&table.id)
             .map(|id| prisma_schema.db.walk(*id))
-            .map(|m| m.name())
-            .unwrap_or_else(|| table.name());
+            .map(|m| Cow::Borrowed(m.name()))
+            .unwrap_or_else(|| crate::sanitize_datamodel_names::sanitize_string(table.name()));
 
         let count = map.top_level_names.entry(name).or_default();
         *count += 1;
@@ -72,8 +75,8 @@ fn populate_top_level_names<'a>(
             .existing_enums
             .get(&r#enum.id)
             .map(|id| prisma_schema.db.walk(*id))
-            .map(|m| m.name())
-            .unwrap_or_else(|| r#enum.name());
+            .map(|m| Cow::Borrowed(m.name()))
+            .unwrap_or_else(|| crate::sanitize_datamodel_names::sanitize_string(r#enum.name()));
 
         let count = map.top_level_names.entry(name).or_default();
         *count += 1;

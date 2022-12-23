@@ -177,9 +177,11 @@ impl<'a> InputContext<'a> {
     }
 
     pub(crate) fn name_is_unique(self, name: &'a str) -> bool {
+        let name = crate::sanitize_datamodel_names::sanitize_string(name);
+
         self.introspection_map
             .top_level_names
-            .get(name)
+            .get(&name)
             .map(|val| *val <= 1)
             .unwrap_or(true)
     }

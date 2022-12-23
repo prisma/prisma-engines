@@ -215,6 +215,78 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
     Ok(())
 }
 
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("1first", "2second")
+)]
+async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "1first";
+    let other_name = "2second";
+    let setup = formatdoc! {
+        r#"
+             CREATE SCHEMA "{schema_name}";
+             CREATE TABLE "{schema_name}"."2A" (id TEXT PRIMARY KEY);
+
+             CREATE SCHEMA "{other_name}";
+             CREATE TABLE "{other_name}"."1A" (id TEXT PRIMARY KEY);
+         "#
+    };
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["1first", "2second"]
+        }
+
+        model first_2A {
+          id String @id
+
+          @@map("2A")
+          @@schema("1first")
+        }
+
+        model second_1A {
+          id String @id
+
+          @@map("1A")
+          @@schema("2second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 20,
+            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "affected": [
+              {
+                "type": "Model",
+                "name": "first_2A"
+              },
+              {
+                "type": "Model",
+                "name": "second_1A"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
 #[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("first", "second"))]
 async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> TestResult {
     let schema_name = "first";
