@@ -80,6 +80,13 @@ fn render_model<'a>(model: ModelPair<'a>, input: InputContext<'a>, warnings: &mu
         });
     }
 
+    if model.uses_duplicate_name() {
+        warnings.duplicate_names.push(warnings::TopLevelItem {
+            r#type: warnings::TopLevelType::Model,
+            name: model.name().to_string(),
+        })
+    }
+
     if model.remapped_name() {
         warnings.remapped_models.push(warnings::Model {
             model: model.name().to_string(),

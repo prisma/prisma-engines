@@ -44,6 +44,12 @@ impl<'a> EnumPair<'a> {
         self.previous.map(|e| e.id)
     }
 
+    /// True, if enum uses the same name as another top-level item from
+    /// a different namespace.
+    pub(crate) fn uses_duplicate_name(self) -> bool {
+        self.previous.is_none() && !self.context.name_is_unique(self.next.name())
+    }
+
     /// Iterates all of the variants that are part of the enum.
     pub(crate) fn variants(self) -> impl ExactSizeIterator<Item = EnumVariantPair<'a>> + 'a {
         self.next.variants().map(move |next| {

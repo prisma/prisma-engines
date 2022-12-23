@@ -35,6 +35,8 @@ pub(crate) struct Warnings {
     /// The relation is copied from a previous data model, only if
     /// `relationMode` is `prisma`.
     pub(crate) reintrospected_relations: Vec<Model>,
+    /// The name of these models or enums was a dupe in the PSL.
+    pub(crate) duplicate_names: Vec<TopLevelItem>,
 }
 
 impl Warnings {
@@ -120,6 +122,12 @@ impl Warnings {
             &mut self.warnings,
         );
 
+        maybe_warn(
+            &self.duplicate_names,
+            warning_top_level_item_name_is_a_dupe,
+            &mut self.warnings,
+        );
+
         std::mem::take(&mut self.warnings)
     }
 }
@@ -163,6 +171,18 @@ pub(crate) struct ModelAndFieldAndType {
 pub(crate) struct EnumAndValue {
     pub(crate) enm: String,
     pub(crate) value: String,
+}
+
+#[derive(Serialize, Debug, Clone, Copy)]
+pub(crate) enum TopLevelType {
+    Model,
+    Enum,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct TopLevelItem {
+    pub(crate) r#type: TopLevelType,
+    pub(crate) name: String,
 }
 
 pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
@@ -275,6 +295,25 @@ pub(crate) fn warning_relations_added_from_the_previous_data_model(affected: &[M
     Warning {
         code: 19,
         message: "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_top_level_item_name_is_a_dupe(affected: &[TopLevelItem]) -> Warning {
+    let has_enums = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Enum));
+    let has_models = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Model));
+
+    let message = if has_models && has_enums {
+        "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else if has_models {
+        "These models were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else {
+        "These enums were renamed due to their names being duplicates in the Prisma Schema Language."
+    };
+
+    Warning {
+        code: 20,
+        message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }
