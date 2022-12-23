@@ -175,20 +175,115 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
           schemas  = ["first", "second"]
         }
 
-        model A {
+        model first_A {
           id String @id
 
+          @@map("A")
           @@schema("first")
         }
 
-        model A {
+        model second_A {
           id String @id
 
+          @@map("A")
           @@schema("second")
         }
     "#]];
 
     api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 20,
+            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "affected": [
+              {
+                "type": "Model",
+                "name": "first_A"
+              },
+              {
+                "type": "Model",
+                "name": "second_A"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("1first", "2second")
+)]
+async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api: &TestApi) -> TestResult {
+    let schema_name = "1first";
+    let other_name = "2second";
+    let setup = formatdoc! {
+        r#"
+             CREATE SCHEMA "{schema_name}";
+             CREATE TABLE "{schema_name}"."2A" (id TEXT PRIMARY KEY);
+
+             CREATE SCHEMA "{other_name}";
+             CREATE TABLE "{other_name}"."1A" (id TEXT PRIMARY KEY);
+         "#
+    };
+    api.raw_cmd(&setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["1first", "2second"]
+        }
+
+        model first_2A {
+          id String @id
+
+          @@map("2A")
+          @@schema("1first")
+        }
+
+        model second_1A {
+          id String @id
+
+          @@map("1A")
+          @@schema("2second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 20,
+            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "affected": [
+              {
+                "type": "Model",
+                "name": "first_2A"
+              },
+              {
+                "type": "Model",
+                "name": "second_1A"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expected).await;
+
     Ok(())
 }
 
@@ -314,18 +409,20 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
     api.database().raw_cmd(&create_table).await?;
 
     let expected = expect![[r#"
-        model A {
-          id String @id
-          A  A[]
+        model first_A {
+          id String     @id
+          A  second_A[]
 
+          @@map("A")
           @@schema("first")
         }
 
-        model A {
-          id String  @id
+        model second_A {
+          id String   @id
           fk String?
-          A  A?      @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          A  first_A? @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+          @@map("A")
           @@schema("second")
         }
     "#]];
@@ -422,27 +519,265 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> T
           schemas  = ["first", "second"]
         }
 
-        model HappyPerson {
-          mood HappyMood @id
+        model first_HappyPerson {
+          mood first_HappyMood @id
 
+          @@map("HappyPerson")
           @@schema("first")
         }
 
-        model HappyPerson {
-          mood HappyMood @id
+        model second_HappyPerson {
+          mood first_HappyMood @id
 
+          @@map("HappyPerson")
           @@schema("second")
         }
 
         model VeryHappyPerson {
-          mood HappyMood @id
+          mood second_HappyMood @id
 
           @@schema("second")
         }
 
-        enum HappyMood {
+        enum first_HappyMood {
           happy
 
+          @@map("HappyMood")
+          @@schema("first")
+        }
+
+        enum second_HappyMood {
+          veryHappy
+
+          @@map("HappyMood")
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 9,
+            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "enm": "first_HappyMood"
+              }
+            ]
+          },
+          {
+            "code": 9,
+            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "enm": "second_HappyMood"
+              }
+            ]
+          },
+          {
+            "code": 20,
+            "message": "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "affected": [
+              {
+                "type": "Enum",
+                "name": "first_HappyMood"
+              },
+              {
+                "type": "Enum",
+                "name": "second_HappyMood"
+              },
+              {
+                "type": "Model",
+                "name": "first_HappyPerson"
+              },
+              {
+                "type": "Model",
+                "name": "second_HappyPerson"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA "{schema_name}";
+            CREATE TABLE "{schema_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+
+            CREATE SCHEMA "{other_name}";
+            CREATE TABLE "{other_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+
+        "#
+    };
+
+    api.raw_cmd(&setup).await;
+
+    let input = indoc! {r#"
+        model FooBar {
+          id Int @id @default(autoincrement())
+
+          @@map("HappyPerson")
+          @@schema("first")
+        }
+
+        model HappyPerson {
+          id Int @id @default(autoincrement())
+
+          @@schema("second")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model FooBar {
+          id Int @id @default(autoincrement())
+
+          @@map("HappyPerson")
+          @@schema("first")
+        }
+
+        model HappyPerson {
+          id Int @id @default(autoincrement())
+
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 7,
+            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "model": "FooBar"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA "{schema_name}";
+            CREATE TABLE "{schema_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+
+            CREATE SCHEMA "{other_name}";
+            CREATE TABLE "{other_name}"."HappyPerson" (id SERIAL PRIMARY KEY);
+
+        "#
+    };
+
+    api.raw_cmd(&setup).await;
+
+    let input = indoc! {r#"
+        model HappyPerson {
+          id Int @id @default(autoincrement())
+
+          @@schema("first")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model HappyPerson {
+          id Int @id @default(autoincrement())
+
+          @@schema("first")
+        }
+
+        model second_HappyPerson {
+          id Int @id @default(autoincrement())
+
+          @@map("HappyPerson")
+          @@schema("second")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 20,
+            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "affected": [
+              {
+                "type": "Model",
+                "name": "second_HappyPerson"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("first", "second")
+)]
+async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &TestApi) -> TestResult {
+    let schema_name = "first";
+    let other_name = "second";
+    let setup = formatdoc! {
+        r#"
+            CREATE SCHEMA "{schema_name}";
+            CREATE TYPE "{schema_name}"."HappyMood" AS ENUM ('veryHappy');
+
+            CREATE SCHEMA "{other_name}";
+            CREATE TYPE "{other_name}"."HappyMood" AS ENUM ('veryHappy');
+        "#
+    };
+
+    api.raw_cmd(&setup).await;
+
+    let input = indoc! {r#"
+        enum RenamedMood {
+          veryHappy
+
+          @@map("HappyMood")
+          @@schema("first")
+        }
+    "#};
+
+    let expected = expect![[r#"
+        enum RenamedMood {
+          veryHappy
+
+          @@map("HappyMood")
           @@schema("first")
         }
 
@@ -453,7 +788,23 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> T
         }
     "#]];
 
-    api.expect_datamodel(&expected).await;
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 9,
+            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "enm": "RenamedMood"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input, expected).await;
+
     Ok(())
 }
 
@@ -511,18 +862,20 @@ async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResu
           schemas  = ["first", "second_schema"]
         }
 
-        model tbl {
-          id  Int   @id @default(autoincrement())
-          tbl tbl[]
+        model first_tbl {
+          id  Int                 @id @default(autoincrement())
+          tbl second_schema_tbl[]
 
+          @@map("tbl")
           @@schema("first")
         }
 
-        model tbl {
-          id  Int  @id @default(autoincrement())
+        model second_schema_tbl {
+          id  Int        @id @default(autoincrement())
           fst Int?
-          tbl tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          tbl first_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+          @@map("tbl")
           @@schema("second_schema")
         }
     "#]];

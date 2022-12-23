@@ -53,6 +53,13 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, warnings: &mut Warnings) -> renderer::E
         rendered_enum.documentation(docs);
     }
 
+    if r#enum.uses_duplicate_name() {
+        warnings.duplicate_names.push(warnings::TopLevelItem {
+            r#type: warnings::TopLevelType::Enum,
+            name: r#enum.name().to_string(),
+        })
+    }
+
     for variant in r#enum.variants() {
         if variant.name().is_empty() {
             let value = variant

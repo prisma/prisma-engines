@@ -708,6 +708,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.numeric_precision_radix,
                 info.datetime_precision,
                 info.data_type,
+                info.udt_schema as type_schema_name,
                 info.udt_name as full_data_type,
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
@@ -1250,8 +1251,14 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
-        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
-        _ => schema.find_enum(&full_data_type),
+        "ARRAY" if full_data_type.starts_with('_') => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+        }
+        _ => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(&full_data_type, namespace.as_deref())
+        }
     };
 
     let (family, native_type) = match full_data_type.as_str() {
@@ -1338,8 +1345,14 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
-        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
-        _ => schema.find_enum(&full_data_type),
+        "ARRAY" if full_data_type.starts_with('_') => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+        }
+        _ => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(&full_data_type, namespace.as_deref())
+        }
     };
 
     let (family, native_type) = match full_data_type.as_str() {

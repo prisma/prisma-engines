@@ -5,6 +5,8 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
+use crate::datamodel_calculator::InputContext;
+
 /// Regex to determine if an identifier starts with a character that
 /// is not supported.
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
@@ -19,12 +21,14 @@ pub(crate) fn needs_sanitation(s: &str) -> bool {
 }
 
 /// Sanitize the string to be used in the PSL.
-pub(crate) fn sanitize_string(s: &str) -> Cow<'_, str> {
-    if needs_sanitation(s) {
-        let start_cleaned = RE_START.replace_all(s, "");
+pub(crate) fn sanitize_string<'a>(s: impl Into<Cow<'a, str>>) -> Cow<'a, str> {
+    let s = s.into();
+
+    if needs_sanitation(&s) {
+        let start_cleaned = RE_START.replace_all(&s, "");
         Cow::Owned(RE.replace_all(start_cleaned.as_ref(), "_").into_owned())
     } else {
-        Cow::Borrowed(s)
+        s
     }
 }
 
@@ -45,17 +49,24 @@ pub(crate) enum ModelName<'a> {
     RenamedSanitized {
         mapped_name: &'a str,
     },
+    RenamedDuplicate {
+        mapped_name: &'a str,
+        namespace: &'a str,
+    },
 }
 
 impl<'a> ModelName<'a> {
     /// Create a name from an SQL identifier.
-    pub(crate) fn new_from_sql(name: &'a str) -> Self {
-        match name {
+    pub(crate) fn new_from_sql(name: &'a str, namespace: Option<&'a str>, context: InputContext<'a>) -> Self {
+        match (name, namespace) {
+            (mapped_name, Some(namespace)) if !context.name_is_unique(mapped_name) => {
+                ModelName::RenamedDuplicate { mapped_name, namespace }
+            }
             _ if psl::is_reserved_type_name(name) => ModelName::RenamedReserved { mapped_name: name },
             _ if crate::sanitize_datamodel_names::needs_sanitation(name) => {
                 ModelName::RenamedSanitized { mapped_name: name }
             }
-            name => ModelName::FromSql { name },
+            (name, _) => ModelName::FromSql { name },
         }
     }
 
@@ -66,7 +77,10 @@ impl<'a> ModelName<'a> {
             ModelName::FromSql { name } => Cow::Borrowed(name),
             ModelName::RenamedReserved { mapped_name } => Cow::Owned(format!("Renamed{mapped_name}")),
             ModelName::RenamedSanitized { mapped_name } => {
-                crate::sanitize_datamodel_names::sanitize_string(mapped_name)
+                crate::sanitize_datamodel_names::sanitize_string(*mapped_name)
+            }
+            ModelName::RenamedDuplicate { mapped_name, namespace } => {
+                crate::sanitize_datamodel_names::sanitize_string(format!("{namespace}_{mapped_name}"))
             }
         }
     }
@@ -78,6 +92,7 @@ impl<'a> ModelName<'a> {
             ModelName::FromSql { .. } => None,
             ModelName::RenamedReserved { mapped_name } => Some(mapped_name),
             ModelName::RenamedSanitized { mapped_name } => Some(mapped_name),
+            ModelName::RenamedDuplicate { mapped_name, .. } => Some(mapped_name),
         }
     }
 }
@@ -115,7 +130,7 @@ impl<'a> IntrospectedName<'a> {
             IntrospectedName::FromPsl { name, .. } => Cow::Borrowed(name),
             IntrospectedName::FromSql { name } => Cow::Borrowed(name),
             IntrospectedName::RenamedSanitized { mapped_name } => {
-                crate::sanitize_datamodel_names::sanitize_string(mapped_name)
+                crate::sanitize_datamodel_names::sanitize_string(*mapped_name)
             }
         }
     }
@@ -162,7 +177,7 @@ impl<'a> EnumVariantName<'a> {
         match self {
             EnumVariantName::Empty => Cow::Borrowed("EMPTY_ENUM_VALUE"),
             EnumVariantName::RenamedSanitized { mapped_name } => {
-                crate::sanitize_datamodel_names::sanitize_string(mapped_name)
+                crate::sanitize_datamodel_names::sanitize_string(*mapped_name)
             }
             EnumVariantName::FromSql { name } | EnumVariantName::FromPsl { name, .. } => Cow::Borrowed(name),
         }

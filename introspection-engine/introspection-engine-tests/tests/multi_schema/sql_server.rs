@@ -230,15 +230,17 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
           schemas  = ["first", "second"]
         }
 
-        model A {
+        model first_A {
           id Int @id @default(autoincrement())
 
+          @@map("A")
           @@schema("first")
         }
 
-        model A {
+        model second_A {
           id Int @id @default(autoincrement())
 
+          @@map("A")
           @@schema("second")
         }
     "#]];
@@ -401,18 +403,20 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
           schemas  = ["first", "second"]
         }
 
-        model A {
-          id Int @id @default(autoincrement())
-          A  A[]
+        model first_A {
+          id Int        @id @default(autoincrement())
+          A  second_A[]
 
+          @@map("A")
           @@schema("first")
         }
 
-        model A {
-          id Int  @id @default(autoincrement())
+        model second_A {
+          id Int      @id @default(autoincrement())
           fk Int?
-          A  A?   @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          A  first_A? @relation(fields: [fk], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+          @@map("A")
           @@schema("second")
         }
     "#]];

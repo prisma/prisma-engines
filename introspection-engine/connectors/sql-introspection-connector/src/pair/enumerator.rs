@@ -1,4 +1,3 @@
-use crate::sanitize_datamodel_names::ModelName;
 use psl::{
     parser_database::walkers,
     schema_ast::ast::{self, WithDocumentation},
@@ -20,12 +19,7 @@ impl<'a> EnumPair<'a> {
     /// The mapped name, if defined, is the actual name of the enum in
     /// the database.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        match self.context.enum_prisma_name(self.next.id) {
-            ModelName::FromPsl { mapped_name, .. } => mapped_name,
-            ModelName::RenamedReserved { mapped_name } => Some(mapped_name),
-            ModelName::RenamedSanitized { mapped_name } => Some(mapped_name),
-            ModelName::FromSql { .. } => None,
-        }
+        self.context.enum_prisma_name(self.next.id).mapped_name()
     }
 
     /// Name of the enum in the PSL. The value can be sanitized if it
@@ -48,6 +42,12 @@ impl<'a> EnumPair<'a> {
     /// sorting the enums in the final introspected data model.
     pub(crate) fn previous_position(self) -> Option<ast::EnumId> {
         self.previous.map(|e| e.id)
+    }
+
+    /// True, if enum uses the same name as another top-level item from
+    /// a different namespace.
+    pub(crate) fn uses_duplicate_name(self) -> bool {
+        self.previous.is_none() && !self.context.name_is_unique(self.next.name())
     }
 
     /// Iterates all of the variants that are part of the enum.
