@@ -42,3 +42,6 @@ dev_datamodel.prisma
 
 dmmf.json
 graph.dot
+
+# Vs studio local history
+.history

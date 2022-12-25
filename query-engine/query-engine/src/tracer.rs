@@ -16,6 +16,7 @@ use std::{fmt::Debug, io::Write};
 #[derive(Debug)]
 pub struct PipelineBuilder {
     trace_config: Option<sdk::trace::Config>,
+    exporter: Option<ClientSpanExporter>,
 }
 
 /// Create a new stdout exporter pipeline builder.
@@ -26,7 +27,10 @@ pub fn new_pipeline() -> PipelineBuilder {
 impl Default for PipelineBuilder {
     /// Return the default pipeline builder.
     fn default() -> Self {
-        Self { trace_config: None }
+        Self {
+            trace_config: None,
+            exporter: None,
+        }
     }
 }
 
@@ -36,14 +40,24 @@ impl PipelineBuilder {
         self.trace_config = Some(config);
         self
     }
+
+    /// Assign the SDK trace configuration.
+    pub fn with_client_span_exporter(mut self) -> Self {
+        self.exporter = Some(ClientSpanExporter::new());
+        self
+    }
 }
 
 impl PipelineBuilder {
     pub fn install_simple(mut self) -> sdk::trace::Tracer {
         global::set_text_map_propagator(TraceContextPropagator::new());
-        let exporter = ClientSpanExporter::new();
 
-        let mut provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+        let mut provider_builder = sdk::trace::TracerProvider::builder();
+
+        if let Some(exporter) = self.exporter {
+            provider_builder = provider_builder.with_simple_exporter(exporter);
+        }
+
         if let Some(config) = self.trace_config.take() {
             provider_builder = provider_builder.with_config(config);
         }
