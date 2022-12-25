@@ -1,8 +1,5 @@
 use opentelemetry::{
-    sdk::{
-        trace::{Config, Tracer},
-        Resource,
-    },
+    sdk::{trace::Config, Resource},
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
@@ -11,7 +8,10 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
-use crate::{telemetry_capturing, LogFormat};
+use crate::{
+    telemetry_capturing::{self},
+    LogFormat,
+};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
@@ -24,7 +24,7 @@ pub struct Logger<'a> {
     log_queries: bool,
     telemetry_endpoint: Option<&'a str>,
     metrics: Option<MetricRegistry>,
-    trace_capturer: Option<telemetry_capturing::traces::Exporter>,
+    telemetry_capturing: Option<telemetry_capturing::traces::Exporter>,
 }
 
 impl<'a> Logger<'a> {
@@ -37,7 +37,7 @@ impl<'a> Logger<'a> {
             log_queries: false,
             telemetry_endpoint: None,
             metrics: None,
-            trace_capturer: None,
+            telemetry_capturing: None,
         }
     }
 
@@ -75,32 +75,28 @@ impl<'a> Logger<'a> {
         } else {
             None
         };
-        self.trace_capturer = capturer.clone();
+        self.telemetry_capturing = capturer.clone();
         capturer
+    }
+
+    pub fn is_metrics_enabled(&self) -> bool {
+        self.metrics.is_some()
+    }
+
+    pub fn is_telemetry_capturing_enabled(&self) -> bool {
+        self.telemetry_capturing.is_some()
+    }
+
+    pub fn is_opentelemetry_enabled(&self) -> bool {
+        self.enable_telemetry
     }
 
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
-    pub fn install(self) -> LoggerResult<()> {
+    pub fn install(&self) -> LoggerResult<()> {
         let filter = create_env_filter(self.log_queries);
-
-        let telemetry = if self.enable_telemetry {
-            let tracer = create_otel_tracer(self.service_name, self.telemetry_endpoint);
-            let mut telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-
-            // todo: This is replacing the telemetry tracer used by the otel tracer
-            if let Some(exporter) = self.trace_capturer {
-                let tracer = crate::telemetry_capturing::traces::setup_and_install_tracer_globally(exporter);
-                telemetry = telemetry.with_tracer(tracer);
-            }
-
-            let is_user_trace = filter_fn(is_user_facing_trace_filter);
-            let telemetry = telemetry.with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
+        let is_user_trace = filter_fn(is_user_facing_trace_filter);
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -115,25 +111,57 @@ impl<'a> Logger<'a> {
 
         let subscriber = tracing_subscriber::registry()
             .with(fmt_layer)
-            .with(self.metrics)
-            .with(telemetry);
+            .with(self.metrics.clone());
 
-        subscriber::set_global_default(subscriber)?;
+        let (otel_enabled, capturing_enabled, endpoint) = (
+            self.is_opentelemetry_enabled(),
+            self.is_telemetry_capturing_enabled(),
+            self.telemetry_endpoint,
+        );
+
+        match (capturing_enabled, otel_enabled, endpoint) {
+            (true, _, _) => {
+                // Capturing is enabled, it overrides otel exporting.
+                let tracer = crate::telemetry_capturing::traces::setup_and_install_tracer_globally(
+                    self.telemetry_capturing.clone().unwrap(),
+                );
+                let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
+                //.with_filter(is_user_trace);
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
+            (_, true, Some(endpoint)) => {
+                // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
+                // the traces to.
+                let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);
+                let config = Config::default().with_resource(resource);
+                let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
+                let exporter = opentelemetry_otlp::new_exporter().tonic().with_endpoint(endpoint);
+                let tracer = builder.with_exporter(exporter).install_simple().unwrap();
+                let telemetry_layer = tracing_opentelemetry::layer()
+                    .with_tracer(tracer)
+                    .with_filter(is_user_trace);
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
+            (_, true, None) => {
+                // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
+                // export traces too. We export it to stdout
+                let tracer = crate::tracer::new_pipeline()
+                    .with_client_span_exporter()
+                    .install_simple();
+                let telemetry_layer = tracing_opentelemetry::layer()
+                    .with_tracer(tracer)
+                    .with_filter(is_user_trace);
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
+            _ => {
+                subscriber::set_global_default(subscriber)?;
+            }
+        }
+
         Ok(())
-    }
-}
-
-fn create_otel_tracer(service_name: &'static str, collector_endpoint: Option<&str>) -> Tracer {
-    if let Some(endpoint) = collector_endpoint {
-        // A special parameter for Jaeger to set the service name in spans.
-        let resource = Resource::new(vec![KeyValue::new("service.name", service_name)]);
-        let config = Config::default().with_resource(resource);
-
-        let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
-        let exporter = opentelemetry_otlp::new_exporter().tonic().with_endpoint(endpoint);
-        builder.with_exporter(exporter).install_simple().unwrap()
-    } else {
-        crate::tracer::new_pipeline().install_simple()
     }
 }
 
