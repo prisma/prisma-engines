@@ -62,11 +62,7 @@ impl From<SpanData> for ExportedSpan {
             })
             .collect();
 
-        let events = span
-            .events
-            .into_iter()
-            .map(|event| ExportedEvent::from(event))
-            .collect();
+        let events = span.events.into_iter().map(ExportedEvent::from).collect();
 
         Self {
             trace_id: span.span_context.trace_id().to_string(),

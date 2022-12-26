@@ -137,8 +137,11 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
                 if let telemetry_capturing::traces::Config::Enabled(capturer) = capture_config {
                     global::force_flush_tracer_provider();
-                    let traces = capturer.fetch_captures().await;
-                    result.set_extension("traces".to_owned(), json!(traces));
+                    let telemetry = capturer.fetch_captures().await;
+                    if let Some(telemetry) = telemetry {
+                        result.set_extension("traces".to_owned(), json!(telemetry.traces));
+                        result.set_extension("logs".to_owned(), json!(telemetry.logs));
+                    }
                 }
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
