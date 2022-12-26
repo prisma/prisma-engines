@@ -136,7 +136,6 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let mut result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
                 if let telemetry_capturing::capturer::Capturer::Enabled(capturer) = capture_config {
-                    global::force_flush_tracer_provider();
                     let telemetry = capturer.fetch_captures().await;
                     if let Some(telemetry) = telemetry {
                         result.set_extension("traces".to_owned(), json!(telemetry.traces));
@@ -402,12 +401,7 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
 
 pub(crate) fn process_gql_req_headers(
     req: &Request<Body>,
-) -> (
-    Option<TxId>,
-    Span,
-    telemetry_capturing::capturer::Capturer,
-    Option<String>,
-) {
+) -> (Option<TxId>, Span, telemetry_capturing::Capturer, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
 
     let span = info_span!("prisma:engine", user_facing = true);
@@ -425,10 +419,7 @@ pub(crate) fn process_gql_req_headers(
     (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
-pub fn create_capture_config(
-    header: Option<&HeaderValue>,
-    trace_id: TraceId,
-) -> telemetry_capturing::capturer::Capturer {
+pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry_capturing::Capturer {
     let settings = if let Some(h) = header {
         h.to_str().unwrap_or("").into()
     } else {

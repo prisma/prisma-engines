@@ -1,11 +1,13 @@
 use async_trait::async_trait;
 use opentelemetry::{
-    sdk::export::trace::{ExportResult, SpanData, SpanExporter},
-    trace::TraceId,
+    sdk::{
+        export::trace::{ExportResult, SpanData, SpanExporter},
+        trace::{BatchSpanProcessor, Span, SpanProcessor},
+    },
+    trace::{TraceId, TraceResult},
 };
-use std::fmt::Debug;
-use std::{collections::HashMap, sync::Arc};
-use tokio::sync::Mutex;
+use std::time::Duration;
+use std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 use super::{models, settings::Settings, storage::Storage};
 
@@ -65,8 +67,8 @@ impl Exporter {
         }
     }
 
-    pub(crate) async fn start_capturing(&self, trace_id: TraceId, settings: Settings) {
-        let mut locked_storage = self.storage.lock().await;
+    pub(self) async fn start_capturing(&self, trace_id: TraceId, settings: Settings) {
+        let mut locked_storage = self.storage.lock().unwrap();
         locked_storage.insert(trace_id, settings.clone().into());
         drop(locked_storage);
 
@@ -74,15 +76,16 @@ impl Exporter {
         let storage = self.storage.clone();
         tokio::spawn(async move {
             tokio::time::sleep(ttl).await;
-            let mut locked_traces = storage.lock().await;
+            let mut locked_traces = storage.lock().unwrap();
             if locked_traces.remove(&trace_id).is_some() {
                 warn!("Timeout waiting for telemetry to be captured. trace_id={}", trace_id)
             }
         });
     }
 
-    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Option<Storage> {
-        let mut traces = self.storage.lock().await;
+    pub(self) async fn fetch_captures(&self, trace_id: TraceId) -> Option<Storage> {
+        _ = super::global_processor().force_flush();
+        let mut traces = self.storage.lock().unwrap();
 
         traces.remove(&trace_id)
     }
@@ -98,7 +101,7 @@ impl Default for Exporter {
 impl SpanExporter for Exporter {
     // todo: lock less
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        let mut locked_storage = self.storage.lock().await;
+        let mut locked_storage = self.storage.lock().unwrap();
         for span in batch {
             let trace_id = span.span_context.trace_id();
 
@@ -108,6 +111,38 @@ impl SpanExporter for Exporter {
         }
 
         Ok(())
+    }
+}
+
+// An adapter of a SpanProcessor that is shareable accross thread boundaries, so we can
+// flush the processor before each request finishes.
+#[derive(Debug, Clone)]
+pub(super) struct SyncedSpanProcessor(Arc<Mutex<dyn SpanProcessor>>);
+
+impl SyncedSpanProcessor {
+    pub(super) fn new(exporter: Exporter) -> Self {
+        let adaptee = BatchSpanProcessor::builder(exporter, opentelemetry::runtime::Tokio)
+            .with_scheduled_delay(Duration::new(0, 1))
+            .build();
+        Self(Arc::new(Mutex::new(adaptee)))
+    }
+}
+
+impl SpanProcessor for SyncedSpanProcessor {
+    fn on_start(&self, span: &mut Span, cx: &opentelemetry::Context) {
+        self.0.lock().unwrap().on_start(span, cx)
+    }
+
+    fn on_end(&self, span: SpanData) {
+        self.0.lock().unwrap().on_end(span)
+    }
+
+    fn force_flush(&self) -> TraceResult<()> {
+        self.0.lock().unwrap().force_flush()
+    }
+
+    fn shutdown(&mut self) -> TraceResult<()> {
+        self.0.lock().unwrap().shutdown()
     }
 }
 
@@ -128,13 +163,13 @@ mod tests {
         settings.ttl = one_ms;
 
         exporter.start_capturing(trace_id, settings).await;
-        let storage = exporter.storage.lock().await;
+        let storage = exporter.storage.lock().unwrap();
         assert!(storage.get(&trace_id).is_some());
         drop(storage);
 
         tokio::time::sleep(10 * one_ms).await;
 
-        let storage = exporter.storage.lock().await;
+        let storage = exporter.storage.lock().unwrap();
         assert!(storage.get(&trace_id).is_none());
     }
 }
