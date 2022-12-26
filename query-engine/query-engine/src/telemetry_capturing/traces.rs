@@ -59,7 +59,7 @@ impl ConfiguredCapturer {
             .await
     }
 
-    pub async fn fetch_captures(&self) -> Vec<models::ExportedSpan> {
+    pub async fn fetch_captures(&self) -> Option<TelemetryStorage> {
         self.capturer.fetch_captures(self.trace_id).await
     }
 }
@@ -68,7 +68,13 @@ impl ConfiguredCapturer {
 /// later retrieval
 #[derive(Debug, Clone)]
 pub struct Exporter {
-    pub(crate) traces: Arc<Mutex<HashMap<TraceId, Vec<models::ExportedSpan>>>>,
+    pub(crate) storage: Arc<Mutex<HashMap<TraceId, TelemetryStorage>>>,
+}
+
+#[derive(Debug, Default)]
+pub struct TelemetryStorage {
+    pub traces: Vec<models::ExportedSpan>,
+    pub logs: Vec<models::ExportedSpan>,
 }
 
 pub(crate) enum CaptureTimeout {
@@ -82,38 +88,34 @@ impl Exporter {
 
     pub fn new() -> Self {
         Self {
-            traces: Default::default(),
+            storage: Default::default(),
         }
     }
 
     pub(crate) async fn start_capturing(&self, trace_id: TraceId, timeout: CaptureTimeout) {
-        let mut locked_traces = self.traces.lock().await;
-        locked_traces.insert(trace_id, Vec::new());
-        drop(locked_traces);
+        let mut locked_storage = self.storage.lock().await;
+        locked_storage.insert(trace_id, Default::default());
+        drop(locked_storage);
 
         let when = match timeout {
             CaptureTimeout::Duration(d) => d,
             CaptureTimeout::Default => Self::DEFAULT_TIMEOUT,
         };
 
-        let traces = self.traces.clone();
+        let storage = self.storage.clone();
         tokio::spawn(async move {
             tokio::time::sleep(when).await;
-            let mut locked_traces = traces.lock().await;
+            let mut locked_traces = storage.lock().await;
             if locked_traces.remove(&trace_id).is_some() {
-                warn!("Timeout waiting for spans to be captured. trace_id{}", trace_id)
+                warn!("Timeout waiting for telemetry to be captured. trace_id={}", trace_id)
             }
         });
     }
 
-    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Vec<models::ExportedSpan> {
-        let mut traces = self.traces.lock().await;
+    pub(crate) async fn fetch_captures(&self, trace_id: TraceId) -> Option<TelemetryStorage> {
+        let mut traces = self.storage.lock().await;
 
-        if let Some(spans) = traces.remove(&trace_id) {
-            spans
-        } else {
-            vec![]
-        }
+        traces.remove(&trace_id)
     }
 }
 
@@ -125,13 +127,14 @@ impl Default for Exporter {
 
 #[async_trait]
 impl SpanExporter for Exporter {
+    // todo: lock less
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        let mut traces = self.traces.lock().await;
+        let mut locked_storage = self.storage.lock().await;
         for span in batch {
             let trace_id = span.span_context.trace_id();
 
-            if let Some(spans) = traces.get_mut(&trace_id) {
-                spans.push(models::ExportedSpan::from(span))
+            if let Some(trace_storage) = locked_storage.get_mut(&trace_id) {
+                trace_storage.traces.push(models::ExportedSpan::from(span))
             }
         }
 
@@ -154,13 +157,13 @@ mod tests {
         exporter
             .start_capturing(trace_id, CaptureTimeout::Duration(one_ms))
             .await;
-        let traces = exporter.traces.lock().await;
+        let traces = exporter.storage.lock().await;
         assert!(traces.get(&trace_id).is_some());
         drop(traces);
 
         tokio::time::sleep(10 * one_ms).await;
 
-        let traces = exporter.traces.lock().await;
+        let traces = exporter.storage.lock().await;
         assert!(traces.get(&trace_id).is_none());
     }
 }
