@@ -106,7 +106,7 @@ impl Logger {
         match self.tracing_config {
             TracingConfig::Captured => {
                 // Capturing is enabled, it overrides otel exporting.
-                let tracer = crate::telemetry_capturing::tracer().to_owned();
+                let tracer = crate::telemetry_capturing::global_tracer().to_owned();
                 let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
                 //.with_filter(is_user_trace);
                 let subscriber = subscriber.with(telemetry_layer);
