@@ -101,12 +101,24 @@ impl Default for Exporter {
 impl SpanExporter for Exporter {
     // todo: lock less
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        let mut locked_storage = self.storage.lock().unwrap();
         for span in batch {
             let trace_id = span.span_context.trace_id();
 
-            if let Some(trace_storage) = locked_storage.get_mut(&trace_id) {
-                trace_storage.traces.push(models::ExportedSpan::from(span))
+            let mut locked_storage = self.storage.lock().unwrap();
+            if let Some(storage) = locked_storage.get_mut(&trace_id) {
+                let exported_span = models::ExportedSpan::from(span);
+
+                if storage.settings.included_log_levels.contains("query") {
+                    if exported_span.is_query() {
+                        storage.logs.push(exported_span.query_event())
+                    }
+                }
+
+                // todo other log levels
+
+                if storage.settings.traces_enabled() {
+                    storage.traces.push(exported_span)
+                }
             }
         }
 

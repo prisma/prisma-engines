@@ -27,6 +27,22 @@ pub struct Link {
     span_id: String,
 }
 
+impl ExportedSpan {
+    pub(super) fn is_query(&self) -> bool {
+        self.name.eq("prisma:engine:db_query")
+    }
+
+    pub(super) fn query_event(&self) -> ExportedSpanEvent {
+        ExportedSpanEvent {
+            span_id: Some(self.span_id.to_owned()),
+            name: "query".to_string(),
+            level: "query".to_string(),
+            timestamp: self.start_time,
+            attributes: self.attributes.clone(),
+        }
+    }
+}
+
 impl From<SpanData> for ExportedSpan {
     fn from(span: SpanData) -> Self {
         let attributes: HashMap<String, String> =
