@@ -119,9 +119,9 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let (tx_id, span, capture_config, trace_id) = process_gql_req_headers(&req, state.cx.trace_capturer.clone());
+    let (tx_id, span, capture_config, trace_id) = process_gql_req_headers(&req);
 
-    if let telemetry_capturing::traces::Config::Enabled(capturer) = capture_config.clone() {
+    if let telemetry_capturing::capturer::Capturer::Enabled(capturer) = capture_config.clone() {
         capturer.start_capturing().await;
     }
 
@@ -135,7 +135,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
                 let mut result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
-                if let telemetry_capturing::traces::Config::Enabled(capturer) = capture_config {
+                if let telemetry_capturing::capturer::Capturer::Enabled(capturer) = capture_config {
                     global::force_flush_tracer_provider();
                     let telemetry = capturer.fetch_captures().await;
                     if let Some(telemetry) = telemetry {
@@ -402,8 +402,12 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
 
 pub(crate) fn process_gql_req_headers(
     req: &Request<Body>,
-    capturer: Option<telemetry_capturing::traces::Exporter>,
-) -> (Option<TxId>, Span, telemetry_capturing::traces::Config, Option<String>) {
+) -> (
+    Option<TxId>,
+    Span,
+    telemetry_capturing::capturer::Capturer,
+    Option<String>,
+) {
     let tx_id = get_transaction_id_from_header(req);
 
     let span = info_span!("prisma:engine", user_facing = true);
@@ -416,26 +420,20 @@ pub(crate) fn process_gql_req_headers(
 
     let trace_id = get_trace_id_from_context(&context);
     let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
-    let trace_capture = create_capture_config(trace_capture_header, capturer, trace_id);
+    let trace_capture = create_capture_config(trace_capture_header, trace_id);
 
     (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
 pub fn create_capture_config(
     header: Option<&HeaderValue>,
-    capturer: Option<telemetry_capturing::traces::Exporter>,
     trace_id: TraceId,
-) -> telemetry_capturing::traces::Config {
-    let enabled = if let Some(h) = header {
-        h.to_str().unwrap_or("false") == "true"
+) -> telemetry_capturing::capturer::Capturer {
+    let settings = if let Some(h) = header {
+        h.to_str().unwrap_or("").into()
     } else {
-        false
+        ""
     };
 
-    if !enabled || capturer.is_none() {
-        return telemetry_capturing::traces::disabled();
-    }
-
-    let c = capturer.unwrap();
-    telemetry_capturing::traces::enabled(c, trace_id)
+    telemetry_capturing::capturer(trace_id, settings)
 }

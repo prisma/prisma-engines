@@ -1,4 +1,4 @@
-use opentelemetry::{sdk::export::trace::SpanData, trace::Event, KeyValue, Value};
+use opentelemetry::{sdk::export::trace::SpanData, trace::Event, KeyValue};
 use query_core::convert_to_high_res_time;
 use serde::Serialize;
 use std::{borrow::Cow, collections::HashMap, time::SystemTime};
@@ -16,7 +16,7 @@ pub struct ExportedSpan {
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     attributes: HashMap<String, String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    events: Vec<ExportedEvent>,
+    events: Vec<ExportedSpanEvent>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     links: Vec<Link>,
 }
@@ -62,7 +62,7 @@ impl From<SpanData> for ExportedSpan {
             })
             .collect();
 
-        let events = span.events.into_iter().map(ExportedEvent::from).collect();
+        let events = span.events.into_iter().map(ExportedSpanEvent::from).collect();
 
         Self {
             trace_id: span.span_context.trace_id().to_string(),
@@ -79,14 +79,15 @@ impl From<SpanData> for ExportedSpan {
 }
 
 #[derive(Serialize, Debug, Clone)]
-pub struct ExportedEvent {
+pub struct ExportedSpanEvent {
+    pub span_id: Option<String>,
     pub name: String,
     pub level: String,
     pub timestamp: [u64; 2],
     pub attributes: HashMap<String, String>,
 }
 
-impl From<Event> for ExportedEvent {
+impl From<Event> for ExportedSpanEvent {
     fn from(event: Event) -> Self {
         let name = event.name.to_string();
         let timestamp = convert_to_high_res_time(event.timestamp.duration_since(SystemTime::UNIX_EPOCH).unwrap());
@@ -106,6 +107,7 @@ impl From<Event> for ExportedEvent {
         };
 
         Self {
+            span_id: None, // already attached to the span
             name,
             level,
             timestamp,
@@ -113,3 +115,5 @@ impl From<Event> for ExportedEvent {
         }
     }
 }
+
+pub type ExportedLog = ExportedSpanEvent;

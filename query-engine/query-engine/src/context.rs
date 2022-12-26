@@ -1,4 +1,4 @@
-use crate::{telemetry_capturing, PrismaError, PrismaResult};
+use crate::{PrismaError, PrismaResult};
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};
@@ -12,8 +12,6 @@ pub struct PrismaContext {
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
-    // The trace capturer being in flight.
-    pub trace_capturer: Option<telemetry_capturing::traces::Exporter>,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -26,7 +24,6 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
-    trace_capturer: Option<telemetry_capturing::traces::Exporter>,
 }
 
 impl ContextBuilder {
@@ -40,19 +37,8 @@ impl ContextBuilder {
         self
     }
 
-    pub fn set_trace_capturer(mut self, trace_capturer: Option<telemetry_capturing::traces::Exporter>) -> Self {
-        self.trace_capturer = trace_capturer;
-        self
-    }
-
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(
-            self.schema,
-            self.enable_raw_queries,
-            self.metrics.unwrap_or_default(),
-            self.trace_capturer,
-        )
-        .await
+        PrismaContext::new(self.schema, self.enable_raw_queries, self.metrics.unwrap_or_default()).await
     }
 }
 
@@ -62,7 +48,6 @@ impl PrismaContext {
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
-        trace_capturer: Option<telemetry_capturing::traces::Exporter>,
     ) -> PrismaResult<Self> {
         let config = &schema.configuration;
         // We only support one data source at the moment, so take the first one (default not exposed yet).
@@ -86,7 +71,6 @@ impl PrismaContext {
             query_schema,
             executor,
             metrics,
-            trace_capturer,
         };
 
         context.verify_connection().await?;
@@ -104,7 +88,6 @@ impl PrismaContext {
             enable_raw_queries: false,
             schema,
             metrics: None,
-            trace_capturer: None,
         }
     }
 

@@ -8,36 +8,54 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
 
-use crate::{
-    telemetry_capturing::{self},
-    LogFormat,
-};
+use crate::LogFormat;
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
 /// An installer for a global logger.
 #[derive(Debug, Clone)]
-pub struct Logger<'a> {
+pub struct Logger {
     service_name: &'static str,
     log_format: LogFormat,
-    enable_telemetry: bool,
     log_queries: bool,
-    telemetry_endpoint: Option<&'a str>,
+    tracing_config: TracingConfig,
     metrics: Option<MetricRegistry>,
-    telemetry_capturing: Option<telemetry_capturing::traces::Exporter>,
 }
 
-impl<'a> Logger<'a> {
+// TracingConfig specifies how tracing will be exposed by the logger facility
+#[derive(Debug, Clone)]
+enum TracingConfig {
+    // exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
+    Exposed(String),
+    // captured means that traces will be captured in memory and exposed in the graphql response
+    // logs will be also exposed in the response when capturing is enabled
+    Captured,
+    // stdout means that traces will be printed to standard output
+    Stdout,
+    // disabled means that tracing will be disabled
+    Disabled,
+}
+
+impl TracingConfig {
+    pub fn new(enable_telemetry: bool, enable_capturing: bool, endpoint: Option<String>) -> Self {
+        match (enable_telemetry, enable_capturing, endpoint) {
+            (_, true, _) => Self::Captured,
+            (true, _, Some(endpoint)) => Self::Exposed(endpoint),
+            (true, _, None) => Self::Stdout,
+            _ => Self::Disabled,
+        }
+    }
+}
+
+impl Logger {
     /// Initialize a new global logger installer.
     pub fn new(service_name: &'static str) -> Self {
         Self {
             service_name,
             log_format: LogFormat::Json,
-            enable_telemetry: false,
             log_queries: false,
-            telemetry_endpoint: None,
             metrics: None,
-            telemetry_capturing: None,
+            tracing_config: TracingConfig::Disabled,
         }
     }
 
@@ -51,44 +69,21 @@ impl<'a> Logger<'a> {
         self.log_queries = log_queries;
     }
 
-    /// Enables Jaeger telemetry.
-    pub fn enable_telemetry(&mut self, enable_telemetry: bool) {
-        self.enable_telemetry = enable_telemetry;
-    }
-
-    /// Sets a custom telemetry endpoint
-    pub fn telemetry_endpoint(&mut self, endpoint: &'a str) {
-        if endpoint.is_empty() {
-            self.telemetry_endpoint = None
-        } else {
-            self.telemetry_endpoint = Some(endpoint);
-        }
-    }
-
     pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
         self.metrics = Some(metrics);
     }
 
-    pub fn enable_trace_capturer(&mut self, capture_logs: bool) -> Option<telemetry_capturing::traces::Exporter> {
-        let capturer = if capture_logs {
-            Some(telemetry_capturing::traces::Exporter::new())
-        } else {
+    pub fn setup_telemetry(&mut self, enable_telemetry: bool, enable_capturing: bool, endpoint: &str) {
+        let endpoint = if endpoint.is_empty() {
             None
+        } else {
+            Some(endpoint.to_owned())
         };
-        self.telemetry_capturing = capturer.clone();
-        capturer
+        self.tracing_config = TracingConfig::new(enable_telemetry, enable_capturing, endpoint);
     }
 
     pub fn is_metrics_enabled(&self) -> bool {
         self.metrics.is_some()
-    }
-
-    pub fn is_telemetry_capturing_enabled(&self) -> bool {
-        self.telemetry_capturing.is_some()
-    }
-
-    pub fn is_opentelemetry_enabled(&self) -> bool {
-        self.enable_telemetry
     }
 
     /// Install logger as a global. Can be called only once per application
@@ -113,24 +108,16 @@ impl<'a> Logger<'a> {
             .with(fmt_layer)
             .with(self.metrics.clone());
 
-        let (otel_enabled, capturing_enabled, endpoint) = (
-            self.is_opentelemetry_enabled(),
-            self.is_telemetry_capturing_enabled(),
-            self.telemetry_endpoint,
-        );
-
-        match (capturing_enabled, otel_enabled, endpoint) {
-            (true, _, _) => {
+        match self.tracing_config {
+            TracingConfig::Captured => {
                 // Capturing is enabled, it overrides otel exporting.
-                let tracer = crate::telemetry_capturing::traces::setup_and_install_tracer_globally(
-                    self.telemetry_capturing.clone().unwrap(),
-                );
+                let tracer = crate::telemetry_capturing::tracer().to_owned();
                 let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
                 //.with_filter(is_user_trace);
                 let subscriber = subscriber.with(telemetry_layer);
                 subscriber::set_global_default(subscriber)?;
             }
-            (_, true, Some(endpoint)) => {
+            TracingConfig::Exposed(ref endpoint) => {
                 // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
                 // the traces to.
                 let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);
@@ -144,7 +131,7 @@ impl<'a> Logger<'a> {
                 let subscriber = subscriber.with(telemetry_layer);
                 subscriber::set_global_default(subscriber)?;
             }
-            (_, true, None) => {
+            TracingConfig::Stdout => {
                 // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
                 // export traces too. We export it to stdout
                 let tracer = crate::tracer::new_pipeline()
@@ -156,7 +143,7 @@ impl<'a> Logger<'a> {
                 let subscriber = subscriber.with(telemetry_layer);
                 subscriber::set_global_default(subscriber)?;
             }
-            _ => {
+            TracingConfig::Disabled => {
                 subscriber::set_global_default(subscriber)?;
             }
         }

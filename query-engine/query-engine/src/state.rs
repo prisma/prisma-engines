@@ -54,11 +54,12 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     let mut logger = Logger::new("prisma-engine-http");
     logger.log_format(opts.log_format());
     logger.log_queries(opts.log_queries());
-    logger.enable_telemetry(opts.enable_open_telemetry);
-    logger.telemetry_endpoint(&opts.open_telemetry_endpoint);
     logger.enable_metrics(metrics.clone());
-
-    let trace_capturer = logger.enable_trace_capturer(opts.enable_telemetry_in_response);
+    logger.setup_telemetry(
+        opts.enable_open_telemetry,
+        opts.enable_telemetry_in_response,
+        &opts.open_telemetry_endpoint,
+    );
 
     if install_logger {
         logger.install().unwrap();
@@ -77,7 +78,6 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
 
     let cx = PrismaContext::builder(datamodel) //  opts.enable_raw_queries, metrics, logs_capture)
         .set_metrics(metrics)
-        .set_trace_capturer(trace_capturer)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
         .instrument(span)

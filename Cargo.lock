@@ -3155,6 +3155,7 @@ dependencies = [
  "hyper",
  "indoc",
  "mongodb-query-connector",
+ "once_cell",
  "opentelemetry",
  "opentelemetry-otlp",
  "prisma-models",
