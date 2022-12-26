@@ -36,17 +36,6 @@ enum TracingConfig {
     Disabled,
 }
 
-impl TracingConfig {
-    pub fn new(enable_telemetry: bool, enable_capturing: bool, endpoint: Option<String>) -> Self {
-        match (enable_telemetry, enable_capturing, endpoint) {
-            (_, true, _) => Self::Captured,
-            (true, _, Some(endpoint)) => Self::Exposed(endpoint),
-            (true, _, None) => Self::Stdout,
-            _ => Self::Disabled,
-        }
-    }
-}
-
 impl Logger {
     /// Initialize a new global logger installer.
     pub fn new(service_name: &'static str) -> Self {
@@ -79,7 +68,13 @@ impl Logger {
         } else {
             Some(endpoint.to_owned())
         };
-        self.tracing_config = TracingConfig::new(enable_telemetry, enable_capturing, endpoint);
+
+        self.tracing_config = match (enable_telemetry, enable_capturing, endpoint) {
+            (_, true, _) => TracingConfig::Captured,
+            (true, _, Some(endpoint)) => TracingConfig::Exposed(endpoint),
+            (true, _, None) => TracingConfig::Stdout,
+            _ => TracingConfig::Disabled,
+        };
     }
 
     pub fn is_metrics_enabled(&self) -> bool {
