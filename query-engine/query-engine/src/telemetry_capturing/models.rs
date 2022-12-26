@@ -116,11 +116,7 @@ impl From<Event> for ExportedSpanEvent {
                     map
                 });
 
-        let level = if let Some(l) = attributes.remove("level") {
-            l.to_string()
-        } else {
-            "unknown".to_string()
-        };
+        let level = attributes.remove("level").unwrap_or_else(|| "unknown".to_string());
 
         Self {
             span_id: None, // already attached to the span
