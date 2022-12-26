@@ -81,25 +81,33 @@ impl From<SpanData> for ExportedSpan {
 #[derive(Serialize, Debug, Clone)]
 pub struct ExportedEvent {
     pub name: String,
+    pub level: String,
     pub timestamp: [u64; 2],
-    pub attributes: HashMap<String, Value>,
+    pub attributes: HashMap<String, String>,
 }
 
 impl From<Event> for ExportedEvent {
     fn from(event: Event) -> Self {
         let name = event.name.to_string();
         let timestamp = convert_to_high_res_time(event.timestamp.duration_since(SystemTime::UNIX_EPOCH).unwrap());
-        let attributes: HashMap<String, Value> =
+        let mut attributes: HashMap<String, String> =
             event
                 .attributes
                 .iter()
                 .fold(Default::default(), |mut map, KeyValue { key, value }| {
-                    map.insert(key.to_string(), value.clone());
+                    map.insert(key.to_string(), value.clone().to_string());
                     map
                 });
 
+        let level = if let Some(l) = attributes.remove("level") {
+            l.to_string()
+        } else {
+            "unknown".to_string()
+        };
+
         Self {
             name,
+            level,
             timestamp,
             attributes,
         }
