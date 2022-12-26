@@ -20,7 +20,7 @@ use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
-const TRACE_CAPTURE_HEADER: &str = "X-capture-traces";
+const TRACE_CAPTURE_HEADER: &str = "X-capture-telemetry";
 
 /// Starts up the graphql query engine server
 pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
@@ -421,7 +421,7 @@ pub(crate) fn process_gql_req_headers(
 
 pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry_capturing::Capturer {
     let settings = if let Some(h) = header {
-        h.to_str().unwrap_or("").into()
+        h.to_str().unwrap_or("")
     } else {
         ""
     };

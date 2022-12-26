@@ -11,9 +11,9 @@ use std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 use super::{models, settings::Settings, storage::Storage};
 
-// This determines, based on a set of settings and a trace id, how capturing is going to be handled.
-// Generally, both the trace id and the settings will be derived from request headers. Thus, a new
-// value of this enum is created per request.
+/// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
+/// Generally, both the trace id and the settings will be derived from request headers. Thus, a new
+/// value of this enum is created per request.
 #[derive(Debug, Clone)]
 pub enum Capturer {
     Enabled(Inner),
@@ -126,8 +126,8 @@ impl SpanExporter for Exporter {
     }
 }
 
-// An adapter of a SpanProcessor that is shareable accross thread boundaries, so we can
-// flush the processor before each request finishes.
+/// An adapter of a SpanProcessor that is shareable accross thread boundaries, so we can
+/// flush the processor before each request finishes.
 #[derive(Debug, Clone)]
 pub(super) struct SyncedSpanProcessor(Arc<Mutex<dyn SpanProcessor>>);
 
@@ -158,7 +158,7 @@ impl SpanProcessor for SyncedSpanProcessor {
     }
 }
 
-// tests for capture exporter
+/// tests for capture exporter
 #[cfg(test)]
 mod tests {
     use super::*;
