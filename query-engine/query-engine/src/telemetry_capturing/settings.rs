@@ -1,6 +1,6 @@
 use std::{collections::HashSet, time};
 
-static VALID_LEVELS: &[&str] = &["error", "warn", "info", "query", "tracing"];
+static VALID_VALUES: &[&str] = &["error", "warn", "info", "debug", "trace", "query", "tracing"];
 static DEFAULT_TTL: time::Duration = time::Duration::from_secs(1800); // 30 minutes
 
 #[derive(Debug, Clone, Default)]
@@ -41,7 +41,7 @@ impl From<&str> for Settings {
                 .into_iter()
                 .map(str::trim)
                 .map(str::to_lowercase)
-                .filter(|s| VALID_LEVELS.contains(&s.as_str())),
+                .filter(|s| VALID_VALUES.contains(&s.as_str())),
         );
 
         let include_traces = set.remove("tracing");

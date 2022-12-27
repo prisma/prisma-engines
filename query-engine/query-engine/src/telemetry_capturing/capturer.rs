@@ -106,18 +106,28 @@ impl SpanExporter for Exporter {
 
             let mut locked_storage = self.storage.lock().unwrap();
             if let Some(storage) = locked_storage.get_mut(&trace_id) {
-                let exported_span = models::ExportedSpan::from(span);
+                let trace = models::ExportedSpan::from(span);
 
                 if storage.settings.included_log_levels.contains("query") {
-                    if exported_span.is_query() {
-                        storage.logs.push(exported_span.query_event())
+                    if trace.is_query() {
+                        storage.logs.push(trace.query_event())
                     }
                 }
 
-                // todo other log levels
+                if storage.settings.logs_enabled() {
+                    let (logs, trace_without_events) = trace.split_events();
 
-                if storage.settings.traces_enabled() {
-                    storage.traces.push(exported_span)
+                    // If both logs and traces are enabled, we remove the events for the traces
+                    // as those can be recomposed from the exported events.
+                    if storage.settings.traces_enabled() {
+                        storage.traces.push(trace_without_events)
+                    }
+
+                    logs.into_iter()
+                        .filter(|l| storage.settings.included_log_levels.contains(&l.level))
+                        .for_each(|l| storage.logs.push(l));
+                } else if storage.settings.traces_enabled() {
+                    storage.traces.push(trace);
                 }
             }
         }

@@ -35,11 +35,18 @@ impl ExportedSpan {
     pub(super) fn query_event(&self) -> ExportedSpanEvent {
         ExportedSpanEvent {
             span_id: Some(self.span_id.to_owned()),
-            name: "query".to_string(),
+            name: self.attributes.get("db.statement").unwrap().to_string(),
             level: "query".to_string(),
             timestamp: self.start_time,
-            attributes: self.attributes.clone(),
+            attributes: Default::default(),
         }
+    }
+
+    /// splits events from the span without cloning
+    pub(super) fn split_events(self) -> (Vec<ExportedSpanEvent>, ExportedSpan) {
+        let events = self.events;
+        let span = ExportedSpan { events: vec![], ..self };
+        (events, span)
     }
 }
 
@@ -78,11 +85,16 @@ impl From<SpanData> for ExportedSpan {
             })
             .collect();
 
-        let events = span.events.into_iter().map(ExportedSpanEvent::from).collect();
+        let span_id = span.span_context.span_id().to_string();
+        let events = span
+            .events
+            .into_iter()
+            .map(|e| ExportedSpanEvent::from(e).with_span_id(span_id.clone()))
+            .collect();
 
         Self {
+            span_id,
             trace_id: span.span_context.trace_id().to_string(),
-            span_id: span.span_context.span_id().to_string(),
             parent_span_id: span.parent_span_id.to_string(),
             name: name.into_owned(),
             start_time: hr_start_time,
@@ -96,11 +108,18 @@ impl From<SpanData> for ExportedSpan {
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ExportedSpanEvent {
-    pub span_id: Option<String>,
-    pub name: String,
-    pub level: String,
-    pub timestamp: [u64; 2],
-    pub attributes: HashMap<String, String>,
+    pub(super) span_id: Option<String>,
+    pub(super) name: String,
+    pub(super) level: String,
+    pub(super) timestamp: [u64; 2],
+    pub(super) attributes: HashMap<String, String>,
+}
+
+impl ExportedSpanEvent {
+    pub(super) fn with_span_id(mut self, spain_id: String) -> Self {
+        self.span_id = Some(spain_id);
+        self
+    }
 }
 
 impl From<Event> for ExportedSpanEvent {
@@ -116,7 +135,10 @@ impl From<Event> for ExportedSpanEvent {
                     map
                 });
 
-        let level = attributes.remove("level").unwrap_or_else(|| "unknown".to_string());
+        let level = attributes
+            .remove("level")
+            .unwrap_or_else(|| "unknown".to_string())
+            .to_ascii_lowercase();
 
         Self {
             span_id: None, // already attached to the span
