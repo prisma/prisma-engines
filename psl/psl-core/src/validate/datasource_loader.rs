@@ -13,6 +13,7 @@ const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SCHEMAS_KEY: &str = "schemas";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
+const DIRECT_URL_KEY: &str = "directUrl";
 
 /// Loads all datasources from the provided schema AST.
 /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
@@ -108,6 +109,9 @@ fn lift_datasource(
     let url = StringFromEnvVar::coerce(url_arg, diagnostics)?;
     let shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
 
+    let direct_url_arg = args.remove(DIRECT_URL_KEY).map(|(_, url)| url);
+    let direct_url = direct_url_arg.and_then(|url_arg| StringFromEnvVar::coerce(url_arg, diagnostics));
+
     let shadow_database_url: Option<(StringFromEnvVar, Span)> =
         if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
             match StringFromEnvVar::coerce(shadow_database_url_arg, diagnostics) {
@@ -178,6 +182,8 @@ fn lift_datasource(
         active_provider: active_connector.provider_name(),
         url,
         url_span: url_arg.span(),
+        direct_url,
+        direct_url_span: direct_url_arg.map(|arg| arg.span()),
         documentation,
         active_connector,
         shadow_database_url,

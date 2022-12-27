@@ -14,6 +14,8 @@ pub struct Datasource {
     pub active_provider: &'static str,
     pub url: StringFromEnvVar,
     pub url_span: Span,
+    pub direct_url: Option<StringFromEnvVar>,
+    pub direct_url_span: Option<Span>,
     pub documentation: Option<String>,
     /// the connector of the active provider
     pub active_connector: &'static dyn Connector,
