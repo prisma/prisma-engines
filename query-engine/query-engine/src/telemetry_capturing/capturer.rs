@@ -108,19 +108,19 @@ impl SpanExporter for Exporter {
             if let Some(storage) = locked_storage.get_mut(&trace_id) {
                 let trace = models::ExportedSpan::from(span);
 
-                if storage.settings.included_log_levels.contains("query") {
-                    if trace.is_query() {
-                        storage.logs.push(trace.query_event())
-                    }
+                if storage.settings.included_log_levels.contains("query") && trace.is_query() {
+                    storage.logs.push(trace.query_event())
                 }
 
+                let (logs, trace) = trace.split_logs();
+
                 if storage.settings.logs_enabled() {
-                    trace
-                        .clone_events()
-                        .into_iter()
+                    logs.into_iter()
                         .filter(|l| storage.settings.included_log_levels.contains(&l.level))
                         .for_each(|l| storage.logs.push(l));
-                } else if storage.settings.traces_enabled() {
+                }
+
+                if storage.settings.traces_enabled() {
                     storage.traces.push(trace);
                 }
             }
