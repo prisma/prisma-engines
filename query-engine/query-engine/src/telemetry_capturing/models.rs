@@ -7,18 +7,18 @@ const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ExportedSpan {
-    trace_id: String,
-    span_id: String,
-    parent_span_id: String,
-    name: String,
-    start_time: [u64; 2],
-    end_time: [u64; 2],
+    pub(self) trace_id: String,
+    pub(self) span_id: String,
+    pub(self) parent_span_id: String,
+    pub(self) name: String,
+    pub(self) start_time: [u64; 2],
+    pub(self) end_time: [u64; 2],
     #[serde(skip_serializing_if = "HashMap::is_empty")]
-    attributes: HashMap<String, String>,
+    pub(self) attributes: HashMap<String, String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    events: Vec<ExportedSpanEvent>,
+    pub(self) events: Vec<ExportedSpanEvent>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    links: Vec<Link>,
+    pub(self) links: Vec<Link>,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -34,7 +34,6 @@ impl ExportedSpan {
 
     pub(super) fn query_event(&self) -> ExportedSpanEvent {
         ExportedSpanEvent {
-            span_id: Some(self.span_id.to_owned()),
             name: self.attributes.get("db.statement").unwrap().to_string(),
             level: "query".to_string(),
             timestamp: self.start_time,
@@ -42,11 +41,8 @@ impl ExportedSpan {
         }
     }
 
-    /// splits events from the span without cloning
-    pub(super) fn split_events(self) -> (Vec<ExportedSpanEvent>, ExportedSpan) {
-        let events = self.events;
-        let span = ExportedSpan { events: vec![], ..self };
-        (events, span)
+    pub fn clone_events(&self) -> Vec<ExportedSpanEvent> {
+        self.events.clone()
     }
 }
 
@@ -86,11 +82,7 @@ impl From<SpanData> for ExportedSpan {
             .collect();
 
         let span_id = span.span_context.span_id().to_string();
-        let events = span
-            .events
-            .into_iter()
-            .map(|e| ExportedSpanEvent::from(e).with_span_id(span_id.clone()))
-            .collect();
+        let events = span.events.into_iter().map(|e| ExportedSpanEvent::from(e)).collect();
 
         Self {
             span_id,
@@ -108,18 +100,10 @@ impl From<SpanData> for ExportedSpan {
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ExportedSpanEvent {
-    pub(super) span_id: Option<String>,
     pub(super) name: String,
     pub(super) level: String,
     pub(super) timestamp: [u64; 2],
     pub(super) attributes: HashMap<String, String>,
-}
-
-impl ExportedSpanEvent {
-    pub(super) fn with_span_id(mut self, spain_id: String) -> Self {
-        self.span_id = Some(spain_id);
-        self
-    }
 }
 
 impl From<Event> for ExportedSpanEvent {
@@ -141,7 +125,6 @@ impl From<Event> for ExportedSpanEvent {
             .to_ascii_lowercase();
 
         Self {
-            span_id: None, // already attached to the span
             name,
             level,
             timestamp,
