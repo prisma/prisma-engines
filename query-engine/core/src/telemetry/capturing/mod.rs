@@ -2,7 +2,10 @@
 //! to the binary engine, and rendering them in the response.
 //!
 //! The interaction diagram below (soorry width!) shows the different roles at play during telemetry
-//! capturing. A textual explanatation follows it.
+//! capturing. A textual explanatation follows it. For the sake of example a server environment
+//! --the query-engine crate-- is assumed.
+//!
+//! ```
 //!
 //!                                                              ╔═══════════════════════╗ ╔═══════════════╗ ╔═══════════════════════╗                                                           
 //!                                                              ║<<SpanExporter, Sync>> ║ ║    Storage    ║ ║<<SpanProcessor, Sync>>║ ╔═══════════════════╗                                     
@@ -71,7 +74,7 @@
 //!        json!(res)                                                                                                                                                                           
 //!          [15]                                                                                                                                                                                                                                                                                                                                                          
 //!                                                                                                                                                                                              
-//!                    
+//! ```                  
 //!  
 //!  
 //!  In the diagram, you will see objects whose lifetime is static. The boxes for those have a double
@@ -137,12 +140,12 @@ pub fn capturer(trace_id: trace::TraceId, settings: &str) -> Capturer {
 
 /// Returns a clone of the global processor used by the tracer and used for deterministic flushing
 /// of the spans that are pending to be processed after a request finishes.
-pub(self) fn global_processor() -> SyncedSpanProcessor {
+pub(self) fn processor() -> SyncedSpanProcessor {
     PROCESSOR.to_owned()
 }
 
 /// Returns a clone to the global tracer used when capturing telemetry in the response
-pub fn global_tracer() -> &'static sdk::trace::Tracer {
+pub fn tracer() -> &'static sdk::trace::Tracer {
     &TRACER
 }
 
@@ -151,7 +154,7 @@ pub fn global_tracer() -> &'static sdk::trace::Tracer {
 fn setup_and_install_tracer_globally() -> sdk::trace::Tracer {
     global::set_text_map_propagator(sdk::propagation::TraceContextPropagator::new());
 
-    let provider_builder = sdk::trace::TracerProvider::builder().with_span_processor(global_processor());
+    let provider_builder = sdk::trace::TracerProvider::builder().with_span_processor(processor());
     let provider = provider_builder.build();
     let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "opentelemetry");
 
@@ -159,7 +162,6 @@ fn setup_and_install_tracer_globally() -> sdk::trace::Tracer {
     tracer
 }
 
-pub mod capturer;
-pub mod models;
+mod capturer;
 mod settings;
 pub mod storage;

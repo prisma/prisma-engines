@@ -7,7 +7,6 @@ pub mod logger;
 pub mod opt;
 pub mod server;
 pub mod state;
-pub mod telemetry_capturing;
 pub mod tracer;
 
 use error::PrismaError;

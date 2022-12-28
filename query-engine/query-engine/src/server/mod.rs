@@ -1,13 +1,11 @@
 use crate::state::State;
-use crate::telemetry_capturing::{self};
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::http::HeaderValue;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::trace::{SpanId, TraceContextExt, TraceId};
 use opentelemetry::{global, propagation::Extractor, Context};
-
-use query_core::get_trace_id_from_context;
+use query_core::telemetry;
 use query_core::{schema::QuerySchemaRenderer, TxId};
 use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
@@ -121,7 +119,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
     let (tx_id, span, capture_config, trace_id) = process_gql_req_headers(&req);
 
-    if let telemetry_capturing::capturer::Capturer::Enabled(capturer) = capture_config.clone() {
+    if let telemetry::capturing::Capturer::Enabled(capturer) = capture_config.clone() {
         capturer.start_capturing().await;
     }
 
@@ -135,7 +133,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
                 let mut result = handler.handle(body, tx_id, trace_id).instrument(span).await;
 
-                if let telemetry_capturing::capturer::Capturer::Enabled(capturer) = capture_config {
+                if let telemetry::capturing::Capturer::Enabled(capturer) = capture_config {
                     let telemetry = capturer.fetch_captures().await;
                     if let Some(telemetry) = telemetry {
                         result.set_extension("traces".to_owned(), json!(telemetry.traces));
@@ -370,7 +368,7 @@ fn get_parent_span_context(req: &Request<Body>) -> Option<Context> {
     // because getting the context is infallible, we can be returning a context that's not
     // useful for our purposes, for that reason we validate it and return None in case
     // it's set with an invalid TraceId
-    let trace_id = get_trace_id_from_context(&context);
+    let trace_id = telemetry::helpers::get_trace_id_from_context(&context);
     let span_id = context.span().span_context().span_id();
     if trace_id == TraceId::INVALID || span_id == SpanId::INVALID {
         None
@@ -401,7 +399,7 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
 
 pub(crate) fn process_gql_req_headers(
     req: &Request<Body>,
-) -> (Option<TxId>, Span, telemetry_capturing::Capturer, Option<String>) {
+) -> (Option<TxId>, Span, telemetry::capturing::Capturer, Option<String>) {
     let tx_id = get_transaction_id_from_header(req);
 
     let span = info_span!("prisma:engine", user_facing = true);
@@ -412,19 +410,19 @@ pub(crate) fn process_gql_req_headers(
 
     let context = span.context();
 
-    let trace_id = get_trace_id_from_context(&context);
+    let trace_id = telemetry::helpers::get_trace_id_from_context(&context);
     let trace_capture_header = req.headers().get(TRACE_CAPTURE_HEADER);
     let trace_capture = create_capture_config(trace_capture_header, trace_id);
 
     (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
-pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry_capturing::Capturer {
+pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry::capturing::Capturer {
     let settings = if let Some(h) = header {
         h.to_str().unwrap_or("")
     } else {
         ""
     };
 
-    telemetry_capturing::capturer(trace_id, settings)
+    telemetry::capturing::capturer(trace_id, settings)
 }

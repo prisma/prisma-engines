@@ -172,7 +172,11 @@ fn run_relation_link_test_impl(
 
                 teardown_project(&datamodel, Default::default()).await.unwrap();
             }
-            .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
+            .with_subscriber(test_tracing_subscriber(
+                ENV_LOG_LEVEL.to_string(),
+                metrics_for_subscriber,
+                log_tx,
+            )),
         );
     }
 }
@@ -282,7 +286,11 @@ pub fn run_connector_test_impl(
 
             crate::teardown_project(&datamodel, db_schemas).await.unwrap();
         }
-        .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
+        .with_subscriber(test_tracing_subscriber(
+            ENV_LOG_LEVEL.to_string(),
+            metrics_for_subscriber,
+            log_tx,
+        )),
     );
 }
 

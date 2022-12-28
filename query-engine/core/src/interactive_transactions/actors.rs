@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, ClosedTx, OpenTx, Operation,
-    ResponseData, TxId,
+    execute_many_operations, execute_single_operation, telemetry::helpers::set_span_link_from_trace_id, ClosedTx,
+    OpenTx, Operation, ResponseData, TxId,
 };
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
