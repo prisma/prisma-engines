@@ -87,6 +87,7 @@ impl Logger {
     pub fn install(&self) -> LoggerResult<()> {
         let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
+        let is_user_trace_or_event = filter_fn(telemetry::helpers::user_facing_filter);
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -109,6 +110,7 @@ impl Logger {
                 let tracer = telemetry::capturing::tracer().to_owned();
                 let telemetry_layer = tracing_opentelemetry::layer()
                     .with_tracer(tracer)
+                    .with_filter(is_user_trace_or_event)
                     .with_filter(telemetry::helpers::env_filter(
                         self.log_queries,
                         telemetry::helpers::QueryEngineLogLevel::FromEnv,
