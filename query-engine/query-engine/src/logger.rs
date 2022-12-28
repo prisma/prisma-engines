@@ -3,10 +3,10 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use query_core::is_user_facing_trace_filter;
+use query_core::telemetry;
 use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, EnvFilter, Layer};
+use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, Layer};
 
 use crate::LogFormat;
 
@@ -85,8 +85,8 @@ impl Logger {
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
     pub fn install(&self) -> LoggerResult<()> {
-        let filter = create_env_filter(self.log_queries);
-        let is_user_trace = filter_fn(is_user_facing_trace_filter);
+        let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
+        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -106,10 +106,13 @@ impl Logger {
         match self.tracing_config {
             TracingConfig::Captured => {
                 // Capturing is enabled, it overrides otel exporting.
-                let tracer = crate::telemetry_capturing::global_tracer().to_owned();
+                let tracer = telemetry::capturing::tracer().to_owned();
                 let telemetry_layer = tracing_opentelemetry::layer()
                     .with_tracer(tracer)
-                    .with_filter(create_env_filter(self.log_queries));
+                    .with_filter(telemetry::helpers::env_filter(
+                        self.log_queries,
+                        telemetry::helpers::QueryEngineLogLevel::FromEnv,
+                    ));
                 let subscriber = subscriber.with(telemetry_layer);
                 subscriber::set_global_default(subscriber)?;
             }
@@ -130,9 +133,8 @@ impl Logger {
             TracingConfig::Stdout => {
                 // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
                 // export traces too. We export it to stdout
-                let tracer = crate::tracer::new_pipeline()
-                    .with_client_span_exporter()
-                    .install_simple();
+                let exporter = crate::tracer::ClientSpanExporter::default();
+                let tracer = crate::tracer::install(Some(exporter), None);
                 let telemetry_layer = tracing_opentelemetry::layer()
                     .with_tracer(tracer)
                     .with_filter(is_user_trace);
@@ -146,31 +148,4 @@ impl Logger {
 
         Ok(())
     }
-}
-
-fn create_env_filter(log_queries: bool) -> EnvFilter {
-    let mut filter = EnvFilter::from_default_env()
-        .add_directive("tide=error".parse().unwrap())
-        .add_directive("tonic=error".parse().unwrap())
-        .add_directive("h2=error".parse().unwrap())
-        .add_directive("hyper=error".parse().unwrap())
-        .add_directive("tower=error".parse().unwrap());
-
-    if let Ok(qe_log_level) = std::env::var("QE_LOG_LEVEL") {
-        filter = filter
-            .add_directive(format!("query_engine={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("query_core={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("query_connector={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("sql_query_connector={}", &qe_log_level).parse().unwrap())
-            .add_directive(format!("mongodb_query_connector={}", &qe_log_level).parse().unwrap());
-    }
-
-    if log_queries {
-        // even when mongo queries are logged in debug mode, we want to log them if the log level is higher
-        filter = filter
-            .add_directive("quaint[{is_query}]=trace".parse().unwrap())
-            .add_directive("mongodb_query_connector=debug".parse().unwrap());
-    }
-
-    filter
 }

@@ -56,8 +56,12 @@ impl Actor {
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
         async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
-            fut.with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, setup_metrics(), log_tx))
-                .await
+            fut.with_subscriber(test_tracing_subscriber(
+                ENV_LOG_LEVEL.to_string(),
+                setup_metrics(),
+                log_tx,
+            ))
+            .await
         }
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);

@@ -1,10 +1,10 @@
-use super::models;
 use super::settings::Settings;
+use crate::telemetry::models;
 
 #[derive(Debug, Default)]
 pub struct Storage {
-    pub traces: Vec<models::ExportedSpan>,
-    pub logs: Vec<models::ExportedLog>,
+    pub traces: Vec<models::TraceSpan>,
+    pub logs: Vec<models::LogEvent>,
     pub settings: Settings,
 }
 

@@ -1,3 +1,5 @@
+use super::{settings::Settings, storage::Storage};
+use crate::telemetry::models::TraceSpan;
 use async_trait::async_trait;
 use opentelemetry::{
     sdk::{
@@ -8,8 +10,6 @@ use opentelemetry::{
 };
 use std::time::Duration;
 use std::{collections::HashMap, sync::Arc, sync::Mutex};
-
-use super::{models, settings::Settings, storage::Storage};
 
 /// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
 /// Generally, both the trace id and the settings will be derived from request headers. Thus, a new
@@ -84,7 +84,7 @@ impl Exporter {
     }
 
     pub(self) async fn fetch_captures(&self, trace_id: TraceId) -> Option<Storage> {
-        _ = super::global_processor().force_flush();
+        _ = super::processor().force_flush();
         let mut traces = self.storage.lock().unwrap();
 
         traces.remove(&trace_id)
@@ -106,7 +106,7 @@ impl SpanExporter for Exporter {
 
             let mut locked_storage = self.storage.lock().unwrap();
             if let Some(storage) = locked_storage.get_mut(&trace_id) {
-                let trace = models::ExportedSpan::from(span);
+                let trace = TraceSpan::from(span);
 
                 if storage.settings.included_log_levels.contains("query") && trace.is_query() {
                     storage.logs.push(trace.query_event())

@@ -32,7 +32,7 @@ pub mod query_graph;
 pub mod query_graph_builder;
 pub mod response_ir;
 pub mod result_ast;
-pub mod trace_helpers;
+pub mod telemetry;
 
 pub use error::*;
 pub use executor::*;
@@ -44,7 +44,7 @@ pub use query_graph::*;
 pub use query_graph_builder::*;
 pub use response_ir::*;
 pub use result_ast::*;
-pub use trace_helpers::*;
+pub use telemetry::*;
 
 /// Result type tying all sub-result type hierarchies of the core together.
 pub type Result<T> = std::result::Result<T, CoreError>;

@@ -1,22 +1,27 @@
-use opentelemetry::{sdk::export::trace::SpanData, trace::Event, KeyValue};
-use query_core::convert_to_high_res_time;
+use opentelemetry::{sdk::export::trace::SpanData, KeyValue};
 use serde::Serialize;
-use std::{borrow::Cow, collections::HashMap, time::SystemTime};
+use std::{
+    borrow::Cow,
+    collections::HashMap,
+    time::{Duration, SystemTime},
+};
 
 const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
 
+pub type HrTime = [u64; 2];
+
 #[derive(Serialize, Debug, Clone)]
-pub struct ExportedSpan {
+pub struct TraceSpan {
     pub(self) trace_id: String,
     pub(self) span_id: String,
     pub(self) parent_span_id: String,
     pub(self) name: String,
-    pub(self) start_time: [u64; 2],
-    pub(self) end_time: [u64; 2],
+    pub(self) start_time: HrTime,
+    pub(self) end_time: HrTime,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
     pub(self) attributes: HashMap<String, String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(self) events: Vec<ExportedSpanEvent>,
+    pub(self) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(self) links: Vec<Link>,
 }
@@ -27,13 +32,13 @@ pub struct Link {
     span_id: String,
 }
 
-impl ExportedSpan {
+impl TraceSpan {
     pub(super) fn is_query(&self) -> bool {
         self.name.eq("prisma:engine:db_query")
     }
 
-    pub(super) fn query_event(&self) -> ExportedSpanEvent {
-        ExportedSpanEvent {
+    pub(super) fn query_event(&self) -> Event {
+        Event {
             span_id: Some(self.span_id.to_owned()),
             name: self.attributes.get("db.statement").unwrap().to_string(),
             level: "query".to_string(),
@@ -42,12 +47,12 @@ impl ExportedSpan {
         }
     }
 
-    pub fn split_logs(self) -> (Vec<ExportedSpanEvent>, ExportedSpan) {
+    pub fn split_logs(self) -> (Vec<Event>, TraceSpan) {
         (self.events, Self { events: vec![], ..self })
     }
 }
 
-impl From<SpanData> for ExportedSpan {
+impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
         let attributes: HashMap<String, String> =
             span.attributes
@@ -86,7 +91,7 @@ impl From<SpanData> for ExportedSpan {
         let events = span
             .events
             .into_iter()
-            .map(|e| ExportedSpanEvent::from(e).with_span_id(span_id.clone()))
+            .map(|e| Event::from(e).with_span_id(span_id.clone()))
             .collect();
 
         Self {
@@ -104,23 +109,23 @@ impl From<SpanData> for ExportedSpan {
 }
 
 #[derive(Serialize, Debug, Clone)]
-pub struct ExportedSpanEvent {
+pub struct Event {
     pub(super) span_id: Option<String>,
     pub(super) name: String,
     pub(super) level: String,
-    pub(super) timestamp: [u64; 2],
+    pub(super) timestamp: HrTime,
     pub(super) attributes: HashMap<String, String>,
 }
 
-impl ExportedSpanEvent {
+impl Event {
     pub(super) fn with_span_id(mut self, spain_id: String) -> Self {
         self.span_id = Some(spain_id);
         self
     }
 }
 
-impl From<Event> for ExportedSpanEvent {
-    fn from(event: Event) -> Self {
+impl From<opentelemetry::trace::Event> for Event {
+    fn from(event: opentelemetry::trace::Event) -> Self {
         let name = event.name.to_string();
         let timestamp = convert_to_high_res_time(event.timestamp.duration_since(SystemTime::UNIX_EPOCH).unwrap());
         let mut attributes: HashMap<String, String> =
@@ -146,5 +151,36 @@ impl From<Event> for ExportedSpanEvent {
         }
     }
 }
+/// logs are modeled as span events
+pub type LogEvent = Event;
+/// metrics are modeled as span events
+pub type MetricEvent = Event;
 
-pub type ExportedLog = ExportedSpanEvent;
+///  Take from the otel library on what the format should be for High-Resolution time
+///  Defines High-Resolution Time.
+///
+///  The first number, HrTime[0], is UNIX Epoch time in seconds since 00:00:00 UTC on 1 January 1970.
+///  The second number, HrTime[1], represents the partial second elapsed since Unix Epoch time represented by first number in nanoseconds.
+///  For example, 2021-01-01T12:30:10.150Z in UNIX Epoch time in milliseconds is represented as 1609504210150.
+///  The first number is calculated by converting and truncating the Epoch time in milliseconds to seconds:
+/// HrTime[0] = Math.trunc(1609504210150 / 1000) = 1609504210.
+/// The second number is calculated by converting the digits after the decimal point of the subtraction, (1609504210150 / 1000) - HrTime[0], to nanoseconds:
+/// HrTime[1] = Number((1609504210.150 - HrTime[0]).toFixed(9)) * 1e9 = 150000000.
+/// This is represented in HrTime format as [1609504210, 150000000].
+fn convert_to_high_res_time(time: Duration) -> HrTime {
+    let secs = time.as_secs();
+    let partial = time.subsec_nanos();
+    [secs, partial as u64]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_high_resolution_time_works() {
+        // 2021-01-01T12:30:10.150Z in UNIX Epoch time in milliseconds
+        let time_val = Duration::from_millis(1609504210150);
+        assert_eq!([1609504210, 150000000], convert_to_high_res_time(time_val));
+    }
+}
