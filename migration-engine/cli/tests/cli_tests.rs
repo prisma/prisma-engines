@@ -311,7 +311,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     }
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Sqlite))]
 fn get_database_version_works_without_datamodel_init_arg(_api: TestApi) {
     use std::io::{BufRead, BufReader, Write as _};
     let schema = r#"
