@@ -6,17 +6,19 @@ mod attributes;
 mod composite_type;
 mod default;
 mod enumerator;
+mod field;
 mod field_type;
+mod index;
 mod model;
 
-pub use composite_type::{CompositeType, CompositeTypeField};
+pub use composite_type::CompositeType;
 pub use default::DefaultValue;
 pub use enumerator::{Enum, EnumVariant};
+pub use field::Field;
 pub use field_type::FieldType;
-pub use model::{
-    IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, IndexOps, Model, ModelField,
-    Relation,
-};
+pub use index::{IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexOps, UniqueFieldAttribute};
+pub use model::{Model, Relation};
+
 use psl::dml;
 use std::fmt;
 
@@ -116,14 +118,14 @@ mod tests {
         let mut data_model = Datamodel::new();
 
         let mut composite = CompositeType::new("Address");
-        let field = CompositeTypeField::new("street", "String");
+        let field = Field::new("street", "String");
         composite.push_field(field);
 
         data_model.push_composite_type(composite);
 
         let mut model = Model::new("User");
 
-        let mut field = ModelField::new("id", "Int");
+        let mut field = Field::new("id", "Int");
         field.id(IdFieldDefinition::default());
 
         let dv = DefaultValue::function(Function::new("autoincrement"));

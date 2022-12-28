@@ -10,6 +10,12 @@ impl<'a> Clone for Constant<&'a str> {
     }
 }
 
+impl<'a> Clone for Constant<Cow<'a, str>> {
+    fn clone(&self) -> Self {
+        Constant(self.0.clone())
+    }
+}
+
 impl<'a> Copy for Constant<&'a str> {}
 
 impl<'a> AsRef<str> for Constant<&'a str> {
