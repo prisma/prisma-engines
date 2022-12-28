@@ -126,7 +126,7 @@ mod tests {
             "ignoreEnvVarErrors": true,
         });
         let expected = expect![[
-            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null}}],"warnings":[]}"#
+            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]}"#
         ]];
         let response = get_config(&request.to_string()).unwrap();
         expected.assert_eq(&response);
@@ -148,7 +148,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"}}],"warnings":[]}"#
+            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[]}],"warnings":[]}"#
         ]];
         let response = get_config(&request.to_string()).unwrap();
         expected.assert_eq(&response);

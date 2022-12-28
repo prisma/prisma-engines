@@ -39,7 +39,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "url": {
               "fromEnvVar": null,
               "value": "postgresql://localhost/postgres1"
-            }
+            },
+            "schemas": []
           }
         ]"#]];
 
@@ -61,7 +62,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "url": {
               "fromEnvVar": "pg2",
               "value": null
-            }
+            },
+            "schemas": []
           }
         ]"#]];
 
@@ -83,7 +85,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "url": {
               "fromEnvVar": null,
               "value": "file://file.db"
-            }
+            },
+            "schemas": []
           }
         ]"#]];
 
@@ -105,7 +108,8 @@ fn serialize_builtin_sources_to_dmmf() {
             "url": {
               "fromEnvVar": null,
               "value": "mysql://localhost"
-            }
+            },
+            "schemas": []
           }
         ]"#]];
 
