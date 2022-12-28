@@ -15,7 +15,7 @@ fn multi_schema_tests(_api: TestApi) {
     let namespaces: &'static [&'static str] = &["one", "two"];
     let base_schema = indoc! {r#"
         datasource db {
-          provider   = "postgresql"
+          provider   = "sqlserver"
           url        = env("TEST_DATABASE_URL")
           schemas    = ["one", "two"]
         }
