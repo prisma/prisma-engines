@@ -273,3 +273,30 @@ fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
     psl::get_config::render_sources_to_json(&config.datasources)
 }
+
+#[test]
+fn parse_direct_url_should_work() {
+    let schema = indoc! {r#"
+        generator js {
+          provider        = "prisma-client-js"
+        }
+
+        datasource ds {
+          provider   = "postgres"
+          url        = env("DATABASE_URL")
+          directUrl = env("DIRECT_DATABASE_URL")
+        }
+    "#};
+
+    // assert_valid(schema);
+    let config = parse_configuration(schema);
+
+    let result = config
+        .datasources
+        .first()
+        .and_then(|ds| ds.direct_url.clone())
+        .and_then(|url| url.from_env_var)
+        .unwrap();
+
+    assert_eq!("DIRECT_DATABASE_URL", result);
+}
