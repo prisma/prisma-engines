@@ -684,3 +684,91 @@ fn relation_mode_default() {
 fn load_env_var(key: &str) -> Option<String> {
     std::env::var(key).ok()
 }
+
+#[test]
+fn must_error_for_empty_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = ""
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91m""[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_for_empty_env_direct_urls() {
+    std::env::set_var("DB_DIRECT_URL_EMPTY_0001", "  ");
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("DB_DIRECT_URL_EMPTY_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL. The environment variable `DB_DIRECT_URL_EMPTY_0001` resolved to an empty string.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("DB_DIRECT_URL_EMPTY_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_for_missing_env_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("MISSING_DIRECT_ENV_VAR_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mEnvironment variable not found: MISSING_DIRECT_ENV_VAR_0001.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("MISSING_DIRECT_ENV_VAR_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
