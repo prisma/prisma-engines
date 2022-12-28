@@ -335,19 +335,23 @@ impl GenericApi for EngineState {
                 Box::pin(async move {
                     let result = connector.introspect(&ctx).await?;
 
-                    Ok(IntrospectResult {
-                        datamodel: result.data_model,
-                        version: format!("{:?}", result.version),
-                        warnings: result
-                            .warnings
-                            .into_iter()
-                            .map(|warning| crate::json_rpc::types::IntrospectionWarning {
-                                code: warning.code,
-                                message: warning.message,
-                                affected: warning.affected,
-                            })
-                            .collect(),
-                    })
+                    if result.is_empty {
+                        Err(ConnectorError::into_introspection_result_empty_error())
+                    } else {
+                        Ok(IntrospectResult {
+                            datamodel: result.data_model,
+                            version: format!("{:?}", result.version),
+                            warnings: result
+                                .warnings
+                                .into_iter()
+                                .map(|warning| crate::json_rpc::types::IntrospectionWarning {
+                                    code: warning.code,
+                                    message: warning.message,
+                                    affected: warning.affected,
+                                })
+                                .collect(),
+                        })
+                    }
                 })
             }),
         )
