@@ -19,7 +19,6 @@ pub use field_type::FieldType;
 pub use index::{IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexOps, UniqueFieldAttribute};
 pub use model::{Model, Relation};
 
-use psl::dml;
 use std::fmt;
 
 /// The PSL data model declaration.
@@ -67,19 +66,6 @@ impl<'a> Datamodel<'a> {
     /// ```
     pub fn push_composite_type(&mut self, composite_type: CompositeType<'a>) {
         self.composite_types.push(composite_type);
-    }
-
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    pub fn push_dml(&mut self, datasource: &'a psl::Datasource, dml_data_model: &dml::Datamodel) {
-        for dml_model in dml_data_model.models() {
-            self.push_model(Model::from_dml(datasource, dml_model));
-        }
-
-        for dml_ct in dml_data_model.composite_types() {
-            self.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
-        }
     }
 
     /// True if the render output would be an empty string.

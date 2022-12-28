@@ -1,5 +1,4 @@
 use crate::value::{Constant, Documentation};
-use psl::dml;
 use std::{borrow::Cow, fmt};
 
 use super::Field;
@@ -53,22 +52,6 @@ impl<'a> CompositeType<'a> {
     /// ```
     pub fn push_field(&mut self, field: Field<'a>) {
         self.fields.push(field);
-    }
-
-    /// Generate a composite type rendering from the deprecated DML structure.
-    ///
-    /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &dml::CompositeType) -> Self {
-        let mut composite_type = CompositeType::new(dml_ct.name.clone());
-        let mut uniques = Default::default();
-
-        for dml_field in dml_ct.fields.iter() {
-            // TODO: remove when removing dml from mongo connector
-            let dml_field = dml::Field::from(dml_field.clone());
-            composite_type.push_field(Field::from_dml(datasource, &dml_field, &mut uniques, None));
-        }
-
-        composite_type
     }
 }
 
