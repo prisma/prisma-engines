@@ -481,7 +481,7 @@ model m1 {
 }
     "#;
 
-    let api = migration_core::migration_api(Some(schema.to_owned()), None).unwrap();
+    let api = migration_core::migration_api(Some(schema.to_owned()), vec![], None).unwrap();
     let err = tok(api.schema_push(migration_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema.to_owned(),

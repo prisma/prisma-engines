@@ -32,7 +32,7 @@ fn db_execute_happy_path_with_literal_url() {
     "#;
 
     // Execute the command.
-    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let generic_api = migration_core::migration_api(None, vec![], None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
@@ -68,7 +68,7 @@ fn db_execute_happy_path_with_prisma_schema() {
     "#;
 
     // Execute the command.
-    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let generic_api = migration_core::migration_api(None, vec![], None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
             schema: schema_path.to_string_lossy().into_owned(),
@@ -93,7 +93,7 @@ fn mysql_incomplete_script_works(api: TestApi) {
     "#;
 
     let url = api.connection_string().to_owned();
-    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let generic_api = migration_core::migration_api(None, vec![], None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
@@ -115,7 +115,7 @@ fn db_execute_error_path(api: TestApi) {
         CREATE TABLE "dogs" ( id INTEGER AUTO_INCREMENT PRIMARY KEY, name TEXT );
     "#;
 
-    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let generic_api = migration_core::migration_api(None, vec![], None).unwrap();
     let result = tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
             url: api.connection_string().to_owned(),
@@ -132,7 +132,7 @@ fn db_execute_drop_database_that_doesnt_exist_error(api: TestApi) {
         DROP DATABASE "thisisadatabaseweassumedoesntexist";
     "#;
 
-    let generic_api = migration_core::migration_api(None, None).unwrap();
+    let generic_api = migration_core::migration_api(None, vec![], None).unwrap();
     let result = tok(generic_api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
             url: api.connection_string().to_owned(),
@@ -164,7 +164,7 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
     let expected_sqlite_path = prisma_dir.join("dev.db");
     assert!(!expected_sqlite_path.exists());
 
-    let api = migration_core::migration_api(None, None).unwrap();
+    let api = migration_core::migration_api(None, vec![], None).unwrap();
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
             schema: schema_path.to_str().unwrap().to_owned(),

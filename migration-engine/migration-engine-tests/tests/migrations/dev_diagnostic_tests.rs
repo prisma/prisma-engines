@@ -829,7 +829,7 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
     let tempdir = tempfile::tempdir().unwrap();
     std::fs::write(tempdir.path().join("schema.prisma"), &schema).unwrap();
 
-    let api = migration_core::migration_api(Some(schema), None).unwrap();
+    let api = migration_core::migration_api(Some(schema), vec![], None).unwrap();
 
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url }),

@@ -98,7 +98,9 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     };
 
     let host = Arc::new(migration_engine_tests::test_api::TestConnectorHost::default());
-    let migration_engine = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    // TODO: accept namespaces as input argument
+    let namespaces: Vec<String> = vec![];
+    let migration_engine = migration_core::migration_api(None, namespaces, Some(host.clone())).unwrap();
 
     tok(migration_engine.diff(migration_core::json_rpc::types::DiffParams {
         exit_code: None,

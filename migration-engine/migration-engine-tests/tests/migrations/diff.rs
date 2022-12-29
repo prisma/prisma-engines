@@ -436,7 +436,7 @@ fn diff_sqlite_migration_directories() {
         }),
     };
 
-    tok(migration_core::migration_api(None, None).unwrap().diff(params)).unwrap();
+    tok(migration_core::migration_api(None, vec![], None).unwrap().diff(params)).unwrap();
     // it's ok!
 }
 
@@ -719,7 +719,7 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
 
 // Call diff, and expect it to error. Return the error.
 pub(crate) fn diff_error(params: DiffParams) -> String {
-    let api = migration_core::migration_api(None, None).unwrap();
+    let api = migration_core::migration_api(None, vec![], None).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params));
     result.unwrap_err().to_string()
 }
@@ -727,7 +727,7 @@ pub(crate) fn diff_error(params: DiffParams) -> String {
 // Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
 pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
-    let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    let api = migration_core::migration_api(None, vec![], Some(host.clone())).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{:?}", printed_messages);
