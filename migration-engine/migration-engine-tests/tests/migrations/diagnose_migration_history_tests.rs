@@ -820,7 +820,8 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(3306),
     );
 
-    let migration_api = migration_api(Some(datamodel), None).unwrap();
+    let namespaces: Vec<String> = vec![];
+    let migration_api = migration_api(Some(datamodel), namespaces, None).unwrap();
 
     let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
         migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
@@ -866,8 +867,9 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(5432),
     );
 
+    let namespaces: Vec<String> = vec![];
     let output = tok(async {
-        migration_api(Some(datamodel.clone()), None)
+        migration_api(Some(datamodel.clone()), namespaces, None)
             .unwrap()
             .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                 migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
@@ -920,12 +922,13 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
 
     let mut tries = 0;
 
+    let namespaces: Vec<String> = vec![];
     let migration_api = loop {
         if tries > 5 {
             panic!("Failed to connect to mssql more than five times.");
         }
 
-        let result = migration_api(Some(datamodel.clone()), None);
+        let result = migration_api(Some(datamodel.clone()), namespaces, None);
 
         match result {
             Ok(api) => break api,
