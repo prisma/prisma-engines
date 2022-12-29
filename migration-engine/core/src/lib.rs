@@ -165,6 +165,7 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn migration_connec
 /// Top-level constructor for the migration engine API.
 pub fn migration_api(
     datamodel: Option<String>,
+    namespaces: Vec<String>,
     host: Option<std::sync::Arc<dyn migration_connector::ConnectorHost>>,
 ) -> CoreResult<Box<dyn api::GenericApi>> {
     // Eagerly load the default schema, for validation errors.
@@ -172,7 +173,7 @@ pub fn migration_api(
         parse_configuration(datamodel)?;
     }
 
-    let state = state::EngineState::new(datamodel, host);
+    let state = state::EngineState::new(datamodel, namespaces, host);
     Ok(Box::new(state))
 }
 

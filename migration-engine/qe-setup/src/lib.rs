@@ -14,7 +14,7 @@ use migration_core::{
     migration_connector::{BoxFuture, ConnectorResult},
 };
 use psl::{builtin_connectors::*, Datasource};
-use std::{env, sync::Arc};
+use std::{env, sync::Arc, vec};
 
 fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<psl::PreviewFeature>)> {
     let config = psl::parse_configuration(datamodel)
@@ -99,9 +99,12 @@ impl migration_core::migration_connector::ConnectorHost for LoggingHost {
 }
 
 async fn diff_and_apply(schema: &str) {
+    // TODO: accept namespaces as input argument
+
     let tmpdir = tempfile::tempdir().unwrap();
     let host = Arc::new(LoggingHost::default());
-    let api = migration_core::migration_api(Some(schema.to_owned()), Some(host.clone())).unwrap();
+    let namespaces: Vec<String> = vec![];
+    let api = migration_core::migration_api(Some(schema.to_owned()), namespaces, Some(host.clone())).unwrap();
     let schema_file_path = tmpdir.path().join("schema.prisma");
     std::fs::write(&schema_file_path, schema).unwrap();
 

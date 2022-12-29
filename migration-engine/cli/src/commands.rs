@@ -24,7 +24,9 @@ impl Cli {
     }
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let api = migration_core::migration_api(None, None)?;
+        // TODO: accept namespaces as input argument
+        let namespaces: Vec<String> = vec![];
+        let api = migration_core::migration_api(None, namespaces, None)?;
         match self.command {
             CliCommand::CreateDatabase => {
                 let migration_core::json_rpc::types::CreateDatabaseResult { database_name } = api

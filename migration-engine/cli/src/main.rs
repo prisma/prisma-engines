@@ -17,6 +17,9 @@ struct MigrationEngineCli {
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
+    /// List of database schemas (namespaces) to use via the "multiSchema" feature
+    #[structopt(short = "s", long, name = "SCHEMAS")]
+    schemas: Vec<String>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
 }
@@ -36,7 +39,7 @@ async fn main() {
     let input = MigrationEngineCli::from_args();
 
     match input.cli_subcommand {
-        None => start_engine(input.datamodel.as_deref()).await,
+        None => start_engine(input.datamodel.as_deref(), input.schemas).await,
         Some(SubCommand::Cli(cli_command)) => {
             tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
             cli_command.run().await;
@@ -91,7 +94,7 @@ impl ConnectorHost for JsonRpcHost {
     }
 }
 
-async fn start_engine(datamodel_location: Option<&str>) {
+async fn start_engine(datamodel_location: Option<&str>, namespaces: Vec<String>) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -114,7 +117,7 @@ async fn start_engine(datamodel_location: Option<&str>) {
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };
 
-    let api = rpc_api(datamodel, Arc::new(host));
+    let api = rpc_api(datamodel, namespaces, Arc::new(host));
     // Block the thread and handle IO in async until EOF.
     json_rpc_stdio::run_with_client(&api, adapter).await.unwrap();
 }

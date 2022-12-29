@@ -20,6 +20,8 @@ use tracing_futures::Instrument;
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
     initial_datamodel: Option<psl::ValidatedSchema>,
+    // Vec of database schemas / namespaces.
+    initial_namespaces: Vec<String>,
     host: Arc<dyn ConnectorHost>,
     // A map from either:
     //
@@ -44,22 +46,33 @@ type ErasedConnectorRequest = Box<
 >;
 
 impl EngineState {
-    pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
+    pub(crate) fn new(
+        initial_datamodel: Option<String>,
+        namespaces: Vec<String>,
+        host: Option<Arc<dyn ConnectorHost>>,
+    ) -> Self {
+        let initial_namespaces = namespaces.clone();
+
         EngineState {
             initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
+            initial_namespaces,
             host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
             connectors: Default::default(),
         }
     }
 
     fn namespaces(&self) -> Option<Namespaces> {
-        self.initial_datamodel
-            .as_ref()
-            .and_then(|schema| schema.configuration.datasources.first())
-            .and_then(|ds| {
-                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
-                Namespaces::from_vec(&mut names)
-            })
+        if self.initial_namespaces.len() > 0 {
+            Namespaces::from_vec(&mut self.initial_namespaces.clone())
+        } else {
+            self.initial_datamodel
+                .as_ref()
+                .and_then(|schema| schema.configuration.datasources.first())
+                .and_then(|ds| {
+                    let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                    Namespaces::from_vec(&mut names)
+                })
+        }
     }
 
     async fn with_connector_from_schema_path<O: Send + 'static>(
@@ -322,15 +335,16 @@ impl GenericApi for EngineState {
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
         let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+        let namespaces = self.namespaces();
         self.with_connector_for_schema(
             &params.schema,
             None,
             Box::new(move |connector| {
                 let composite_type_depth = From::from(params.composite_type_depth);
                 let ctx = if params.force {
-                    migration_connector::IntrospectionContext::new_config_only(schema, composite_type_depth)
+                    migration_connector::IntrospectionContext::new_config_only(schema, namespaces, composite_type_depth)
                 } else {
-                    migration_connector::IntrospectionContext::new(schema, composite_type_depth)
+                    migration_connector::IntrospectionContext::new(schema, namespaces, composite_type_depth)
                 };
                 Box::pin(async move {
                     let result = connector.introspect(&ctx).await?;

@@ -21,7 +21,9 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
         conn.raw_cmd(&sql).await.unwrap();
         conn.raw_cmd(&format!("USE [{db_name}];")).await.unwrap();
     } else {
-        let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
+        // TODO: accept namespaces as input argument
+        let namespaces: Vec<String> = vec![];
+        let api = migration_core::migration_api(Some(prisma_schema.to_owned()), namespaces, None)?;
         api.reset().await.ok();
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.
