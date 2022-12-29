@@ -104,7 +104,7 @@ where
     );
 
     let validated_schema = psl::parse_schema(datamodel_string).unwrap();
-    let mut ctx = IntrospectionContext::new(validated_schema, composite_type_depth);
+    let mut ctx = IntrospectionContext::new(validated_schema, None, composite_type_depth);
     ctx.render_config = false;
 
     RT.block_on(async move {
