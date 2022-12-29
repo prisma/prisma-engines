@@ -1,5 +1,6 @@
-use opentelemetry::{sdk::export::trace::SpanData, KeyValue};
+use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
 use serde::Serialize;
+use serde_json::{json, Number};
 use std::{
     borrow::Cow,
     collections::HashMap,
@@ -8,9 +9,7 @@ use std::{
 
 const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
 
-pub type HrTime = [u64; 2];
-
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TraceSpan {
     pub(self) trace_id: String,
     pub(self) span_id: String,
@@ -19,14 +18,14 @@ pub struct TraceSpan {
     pub(self) start_time: HrTime,
     pub(self) end_time: HrTime,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(self) attributes: HashMap<String, String>,
+    pub(self) attributes: HashMap<String, serde_json::Value>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(self) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(self) links: Vec<Link>,
 }
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct Link {
     trace_id: String,
     span_id: String,
@@ -38,12 +37,31 @@ impl TraceSpan {
     }
 
     pub(super) fn query_event(&self) -> Event {
+        let duration_ms = ((self.end_time[0] as f64 - self.start_time[0] as f64) * 1_000.0)
+            + ((self.end_time[1] as f64 - self.start_time[1] as f64) / 1_000_000.0);
+
+        let statement = if let Some(q) = self.attributes.get("db.statement") {
+            match q {
+                serde_json::Value::String(s) => s.to_string(),
+                _ => "unknown".to_string(),
+            }
+        } else {
+            "unknown".to_string()
+        };
+
+        let attributes = vec![(
+            "duration_ms".to_owned(),
+            serde_json::Value::Number(Number::from_f64(duration_ms).unwrap()),
+        )]
+        .into_iter()
+        .collect();
+
         Event {
             span_id: Some(self.span_id.to_owned()),
-            name: self.attributes.get("db.statement").unwrap().to_string(),
+            name: statement,
             level: "query".to_string(),
             timestamp: self.start_time,
-            attributes: Default::default(),
+            attributes,
         }
     }
 
@@ -54,12 +72,12 @@ impl TraceSpan {
 
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
-        let attributes: HashMap<String, String> =
+        let attributes: HashMap<String, serde_json::Value> =
             span.attributes
-                .iter()
+                .into_iter()
                 .fold(HashMap::default(), |mut map, (key, value)| {
                     if ACCEPT_ATTRIBUTES.contains(&key.as_str()) {
-                        map.insert(key.to_string(), value.to_string());
+                        map.insert(key.to_string(), to_json_value(value));
                     }
 
                     map
@@ -108,13 +126,13 @@ impl From<SpanData> for TraceSpan {
     }
 }
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct Event {
     pub(super) span_id: Option<String>,
     pub(super) name: String,
     pub(super) level: String,
     pub(super) timestamp: HrTime,
-    pub(super) attributes: HashMap<String, String>,
+    pub(super) attributes: HashMap<String, serde_json::Value>,
 }
 
 impl Event {
@@ -128,18 +146,19 @@ impl From<opentelemetry::trace::Event> for Event {
     fn from(event: opentelemetry::trace::Event) -> Self {
         let name = event.name.to_string();
         let timestamp = convert_to_high_res_time(event.timestamp.duration_since(SystemTime::UNIX_EPOCH).unwrap());
-        let mut attributes: HashMap<String, String> =
+        let mut attributes: HashMap<String, serde_json::Value> =
             event
                 .attributes
-                .iter()
+                .into_iter()
                 .fold(Default::default(), |mut map, KeyValue { key, value }| {
-                    map.insert(key.to_string(), value.clone().to_string());
+                    map.insert(key.to_string(), to_json_value(value));
                     map
                 });
 
         let level = attributes
             .remove("level")
-            .unwrap_or_else(|| "unknown".to_string())
+            .unwrap_or(serde_json::Value::String("unknown".to_owned()))
+            .to_string()
             .to_ascii_lowercase();
 
         Self {
@@ -155,6 +174,8 @@ impl From<opentelemetry::trace::Event> for Event {
 pub type LogEvent = Event;
 /// metrics are modeled as span events
 pub type MetricEvent = Event;
+
+pub type HrTime = [u64; 2];
 
 ///  Take from the otel library on what the format should be for High-Resolution time
 ///  Defines High-Resolution Time.
@@ -173,9 +194,87 @@ fn convert_to_high_res_time(time: Duration) -> HrTime {
     [secs, partial as u64]
 }
 
+/// Transforms an [`opentelemetry::Value`] to a [`serde_json::Value`]
+/// This is because we want to flatten the JSON representation for a value, which by default will
+/// be a nested structure informing of the type. For instance a float [`opentelemetry::Value`]
+/// would be represented as json as:
+///
+/// ```
+/// "value": {
+///     "F64": 4.887
+/// }
+/// ```
+///
+/// But we want it to be just:
+///
+///  ```
+/// "value": 4.887
+/// ```
+fn to_json_value(value: Value) -> serde_json::Value {
+    match value {
+        Value::String(s) => json!(s),
+        Value::F64(f) => json!(f),
+        Value::Bool(b) => json!(b),
+        Value::I64(i) => json!(i),
+        Value::Array(ary) => match ary {
+            opentelemetry::Array::Bool(b_vec) => json!(b_vec),
+            opentelemetry::Array::I64(i_vec) => json!(i_vec),
+            opentelemetry::Array::F64(f_vec) => json!(f_vec),
+            opentelemetry::Array::String(s_vec) => json!(s_vec),
+        },
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // test conversion of tracespan to query event
+    #[test]
+    fn test_query_span_to_event() {
+        let mut span = TraceSpan {
+            trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_owned(),
+            span_id: "00f067aa0ba902b7".to_owned(),
+            parent_span_id: "00f067aa0ba902b5".to_owned(),
+            name: "prisma:engine:db_query".to_ascii_lowercase(),
+            start_time: [101, 0],
+            end_time: [101, 10000000],
+            attributes: Default::default(),
+            events: Default::default(),
+            links: Default::default(),
+        };
+
+        assert!(span.is_query());
+        assert_eq!(
+            json!(
+                {
+                    "span_id": "00f067aa0ba902b7",
+                    "name": "unknown",
+                    "level": "query",
+                    "timestamp": [101, 0],
+                    "attributes": {"duration_ms": 10.0},
+                }
+            ),
+            json!(span.query_event())
+        );
+
+        span.attributes = vec![("db.statement".to_owned(), "SELECT * FROM users".into())]
+            .into_iter()
+            .collect();
+
+        assert_eq!(
+            json!(
+                {
+                    "span_id": "00f067aa0ba902b7",
+                    "name": "SELECT * FROM users",
+                    "level": "query",
+                    "timestamp": [101, 0],
+                    "attributes": {"duration_ms": 10.0},
+                }
+            ),
+            json!(span.query_event())
+        );
+    }
 
     #[test]
     fn test_high_resolution_time_works() {
