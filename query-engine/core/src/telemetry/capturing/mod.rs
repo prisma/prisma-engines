@@ -5,7 +5,6 @@
 //! capturing. A textual explanatation follows it. For the sake of example a server environment
 //! --the query-engine crate-- is assumed.
 //!
-//! ```
 //!
 //!                                                              ╔═══════════════════════╗ ╔═══════════════╗ ╔═══════════════════════╗                                                           
 //!                                                              ║<<SpanExporter, Sync>> ║ ║    Storage    ║ ║<<SpanProcessor, Sync>>║ ╔═══════════════════╗                                     
@@ -73,9 +72,7 @@
 //!           ◀ ─ ─ ─└┬┘                                                     │                     │                     │                       │                                   x           
 //!        json!(res)                                                                                                                                                                           
 //!          [15]                                                                                                                                                                                                                                                                                                                                                          
-//!                                                                                                                                                                                              
-//! ```                  
-//!  
+//!                                                                                                                                                                                                         
 //!  
 //!  In the diagram, you will see objects whose lifetime is static. The boxes for those have a double
 //!  width margin. These are:
