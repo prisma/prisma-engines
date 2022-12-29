@@ -111,5 +111,15 @@ pub fn user_facing_filter(meta: &Metadata) -> bool {
         return true;
     }
 
-    meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
+    // a quaint query event is always user facing
+    if meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query" {
+        return true;
+    }
+
+    // a mongo query event is always user facing
+    if meta.target() == "mongodb_query_connector::query" {
+        return true;
+    }
+
+    false
 }
