@@ -51,18 +51,16 @@ impl EngineState {
         namespaces: Vec<String>,
         host: Option<Arc<dyn ConnectorHost>>,
     ) -> Self {
-        let initial_namespaces = namespaces.clone();
-
         EngineState {
             initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
-            initial_namespaces,
+            initial_namespaces: namespaces,
             host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
             connectors: Default::default(),
         }
     }
 
     fn namespaces(&self) -> Option<Namespaces> {
-        if self.initial_namespaces.len() > 0 {
+        if !self.initial_namespaces.is_empty() {
             Namespaces::from_vec(&mut self.initial_namespaces.clone())
         } else {
             self.initial_datamodel
