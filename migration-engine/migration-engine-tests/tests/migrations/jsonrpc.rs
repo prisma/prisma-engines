@@ -11,11 +11,13 @@ struct TestApi {
 
 impl TestApi {
     fn new(_args: TestApiArgs) -> Self {
+        // TODO: accept namespaces as input argument
         let host = Arc::new(migration_core::migration_connector::EmptyHost);
         let rt = tokio::runtime::Runtime::new().unwrap();
+        let namespaces: Vec<String> = vec![];
         TestApi {
             _args,
-            api: migration_core::rpc_api(None, host),
+            api: migration_core::rpc_api(None, namespaces, host),
             rt,
         }
     }
