@@ -180,19 +180,7 @@ fn convert_to_high_res_time(time: Duration) -> HrTime {
 /// Transforms an [`opentelemetry::Value`] to a [`serde_json::Value`]
 /// This is because we want to flatten the JSON representation for a value, which by default will
 /// be a nested structure informing of the type. For instance a float [`opentelemetry::Value`]
-/// would be represented as json as:
-///
-/// ```
-/// "value": {
-///     "F64": 4.887
-/// }
-/// ```
-///
-/// But we want it to be just:
-///
-///  ```
-/// "value": 4.887
-/// ```
+/// would be represented as json as `{"f64": 1.0}`. This function will flatten it to just `1.0`.
 fn to_json_value(value: &Value) -> serde_json::Value {
     match value {
         Value::String(s) => json!(s),

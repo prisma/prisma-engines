@@ -179,7 +179,7 @@ impl Candidate<'_, models::LogEvent> {
         }
 
         models::LogEvent {
-            name: name,
+            name,
             level: "query".to_string(),
             attributes: attrs,
             ..self.value
