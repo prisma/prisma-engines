@@ -922,12 +922,12 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
 
     let mut tries = 0;
 
-    let namespaces: Vec<String> = vec![];
     let migration_api = loop {
         if tries > 5 {
             panic!("Failed to connect to mssql more than five times.");
         }
 
+        let namespaces: Vec<String> = vec![];
         let result = migration_api(Some(datamodel.clone()), namespaces, None);
 
         match result {
