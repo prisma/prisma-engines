@@ -1,6 +1,6 @@
 use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
 use serde::Serialize;
-use serde_json::{json, Number};
+use serde_json::json;
 use std::{
     borrow::Cow,
     collections::HashMap,
@@ -11,18 +11,18 @@ const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TraceSpan {
-    pub(self) trace_id: String,
-    pub(self) span_id: String,
-    pub(self) parent_span_id: String,
-    pub(self) name: String,
-    pub(self) start_time: HrTime,
-    pub(self) end_time: HrTime,
+    pub(super) trace_id: String,
+    pub(super) span_id: String,
+    pub(super) parent_span_id: String,
+    pub(super) name: String,
+    pub(super) start_time: HrTime,
+    pub(super) end_time: HrTime,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(self) attributes: HashMap<String, serde_json::Value>,
+    pub(super) attributes: HashMap<String, serde_json::Value>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(self) events: Vec<Event>,
+    pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(self) links: Vec<Link>,
+    pub(super) links: Vec<Link>,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
@@ -32,40 +32,7 @@ pub struct Link {
 }
 
 impl TraceSpan {
-    pub(super) fn is_query(&self) -> bool {
-        self.name.eq("prisma:engine:db_query")
-    }
-
-    pub(super) fn query_event(&self) -> Event {
-        let duration_ms = ((self.end_time[0] as f64 - self.start_time[0] as f64) * 1_000.0)
-            + ((self.end_time[1] as f64 - self.start_time[1] as f64) / 1_000_000.0);
-
-        let statement = if let Some(q) = self.attributes.get("db.statement") {
-            match q {
-                serde_json::Value::String(s) => s.to_string(),
-                _ => "unknown".to_string(),
-            }
-        } else {
-            "unknown".to_string()
-        };
-
-        let attributes = vec![(
-            "duration_ms".to_owned(),
-            serde_json::Value::Number(Number::from_f64(duration_ms).unwrap()),
-        )]
-        .into_iter()
-        .collect();
-
-        Event {
-            span_id: Some(self.span_id.to_owned()),
-            name: statement,
-            level: "query".to_string(),
-            timestamp: self.start_time,
-            attributes,
-        }
-    }
-
-    pub fn split_logs(self) -> (Vec<Event>, TraceSpan) {
+    pub fn split_events(self) -> (Vec<Event>, TraceSpan) {
         (self.events, Self { events: vec![], ..self })
     }
 }
@@ -74,7 +41,7 @@ impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
         let attributes: HashMap<String, serde_json::Value> =
             span.attributes
-                .into_iter()
+                .iter()
                 .fold(HashMap::default(), |mut map, (key, value)| {
                     if ACCEPT_ATTRIBUTES.contains(&key.as_str()) {
                         map.insert(key.to_string(), to_json_value(value));
@@ -83,11 +50,27 @@ impl From<SpanData> for TraceSpan {
                     map
                 });
 
-        // Override the name of quaint. It will be confusing for users to see quaint instead of
-        // Prisma in the spans.
-        let name: Cow<str> = match span.name {
-            Cow::Borrowed("quaint:query") => "prisma:engine:db_query".into(),
-            _ => span.name.clone(),
+        // TODO(fernandez@prisma.io) mongo query events and quaint query events
+        // have different attributes. both of them are queries, however the name
+        // of quaint queries is quaint::query and the name of mongodb queries is
+        // prisma::engine::db_query. Both of them are generated as spans but quaint
+        // contains the full query, while mongodb only contains the collection name
+        // and the operatiion. For this reason, we treat them differently when geneating
+        // query events in logging capturing and other places.
+        //
+        // What we are currently doing is to add a quaint attribute to quaint queries
+        // so we can transform span containing the query into a query event. For mongo
+        // this is not enough and we need to extract a particular event.
+        //
+        // If we unified these two ways of logging / tracing query information, we could get rid of
+        // a lot of spaghetti code.
+
+        let is_quaint_query = matches!(span.name, Cow::Borrowed("quaint:query"));
+
+        let name: Cow<str> = if is_quaint_query {
+            "prisma:engine:db_query".into()
+        } else {
+            span.name.clone()
         };
 
         let hr_start_time = convert_to_high_res_time(span.start_time.duration_since(SystemTime::UNIX_EPOCH).unwrap());
@@ -151,7 +134,7 @@ impl From<opentelemetry::trace::Event> for Event {
                 .attributes
                 .into_iter()
                 .fold(Default::default(), |mut map, KeyValue { key, value }| {
-                    map.insert(key.to_string(), to_json_value(value));
+                    map.insert(key.to_string(), to_json_value(&value));
                     map
                 });
 
@@ -210,7 +193,7 @@ fn convert_to_high_res_time(time: Duration) -> HrTime {
 ///  ```
 /// "value": 4.887
 /// ```
-fn to_json_value(value: Value) -> serde_json::Value {
+fn to_json_value(value: &Value) -> serde_json::Value {
     match value {
         Value::String(s) => json!(s),
         Value::F64(f) => json!(f),
@@ -228,53 +211,6 @@ fn to_json_value(value: Value) -> serde_json::Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // test conversion of tracespan to query event
-    #[test]
-    fn test_query_span_to_event() {
-        let mut span = TraceSpan {
-            trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_owned(),
-            span_id: "00f067aa0ba902b7".to_owned(),
-            parent_span_id: "00f067aa0ba902b5".to_owned(),
-            name: "prisma:engine:db_query".to_ascii_lowercase(),
-            start_time: [101, 0],
-            end_time: [101, 10000000],
-            attributes: Default::default(),
-            events: Default::default(),
-            links: Default::default(),
-        };
-
-        assert!(span.is_query());
-        assert_eq!(
-            json!(
-                {
-                    "span_id": "00f067aa0ba902b7",
-                    "name": "unknown",
-                    "level": "query",
-                    "timestamp": [101, 0],
-                    "attributes": {"duration_ms": 10.0},
-                }
-            ),
-            json!(span.query_event())
-        );
-
-        span.attributes = vec![("db.statement".to_owned(), "SELECT * FROM users".into())]
-            .into_iter()
-            .collect();
-
-        assert_eq!(
-            json!(
-                {
-                    "span_id": "00f067aa0ba902b7",
-                    "name": "SELECT * FROM users",
-                    "level": "query",
-                    "timestamp": [101, 0],
-                    "attributes": {"duration_ms": 10.0},
-                }
-            ),
-            json!(span.query_event())
-        );
-    }
 
     #[test]
     fn test_high_resolution_time_works() {
