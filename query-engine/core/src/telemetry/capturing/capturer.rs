@@ -8,7 +8,7 @@ use opentelemetry::{
     },
     trace::{TraceId, TraceResult},
 };
-use std::{borrow::Cow, time::Duration};
+use std::{borrow::Cow, fmt, time::Duration};
 use std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 /// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
@@ -99,7 +99,8 @@ impl Default for Exporter {
 
 /// A Candidate represents either a span or an event that is being considered for capturing.
 /// A Candidate can be converted into a [`Capture`].
-struct Candidate<'batch_iter, T: Clone> {
+#[derive(Debug, Clone)]
+struct Candidate<'batch_iter, T: Clone + fmt::Debug> {
     value: T,
     settings: &'batch_iter Settings,
     original_span_name: Option<Cow<'batch_iter, str>>,
@@ -146,10 +147,9 @@ impl Candidate<'_, models::TraceSpan> {
 }
 
 impl Candidate<'_, models::LogEvent> {
-    //#[inline(always)]
+    #[inline(always)]
     fn is_loggable_mongo_db_query(&self) -> bool {
         self.settings.included_log_levels.contains("query") && {
-            dbg!(self.value.clone());
             if let Some(target) = self.value.attributes.get("target") {
                 if let Some(val) = target.as_str() {
                     return val == "mongodb_query_connector::query";
@@ -352,62 +352,145 @@ mod tests {
     use super::*;
     use std::time::Duration;
 
+    #[test]
     fn test_candidate_event_transformation() {
-        // Check that a mongo event is properly transformed and so they are the rest of Candidates
-        todo!()
+        let event = models::LogEvent {
+            span_id: Some("00f067aa0ba902b7".to_owned()),
+            name: "foo bar".to_owned(),
+            level: "debug".to_owned(),
+            timestamp: [101, 0],
+            attributes: vec![
+                (
+                    "target".to_owned(),
+                    serde_json::Value::String("mongodb_query_connector::query".to_owned()),
+                ),
+                (
+                    "query".to_owned(),
+                    serde_json::Value::String("db.Users.find()".to_owned()),
+                ),
+                ("duration_ms".to_owned(), serde_json::json!(100.0)),
+            ]
+            .into_iter()
+            .collect(),
+        };
+
+        let only_query_log_events: Settings = "query".into();
+
+        let candidate = Candidate {
+            value: event.clone(),
+            settings: &only_query_log_events,
+            original_span_name: None,
+        };
+
+        let capture: Capture = candidate.into();
+        match capture {
+            Capture::LogEvent(event) => {
+                assert_eq!(event.level, "query");
+                assert_eq!(event.name.to_string().as_str(), "db.Users.find()");
+                assert_eq!(event.attributes.get("duration_ms").unwrap().to_string(), "100.0");
+            }
+            _ => unreachable!(),
+        };
+
+        let event = models::LogEvent {
+            attributes: vec![(
+                "target".to_owned(),
+                serde_json::Value::String("a different one".to_owned()),
+            )]
+            .into_iter()
+            .collect(),
+            ..event
+        };
+        let candidate = Candidate {
+            value: event.clone(),
+            settings: &only_query_log_events,
+            original_span_name: None,
+        };
+
+        let capture: Capture = candidate.into();
+        match capture {
+            Capture::Discarded => {}
+            _ => unreachable!(),
+        }
     }
 
+    #[test]
     fn test_candidate_span_transformation() {
-        // Check that a quaint span is properly transformed, and so they are the rest of Candidates
-        todo!()
+        let trace_span = models::TraceSpan {
+            trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_owned(),
+            span_id: "00f067aa0ba902b7".to_owned(),
+            parent_span_id: "00f067aa0ba902b5".to_owned(),
+            name: "prisma:engine:db_query".to_ascii_lowercase(),
+            start_time: [101, 0],
+            end_time: [101, 10000000],
+            attributes: vec![(
+                "db.statement".to_owned(),
+                serde_json::Value::String("SELECT 1".to_owned()),
+            )]
+            .into_iter()
+            .collect(),
+            events: Default::default(),
+            links: Default::default(),
+        };
+
+        // capturing query events
+        let only_query_log_events: Settings = "query".into();
+        let original_span_name = Some(Cow::Borrowed("quaint:query"));
+
+        let candidate = Candidate {
+            value: trace_span.clone(),
+            settings: &only_query_log_events,
+            original_span_name: original_span_name.clone(),
+        };
+
+        let capture: Capture = candidate.into();
+        match capture {
+            Capture::LogEvent(event) => {
+                assert_eq!(event.level, "query");
+                assert_eq!(event.name.to_string().as_str(), "SELECT 1");
+                assert_eq!(event.attributes.get("duration_ms").unwrap().to_string(), "10.0");
+            }
+            _ => unreachable!(),
+        };
+
+        // capturing query and tracing events
+        let query_logs_and_traces: Settings = "query, tracing".into();
+        let candidate = Candidate {
+            value: trace_span.clone(),
+            settings: &query_logs_and_traces,
+            original_span_name: original_span_name.clone(),
+        };
+
+        let capture: Capture = candidate.into();
+        match capture {
+            Capture::Multiple(captures) => {
+                match captures[0] {
+                    Capture::LogEvent(_) => {}
+                    _ => unreachable!(),
+                };
+
+                match captures[1] {
+                    Capture::Span(_) => {}
+                    _ => unreachable!(),
+                };
+            }
+            _ => unreachable!(),
+        };
+
+        // capturing nothing
+        let reject_all: Settings = "".into();
+        let candidate = Candidate {
+            value: trace_span.clone(),
+            settings: &reject_all,
+            original_span_name: original_span_name.clone(),
+        };
+
+        let capture: Capture = candidate.into();
+        match capture {
+            Capture::Discarded => {}
+            _ => unreachable!(),
+        };
     }
-
-    // test conversion of tracespan to query event
-    // #[test]
-    // fn test_query_span_to_event() {
-    //     let mut span = TraceSpan {
-    //         trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_owned(),
-    //         span_id: "00f067aa0ba902b7".to_owned(),
-    //         parent_span_id: "00f067aa0ba902b5".to_owned(),
-    //         name: "prisma:engine:db_query".to_ascii_lowercase(),
-    //         start_time: [101, 0],
-    //         end_time: [101, 10000000],
-    //         attributes: Default::default(),
-    //         events: Default::default(),
-    //         links: Default::default(),
-    //     };
-
-    //     assert!(span.is_query());
-    //     assert_eq!(
-    //         json!(
-    //             {
-    //                 "span_id": "00f067aa0ba902b7",
-    //                 "name": "unknown",
-    //                 "level": "query",
-    //                 "timestamp": [101, 0],
-    //                 "attributes": {"duration_ms": 10.0},
-    //             }
-    //         ),
-    //         json!(span.query_event())
-    //     );
-
-    //     span.attributes = vec![("db.statement".to_owned(), "SELECT * FROM users".into())]
-    //         .into_iter()
-    //         .collect();
-
-    //     assert_eq!(
-    //         json!(
-    //             {
-    //                 "span_id": "00f067aa0ba902b7",
-    //                 "name": "SELECT * FROM users",
-    //                 "level": "query",
-    //                 "timestamp": [101, 0],
-    //                 "attributes": {"duration_ms": 10.0},
-    //             }
-    //         ),
-    //         json!(span.query_event())
-    //     );
-    // }
 
     #[tokio::test]
     async fn test_garbage_collection() {
