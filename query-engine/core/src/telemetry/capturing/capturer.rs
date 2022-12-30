@@ -129,12 +129,16 @@ impl Candidate<'_, models::TraceSpan> {
             "unknown".to_string()
         };
 
-        let attributes = vec![(
+        let mut attributes: HashMap<String, serde_json::Value> = vec![(
             "duration_ms".to_owned(),
             serde_json::Value::Number(serde_json::Number::from_f64(duration_ms).unwrap()),
         )]
         .into_iter()
         .collect();
+
+        if let Some(params) = span.attributes.get("params") {
+            attributes.insert("params".to_owned(), params.clone());
+        };
 
         models::Event {
             span_id: Some(span.span_id.to_owned()),
@@ -167,8 +171,12 @@ impl Candidate<'_, models::LogEvent> {
     fn query_event(self) -> models::LogEvent {
         let mut attributes = self.value.attributes;
         let mut attrs = HashMap::new();
-        if let Some(dur) = attributes.get("duration_ms") {
-            attrs.insert("duration_ms".to_owned(), dur.clone());
+        if let Some(duration) = attributes.get("duration_ms") {
+            attrs.insert("duration_ms".to_owned(), duration.clone());
+        }
+
+        if let Some(params) = attributes.get("params") {
+            attrs.insert("params".to_owned(), params.clone());
         }
 
         let mut name = "uknown".to_owned();
@@ -360,14 +368,9 @@ mod tests {
             level: "debug".to_owned(),
             timestamp: [101, 0],
             attributes: vec![
-                (
-                    "target".to_owned(),
-                    serde_json::Value::String("mongodb_query_connector::query".to_owned()),
-                ),
-                (
-                    "query".to_owned(),
-                    serde_json::Value::String("db.Users.find()".to_owned()),
-                ),
+                ("target".to_owned(), serde_json::json!("mongodb_query_connector::query")),
+                ("query".to_owned(), serde_json::json!("db.Users.find()")),
+                ("params".to_owned(), serde_json::json!(vec![1])),
                 ("duration_ms".to_owned(), serde_json::json!(100.0)),
             ]
             .into_iter()
@@ -387,7 +390,8 @@ mod tests {
             Capture::LogEvent(event) => {
                 assert_eq!(event.level, "query");
                 assert_eq!(event.name.to_string().as_str(), "db.Users.find()");
-                assert_eq!(event.attributes.get("duration_ms").unwrap().to_string(), "100.0");
+                assert!(event.attributes.contains_key("duration_ms"));
+                assert!(event.attributes.contains_key("params"))
             }
             _ => unreachable!(),
         };
@@ -423,10 +427,10 @@ mod tests {
             name: "prisma:engine:db_query".to_ascii_lowercase(),
             start_time: [101, 0],
             end_time: [101, 10000000],
-            attributes: vec![(
-                "db.statement".to_owned(),
-                serde_json::Value::String("SELECT 1".to_owned()),
-            )]
+            attributes: vec![
+                ("db.statement".to_owned(), serde_json::json!("SELECT ?")),
+                ("params".to_owned(), serde_json::json!([1])),
+            ]
             .into_iter()
             .collect(),
             events: Default::default(),
@@ -447,8 +451,9 @@ mod tests {
         match capture {
             Capture::LogEvent(event) => {
                 assert_eq!(event.level, "query");
-                assert_eq!(event.name.to_string().as_str(), "SELECT 1");
-                assert_eq!(event.attributes.get("duration_ms").unwrap().to_string(), "10.0");
+                assert_eq!(event.name.to_string().as_str(), "SELECT ?");
+                assert!(event.attributes.contains_key("duration_ms"));
+                assert!(event.attributes.contains_key("params"));
             }
             _ => unreachable!(),
         };
