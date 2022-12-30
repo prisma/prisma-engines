@@ -1,5 +1,5 @@
 use super::{settings::Settings, storage::Storage};
-use crate::telemetry::models::TraceSpan;
+use crate::models;
 use async_trait::async_trait;
 use opentelemetry::{
     sdk::{
@@ -8,7 +8,7 @@ use opentelemetry::{
     },
     trace::{TraceId, TraceResult},
 };
-use std::time::Duration;
+use std::{borrow::Cow, time::Duration};
 use std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 /// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
@@ -97,31 +97,215 @@ impl Default for Exporter {
     }
 }
 
+/// A Candidate represents either a span or an event that is being considered for capturing.
+/// A Candidate can be converted into a [`Capture`].
+struct Candidate<'batch_iter, T: Clone> {
+    value: T,
+    settings: &'batch_iter Settings,
+    original_span_name: Option<Cow<'batch_iter, str>>,
+}
+
+impl Candidate<'_, models::TraceSpan> {
+    #[inline(always)]
+    fn is_loggable_quaint_query(&self) -> bool {
+        self.settings.included_log_levels.contains("query")
+            && self.original_span_name.is_some()
+            && matches!(self.original_span_name, Some(Cow::Borrowed("quaint:query")))
+    }
+
+    fn query_event(&self) -> models::Event {
+        let span = &self.value;
+
+        let duration_ms = ((span.end_time[0] as f64 - span.start_time[0] as f64) * 1_000.0)
+            + ((span.end_time[1] as f64 - span.start_time[1] as f64) / 1_000_000.0);
+
+        let statement = if let Some(q) = span.attributes.get("db.statement") {
+            match q {
+                serde_json::Value::String(s) => s.to_string(),
+                _ => "unknown".to_string(),
+            }
+        } else {
+            "unknown".to_string()
+        };
+
+        let attributes = vec![(
+            "duration_ms".to_owned(),
+            serde_json::Value::Number(serde_json::Number::from_f64(duration_ms).unwrap()),
+        )]
+        .into_iter()
+        .collect();
+
+        models::Event {
+            span_id: Some(span.span_id.to_owned()),
+            name: statement,
+            level: "query".to_string(),
+            timestamp: span.start_time,
+            attributes,
+        }
+    }
+}
+
+impl Candidate<'_, models::LogEvent> {
+    //#[inline(always)]
+    fn is_loggable_mongo_db_query(&self) -> bool {
+        self.settings.included_log_levels.contains("query") && {
+            dbg!(self.value.clone());
+            if let Some(target) = self.value.attributes.get("target") {
+                if let Some(val) = target.as_str() {
+                    return val == "mongodb_query_connector::query";
+                }
+            }
+            false
+        }
+    }
+
+    #[inline(always)]
+    fn is_loggable_event(&self) -> bool {
+        self.settings.included_log_levels.contains(&self.value.level)
+    }
+
+    fn query_event(self) -> models::LogEvent {
+        let mut attributes = self.value.attributes;
+        let mut attrs = HashMap::new();
+        if let Some(dur) = attributes.get("duration_ms") {
+            attrs.insert("duration_ms".to_owned(), dur.clone());
+        }
+
+        let mut name = "uknown".to_owned();
+        if let Some(query) = attributes.remove("query") {
+            if let Some(str) = query.as_str() {
+                name = str.to_owned();
+            }
+        }
+
+        models::LogEvent {
+            name: name,
+            level: "query".to_string(),
+            attributes: attrs,
+            ..self.value
+        }
+    }
+}
+
+/// Capture provides mechanisms to transform a candidate into one of the enum variants.
+/// This is necessary because a candidate span might also be transformed into a log event
+/// (for quaint queries), or log events need to be transformed to a slightly different format
+/// (for mongo queries). In addition some span and events are discarded.
+enum Capture {
+    Span(models::TraceSpan),
+    LogEvent(models::LogEvent),
+    Multiple(Vec<Capture>),
+    Discarded,
+}
+
+impl Capture {
+    /// Add the capture to the traces and logs vectors. We pass the vectors in to allow for
+    /// a recursive implementation for the case of a candidate transforming into a Capture::Multiple
+    fn add_to(self, traces: &mut Vec<models::TraceSpan>, logs: &mut Vec<models::LogEvent>) {
+        match self {
+            Capture::Span(span) => {
+                traces.push(span);
+            }
+            Capture::LogEvent(log) => {
+                logs.push(log);
+            }
+            Capture::Multiple(captures) => {
+                for capture in captures {
+                    capture.add_to(traces, logs);
+                }
+            }
+            Capture::Discarded => {}
+        }
+    }
+}
+
+/// A Candidate Event can be transformed into either a slightly different LogEvent (for mongo queries)
+/// be captrured as-is if its log level is among the levels to capture, or be discarded.
+impl From<Candidate<'_, models::Event>> for Capture {
+    fn from(candidate: Candidate<'_, models::Event>) -> Capture {
+        if candidate.is_loggable_mongo_db_query() {
+            // mongo events representing queries are transformed into a more meaningful log event
+            return Capture::LogEvent(candidate.query_event());
+        } else if candidate.is_loggable_event() {
+            return Capture::LogEvent(candidate.value);
+        } else {
+            return Capture::Discarded;
+        }
+    }
+}
+
+/// A Candidate TraceSpan can be transformed into a LogEvent (for quaint queries) if query logging
+/// is enabled; captured as-is, if tracing is enabled; or be discarded.
+impl From<Candidate<'_, models::TraceSpan>> for Capture {
+    fn from(candidate: Candidate<'_, models::TraceSpan>) -> Capture {
+        let mut captures = vec![];
+
+        if candidate.is_loggable_quaint_query() {
+            captures.push(Capture::LogEvent(candidate.query_event()));
+        }
+
+        if candidate.settings.traces_enabled() {
+            captures.push(Capture::Span(candidate.value));
+        }
+
+        match captures.len() {
+            0 => Capture::Discarded,
+            1 => captures.pop().unwrap(),
+            _ => Capture::Multiple(captures),
+        }
+    }
+}
+
 #[async_trait]
 impl SpanExporter for Exporter {
-    // todo: lock less
+    /// Exports a batch of spans, each of them containing zero or more events that might represent
+    /// logs in the prisma client logging categories of logs (query, info, warn, error)
+    ///
+    /// There's an impedance between the client categories of logs and the server (standard)
+    /// hierarchical levels of logs (trace, debug, info, warn, error).
+    ///
+    /// The most prominent difference is the "query" type of events. In the client these model
+    /// database queries made by the engine through a connector. But ATM there's not a 1:1 mapping
+    /// between the client "query" level and one of the server levels. And depending on the database
+    /// mongo / relational, the information to build this kind of log event is logged diffeerently in
+    /// the server.
+    ///
+    /// In the case of the of relational databaes --queried through sql_query_connector and eventually
+    /// through quaint, a trace span describes the query-- `TraceSpan::represents_query_event`
+    /// determines if a span represents a query event.
+    ///
+    /// In the case of mongo, an event represents the query, but it needs to be transformed before
+    /// capturing it. `Event::query_event` does that.    
     async fn export(&mut self, batch: Vec<SpanData>) -> ExportResult {
-        for span in batch {
-            let trace_id = span.span_context.trace_id();
+        for span_data in batch {
+            let trace_id = span_data.span_context.trace_id();
 
             let mut locked_storage = self.storage.lock().unwrap();
             if let Some(storage) = locked_storage.get_mut(&trace_id) {
-                let trace = TraceSpan::from(span);
+                let settings = storage.settings.clone();
+                let original_span_name = span_data.name.clone();
 
-                if storage.settings.included_log_levels.contains("query") && trace.is_query() {
-                    storage.logs.push(trace.query_event())
-                }
+                let (events, span) = models::TraceSpan::from(span_data).split_events();
 
-                let (logs, trace) = trace.split_logs();
+                let candidate_span = Candidate {
+                    value: span,
+                    settings: &settings,
+                    original_span_name: Some(original_span_name),
+                };
+
+                let capture: Capture = candidate_span.into();
+                capture.add_to(&mut storage.traces, &mut storage.logs);
 
                 if storage.settings.logs_enabled() {
-                    logs.into_iter()
-                        .filter(|l| storage.settings.included_log_levels.contains(&l.level))
-                        .for_each(|l| storage.logs.push(l));
-                }
-
-                if storage.settings.traces_enabled() {
-                    storage.traces.push(trace);
+                    events.into_iter().for_each(|log| {
+                        let candidate_event = Candidate {
+                            value: log,
+                            settings: &settings,
+                            original_span_name: None,
+                        };
+                        let capture: Capture = candidate_event.into();
+                        capture.add_to(&mut storage.traces, &mut storage.logs);
+                    });
                 }
             }
         }
@@ -167,6 +351,63 @@ impl SpanProcessor for SyncedSpanProcessor {
 mod tests {
     use super::*;
     use std::time::Duration;
+
+    fn test_candidate_event_transformation() {
+        // Check that a mongo event is properly transformed and so they are the rest of Candidates
+        todo!()
+    }
+
+    fn test_candidate_span_transformation() {
+        // Check that a quaint span is properly transformed, and so they are the rest of Candidates
+        todo!()
+    }
+
+    // test conversion of tracespan to query event
+    // #[test]
+    // fn test_query_span_to_event() {
+    //     let mut span = TraceSpan {
+    //         trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_owned(),
+    //         span_id: "00f067aa0ba902b7".to_owned(),
+    //         parent_span_id: "00f067aa0ba902b5".to_owned(),
+    //         name: "prisma:engine:db_query".to_ascii_lowercase(),
+    //         start_time: [101, 0],
+    //         end_time: [101, 10000000],
+    //         attributes: Default::default(),
+    //         events: Default::default(),
+    //         links: Default::default(),
+    //     };
+
+    //     assert!(span.is_query());
+    //     assert_eq!(
+    //         json!(
+    //             {
+    //                 "span_id": "00f067aa0ba902b7",
+    //                 "name": "unknown",
+    //                 "level": "query",
+    //                 "timestamp": [101, 0],
+    //                 "attributes": {"duration_ms": 10.0},
+    //             }
+    //         ),
+    //         json!(span.query_event())
+    //     );
+
+    //     span.attributes = vec![("db.statement".to_owned(), "SELECT * FROM users".into())]
+    //         .into_iter()
+    //         .collect();
+
+    //     assert_eq!(
+    //         json!(
+    //             {
+    //                 "span_id": "00f067aa0ba902b7",
+    //                 "name": "SELECT * FROM users",
+    //                 "level": "query",
+    //                 "timestamp": [101, 0],
+    //                 "attributes": {"duration_ms": 10.0},
+    //             }
+    //         ),
+    //         json!(span.query_event())
+    //     );
+    // }
 
     #[tokio::test]
     async fn test_garbage_collection() {
