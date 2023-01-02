@@ -405,7 +405,47 @@ fn new_lines_in_source_must_work() {
             "url": {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
-            }
+            },
+            "schemas": []
+          }
+        ]"#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn multischema_must_work() {
+    let schema = indoc! {r#"
+      generator client {
+        provider        = "prisma-client-js"
+        previewFeatures = ["multiSchema"]
+      }
+
+      datasource ds {
+        provider = "postgresql"
+        url = "postgresql://localhost"
+        schemas = ["transactional", "public"]
+      }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = psl::render_sources_to_json(&config.datasources);
+
+    // schemas are sorted in ascending order
+    let expected = expect![[r#"
+        [
+          {
+            "name": "ds",
+            "provider": "postgresql",
+            "activeProvider": "postgresql",
+            "url": {
+              "fromEnvVar": null,
+              "value": "postgresql://localhost"
+            },
+            "schemas": [
+              "public",
+              "transactional"
+            ]
           }
         ]"#]];
 

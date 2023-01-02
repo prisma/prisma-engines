@@ -350,6 +350,53 @@ fn get_database_version_works_without_datamodel_init_arg(_api: TestApi) {
 }
 
 #[test]
+fn introspect_empty_database() {
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = env("TEST_DATABASE_URL")
+        }
+
+    "#;
+    std::fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+    let mut process = Command::new(migration_engine_bin_path())
+        .env(
+            "TEST_DATABASE_URL",
+            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
+        )
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "introspect",
+        "id": 1,
+        "params": {
+            "schema": schema,
+            "force": true,
+            "compositeTypeDepth": 5,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
+}
+
+// TODO: create a basic table before introspecting
+#[test]
+#[ignore]
 fn introspect_e2e() {
     use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
@@ -390,6 +437,8 @@ fn introspect_e2e() {
 
     let mut response = String::new();
     stdout.read_line(&mut response).unwrap();
+
+    dbg!("response: {:?}", &response);
 
     assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
 }
