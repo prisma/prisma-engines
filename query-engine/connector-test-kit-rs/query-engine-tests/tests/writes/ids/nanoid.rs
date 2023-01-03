@@ -73,8 +73,8 @@ mod nanoid {
         );
 
         let nanoid = match &res["data"]["createOneTodo"]["id"] {
-          serde_json::Value::String(str) => str,
-          _ => unreachable!(),
+            serde_json::Value::String(str) => str,
+            _ => unreachable!(),
         };
 
         assert_eq!(nanoid.len(), 7);
