@@ -433,6 +433,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb4a24b1aaf0fd0ce8b45161144d6f42cd91677fd5940fd431183eb023b3a2b8"
 
 [[package]]
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2056,7 +2065,7 @@ name = "mongodb-introspection-connector"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "convert_case",
+ "convert_case 0.5.0",
  "datamodel-renderer",
  "enumflags2",
  "expect-test",
@@ -2224,9 +2233,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "2.9.1"
+version = "2.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "743fece4c26c5132f8559080145fde9ba88700c0f1aa30a1ab3e057ab105814d"
+checksum = "838b5b414a008e75b97edb3c3e6f189034af789a0608686299b149d3b0e66c39"
 dependencies = [
  "bitflags",
  "ctor",
@@ -2246,11 +2255,11 @@ checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-derive"
-version = "2.9.1"
+version = "2.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39f3d8b02ef355898ea98f69082d9a183c8701c836942c2daf3e92364e88a0fa"
+checksum = "af4e44e34e70aa61be9036ae652e27c20db5bca80e006be0f482419f6601352a"
 dependencies = [
- "convert_case",
+ "convert_case 0.6.0",
  "napi-derive-backend",
  "proc-macro2",
  "quote",
@@ -2259,11 +2268,11 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "1.0.38"
+version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c35640513eb442fcbd1653a1c112fb6b2cc12b54d82f9c141f5859c721cab36"
+checksum = "17925fff04b6fa636f8e4b4608cc1a4f1360b64ac8ecbfdb7da1be1dc74f6843"
 dependencies = [
- "convert_case",
+ "convert_case 0.6.0",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -2377,9 +2386,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.15.0"
+version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e82dad04139b71a90c080c8463fe0dc7902db5192d939bd0950f074d014339e1"
+checksum = "6f61fba1741ea2b3d6a1e3178721804bb716a68a6aeba1149b5d52e3d464ea66"
 
 [[package]]
 name = "opaque-debug"

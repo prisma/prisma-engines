@@ -1,15 +1,18 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt};
 
 use super::IndexOps;
-use crate::value::{Constant, Function};
+use crate::{
+    datamodel::attributes::FieldAttribute,
+    value::{Constant, Function, Text},
+};
 
 /// Input parameters for a field in a model index definition.
 #[derive(Debug, Clone)]
 pub struct IndexFieldInput<'a> {
-    pub(super) name: Cow<'a, str>,
-    pub(super) sort_order: Option<Cow<'a, str>>,
-    pub(super) length: Option<u32>,
-    pub(super) ops: Option<IndexOps<'a>>,
+    pub(crate) name: Cow<'a, str>,
+    pub(crate) sort_order: Option<Cow<'a, str>>,
+    pub(crate) length: Option<u32>,
+    pub(crate) ops: Option<IndexOps<'a>>,
 }
 
 impl<'a> IndexFieldInput<'a> {
@@ -59,57 +62,6 @@ impl<'a> IndexFieldInput<'a> {
     }
 }
 
-/// Options for a field-level index attribute.
-#[derive(Debug, Default, Clone)]
-pub struct IndexFieldOptions<'a> {
-    pub(super) sort_order: Option<Cow<'a, str>>,
-    pub(super) length: Option<u32>,
-    pub(super) clustered: Option<bool>,
-    pub(super) map: Option<Cow<'a, str>>,
-}
-
-impl<'a> IndexFieldOptions<'a> {
-    /// Define the sort order of the inline field index.
-    ///
-    /// ```ignore
-    /// @unique(sort: Asc)
-    /// //            ^^^ here
-    /// ```
-    pub fn sort_order(&mut self, sort_order: impl Into<Cow<'a, str>>) {
-        self.sort_order = Some(sort_order.into());
-    }
-
-    /// Define the length of the inline field index.
-    ///
-    /// ```ignore
-    /// @unique(length: 32)
-    /// //              ^^ here
-    /// ```
-    pub fn length(&mut self, length: u32) {
-        self.length = Some(length);
-    }
-
-    /// Define the length clustering of the inline field index.
-    ///
-    /// ```ignore
-    /// @unique(clustered: true)
-    /// //                 ^^^^ here
-    /// ```
-    pub fn clustered(&mut self, value: bool) {
-        self.clustered = Some(value);
-    }
-
-    /// Define the constraint name.
-    ///
-    /// ```ignore
-    /// @unique(map: "key_foo")
-    /// //            ^^^^^^^ here
-    /// ```
-    pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
-        self.map = Some(value.into());
-    }
-}
-
 impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
     fn from(definition: IndexFieldInput<'a>) -> Self {
         let name: Vec<_> = definition
@@ -134,5 +86,63 @@ impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
         }
 
         fun
+    }
+}
+
+/// Options for a field-level unique attribute.
+#[derive(Debug)]
+pub struct UniqueFieldAttribute<'a>(FieldAttribute<'a>);
+
+impl<'a> Default for UniqueFieldAttribute<'a> {
+    fn default() -> Self {
+        Self(FieldAttribute::new(Function::new("unique")))
+    }
+}
+
+impl<'a> UniqueFieldAttribute<'a> {
+    /// Define the sort order of the inline field index.
+    ///
+    /// ```ignore
+    /// @unique(sort: Asc)
+    /// //            ^^^ here
+    /// ```
+    pub fn sort_order(&mut self, value: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("sort", Constant::new_no_validate(value.into())));
+    }
+
+    /// Define the length of the inline field index.
+    ///
+    /// ```ignore
+    /// @unique(length: 32)
+    /// //              ^^ here
+    /// ```
+    pub fn length(&mut self, length: u32) {
+        self.0.push_param(("length", Constant::new_no_validate(length)));
+    }
+
+    /// Define the length clustering of the inline field index.
+    ///
+    /// ```ignore
+    /// @unique(clustered: true)
+    /// //                 ^^^^ here
+    /// ```
+    pub fn clustered(&mut self, value: bool) {
+        self.0.push_param(("clustered", Constant::new_no_validate(value)))
+    }
+
+    /// Define the constraint name.
+    ///
+    /// ```ignore
+    /// @unique(map: "key_foo")
+    /// //            ^^^^^^^ here
+    /// ```
+    pub fn map(&mut self, value: impl Into<Cow<'a, str>>) {
+        self.0.push_param(("map", Text::new(value.into())))
+    }
+}
+
+impl<'a> fmt::Display for UniqueFieldAttribute<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
     }
 }

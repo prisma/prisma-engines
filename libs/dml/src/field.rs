@@ -4,6 +4,7 @@ use crate::native_type_instance::NativeTypeInstance;
 use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use crate::CompositeTypeFieldType;
 use crate::{
     default_value::{DefaultKind, DefaultValue, ValueGenerator},
     relation_info::ReferentialAction,
@@ -44,6 +45,17 @@ pub enum FieldType {
     Scalar(ScalarType, Option<NativeTypeInstance>),
     /// This is a composite type fields, with a composite type of the given type.
     CompositeType(String),
+}
+
+impl From<CompositeTypeFieldType> for FieldType {
+    fn from(typ: CompositeTypeFieldType) -> Self {
+        match typ {
+            CompositeTypeFieldType::CompositeType(t) => Self::CompositeType(t),
+            CompositeTypeFieldType::Scalar(t, nt) => Self::Scalar(t, nt),
+            CompositeTypeFieldType::Enum(e) => Self::Enum(e),
+            CompositeTypeFieldType::Unsupported(u) => Self::Unsupported(u),
+        }
+    }
 }
 
 impl FieldType {
