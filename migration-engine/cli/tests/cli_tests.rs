@@ -419,7 +419,7 @@ fn execute_postgres(api: TestApi) {
 }
 
 // TODO: it works fine if run once, it fails with a "Relation already exists" error if run twice in a row.
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn introspect_postgres(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
