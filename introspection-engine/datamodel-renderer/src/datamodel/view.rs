@@ -1,34 +1,12 @@
-mod relation;
-
-use psl::dml;
-pub use relation::Relation;
+use std::{borrow::Cow, fmt};
 
 use crate::value::{Constant, Documentation, Function};
-use std::{borrow::Cow, collections::HashMap, fmt};
 
-use super::{
-    attributes::BlockAttribute, field::Field, IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput,
-    IndexOps, UniqueFieldAttribute,
-};
-
-#[derive(Debug, Clone, Copy)]
-pub(super) enum Commented {
-    On,
-    Off,
-}
-
-impl fmt::Display for Commented {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Commented::On => f.write_str("// "),
-            Commented::Off => Ok(()),
-        }
-    }
-}
+use super::{attributes::BlockAttribute, model::Commented, Field, IdDefinition, IndexDefinition};
 
 /// Defines a model block.
 #[derive(Debug)]
-pub struct Model<'a> {
+pub struct View<'a> {
     name: Constant<Cow<'a, str>>,
     documentation: Option<Documentation<'a>>,
     commented_out: Commented,
@@ -40,11 +18,11 @@ pub struct Model<'a> {
     schema: Option<BlockAttribute<'a>>,
 }
 
-impl<'a> Model<'a> {
-    /// Create a new model declaration.
+impl<'a> View<'a> {
+    /// Create a new view declaration.
     ///
     /// ```ignore
-    /// model User {
+    /// view User {
     /// //    ^^^^ name
     /// }
     /// ```
@@ -64,12 +42,12 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Documentation of the model. If called repeteadly,
+    /// Documentation of the view. If called repeteadly,
     /// adds the new docs to the end with a newline.
     ///
     /// ```ignore
     /// /// This is the documentation.
-    /// model Foo {
+    /// view Foo {
     ///   ....
     /// }
     /// ```
@@ -80,10 +58,10 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Ignore the model.
+    /// Ignore the view.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@ignore
     ///   ^^^^^^^^ this
     /// }
@@ -92,10 +70,10 @@ impl<'a> Model<'a> {
         self.ignore = Some(BlockAttribute(Function::new("ignore")));
     }
 
-    /// Add a model-level id definition.
+    /// Add a view-level id definition.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@id([field1, field2(sort: Desc)])
     ///   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -104,10 +82,10 @@ impl<'a> Model<'a> {
         self.id = Some(id);
     }
 
-    /// Add a model-level mapping.
+    /// Add a view-level mapping.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@map("1Foo")
     ///   ^^^^^^^^^^^^^ this
     /// }
@@ -119,10 +97,10 @@ impl<'a> Model<'a> {
         self.map = Some(BlockAttribute(fun));
     }
 
-    /// The schema attribute of the model block
+    /// The schema attribute of the view block
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@schema("public")
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -134,10 +112,10 @@ impl<'a> Model<'a> {
         self.schema = Some(BlockAttribute(fun));
     }
 
-    /// Comments the complete model block out.
+    /// Comments the complete view block out.
     ///
     /// ```ignore
-    /// // model Foo {
+    /// // view Foo {
     /// //   id Int @id
     /// // }
     /// ```
@@ -145,10 +123,10 @@ impl<'a> Model<'a> {
         self.commented_out = Commented::On
     }
 
-    /// Push a new field to the model.
+    /// Push a new field to the view.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   id Int @id
     ///   ^^^^^^^^^^ this
     /// }
@@ -157,10 +135,10 @@ impl<'a> Model<'a> {
         self.fields.push(field);
     }
 
-    /// Push a new index to the model.
+    /// Push a new index to the view.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@index([field1, field2])
     ///   ^^^^^^^^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -168,191 +146,9 @@ impl<'a> Model<'a> {
     pub fn push_index(&mut self, index: IndexDefinition<'a>) {
         self.indexes.push(index);
     }
-
-    /// Generate a model rendering from the deprecated DML structure.
-    ///
-    /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_model: &dml::Model) -> Self {
-        let mut model = Model::new(dml_model.name.clone());
-
-        if let Some(docs) = &dml_model.documentation {
-            model.documentation(docs.clone());
-        }
-
-        if let Some(map) = &dml_model.database_name {
-            model.map(map.clone());
-        }
-
-        if let Some(ref schema) = dml_model.schema {
-            model.schema(schema.clone());
-        }
-
-        if dml_model.is_commented_out {
-            model.comment_out();
-        }
-
-        if dml_model.is_ignored {
-            model.ignore();
-        }
-
-        match dml_model.primary_key {
-            Some(ref pk) if !dml_model.has_single_id_field() => {
-                let fields = pk.fields.iter().map(|field| IndexFieldInput {
-                    name: Cow::Owned(field.name.clone()),
-                    sort_order: field.sort_order.as_ref().map(|so| so.as_ref().to_owned().into()),
-                    length: field.length,
-                    ops: None,
-                });
-
-                let mut definition: IdDefinition<'static> = IdDefinition::new(fields);
-
-                if let Some(ref name) = pk.name {
-                    definition.name(name.clone());
-                }
-
-                if let Some(ref map) = &pk.db_name {
-                    definition.map(map.clone());
-                }
-
-                if let Some(clustered) = pk.clustered {
-                    definition.clustered(clustered);
-                }
-
-                model.id(definition);
-            }
-            _ => (),
-        }
-
-        // weep
-        let mut uniques: HashMap<&str, UniqueFieldAttribute<'static>> = dml_model
-            .indices
-            .iter()
-            .rev() // replicate existing behaviour on duplicate unique constraints
-            .filter(|ix| ix.is_unique())
-            .filter(|ix| ix.defined_on_field)
-            .map(|ix| {
-                let definition = ix.fields.first().unwrap();
-                let mut opts = UniqueFieldAttribute::default();
-
-                if let Some(clustered) = ix.clustered {
-                    opts.clustered(clustered);
-                }
-
-                if let Some(ref sort_order) = definition.sort_order {
-                    opts.sort_order(sort_order.as_ref().to_owned());
-                }
-
-                if let Some(length) = definition.length {
-                    opts.length(length);
-                }
-
-                if let Some(ref map) = ix.db_name {
-                    opts.map(map.clone());
-                }
-
-                (definition.from_field(), opts)
-            })
-            .collect();
-
-        let primary_key = dml_model.primary_key.as_ref().filter(|pk| pk.defined_on_field);
-
-        for dml_field in dml_model.fields.iter() {
-            // sob :(
-            let id = primary_key.and_then(|pk| {
-                let field = pk.fields.first().unwrap();
-
-                if field.name == dml_field.name() {
-                    let mut opts = IdFieldDefinition::default();
-
-                    if let Some(clustered) = pk.clustered {
-                        opts.clustered(clustered);
-                    }
-
-                    if let Some(ref sort_order) = field.sort_order {
-                        opts.sort_order(sort_order.as_ref().to_owned());
-                    }
-
-                    if let Some(length) = field.length {
-                        opts.length(length);
-                    }
-
-                    if let Some(ref map) = pk.db_name {
-                        opts.map(map.clone());
-                    }
-
-                    Some(opts)
-                } else {
-                    None
-                }
-            });
-
-            model.push_field(Field::from_dml(datasource, dml_field, &mut uniques, id));
-        }
-
-        for dml_index in dml_model.indices.iter() {
-            if dml_index.defined_on_field && dml_index.is_unique() {
-                continue;
-            }
-
-            // cry
-            let fields = dml_index.fields.iter().map(|f| {
-                let mut name = String::new();
-                let mut name_path = f.path.iter().peekable();
-
-                while let Some((ident, _)) = name_path.next() {
-                    name.push_str(ident);
-
-                    if name_path.peek().is_some() {
-                        name.push('.');
-                    }
-                }
-
-                let ops = f.operator_class.as_ref().map(|c| {
-                    if c.is_raw() {
-                        IndexOps::raw(c.as_ref().to_owned())
-                    } else {
-                        IndexOps::managed(c.as_ref().to_owned())
-                    }
-                });
-
-                IndexFieldInput {
-                    name: Cow::Owned(name),
-                    sort_order: f.sort_order.map(|s| s.as_ref().to_string().into()),
-                    length: f.length,
-                    ops,
-                }
-            });
-
-            let mut definition = match dml_index.tpe {
-                dml::IndexType::Unique => IndexDefinition::unique(fields),
-                dml::IndexType::Normal => IndexDefinition::index(fields),
-                dml::IndexType::Fulltext => IndexDefinition::fulltext(fields),
-            };
-
-            if let Some(ref name) = dml_index.name {
-                definition.name(name.clone());
-            }
-
-            if let Some(ref map) = dml_index.db_name {
-                definition.map(map.clone());
-            }
-
-            if let Some(clustered) = dml_index.clustered {
-                definition.clustered(clustered);
-            }
-
-            if let Some(ref algo) = dml_index.algorithm {
-                definition.index_type(algo.as_ref().to_string());
-            }
-
-            model.push_index(definition);
-        }
-
-        model
-    }
 }
 
-impl<'a> fmt::Display for Model<'a> {
+impl<'a> fmt::Display for View<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Prefix everything with this, so if the model is commented out, so
         // is your line.
@@ -362,7 +158,7 @@ impl<'a> fmt::Display for Model<'a> {
             docs.fmt(f)?;
         }
 
-        writeln!(f, "{comment}model {} {{", self.name)?;
+        writeln!(f, "{comment}view {} {{", self.name)?;
 
         for field in self.fields.iter() {
             writeln!(f, "{comment}{field}")?;
@@ -403,7 +199,7 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut model = Model::new("Country");
+        let mut model = View::new("Country");
         model.map("1Country");
         model.documentation("Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!");
 
@@ -502,7 +298,7 @@ mod tests {
             /// If you love the trail of streaking fire
             /// Do not fear death
             /// If you desire a speed king to become!
-            model Country {
+            view Country {
               id          String              @id(sort: Desc, length: 32, clustered: false) @default(uuid()) @db.VarChar(255)
               /// NOPEUSKUNINGAS
               value       Bytes?              @default("AQIDBA==")
@@ -527,7 +323,7 @@ mod tests {
 
     #[test]
     fn commented_out() {
-        let mut model = Model::new("Country");
+        let mut model = View::new("Country");
 
         let mut field = Field::new("id", "String");
         field.id(IdFieldDefinition::default());
@@ -539,7 +335,7 @@ mod tests {
         model.comment_out();
 
         let expected = expect![[r#"
-            // model Country {
+            // view Country {
             // id String @id @default(uuid()) @db.VarChar(255)
             // @@schema("public")
             // }
