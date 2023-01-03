@@ -10,6 +10,7 @@ schema-ast = { path = "../../psl/schema-ast" }
 
 uuid.workspace = true
 cuid = { version = "1.2", optional = true }
+nanoid = { version = "0.4.0", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
 serde.workspace = true
 serde_json.workspace = true
@@ -20,4 +21,4 @@ either = "1.6"
 [features]
 # Support for generating default UUID and CUID default values. This implies
 # random number generation works, so it doesn't compile on targets like wasm32.
-default_generators = ["uuid/v4", "cuid"]
+default_generators = ["uuid/v4", "cuid", "nanoid"]

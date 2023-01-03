@@ -44,6 +44,23 @@ fn should_allow_string_ids_with_cuid() {
 }
 
 #[test]
+fn should_allow_string_ids_with_nanoid() {
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(nanoid())
+        }
+    "#};
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_scalar_field("id")
+        .assert_is_id(user_model)
+        .assert_base_type(&ScalarType::String)
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid()));
+}
+
+#[test]
 fn should_allow_string_ids_with_uuid() {
     let dml = indoc! {r#"
         model Model {

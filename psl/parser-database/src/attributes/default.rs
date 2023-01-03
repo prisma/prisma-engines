@@ -193,7 +193,7 @@ fn validate_model_builtin_scalar_type_default(
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID =>
+            if funcname == FN_UUID || funcname == FN_CUID || funcname == FN_NANOID =>
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
@@ -459,8 +459,9 @@ fn validate_builtin_scalar_list_default(
 const FN_AUTOINCREMENT: &str = "autoincrement";
 const FN_CUID: &str = "cuid";
 const FN_DBGENERATED: &str = "dbgenerated";
+const FN_NANOID: &str = "nanoid";
 const FN_NOW: &str = "now";
 const FN_UUID: &str = "uuid";
 const FN_AUTO: &str = "auto";
 
-const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NOW, FN_UUID, FN_AUTO];
+const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NANOID, FN_NOW, FN_UUID, FN_AUTO];

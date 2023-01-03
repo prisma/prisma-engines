@@ -575,6 +575,9 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
         ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
             DefaultKind::Expression(ValueGenerator::new_cuid())
         }
+        ast::Expression::Function(funcname, _args, _) if funcname == "nanoid" => {
+          DefaultKind::Expression(ValueGenerator::new_nanoid())
+        }
         ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
             DefaultKind::Expression(ValueGenerator::new_now())
         }

@@ -19,6 +19,7 @@ pub(crate) enum DefaultKind<'a> {
     Autoincrement,
     Uuid,
     Cuid,
+    Nanoid,
     Prisma1Uuid,
     Prisma1Cuid,
     Now,
@@ -123,6 +124,7 @@ impl<'a> DefaultValuePair<'a> {
             (None, sql::ColumnTypeFamily::String) => match self.previous {
                 Some(previous) if previous.is_cuid() => Some(DefaultKind::Cuid),
                 Some(previous) if previous.is_uuid() => Some(DefaultKind::Uuid),
+                Some(previous) if previous.is_nanoid() => Some(DefaultKind::Nanoid),
                 None if self.context.version.is_prisma1() && self.context.sql_family.is_postgres() => {
                     let native_type: &PostgresType = self.next.column_type().native_type.as_ref()?.downcast_ref();
 

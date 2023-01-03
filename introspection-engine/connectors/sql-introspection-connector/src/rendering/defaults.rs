@@ -50,6 +50,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
             DefaultKind::Autoincrement => Some(renderer::DefaultValue::function(Function::new("autoincrement"))),
             DefaultKind::Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
             DefaultKind::Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
+            DefaultKind::Nanoid => Some(renderer::DefaultValue::function(Function::new("nanoid"))),
             DefaultKind::Now => Some(renderer::DefaultValue::function(Function::new("now"))),
             DefaultKind::String(s) => Some(renderer::DefaultValue::text(s)),
             DefaultKind::Constant(c) => Some(renderer::DefaultValue::constant(c)),
