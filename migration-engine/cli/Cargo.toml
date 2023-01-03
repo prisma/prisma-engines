@@ -22,7 +22,6 @@ serde_json = "1.0.74"
 tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
-migration-engine-tests = { path = "../migration-engine-tests" }
 url = "2.1.1"
 connection-string = "0.1"
 quaint.workspace = true

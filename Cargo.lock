@@ -1913,7 +1913,6 @@ dependencies = [
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
- "migration-engine-tests",
  "quaint",
  "serde_json",
  "structopt",
