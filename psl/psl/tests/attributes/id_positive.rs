@@ -57,8 +57,27 @@ fn should_allow_string_ids_with_nanoid() {
         .assert_has_scalar_field("id")
         .assert_is_id(user_model)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid(None)));
 }
+
+
+#[test]
+fn should_allow_string_ids_with_nanoid_with_length() {
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(nanoid(7))
+        }
+    "#};
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_scalar_field("id")
+        .assert_is_id(user_model)
+        .assert_base_type(&ScalarType::String)
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid(Some(7))));
+}
+
 
 #[test]
 fn should_allow_string_ids_with_uuid() {

@@ -513,6 +513,69 @@ fn dbgenerated_default_errors_must_not_cascade_into_other_errors() {
 }
 
 #[test]
+fn must_error_on_too_small_argument_in_nanoid() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id String @id @default(nanoid(1))
+        }"#
+    );
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": `nanoid()` takes either no argument, or a single integer argument >= 2.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel Category {
+        [1;94m 2 | [0m  id String @id [1;91m@default(nanoid(1))[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_unwrap_err(input));
+}
+
+#[test]
+fn must_error_on_invalid_type_in_nanoid() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id String @id @default(nanoid("asdf"))
+        }"#
+    );
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": `nanoid()` takes a single Int argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel Category {
+        [1;94m 2 | [0m  id String @id [1;91m@default(nanoid("asdf"))[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_unwrap_err(input));
+}
+
+#[test]
+fn must_error_on_non_string_column_for_nanoid() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id Int @id @default(nanoid("asdf"))
+        }"#
+    );
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `nanoid()` cannot be used on fields of type `Int`.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel Category {
+        [1;94m 2 | [0m  id Int @id [1;91m@default(nanoid("asdf"))[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_unwrap_err(input));
+}
+
+#[test]
 fn named_default_constraints_should_not_work_on_non_sql_server() {
     let dml = indoc! { r#"
         datasource test {

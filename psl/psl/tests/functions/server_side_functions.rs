@@ -55,7 +55,7 @@ fn correctly_handle_server_side_nanoid_function() {
     user_model
         .assert_has_scalar_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid()));
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid(None)));
 }
 
 #[test]
