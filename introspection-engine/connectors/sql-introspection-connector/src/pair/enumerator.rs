@@ -1,3 +1,4 @@
+use crate::sanitize_datamodel_names::{EnumVariantName, ModelName};
 use psl::{
     parser_database::walkers,
     schema_ast::ast::{self, WithDocumentation},
@@ -27,6 +28,17 @@ impl<'a> EnumPair<'a> {
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
         self.context.enum_prisma_name(self.next.id).prisma_name()
+    }
+
+    /// The name of the variant is taken from the PSL.
+    pub(crate) fn name_from_psl(self) -> bool {
+        matches!(
+            self.context.enum_prisma_name(self.next.id),
+            ModelName::FromPsl {
+                mapped_name: Some(_),
+                ..
+            }
+        )
     }
 
     /// The namespace of the enumerator, if using the multi-schema feature.
@@ -76,6 +88,17 @@ impl<'a> EnumVariantPair<'a> {
     /// the database.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
         self.context.enum_variant_name(self.next.id).mapped_name()
+    }
+
+    /// The name of the variant is taken from the PSL.
+    pub(crate) fn name_from_psl(self) -> bool {
+        matches!(
+            self.context.enum_variant_name(self.next.id),
+            EnumVariantName::FromPsl {
+                mapped_name: Some(_),
+                ..
+            }
+        )
     }
 
     /// Name of the variant in the PSL. The value can be sanitized if

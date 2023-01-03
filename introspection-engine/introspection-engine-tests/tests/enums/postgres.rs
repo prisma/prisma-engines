@@ -269,3 +269,85 @@ async fn a_variant_that_cannot_be_sanitized_triggers_dbgenerated_in_defaults(api
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_mapped_variant_will_not_warn(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE Type "A" as ENUM ('0first', '1second');
+
+        CREATE TABLE "B" (
+            id SERIAL PRIMARY KEY,
+            val "A" NOT NULL
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          val A
+        }
+
+        enum A {
+          first  @map("0first")
+          second @map("1second")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+    api.expect_no_warnings().await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn a_mapped_enum_will_not_warn(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE Type "1A" as ENUM ('first', 'second');
+
+        CREATE TABLE "B" (
+            id SERIAL PRIMARY KEY,
+            val "1A" NOT NULL
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model B {
+          id  Int @id @default(autoincrement())
+          val A
+        }
+
+        enum A {
+          first
+          second
+
+          @@map("1A")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+    api.expect_no_warnings().await;
+
+    Ok(())
+}

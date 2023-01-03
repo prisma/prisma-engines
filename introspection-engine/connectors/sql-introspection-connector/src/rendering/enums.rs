@@ -44,7 +44,9 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, warnings: &mut Warnings) -> renderer::E
 
     if let Some(mapped_name) = r#enum.mapped_name() {
         rendered_enum.map(mapped_name);
+    }
 
+    if r#enum.name_from_psl() {
         let warning = warnings::warning_enriched_with_map_on_enum(&[warnings::Enum::new(&r#enum.name())]);
         warnings.push(warning);
     }
@@ -93,7 +95,7 @@ fn render_enum<'a>(r#enum: EnumPair<'a>, warnings: &mut Warnings) -> renderer::E
 
             warnings.enum_values_with_empty_names.push(warning);
             rendered_variant.comment_out();
-        } else if variant.mapped_name().is_some() {
+        } else if variant.name_from_psl() {
             remapped_values.push(warnings::EnumAndValue {
                 value: variant.name().to_string(),
                 enm: r#enum.name().to_string(),

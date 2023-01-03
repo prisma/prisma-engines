@@ -559,24 +559,6 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> T
     let expected = expect![[r#"
         [
           {
-            "code": 9,
-            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "enm": "first_HappyMood"
-              }
-            ]
-          },
-          {
-            "code": 9,
-            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "enm": "second_HappyMood"
-              }
-            ]
-          },
-          {
             "code": 20,
             "message": "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language.",
             "affected": [
