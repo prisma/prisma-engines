@@ -53,8 +53,8 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
             DefaultKind::Nanoid(length) => {
                 let mut fun = Function::new("nanoid");
 
-                if let Some(param) = length.filter(|i| (*i) > &2) {
-                    fun.push_param(Value::from(Constant::from(param)));
+                if let Some(length_val) = length {
+                    fun.push_param(Value::from(Constant::from(length_val)));
                 }
 
                 Some(renderer::DefaultValue::function(fun))
