@@ -979,6 +979,10 @@ async fn virtual_cuid_default(api: &TestApi) {
                 t.add_column("id", types::varchar(36).primary(true));
             });
 
+            migration.create_table("User3", |t| {
+                t.add_column("id", types::varchar(21).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -995,6 +999,10 @@ async fn virtual_cuid_default(api: &TestApi) {
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
         }
+
+        model User3 {
+            id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1005,6 +1013,10 @@ async fn virtual_cuid_default(api: &TestApi) {
 
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
+        }
+
+        model User3 {
+            id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
 
         model Unrelated {
