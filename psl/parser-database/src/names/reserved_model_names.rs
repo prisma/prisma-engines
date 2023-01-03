@@ -8,14 +8,14 @@ pub fn is_reserved_type_name(name: &str) -> bool {
     RESERVED_NAMES.contains(&name)
 }
 
-pub(crate) fn validate_model_name(ast_model: &ast::Model, diagnostics: &mut Diagnostics) {
+pub(crate) fn validate_model_name(ast_model: &ast::Model, block_type: &'static str, diagnostics: &mut Diagnostics) {
     if !is_reserved_type_name(ast_model.name()) {
         return;
     }
 
     diagnostics.push_error(DatamodelError::new_model_validation_error(
         &format!(
-            "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
+            "The {block_type} name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
             ast_model.name()
         ),
         ast_model.name(),
