@@ -9,8 +9,8 @@ use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer::ColumnArity;
 
 /// Render a scalar field to be added in a model.
-pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> renderer::ModelField<'a> {
-    let mut rendered = renderer::ModelField::new(field.name(), field.prisma_type());
+pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> renderer::Field<'a> {
+    let mut rendered = renderer::Field::new(field.name(), field.prisma_type());
 
     match field.arity() {
         ColumnArity::Nullable => rendered.optional(),
@@ -114,8 +114,8 @@ fn render_id(pk: IdPair<'_>) -> renderer::IdFieldDefinition<'_> {
 }
 
 /// Render a `@unique` definition to a field.
-fn render_unique(unique: IndexPair<'_>) -> renderer::IndexFieldOptions<'_> {
-    let mut opts = renderer::IndexFieldOptions::default();
+fn render_unique(unique: IndexPair<'_>) -> renderer::UniqueFieldAttribute<'_> {
+    let mut opts = renderer::UniqueFieldAttribute::default();
     let field = unique.field().unwrap();
 
     if let Some(map) = unique.mapped_name() {
