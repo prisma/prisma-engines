@@ -1,3 +1,6 @@
+mod field;
+mod id;
+
 use std::{borrow::Cow, fmt};
 
 use crate::{
@@ -5,7 +8,8 @@ use crate::{
     value::{Array, Constant, Function, Text, Value},
 };
 
-use super::IndexFieldInput;
+pub use field::{IndexFieldInput, UniqueFieldAttribute};
+pub use id::{IdDefinition, IdFieldDefinition};
 
 /// Defines an index in a model block.
 #[derive(Debug)]

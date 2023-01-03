@@ -4,8 +4,8 @@ use crate::{pair::RelationFieldPair, warnings::Warnings};
 use datamodel_renderer::datamodel as renderer;
 
 /// Render a relation field to be added in a model.
-pub(super) fn render<'a>(field: RelationFieldPair<'a>, warnings: &mut Warnings) -> renderer::ModelField<'a> {
-    let mut rendered = renderer::ModelField::new(field.field_name(), field.prisma_type());
+pub(super) fn render<'a>(field: RelationFieldPair<'a>, warnings: &mut Warnings) -> renderer::Field<'a> {
+    let mut rendered = renderer::Field::new(field.field_name(), field.prisma_type());
 
     if field.is_optional() {
         rendered.optional();

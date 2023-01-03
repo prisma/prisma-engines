@@ -1,22 +1,21 @@
 use crate::{
     datamodel::{
-        attributes::FieldAttribute, model::index_field_input::IndexFieldOptions, DefaultValue, FieldType,
-        IdFieldDefinition, Relation,
+        attributes::FieldAttribute, index::UniqueFieldAttribute, DefaultValue, FieldType, IdFieldDefinition, Relation,
     },
-    value::{Constant, Documentation, Function, Text},
+    value::{Constant, Documentation, Function},
 };
 use psl::dml;
 use std::{borrow::Cow, collections::HashMap, fmt};
 
 /// A field in a model block.
 #[derive(Debug)]
-pub struct ModelField<'a> {
+pub struct Field<'a> {
     name: Constant<Cow<'a, str>>,
     commented_out: bool,
     r#type: FieldType<'a>,
     documentation: Option<Documentation<'a>>,
     updated_at: Option<FieldAttribute<'a>>,
-    unique: Option<FieldAttribute<'a>>,
+    unique: Option<UniqueFieldAttribute<'a>>,
     id: Option<IdFieldDefinition<'a>>,
     default: Option<DefaultValue<'a>>,
     map: Option<FieldAttribute<'a>>,
@@ -25,7 +24,7 @@ pub struct ModelField<'a> {
     ignore: Option<FieldAttribute<'a>>,
 }
 
-impl<'a> ModelField<'a> {
+impl<'a> Field<'a> {
     /// Create a new required model field declaration.
     ///
     /// ```ignore
@@ -181,26 +180,8 @@ impl<'a> ModelField<'a> {
     /// //              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn unique(&mut self, options: IndexFieldOptions<'a>) {
-        let mut fun = Function::new("unique");
-
-        if let Some(map) = options.map {
-            fun.push_param(("map", Text::new(map)));
-        }
-
-        if let Some(sort_order) = options.sort_order {
-            fun.push_param(("sort", Constant::new_no_validate(sort_order)));
-        }
-
-        if let Some(length) = options.length {
-            fun.push_param(("length", Constant::new_no_validate(length)));
-        }
-
-        if let Some(clustered) = options.clustered {
-            fun.push_param(("clustered", Constant::new_no_validate(clustered)));
-        }
-
-        self.unique = Some(FieldAttribute::new(fun));
+    pub fn unique(&mut self, options: UniqueFieldAttribute<'a>) {
+        self.unique = Some(options);
     }
 
     /// Marks the field to be the id of the model.
@@ -251,11 +232,10 @@ impl<'a> ModelField<'a> {
     /// make much sense to call this from outside of the module.
     pub(super) fn from_dml(
         datasource: &'a psl::Datasource,
-        _dml_model: &dml::Model,
         dml_field: &dml::Field,
-        uniques: &HashMap<&str, IndexFieldOptions<'static>>,
+        uniques: &mut HashMap<&str, UniqueFieldAttribute<'static>>,
         id: Option<IdFieldDefinition<'static>>,
-    ) -> ModelField<'a> {
+    ) -> Field<'a> {
         match dml_field {
             dml::Field::ScalarField(ref sf) => {
                 let (r#type, native_type): (String, _) = match sf.field_type {
@@ -300,8 +280,8 @@ impl<'a> ModelField<'a> {
                     field.updated_at();
                 }
 
-                if let Some(unique) = uniques.get(sf.name.as_str()) {
-                    field.unique(unique.clone());
+                if let Some(unique) = uniques.remove(sf.name.as_str()) {
+                    field.unique(unique);
                 }
 
                 if sf.is_ignored {
@@ -411,7 +391,7 @@ impl<'a> ModelField<'a> {
     }
 }
 
-impl<'a> fmt::Display for ModelField<'a> {
+impl<'a> fmt::Display for Field<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref docs) = self.documentation {
             docs.fmt(f)?;
