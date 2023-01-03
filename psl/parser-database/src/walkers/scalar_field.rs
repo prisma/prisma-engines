@@ -195,8 +195,8 @@ impl<'db> DefaultValueWalker<'db> {
 
     /// Is this an `@default(nanoid())`?
     pub fn is_nanoid(self) -> bool {
-      matches!(self.value(), ast::Expression::Function(name, _, _) if name == "nanoid")
-  }
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "nanoid")
+    }
 
     /// Is this an `@default(dbgenerated())`?
     pub fn is_dbgenerated(self) -> bool {

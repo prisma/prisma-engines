@@ -1,10 +1,10 @@
 use crate::scalars::ScalarType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use std::fmt;
 use regex::Regex;
+use std::fmt;
 
-static NANOID_RE: Lazy<Regex> = Lazy::new(|| Regex::new( r"nanoid\((?P<length>\d+)?\)").unwrap());
+static NANOID_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"nanoid\((?P<length>\d+)?\)").unwrap());
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
@@ -38,9 +38,9 @@ impl DefaultKind {
         matches!(self, DefaultKind::Expression(generator) if generator.name == "dbgenerated")
     }
 
-     /// Does this match @default(nanoid(_))?
+    /// Does this match @default(nanoid(_))?
     pub fn is_nanoid(&self) -> bool {
-      matches!(self, DefaultKind::Expression(generator) if NANOID_RE.is_match(generator.name()))
+        matches!(self, DefaultKind::Expression(generator) if NANOID_RE.is_match(generator.name()))
     }
 
     /// Does this match @default(now())?
@@ -113,9 +113,9 @@ impl DefaultValue {
         self.kind.is_dbgenerated()
     }
 
-    /// Does this match @default(cuid(_))?
+    /// Does this match @default(nanoid(_))?
     pub fn is_nanoid(&self) -> bool {
-      self.kind.is_nanoid()
+        self.kind.is_nanoid()
     }
 
     /// Does this match @default(now())?
@@ -206,11 +206,15 @@ impl ValueGenerator {
     }
 
     pub fn new_nanoid(length: Option<u8>) -> Self {
-      if length.is_some() {
-        ValueGenerator::new(format!("nanoid({})", length.unwrap()).to_owned(), vec![(None, PrismaValue::Int(length.unwrap().into()))]).unwrap()
-      } else {
-        ValueGenerator::new("nanoid()".to_owned(), vec![]).unwrap()
-      }
+        if length.is_some() {
+            ValueGenerator::new(
+                format!("nanoid({})", length.unwrap()),
+                vec![(None, PrismaValue::Int(length.unwrap().into()))],
+            )
+            .unwrap()
+        } else {
+            ValueGenerator::new("nanoid()".to_owned(), vec![]).unwrap()
+        }
     }
 
     pub fn name(&self) -> &str {
@@ -269,8 +273,6 @@ pub enum ValueGeneratorFn {
     Auto,
 }
 
-
-
 impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
@@ -281,13 +283,13 @@ impl ValueGeneratorFn {
             "sequence" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
-            name if NANOID_RE.is_match(name) => {
-              Ok(
-                Self::Nanoid(
-                  NANOID_RE.captures(name).unwrap().name("length").and_then(|v| v.as_str().parse::<u8>().ok())
-                )
-              )
-            },
+            name if NANOID_RE.is_match(name) => Ok(Self::Nanoid(
+                NANOID_RE
+                    .captures(name)
+                    .unwrap()
+                    .name("length")
+                    .and_then(|v| v.as_str().parse::<u8>().ok()),
+            )),
             _ => Err(format!("The function {} is not a known function.", name)),
         }
     }
@@ -332,12 +334,12 @@ impl ValueGeneratorFn {
 
     #[cfg(feature = "default_generators")]
     fn generate_nanoid(length: &Option<u8>) -> PrismaValue {
-      if length.is_some() {
-        let value: usize = usize::from(length.unwrap());
-        PrismaValue::String(nanoid::nanoid!(value))
-      } else {
-        PrismaValue::String(nanoid::nanoid!())
-      }
+        if length.is_some() {
+            let value: usize = usize::from(length.unwrap());
+            PrismaValue::String(nanoid::nanoid!(value))
+        } else {
+            PrismaValue::String(nanoid::nanoid!())
+        }
     }
 
     #[cfg(feature = "default_generators")]

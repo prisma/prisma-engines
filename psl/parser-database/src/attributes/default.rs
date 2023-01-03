@@ -197,9 +197,7 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_NANOID =>
-        {
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NANOID => {
             validate_nanoid_args(&funcargs.arguments, accept, ctx)
         }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
@@ -384,24 +382,21 @@ fn validate_dbgenerated_args(args: &[ast::Argument], mut accept: impl FnMut(), c
 }
 
 fn validate_nanoid_args(args: &[ast::Argument], mut accept: impl FnMut(), ctx: &mut Context<'_>) {
-  let mut bail = || {
-    ctx.push_attribute_validation_error("`nanoid()` takes a single Int argument.")
-  };
+    let mut bail = || ctx.push_attribute_validation_error("`nanoid()` takes a single Int argument.");
 
-  if args.len() > 1 {
-    bail()
-  }
+    if args.len() > 1 {
+        bail()
+    }
 
-  match args.get(0).map(|arg| &arg.value) {
-    Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
-      ctx.push_attribute_validation_error(
-        "`nanoid()` takes either no argument, or a single integer argument >= 2.",
-      );
-    },
-    None | Some(ast::Expression::NumericValue(_, _)) => accept(),
-    _ => bail(),
-  }
-
+    match args.get(0).map(|arg| &arg.value) {
+        Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
+            ctx.push_attribute_validation_error(
+                "`nanoid()` takes either no argument, or a single integer argument >= 2.",
+            );
+        }
+        None | Some(ast::Expression::NumericValue(_, _)) => accept(),
+        _ => bail(),
+    }
 }
 
 fn validate_enum_default(
@@ -490,4 +485,12 @@ const FN_NOW: &str = "now";
 const FN_UUID: &str = "uuid";
 const FN_AUTO: &str = "auto";
 
-const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NANOID, FN_NOW, FN_UUID, FN_AUTO];
+const KNOWN_FUNCTIONS: &[&str] = &[
+    FN_AUTOINCREMENT,
+    FN_CUID,
+    FN_DBGENERATED,
+    FN_NANOID,
+    FN_NOW,
+    FN_UUID,
+    FN_AUTO,
+];

@@ -51,14 +51,14 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
             DefaultKind::Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
             DefaultKind::Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
             DefaultKind::Nanoid(length) => {
-              let mut fun = Function::new("nanoid");
+                let mut fun = Function::new("nanoid");
 
-              if let Some(param) = length.filter(|i| (*i) > &2) {
-                fun.push_param(Value::from(Constant::from(param)));
+                if let Some(param) = length.filter(|i| (*i) > &2) {
+                    fun.push_param(Value::from(Constant::from(param)));
+                }
+
+                Some(renderer::DefaultValue::function(fun))
             }
-
-              Some(renderer::DefaultValue::function(fun))
-            },
             DefaultKind::Now => Some(renderer::DefaultValue::function(Function::new("now"))),
             DefaultKind::String(s) => Some(renderer::DefaultValue::text(s)),
             DefaultKind::Constant(c) => Some(renderer::DefaultValue::constant(c)),

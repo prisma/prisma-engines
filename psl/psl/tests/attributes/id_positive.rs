@@ -60,7 +60,6 @@ fn should_allow_string_ids_with_nanoid() {
         .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid(None)));
 }
 
-
 #[test]
 fn should_allow_string_ids_with_nanoid_with_length() {
     let dml = indoc! {r#"
@@ -77,7 +76,6 @@ fn should_allow_string_ids_with_nanoid_with_length() {
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_nanoid(Some(7))));
 }
-
 
 #[test]
 fn should_allow_string_ids_with_uuid() {
