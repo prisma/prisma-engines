@@ -186,8 +186,8 @@ impl EngineState {
 
 #[async_trait::async_trait]
 impl GenericApi for EngineState {
-    async fn version(&self) -> CoreResult<String> {
-        self.with_default_connector(Box::new(|connector| connector.version()))
+    async fn version(&self, input: GetDatabaseVersionInput) -> CoreResult<String> {
+        self.with_connector_from_datasource_param(&input.datasource, Box::new(|connector| connector.version()))
             .await
     }
 
