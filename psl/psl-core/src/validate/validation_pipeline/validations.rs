@@ -64,6 +64,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
         autoincrement::validate_auto_increment(model, ctx);
 
+        if model.ast_model().is_view() {
+            models::view_definition_without_preview_flag(model, ctx);
+        }
+
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
                 let span = pk.ast_attribute().span;

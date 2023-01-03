@@ -183,11 +183,13 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "Field \"{}\" is already defined on {} \"{}\".",
-            field_name, "model", model_name
-        );
+    pub fn new_duplicate_field_error(
+        model_name: &str,
+        field_name: &str,
+        container: &'static str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!("Field \"{field_name}\" is already defined on {container} \"{model_name}\".",);
         Self::new(msg, span)
     }
 

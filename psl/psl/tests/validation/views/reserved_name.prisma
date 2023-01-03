@@ -1,0 +1,16 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+view Cat {
+  id Int @unique
+  id Int
+}
+
+// [1;91merror[0m: [1mField "id" is already defined on view "Cat".[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m  id Int @unique
+// [1;94m 8 | [0m  [1;91mid[0m Int
+// [1;94m   | [0m

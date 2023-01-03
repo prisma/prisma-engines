@@ -323,6 +323,7 @@ impl<'a> LiftAstToDml<'a> {
         model.database_name = walker.mapped_name().map(String::from);
         model.is_ignored = walker.is_ignored();
         model.schema = walker.schema().map(|(s, _)| s.to_owned());
+        model.is_view = walker.ast_model().is_view();
 
         model.primary_key = walker.primary_key().map(|pk| PrimaryKeyDefinition {
             name: pk.name().map(String::from),

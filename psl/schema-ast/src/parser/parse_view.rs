@@ -1,23 +1,23 @@
 use super::{
     helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
-    parse_comments::*,
+    parse_comments::parse_comment_block,
     parse_field::parse_field,
     Rule,
 };
-use crate::ast::*;
+use crate::ast::{self, Attribute};
 use diagnostics::{DatamodelError, Diagnostics};
 
-pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &mut Diagnostics) -> Model {
+pub(crate) fn parse_view(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &mut Diagnostics) -> ast::Model {
     let pair_span = pair.as_span();
-    let mut name: Option<Identifier> = None;
-    let mut attributes: Vec<Attribute> = Vec::new();
-    let mut fields: Vec<Field> = Vec::new();
+    let mut name: Option<ast::Identifier> = None;
+    let mut fields: Vec<ast::Field> = vec![];
     let mut pending_field_comment: Option<Pair<'_>> = None;
+    let mut attributes: Vec<Attribute> = Vec::new();
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::MODEL_KEYWORD | Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => {}
+            Rule::VIEW_KEYWORD | Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => (),
             Rule::identifier => name = Some(current.into()),
             Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::field_declaration => match parse_field(
@@ -34,18 +34,18 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
                 "This line is not a valid field or attribute definition.",
                 current.as_span().into(),
             )),
-            _ => parsing_catch_all(&current, "model"),
+            _ => parsing_catch_all(&current, "view"),
         }
     }
 
     match name {
-        Some(name) => Model {
+        Some(name) => ast::Model {
             name,
             fields,
             attributes,
             documentation: doc_comment.and_then(parse_comment_block),
-            is_view: false,
-            span: Span::from(pair_span),
+            is_view: true,
+            span: ast::Span::from(pair_span),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }
