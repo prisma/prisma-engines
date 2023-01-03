@@ -29,6 +29,8 @@ pub struct Model {
     pub is_ignored: bool,
     /// The contents of the `@@schema("...")` attribute.
     pub schema: Option<String>,
+    /// If the model is defined as a view in the database.
+    pub is_view: bool,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -350,6 +352,7 @@ impl Model {
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            is_view: false,
             schema: None,
         }
     }

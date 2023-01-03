@@ -9,7 +9,7 @@ fn nice_error_for_missing_model_keyword() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
+        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'type', 'datasource' and 'generator'.[0m
           [1;94m-->[0m  [4mschema.prisma:1[0m
         [1;94m   | [0m
         [1;94m   | [0m
@@ -35,7 +35,7 @@ fn nice_error_for_missing_model_keyword_2() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.[0m
+        [1;91merror[0m: [1mError validating: This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'type', 'datasource' and 'generator'.[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0m

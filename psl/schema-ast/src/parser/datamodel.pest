@@ -27,7 +27,7 @@ schema = {
 
 // At the syntax level, models and composite types are the same.
 model_declaration = { 
-    (MODEL_KEYWORD | TYPE_KEYWORD)
+    (MODEL_KEYWORD | TYPE_KEYWORD | VIEW_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
     ~ (field_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
@@ -132,6 +132,7 @@ BLOCK_CLOSE = { "}" }
 ENUM_KEYWORD = { "enum" }
 MODEL_KEYWORD = { "model" }
 TYPE_KEYWORD = { "type" }
+VIEW_KEYWORD = { "view" }
 GENERATOR_KEYWORD = { "generator" }
 DATASOURCE_KEYWORD = { "datasource" }
 LEGACY_COLON = { ":" }

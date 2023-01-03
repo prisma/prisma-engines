@@ -38,6 +38,7 @@ pub(super) fn scalar_field(
         ctx.push_error(DatamodelError::new_duplicate_field_error(
             ast_model.name(),
             ast_field.name(),
+            if ast_model.is_view() { "view" } else { "model" },
             ast_field.span(),
         ));
     }
@@ -58,6 +59,7 @@ pub(super) fn scalar_field(
             _ => ctx.push_error(DatamodelError::new_duplicate_field_error(
                 ast_model.name(),
                 ast_field.name(),
+                if ast_model.is_view() { "view" } else { "model" },
                 ast_field.span(),
             )),
         }
