@@ -198,6 +198,13 @@ pub enum RelationName<'db> {
     Generated(String),
 }
 
+impl<'db> RelationName<'db> {
+    /// If relation name is explicitly written to the PSL.
+    pub fn is_explicit(&self) -> bool {
+        matches!(self, Self::Explicit(_))
+    }
+}
+
 impl<'db> PartialEq for RelationName<'db> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {

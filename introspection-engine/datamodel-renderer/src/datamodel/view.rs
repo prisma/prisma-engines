@@ -112,17 +112,6 @@ impl<'a> View<'a> {
         self.schema = Some(BlockAttribute(fun));
     }
 
-    /// Comments the complete view block out.
-    ///
-    /// ```ignore
-    /// // view Foo {
-    /// //   id Int @id
-    /// // }
-    /// ```
-    pub fn comment_out(&mut self) {
-        self.commented_out = Commented::On
-    }
-
     /// Push a new field to the view.
     ///
     /// ```ignore
@@ -315,30 +304,6 @@ mod tests {
               @@ignore
               @@schema("public")
             }
-        "#]];
-
-        let rendered = psl::reformat(&model.to_string(), 2).unwrap();
-        expected.assert_eq(&rendered);
-    }
-
-    #[test]
-    fn commented_out() {
-        let mut model = View::new("Country");
-
-        let mut field = Field::new("id", "String");
-        field.id(IdFieldDefinition::default());
-        field.native_type("db", "VarChar", vec![String::from("255")]);
-        field.default(DefaultValue::function(Function::new("uuid")));
-        model.push_field(field);
-
-        model.schema("public");
-        model.comment_out();
-
-        let expected = expect![[r#"
-            // view Country {
-            // id String @id @default(uuid()) @db.VarChar(255)
-            // @@schema("public")
-            // }
         "#]];
 
         let rendered = psl::reformat(&model.to_string(), 2).unwrap();

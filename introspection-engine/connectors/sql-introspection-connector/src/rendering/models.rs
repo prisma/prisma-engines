@@ -1,6 +1,6 @@
 //! Rendering of model blocks.
 
-use super::{relation_field, scalar_field};
+pub(super) use super::{relation_field, scalar_field};
 use crate::{
     datamodel_calculator::{InputContext, OutputContext},
     introspection_helpers as helpers,

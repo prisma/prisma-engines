@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::IndexFieldWalker;
 use crate::{
     ast::{self, WithName},
@@ -147,6 +149,22 @@ impl<'db> ScalarFieldWalker<'db> {
     /// The type of the field.
     pub fn scalar_field_type(self) -> ScalarFieldType {
         self.attributes().r#type
+    }
+
+    /// The string represenation of the field type.
+    pub fn type_str(self) -> &'db str {
+        match self.scalar_field_type() {
+            ScalarFieldType::CompositeType(ctid) => {
+                let r#type = self.db.walk(ctid);
+                r#type.name()
+            }
+            ScalarFieldType::Enum(eid) => {
+                let r#enum = self.db.walk(eid);
+                r#enum.name()
+            }
+            ScalarFieldType::BuiltInScalar(st) => st.as_str(),
+            ScalarFieldType::Unsupported(ut) => &self.db[ut.name()],
+        }
     }
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
@@ -347,6 +365,25 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
                 let walker = self.db.walk((ctid, field_id));
                 IndexFieldWalker::new(walker)
             }
+        }
+    }
+
+    /// Stringified representation of the indexed field or path.
+    pub fn as_path_string(self) -> Cow<'db, str> {
+        let path = self.args().path.path();
+
+        if !path.is_empty() {
+            let path = path
+                .iter()
+                .map(|(ctid, field_id)| self.db.ast()[*ctid][*field_id].name())
+                .collect::<Vec<_>>()
+                .join(".");
+
+            Cow::Owned(path)
+        } else {
+            let path = self.as_index_field().name();
+
+            Cow::Borrowed(path)
         }
     }
 
