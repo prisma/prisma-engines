@@ -1,4 +1,5 @@
 use connection_string::JdbcString;
+use migration_engine_tests::test_api::{expect, TestApi as MigrationTestApi};
 use std::process::{Command, Output};
 use test_macros::test_connector;
 use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
@@ -355,25 +356,24 @@ fn introspect_empty_database() {
     assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
 }
 
-// TODO: create a basic table before introspecting
-#[test]
-#[ignore]
-fn introspect_e2e() {
+#[test_connector(tags(Postgres))]
+fn introspect_postgres(api: MigrationTestApi) {
     use std::io::{BufRead, BufReader, Write as _};
-    let tmpdir = tempfile::tempdir().unwrap();
     let schema = r#"
         datasource db {
-            provider = "sqlite"
+            provider = "postgres"
             url = env("TEST_DATABASE_URL")
         }
-
     "#;
-    std::fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+
+    let namespace = "public";
+    let create_table = format!("CREATE TABLE \"{namespace}\".\"A\" (id Text PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX \"A_idx\" ON \"{namespace}\".\"A\" (\"data\")",);
+
+    api.raw_cmd(&create_table);
+    api.raw_cmd(&create_primary);
+
     let mut process = Command::new(migration_engine_bin_path())
-        .env(
-            "TEST_DATABASE_URL",
-            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-        )
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
@@ -399,7 +399,74 @@ fn introspect_e2e() {
     let mut response = String::new();
     stdout.read_line(&mut response).unwrap();
 
-    dbg!("response: {:?}", &response);
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}
+    "#]];
+    expected.assert_eq(&response);
+}
 
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+#[test_connector(tags(Postgres))]
+fn introspect_multischema_postgres(api: MigrationTestApi) {
+    use std::io::{BufRead, BufReader, Write as _};
+    let schema = r#"
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+            schemas = ["first", "second"]
+        }
+    "#;
+
+    let namespace = "first";
+    let create_schema = format!("CREATE Schema \"{namespace}\"",);
+    let create_table = format!("CREATE TABLE \"{namespace}\".\"A\" (id Text PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX \"A_idx\" ON \"{namespace}\".\"A\" (\"data\")",);
+
+    api.raw_cmd(&create_schema);
+    api.raw_cmd(&create_table);
+    api.raw_cmd(&create_primary);
+
+    let namespace = "second";
+    let create_schema = format!("CREATE Schema \"{namespace}\"",);
+    let create_table = format!("CREATE TABLE \"{namespace}\".\"A\" (id Text PRIMARY KEY, data Text)",);
+    let create_primary = format!("CREATE INDEX \"A_idx\" ON \"{namespace}\".\"A\" (\"data\")",);
+
+    api.raw_cmd(&create_schema);
+    api.raw_cmd(&create_table);
+    api.raw_cmd(&create_primary);
+
+    let mut process = Command::new(migration_engine_bin_path())
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "introspect",
+        "id": 1,
+        "params": {
+            "schema": schema,
+            "force": true,
+            "compositeTypeDepth": 5,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}
+    "#]];
+    expected.assert_eq(&response);
 }
