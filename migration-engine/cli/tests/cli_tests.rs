@@ -1,4 +1,5 @@
 use connection_string::JdbcString;
+use expect_test::expect;
 use indoc::*;
 use std::process::{Command, Output};
 use test_macros::test_connector;
@@ -356,10 +357,10 @@ fn introspect_empty_database() {
     assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
 }
 
-// TODO: it works fine if run once, it fails with a "Relation already exists" error if run twice in a row.
 #[test_connector(tags(Postgres))]
 fn execute_postgres(api: TestApi) {
-    // create database
+    /* Drop and create database via `drop-database` and `create-database` */
+
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
     assert!(output.status.success(), "{:#?}", output);
@@ -387,11 +388,10 @@ fn execute_postgres(api: TestApi) {
     let stdin = process.stdin.as_mut().unwrap();
     let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
 
+    /* Run `dbExecute` */
+
     let script = formatdoc! {r#"
-        CREATE TABLE "public"."A" (
-            id SERIAL PRIMARY KEY,
-            data TEXT
-        );
+        SELECT 1;
     "#};
     let msg = serde_json::to_string(&serde_json::json!({
         "jsonrpc": "2.0",
@@ -412,9 +412,13 @@ fn execute_postgres(api: TestApi) {
     let mut response = String::new();
     stdout.read_line(&mut response).unwrap();
 
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":null,"id":1}"##));
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":null,"id":1}
+    "#]];
+    expected.assert_eq(&response);
 }
 
+// TODO: it works fine if run once, it fails with a "Relation already exists" error if run twice in a row.
 #[test_connector(tags(Postgres))]
 fn introspect_postgres(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
@@ -473,7 +477,10 @@ fn introspect_postgres(api: TestApi) {
     let mut response = String::new();
     stdout.read_line(&mut response).unwrap();
 
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":null,"id":1}"##));
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":null,"id":1}
+    "#]];
+    expected.assert_eq(&response);
 
     /* Introspect via `introspect` */
     let msg = serde_json::to_string(&serde_json::json!({
@@ -493,8 +500,10 @@ fn introspect_postgres(api: TestApi) {
     let mut response = String::new();
     stdout.read_line(&mut response).unwrap();
 
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result""##));
-    assert!(response.contains(r##""model A""##));
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","version":"Prisma11","warnings":[]},"id":1}
+    "#]];
+    expected.assert_eq(&response);
 }
 
 // TODO: create a basic table before introspecting
