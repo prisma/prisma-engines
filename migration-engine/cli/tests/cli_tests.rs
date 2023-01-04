@@ -506,6 +506,221 @@ fn introspect_postgres(api: TestApi) {
     expected.assert_eq(&response);
 }
 
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn introspect_postgres_multischema_in_initial_datamodel(api: TestApi) {
+    /* Drop and create database via `drop-database` and `create-database` */
+
+    let connection_string = api.connection_string();
+    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    assert!(output.status.success(), "{:#?}", output);
+    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    assert!(output.status.success(), "{:#?}", output);
+
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema = r#"
+        generator client {
+            provider        = "prisma-client-js"
+            previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+            schemas = ["public", "other"]
+        }
+    "#;
+    let schema_path = tmpdir.path().join("prisma.schema");
+    std::fs::write(&schema_path, schema).unwrap();
+
+    let mut process = Command::new(migration_engine_bin_path())
+        .arg("--datamodel")
+        .arg(&schema_path)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    /* Create table via `dbExecute` */
+
+    let script = formatdoc! {r#"
+        CREATE TABLE "public"."A" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE SCHEMA "other";
+        CREATE TABLE "other"."B" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE SCHEMA "hidden";
+        CREATE TABLE "hidden"."C" (
+            id SERIAL PRIMARY KEY
+        );
+    "#};
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "dbExecute",
+        "id": 1,
+        "params": {
+            "datasourceType": {
+                "tag": "schema",
+                "schema": &schema_path,
+            },
+            "script": &script,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":null,"id":1}
+    "#]];
+    expected.assert_eq(&response);
+
+    /* Introspect via `introspect` */
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "introspect",
+        "id": 1,
+        "params": {
+            "schema": &schema,
+            "force": true,
+            "compositeTypeDepth": 5,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":{"datamodel":"generator client {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"multiSchema\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n  schemas  = [\"other\", \"public\"]\n}\n\nmodel B {\n  id Int @id @default(autoincrement())\n\n  @@schema(\"other\")\n}\n\nmodel A {\n  id Int @id @default(autoincrement())\n\n  @@schema(\"public\")\n}\n","version":"Prisma11","warnings":[]},"id":1}
+    "#]];
+    expected.assert_eq(&response);
+    assert!(expected.data().contains("model A")); // "public"."A"
+    assert!(expected.data().contains("model B")); // "other"."B"
+    assert!(!expected.data().contains("model C")); // "hidden"."C"
+}
+
+// TODO: this results in an empty database
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn introspect_postgres_multischema_in_initial_namespaces(api: TestApi) {
+    /* Drop and create database via `drop-database` and `create-database` */
+
+    let connection_string = api.connection_string();
+    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    assert!(output.status.success(), "{:#?}", output);
+    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    assert!(output.status.success(), "{:#?}", output);
+
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema = r#"
+        generator client {
+            provider        = "prisma-client-js"
+        }
+
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
+    let schema_path = tmpdir.path().join("prisma.schema");
+    std::fs::write(&schema_path, schema).unwrap();
+
+    let mut process = Command::new(migration_engine_bin_path())
+        .arg("--datamodel")
+        .arg(&schema_path)
+        .arg("--schemas")
+        .arg("public,other")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    /* Create table via `dbExecute` */
+
+    let script = formatdoc! {r#"
+        CREATE TABLE "public"."A" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE SCHEMA "other";
+        CREATE TABLE "other"."B" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE SCHEMA "hidden";
+        CREATE TABLE "hidden"."C" (
+            id SERIAL PRIMARY KEY
+        );
+    "#};
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "dbExecute",
+        "id": 1,
+        "params": {
+            "datasourceType": {
+                "tag": "schema",
+                "schema": &schema_path,
+            },
+            "script": &script,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","result":null,"id":1}
+    "#]];
+    expected.assert_eq(&response);
+
+    /* Introspect via `introspect` */
+    let msg = serde_json::to_string(&serde_json::json!({
+        "jsonrpc": "2.0",
+        "method": "introspect",
+        "id": 1,
+        "params": {
+            "schema": &schema,
+            "force": true,
+            "compositeTypeDepth": 5,
+        }
+    }))
+    .unwrap();
+    stdin.write_all(msg.as_bytes()).unwrap();
+    stdin.write_all(b"\n").unwrap();
+
+    let mut response = String::new();
+    stdout.read_line(&mut response).unwrap();
+
+    let expected = expect![[r#"
+        {"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}
+    "#]];
+    expected.assert_eq(&response);
+    // assert!(expected.data().contains("model A")); // "public"."A"
+    // assert!(expected.data().contains("model B")); // "other"."B"
+    // assert!(!expected.data().contains("model C")); // "hidden"."C"
+}
+
 // TODO: create a basic table before introspecting
 #[test]
 #[ignore]
