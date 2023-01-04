@@ -530,7 +530,7 @@ fn introspect_postgres_multischema_in_initial_datamodel(api: TestApi) {
             schemas = ["public", "other"]
         }
     "#;
-    let schema_path = tmpdir.path().join("prisma.schema");
+    let schema_path = tmpdir.path().join("schema.prisma");
     std::fs::write(&schema_path, schema).unwrap();
 
     let mut process = Command::new(migration_engine_bin_path())
@@ -608,12 +608,14 @@ fn introspect_postgres_multischema_in_initial_datamodel(api: TestApi) {
         {"jsonrpc":"2.0","result":{"datamodel":"generator client {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"multiSchema\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n  schemas  = [\"other\", \"public\"]\n}\n\nmodel B {\n  id Int @id @default(autoincrement())\n\n  @@schema(\"other\")\n}\n\nmodel A {\n  id Int @id @default(autoincrement())\n\n  @@schema(\"public\")\n}\n","version":"Prisma11","warnings":[]},"id":1}
     "#]];
     expected.assert_eq(&response);
-    assert!(expected.data().contains("model A")); // "public"."A"
-    assert!(expected.data().contains("model B")); // "other"."B"
-    assert!(!expected.data().contains("model C")); // "hidden"."C"
+    assert!(&expected.data().contains("model A")); // "public"."A"
+    assert!(&expected.data().contains("model B")); // "other"."B"
+    assert!(!&expected.data().contains("model C")); // "hidden"."C"
 }
 
-// TODO: this results in an empty database
+// It works with:
+// "--schemas", "other"
+// "--schemas", "public"
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn introspect_postgres_multischema_in_initial_namespaces(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
@@ -636,14 +638,16 @@ fn introspect_postgres_multischema_in_initial_namespaces(api: TestApi) {
             url = env("TEST_DATABASE_URL")
         }
     "#;
-    let schema_path = tmpdir.path().join("prisma.schema");
+    let schema_path = tmpdir.path().join("schema.prisma");
     std::fs::write(&schema_path, schema).unwrap();
 
     let mut process = Command::new(migration_engine_bin_path())
         .arg("--datamodel")
         .arg(&schema_path)
         .arg("--schemas")
-        .arg("public,other")
+        .arg("other")
+        .arg("--schemas")
+        .arg("public")
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
@@ -713,12 +717,12 @@ fn introspect_postgres_multischema_in_initial_namespaces(api: TestApi) {
     stdout.read_line(&mut response).unwrap();
 
     let expected = expect![[r#"
-        {"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}
+        {"jsonrpc":"2.0","result":{"datamodel":"generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel B {\n  id Int @id @default(autoincrement())\n}\n\nmodel A {\n  id Int @id @default(autoincrement())\n}\n","version":"Prisma11","warnings":[]},"id":1}
     "#]];
     expected.assert_eq(&response);
-    // assert!(expected.data().contains("model A")); // "public"."A"
-    // assert!(expected.data().contains("model B")); // "other"."B"
-    // assert!(!expected.data().contains("model C")); // "hidden"."C"
+    assert!(expected.data().contains("model A")); // "public"."A"
+    assert!(expected.data().contains("model B")); // "other"."B"
+    assert!(!expected.data().contains("model C")); // "hidden"."C"
 }
 
 // TODO: create a basic table before introspecting
