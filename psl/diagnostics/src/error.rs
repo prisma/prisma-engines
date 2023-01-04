@@ -137,7 +137,19 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The model with database name \"{}\" could not be defined because another model with this name exists: \"{}\"",
+        let msg = format!("The model with database name \"{}\" could not be defined because another model or view with this name exists: \"{}\"",
+          model_database_name,
+          existing_model_name
+        );
+        Self::new(msg, span)
+    }
+
+    pub fn new_duplicate_view_database_name_error(
+        model_database_name: &str,
+        existing_model_name: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!("The view with database name \"{}\" could not be defined because another model or view with this name exists: \"{}\"",
           model_database_name,
           existing_model_name
         );
@@ -193,13 +205,26 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_scalar_list_fields_are_not_supported(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("Field \"{}\" in model \"{}\" can't be a list. The current connector does not support lists of primitive types.", field_name, model_name);
+    pub fn new_scalar_list_fields_are_not_supported(
+        container: &str,
+        container_name: &str,
+        field_name: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!("Field \"{field_name}\" in {container} \"{container_name}\" can't be a list. The current connector does not support lists of primitive types.");
         Self::new(msg, span)
     }
 
-    pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
-        Self::new(format!("Error validating model \"{model_name}\": {message}"), span)
+    pub fn new_model_validation_error(
+        message: &str,
+        block_type: &'static str,
+        model_name: &str,
+        span: Span,
+    ) -> DatamodelError {
+        Self::new(
+            format!("Error validating {block_type} \"{model_name}\": {message}"),
+            span,
+        )
     }
 
     pub fn new_composite_type_validation_error(message: &str, composite_type_name: &str, span: Span) -> DatamodelError {
@@ -227,11 +252,14 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
-    pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "Error validating field `{}` in {} `{}`: {}",
-            field, "model", model, message
-        );
+    pub fn new_field_validation_error(
+        message: &str,
+        container_type: &str,
+        container_name: &str,
+        field: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!("Error validating field `{field}` in {container_type} `{container_name}`: {message}",);
         Self::new(msg, span)
     }
 

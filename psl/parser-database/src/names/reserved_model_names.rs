@@ -18,6 +18,7 @@ pub(crate) fn validate_model_name(ast_model: &ast::Model, block_type: &'static s
             "The {block_type} name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
             ast_model.name()
         ),
+        "model",
         ast_model.name(),
         ast_model.span(),
     ))

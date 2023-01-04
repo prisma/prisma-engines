@@ -42,7 +42,8 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                     .join(", ");
 
                 let msg = format!("The multi field id declaration refers to the unknown fields {fields_str}.");
-                let error = DatamodelError::new_model_validation_error(&msg, ctx.ast[model_id].name(), fields.span());
+                let error =
+                    DatamodelError::new_model_validation_error(&msg, "model", ctx.ast[model_id].name(), fields.span());
 
                 ctx.push_error(error);
             }
@@ -58,6 +59,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
 
                 ctx.push_error(DatamodelError::new_model_validation_error(
                     &msg,
+                    "model",
                     ctx.ast[model_id].name(),
                     attr.span,
                 ));
@@ -104,6 +106,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                 "The id definition refers to the optional fields {}. ID definitions must reference only required fields.",
                 fields_that_are_not_required.join(", ")
             ),
+            "model",
             ast_model.name(),
             attr.span,
         ))
@@ -112,6 +115,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
     if model_data.primary_key.is_some() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
+            "model",
             ast_model.name(),
             ast_model.span(),
         ))
@@ -149,6 +153,7 @@ pub(super) fn field<'db>(
     match model_attributes.primary_key {
         Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` attribute.",
+            "model",
             ast_model.name(),
             ast_model.span(),
         )),

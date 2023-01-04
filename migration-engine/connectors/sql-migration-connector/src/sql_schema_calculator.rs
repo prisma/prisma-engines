@@ -132,6 +132,10 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
 
 fn push_inline_relations(ctx: &mut Context<'_>) {
     for relation in ctx.datamodel.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
+        if relation.referencing_model().ast_model().is_view() || relation.referenced_model().ast_model().is_view() {
+            continue;
+        }
+
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");

@@ -47,8 +47,11 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
         Cow::from(msg)
     };
 
+    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
     ctx.push_error(DatamodelError::new_model_validation_error(
         msg.as_ref(),
+        container_type,
         model.name(),
         model.ast_model().span(),
     ))
@@ -222,9 +225,12 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
         return;
     };
 
+    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
     if primary_key.mapped_name().is_some() && !ctx.connector.supports_named_primary_keys() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            container_type,
             model.name(),
             model.ast_model().span(),
         ));
@@ -233,6 +239,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
     if primary_key.fields().len() > 1 && !ctx.connector.supports_compound_ids() {
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
+            container_type,
             model.name(),
             primary_key.ast_attribute().span,
         ));
@@ -267,8 +274,11 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
 
     let id_client_name = id.fields().map(|f| f.name()).collect::<Vec<_>>().join("_");
     if model.scalar_fields().any(|f| f.name() == id_client_name) {
+        let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
         ctx.push_error(DatamodelError::new_model_validation_error(
             &format!("The field `{id_client_name}` clashes with the `@@id` attribute's name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \"custom_name\")`"),
+            container_type,
             model.name(),
             id.ast_attribute().span,
         ));
@@ -360,7 +370,7 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     // (schema_name, model_database_name) -> ModelId
     let mut database_names: HashMap<(Option<&str>, &str), ast::ModelId> = HashMap::with_capacity(ctx.db.models_count());
 
-    for model in ctx.db.walk_models() {
+    for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
         let key = (model.schema().map(|(name, _)| name), model.database_name());
         match database_names.insert(key, model.model_id()) {
             // Two branches because we want to put the error on the @@map attribute, and it can be
@@ -410,19 +420,4 @@ pub(super) fn multischema_feature_flag_needed(model: ModelWalker<'_>, ctx: &mut 
             span,
         ));
     }
-}
-
-pub(crate) fn view_definition_without_preview_flag(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(crate::PreviewFeature::Views) {
-        return;
-    }
-
-    if !model.ast_model().is_view() {
-        return;
-    }
-
-    ctx.push_error(DatamodelError::new_validation_error(
-        "View definitions are only available with the `views` preview feature.",
-        model.ast_model().span(),
-    ));
 }

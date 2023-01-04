@@ -11,6 +11,7 @@ mod models;
 mod names;
 mod relation_fields;
 mod relations;
+mod views;
 
 use super::context::Context;
 use names::Names;
@@ -46,7 +47,11 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     // Model validations
     models::database_name_clashes(ctx);
 
-    for model in ctx.db.walk_models() {
+    for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
+        if model.ast_model().is_view() {
+            views::view_definition_without_preview_flag(model, ctx);
+        }
+
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
         models::has_a_unique_custom_primary_key_name_per_model(model, &names, ctx);
@@ -63,10 +68,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         models::connector_specific(model, ctx);
 
         autoincrement::validate_auto_increment(model, ctx);
-
-        if model.ast_model().is_view() {
-            models::view_definition_without_preview_flag(model, ctx);
-        }
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {

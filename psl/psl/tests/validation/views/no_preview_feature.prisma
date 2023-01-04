@@ -8,6 +8,7 @@ view Mountain {
   val String
 }
 
+
 // [1;91merror[0m: [1mError validating: View definitions are only available with the `views` preview feature.[0m
 //   [1;94m-->[0m  [4mschema.prisma:6[0m
 // [1;94m   | [0m

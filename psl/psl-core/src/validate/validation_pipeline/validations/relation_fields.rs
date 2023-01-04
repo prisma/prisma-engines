@@ -108,8 +108,11 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
                 }
             };
 
+            let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
             Err(DatamodelError::new_model_validation_error(
                 &message,
+                container_type,
                 model.name(),
                 field.ast_field().span(),
             ))
@@ -284,6 +287,10 @@ pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWal
     }
 }
 
+pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
+    ctx.connector.validate_relation_field(field, ctx.diagnostics)
+}
+
 /// An subgroup is left-wise included in a supergroup if the subgroup is contained in the supergroup, and all the entries of
 /// the left-most entries of the supergroup match the order of definitions of the subgroup.
 /// More formally: { x_1, x_2, ..., x_n } is left-wise included in { y_1, y_2, ..., y_m } if and only if
@@ -313,8 +320,4 @@ mod tests {
         let group = vec![1, 2, 3, 4];
         assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
     }
-}
-
-pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_relation_field(field, ctx.diagnostics)
 }

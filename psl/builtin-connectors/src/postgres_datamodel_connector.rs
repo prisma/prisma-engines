@@ -478,6 +478,7 @@ impl Connector for PostgresDatamodelConnector {
 
                 let index_field = db
                     .walk_models()
+                    .chain(db.walk_views())
                     .find(|model| model.model_id() == model_id)
                     .and_then(|model| {
                         model.indexes().find(|index| {
