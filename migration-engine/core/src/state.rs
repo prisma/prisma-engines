@@ -60,6 +60,9 @@ impl EngineState {
     }
 
     fn namespaces(&self) -> Option<Namespaces> {
+        dbg!("initial_namespaces: {:?}", &self.initial_namespaces);
+        dbg!("initial_datamodel: {:?}", &self.initial_datamodel);
+
         if !self.initial_namespaces.is_empty() {
             Namespaces::from_vec(&mut self.initial_namespaces.clone())
         } else {
@@ -68,6 +71,7 @@ impl EngineState {
                 .and_then(|schema| schema.configuration.datasources.first())
                 .and_then(|ds| {
                     let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                    dbg!("names in initial_datamodel: {:?}", &names);
                     Namespaces::from_vec(&mut names)
                 })
         }
@@ -331,9 +335,11 @@ impl GenericApi for EngineState {
     }
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
+        dbg!("into introspect");
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
         let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
         let namespaces = self.namespaces();
+        dbg!("namespaces@introspect", &namespaces);
         self.with_connector_for_schema(
             &params.schema,
             None,
