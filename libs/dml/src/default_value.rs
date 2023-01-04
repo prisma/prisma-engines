@@ -1,10 +1,6 @@
 use crate::scalars::ScalarType;
-use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use regex::Regex;
 use std::fmt;
-
-static NANOID_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"nanoid\((?P<length>\d+)?\)").unwrap());
 
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
@@ -40,7 +36,7 @@ impl DefaultKind {
 
     /// Does this match @default(nanoid(_))?
     pub fn is_nanoid(&self) -> bool {
-        matches!(self, DefaultKind::Expression(generator) if NANOID_RE.is_match(generator.name()))
+        matches!(self, DefaultKind::Expression(generator) if generator.name.starts_with("nanoid("))
     }
 
     /// Does this match @default(now())?
@@ -283,13 +279,7 @@ impl ValueGeneratorFn {
             "sequence" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
-            name if NANOID_RE.is_match(name) => Ok(Self::Nanoid(
-                NANOID_RE
-                    .captures(name)
-                    .unwrap()
-                    .name("length")
-                    .and_then(|v| v.as_str().parse::<u8>().ok()),
-            )),
+            name if name.starts_with("nanoid(") => Ok(Self::Nanoid(name[7..name.len() - 1].parse::<u8>().ok())),
             _ => Err(format!("The function {} is not a known function.", name)),
         }
     }
