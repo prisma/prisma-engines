@@ -149,7 +149,6 @@ impl Datasource {
     /// Load the direct database URL, validating it and resolving env vars in the
     /// process. If there is no `directUrl` passed, it will default to `load_url()`.
     ///
-    // TODO: see if we need to do `load_url_with_config_dir()`.
     pub fn load_direct_url<F>(&self, env: F) -> Result<String, Diagnostics>
     where
         F: Fn(&str) -> Option<String>,

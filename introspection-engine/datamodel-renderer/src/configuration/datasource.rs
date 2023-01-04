@@ -9,6 +9,7 @@ pub struct Datasource<'a> {
     name: &'a str,
     provider: Text<&'a str>,
     url: Env<'a>,
+    direct_url: Option<Env<'a>>,
     shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
@@ -33,6 +34,7 @@ impl<'a> Datasource<'a> {
             name,
             provider: Text(provider),
             url: url.into(),
+            direct_url: None,
             shadow_database_url: None,
             relation_mode: None,
             custom_properties: Default::default(),
@@ -116,6 +118,7 @@ impl<'a> Datasource<'a> {
             name: &psl_ds.name,
             provider: Text(&psl_ds.provider),
             url: Env::from(&psl_ds.url),
+            direct_url: psl_ds.direct_url.as_ref().map(Env::from),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
             documentation: psl_ds.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
@@ -134,6 +137,9 @@ impl<'a> fmt::Display for Datasource<'a> {
         writeln!(f, "datasource {} {{", self.name)?;
         writeln!(f, "provider = {}", self.provider)?;
         writeln!(f, "url = {}", self.url)?;
+        if let Some(direct_url) = self.direct_url {
+            writeln!(f, "directUrl = {}", direct_url)?;
+        }
 
         if let Some(url) = self.shadow_database_url {
             writeln!(f, "shadowDatabaseUrl = {}", url)?;
