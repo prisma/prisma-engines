@@ -35,6 +35,11 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
+        runs-on: [
+          ubuntu-latest, 
+          buildjet-16vcpu-ubuntu-2004
+        ]
+    runs-on: ${{matrix.runs-on}}
 
     env:
       LOG_LEVEL: "info"
@@ -49,7 +54,7 @@ jobs:
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
 
-    runs-on: buildjet-16vcpu-ubuntu-2004
+
     steps:
       - uses: actions/checkout@v3
 

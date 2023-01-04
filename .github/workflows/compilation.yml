@@ -10,10 +10,15 @@ on:
 
 jobs:
   test-crate-compilation:
-    name: "Compile top level crates on Linux"
+    name: "Compile top level crates on Linux (${{matrix.runs-on}})"
     strategy:
       fail-fast: false
-    runs-on: buildjet-16vcpu-ubuntu-2004
+      matrix:
+        runs-on: [
+          ubuntu-latest, 
+          buildjet-16vcpu-ubuntu-2004
+        ]
+    runs-on: ${{matrix.runs-on}}
     steps:
       - uses: actions/checkout@v3
 
