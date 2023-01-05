@@ -4,7 +4,7 @@ use mongodb::{
 };
 use std::time::{Duration, Instant};
 
-const MAX_TX_TIMEOUT_COMMIT_RETRY_LIMIT: Duration = Duration::from_secs(10);
+const MAX_TX_TIMEOUT_COMMIT_RETRY_LIMIT: Duration = Duration::from_secs(12);
 
 pub async fn commit_with_retry(session: &mut ClientSession) -> Result<()> {
     let timeout = Instant::now();
