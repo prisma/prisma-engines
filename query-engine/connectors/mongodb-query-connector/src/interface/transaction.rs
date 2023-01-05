@@ -65,10 +65,6 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
-
-    fn should_retry_on_transient_transaction(&self) -> bool {
-        true
-    }
 }
 
 #[async_trait]

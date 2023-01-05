@@ -59,10 +59,6 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
-
-    fn should_retry_on_transient_transaction(&self) -> bool {
-        false
-    }
 }
 
 #[async_trait]

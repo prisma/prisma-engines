@@ -107,14 +107,14 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         let conn = connector.get_connection().instrument(conn_span).await?;
 
         futures.push(tokio::spawn(
-            execute_self_contained(
+            crate::with_request_now(execute_self_contained(
                 conn,
                 query_schema.clone(),
                 op.clone(),
                 force_transactions,
                 connector.should_retry_on_transient_transaction_error(),
                 trace_id.clone(),
-            )
+            ))
             .with_subscriber(dispatcher.clone()),
         ));
     }
@@ -159,8 +159,6 @@ async fn execute_self_contained<'a>(
     result
 }
 
-const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(10);
-
 async fn execute_self_contained_without_retry(
     mut conn: Box<dyn Connection>,
     graph: QueryGraph,
@@ -175,7 +173,9 @@ async fn execute_self_contained_without_retry(
     execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
 }
 
-// MongoDB-specific transient transaction & commit retry logic.
+const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(12);
+
+// MongoDB-specific transient transaction error retry logic.
 // Hack: This should ideally live in MongoDb's connector but our current architecture doesn't allow us to easily do that.
 async fn execute_self_contained_with_retry<'a>(
     conn: &'a mut Box<dyn Connection>,

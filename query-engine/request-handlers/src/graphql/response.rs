@@ -149,7 +149,9 @@ impl GQLBatchResponse {
     }
 
     pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
-        self.errors.iter()
+        self.errors
+            .iter()
+            .chain(self.batch_result.iter().flat_map(|res| res.errors()))
     }
 }
 

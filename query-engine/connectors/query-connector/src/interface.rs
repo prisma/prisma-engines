@@ -37,10 +37,6 @@ pub trait Transaction: ConnectionLike {
     /// Explicit upcast of self reference. Rusts current vtable layout doesn't allow for an upcast if
     /// `trait A`, `trait B: A`, so that `Box<dyn B> as Box<dyn A>` works. This is a simple, explicit workaround.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
-
-    /// Should the transaction be manually retried when a TransientTransaction error is thrown.
-    /// This should mostly be useful for MongoDB.
-    fn should_retry_on_transient_transaction(&self) -> bool;
 }
 
 /// Marker trait required by the query core executor to abstract connections and
