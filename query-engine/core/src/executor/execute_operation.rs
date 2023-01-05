@@ -177,8 +177,8 @@ const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(12);
 
 // MongoDB-specific transient transaction error retry logic.
 // Hack: This should ideally live in MongoDb's connector but our current architecture doesn't allow us to easily do that.
-async fn execute_self_contained_with_retry<'a>(
-    conn: &'a mut Box<dyn Connection>,
+async fn execute_self_contained_with_retry(
+    conn: &mut Box<dyn Connection>,
     query_schema: QuerySchemaRef,
     operation: Operation,
     force_transactions: bool,
