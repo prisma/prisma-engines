@@ -467,5 +467,5 @@ async fn direct_url(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect_config(input_dm).await.unwrap());
+    pretty_assertions::assert_eq!(final_dm, &api.re_introspect_config(input_dm).await.unwrap());
 }
