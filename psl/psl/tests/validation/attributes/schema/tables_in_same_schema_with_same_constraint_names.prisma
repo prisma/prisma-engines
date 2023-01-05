@@ -28,7 +28,7 @@ model Post {
     @@schema("transactional")
 }
 
-// [1;91merror[0m: [1mThe model with database name "some_table" could not be defined because another model with this name exists: "User"[0m
+// [1;91merror[0m: [1mThe model with database name "some_table" could not be defined because another model or view with this name exists: "User"[0m
 //   [1;94m-->[0m  [4mschema.prisma:27[0m
 // [1;94m   | [0m
 // [1;94m26 | [0m

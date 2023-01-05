@@ -783,7 +783,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
     }"#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m      id    Int    @id @default(autoincrement())
@@ -811,7 +811,7 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m      id    Int    @id @default(autoincrement())

@@ -24,7 +24,7 @@ model Cat {
   @@schema("base")
 }
 
-// [1;91merror[0m: [1mThe model with database name "pets" could not be defined because another model with this name exists: "Dog"[0m
+// [1;91merror[0m: [1mThe model with database name "pets" could not be defined because another model or view with this name exists: "Dog"[0m
 //   [1;94m-->[0m  [4mschema.prisma:23[0m
 // [1;94m   | [0m
 // [1;94m22 | [0m

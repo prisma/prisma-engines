@@ -1,3 +1,5 @@
+mod views;
+
 use indoc::indoc;
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;

@@ -355,7 +355,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `more_posts` in model `User`: The relation field `more_posts` on Model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `more_posts` in model `User`: The relation field `more_posts` on model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  posts Post[] @relation(name: "test")
@@ -449,21 +449,21 @@ fn should_fail_on_conflicting_generated_back_relation_fields() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `author` in model `Todo`: The relation field `author` on Model `Todo` is missing an opposite relation field on the model `Owner`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `author` in model `Todo`: The relation field `author` on model `Todo` is missing an opposite relation field on the model `Owner`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
         [1;94m 3 | [0m  [1;91mauthor Owner @relation(name: "AuthorTodo")[0m
         [1;94m 4 | [0m  delegatedTo Owner? @relation(name: "DelegatedToTodo")
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating field `delegatedTo` in model `Todo`: The relation field `delegatedTo` on Model `Todo` is missing an opposite relation field on the model `Owner`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `delegatedTo` in model `Todo`: The relation field `delegatedTo` on model `Todo` is missing an opposite relation field on the model `Owner`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  author Owner @relation(name: "AuthorTodo")
         [1;94m 4 | [0m  [1;91mdelegatedTo Owner? @relation(name: "DelegatedToTodo")[0m
         [1;94m 5 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating field `todos` in model `Owner`: The relation field `todos` on Model `Owner` is missing an opposite relation field on the model `Todo`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `todos` in model `Owner`: The relation field `todos` on model `Owner` is missing an opposite relation field on the model `Todo`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  id Int @id
@@ -493,7 +493,7 @@ fn must_generate_forward_relation_fields_for_named_relation_fields() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `assignees` in model `Todo`: The relation field `assignees` on Model `Todo` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `assignees` in model `Todo`: The relation field `assignees` on model `Todo` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
@@ -522,7 +522,7 @@ fn issue4850() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `postableEntities` in model `Post`: The relation field `postableEntities` on Model `Post` is missing an opposite relation field on the model `PostableEntity`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `postableEntities` in model `Post`: The relation field `postableEntities` on model `Post` is missing an opposite relation field on the model `PostableEntity`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0m  id String @id
@@ -553,14 +553,14 @@ fn issue4822() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `custom_User` in model `Post`: The relation field `custom_User` on Model `Post` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `custom_User` in model `Post`: The relation field `custom_User` on model `Post` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  user_id     Int    @unique
         [1;94m 4 | [0m  [1;91mcustom_User User   @relation("CustomName", fields: [user_id], references: [id])[0m
         [1;94m 5 | [0m}
         [1;94m   | [0m
-        [1;91merror[0m: [1mError validating field `custom_Post` in model `User`: The relation field `custom_Post` on Model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `custom_Post` in model `User`: The relation field `custom_Post` on model `User` is missing an opposite relation field on the model `Post`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m  id          Int    @id
@@ -627,7 +627,7 @@ fn issue5069() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `createdBy` in model `Code`: The relation field `createdBy` on Model `Code` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `createdBy` in model `Code`: The relation field `createdBy` on model `Code` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  createdById String?
@@ -902,7 +902,7 @@ fn a_typoed_relation_should_fail_gracefully() {
     "#};
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `self` in model `TestParent`: The relation field `self` on Model `TestParent` is missing an opposite relation field on the model `TestParent`. Either run `prisma format` or add it manually.[0m
+        [1;91merror[0m: [1mError validating field `self` in model `TestParent`: The relation field `self` on model `TestParent` is missing an opposite relation field on the model `TestParent`. Either run `prisma format` or add it manually.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m  fk   Int

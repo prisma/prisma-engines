@@ -22,6 +22,7 @@ pub(crate) fn parse_view(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnost
             Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::field_declaration => match parse_field(
                 &name.as_ref().unwrap().name,
+                "view",
                 current,
                 pending_field_comment.take(),
                 diagnostics,

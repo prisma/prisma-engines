@@ -15,6 +15,12 @@ use parser_database::{
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
 
+    let container_type = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
         match taken {
             NameTaken::Index => {
@@ -23,8 +29,12 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error =
-                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
+                let error = DatamodelError::new_model_validation_error(
+                    &message,
+                    container_type,
+                    model.name(),
+                    model.ast_model().span(),
+                );
                 ctx.push_error(error);
             }
             NameTaken::Unique => {
@@ -33,8 +43,12 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error =
-                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
+                let error = DatamodelError::new_model_validation_error(
+                    &message,
+                    container_type,
+                    model.name(),
+                    model.ast_model().span(),
+                );
                 ctx.push_error(error);
             }
             NameTaken::PrimaryKey => {
@@ -43,8 +57,12 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
                     field.name()
                 );
 
-                let error =
-                    DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span());
+                let error = DatamodelError::new_model_validation_error(
+                    &message,
+                    container_type,
+                    model.name(),
+                    model.ast_model().span(),
+                );
                 ctx.push_error(error);
             }
         }
@@ -230,15 +248,22 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_>, ctx: &mut Con
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     match field.scalar_field_type() {
         ScalarFieldType::BuiltInScalar(ScalarType::Json) => {
             if !ctx.connector.supports_json() {
                 ctx.push_error(DatamodelError::new_field_validation_error(
                     &format!(
-                        "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+                        "Field `{}` in {container} `{}` can't be of type Json. The current connector does not support the Json type.",
                         field.name(),
                         field.model().name(),
                     ),
+                    container,
                     field.model().name(),
                     field.name(),
                     field.ast_field().span(),
@@ -248,10 +273,11 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             if field.ast_field().arity.is_list() && !ctx.connector.supports_json_lists() {
                 ctx.push_error(DatamodelError::new_field_validation_error(
                     &format!(
-                        "Field `{}` in model `{}` can't be of type Json[]. The current connector does not support the Json List type.",
+                        "Field `{}` in {container} `{}` can't be of type Json[]. The current connector does not support the Json List type.",
                         field.name(),
                         field.model().name()
                     ),
+                    container,
                     field.model().name(),
                     field.name(),
                     field.ast_field().span(),
@@ -263,10 +289,11 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             if !ctx.connector.supports_decimal() {
                 ctx.push_error(DatamodelError::new_field_validation_error(
                     &format!(
-                        "Field `{}` in model `{}` can't be of type Decimal. The current connector does not support the Decimal type.",
+                        "Field `{}` in {container} `{}` can't be of type Decimal. The current connector does not support the Decimal type.",
                         field.name(),
                         field.model().name(),
                     ),
+                    container,
                     field.model().name(),
                     field.name(),
                     field.ast_field().span(),
@@ -279,6 +306,11 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
 
     if field.ast_field().arity.is_list() && !ctx.connector.supports_scalar_lists() {
         ctx.push_error(DatamodelError::new_scalar_list_fields_are_not_supported(
+            if field.model().ast_model().is_view() {
+                "view"
+            } else {
+                "model"
+            },
             field.model().name(),
             field.name(),
             field.ast_field().span(),

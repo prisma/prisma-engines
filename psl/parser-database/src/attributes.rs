@@ -634,7 +634,7 @@ fn common_index_validations(
                         fields.join(", "),
                     );
                     let model_name = ctx.ast[model_id].name();
-                    DatamodelError::new_model_validation_error(message, model_name, current_attribute.span)
+                    DatamodelError::new_model_validation_error(message, "model", model_name, current_attribute.span)
                 });
             }
 
@@ -665,6 +665,7 @@ fn common_index_validations(
                         the_fields = relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                         suggestion = suggestion
                     ),
+                    "model",
                     ctx.ast[model_id].name(),
                     current_attribute.span,
                 ));
@@ -867,6 +868,7 @@ fn resolve_field_array_without_args<'db>(
                     "The unique index definition refers to the field {} multiple times.",
                     ast_model[field_id].name()
                 ),
+                "model",
                 ast_model.name(),
                 attribute_span,
             ));
@@ -1011,6 +1013,7 @@ fn resolve_field_array_with_args<'db>(
 
             ctx.push_error(DatamodelError::new_model_validation_error(
                 &format!("The unique index definition refers to the field {path_str} multiple times.",),
+                "model",
                 ast_model.name(),
                 attribute_span,
             ));
@@ -1083,6 +1086,7 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
             "The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.",
             attribute
         ),
+        "model",
         object_name,
         span,
     ))

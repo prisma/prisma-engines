@@ -69,6 +69,16 @@ impl crate::ParserDatabase {
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_model_id())
             .map(move |model_id| self.walk(model_id))
+            .filter(|m| !m.ast_model().is_view())
+    }
+
+    /// Walk all the views in the schema.
+    pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
+        self.ast()
+            .iter_tops()
+            .filter_map(|(top_id, _)| top_id.as_model_id())
+            .map(move |model_id| self.walk(model_id))
+            .filter(|m| m.ast_model().is_view())
     }
 
     /// Walk all the composite types in the schema.

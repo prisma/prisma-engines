@@ -11,6 +11,7 @@ use psl::datamodel_connector::Connector;
 use sql::{
     postgres::{ExtensionWalker, PostgresSchemaExt},
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    ViewWalker,
 };
 use sql_schema_describer::{
     self as sql,
@@ -50,6 +51,17 @@ impl SchemaAssertion {
 
     pub fn into_schema(self) -> SqlSchema {
         self.schema
+    }
+
+    #[track_caller]
+    fn find_view_option<'a>(&'a self, view_name: &str) -> Option<ViewWalker<'a>> {
+        self.schema.view_walkers().find(|v| {
+            if self.tags.contains(Tags::LowerCasesTableNames) {
+                v.name().eq_ignore_ascii_case(view_name)
+            } else {
+                v.name() == view_name
+            }
+        })
     }
 
     #[track_caller]
@@ -138,6 +150,14 @@ impl SchemaAssertion {
     pub fn assert_has_no_table(self, table_name: &str) -> Self {
         if self.find_table_option(table_name).is_some() {
             self.assert_error(table_name, false);
+        }
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_has_no_view(self, view_name: &str) -> Self {
+        if self.find_view_option(view_name).is_some() {
+            self.assert_error(view_name, false)
         }
         self
     }
@@ -369,6 +389,18 @@ impl<'a> TableAssertion<'a> {
         } else {
             panic!("Could not find foreign key on {}.{:?}", self.table.name(), columns);
         }
+
+        self
+    }
+
+    #[track_caller]
+    pub fn assert_no_fks(self) -> Self {
+        let fk_count = self.table.foreign_key_count();
+
+        assert!(
+            fk_count == 0,
+            "Expected no foreign keys in the table, found {fk_count}."
+        );
 
         self
     }

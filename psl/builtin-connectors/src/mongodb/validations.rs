@@ -16,8 +16,15 @@ pub(super) fn objectid_type_required_with_auto_attribute(field: ScalarFieldWalke
         return;
     }
 
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     let err = DatamodelError::new_field_validation_error(
         "MongoDB `@default(auto())` fields must have `ObjectId` native type.",
+        container,
         field.model().name(),
         field.name(),
         field.ast_field().span(),
@@ -36,8 +43,15 @@ pub(super) fn auto_attribute_must_be_an_id(field: ScalarFieldWalker<'_>, errors:
         return;
     }
 
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     let err = DatamodelError::new_field_validation_error(
         "MongoDB `@default(auto())` fields must have the `@id` attribute.",
+        container,
         field.model().name(),
         field.name(),
         field.ast_field().span(),
@@ -52,8 +66,15 @@ pub(super) fn dbgenerated_attribute_is_not_allowed(field: ScalarFieldWalker<'_>,
         return;
     }
 
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     let err = DatamodelError::new_field_validation_error(
         "The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.",
+        container,
         field.model().name(),
         field.name(),
         field.ast_field().span(),
@@ -76,12 +97,19 @@ pub(super) fn id_field_must_have_a_correct_mapped_name(pk: PrimaryKeyWalker<'_>,
         return;
     }
 
+    let container = if field.model().ast_model().is_view() {
+        "view"
+    } else {
+        "model"
+    };
+
     let error = match field.mapped_name() {
         Some(name) => {
             let msg = format!("MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{name}\").",);
 
             DatamodelError::new_field_validation_error(
                 &msg,
+                container,
                 field.model().name(),
                 field.name(),
                 field.ast_field().span(),
@@ -89,6 +117,7 @@ pub(super) fn id_field_must_have_a_correct_mapped_name(pk: PrimaryKeyWalker<'_>,
         }
         None => DatamodelError::new_field_validation_error(
             "MongoDB model IDs must have a @map(\"_id\") annotations.",
+            container,
             field.model().name(),
             field.name(),
             field.ast_field().span(),
