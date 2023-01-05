@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  id Int @unique
+  val
+}
+// [1;91merror[0m: [1mError validating view "Mountain": This field declaration is invalid. It is either missing a name or a type.[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id Int @unique
+// [1;94m13 | [0m  [1;91mval[0m
+// [1;94m14 | [0m}
+// [1;94m   | [0m
