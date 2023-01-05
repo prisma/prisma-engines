@@ -34,6 +34,11 @@ impl DefaultKind {
         matches!(self, DefaultKind::Expression(generator) if generator.name == "dbgenerated")
     }
 
+    /// Does this match @default(nanoid(_))?
+    pub fn is_nanoid(&self) -> bool {
+        matches!(self, DefaultKind::Expression(generator) if generator.name.starts_with("nanoid("))
+    }
+
     /// Does this match @default(now())?
     pub fn is_now(&self) -> bool {
         matches!(self, DefaultKind::Expression(generator) if generator.name == "now")
@@ -102,6 +107,11 @@ impl DefaultValue {
     /// Does this match @default(dbgenerated(_))?
     pub fn is_dbgenerated(&self) -> bool {
         self.kind.is_dbgenerated()
+    }
+
+    /// Does this match @default(nanoid(_))?
+    pub fn is_nanoid(&self) -> bool {
+        self.kind.is_nanoid()
     }
 
     /// Does this match @default(now())?
@@ -191,6 +201,18 @@ impl ValueGenerator {
         ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
     }
 
+    pub fn new_nanoid(length: Option<u8>) -> Self {
+        if length.is_some() {
+            ValueGenerator::new(
+                format!("nanoid({})", length.unwrap()),
+                vec![(None, PrismaValue::Int(length.unwrap().into()))],
+            )
+            .unwrap()
+        } else {
+            ValueGenerator::new("nanoid()".to_owned(), vec![]).unwrap()
+        }
+    }
+
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -240,6 +262,7 @@ impl ValueGenerator {
 pub enum ValueGeneratorFn {
     Uuid,
     Cuid,
+    Nanoid(Option<u8>),
     Now,
     Autoincrement,
     DbGenerated,
@@ -256,6 +279,7 @@ impl ValueGeneratorFn {
             "sequence" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
+            name if name.starts_with("nanoid(") => Ok(Self::Nanoid(name[7..name.len() - 1].parse::<u8>().ok())),
             _ => Err(format!("The function {} is not a known function.", name)),
         }
     }
@@ -265,6 +289,7 @@ impl ValueGeneratorFn {
         match self {
             Self::Uuid => Some(Self::generate_uuid()),
             Self::Cuid => Some(Self::generate_cuid()),
+            Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
@@ -277,6 +302,7 @@ impl ValueGeneratorFn {
         match (self, scalar_type) {
             (Self::Uuid, ScalarType::String) => true,
             (Self::Cuid, ScalarType::String) => true,
+            (Self::Nanoid(_), ScalarType::String) => true,
             (Self::Now, ScalarType::DateTime) => true,
             (Self::Autoincrement, ScalarType::Int) => true,
             (Self::Autoincrement, ScalarType::BigInt) => true,
@@ -294,6 +320,16 @@ impl ValueGeneratorFn {
     #[cfg(feature = "default_generators")]
     fn generate_uuid() -> PrismaValue {
         PrismaValue::Uuid(uuid::Uuid::new_v4())
+    }
+
+    #[cfg(feature = "default_generators")]
+    fn generate_nanoid(length: &Option<u8>) -> PrismaValue {
+        if length.is_some() {
+            let value: usize = usize::from(length.unwrap());
+            PrismaValue::String(nanoid::nanoid!(value))
+        } else {
+            PrismaValue::String(nanoid::nanoid!())
+        }
     }
 
     #[cfg(feature = "default_generators")]
@@ -350,6 +386,14 @@ mod tests {
 
         assert!(cuid_default.is_cuid());
         assert!(!cuid_default.is_now());
+    }
+
+    #[test]
+    fn default_value_is_nanoid() {
+        let nanoid_default = DefaultValue::new_expression(ValueGenerator::new_nanoid(None));
+
+        assert!(nanoid_default.is_nanoid());
+        assert!(!nanoid_default.is_cuid());
     }
 
     #[test]

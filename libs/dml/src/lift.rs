@@ -576,6 +576,15 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
         ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
             DefaultKind::Expression(ValueGenerator::new_cuid())
         }
+        ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
+            DefaultKind::Expression(ValueGenerator::new_nanoid(
+                args.arguments
+                    .get(0)
+                    .and_then(|arg| arg.value.as_numeric_value())
+                    .map(|(val, _)| val.to_owned().parse::<u8>().ok())
+                    .unwrap_or(None),
+            ))
+        }
         ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
             DefaultKind::Expression(ValueGenerator::new_now())
         }
