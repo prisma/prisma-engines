@@ -438,7 +438,7 @@ async fn direct_url(api: &TestApi) {
         }
 
         model User {
-          id           Int    @id
+          id           Int       @id
           lastupdated  DateTime? @updatedAt
           lastupdated2 DateTime? @db.DateTime @updatedAt
         }
@@ -457,7 +457,7 @@ async fn direct_url(api: &TestApi) {
         }
 
         model User {
-          id           Int    @id
+          id           Int       @id
           lastupdated  DateTime? @updatedAt @db.DateTime
           lastupdated2 DateTime? @updatedAt
         }
