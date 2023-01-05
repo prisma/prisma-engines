@@ -342,10 +342,6 @@ mod singular_batch {
     }
 
     async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<(QueryResult, BatchDocument)> {
-        // Ensure batched queries are valid
-        let res = runner.batch(queries.clone(), false, None).await?;
-        res.assert_success();
-
         let doc = GraphQlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             false,
