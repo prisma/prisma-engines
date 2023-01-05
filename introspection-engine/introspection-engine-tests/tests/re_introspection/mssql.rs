@@ -401,3 +401,71 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
 
     Ok(())
 }
+
+#[test_connector(tags(Mssql))]
+async fn direct_url(api: &TestApi) {
+    let setup = format!(
+        r#"
+        CREATE TABLE [{schema_name}].[User] (
+            id INTEGER,
+            [lastupdated] DATETIME,
+            [lastupdated2] DATETIME2,
+
+            CONSTRAINT [User_pkey] PRIMARY KEY ([id])
+        );
+
+        CREATE TABLE [{schema_name}].[Unrelated] (
+            id INTEGER IDENTITY,
+
+            CONSTRAINT [Unrelated_pkey] PRIMARY KEY ([id])
+        );
+        "#,
+        schema_name = api.schema_name()
+    );
+
+    api.raw_cmd(&setup).await;
+
+    let input_dm = indoc! {r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider   = "sqlserver"
+          url        = "bad url"
+          directUrl  = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+            id           Int    @id
+            lastupdated  DateTime? @updatedAt
+            lastupdated2 DateTime? @db.DateTime @updatedAt
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = []
+        }
+
+        datasource db {
+          provider   = "sqlserver"
+          url        = "bad url"
+          directUrl  = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+            id           Int    @id
+            lastupdated  DateTime? @updatedAt @db.DateTime
+            lastupdated2 DateTime? @updatedAt
+        }
+
+        model Unrelated {
+            id               Int @id @default(autoincrement())
+        }
+    "#};
+
+    api.assert_eq_datamodels(final_dm, &api.re_introspect_config(input_dm).await.unwrap());
+}
