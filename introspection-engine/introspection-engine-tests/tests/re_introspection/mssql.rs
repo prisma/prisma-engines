@@ -432,15 +432,15 @@ async fn direct_url(api: &TestApi) {
         }
 
         datasource db {
-          provider   = "sqlserver"
-          url        = "bad url"
-          directUrl  = "env(TEST_DATABASE_URL)"
+          provider  = "sqlserver"
+          url       = "bad url"
+          directUrl = "env(TEST_DATABASE_URL)"
         }
 
         model User {
-            id           Int    @id
-            lastupdated  DateTime? @updatedAt
-            lastupdated2 DateTime? @db.DateTime @updatedAt
+          id           Int    @id
+          lastupdated  DateTime? @updatedAt
+          lastupdated2 DateTime? @db.DateTime @updatedAt
         }
     "#};
 
@@ -451,19 +451,19 @@ async fn direct_url(api: &TestApi) {
         }
 
         datasource db {
-          provider   = "sqlserver"
-          url        = "bad url"
-          directUrl  = "env(TEST_DATABASE_URL)"
+          provider  = "sqlserver"
+          url       = "bad url"
+          directUrl = "env(TEST_DATABASE_URL)"
         }
 
         model User {
-            id           Int    @id
-            lastupdated  DateTime? @updatedAt @db.DateTime
-            lastupdated2 DateTime? @updatedAt
+          id           Int    @id
+          lastupdated  DateTime? @updatedAt @db.DateTime
+          lastupdated2 DateTime? @updatedAt
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
     "#};
 
