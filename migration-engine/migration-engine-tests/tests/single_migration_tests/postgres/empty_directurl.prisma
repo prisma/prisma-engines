@@ -16,6 +16,6 @@ model table {
 // CREATE TABLE "table" (
 //     "id" TEXT NOT NULL,
 //     "hereBeDragons" TEXT NOT NULL,
-//
+
 //     CONSTRAINT "table_pkey" PRIMARY KEY ("id")
 // );
