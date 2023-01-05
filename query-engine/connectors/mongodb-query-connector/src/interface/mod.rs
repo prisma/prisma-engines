@@ -73,6 +73,10 @@ impl Connector for MongoDb {
     fn name(&self) -> &'static str {
         "mongodb"
     }
+
+    fn should_retry_on_transient_transaction_error(&self) -> bool {
+        true
+    }
 }
 
 async fn catch<O>(

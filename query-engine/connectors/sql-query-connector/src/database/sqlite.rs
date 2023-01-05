@@ -93,4 +93,8 @@ impl Connector for Sqlite {
     fn name(&self) -> &'static str {
         "sqlite"
     }
+
+    fn should_retry_on_transient_transaction_error(&self) -> bool {
+        false
+    }
 }

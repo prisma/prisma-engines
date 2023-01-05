@@ -12,6 +12,10 @@ pub trait Connector {
 
     /// Returns the name of the connector.
     fn name(&self) -> &'static str;
+
+    /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution
+    /// because of a transient transaction error. Note: This is specific to MongoDB for now.
+    fn should_retry_on_transient_transaction_error(&self) -> bool;
 }
 
 #[async_trait]

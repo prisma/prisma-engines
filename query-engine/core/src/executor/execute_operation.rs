@@ -67,7 +67,6 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     operation: Operation,
     trace_id: Option<String>,
     force_transactions: bool,
-    retry_on_transient_transaction_error: bool,
 ) -> crate::Result<ResponseData> {
     let conn_span = info_span!(
         "prisma:engine:connection",
@@ -81,7 +80,7 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
         query_schema,
         operation,
         force_transactions,
-        retry_on_transient_transaction_error,
+        connector.should_retry_on_transient_transaction_error(),
         trace_id,
     )
     .await
@@ -93,7 +92,6 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     operations: &[Operation],
     trace_id: Option<String>,
     force_transactions: bool,
-    retry_on_transient_transaction_error: bool,
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let mut futures = Vec::with_capacity(operations.len());
 
@@ -114,7 +112,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
                 query_schema.clone(),
                 op.clone(),
                 force_transactions,
-                retry_on_transient_transaction_error,
+                connector.should_retry_on_transient_transaction_error(),
                 trace_id.clone(),
             )
             .with_subscriber(dispatcher.clone()),
@@ -210,17 +208,6 @@ async fn execute_self_contained_with_retry<'a>(
         execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
     }
 }
-
-// async fn execute_with_retry(
-//     conn: &mut Box<dyn Connection>,
-//     graph: QueryGraph,
-//     serializer: IrSerializer,
-//     query_schema: QuerySchemaRef,
-//     operation: Operation,
-//     trace_id: Option<String>,
-//     retry_timeout: Instant,
-// ) -> crate::Result<ResponseData> {
-// }
 
 async fn execute_in_tx(
     conn: &mut Box<dyn Connection>,

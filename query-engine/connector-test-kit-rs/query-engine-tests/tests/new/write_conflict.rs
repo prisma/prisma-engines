@@ -42,18 +42,4 @@ mod write_conflict {
 
         Ok(())
     }
-
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ uniqueField: 1, nonUniqFieldA: "A", nonUniqFieldB: "A"}"#).await?;
-
-        Ok(())
-    }
-
-    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
-        runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
-            .await?
-            .assert_success();
-        Ok(())
-    }
 }

@@ -68,4 +68,8 @@ impl Connector for PostgreSql {
     fn name(&self) -> &'static str {
         "postgres"
     }
+
+    fn should_retry_on_transient_transaction_error(&self) -> bool {
+        false
+    }
 }

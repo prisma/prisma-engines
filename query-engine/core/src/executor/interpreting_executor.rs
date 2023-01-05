@@ -20,20 +20,16 @@ pub struct InterpretingExecutor<C> {
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
     force_transactions: bool,
-
-    /// Only used on MongoDb for now. This ensures that transient transaction errors leads to the entire being retried.
-    retry_on_transient_transaction_error: bool,
 }
 
 impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    pub fn new(connector: C, force_transactions: bool, retry_on_transient_transaction_error: bool) -> Self {
+    pub fn new(connector: C, force_transactions: bool) -> Self {
         InterpretingExecutor {
             connector,
             force_transactions,
-            retry_on_transient_transaction_error,
             itx_manager: TransactionActorManager::new(),
         }
     }
@@ -63,7 +59,6 @@ where
                     operation,
                     trace_id,
                     self.force_transactions,
-                    self.retry_on_transient_transaction_error,
                 )
                 .await
             })
@@ -131,7 +126,6 @@ where
                     &operations,
                     trace_id,
                     self.force_transactions,
-                    self.retry_on_transient_transaction_error,
                 )
                 .await
             })
