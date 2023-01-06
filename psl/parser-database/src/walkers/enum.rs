@@ -1,3 +1,5 @@
+use schema_ast::ast::{IndentationType, NewlineType};
+
 use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
 
 /// An `enum` declaration in the schema.
@@ -44,6 +46,16 @@ impl<'db> EnumWalker<'db> {
     /// The values of the enum.
     pub fn values(self) -> impl ExactSizeIterator<Item = EnumValueWalker<'db>> {
         (0..self.ast_enum().values.len()).map(move |idx| self.walk((self.id, idx)))
+    }
+
+    /// How fields are indented in the enum.
+    pub fn indentation(self) -> IndentationType {
+        IndentationType::default()
+    }
+
+    /// What kind of newlines the enum uses.
+    pub fn newline(self) -> NewlineType {
+        NewlineType::Unix
     }
 
     /// The name of the schema the enum belongs to.

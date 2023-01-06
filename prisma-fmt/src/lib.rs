@@ -138,7 +138,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
                 Some(_) => {
                     offset += 1;
                 }
-                None => return None,
+                None => return Some(offset),
             }
         }
 
@@ -147,7 +147,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
     while character_offset > 0 {
         match chars.next() {
-            Some('\n') | None => return None,
+            Some('\n') | None => return Some(offset),
             Some(_) => {
                 offset += 1;
                 character_offset -= 1;
@@ -158,6 +158,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     Some(offset)
 }
 
+#[track_caller]
 /// Converts an LSP range to a span.
 pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();

@@ -11,7 +11,7 @@ model Dog {
     id         Int    @id
     name       String
     age        Int
-    bestFriend Cat    @relation(fields: [catId], references: [id], onDelete: Re<|>)
+    bestFriend Cat    @relation(fields: [catId], references: [id], onDelete: Re<|>) 
     catId      Int    @unique
 }
 
