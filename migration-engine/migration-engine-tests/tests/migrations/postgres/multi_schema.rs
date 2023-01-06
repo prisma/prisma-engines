@@ -1,4 +1,13 @@
-use indoc::indoc;
+use indoc::{formatdoc, indoc};
+use migration_core::{
+    commands::apply_migrations,
+    commands::create_migration,
+    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput},
+    migration_connector::{ConnectorParams, MigrationConnector},
+};
+use psl::PreviewFeature;
+use sql_migration_connector::SqlMigrationConnector;
+use url::Url;
 
 use crate::migrations::multi_schema::*;
 use migration_engine_tests::test_api::*;
@@ -1359,4 +1368,150 @@ fn multi_schema_tests(_api: TestApi) {
     tests.iter_mut().filter(|t| t.skip.is_none()).for_each(|t| {
         run_test(t);
     });
+}
+
+#[tokio::test]
+async fn migration_with_shadow_database() {
+    let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
+
+    if !conn_str.starts_with("postgres") || conn_str.contains("localhost:26257") {
+        return;
+    }
+
+    let (params, datasource) = {
+        let mut shadow_str: Url = conn_str.parse().unwrap();
+        shadow_str.set_path("shadow");
+
+        let shadow_str = shadow_str.to_string();
+
+        let datasource = formatdoc! {r#"
+            datasource db {{
+              provider          = "postgresql"
+              url               = "{conn_str}"
+              shadowDatabaseUrl = "{shadow_str}"
+              schemas           = ["one", "two"]
+            }}
+
+            generator js {{
+              provider        = "prisma-client-javascript"
+              previewFeatures = ["multiSchema"]
+            }}
+        "#};
+
+        let params = ConnectorParams {
+            connection_string: dbg!(conn_str),
+            preview_features: PreviewFeature::MultiSchema.into(),
+            shadow_database_connection_string: dbg!(Some(shadow_str)),
+        };
+
+        (params, datasource)
+    };
+
+    let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
+
+    let mut conn = {
+        let mut conn = SqlMigrationConnector::new_postgres();
+
+        conn.set_params(params).unwrap();
+        let _ = conn.raw_cmd("DROP DATABASE shadow").await;
+
+        conn.raw_cmd("CREATE DATABASE shadow").await.unwrap();
+        conn.reset(false, namespaces.clone()).await.unwrap();
+
+        let _ = conn.raw_cmd("DROP SCHEMA one CASCADE").await;
+        let _ = conn.raw_cmd("DROP SCHEMA two CASCADE").await;
+        let _ = conn.raw_cmd("DROP SCHEMA public CASCADE").await;
+        let _ = conn.raw_cmd("CREATE SCHEMA public").await;
+
+        conn
+    };
+
+    let dm = formatdoc! {r#"
+        {datasource}
+
+        model A {{
+          id  Int @id
+          bId Int
+          bs  B[] @relation("one")
+          b   B   @relation("two", fields: [bId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("one")
+        }}
+
+        model B {{
+          id  Int @id
+          aId Int
+          a   A   @relation("one", fields: [aId], references: [id])
+          as  A[] @relation("two")
+
+          @@schema("two")
+        }}
+    "#};
+
+    let migrations_directory = tempfile::tempdir().unwrap();
+
+    let migration = CreateMigrationInput {
+        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
+        prisma_schema: dm.clone(),
+        draft: false,
+        migration_name: "init".to_string(),
+    };
+
+    create_migration(migration, &mut conn).await.unwrap();
+
+    let path = std::fs::read_dir(migrations_directory.path())
+        .expect("Reading migrations directory for named migration.")
+        .find_map(|entry| {
+            let entry = entry.unwrap();
+            let name = entry.file_name();
+
+            if name.to_str().unwrap().contains("init") {
+                Some(entry)
+            } else {
+                None
+            }
+        })
+        .unwrap()
+        .path()
+        .join("migration.sql");
+
+    let sql = std::fs::read_to_string(path).unwrap();
+
+    let expected = expect![[r#"
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "one";
+
+        -- CreateSchema
+        CREATE SCHEMA IF NOT EXISTS "two";
+
+        -- CreateTable
+        CREATE TABLE "one"."A" (
+            "id" INTEGER NOT NULL,
+            "bId" INTEGER NOT NULL,
+
+            CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+        );
+
+        -- CreateTable
+        CREATE TABLE "two"."B" (
+            "id" INTEGER NOT NULL,
+            "aId" INTEGER NOT NULL,
+
+            CONSTRAINT "B_pkey" PRIMARY KEY ("id")
+        );
+
+        -- AddForeignKey
+        ALTER TABLE "one"."A" ADD CONSTRAINT "A_bId_fkey" FOREIGN KEY ("bId") REFERENCES "two"."B"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+        -- AddForeignKey
+        ALTER TABLE "two"."B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "one"."A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+    "#]];
+
+    expected.assert_eq(&sql);
+
+    let input = ApplyMigrationsInput {
+        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
+    };
+
+    apply_migrations(input, &mut conn, namespaces).await.unwrap();
 }
