@@ -68,7 +68,7 @@ impl Connector for Mysql {
         .await
     }
 
-    fn name(&self) -> String {
-        "mysql".to_owned()
+    fn name(&self) -> &'static str {
+        "mysql"
     }
 }

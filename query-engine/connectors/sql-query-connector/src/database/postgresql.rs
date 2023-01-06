@@ -65,7 +65,7 @@ impl Connector for PostgreSql {
         .await
     }
 
-    fn name(&self) -> String {
-        "postgres".to_owned()
+    fn name(&self) -> &'static str {
+        "postgres"
     }
 }

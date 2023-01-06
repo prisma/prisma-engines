@@ -69,8 +69,8 @@ impl Connector for MongoDb {
         }))
     }
 
-    fn name(&self) -> String {
-        "mongodb".to_owned()
+    fn name(&self) -> &'static str {
+        "mongodb"
     }
 }
 
