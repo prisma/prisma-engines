@@ -8,12 +8,12 @@ use prisma_models::*;
 use quaint::ast::*;
 use tracing::Span;
 
-pub trait SelectDefinition {
+pub(crate) trait SelectDefinition {
     fn into_select(
         self,
         _: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
 }
 
@@ -22,7 +22,7 @@ impl SelectDefinition for Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
         args.into_select(model, aggr_selections, trace_id)
@@ -34,7 +34,7 @@ impl SelectDefinition for &Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         self.clone().into_select(model, aggr_selections, trace_id)
     }
@@ -45,7 +45,7 @@ impl SelectDefinition for Select<'static> {
         self,
         _: &ModelRef,
         _: &[RelAggregationSelection],
-        _trace_id: Option<String>,
+        _trace_id: Option<&str>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
     }
@@ -56,7 +56,7 @@ impl SelectDefinition for QueryArguments {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self);
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
@@ -111,17 +111,17 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(
+pub(crate) fn get_records<T>(
     model: &ModelRef,
     columns: impl Iterator<Item = Column<'static>>,
     aggr_selections: &[RelAggregationSelection],
     query: T,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, aggr_selections, trace_id.clone());
+    let (select, additional_selection_set) = query.into_select(model, aggr_selections, trace_id);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(trace_id);
@@ -157,14 +157,14 @@ where
 /// ```
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
-pub fn aggregate(
+pub(crate) fn aggregate(
     model: &ModelRef,
     selections: &[AggregationSelection],
     args: QueryArguments,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> Select<'static> {
     let columns = extract_columns(model, &selections);
-    let sub_query = get_records(model, columns.into_iter(), &[], args, trace_id.clone());
+    let sub_query = get_records(model, columns.into_iter(), &[], args, trace_id);
     let sub_table = Table::from(sub_query).alias("sub");
 
     selections.iter().fold(
@@ -205,15 +205,15 @@ pub fn aggregate(
     )
 }
 
-pub fn group_by_aggregate(
+pub(crate) fn group_by_aggregate(
     model: &ModelRef,
     args: QueryArguments,
     selections: &[AggregationSelection],
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> Select<'static> {
-    let (base_query, _) = args.into_select(model, &[], trace_id.clone());
+    let (base_query, _) = args.into_select(model, &[], trace_id);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
         AggregationSelection::Field(field) => select.column(field.as_column()),

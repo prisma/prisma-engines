@@ -36,7 +36,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> crate::Result<Vec<SqlRow>> {
         let span = info_span!("filter read query");
 
@@ -118,12 +118,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    async fn find(
-        &self,
-        q: Select<'_>,
-        meta: &[ColumnMetadata<'_>],
-        trace_id: Option<String>,
-    ) -> crate::Result<SqlRow> {
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], trace_id: Option<&str>) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), meta, trace_id)
             .await?
             .into_iter()
@@ -137,7 +132,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
@@ -151,7 +146,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         filter: Filter,
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
@@ -159,7 +154,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
             .append_trace(&Span::current())
-            .add_trace_id(trace_id.clone())
+            .add_trace_id(trace_id)
             .so_that(filter.aliased_condition_from(None, false));
 
         self.select_ids(select, model_id, trace_id).await
@@ -169,7 +164,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         select: Select<'_>,
         model_id: ModelProjection,
-        trace_id: Option<String>,
+        trace_id: Option<&str>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()

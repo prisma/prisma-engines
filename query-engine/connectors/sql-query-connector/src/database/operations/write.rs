@@ -21,7 +21,7 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 async fn generate_id(
     conn: &dyn QueryExt,
     primary_key: &FieldSelection,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
     args: &WriteArgs,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
@@ -67,12 +67,12 @@ pub async fn create_record(
     sql_family: &SqlFamily,
     model: &ModelRef,
     mut args: WriteArgs,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<SelectionResult> {
     let pk = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, trace_id.clone(), &args).await?
+        generate_id(conn, &pk, trace_id, &args).await?
     } else {
         args.as_record_projection(pk.clone().into())
     };
@@ -159,7 +159,7 @@ pub async fn create_records(
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     if args.is_empty() {
         return Ok(0);
@@ -199,7 +199,7 @@ async fn create_many_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     let batches = if let Some(max_params) = sql_info.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
@@ -273,7 +273,7 @@ async fn create_many_nonempty(
 
     let mut count = 0;
     for batch in partitioned_batches {
-        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, trace_id.clone());
+        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, trace_id);
         count += conn.execute(stmt.into()).await?;
     }
 
@@ -286,7 +286,7 @@ async fn create_many_empty(
     model: &ModelRef,
     num_records: usize,
     skip_duplicates: bool,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     let stmt = write::create_records_empty(model, skip_duplicates, trace_id);
     let mut count = 0;
@@ -306,16 +306,14 @@ pub async fn update_record(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     // This is to match the behaviour expected but it seems a bit strange to me
     // This comes across as if the update happened even if it didn't
     if args.args.is_empty() {
-        let ids: Vec<SelectionResult> = conn
-            .filter_selectors(model, record_filter.clone(), trace_id.clone())
-            .await?;
+        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), trace_id).await?;
 
         return Ok(ids);
     }
@@ -332,10 +330,10 @@ async fn update_records_from_ids_and_filter(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<(usize, Vec<SelectionResult>)> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, trace_id).await?;
 
     if ids.is_empty() {
         return Ok((0, Vec::new()));
@@ -365,7 +363,7 @@ async fn update_records_from_filter(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     let update = build_update_and_set_query(model, args, trace_id);
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
@@ -385,7 +383,7 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     if args.args.is_empty() {
         return Ok(0);
@@ -400,14 +398,14 @@ pub async fn update_records(
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
-pub async fn delete_records(
+pub(crate) async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<usize> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
-    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let ids = conn.filter_selectors(model, record_filter, trace_id).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
 
@@ -428,7 +426,7 @@ pub async fn delete_records(
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect(
+pub(crate) async fn m2m_connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
@@ -442,12 +440,12 @@ pub async fn m2m_connect(
 
 /// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_disconnect(
+pub(crate) async fn m2m_disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids, trace_id);
     conn.delete(query).await?;
@@ -457,7 +455,7 @@ pub async fn m2m_disconnect(
 
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
-pub async fn execute_raw(
+pub(crate) async fn execute_raw(
     conn: &dyn QueryExt,
     features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,

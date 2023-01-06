@@ -8,7 +8,7 @@ static ORDER_JOIN_PREFIX: &str = "orderby_";
 static ORDER_AGGREGATOR_ALIAS: &str = "orderby_aggregator";
 
 #[derive(Debug, Clone)]
-pub struct OrderByDefinition {
+pub(crate) struct OrderByDefinition {
     /// Final column identifier to be used for the scalar field to order by
     pub(crate) order_column: Expression<'static>,
     /// Defines ordering for an `ORDER BY` statement.
@@ -18,14 +18,14 @@ pub struct OrderByDefinition {
 }
 
 #[derive(Debug, Default)]
-pub struct OrderByBuilder {
+pub(crate) struct OrderByBuilder {
     // Used to generate unique join alias
     join_counter: usize,
 }
 
 impl OrderByBuilder {
     /// Builds all expressions for an `ORDER BY` clause based on the query arguments.
-    pub fn build(&mut self, query_arguments: &QueryArguments) -> Vec<OrderByDefinition> {
+    pub(crate) fn build(&mut self, query_arguments: &QueryArguments) -> Vec<OrderByDefinition> {
         let needs_reversed_order = query_arguments.needs_reversed_order();
 
         // The index is used to differentiate potentially separate relations to the same model.
