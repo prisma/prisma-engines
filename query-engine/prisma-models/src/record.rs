@@ -8,11 +8,11 @@ pub struct SingleRecord {
     pub field_names: Vec<String>,
 }
 
-impl Into<ManyRecords> for SingleRecord {
-    fn into(self) -> ManyRecords {
+impl From<SingleRecord> for ManyRecords {
+    fn from(single: SingleRecord) -> ManyRecords {
         ManyRecords {
-            records: vec![self.record],
-            field_names: self.field_names,
+            records: vec![single.record],
+            field_names: single.field_names,
         }
     }
 }
