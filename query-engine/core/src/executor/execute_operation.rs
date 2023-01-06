@@ -76,11 +76,10 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     force_transactions: bool,
 ) -> crate::Result<ResponseData> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-    let connection_name = connector.name();
     let conn_span = info_span!(
         "prisma:engine:connection",
         user_facing = true,
-        "db.type" = connection_name.as_str()
+        "db.type" = connector.name()
     );
     let conn = connector.get_connection().instrument(conn_span).await?;
     execute_self_contained(conn, query_graph, serializer, force_transactions, trace_id).await
@@ -101,11 +100,10 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
             Ok((graph, serializer)) => {
                 increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
 
-                let connection_name = connector.name();
                 let conn_span = info_span!(
                     "prisma:engine:connection",
                     user_facing = true,
-                    "db.type" = connection_name.as_str()
+                    "db.type" = connector.name(),
                 );
                 let conn = connector.get_connection().instrument(conn_span).await?;
 

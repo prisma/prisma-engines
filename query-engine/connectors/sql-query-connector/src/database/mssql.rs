@@ -69,7 +69,7 @@ impl Connector for Mssql {
         .await
     }
 
-    fn name(&self) -> String {
-        "mssql".to_owned()
+    fn name(&self) -> &'static str {
+        "mssql"
     }
 }

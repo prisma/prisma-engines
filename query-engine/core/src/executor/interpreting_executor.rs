@@ -95,11 +95,10 @@ where
             }
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
         } else if let Some(transaction) = transaction {
-            let connection_name = self.connector.name();
             let conn_span = info_span!(
                 "prisma:engine:connection",
                 user_facing = true,
-                "db.type" = connection_name.as_str()
+                "db.type" = self.connector.name(),
             );
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
             let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
@@ -154,11 +153,10 @@ where
         super::with_request_now(async move {
             let id = TxId::default();
             trace!("[{}] Starting...", id);
-            let connection_name = self.connector.name();
             let conn_span = info_span!(
                 "prisma:engine:connection",
                 user_facing = true,
-                "db.type" = connection_name.as_str()
+                "db.type" = self.connector.name()
             );
             let conn = time::timeout(
                 Duration::from_millis(max_acquisition_millis),

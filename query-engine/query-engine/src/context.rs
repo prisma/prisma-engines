@@ -94,7 +94,7 @@ impl PrismaContext {
         &self.query_schema
     }
 
-    pub fn primary_connector(&self) -> String {
+    pub fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector().name()
     }
 }

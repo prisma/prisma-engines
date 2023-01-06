@@ -90,7 +90,7 @@ impl Connector for Sqlite {
         .await
     }
 
-    fn name(&self) -> String {
-        "sqlite".to_owned()
+    fn name(&self) -> &'static str {
+        "sqlite"
     }
 }
