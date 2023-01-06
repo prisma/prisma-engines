@@ -20,6 +20,7 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext) -> SqlIntr
         sql_family: ctx.sql_family(),
         previous_schema: ctx.previous_schema(),
         introspection_map: &introspection_map,
+        force_namespaces: ctx.namespaces(),
     };
 
     let introspection_map = crate::introspection_map::IntrospectionMap::new(input);

@@ -6,7 +6,7 @@ use introspection_connector::{
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
-use psl::Configuration;
+use psl::{Configuration, PreviewFeature};
 use serde::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
@@ -60,6 +60,7 @@ impl Rpc for RpcImpl {
             input.schema,
             input.force,
             CompositeTypeDepth::from(input.composite_type_depth.unwrap_or(0)),
+            input.schemas,
         ))
     }
 
@@ -102,17 +103,30 @@ impl RpcImpl {
         schema: String,
         force: bool,
         composite_type_depth: CompositeTypeDepth,
+        schemas: Option<Vec<String>>,
     ) -> RpcResult<IntrospectionResultOutput> {
         let (_config, _url, connector) = RpcImpl::load_connector(&schema).await?;
         let source = psl::SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
         let ctx = if force {
             let previous_schema = psl::validate(source);
-            IntrospectionContext::new_config_only(previous_schema, composite_type_depth)
+            IntrospectionContext::new_config_only(previous_schema, composite_type_depth, schemas)
         } else {
             let previous_schema = psl::parse_schema(source).map_err(Error::DatamodelError)?;
-            IntrospectionContext::new(previous_schema, composite_type_depth)
+            IntrospectionContext::new(previous_schema, composite_type_depth, schemas)
         };
+
+        if !ctx
+            .configuration()
+            .preview_features()
+            .contains(PreviewFeature::MultiSchema)
+            && ctx.namespaces().is_some()
+        {
+            let msg =
+                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
+
+            return Err(RpcError::from(Error::DatamodelError(msg.to_string())));
+        }
 
         let introspection_result = connector.introspect(&ctx).await.map_err(Error::from)?;
 
@@ -160,6 +174,8 @@ pub struct IntrospectionInput {
     pub(crate) force: bool,
     #[serde(default)]
     pub(crate) composite_type_depth: Option<isize>,
+    #[serde(default)]
+    pub(crate) schemas: Option<Vec<String>>,
 }
 
 fn default_false() -> bool {

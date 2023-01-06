@@ -15,6 +15,11 @@ shape = "bool"
 [recordShapes.introspectParams.fields.compositeTypeDepth]
 shape = "isize"
 
+[recordShapes.introspectParams.fields.schemas]
+shape = "string"
+isList = true
+isNullable = true
+
 [recordShapes.introspectResult]
 description = "Result type for the introspect method."
 

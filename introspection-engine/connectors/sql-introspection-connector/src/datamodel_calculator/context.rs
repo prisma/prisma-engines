@@ -35,6 +35,7 @@ pub(crate) struct InputContext<'a> {
     pub(crate) version: Version,
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
     pub(crate) introspection_map: &'a crate::introspection_map::IntrospectionMap<'a>,
+    pub(crate) force_namespaces: Option<&'a [String]>,
 }
 
 impl<'a> InputContext<'a> {
@@ -55,7 +56,10 @@ impl<'a> InputContext<'a> {
     }
 
     pub(crate) fn uses_namespaces(self) -> bool {
-        matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty())
+        let schemas_in_datasource = matches!(self.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty());
+        let schemas_in_parameters = self.force_namespaces.is_some();
+
+        schemas_in_datasource || schemas_in_parameters
     }
 
     /// Iterate over the database enums, combined together with a

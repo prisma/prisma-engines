@@ -1380,6 +1380,7 @@ fn cockroach_introspection_with_postgres_provider_works() {
         composite_type_depth: -1,
         force: false,
         schema,
+        schemas: None,
     }))
     .unwrap();
 

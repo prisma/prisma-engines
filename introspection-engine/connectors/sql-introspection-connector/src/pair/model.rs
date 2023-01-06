@@ -25,7 +25,7 @@ impl<'a> ModelPair<'a> {
 
     /// The namespace of the model, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        if matches!(self.context.config.datasources.first(), Some(ds) if !ds.namespaces.is_empty()) {
+        if self.context.uses_namespaces() {
             self.next.namespace()
         } else {
             None
