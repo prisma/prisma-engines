@@ -78,7 +78,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 filter,
                 &selected_fields.into(),
                 aggr_selections,
-                trace_id,
+                trace_id.as_deref(),
             )
             .await
         })
@@ -101,7 +101,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 &selected_fields.into(),
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
-                trace_id,
+                trace_id.as_deref(),
             )
             .await
         })
@@ -115,7 +115,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(self.connection_info.clone(), async move {
-            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, trace_id).await
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, trace_id.as_deref()).await
         })
         .await
     }
@@ -137,7 +137,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 selections,
                 group_by,
                 having,
-                trace_id,
+                trace_id.as_deref(),
             )
             .await
         })
@@ -154,7 +154,14 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
-            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, trace_id).await
+            write::create_record(
+                &self.inner,
+                &self.connection_info.sql_family(),
+                model,
+                args,
+                trace_id.as_deref(),
+            )
+            .await
         })
         .await
     }
@@ -173,7 +180,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
                 model,
                 args,
                 skip_duplicates,
-                trace_id,
+                trace_id.as_deref(),
             )
             .await
         })
@@ -188,7 +195,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::update_records(&self.inner, model, record_filter, args, trace_id).await
+            write::update_records(&self.inner, model, record_filter, args, trace_id.as_deref()).await
         })
         .await
     }
@@ -201,7 +208,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<Option<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
-            let mut res = write::update_record(&self.inner, model, record_filter, args, trace_id).await?;
+            let mut res = write::update_record(&self.inner, model, record_filter, args, trace_id.as_deref()).await?;
             Ok(res.pop())
         })
         .await
@@ -214,7 +221,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::delete_records(&self.inner, model, record_filter, trace_id).await
+            write::delete_records(&self.inner, model, record_filter, trace_id.as_deref()).await
         })
         .await
     }
@@ -225,7 +232,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<SingleRecord> {
         catch(self.connection_info.clone(), async move {
-            native_upsert(&self.inner, upsert, trace_id).await
+            native_upsert(&self.inner, upsert, trace_id.as_deref()).await
         })
         .await
     }
@@ -250,7 +257,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         trace_id: Option<String>,
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, trace_id).await
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, trace_id.as_deref()).await
         })
         .await
     }

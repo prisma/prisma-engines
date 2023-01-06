@@ -1,20 +1,19 @@
-use connector_interface::NativeUpsert;
-use prisma_models::{ModelProjection, Record, SingleRecord};
-use quaint::prelude::{OnConflict, Query};
-
 use crate::{
     column_metadata,
     filter_conversion::AliasedCondition,
     model_extensions::AsColumns,
-    query_builder::{build_update_and_set_query, create_record},
+    query_builder::write::{build_update_and_set_query, create_record},
     query_ext::QueryExt,
     row::ToSqlRow,
 };
+use connector_interface::NativeUpsert;
+use prisma_models::{ModelProjection, Record, SingleRecord};
+use quaint::prelude::{OnConflict, Query};
 
-pub async fn native_upsert(
+pub(crate) async fn native_upsert(
     conn: &dyn QueryExt,
     upsert: NativeUpsert,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<SingleRecord> {
     let selected_fields: ModelProjection = upsert.selected_fields().into();
     let field_names: Vec<_> = selected_fields.db_names().collect();

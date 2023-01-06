@@ -118,7 +118,7 @@ struct CursorOrderForeignKey {
 ///     OR `ModelA`.`modelB_id` IS NULL -- >>> Additional check for the nullable foreign key
 ///   )
 /// ```
-pub fn build(
+pub(crate) fn build(
     query_arguments: &QueryArguments,
     model: &ModelRef,
     order_by_defs: &[OrderByDefinition],

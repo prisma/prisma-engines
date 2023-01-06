@@ -1,8 +1,5 @@
-pub mod read;
-pub mod write;
-
-pub use read::*;
-pub use write::*;
+pub(crate) mod read;
+pub(crate) mod write;
 
 use crate::model_extensions::SelectionResultExt;
 use prisma_models::SelectionResult;

@@ -11,21 +11,15 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
 
-pub async fn get_single_record(
+pub(crate) async fn get_single_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(
-        model,
-        selected_fields.as_columns(),
-        aggr_selections,
-        filter,
-        trace_id.clone(),
-    );
+    let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, filter, trace_id);
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -61,7 +55,7 @@ pub async fn get_many_records(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
     sql_info: SqlInfo,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<ManyRecords> {
     let reversed = query_arguments.needs_reversed_order();
 
@@ -112,15 +106,9 @@ pub async fn get_many_records(
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
-                let query = read::get_records(
-                    model,
-                    selected_fields.as_columns(),
-                    aggr_selections,
-                    args,
-                    trace_id.clone(),
-                );
+                let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, args, trace_id);
 
-                futures.push(conn.filter(query.into(), meta.as_slice(), trace_id.clone()));
+                futures.push(conn.filter(query.into(), meta.as_slice(), trace_id));
             }
 
             while let Some(result) = futures.next().await {
@@ -139,7 +127,7 @@ pub async fn get_many_records(
                 selected_fields.as_columns(),
                 aggr_selections,
                 query_arguments,
-                trace_id.clone(),
+                trace_id,
             );
 
             for item in conn.filter(query.into(), meta.as_slice(), trace_id).await?.into_iter() {
@@ -159,7 +147,7 @@ pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>> {
     let mut idents = vec![];
     idents.extend(ModelProjection::from(from_field.model().primary_identifier()).type_identifiers_with_arities());
@@ -231,7 +219,7 @@ pub async fn aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Vec<AggregationRow>> {
     if !group_by.is_empty() {
         group_by_aggregate(conn, model, query_arguments, selections, group_by, having, trace_id).await
@@ -247,9 +235,9 @@ async fn plain_aggregate(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &selections, query_arguments, trace_id.clone());
+    let query = read::aggregate(model, &selections, query_arguments, trace_id);
 
     let idents: Vec<_> = selections
         .iter()
@@ -274,9 +262,9 @@ async fn group_by_aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
-    trace_id: Option<String>,
+    trace_id: Option<&str>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, trace_id.clone());
+    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, trace_id);
 
     let idents: Vec<_> = selections
         .iter()
