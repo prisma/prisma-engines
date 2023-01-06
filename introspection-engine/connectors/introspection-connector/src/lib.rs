@@ -1,7 +1,9 @@
 mod error;
+mod namespaces;
 
 pub use error::{ConnectorError, ErrorKind};
 
+pub use crate::namespaces::Namespaces;
 use enumflags2::BitFlags;
 use psl::{Datasource, PreviewFeature};
 use serde::{Deserialize, Serialize};
@@ -76,13 +78,19 @@ pub struct IntrospectionContext {
     /// set to false to take the config into account.
     pub render_config: bool,
     pub composite_type_depth: CompositeTypeDepth,
+    pub namespaces: Option<Namespaces>,
     previous_schema: psl::ValidatedSchema,
 }
 
 impl IntrospectionContext {
-    pub fn new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+    pub fn new(
+        previous_schema: psl::ValidatedSchema,
+        namespaces: Option<Namespaces>,
+        composite_type_depth: CompositeTypeDepth,
+    ) -> Self {
         IntrospectionContext {
             previous_schema,
+            namespaces,
             composite_type_depth,
             render_config: true,
         }
@@ -90,7 +98,11 @@ impl IntrospectionContext {
 
     /// Take the previous schema _but ignore all the datamodel part_, keeping just the
     /// configuration blocks.
-    pub fn new_config_only(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+    pub fn new_config_only(
+        previous_schema: psl::ValidatedSchema,
+        namespaces: Option<Namespaces>,
+        composite_type_depth: CompositeTypeDepth,
+    ) -> Self {
         let mut config_blocks = String::new();
 
         for source in previous_schema.db.ast().sources() {
@@ -105,7 +117,7 @@ impl IntrospectionContext {
 
         let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        Self::new(previous_schema_config_only, composite_type_depth)
+        Self::new(previous_schema_config_only, namespaces, composite_type_depth)
     }
 
     pub fn previous_schema(&self) -> &psl::ValidatedSchema {
@@ -113,6 +125,7 @@ impl IntrospectionContext {
     }
 
     pub fn datasource(&self) -> &Datasource {
+        // The `unwrap()` won't panic because `previous_schema` is already validated
         self.previous_schema.configuration.datasources.first().unwrap()
     }
 

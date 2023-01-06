@@ -27,7 +27,7 @@ fn db_push_on_cockroach_db_with_postgres_provider_works(api: TestApi) {
         api.connection_string()
     );
 
-    let connector = migration_core::migration_api(Some(schema.clone()), None).unwrap();
+    let connector = migration_core::migration_api(Some(schema.clone()), vec![], None).unwrap();
     let output = tok(connector.schema_push(migration_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema.clone(),
@@ -439,7 +439,7 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
 
 //     "#;
 
-//     let engine = migration_core::migration_api(None, None).unwrap();
+//     let engine = migration_core::migration_api(None, vec![], None).unwrap();
 //     let err = tok(
 //         engine.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
 //             datasource: migration_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
@@ -465,7 +465,7 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_says_nothi
         }
     "#;
 
-    let engine = migration_core::migration_api(None, None).unwrap();
+    let engine = migration_core::migration_api(None, vec![], None).unwrap();
 
     tok(
         engine.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
@@ -1339,7 +1339,7 @@ fn cockroach_introspection_with_postgres_provider_works() {
     ))
     .unwrap();
 
-    let me = migration_core::migration_api(None, None).unwrap();
+    let me = migration_core::migration_api(None, vec![], None).unwrap();
 
     tok(me.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),

@@ -233,14 +233,18 @@ async fn main() -> anyhow::Result<()> {
             };
         }
         Command::ResetDatabase(cmd) => {
+            // TODO: accept namespaces as input argument
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema), None)?;
+            let namespaces: Vec<String> = vec![];
+            let api = migration_core::migration_api(Some(schema), namespaces, None)?;
 
             api.reset().await?;
         }
         Command::CreateDatabase(cmd) => {
+            // TODO: accept namespaces as input argument
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+            let namespaces: Vec<String> = vec![];
+            let api = migration_core::migration_api(Some(schema.clone()), namespaces, None)?;
 
             api.create_database(CreateDatabaseParams {
                 datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
@@ -248,10 +252,12 @@ async fn main() -> anyhow::Result<()> {
             .await?;
         }
         Command::CreateMigration(cmd) => {
+            // TODO: accept namespaces as input argument
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema.clone()), None)?;
+            let namespaces: Vec<String> = vec![];
+            let api = migration_core::migration_api(Some(prisma_schema.clone()), namespaces, None)?;
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -263,10 +269,12 @@ async fn main() -> anyhow::Result<()> {
             api.create_migration(input).await?;
         }
         Command::ApplyMigrations(cmd) => {
+            // TODO: accept namespaces as input argument
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema), None)?;
+            let namespaces: Vec<String> = vec![];
+            let api = migration_core::migration_api(Some(prisma_schema), namespaces, None)?;
             api.apply_migrations(cmd.into()).await?;
         }
     }
@@ -358,8 +366,10 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 }
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
+    // TODO: accept namespaces as input argument
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(Some(schema.clone()), None)?;
+    let namespaces: Vec<String> = vec![];
+    let api = migration_core::migration_api(Some(schema.clone()), namespaces, None)?;
 
     let response = api
         .schema_push(SchemaPushInput {
@@ -418,9 +428,11 @@ impl migration_connector::ConnectorHost for DiffHost {
 }
 
 async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
+    // TODO: accept namespaces as input argument
     use migration_core::json_rpc::types::*;
 
-    let api = migration_core::migration_api(None, Some(Arc::new(DiffHost)))?;
+    let namespaces: Vec<String> = vec![];
+    let api = migration_core::migration_api(None, namespaces, Some(Arc::new(DiffHost)))?;
     let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
         DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_schema_datamodel.clone(),

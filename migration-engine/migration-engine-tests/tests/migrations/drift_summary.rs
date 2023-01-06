@@ -19,7 +19,7 @@ fn check(from: &str, to: &str, expectation: Expect) {
     };
 
     let host = Arc::new(TestConnectorHost::default());
-    let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    let api = migration_core::migration_api(None, vec![], Some(host.clone())).unwrap();
     test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{:?}", printed_messages);

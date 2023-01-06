@@ -631,8 +631,9 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         dbport = db_url.port().unwrap_or(3306),
     );
 
+    let namespaces: Vec<String> = vec![];
     let err = tok(async {
-        let migration_api = migration_api(Some(datamodel), None).unwrap();
+        let migration_api = migration_api(Some(datamodel), namespaces, None).unwrap();
         migration_api
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
@@ -679,8 +680,9 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         dbport = db_url.port().unwrap(),
     );
 
+    let namespaces: Vec<String> = vec![];
     let err = tok(async move {
-        let migration_api = migration_api(Some(datamodel), None).unwrap();
+        let migration_api = migration_api(Some(datamodel), namespaces, None).unwrap();
         migration_api
             .dev_diagnostic(DevDiagnosticInput {
                 migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
@@ -829,7 +831,7 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
     let tempdir = tempfile::tempdir().unwrap();
     std::fs::write(tempdir.path().join("schema.prisma"), &schema).unwrap();
 
-    let api = migration_core::migration_api(Some(schema), None).unwrap();
+    let api = migration_core::migration_api(Some(schema), vec![], None).unwrap();
 
     tok(api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url }),

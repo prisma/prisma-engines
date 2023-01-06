@@ -7,7 +7,9 @@ use serde_json::json;
 use url::Url;
 
 pub(crate) async fn connection_error(schema: String) -> ConnectorError {
-    let api = match migration_core::migration_api(Some(schema.clone()), None) {
+    // TODO: accept namespaces as input argument
+    let namespaces: Vec<String> = vec![];
+    let api = match migration_core::migration_api(Some(schema.clone()), namespaces, None) {
         Ok(api) => api,
         Err(err) => return err,
     };
@@ -399,7 +401,7 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let api = migration_core::migration_api(Some(dm.clone()), None).unwrap();
+        let api = migration_core::migration_api(Some(dm.clone()), vec![], None).unwrap();
         let error = api
             .ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
                 datasource: migration_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {

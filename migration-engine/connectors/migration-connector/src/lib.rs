@@ -8,11 +8,9 @@ mod destructive_change_checker;
 mod diff;
 mod error;
 mod migration_persistence;
-mod namespaces;
 
 pub mod migrations_directory;
 
-pub use crate::namespaces::Namespaces;
 pub use connector_params::ConnectorParams;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
@@ -20,6 +18,7 @@ pub use destructive_change_checker::{
 pub use diff::DiffTarget;
 use enumflags2::BitFlags;
 pub use error::{ConnectorError, ConnectorResult};
+pub use introspection_connector::Namespaces;
 pub use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 

@@ -202,7 +202,7 @@ fn introspecting_a_non_existing_db_fails() {
         }
     "#;
 
-    let api = migration_core::migration_api(None, None).unwrap();
+    let api = migration_core::migration_api(None, vec![], None).unwrap();
     let err = tok(api.introspect(migration_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,

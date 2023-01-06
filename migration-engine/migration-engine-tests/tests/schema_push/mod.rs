@@ -483,7 +483,7 @@ model m1 {
 }
     "#;
 
-    let api = migration_core::migration_api(Some(schema.to_owned()), None).unwrap();
+    let api = migration_core::migration_api(Some(schema.to_owned()), vec![], None).unwrap();
     let err = tok(api.schema_push(migration_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema.to_owned(),
@@ -493,6 +493,6 @@ model m1 {
     let expected = expect_test::expect![[r#"
         The `mysql` database is a system database, it should not be altered with prisma migrate. Please connect to another database.
            0: migration_core::state::SchemaPush
-                     at migration-engine/core/src/state.rs:410"#]];
+                     at migration-engine/core/src/state.rs:422"#]];
     expected.assert_eq(&err.to_string());
 }

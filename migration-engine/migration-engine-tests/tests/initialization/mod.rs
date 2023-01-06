@@ -54,7 +54,8 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             url
         );
 
-        let me = migration_api(Some(schema.clone()), None).unwrap();
+        let namespaces: Vec<String> = vec![];
+        let me = migration_api(Some(schema.clone()), namespaces, None).unwrap();
         tok(
             me.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
                 datasource: migration_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
