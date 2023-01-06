@@ -176,6 +176,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_connect(

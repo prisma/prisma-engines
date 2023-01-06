@@ -343,6 +343,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).

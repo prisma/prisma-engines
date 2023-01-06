@@ -80,7 +80,7 @@ impl From<SqlRow> for Record {
     }
 }
 
-pub trait ToSqlRow {
+pub(crate) trait ToSqlRow {
     /// Conversion from a database specific row to an allocated `SqlRow`. To
     /// help deciding the right types, the provided `ColumnMetadata`s should map
     /// to the returned columns in the right order.

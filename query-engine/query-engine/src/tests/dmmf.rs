@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
     let dm = psl::parse_schema(datamodel_string).unwrap();
-    let internal_ref = prisma_models::convert(Arc::new(dm), "db".to_owned());
+    let internal_ref = prisma_models::convert(Arc::new(dm));
     schema_builder::build(internal_ref, false)
 }
 

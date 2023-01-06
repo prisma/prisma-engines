@@ -1,16 +1,19 @@
-use crate::join_utils::{compute_aggr_join, AggregationType, AliasedJoin};
+use crate::{
+    join_utils::{compute_aggr_join, AggregationType, AliasedJoin},
+    Context,
+};
 use connector_interface::RelAggregationSelection;
 use quaint::prelude::*;
 
 #[derive(Debug)]
-pub struct RelAggregationJoins {
+pub(crate) struct RelAggregationJoins {
     // Joins necessary to perform the relation aggregations
     pub(crate) joins: Vec<AliasedJoin>,
     // Aggregator columns
     pub(crate) columns: Vec<Expression<'static>>,
 }
 
-pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins {
+pub(crate) fn build(aggr_selections: &[RelAggregationSelection], ctx: &Context<'_>) -> RelAggregationJoins {
     let mut joins = vec![];
     let mut columns: Vec<Expression<'static>> = vec![];
 
@@ -26,6 +29,7 @@ pub fn build(aggr_selections: &[RelAggregationSelection]) -> RelAggregationJoins
                     aggregator_alias.as_str(),
                     join_alias.as_str(),
                     None,
+                    ctx,
                 );
 
                 columns.push(Column::from((join.alias.clone(), aggregator_alias)).into());

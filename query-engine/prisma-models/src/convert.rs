@@ -2,7 +2,7 @@ use crate::{builders, InternalDataModel, InternalDataModelRef};
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
-pub fn convert(schema: Arc<psl::ValidatedSchema>, db_name: String) -> InternalDataModelRef {
+pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
     let datamodel = psl::lift(&schema);
     let relation_mode = schema.relation_mode();
 
@@ -20,7 +20,6 @@ pub fn convert(schema: Arc<psl::ValidatedSchema>, db_name: String) -> InternalDa
         composite_types: OnceCell::new(),
         relations: OnceCell::new(),
         relation_fields: OnceCell::new(),
-        db_name,
         enums: enums.into_iter().map(Arc::new).collect(),
         schema,
     });

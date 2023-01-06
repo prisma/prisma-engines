@@ -5,7 +5,7 @@ use std::{any::Any, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
-pub enum RawError {
+pub(crate) enum RawError {
     IncorrectNumberOfParameters {
         expected: usize,
         actual: usize,

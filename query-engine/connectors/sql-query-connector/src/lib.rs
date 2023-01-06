@@ -9,6 +9,7 @@
 )]
 
 mod column_metadata;
+mod context;
 mod cursor_condition;
 mod database;
 mod error;
@@ -26,6 +27,7 @@ mod sql_trace;
 mod value;
 mod value_ext;
 
+use self::context::Context;
 use column_metadata::*;
 use filter_conversion::*;
 use query_ext::QueryExt;

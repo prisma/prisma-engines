@@ -1,6 +1,7 @@
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_info::SqlInfo, sql_trace::SqlTraceComment,
-    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_info::SqlInfo, sql_trace::trace_parent_to_string,
+    sql_trace::SqlTraceComment, value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, Context, SqlRow,
+    ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
@@ -15,12 +16,9 @@ use quaint::{
 };
 use tracing_futures::Instrument;
 
+use opentelemetry::trace::TraceContextExt;
 use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
-
-use crate::sql_trace::trace_parent_to_string;
-
-use opentelemetry::trace::TraceContextExt;
 use tracing::{info_span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -30,13 +28,13 @@ impl QueryExt for PooledConnection {}
 /// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
 /// database operations on top of `Queryable`.
 #[async_trait]
-pub trait QueryExt: Queryable + Send + Sync {
+pub(crate) trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     async fn filter(
         &self,
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
-        trace_id: Option<&str>,
+        ctx: &Context<'_>,
     ) -> crate::Result<Vec<SqlRow>> {
         let span = info_span!("filter read query");
 
@@ -44,7 +42,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let span_ref = otel_ctx.span();
         let span_ctx = span_ref.span_context();
 
-        let q = match (q, trace_id) {
+        let q = match (q, ctx.trace_id) {
             (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
@@ -118,8 +116,8 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], trace_id: Option<&str>) -> crate::Result<SqlRow> {
-        self.filter(q.limit(1).into(), meta, trace_id)
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow> {
+        self.filter(q.limit(1).into(), meta, ctx)
             .await?
             .into_iter()
             .next()
@@ -132,12 +130,12 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
-        trace_id: Option<&str>,
+        ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
-            self.filter_ids(model, record_filter.filter, trace_id).await
+            self.filter_ids(model, record_filter.filter, ctx).await
         }
     }
 
@@ -146,25 +144,25 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         filter: Filter,
-        trace_id: Option<&str>,
+        ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
-        let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
+        let id_cols: Vec<Column<'static>> = model_id.as_columns(ctx).collect();
 
-        let select = Select::from_table(model.as_table())
+        let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
             .append_trace(&Span::current())
-            .add_trace_id(trace_id)
-            .so_that(filter.aliased_condition_from(None, false));
+            .add_trace_id(ctx.trace_id)
+            .so_that(filter.aliased_condition_from(None, false, ctx));
 
-        self.select_ids(select, model_id, trace_id).await
+        self.select_ids(select, model_id, ctx).await
     }
 
     async fn select_ids(
         &self,
         select: Select<'_>,
         model_id: ModelProjection,
-        trace_id: Option<&str>,
+        ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()
@@ -179,7 +177,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
         // TODO: Add tracing
-        let mut rows = self.filter(select.into(), &meta, trace_id).await?;
+        let mut rows = self.filter(select.into(), &meta, ctx).await?;
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {
