@@ -4,8 +4,12 @@
     {
       "label": "schemas",
       "kind": 10,
-      "documentation": "The list of database schemas.",
-      "insertText": "schemas = []"
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nschemas = [\"foo\", \"bar\", \"baz\"]\n```\n___\nThe list of database schemas."
+      },
+      "insertText": "schemas = [$0]",
+      "insertTextFormat": 2
     }
   ]
 }

@@ -110,9 +110,17 @@ fn push_ast_completions(
             {
                 completion_list.items.push(CompletionItem {
                     label: "schemas".to_owned(),
-                    insert_text: Some("schemas = []".to_owned()),
+                    insert_text: Some(r#"schemas = [$0]"#.to_owned()),
+                    insert_text_format: Some(InsertTextFormat::SNIPPET),
                     kind: Some(CompletionItemKind::PROPERTY),
-                    documentation: Some(Documentation::String("The list of database schemas.".to_owned())),
+                    documentation: Some(Documentation::MarkupContent(MarkupContent {
+                        kind: MarkupKind::Markdown,
+                        value: generate_pretty_doc(
+                            r#"schemas = ["foo", "bar", "baz"]"#,
+                            "The list of database schemas.",
+                        ),
+                    })),
+                    // detail: Some("schemas".to_owned()),
                     ..Default::default()
                 });
             }
@@ -120,4 +128,8 @@ fn push_ast_completions(
 
         position => connector.push_completions(db, position, completion_list),
     }
+}
+
+fn generate_pretty_doc(example: &str, description: &str) -> String {
+    format!("```prisma\n{}\n```\n___\n{}", example, description)
 }
