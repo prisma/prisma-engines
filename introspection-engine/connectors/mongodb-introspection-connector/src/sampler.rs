@@ -49,22 +49,19 @@ pub(super) async fn sample(
         }
     }
 
-    let data_model = statistics.into_datamodel(&mut warnings);
-    let is_empty = data_model.is_empty();
+    let mut data_model = render::Datamodel::default();
+    statistics.render(ctx.datasource(), &mut data_model, &mut warnings);
 
-    let mut rendered = render::Datamodel::default();
-    rendered.push_dml(ctx.datasource(), &data_model);
-    let config = if ctx.render_config {
-        render::Configuration::from_psl(ctx.configuration()).to_string()
+    let psl_string = if ctx.render_config {
+        let config = render::Configuration::from_psl(ctx.configuration());
+        format!("{config}\n{data_model}")
     } else {
-        String::new()
+        data_model.to_string()
     };
 
-    let data_model = format!("{config}\n{rendered}");
-
     Ok(IntrospectionResult {
-        data_model: psl::reformat(&data_model, 2).unwrap(),
-        is_empty,
+        data_model: psl::reformat(&psl_string, 2).unwrap(),
+        is_empty: data_model.is_empty(),
         warnings,
         version: Version::NonPrisma,
     })

@@ -1353,9 +1353,9 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
     let expected = expect![[r#"
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           age  Json?
+          name String
 
           @@index([age], map: "age_1")
         }
@@ -1400,9 +1400,9 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
 
         model Cat {
           id   String   @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           info CatInfo?
+          name String
 
           @@index([info.age], map: "info.age_1")
         }
@@ -1412,10 +1412,16 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
 
     res.assert_warning("Could not determine the types for the following fields.");
     res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "compositeType": "CatInfo",
-        "field": "age"
-    }]));
+    res.assert_warning_affected(&json!([
+        {
+            "model": "Cat",
+            "field": "info"
+        },
+        {
+            "compositeType": "CatInfo",
+            "field": "age"
+        }
+    ]));
 }
 
 #[test]
@@ -1452,9 +1458,9 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
 
         model Cat {
           id   String   @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           info CatInfo?
+          name String
 
           @@index([info.specific.age], map: "info.specific.age_1")
         }
@@ -1464,10 +1470,20 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
 
     res.assert_warning("Could not determine the types for the following fields.");
     res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "compositeType": "CatInfoSpecific",
-        "field": "age"
-    }]));
+    res.assert_warning_affected(&json!([
+        {
+            "model": "Cat",
+            "field": "info"
+        },
+        {
+            "compositeType": "CatInfo",
+            "field": "specific"
+        },
+        {
+            "compositeType": "CatInfoSpecific",
+            "field": "age"
+        }
+    ]));
 }
 
 #[test]
@@ -1494,9 +1510,9 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
     let expected = expect![[r#"
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           age  Json?  @map("_age")
+          name String
 
           @@index([age], map: "_age_1")
         }
@@ -1541,9 +1557,9 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
 
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           info AInfo?
+          name String
 
           @@index([info.age], map: "info._age_1")
         }
@@ -1553,10 +1569,16 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
 
     res.assert_warning("Could not determine the types for the following fields.");
     res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "compositeType": "AInfo",
-        "field": "age"
-    }]));
+    res.assert_warning_affected(&json!([
+        {
+            "model": "A",
+            "field": "info"
+        },
+        {
+            "compositeType": "AInfo",
+            "field": "_age"
+        }
+    ]));
 }
 
 #[test]
@@ -1583,9 +1605,9 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
     let expected = expect![[r#"
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           age  Json?
+          name String
           /// Field referred in an index, but found no data to define the type.
           play Json?
 
@@ -1706,6 +1728,10 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
     res.assert_warning_code(103);
     res.assert_warning_affected(&json!([
         {
+            "compositeType": "AInfo",
+            "field": "special"
+        },
+        {
             "compositeType": "AInfoSpecial",
             "field": "play"
         },
@@ -1789,9 +1815,9 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
     let expected = expect![[r#"
         type AInfo {
           /// Field referred in an index, but found no data to define the type.
-          special AInfoSpecial?
-          /// Field referred in an index, but found no data to define the type.
           play    Json?
+          /// Field referred in an index, but found no data to define the type.
+          special AInfoSpecial?
         }
 
         type AInfoSpecial {
@@ -1801,9 +1827,9 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
 
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           info AInfo?
+          name String
 
           @@index([info.special.age, info.play], map: "info.special.age_1_info.play_1")
         }
@@ -1815,12 +1841,20 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
     res.assert_warning_code(103);
     res.assert_warning_affected(&json!([
         {
-            "compositeType": "AInfoSpecial",
-            "field": "age"
+            "model": "A",
+            "field": "info",
         },
         {
             "compositeType": "AInfo",
-            "field": "play"
+            "field": "play",
+        },
+        {
+            "compositeType": "AInfo",
+            "field": "special",
+        },
+        {
+            "compositeType": "AInfoSpecial",
+            "field": "age",
         },
     ]));
 }
@@ -1894,9 +1928,9 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
     let expected = expect![[r#"
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           age  Json?  @unique(map: "age_1")
+          name String
         }
     "#]];
 
@@ -1934,9 +1968,9 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
     let expected = expect![[r#"
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
-          name String
           /// Field referred in an index, but found no data to define the type.
           age  Json?  @unique(map: "age_1")
+          name String
         }
     "#]];
 
@@ -1972,6 +2006,18 @@ fn composite_type_index_without_corresponding_data_should_not_crash() {
     });
 
     let expected = expect![[r#"
+        type AFoo {
+          /// Field referred in an index, but found no data to define the type.
+          bar Json?
+          /// Field referred in an index, but found no data to define the type.
+          baz AFooBaz?
+        }
+
+        type AFooBaz {
+          /// Field referred in an index, but found no data to define the type.
+          quux Json?
+        }
+
         model A {
           id  String @id @default(auto()) @map("_id") @db.ObjectId
           /// Field referred in an index, but found no data to define the type.
@@ -2003,10 +2049,10 @@ fn composite_type_index_with_non_composite_fields_in_the_middle_should_not_crash
 
     let expected = expect![[r#"
         type AA {
-          b Int
+          /// Nested objects had no data in the sample dataset to introspect a nested type.
+          /// Multiple data types found: Int: 50%, AaB: 50% out of 1 sampled entries
+          b Json
           d AaD
-          /// Field referred in an index, but found no data to define the type.
-          b AaB?
         }
 
         type AaB {

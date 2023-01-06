@@ -3,7 +3,7 @@ use serde_json::json;
 
 use crate::sampler::Name;
 
-pub(crate) fn unsupported_type(affected: &[(Name, String, &str)]) -> Warning {
+pub(crate) fn unsupported_type(affected: &[(Name, String, String)]) -> Warning {
     let affected = serde_json::Value::Array({
         affected
             .iter()
