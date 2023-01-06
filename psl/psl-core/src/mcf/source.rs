@@ -7,6 +7,8 @@ pub struct SourceConfig {
     pub provider: String,
     pub active_provider: String,
     pub url: StringFromEnvVar,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub direct_url: Option<StringFromEnvVar>,
     pub schemas: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
@@ -44,6 +46,7 @@ fn source_to_json_struct(source: &configuration::Datasource) -> SourceConfig {
         provider: source.provider.clone(),
         active_provider: source.active_provider.to_string(),
         url: source.url.clone(),
+        direct_url: source.direct_url.clone(),
         documentation: source.documentation.clone(),
         schemas,
     }

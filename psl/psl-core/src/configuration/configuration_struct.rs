@@ -64,47 +64,4 @@ impl Configuration {
 
         Ok(())
     }
-
-    pub fn resolve_direct_datasource_urls_from_env<F>(
-        &mut self,
-        url_overrides: &[(String, String)],
-        env: F,
-    ) -> Result<(), Diagnostics>
-    where
-        F: Fn(&str) -> Option<String> + Copy,
-    {
-        for datasource in &mut self.datasources {
-            let url_override = url_overrides.iter().find(|(name, _url)| name == &datasource.name);
-
-            match (
-                url_override,
-                datasource
-                    .direct_url
-                    .as_ref()
-                    .and_then(|direct_url| direct_url.from_env_var.as_ref()),
-                &datasource.url.from_env_var,
-                &datasource.url.value,
-            ) {
-                // We can't grab it from anywhere, so we give up.
-                (None, None, None, None) => {}
-                // URL overrides trump everything else.
-                (Some((_, url)), _, _, _) => {
-                    datasource.url.value = Some(url.clone());
-                    datasource.url.from_env_var = None;
-                }
-                // We have a directUrl, so we can/should override.
-                (_, Some(_), _, _) => {
-                    datasource.url.value = Some(datasource.load_direct_url(env)?);
-                }
-                // We already have an URL, so we ignore the env var.
-                (_, _, _, Some(_)) => {}
-                // We don't have an URL, but we have an env var, so we resolve it.
-                (_, _, Some(_), None) => {
-                    datasource.url.value = Some(datasource.load_url(env)?);
-                }
-            }
-        }
-
-        Ok(())
-    }
 }

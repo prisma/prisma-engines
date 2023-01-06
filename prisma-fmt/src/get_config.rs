@@ -59,7 +59,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
         config
-            .resolve_direct_datasource_urls_from_env(&overrides, |key| params.env.get(key).map(String::from))
+            .resolve_datasource_urls_from_env(&overrides, |key| params.env.get(key).map(String::from))
             .map_err(wrap_get_config_err)?;
     }
 
