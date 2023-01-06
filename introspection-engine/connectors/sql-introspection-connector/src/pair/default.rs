@@ -128,7 +128,7 @@ impl<'a> DefaultValuePair<'a> {
                     let length = previous.value().as_function().and_then(|(_, args, _)| {
                         args.arguments
                             .get(0)
-                            .and_then(|arg| arg.value.to_string().parse::<u8>().ok())
+                            .map(|arg| arg.value.as_numeric_value().unwrap().0.parse::<u8>().unwrap())
                     });
 
                     Some(DefaultKind::Nanoid(length))

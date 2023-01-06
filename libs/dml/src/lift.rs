@@ -581,8 +581,7 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
                 args.arguments
                     .get(0)
                     .and_then(|arg| arg.value.as_numeric_value())
-                    .map(|(val, _)| val.to_owned().parse::<u8>().ok())
-                    .unwrap_or(None),
+                    .map(|(val, _)| val.parse::<u8>().unwrap()),
             ))
         }
         ast::Expression::Function(funcname, _args, _) if funcname == "now" => {

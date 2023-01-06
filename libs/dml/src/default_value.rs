@@ -202,10 +202,10 @@ impl ValueGenerator {
     }
 
     pub fn new_nanoid(length: Option<u8>) -> Self {
-        if length.is_some() {
+        if let Some(length) = length {
             ValueGenerator::new(
-                format!("nanoid({})", length.unwrap()),
-                vec![(None, PrismaValue::Int(length.unwrap().into()))],
+                format!("nanoid({})", length),
+                vec![(None, PrismaValue::Int(length.into()))],
             )
             .unwrap()
         } else {
