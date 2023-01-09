@@ -219,8 +219,13 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut map = IndexMap::new();
 
         for (table_name, namespace) in names {
+            let namespace_id = match sql_schema.get_namespace_id(&namespace) {
+                Some(id) => id,
+                None => continue,
+            };
+
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
+            let id = sql_schema.push_table(table_name, namespace_id);
             map.insert((namespace, cloned_name), id);
         }
 
