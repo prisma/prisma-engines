@@ -73,7 +73,7 @@ impl Connector for Mssql {
         "mssql"
     }
 
-    fn should_retry_on_transient_transaction_error(&self) -> bool {
+    fn should_retry_on_transient_error(&self) -> bool {
         false
     }
 }

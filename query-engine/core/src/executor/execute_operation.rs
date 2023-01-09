@@ -1,10 +1,8 @@
 use std::time::{Duration, Instant};
 
 use super::pipeline::QueryPipeline;
-use crate::{
-    CoreError, InterpreterError, IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData,
-};
-use connector::{error::ErrorKind, Connection, ConnectionLike, Connector};
+use crate::{CoreError, IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
+use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
@@ -80,7 +78,7 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
         query_schema,
         operation,
         force_transactions,
-        connector.should_retry_on_transient_transaction_error(),
+        connector.should_retry_on_transient_error(),
         trace_id,
     )
     .await
@@ -112,7 +110,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
                 query_schema.clone(),
                 op.clone(),
                 force_transactions,
-                connector.should_retry_on_transient_transaction_error(),
+                connector.should_retry_on_transient_error(),
                 trace_id.clone(),
             ))
             .with_subscriber(dispatcher.clone()),
@@ -134,11 +132,11 @@ async fn execute_self_contained<'a>(
     query_schema: QuerySchemaRef,
     operation: Operation,
     force_transactions: bool,
-    retry_on_transient_transaction_error: bool,
+    retry_on_transient_error: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
-    let result = if retry_on_transient_transaction_error {
+    let result = if retry_on_transient_error {
         execute_self_contained_with_retry(
             &mut conn,
             query_schema,
@@ -190,7 +188,7 @@ async fn execute_self_contained_with_retry(
     if force_transactions || graph.needs_transaction() {
         let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
 
-        if !is_transient_tx_error(&res) {
+        if !is_transient_error(&res) {
             return res;
         }
 
@@ -198,7 +196,7 @@ async fn execute_self_contained_with_retry(
             let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
             let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
 
-            if is_transient_tx_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
+            if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
                 continue;
             } else {
                 return res;
@@ -248,10 +246,9 @@ fn build_graph(query_schema: QuerySchemaRef, operation: Operation) -> crate::Res
     Ok((query_graph, serializer))
 }
 
-fn is_transient_tx_error<T>(res: &Result<T, CoreError>) -> bool {
-    if let Err(CoreError::InterpreterError(InterpreterError::ConnectorError(conn_error))) = res {
-        return matches!(conn_error.kind, ErrorKind::TransientTransaction);
-    } else {
-        false
+fn is_transient_error<T>(res: &Result<T, CoreError>) -> bool {
+    match res {
+        Ok(_) => false,
+        Err(err) => err.is_transient(),
     }
 }

@@ -49,7 +49,7 @@ impl FromSource for PostgreSql {
         Ok(PostgreSql {
             pool,
             connection_info,
-            features: features.to_owned(),
+            features,
         })
     }
 }
@@ -69,7 +69,7 @@ impl Connector for PostgreSql {
         "postgres"
     }
 
-    fn should_retry_on_transient_transaction_error(&self) -> bool {
+    fn should_retry_on_transient_error(&self) -> bool {
         false
     }
 }
