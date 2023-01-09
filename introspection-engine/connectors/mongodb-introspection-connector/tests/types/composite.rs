@@ -487,6 +487,42 @@ fn do_not_create_empty_types() {
 }
 
 #[test]
+fn do_not_spam_empty_type_warnings() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "data": {} }, doc! {}, doc! { "data": {} }, doc! { "data": {} }];
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Test {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Nested objects had no data in the sample dataset to introspect a nested type.
+          data Json?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    let expected = expect![[r#"
+        [
+          {
+            "code": 102,
+            "message": "The following fields point to nested objects without any data.",
+            "affected": [
+              {
+                "model": "Test",
+                "field": "data"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expected);
+}
+
+#[test]
 fn do_not_create_empty_types_in_types() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "tost": { "data": {} } }];
