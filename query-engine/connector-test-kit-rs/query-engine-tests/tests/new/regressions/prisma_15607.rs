@@ -235,7 +235,10 @@ async fn sqlserver_can_recover_from_deadlocks() -> TestResult<()> {
     let res2 = conn2.recv_query_response().await?;
 
     if res1.failed() {
-        res1.assert_failure(2034, Some("Transaction failed due to a write conflict or a deadlock.".to_string()));
+        res1.assert_failure(
+            2034,
+            Some("Transaction failed due to a write conflict or a deadlock.".to_string()),
+        );
 
         // Rollback the successful transaction, so the failed one can continue.
         conn2.rollback(tx2.clone()).await?;
@@ -244,7 +247,10 @@ async fn sqlserver_can_recover_from_deadlocks() -> TestResult<()> {
         // connection must be usable at this point.
         conn1.run_query(r#"query { findManyCity(where: {}) { id } }"#).await?;
     } else if res2.failed() {
-        res2.assert_failure(2034, Some("Transaction failed due to a write conflict or a deadlock".to_string()));
+        res2.assert_failure(
+            2034,
+            Some("Transaction failed due to a write conflict or a deadlock".to_string()),
+        );
 
         // Rollback the successful transaction, so the failed one can continue.
         conn1.rollback(tx1.clone()).await?;
