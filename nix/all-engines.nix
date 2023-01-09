@@ -5,6 +5,7 @@ let
   src = pkgs.lib.cleanSourceWith { filter = enginesSourceFilter; src = srcPath; };
   craneLib = inputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
+  libSuffix = if pkgs.stdenv.isDarwin then "dylib" else "so";
 
   enginesSourceFilter = path: type: (builtins.match "\\.pest$" path != null) ||
     (builtins.match "\\.README.md$" path != null) ||
@@ -25,6 +26,9 @@ in
       protobuf # for tonic
       openssl.dev
       pkg-config
+    ] ++ lib.optionals stdenv.isDarwin [
+      perl # required to build openssl
+      darwin.apple_sdk.frameworks.Security
     ];
 
     buildPhase = ''
@@ -40,7 +44,7 @@ in
       cp target/release/migration-engine $out/bin/
       cp target/release/introspection-engine $out/bin/
       cp target/release/prisma-fmt $out/bin/
-      cp target/release/libquery_engine.so $out/lib/libquery_engine.node
+      cp target/release/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
     '';
   };
 }
