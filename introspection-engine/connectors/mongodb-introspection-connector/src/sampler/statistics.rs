@@ -300,12 +300,6 @@ impl<'a> Statistics<'a> {
                 unknown_types.push((container.clone(), field_name.to_string()));
             }
 
-            if !fields_with_an_empty_type.is_empty() {
-                warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
-                    &fields_with_an_empty_type,
-                ));
-            }
-
             match container {
                 Name::Model(ref model_name) => {
                     let unique = self.indices.get(model_name).and_then(|indices| {
@@ -359,6 +353,12 @@ impl<'a> Statistics<'a> {
 
         for (_, model) in models.into_iter() {
             rendered.push_model(model);
+        }
+
+        if !fields_with_an_empty_type.is_empty() {
+            warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
+                &fields_with_an_empty_type,
+            ));
         }
 
         if !unsupported.is_empty() {
