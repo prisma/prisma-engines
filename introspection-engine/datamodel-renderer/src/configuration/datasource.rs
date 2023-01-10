@@ -106,13 +106,22 @@ impl<'a> Datasource<'a> {
     }
 
     /// Create a rendering from a PSL datasource.
-    pub fn from_psl(psl_ds: &'a psl::Datasource) -> Self {
+    pub fn from_psl(psl_ds: &'a psl::Datasource, force_namespaces: Option<&'a [String]>) -> Self {
         let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
-        let namespaces: Vec<Text<_>> = psl_ds
-            .namespaces
-            .iter()
-            .map(|(ns, _)| Text(Cow::Owned(ns.clone())))
-            .collect();
+
+        let namespaces: Vec<Text<_>> = match force_namespaces {
+            Some(namespaces) => namespaces
+                .iter()
+                .map(AsRef::as_ref)
+                .map(Cow::Borrowed)
+                .map(Text)
+                .collect(),
+            None => psl_ds
+                .namespaces
+                .iter()
+                .map(|(ns, _)| Text(Cow::Owned(ns.clone())))
+                .collect(),
+        };
 
         Self {
             name: &psl_ds.name,

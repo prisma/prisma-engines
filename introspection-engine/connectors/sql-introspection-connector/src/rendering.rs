@@ -22,11 +22,8 @@ pub(crate) fn to_psl_string<'a>(
     models::render(input, output);
 
     let psl_string = if input.render_config {
-        format!(
-            "{}\n{}",
-            configuration::render(input.config, input.schema),
-            output.rendered_schema
-        )
+        let config = configuration::render(input.config, input.schema, input.force_namespaces);
+        format!("{}\n{}", config, output.rendered_schema)
     } else {
         output.rendered_schema.to_string()
     };

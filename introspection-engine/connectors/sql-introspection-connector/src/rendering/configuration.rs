@@ -5,10 +5,14 @@ use psl::Configuration;
 use sql_schema_describer::SqlSchema;
 
 /// Render a configuration block.
-pub(super) fn render<'a>(config: &'a Configuration, schema: &'a SqlSchema) -> render::Configuration<'a> {
+pub(super) fn render<'a>(
+    config: &'a Configuration,
+    schema: &'a SqlSchema,
+    force_namespaces: Option<&'a [String]>,
+) -> render::Configuration<'a> {
     let mut output = render::Configuration::default();
     let prev_ds = config.datasources.first().unwrap();
-    let mut datasource = render::configuration::Datasource::from_psl(prev_ds);
+    let mut datasource = render::configuration::Datasource::from_psl(prev_ds, force_namespaces);
 
     if prev_ds.active_connector.is_provider("postgres") {
         super::postgres::add_extensions(&mut datasource, schema, config);

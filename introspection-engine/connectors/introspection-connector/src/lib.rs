@@ -77,20 +77,30 @@ pub struct IntrospectionContext {
     pub render_config: bool,
     pub composite_type_depth: CompositeTypeDepth,
     previous_schema: psl::ValidatedSchema,
+    namespaces: Option<Vec<String>>,
 }
 
 impl IntrospectionContext {
-    pub fn new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+    pub fn new(
+        previous_schema: psl::ValidatedSchema,
+        composite_type_depth: CompositeTypeDepth,
+        namespaces: Option<Vec<String>>,
+    ) -> Self {
         IntrospectionContext {
             previous_schema,
             composite_type_depth,
             render_config: true,
+            namespaces,
         }
     }
 
     /// Take the previous schema _but ignore all the datamodel part_, keeping just the
     /// configuration blocks.
-    pub fn new_config_only(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+    pub fn new_config_only(
+        previous_schema: psl::ValidatedSchema,
+        composite_type_depth: CompositeTypeDepth,
+        namespaces: Option<Vec<String>>,
+    ) -> Self {
         let mut config_blocks = String::new();
 
         for source in previous_schema.db.ast().sources() {
@@ -105,7 +115,7 @@ impl IntrospectionContext {
 
         let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        Self::new(previous_schema_config_only, composite_type_depth)
+        Self::new(previous_schema_config_only, composite_type_depth, namespaces)
     }
 
     pub fn previous_schema(&self) -> &psl::ValidatedSchema {
@@ -130,6 +140,10 @@ impl IntrospectionContext {
 
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.previous_schema.configuration.preview_features()
+    }
+
+    pub fn namespaces(&self) -> Option<&[String]> {
+        self.namespaces.as_deref()
     }
 }
 

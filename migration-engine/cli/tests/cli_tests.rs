@@ -1,7 +1,12 @@
 use connection_string::JdbcString;
 use expect_test::expect;
 use indoc::*;
-use std::process::{Command, Output};
+use std::{
+    fs,
+    io::{BufRead, BufReader, Write as _},
+    panic::{self, AssertUnwindSafe},
+    process::{Child, Command, Output},
+};
 use test_macros::test_connector;
 use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
 use url::Url;
@@ -18,6 +23,25 @@ fn run(args: &[&str]) -> Output {
         .env("RUST_LOG", "INFO")
         .output()
         .unwrap()
+}
+
+fn with_child_process<F>(mut command: Command, f: F)
+where
+    F: FnOnce(&mut Child),
+{
+    let mut child = command
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+
+    let res = panic::catch_unwind(AssertUnwindSafe(|| {
+        f(&mut child);
+    }));
+
+    child.kill().unwrap();
+    res.unwrap();
 }
 
 struct TestApi {
@@ -275,46 +299,43 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
-    use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
+
     let datamodel = r#"
         datasource db {
             provider = "postgres"
             url = env("TEST_DATABASE_URL")
         }
     "#;
-    std::fs::create_dir_all(&tmpdir).unwrap();
-    std::fs::write(&tmpfile, datamodel).unwrap();
-    let mut process = Command::new(migration_engine_bin_path())
-        .arg("--datamodel")
-        .arg(&tmpfile)
-        .env("RUST_LOG", "INFO")
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .spawn()
-        .unwrap();
-    let stdin = process.stdin.as_mut().unwrap();
-    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
 
-    for _ in 0..2 {
-        writeln!(
-            stdin,
-            r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ }}, "id": 1 }}"#,
-        )
-        .unwrap();
+    fs::create_dir_all(&tmpdir).unwrap();
+    fs::write(&tmpfile, datamodel).unwrap();
 
-        let mut response = String::new();
-        stdout.read_line(&mut response).unwrap();
+    let mut command = Command::new(migration_engine_bin_path());
+    command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
 
-        assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
-    }
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            writeln!(
+                stdin,
+                r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ }}, "id": 1 }}"#,
+            )
+            .unwrap();
+
+            let mut response = String::new();
+            stdout.read_line(&mut response).unwrap();
+
+            assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+        }
+    });
 }
 
 #[test]
 fn introspect_empty_database() {
-    use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = r#"
         datasource db {
@@ -323,38 +344,38 @@ fn introspect_empty_database() {
         }
 
     "#;
-    std::fs::File::create(tmpdir.path().join("dev.db")).unwrap();
-    let mut process = Command::new(migration_engine_bin_path())
-        .env(
-            "TEST_DATABASE_URL",
-            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-        )
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .spawn()
+
+    fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+
+    let mut command = Command::new(migration_engine_bin_path());
+    command.env(
+        "TEST_DATABASE_URL",
+        format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
+    );
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": 1,
+            "params": {
+                "schema": schema,
+                "force": true,
+                "compositeTypeDepth": 5,
+            }
+        }))
         .unwrap();
-    let stdin = process.stdin.as_mut().unwrap();
-    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
 
-    let msg = serde_json::to_string(&serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "introspect",
-        "id": 1,
-        "params": {
-            "schema": schema,
-            "force": true,
-            "compositeTypeDepth": 5,
-        }
-    }))
-    .unwrap();
-    stdin.write_all(msg.as_bytes()).unwrap();
-    stdin.write_all(b"\n").unwrap();
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
 
-    let mut response = String::new();
-    stdout.read_line(&mut response).unwrap();
-
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
+        assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
+    })
 }
 
 #[test_connector(tags(Postgres))]
@@ -367,7 +388,6 @@ fn execute_postgres(api: TestApi) {
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
     assert!(output.status.success(), "{:#?}", output);
 
-    use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = r#"
         datasource db {
@@ -375,135 +395,135 @@ fn execute_postgres(api: TestApi) {
             url = env("TEST_DATABASE_URL")
         }
     "#;
-    let schema_path = tmpdir.path().join("prisma.schema");
-    std::fs::write(&schema_path, schema).unwrap();
 
-    let mut process = Command::new(migration_engine_bin_path())
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .spawn()
+    let schema_path = tmpdir.path().join("prisma.schema");
+    fs::write(&schema_path, schema).unwrap();
+
+    let command = Command::new(migration_engine_bin_path());
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        /* Run `dbExecute` */
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "dbExecute",
+            "id": 1,
+            "params": {
+                "datasourceType": {
+                    "tag": "schema",
+                    "schema": &schema_path,
+                },
+                "script": "SELECT 1;",
+            }
+        }))
         .unwrap();
 
-    let stdin = process.stdin.as_mut().unwrap();
-    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
 
-    /* Run `dbExecute` */
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
 
-    let script = formatdoc! {r#"
-        SELECT 1;
-    "#};
-    let msg = serde_json::to_string(&serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "dbExecute",
-        "id": 1,
-        "params": {
-            "datasourceType": {
-                "tag": "schema",
-                "schema": &schema_path,
-            },
-            "script": &script,
-        }
-    }))
-    .unwrap();
-    stdin.write_all(msg.as_bytes()).unwrap();
-    stdin.write_all(b"\n").unwrap();
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":null,"id":1}
+        "#]];
 
-    let mut response = String::new();
-    stdout.read_line(&mut response).unwrap();
-
-    let expected = expect![[r#"
-        {"jsonrpc":"2.0","result":null,"id":1}
-    "#]];
-    expected.assert_eq(&response);
+        expected.assert_eq(&response);
+    });
 }
 
-// TODO: it works fine if run once, it fails with a "Relation already exists" error if run twice in a row.
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn introspect_postgres(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
     let connection_string = api.connection_string();
+
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
     assert!(output.status.success(), "{:#?}", output);
+
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
     assert!(output.status.success(), "{:#?}", output);
 
-    use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
-    let schema = r#"
+    let schema = indoc! {r#"
         datasource db {
-            provider = "postgres"
-            url = env("TEST_DATABASE_URL")
+          provider = "postgres"
+          url = env("TEST_DATABASE_URL")
         }
-    "#;
-    let schema_path = tmpdir.path().join("prisma.schema");
-    std::fs::write(&schema_path, schema).unwrap();
+    "#};
 
-    let mut process = Command::new(migration_engine_bin_path())
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .spawn()
+    let schema_path = tmpdir.path().join("prisma.schema");
+    fs::write(&schema_path, schema).unwrap();
+
+    let command = Command::new(migration_engine_bin_path());
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        /* Create table via `dbExecute` */
+
+        let script = indoc! {r#"
+            DROP TABLE IF EXISTS "public"."A";
+
+            CREATE TABLE "public"."A" (
+                id SERIAL PRIMARY KEY,
+                data TEXT
+            );
+        "#};
+
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "dbExecute",
+            "id": 1,
+            "params": {
+                "datasourceType": {
+                    "tag": "schema",
+                    "schema": &schema_path,
+                },
+                "script": script,
+            }
+        }))
+        .unwrap();
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":null,"id":1}
+        "#]];
+
+        expected.assert_eq(&response);
+
+        /* Introspect via `introspect` */
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": 1,
+            "params": {
+                "schema": &schema,
+                "force": true,
+                "compositeTypeDepth": 5,
+            }
+        }))
         .unwrap();
 
-    let stdin = process.stdin.as_mut().unwrap();
-    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
 
-    /* Create table via `dbExecute` */
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
 
-    let script = formatdoc! {r#"
-        CREATE TABLE "public"."A" (
-            id SERIAL PRIMARY KEY,
-            data TEXT
-        );
-    "#};
-    let msg = serde_json::to_string(&serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "dbExecute",
-        "id": 1,
-        "params": {
-            "datasourceType": {
-                "tag": "schema",
-                "schema": &schema_path,
-            },
-            "script": &script,
-        }
-    }))
-    .unwrap();
-    stdin.write_all(msg.as_bytes()).unwrap();
-    stdin.write_all(b"\n").unwrap();
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","version":"Prisma11","warnings":[]},"id":1}
+        "#]];
 
-    let mut response = String::new();
-    stdout.read_line(&mut response).unwrap();
-
-    let expected = expect![[r#"
-        {"jsonrpc":"2.0","result":null,"id":1}
-    "#]];
-    expected.assert_eq(&response);
-
-    /* Introspect via `introspect` */
-    let msg = serde_json::to_string(&serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "introspect",
-        "id": 1,
-        "params": {
-            "schema": &schema,
-            "force": true,
-            "compositeTypeDepth": 5,
-        }
-    }))
-    .unwrap();
-    stdin.write_all(msg.as_bytes()).unwrap();
-    stdin.write_all(b"\n").unwrap();
-
-    let mut response = String::new();
-    stdout.read_line(&mut response).unwrap();
-
-    let expected = expect![[r#"
-        {"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","version":"Prisma11","warnings":[]},"id":1}
-    "#]];
-    expected.assert_eq(&response);
+        expected.assert_eq(&response);
+    });
 }
 
 // TODO: create a basic table before introspecting
@@ -519,38 +539,38 @@ fn introspect_e2e() {
         }
 
     "#;
-    std::fs::File::create(tmpdir.path().join("dev.db")).unwrap();
-    let mut process = Command::new(migration_engine_bin_path())
-        .env(
-            "TEST_DATABASE_URL",
-            format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
-        )
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::null())
-        .spawn()
+    fs::File::create(tmpdir.path().join("dev.db")).unwrap();
+
+    let mut command = Command::new(migration_engine_bin_path());
+
+    command.env(
+        "TEST_DATABASE_URL",
+        format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
+    );
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": 1,
+            "params": {
+                "schema": schema,
+                "force": true,
+                "compositeTypeDepth": 5,
+            }
+        }))
         .unwrap();
-    let stdin = process.stdin.as_mut().unwrap();
-    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
 
-    let msg = serde_json::to_string(&serde_json::json!({
-        "jsonrpc": "2.0",
-        "method": "introspect",
-        "id": 1,
-        "params": {
-            "schema": schema,
-            "force": true,
-            "compositeTypeDepth": 5,
-        }
-    }))
-    .unwrap();
-    stdin.write_all(msg.as_bytes()).unwrap();
-    stdin.write_all(b"\n").unwrap();
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
 
-    let mut response = String::new();
-    stdout.read_line(&mut response).unwrap();
+        dbg!("response: {:?}", &response);
 
-    dbg!("response: {:?}", &response);
-
-    assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+    });
 }

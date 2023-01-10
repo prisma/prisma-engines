@@ -214,6 +214,7 @@ async fn main() -> anyhow::Result<()> {
                 schema,
                 false,
                 CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
+                None,
             )
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
@@ -317,7 +318,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let skeleton = minimal_schema_from_url(url)?;
             //todo make this configurable
             let introspected =
-                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite)
+                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite, None)
                     .await
                     .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 

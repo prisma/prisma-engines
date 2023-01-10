@@ -207,6 +207,7 @@ fn introspecting_a_non_existing_db_fails() {
         composite_type_depth: -1,
         force: false,
         schema: dm.to_owned(),
+        schemas: None,
     }))
     .unwrap_err();
 

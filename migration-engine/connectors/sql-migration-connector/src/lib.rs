@@ -238,7 +238,11 @@ impl MigrationConnector for SqlMigrationConnector {
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let mut namespace_names = ctx.datasource().namespaces.iter().map(|(s, _)| s.clone()).collect();
+            let mut namespace_names = match ctx.namespaces() {
+                Some(namespaces) => namespaces.iter().map(|s| s.to_string()).collect(),
+                None => ctx.datasource().namespaces.iter().map(|(s, _)| s.to_string()).collect(),
+            };
+
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
             let datamodel = datamodel_calculator::calculate(&sql_schema, ctx)

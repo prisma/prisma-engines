@@ -3,10 +3,10 @@
 //! Why this rather than using connectors directly? We must be able to use the migration engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
+use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector, Namespaces};
-use psl::parser_database::SourceFile;
+use psl::{parser_database::SourceFile, PreviewFeature};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
@@ -320,18 +320,38 @@ impl GenericApi for EngineState {
     }
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
+        tracing::info!("{:?}", params.schema);
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
         let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+
+        if !schema
+            .configuration
+            .preview_features()
+            .contains(PreviewFeature::MultiSchema)
+            && params.schemas.is_some()
+        {
+            let msg =
+                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
+
+            return Err(CoreError::from_msg(msg.to_string()));
+        }
+
         self.with_connector_for_schema(
             &params.schema,
             None,
             Box::new(move |connector| {
                 let composite_type_depth = From::from(params.composite_type_depth);
+
                 let ctx = if params.force {
-                    migration_connector::IntrospectionContext::new_config_only(schema, composite_type_depth)
+                    migration_connector::IntrospectionContext::new_config_only(
+                        schema,
+                        composite_type_depth,
+                        params.schemas,
+                    )
                 } else {
-                    migration_connector::IntrospectionContext::new(schema, composite_type_depth)
+                    migration_connector::IntrospectionContext::new(schema, composite_type_depth, params.schemas)
                 };
+
                 Box::pin(async move {
                     let result = connector.introspect(&ctx).await?;
 

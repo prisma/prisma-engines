@@ -27,7 +27,7 @@ async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
     api.raw_cmd(setup).await;
 
     let schema = psl::parse_schema(schema).unwrap();
-    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite);
+    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None);
     api.api.introspect(&ctx).await.unwrap();
 }
 

@@ -53,7 +53,7 @@ pub(super) async fn sample(
     statistics.render(ctx.datasource(), &mut data_model, &mut warnings);
 
     let psl_string = if ctx.render_config {
-        let config = render::Configuration::from_psl(ctx.configuration());
+        let config = render::Configuration::from_psl(ctx.configuration(), None);
         format!("{config}\n{data_model}")
     } else {
         data_model.to_string()
