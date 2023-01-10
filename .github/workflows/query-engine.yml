@@ -10,6 +10,7 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
+      - 'introspection-engine/**'
 
 jobs:
   rust-vitess-tests:
@@ -35,7 +36,10 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
-
+          - name: "cockroach_22_1_0"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "22.1.0"
     env:
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
