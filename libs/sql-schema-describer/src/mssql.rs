@@ -701,6 +701,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     from: format!("{namespace}.{table_name}"),
                     to: format!("{referenced_schema_name}.{referenced_table}"),
                     constraint: constraint_name,
+                    missing_namespace: referenced_schema_name,
                 }));
             }
 

@@ -957,9 +957,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             if !sql_schema.namespaces.contains(&referenced_schema_name) {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", sql_schema.namespaces[0], table_name), //TODO(matthias)
+                    from: format!("{}.{}", sql_schema.namespaces[0], table_name),
                     to: format!("{}.{}", referenced_schema_name, referenced_table),
                     constraint: constraint_name,
+                    missing_namespace: referenced_schema_name,
                 }));
             }
 

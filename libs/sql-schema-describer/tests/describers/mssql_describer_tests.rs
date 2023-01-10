@@ -721,10 +721,9 @@ fn mssql_cross_schema_references_are_not_allowed(api: TestApi) {
     api.raw_cmd(&sql);
     let err = api.describe_error();
 
-    assert_eq!(
-        "Illegal cross schema reference from `dbo.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
-        err.to_string(),
-    );
+    let expected = expect!["The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `dbo.User` points to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Please add `mssql_foreign_key_on_delete_must_be_handled_B` to your `schemas` property and run this command again."];
+
+    expected.assert_eq(&err.to_string());
 }
 
 #[test_connector(tags(Mssql))]
