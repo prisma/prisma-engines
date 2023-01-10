@@ -29,12 +29,15 @@ node -e "const prismaFmt = require('@prisma/prisma-fmt-wasm'); console.log(prism
 When implementing features for `language-tools` in `prisma-engines`, to sync with your local dev environment for the `language-server`, one can do the following:
 
 ### On first setup
-Install the latest Rust version
 ```
+# Install the latest Rust version with `rustup`
+# or update the latest Rust version with `rustup`
+rustup update
+rustup target add wasm32-unknown-unknown
 cargo update -p wasm-bindgen
+# Check the version defined in `prisma-fmt-wasm/cargo.toml` for `wasm-bindgen` and replace `version` below:
 cargo install -f wasm-bindgen-cli@version
 ```
-- version is defined in `prisma-fmt-wasm/cargo.toml`
 
 ### On Changes
 
