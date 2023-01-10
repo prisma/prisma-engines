@@ -57,6 +57,20 @@ impl SqlFlavour for SqliteFlavour {
             .map(|p| p.connector_params.connection_string.as_str())
     }
 
+    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let select = r#"SELECT name AS table_name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
+            let rows = self.query_raw(select, &[]).await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
+        })
+    }
+
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
