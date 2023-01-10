@@ -68,7 +68,6 @@ mod write_conflict {
             .collect();
 
         for res in future::join_all(futs).await {
-            dbg!(&res);
             res?.assert_success();
         }
 

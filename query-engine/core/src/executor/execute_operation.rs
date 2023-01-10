@@ -8,6 +8,7 @@ use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 use schema::QuerySchemaRef;
+use tokio_retry::strategy;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
@@ -171,6 +172,8 @@ async fn execute_self_contained_without_retry(
     execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
 }
 
+// As suggested by the MongoDB documentation
+// https://github.com/mongodb/specifications/blob/master/source/transactions-convenient-api/transactions-convenient-api.rst#pseudo-code
 const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(12);
 
 // MongoDB-specific transient transaction error retry logic.
@@ -192,11 +195,19 @@ async fn execute_self_contained_with_retry(
             return res;
         }
 
+        // backoff strategy: 0ms, 4ms, 8ms, 16ms, 32ms, 64ms, 128ms, 256ms, 512ms, 512ms, ...
+        let mut backoff = std::iter::once(Duration::from_secs(0)).chain(
+            strategy::ExponentialBackoff::from_millis(2)
+                .max_delay(Duration::from_millis(512))
+                .factor(2),
+        );
+
         loop {
             let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
             let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
 
             if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
+                tokio::time::sleep(backoff.next().unwrap()).await;
                 continue;
             } else {
                 return res;
