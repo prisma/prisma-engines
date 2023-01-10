@@ -55,6 +55,8 @@ pub enum DescriberErrorKind {
         to: String,
         /// Name of the constraint.
         constraint: String,
+        /// This must be added to the schemas property.
+        missing_namespace: String,
     },
 }
 
@@ -74,11 +76,15 @@ impl Display for DescriberErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::QuaintError(err) => err.fmt(f),
-            Self::CrossSchemaReference { from, to, constraint } => {
+            Self::CrossSchemaReference {
+                from,
+                to,
+                constraint,
+                missing_namespace,
+            } => {
                 write!(
                     f,
-                    "Illegal cross schema reference from `{}` to `{}` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
-                    from, to, constraint
+                    "The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `{from}` points to `{to}` in constraint `{constraint}`. Please add `{missing_namespace}` to your `schemas` property and run this command again.",
                 )
             }
         }
