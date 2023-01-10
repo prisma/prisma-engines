@@ -56,7 +56,7 @@ impl<'a> LiftAstToDml<'a> {
         // (model_idx, field_name) -> sort_key
         let mut field_ids_for_sorting: HashMap<(&str, &str), ast::FieldId> = HashMap::new();
 
-        for model in self.db.walk_models() {
+        for model in self.db.walk_models().chain(self.db.walk_views()) {
             schema.models.push(self.lift_model(model, &mut field_ids_for_sorting));
         }
 

@@ -25,7 +25,11 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let validated_schema = psl::validate(file);
 
-    for model in validated_schema.db.walk_models() {
+    for model in validated_schema
+        .db
+        .walk_models()
+        .chain(validated_schema.db.walk_views())
+    {
         if validated_schema
             .configuration
             .preview_features()
