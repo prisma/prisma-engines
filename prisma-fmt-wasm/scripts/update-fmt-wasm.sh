@@ -16,9 +16,6 @@ language_tools_node="$language_tools_server/node_modules/@prisma/prisma-fmt-wasm
 printf '%s\n' "Starting build :: prisma-fmt-wasm"
 cargo build --release --target=wasm32-unknown-unknown --manifest-path=$prisma_fmt_wasm_dir/Cargo.toml
 
-printf '%s\n' "Marking executables :: $prisma_fmt_wasm_dir/scripts/*"
-chmod +x $prisma_fmt_wasm_dir/scripts/*
-
 printf '%s\n' "Generating node module"
 out=$prisma_fmt_wasm_dir/nodejs $prisma_fmt_wasm_dir/scripts/install.sh
 
