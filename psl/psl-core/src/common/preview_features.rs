@@ -1,3 +1,4 @@
+use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
 
@@ -91,6 +92,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | ExtendedWhereUnique
          | ClientExtensions
          | MultiSchema
+         | Views
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -119,9 +121,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | InteractiveTransactions
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        Views
-    }),
+    hidden: BitFlags::EMPTY,
 };
 
 #[derive(Debug)]
