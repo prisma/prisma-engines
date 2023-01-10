@@ -112,12 +112,12 @@ fn push_ast_completions(
                     label: "schemas".to_owned(),
                     insert_text: Some(r#"schemas = [$0]"#.to_owned()),
                     insert_text_format: Some(InsertTextFormat::SNIPPET),
-                    kind: Some(CompletionItemKind::PROPERTY),
+                    kind: Some(CompletionItemKind::FIELD),
                     documentation: Some(Documentation::MarkupContent(MarkupContent {
                         kind: MarkupKind::Markdown,
                         value: generate_pretty_doc(
                             r#"schemas = ["foo", "bar", "baz"]"#,
-                            "The list of database schemas.",
+                            "The list of database schemas. [Learn More](https://pris.ly/d/multi-schema-configuration)",
                         ),
                     })),
                     // detail: Some("schemas".to_owned()),
