@@ -55,6 +55,10 @@ impl MysqlFlavour {
         self.circumstances().contains(Circumstances::LowerCasesTableNames)
     }
 
+    pub(crate) fn database_name(&self) -> &str {
+        self.state.params().map(|p| p.url.dbname()).unwrap_or("mysql")
+    }
+
     fn circumstances(&self) -> BitFlags<Circumstances> {
         match self.state {
             super::State::Initial | super::State::WithParams(_) => Default::default(),
@@ -94,6 +98,39 @@ impl SqlFlavour for MysqlFlavour {
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, _c, connection| async move {
             connection.describe_schema(params).await
+        })
+    }
+
+    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let select = r#"
+                SELECT DISTINCT BINARY table_info.table_name AS table_name
+                FROM information_schema.tables AS table_info
+                JOIN information_schema.columns AS column_info
+                    ON BINARY column_info.table_name = BINARY table_info.table_name
+                WHERE
+                    table_info.table_schema = ?
+                    AND column_info.table_schema = ?
+                    -- Exclude views.
+                    AND table_info.table_type = 'BASE TABLE'
+                ORDER BY BINARY table_info.table_name
+            "#;
+
+            let database_name = self.database_name();
+
+            let rows = self
+                .query_raw(
+                    select,
+                    &[database_name.to_string().into(), database_name.to_string().into()],
+                )
+                .await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
         })
     }
 

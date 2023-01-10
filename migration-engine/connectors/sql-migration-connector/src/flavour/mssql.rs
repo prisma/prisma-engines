@@ -192,6 +192,40 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let search_path = self.schema_name().to_string();
+
+            let mut namespaces: Vec<_> = namespaces.map(|ns| ns.into_iter().collect()).unwrap_or_default();
+            namespaces.push(search_path);
+
+            let select = r#"
+                SELECT
+                    tbl.name AS table_name,
+                    SCHEMA_NAME(tbl.schema_id) AS namespace
+                FROM sys.tables tbl
+                WHERE tbl.is_ms_shipped = 0 AND tbl.type = 'U'
+                ORDER BY tbl.name;
+            "#;
+
+            let rows = self.query_raw(select, &[]).await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| {
+                    let ns = row.get("namespace").and_then(|s| s.to_string());
+                    let table_name = row.get("table_name").and_then(|s| s.to_string());
+
+                    ns.and_then(|ns| table_name.map(|table_name| (ns, table_name)))
+                })
+                .filter(|(ns, _)| namespaces.contains(ns))
+                .map(|(_, table_name)| table_name)
+                .collect();
+
+            Ok(table_names)
+        })
+    }
+
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), crate::MIGRATIONS_TABLE_NAME);
         Box::pin(async move { self.raw_cmd(&sql).await })
@@ -216,6 +250,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[tracing::instrument(skip(self))]
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, connection| async move {
             let ns_vec = Namespaces::to_vec(namespaces, params.url.schema().to_string());

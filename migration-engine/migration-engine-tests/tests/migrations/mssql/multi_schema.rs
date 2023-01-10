@@ -1091,6 +1091,50 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
+#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+fn multi_schema_migration(api: TestApi) {
+    let dm = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("TEST_DATABASE_URL")
+          schemas  = ["one", "two"]
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        model A {
+          id  Int @id
+          bId Int
+          bs  B[] @relation("one")
+          b   B   @relation("two", fields: [bId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+          @@schema("one")
+        }
+
+        model B {
+          id  Int @id
+          aId Int
+          a   A   @relation("one", fields: [aId], references: [id])
+          as  A[] @relation("two")
+
+          @@schema("two")
+        }
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("init", &dm, &dir).send_sync();
+
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
+
+    api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
+}
+
 #[tokio::test]
 async fn migration_with_shadow_database() {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();

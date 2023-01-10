@@ -152,6 +152,10 @@ pub(crate) trait SqlFlavour:
     /// Drop the migrations table
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
+    /// List all visible tables in the given namespaces,
+    /// including the search path.
+    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
+
     /// Return an empty database schema. This happens in the flavour, because we need
     /// SqlSchema::connector_data to be set.
     fn empty_database_schema(&self) -> SqlSchema {

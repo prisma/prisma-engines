@@ -8,7 +8,7 @@ use indoc::indoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
-use quaint::connector::PostgresUrl;
+use quaint::{connector::PostgresUrl, Value};
 use sql_schema_describer::SqlSchema;
 use std::{borrow::Cow, collections::HashMap, future, time};
 use url::Url;
@@ -76,6 +76,10 @@ impl PostgresFlavour {
                 .map(|c| c.contains(Circumstances::IsCockroachDb))
                 .unwrap_or(false)
     }
+
+    pub(crate) fn schema_name(&self) -> &str {
+        self.state.params().map(|p| p.url.schema()).unwrap_or("public")
+    }
 }
 
 impl SqlFlavour for PostgresFlavour {
@@ -116,6 +120,34 @@ impl SqlFlavour for PostgresFlavour {
         } else {
             "postgresql"
         }
+    }
+
+    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let search_path = self.schema_name().to_string();
+
+            let mut namespaces: Vec<_> = namespaces
+                .map(|ns| ns.into_iter().map(Value::text).collect())
+                .unwrap_or_default();
+
+            namespaces.push(Value::text(search_path));
+
+            let select = r#"
+                SELECT tbl.relname AS table_name
+                FROM pg_class AS tbl
+                INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
+                WHERE tbl.relkind = 'r' AND namespace.nspname = ANY ( $1 )
+            "#;
+
+            let rows = self.query_raw(select, &[Value::array(namespaces)]).await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
+        })
     }
 
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
