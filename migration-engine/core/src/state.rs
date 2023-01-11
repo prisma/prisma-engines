@@ -323,13 +323,27 @@ impl GenericApi for EngineState {
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         tracing::info!("{:?}", params.schema);
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
-        let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
 
-        if !schema
-            .configuration
+        let has_some_namespaces = params.schemas.is_some();
+        let composite_type_depth = From::from(params.composite_type_depth);
+
+        let ctx = if params.force {
+            let previous_schema = psl::validate(source_file);
+            migration_connector::IntrospectionContext::new_config_only(
+                previous_schema,
+                composite_type_depth,
+                params.schemas,
+            )
+        } else {
+            let previous_schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+            migration_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
+        };
+
+        if !ctx
+            .configuration()
             .preview_features()
             .contains(PreviewFeature::MultiSchema)
-            && params.schemas.is_some()
+            && has_some_namespaces
         {
             let msg =
                 "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
@@ -341,18 +355,6 @@ impl GenericApi for EngineState {
             &params.schema,
             None,
             Box::new(move |connector| {
-                let composite_type_depth = From::from(params.composite_type_depth);
-
-                let ctx = if params.force {
-                    migration_connector::IntrospectionContext::new_config_only(
-                        schema,
-                        composite_type_depth,
-                        params.schemas,
-                    )
-                } else {
-                    migration_connector::IntrospectionContext::new(schema, composite_type_depth, params.schemas)
-                };
-
                 Box::pin(async move {
                     let result = connector.introspect(&ctx).await?;
 
