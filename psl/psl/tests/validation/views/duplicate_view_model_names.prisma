@@ -1,0 +1,25 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  id Int @unique
+  val String
+}
+
+model Mountain {
+  id Int @unique
+  val String
+}
+// [1;91merror[0m: [1mThe model "Mountain" cannot be defined because a view with that name already exists.[0m
+//   [1;94m-->[0m  [4mschema.prisma:16[0m
+// [1;94m   | [0m
+// [1;94m15 | [0m
+// [1;94m16 | [0mmodel [1;91mMountain[0m {
+// [1;94m   | [0m

@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  id Int
+}
+// [1;91merror[0m: [1mError validating view "Mountain": Each view must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the view.[0m
+//   [1;94m-->[0m  [4mschema.prisma:11[0m
+// [1;94m   | [0m
+// [1;94m10 | [0m
+// [1;94m11 | [0m[1;91mview Mountain {[0m
+// [1;94m12 | [0m  id Int
+// [1;94m13 | [0m}
+// [1;94m   | [0m

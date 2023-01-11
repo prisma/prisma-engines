@@ -21,6 +21,7 @@ impl Top {
         match self {
             Top::CompositeType(_) => "composite type",
             Top::Enum(_) => "enum",
+            Top::Model(m) if m.is_view => "view",
             Top::Model(_) => "model",
             Top::Source(_) => "source",
             Top::Generator(_) => "generator",

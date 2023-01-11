@@ -33,8 +33,10 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
         })
         .peekable();
 
+    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
     let msg =
-        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.";
+        format!("Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}.");
 
     let msg = if loose_criterias.peek().is_some() {
         let suffix = format!(
@@ -46,8 +48,6 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
     } else {
         Cow::from(msg)
     };
-
-    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
 
     ctx.push_error(DatamodelError::new_model_validation_error(
         msg.as_ref(),
@@ -360,8 +360,12 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    ctx.push_error(DatamodelError::new_static(
-        "This model is missing an `@@schema` attribute.",
+    let container = if model.ast_model().is_view() { "view" } else { "model" };
+
+    ctx.push_error(DatamodelError::new_model_validation_error(
+        &format!("This {container} is missing an `@@schema` attribute."),
+        container,
+        model.name(),
         model.ast_model().span(),
     ))
 }

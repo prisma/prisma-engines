@@ -1,0 +1,28 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["A", "B"]
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views", "multiSchema"]
+}
+
+model A {
+  id Int @id
+
+  @@schema("B")
+}
+
+view Mountain {
+  id Int @unique
+}
+// [1;91merror[0m: [1mError validating view "Mountain": This view is missing an `@@schema` attribute.[0m
+//   [1;94m-->[0m  [4mschema.prisma:18[0m
+// [1;94m   | [0m
+// [1;94m17 | [0m
+// [1;94m18 | [0m[1;91mview Mountain {[0m
+// [1;94m19 | [0m  id Int @unique
+// [1;94m20 | [0m}
+// [1;94m   | [0m
