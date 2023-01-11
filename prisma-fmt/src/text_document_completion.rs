@@ -1,13 +1,15 @@
 use log::*;
 use lsp_types::*;
 use psl::{
-    datamodel_connector::{Connector, RelationMode},
+    datamodel_connector::Connector,
     diagnostics::Span,
     parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
     Diagnostics, PreviewFeature, PreviewFeatures,
 };
 use std::sync::Arc;
+
+use crate::position_to_offset;
 
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
@@ -29,20 +31,18 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 
     let configs = parse_configuration(source_file.as_str()).ok();
 
-    let (connector, relation_mode, namespaces) = configs
+    let (connector, namespaces) = configs
         .as_ref()
         .and_then(|conf| conf.datasources.first())
         .map(|datasource| {
             (
                 datasource.active_connector,
-                datasource.relation_mode(),
                 datasource.namespaces.clone(),
             )
         })
         .unwrap_or_else(|| {
             (
                 &psl::datamodel_connector::EmptyDatamodelConnector,
-                Default::default(),
                 Default::default(),
             )
         });
@@ -63,12 +63,11 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         ParserDatabase::new(source_file, &mut diag)
     };
 
-    let add_quotes = add_quotes(params);
+    let add_quotes = add_quotes(&params, db.source());
 
     push_ast_completions(
         &mut list,
         connector,
-        relation_mode,
         &db,
         position,
         preview_features,
@@ -85,7 +84,6 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 fn push_ast_completions(
     completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
-    _relation_mode: RelationMode,
     db: &ParserDatabase,
     position: usize,
     preview_features: PreviewFeatures,
@@ -138,14 +136,31 @@ fn format_insert_string(add_quotes: bool, text: &str) -> String {
     }
 }
 
-fn add_quotes(params: CompletionParams) -> bool {
-    match params.context {
-        Some(ctx) => {
-            !(ctx.trigger_kind == CompletionTriggerKind::TRIGGER_CHARACTER
-                && matches!(ctx.trigger_character, Some(c) if c == "\""))
-            // || (params.text_document_position.position.character - 1 == "\""
-            //     && params.text_document_position.position.character + 1 == "\"")
+fn add_quotes(params: &CompletionParams, schema: &str) -> bool {
+    if let Some(ctx) = &params.context {
+        !(
+            ctx.trigger_kind == CompletionTriggerKind::TRIGGER_CHARACTER
+            && matches!(&ctx.trigger_character, Some(c) if c == "\"")
+        )
+        && is_inside_quote(params, schema)
+    } else {
+        true
+    }
+}
+
+fn is_inside_quote(params: &CompletionParams, schema: &str) -> bool {
+    match position_to_offset(&params.text_document_position.position, schema) {
+        Some(pos) => {
+            for i in (0..pos).rev() {
+                if schema.is_char_boundary(i) {
+                    match schema[i - 1..].chars().next() {
+                        Some('"') => return true,
+                        _ => return false,
+                    }
+                }
+            }
+            false
         }
-        None => true,
+        None => false,
     }
 }
