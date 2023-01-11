@@ -155,7 +155,6 @@ fn run_relation_link_test_impl(
     if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
         let connector = config.test_connector_tag().unwrap();
-        let connection_string = connector.connection_string(test_database, config.is_ci(), Default::default(), None);
         let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
@@ -166,16 +165,9 @@ fn run_relation_link_test_impl(
                 println!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
-                let runner = Runner::load(
-                    config.runner(),
-                    datamodel.clone(),
-                    connector,
-                    &connection_string,
-                    metrics,
-                    log_capture,
-                )
-                .await
-                .unwrap();
+                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
+                    .await
+                    .unwrap();
 
                 test_fn(&runner, &dm_with_params_json).await.unwrap();
 
@@ -277,14 +269,11 @@ pub fn run_connector_test_impl(
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
             let requires_teardown = connector.requires_teardown();
-            let connection_string =
-                connector.connection_string(test_database_name, config.is_ci(), !db_schemas.is_empty(), None);
 
             let runner = Runner::load(
                 crate::CONFIG.runner(),
                 datamodel.clone(),
                 connector,
-                &connection_string,
                 metrics,
                 log_capture,
             )

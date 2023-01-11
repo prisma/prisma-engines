@@ -16,12 +16,7 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
     /// Initializes the runner.
-    async fn load(
-        datamodel: String,
-        connector_tag: ConnectorTag,
-        connection_string: &str,
-        metrics: MetricRegistry,
-    ) -> TestResult<Self>;
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
 
     /// Queries the engine.
     async fn query(&self, query: String) -> TestResult<QueryResult>;
@@ -90,14 +85,13 @@ impl Runner {
         ident: &str,
         datamodel: String,
         connector_tag: ConnectorTag,
-        connection_string: &str,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let inner = match ident {
-            "direct" => Self::direct(datamodel, connector_tag, connection_string, metrics).await,
+            "direct" => Self::direct(datamodel, connector_tag, metrics).await,
             "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag, connection_string, metrics).await,
+            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }?;
 
@@ -188,24 +182,14 @@ impl Runner {
         }
     }
 
-    async fn direct(
-        datamodel: String,
-        connector_tag: ConnectorTag,
-        connection_string: &str,
-        metrics: MetricRegistry,
-    ) -> TestResult<RunnerType> {
-        let runner = DirectRunner::load(datamodel, connector_tag, connection_string, metrics).await?;
+    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
+        let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
 
         Ok(RunnerType::Direct(runner))
     }
 
-    async fn binary(
-        datamodel: String,
-        connector_tag: ConnectorTag,
-        connection_string: &str,
-        metrics: MetricRegistry,
-    ) -> TestResult<RunnerType> {
-        let runner = BinaryRunner::load(datamodel, connector_tag, connection_string, metrics).await?;
+    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
+        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
 
         Ok(RunnerType::Binary(runner))
     }

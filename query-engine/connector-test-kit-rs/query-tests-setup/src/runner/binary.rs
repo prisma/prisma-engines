@@ -7,25 +7,29 @@ use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, Mul
 
 use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
+use std::env;
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
     state: State,
-    quaint: Quaint,
+    quaint: Option<Quaint>,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
-    async fn load(
-        datamodel: String,
-        connector_tag: ConnectorTag,
-        connection_string: &str,
-        metrics: MetricRegistry,
-    ) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
         let state = setup(&opts, metrics).await.unwrap();
-        let quaint = Quaint::new(connection_string).await.unwrap();
+
+        let configuration = opts.configuration(true).unwrap();
+        let data_source = configuration.datasources.first().unwrap();
+        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+
+        let quaint = match connector_tag {
+            ConnectorTag::MongoDb(_) => None,
+            _ => Some(Quaint::new(&url).await.unwrap()),
+        };
 
         Ok(BinaryRunner {
             state,
@@ -57,7 +61,14 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        self.quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
+        if let Some(quaint) = &self.quaint {
+            quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
+        } else {
+            unimplemented!(
+                "raw_execute is currently not supported for {}",
+                self.connector().to_string()
+            )
+        }
     }
 
     async fn batch(
@@ -204,7 +215,14 @@ impl RunnerInterface for BinaryRunner {
     }
 
     fn schema_name(&self) -> &str {
-        self.quaint.connection_info().schema_name()
+        if let Some(quaint) = &self.quaint {
+            quaint.connection_info().schema_name()
+        } else {
+            unimplemented!(
+                "schema_name is currently not supported for the active connector: {}.",
+                self.connector().to_string()
+            )
+        }
     }
 }
 

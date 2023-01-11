@@ -97,9 +97,15 @@ mod views {
         );
 
         // Order by relation
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyTestView(orderBy: { children: { _count: asc } }) { id _count { children } } }"#),
-          @r###"{"data":{"findManyTestView":[{"id":2,"_count":{"children":0}},{"id":3,"_count":{"children":0}},{"id":1,"_count":{"children":2}}]}}"###
+        is_one_of!(
+            run_query!(
+                &runner,
+                r#"{ findManyTestView(orderBy: { children: { _count: asc } }) { id _count { children } } }"#
+            ),
+            vec![
+                r#"{"data":{"findManyTestView":[{"id":2,"_count":{"children":0}},{"id":3,"_count":{"children":0}},{"id":1,"_count":{"children":2}}]}}"#,
+                r#"{"data":{"findManyTestView":[{"id":3,"_count":{"children":0}},{"id":2,"_count":{"children":0}},{"id":1,"_count":{"children":2}}]}}"#,
+            ]
         );
 
         Ok(())

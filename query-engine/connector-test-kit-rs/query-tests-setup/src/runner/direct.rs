@@ -14,27 +14,26 @@ pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
-    quaint: Quaint,
+    quaint: Option<Quaint>,
     current_tx_id: Option<TxId>,
     metrics: MetricRegistry,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
-    async fn load(
-        datamodel: String,
-        connector_tag: ConnectorTag,
-        connection_string: &str,
-        metrics: MetricRegistry,
-    ) -> TestResult<Self> {
+    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
         let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
+        let quaint = match connector_tag {
+            ConnectorTag::MongoDb(_) => None,
+            _ => Some(Quaint::new(&url).await.unwrap()),
+        };
+
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
-        let quaint = Quaint::new(connection_string).await.unwrap();
 
         Ok(Self {
             executor,
@@ -56,7 +55,14 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        self.quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
+        if let Some(quaint) = &self.quaint {
+            quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
+        } else {
+            unimplemented!(
+                "raw_execute is currently not supported for {}",
+                self.connector().to_string()
+            )
+        }
     }
 
     async fn batch(
@@ -134,6 +140,13 @@ impl RunnerInterface for DirectRunner {
     }
 
     fn schema_name(&self) -> &str {
-        self.quaint.connection_info().schema_name()
+        if let Some(quaint) = &self.quaint {
+            quaint.connection_info().schema_name()
+        } else {
+            unimplemented!(
+                "schema_name is currently not supported for the active connector: {}.",
+                self.connector().to_string()
+            )
+        }
     }
 }
