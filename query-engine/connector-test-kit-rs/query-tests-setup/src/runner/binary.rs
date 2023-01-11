@@ -202,6 +202,10 @@ impl RunnerInterface for BinaryRunner {
     fn query_schema(&self) -> &QuerySchemaRef {
         self.state.query_schema()
     }
+
+    fn schema_name(&self) -> &str {
+        self.quaint.connection_info().schema_name()
+    }
 }
 
 async fn response_to_json(resp: Response<Body>) -> serde_json::Value {

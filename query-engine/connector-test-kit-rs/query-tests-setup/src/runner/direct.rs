@@ -34,7 +34,6 @@ impl RunnerInterface for DirectRunner {
         let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
-        dbg!(&connection_string);
         let quaint = Quaint::new(connection_string).await.unwrap();
 
         Ok(Self {
@@ -132,5 +131,9 @@ impl RunnerInterface for DirectRunner {
 
     fn query_schema(&self) -> &QuerySchemaRef {
         &self.query_schema
+    }
+
+    fn schema_name(&self) -> &str {
+        self.quaint.connection_info().schema_name()
     }
 }
