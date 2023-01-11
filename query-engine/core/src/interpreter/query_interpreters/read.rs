@@ -299,6 +299,7 @@ fn record_not_found() -> InterpretationResult<QueryResult> {
             },
         )),
         kind: connector::error::ErrorKind::RecordDoesNotExist,
+        transient: false,
     }
     .into())
 }

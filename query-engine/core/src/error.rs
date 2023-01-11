@@ -90,6 +90,14 @@ impl CoreError {
             to_type: to_type.into(),
         }
     }
+
+    pub fn is_transient(&self) -> bool {
+        match self {
+            CoreError::InterpreterError(InterpreterError::ConnectorError(err)) => err.is_transient(),
+            CoreError::ConnectorError(err) => err.is_transient(),
+            _ => false,
+        }
+    }
 }
 
 impl From<QueryGraphBuilderError> for CoreError {
