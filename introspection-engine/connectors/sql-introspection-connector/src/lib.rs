@@ -168,19 +168,22 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
-        let namespaces = &mut ctx
-            .datasource()
-            .namespaces
-            .iter()
-            .map(|(ns, _)| ns.as_ref())
-            .collect::<Vec<&str>>();
+        let mut namespaces = match ctx.namespaces() {
+            Some(namespaces) => namespaces.iter().map(|ns| ns.as_str()).collect(),
+            None => ctx
+                .datasource()
+                .namespaces
+                .iter()
+                .map(|(ns, _)| ns.as_ref())
+                .collect::<Vec<&str>>(),
+        };
 
         if namespaces.is_empty() {
             namespaces.push(self.connection.connection_info().schema_name())
         }
 
         let sql_schema = self
-            .catch(self.describe(Some(ctx.datasource().active_provider), namespaces))
+            .catch(self.describe(Some(ctx.datasource().active_provider), &namespaces))
             .await?;
 
         datamodel_calculator::calculate(&sql_schema, ctx).map_err(|sql_introspection_error| {
