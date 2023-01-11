@@ -31,7 +31,7 @@ pub use identifier::Identifier;
 pub use indentation_type::IndentationType;
 pub use model::{FieldId, Model};
 pub use newline_type::NewlineType;
-pub use r#enum::{Enum, EnumValue};
+pub use r#enum::{Enum, EnumValue, EnumValueId};
 pub use source_config::SourceConfig;
 pub use top::Top;
 pub use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
