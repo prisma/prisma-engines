@@ -1,37 +1,12 @@
 //! A field in a model.
 
+use crate::default_value::{DefaultKind, DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
-use crate::CompositeTypeFieldType;
-use crate::{
-    default_value::{DefaultKind, DefaultValue, ValueGenerator},
-    relation_info::ReferentialAction,
-};
-use std::hash::Hash;
-
-/// Arity of a Field in a Model.
-#[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
-pub enum FieldArity {
-    Required,
-    Optional,
-    List,
-}
-
-impl FieldArity {
-    pub fn is_list(&self) -> bool {
-        self == &Self::List
-    }
-
-    pub fn is_required(&self) -> bool {
-        self == &Self::Required
-    }
-
-    pub fn is_optional(&self) -> bool {
-        self == &Self::Optional
-    }
-}
+use crate::{CompositeTypeFieldType, FieldArity};
+use psl_core::parser_database::ReferentialAction;
 
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
@@ -563,15 +538,5 @@ impl WithDatabaseName for CompositeField {
     }
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
-    }
-}
-
-impl From<psl_core::parser_database::ast::FieldArity> for FieldArity {
-    fn from(arity: psl_core::parser_database::ast::FieldArity) -> Self {
-        match arity {
-            schema_ast::ast::FieldArity::Required => FieldArity::Required,
-            schema_ast::ast::FieldArity::Optional => FieldArity::Optional,
-            schema_ast::ast::FieldArity::List => FieldArity::List,
-        }
     }
 }

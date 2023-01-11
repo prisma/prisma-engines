@@ -5,7 +5,7 @@ use crate::{
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, fmt};
 
 /// Detect relation types and construct relation objects to the database.
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
@@ -86,7 +86,7 @@ impl std::ops::Index<RelationId> for Relations {
 
 impl Relations {
     /// Iterate over all relations in the schema.
-    pub(crate) fn iter(&self) -> impl Iterator<Item = RelationId> {
+    pub(crate) fn iter(&self) -> impl ExactSizeIterator<Item = RelationId> + Clone {
         (0..self.relations_storage.len()).map(|idx| RelationId(idx as u32))
     }
 
@@ -417,6 +417,9 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
 pub enum ReferentialAction {
     /// Deletes record if dependent record is deleted. Updates relation scalar
     /// fields if referenced scalar fields of the dependent record are updated.
+    ///
+    /// Prevents operation (both updates and deletes) from succeeding if any
+    /// records are connected.
     Cascade,
     /// Prevents operation (both updates and deletes) from succeeding if any
     /// records are connected. This behavior will always result in a runtime
@@ -427,6 +430,9 @@ pub enum ReferentialAction {
     /// deferred, this makes it possible to temporarily violate integrity in a
     /// transaction while making sure that subsequent operations in the
     /// transaction restore integrity.
+    ///
+    /// When using relationMode = "prisma", NoAction becomes an alias of
+    /// the emulated Restrict (when supported).
     NoAction,
     /// Sets relation scalar fields to null if the relation is deleted or
     /// updated. This will always result in a runtime error if one or more of the
@@ -488,5 +494,23 @@ impl ReferentialAction {
                 None
             }
         }
+    }
+}
+
+impl AsRef<str> for ReferentialAction {
+    fn as_ref(&self) -> &'static str {
+        match self {
+            ReferentialAction::Cascade => "Cascade",
+            ReferentialAction::Restrict => "Restrict",
+            ReferentialAction::NoAction => "NoAction",
+            ReferentialAction::SetNull => "SetNull",
+            ReferentialAction::SetDefault => "SetDefault",
+        }
+    }
+}
+
+impl fmt::Display for ReferentialAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
     }
 }

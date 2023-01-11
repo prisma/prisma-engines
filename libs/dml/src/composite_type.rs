@@ -1,8 +1,8 @@
 //! Composite types defined with the `type` keyword.
 
 use crate::{
-    default_value::DefaultValue, field::FieldArity, native_type_instance::NativeTypeInstance, scalars::ScalarType,
-    Field, FieldType, ScalarField,
+    default_value::DefaultValue, native_type_instance::NativeTypeInstance, scalars::ScalarType, Field, FieldArity,
+    FieldType, ScalarField,
 };
 
 #[derive(Debug, PartialEq, Clone)]

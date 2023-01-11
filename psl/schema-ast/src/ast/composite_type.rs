@@ -44,7 +44,7 @@ impl CompositeType {
         false
     }
 
-    pub fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
+    pub fn iter_fields(&self) -> impl ExactSizeIterator<Item = (FieldId, &Field)> + Clone {
         self.fields
             .iter()
             .enumerate()
