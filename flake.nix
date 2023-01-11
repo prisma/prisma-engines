@@ -20,10 +20,10 @@
   };
 
   outputs = inputs@{ self, nixpkgs, rust-overlay, flake-parts, flake-utils, crane, ... }:
-    flake-parts.lib.mkFlake { inherit self; } {
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = flake-utils.lib.defaultSystems;
       perSystem = { config, system, pkgs, craneLib, ... }: {
-        config._module.args.inputs = inputs;
+        config._module.args.flakeInputs = inputs;
         imports = [
           ./nix/all-engines.nix
           ./nix/args.nix
