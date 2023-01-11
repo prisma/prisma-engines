@@ -5,6 +5,8 @@ use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 
+use quaint::{prelude::Queryable, single::Quaint};
+
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 /// Direct engine runner.
@@ -12,13 +14,19 @@ pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
+    quaint: Quaint,
     current_tx_id: Option<TxId>,
     metrics: MetricRegistry,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for DirectRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+    async fn load(
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        connection_string: &str,
+        metrics: MetricRegistry,
+    ) -> TestResult<Self> {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
@@ -26,11 +34,14 @@ impl RunnerInterface for DirectRunner {
         let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
+        dbg!(&connection_string);
+        let quaint = Quaint::new(connection_string).await.unwrap();
 
         Ok(Self {
             executor,
             query_schema,
             connector_tag,
+            quaint,
             current_tx_id: None,
             metrics,
         })
@@ -43,6 +54,10 @@ impl RunnerInterface for DirectRunner {
         let query = GraphQlBody::Single(query.into());
 
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
+    }
+
+    async fn raw_execute(&self, query: String) -> TestResult<()> {
+        self.quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
     }
 
     async fn batch(

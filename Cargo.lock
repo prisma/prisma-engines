@@ -3416,6 +3416,7 @@ dependencies = [
  "prisma-models",
  "psl",
  "qe-setup",
+ "quaint",
  "query-core",
  "query-engine",
  "query-engine-metrics",

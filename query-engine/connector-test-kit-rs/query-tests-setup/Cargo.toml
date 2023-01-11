@@ -37,3 +37,19 @@ query-engine-metrics = {path = "../../metrics"}
 # as this is a small crate with little user base.
 parse-hyperlinks = "0.23.3"
 strip-ansi-escapes = "0.1.1"
+
+[dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+features = [
+  "bigdecimal",
+  "chrono",
+  "expose-drivers",
+  "fmt-sql",
+  "json",
+  "mssql",
+  "mysql",
+  "pooled",
+  "postgresql",
+  "sqlite",
+  "uuid",
+]

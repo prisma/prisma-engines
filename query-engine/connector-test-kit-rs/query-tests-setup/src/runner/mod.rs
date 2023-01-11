@@ -16,7 +16,12 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
     /// Initializes the runner.
-    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
+    async fn load(
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        connection_string: &str,
+        metrics: MetricRegistry,
+    ) -> TestResult<Self>;
 
     /// Queries the engine.
     async fn query(&self, query: String) -> TestResult<QueryResult>;
@@ -28,6 +33,9 @@ pub trait RunnerInterface: Sized {
         transaction: bool,
         isolation_level: Option<String>,
     ) -> TestResult<QueryResult>;
+
+    /// Execute a raw query on the underlying connected database.
+    async fn raw_execute(&self, query: String) -> TestResult<()>;
 
     /// start a transaction for a batch run
     async fn start_tx(
@@ -79,13 +87,14 @@ impl Runner {
         ident: &str,
         datamodel: String,
         connector_tag: ConnectorTag,
+        connection_string: &str,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let inner = match ident {
-            "direct" => Self::direct(datamodel, connector_tag, metrics).await,
+            "direct" => Self::direct(datamodel, connector_tag, connection_string, metrics).await,
             "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
+            "binary" => Self::binary(datamodel, connector_tag, connection_string, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }?;
 
@@ -112,6 +121,20 @@ impl Runner {
         }
 
         Ok(response)
+    }
+
+    pub async fn raw_execute<T>(&self, sql: T) -> TestResult<()>
+    where
+        T: Into<String>,
+    {
+        let sql = sql.into();
+        tracing::debug!("Raw execute: {}", sql.clone().green());
+
+        match &self.inner {
+            RunnerType::Direct(r) => r.raw_execute(sql).await,
+            RunnerType::Binary(r) => r.raw_execute(sql).await,
+            RunnerType::NodeApi(_) => todo!(),
+        }
     }
 
     pub async fn start_tx(
@@ -162,14 +185,24 @@ impl Runner {
         }
     }
 
-    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
+    async fn direct(
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        connection_string: &str,
+        metrics: MetricRegistry,
+    ) -> TestResult<RunnerType> {
+        let runner = DirectRunner::load(datamodel, connector_tag, connection_string, metrics).await?;
 
         Ok(RunnerType::Direct(runner))
     }
 
-    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
+    async fn binary(
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        connection_string: &str,
+        metrics: MetricRegistry,
+    ) -> TestResult<RunnerType> {
+        let runner = BinaryRunner::load(datamodel, connector_tag, connection_string, metrics).await?;
 
         Ok(RunnerType::Binary(runner))
     }

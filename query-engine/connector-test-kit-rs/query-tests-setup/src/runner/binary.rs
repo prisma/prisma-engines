@@ -1,26 +1,36 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
-use hyper::{Body, Method, Request, Response};
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
+use hyper::{Body, Method, Request, Response};
+use quaint::{prelude::Queryable, single::Quaint};
+
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
     state: State,
+    quaint: Quaint,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
-    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
+    async fn load(
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        connection_string: &str,
+        metrics: MetricRegistry,
+    ) -> TestResult<Self> {
         let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
         let state = setup(&opts, metrics).await.unwrap();
+        let quaint = Quaint::new(connection_string).await.unwrap();
 
         Ok(BinaryRunner {
             state,
             connector_tag,
+            quaint,
             current_tx_id: None,
         })
     }
@@ -44,6 +54,10 @@ impl RunnerInterface for BinaryRunner {
         let gql_response = json_to_gql_response(&json_resp);
 
         Ok(PrismaResponse::Single(gql_response).into())
+    }
+
+    async fn raw_execute(&self, query: String) -> TestResult<()> {
+        self.quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
     }
 
     async fn batch(
