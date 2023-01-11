@@ -125,7 +125,7 @@ mod views {
     }
 
     async fn migrate_view(runner: &Runner) -> TestResult<()> {
-        let sql = migrate_view_sql(runner);
+        let sql = migrate_view_sql(runner).await;
 
         runner.raw_execute(sql).await?;
 
@@ -133,7 +133,7 @@ mod views {
     }
 
     // schema name must be the name of the test in which it's called.
-    fn migrate_view_sql(runner: &Runner) -> String {
+    async fn migrate_view_sql(runner: &Runner) -> String {
         match runner.connector() {
             ConnectorTag::Postgres(_)
             | ConnectorTag::Cockroach(_)
@@ -148,7 +148,7 @@ mod views {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#.to_owned()
             }
             ConnectorTag::SqlServer(_) => {
-              let schema_name = runner.schema_name();
+              let schema_name = runner.schema_name().await;
 
               format!(r#"CREATE VIEW [{schema_name}].[TestView] AS SELECT [{schema_name}].[TestModel].[id], [{schema_name}].[TestModel].[firstName], [{schema_name}].[TestModel].[lastName], CONCAT([{schema_name}].[TestModel].[firstName], ' ', [{schema_name}].[TestModel].[lastName]) as "fullName" FROM [{schema_name}].[TestModel];"#)
             },

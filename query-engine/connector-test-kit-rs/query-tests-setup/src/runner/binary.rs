@@ -8,12 +8,28 @@ use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, Mul
 use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
 use std::env;
+use tokio::sync::OnceCell;
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
     state: State,
-    quaint: Option<Quaint>,
+    quaint: OnceCell<Quaint>,
+    connection_url: String,
+}
+
+impl BinaryRunner {
+    // Avoid fetching a new database connection unless needed.
+    async fn quaint(&self) -> &Quaint {
+        if matches!(&self.connector_tag, ConnectorTag::MongoDb(_)) {
+            unimplemented!("quaint cannot be instantiated when the active connector is MongoDb");
+        }
+
+        self.quaint
+            .get_or_try_init(|| Quaint::new(&self.connection_url))
+            .await
+            .unwrap()
+    }
 }
 
 #[async_trait::async_trait]
@@ -26,15 +42,11 @@ impl RunnerInterface for BinaryRunner {
         let data_source = configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
-        let quaint = match connector_tag {
-            ConnectorTag::MongoDb(_) => None,
-            _ => Some(Quaint::new(&url).await.unwrap()),
-        };
-
         Ok(BinaryRunner {
             state,
             connector_tag,
-            quaint,
+            quaint: OnceCell::default(),
+            connection_url: url,
             current_tx_id: None,
         })
     }
@@ -61,14 +73,11 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        if let Some(quaint) = &self.quaint {
-            quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
-        } else {
-            unimplemented!(
-                "raw_execute is currently not supported for {}",
-                self.connector().to_string()
-            )
-        }
+        self.quaint()
+            .await
+            .raw_cmd(&query)
+            .await
+            .map_err(crate::TestError::RawExecute)
     }
 
     async fn batch(
@@ -214,15 +223,8 @@ impl RunnerInterface for BinaryRunner {
         self.state.query_schema()
     }
 
-    fn schema_name(&self) -> &str {
-        if let Some(quaint) = &self.quaint {
-            quaint.connection_info().schema_name()
-        } else {
-            unimplemented!(
-                "schema_name is currently not supported for the active connector: {}.",
-                self.connector().to_string()
-            )
-        }
+    async fn schema_name(&self) -> &str {
+        self.quaint().await.connection_info().schema_name()
     }
 }
 
