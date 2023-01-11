@@ -8,7 +8,6 @@ use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 use schema::QuerySchemaRef;
-use tokio_retry::strategy;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
