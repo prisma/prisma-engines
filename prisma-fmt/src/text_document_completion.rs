@@ -34,18 +34,8 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
     let (connector, namespaces) = configs
         .as_ref()
         .and_then(|conf| conf.datasources.first())
-        .map(|datasource| {
-            (
-                datasource.active_connector,
-                datasource.namespaces.clone(),
-            )
-        })
-        .unwrap_or_else(|| {
-            (
-                &psl::datamodel_connector::EmptyDatamodelConnector,
-                Default::default(),
-            )
-        });
+        .map(|datasource| (datasource.active_connector, datasource.namespaces.clone()))
+        .unwrap_or_else(|| (&psl::datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
     let preview_features: PreviewFeatures = configs
         .as_ref()
@@ -138,22 +128,19 @@ fn format_insert_string(add_quotes: bool, text: &str) -> String {
 
 fn add_quotes(params: &CompletionParams, schema: &str) -> bool {
     if let Some(ctx) = &params.context {
-        !(
-            ctx.trigger_kind == CompletionTriggerKind::TRIGGER_CHARACTER
-            && matches!(&ctx.trigger_character, Some(c) if c == "\"")
-        )
-        && is_inside_quote(params, schema)
+        !(is_inside_quote(&params.text_document_position.position, schema)
+            || matches!(ctx.trigger_character.as_deref(), Some("\"")))
     } else {
-        true
+        false
     }
 }
 
-fn is_inside_quote(params: &CompletionParams, schema: &str) -> bool {
-    match position_to_offset(&params.text_document_position.position, schema) {
+fn is_inside_quote(position: &lsp_types::Position, schema: &str) -> bool {
+    match position_to_offset(position, schema) {
         Some(pos) => {
             for i in (0..pos).rev() {
                 if schema.is_char_boundary(i) {
-                    match schema[i - 1..].chars().next() {
+                    match schema[(i + 1)..].chars().next() {
                         Some('"') => return true,
                         _ => return false,
                     }
