@@ -1,5 +1,25 @@
 use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
+/// An opaque identifier for a value in an AST enum. Use the
+/// `r#enum[enum_value_id]` syntax to resolve the id to an `ast::EnumValue`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct EnumValueId(pub(super) u32);
+
+impl EnumValueId {
+    /// Used for range bounds when iterating over BTreeMaps.
+    pub const MIN: EnumValueId = EnumValueId(0);
+    /// Used for range bounds when iterating over BTreeMaps.
+    pub const MAX: EnumValueId = EnumValueId(u32::MAX);
+}
+
+impl std::ops::Index<EnumValueId> for Enum {
+    type Output = EnumValue;
+
+    fn index(&self, index: EnumValueId) -> &Self::Output {
+        &self.values[index.0 as usize]
+    }
+}
+
 /// An enum declaration. Enumeration can either be in the database schema, or completely a Prisma level concept.
 ///
 /// PostgreSQL stores enums in a schema, while in MySQL the information is in
@@ -50,6 +70,15 @@ pub struct Enum {
     pub(crate) documentation: Option<Comment>,
     /// The location of this enum in the text representation.
     pub span: Span,
+}
+
+impl Enum {
+    pub fn iter_values(&self) -> impl ExactSizeIterator<Item = (EnumValueId, &EnumValue)> {
+        self.values
+            .iter()
+            .enumerate()
+            .map(|(idx, field)| (EnumValueId(idx as u32), field))
+    }
 }
 
 impl WithIdentifier for Enum {
