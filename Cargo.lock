@@ -2955,6 +2955,7 @@ name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
  "dissimilar",
+ "enumflags2",
  "expect-test",
  "indoc",
  "log",
@@ -3367,6 +3368,7 @@ dependencies = [
  "base64 0.13.1",
  "chrono",
  "colored",
+ "futures",
  "indoc",
  "insta",
  "once_cell",

@@ -9,10 +9,12 @@ use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 #[derive(Debug, Error)]
 #[error("{}", kind)]
 pub struct ConnectorError {
-    /// An optional error already rendered for users in case the migration core does not handle it.
+    /// An optional error already rendered for users.
     pub user_facing_error: Option<KnownError>,
     /// The error information for internal use.
     pub kind: ErrorKind,
+    /// Whether an error is transient and should be retried.
+    pub transient: bool,
 }
 
 impl ConnectorError {
@@ -97,8 +99,20 @@ impl ConnectorError {
             ErrorKind::TransactionWriteConflict => Some(KnownError::new(
                 user_facing_errors::query_engine::TransactionWriteConflict {},
             )),
+            ErrorKind::TransactionAlreadyClosed { message } => {
+                Some(KnownError::new(user_facing_errors::common::TransactionAlreadyClosed {
+                    message: message.clone(),
+                }))
+            }
+            ErrorKind::ConnectionClosed => Some(KnownError::new(user_facing_errors::common::ConnectionClosed)),
             ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
                 user_facing_errors::query_engine::MongoReplicaSetRequired {},
+            )),
+            ErrorKind::RawDatabaseError { code, message } => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::RawQueryFailed {
+                    code: code.clone(),
+                    message: message.clone(),
+                },
             )),
             _ => None,
         };
@@ -106,7 +120,16 @@ impl ConnectorError {
         ConnectorError {
             user_facing_error,
             kind,
+            transient: false,
         }
+    }
+
+    pub fn set_transient(&mut self, transient: bool) {
+        self.transient = transient;
+    }
+
+    pub fn is_transient(&self) -> bool {
+        self.transient
     }
 }
 
