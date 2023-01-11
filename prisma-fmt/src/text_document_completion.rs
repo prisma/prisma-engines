@@ -108,7 +108,6 @@ fn push_ast_completions(
                         label: String::from(&namespace),
                         insert_text: Some(format_insert_string(add_quotes, &namespace)),
                         kind: Some(CompletionItemKind::PROPERTY),
-                        documentation: Some(Documentation::String("documentation".to_owned())),
                         ..Default::default()
                     })
                 }
