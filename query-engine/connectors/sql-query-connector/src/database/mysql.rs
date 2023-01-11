@@ -71,4 +71,8 @@ impl Connector for Mysql {
     fn name(&self) -> &'static str {
         "mysql"
     }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
+    }
 }

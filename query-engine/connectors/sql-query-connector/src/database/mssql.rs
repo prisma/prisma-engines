@@ -72,4 +72,8 @@ impl Connector for Mssql {
     fn name(&self) -> &'static str {
         "mssql"
     }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
+    }
 }
