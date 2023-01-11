@@ -175,6 +175,7 @@ async fn execute_self_contained_without_retry(
 // As suggested by the MongoDB documentation
 // https://github.com/mongodb/specifications/blob/master/source/transactions-convenient-api/transactions-convenient-api.rst#pseudo-code
 const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(12);
+const TX_RETRY_BACKOFF: Duration = Duration::from_millis(5);
 
 // MongoDB-specific transient transaction error retry logic.
 // Hack: This should ideally live in MongoDb's connector but our current architecture doesn't allow us to easily do that.
@@ -195,19 +196,12 @@ async fn execute_self_contained_with_retry(
             return res;
         }
 
-        // backoff strategy: 0ms, 4ms, 8ms, 16ms, 32ms, 64ms, 128ms, 256ms, 512ms, 512ms, ...
-        let mut backoff = std::iter::once(Duration::from_secs(0)).chain(
-            strategy::ExponentialBackoff::from_millis(2)
-                .max_delay(Duration::from_millis(512))
-                .factor(2),
-        );
-
         loop {
             let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
             let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
 
             if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
-                tokio::time::sleep(backoff.next().unwrap()).await;
+                tokio::time::sleep(TX_RETRY_BACKOFF).await;
                 continue;
             } else {
                 return res;
