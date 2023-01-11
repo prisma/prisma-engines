@@ -1,9 +1,9 @@
-{ craneLib, pkgs, inputs, ... }:
+{ craneLib, pkgs, flakeInputs, ... }:
 
 let
   srcPath = builtins.path { path = ../.; name = "prisma-engines-workspace-root-path"; };
   src = pkgs.lib.cleanSourceWith { filter = enginesSourceFilter; src = srcPath; };
-  craneLib = inputs.crane.mkLib pkgs;
+  craneLib = flakeInputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
   libSuffix = if pkgs.stdenv.isDarwin then "dylib" else "so";
 
