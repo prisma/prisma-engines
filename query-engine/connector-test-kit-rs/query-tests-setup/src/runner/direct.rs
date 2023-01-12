@@ -52,8 +52,11 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        let conn = Quaint::new(&self.connection_url).await?;
+        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
+            panic!("raw_execute is not supported for MongoDB yet");
+        }
 
+        let conn = Quaint::new(&self.connection_url).await?;
         conn.raw_cmd(&query).await?;
 
         Ok(())
