@@ -1,3 +1,4 @@
+use std::sync::atomic::Ordering;
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
@@ -16,7 +17,9 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, _: bool, _: Option<&'static str>) -> String {
+    fn connection_string(&self, _database: &str, is_ci: bool, _: bool, _: Option<&'static str>) -> String {
+        static DB_NAMES: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+        let database = format!("test_{}", DB_NAMES.fetch_add(1, Ordering::Relaxed));
         match self.version {
             Some(PostgresVersion::V9) if is_ci => {
                 format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{}", database)
