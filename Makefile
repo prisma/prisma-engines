@@ -3,6 +3,13 @@ CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 
+LIBRARY_EXT := $(shell                            \
+    case "$$(uname -s)" in                        \
+        (Darwin)               echo "dylib" ;;    \
+        (MINGW*|MSYS*|CYGWIN*) echo "dll"   ;;    \
+        (*)                    echo "so"    ;;    \
+    esac)
+
 default: build
 
 ##################
@@ -241,3 +248,13 @@ show-metrics:
 ## OpenTelemetry
 otel:
 	docker compose up --remove-orphans -d otel
+
+# Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
+.PHONY: qe-node-api
+qe-node-api: build target/debug/libquery_engine.node
+
+%.node: %.$(LIBRARY_EXT)
+# Remove the file first to work around a macOS bug: https://openradar.appspot.com/FB8914243
+# otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
+	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
+	cp $< $@
