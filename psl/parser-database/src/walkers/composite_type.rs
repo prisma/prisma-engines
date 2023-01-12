@@ -39,7 +39,7 @@ impl<'db> CompositeTypeWalker<'db> {
     }
 
     /// Iterator over all the fields of the composite type.
-    pub fn fields(self) -> impl Iterator<Item = CompositeTypeFieldWalker<'db>> {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = CompositeTypeFieldWalker<'db>> + Clone {
         self.ast_composite_type()
             .iter_fields()
             .map(move |(id, _)| self.walk((self.id, id)))
@@ -142,7 +142,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
-    pub(crate) fn database_name(self) -> &'db str {
+    pub fn database_name(self) -> &'db str {
         self.field()
             .mapped_name
             .map(|id| &self.db[id])

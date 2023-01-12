@@ -3,7 +3,7 @@ mod cycle_detection;
 use crate::common::*;
 use psl::{
     datamodel_connector::RelationMode,
-    dml::ReferentialAction::{self, *},
+    parser_database::ReferentialAction::{self, *},
 };
 
 #[test]

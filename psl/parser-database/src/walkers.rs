@@ -50,6 +50,15 @@ where
 }
 
 impl crate::ParserDatabase {
+    /// Find an enum by name.
+    pub fn find_enum<'db>(&'db self, name: &str) -> Option<EnumWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|top_id| top_id.as_enum_id())
+            .map(|enum_id| self.walk(enum_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }
@@ -107,7 +116,7 @@ impl crate::ParserDatabase {
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
-    pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'_>> + '_ {
+    pub fn walk_relations(&self) -> impl ExactSizeIterator<Item = RelationWalker<'_>> + Clone + '_ {
         self.relations.iter().map(move |relation_id| Walker {
             db: self,
             id: relation_id,

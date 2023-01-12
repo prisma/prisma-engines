@@ -69,7 +69,7 @@ pub struct ParserDatabase {
     ast: ast::SchemaAst,
     file: schema_ast::SourceFile,
     interner: interner::StringInterner,
-    _names: Names,
+    names: Names,
     types: Types,
     relations: Relations,
 }
@@ -94,7 +94,7 @@ impl ParserDatabase {
                 ast,
                 file,
                 interner,
-                _names: names,
+                names,
                 types,
                 relations,
             };
@@ -109,7 +109,7 @@ impl ParserDatabase {
                 ast,
                 file,
                 interner,
-                _names: names,
+                names,
                 types,
                 relations,
             };
@@ -127,7 +127,7 @@ impl ParserDatabase {
             ast,
             file,
             interner,
-            _names: names,
+            names,
             types,
             relations,
         }

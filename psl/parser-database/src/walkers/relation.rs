@@ -13,6 +13,12 @@ use crate::{ast, relations::*, walkers::*};
 pub type RelationWalker<'db> = Walker<'db, RelationId>;
 
 impl<'db> RelationWalker<'db> {
+    /// Is this a relation where both ends are the same model?
+    pub fn is_self_relation(self) -> bool {
+        let r = self.get();
+        r.model_a == r.model_b
+    }
+
     /// Converts the walker to either an implicit many to many, or a inline relation walker
     /// gathering 1:1 and 1:n relations.
     pub fn refine(self) -> RefinedRelationWalker<'db> {

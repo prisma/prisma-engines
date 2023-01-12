@@ -36,6 +36,26 @@ impl<'db> ScalarFieldWalker<'db> {
         &self.db.ast[self.model_id][self.field_id]
     }
 
+    /// Is this field unique? This method will return true if:
+    ///
+    /// - The field has an `@id` or `@unique` attribute.
+    /// - There is an `@@id` or `@@unique` on the model that contains __only__ this field.
+    pub fn is_unique(self) -> bool {
+        let model = self.model();
+
+        if let Some(true) = model
+            .primary_key()
+            .map(|pk| pk.contains_exactly_fields_by_id(&[self.field_id]))
+        {
+            return true;
+        }
+
+        self.model().indexes().any(|idx| {
+            let mut fields = idx.fields();
+            idx.is_unique() && fields.len() == 1 && fields.next().map(|f| f.field_id()) == Some(self.field_id)
+        })
+    }
+
     /// The name of the field.
     pub fn name(self) -> &'db str {
         self.ast_field().name()
