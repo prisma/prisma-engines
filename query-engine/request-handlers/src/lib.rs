@@ -4,14 +4,12 @@ pub mod dmmf;
 
 mod error;
 mod graphql;
-mod transactions;
 
 #[cfg(test)]
 mod tests;
 
 pub use error::HandlerError;
 pub use graphql::*;
-pub use transactions::*;
 
 pub type Result<T> = std::result::Result<T, HandlerError>;
 

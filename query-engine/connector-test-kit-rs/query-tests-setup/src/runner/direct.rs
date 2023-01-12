@@ -1,6 +1,6 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use colored::Colorize;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TxId};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
@@ -82,15 +82,9 @@ impl RunnerInterface for DirectRunner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
-        let id = self
-            .executor
-            .start_tx(
-                self.query_schema.clone(),
-                max_acquisition_millis,
-                valid_for_millis,
-                isolation_level,
-            )
-            .await?;
+        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+
+        let id = self.executor.start_tx(self.query_schema.clone(), &tx_opts).await?;
         Ok(id)
     }
 

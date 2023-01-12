@@ -1,4 +1,4 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
 use psl::PreviewFeature;
 use query_core::{
@@ -7,7 +7,7 @@ use query_core::{
     schema_builder, telemetry, QueryExecutor, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -334,15 +334,10 @@ impl QueryEngine {
                 let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
                 telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-                let input: TxInput = serde_json::from_str(&input)?;
+                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine
                     .executor()
-                    .start_tx(
-                        engine.query_schema().clone(),
-                        input.max_wait,
-                        input.timeout,
-                        input.isolation_level,
-                    )
+                    .start_tx(engine.query_schema().clone(), &tx_opts)
                     .instrument(span)
                     .await
                 {

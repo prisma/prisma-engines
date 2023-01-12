@@ -1,7 +1,7 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
     BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
-    TransactionError, TransactionManager, TxId,
+    TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
 use async_trait::async_trait;
@@ -143,15 +143,13 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(
-        &self,
-        query_schema: QuerySchemaRef,
-        max_acquisition_millis: u64,
-        valid_for_millis: u64,
-        isolation_level: Option<String>,
-    ) -> crate::Result<TxId> {
+    async fn start_tx(&self, query_schema: QuerySchemaRef, tx_opts: &TransactionOptions) -> crate::Result<TxId> {
         super::with_request_now(async move {
-            let id = TxId::default();
+            let id = if let Some(id_str) = tx_opts.predefined_id.clone() {
+                id_str.into()
+            } else {
+                TxId::default()
+            };
             trace!("[{}] Starting...", id);
             let conn_span = info_span!(
                 "prisma:engine:connection",
@@ -159,21 +157,21 @@ where
                 "db.type" = self.connector.name()
             );
             let conn = time::timeout(
-                Duration::from_millis(max_acquisition_millis),
+                Duration::from_millis(tx_opts.max_acquisition_millis),
                 self.connector.get_connection(),
             )
             .instrument(conn_span)
             .await;
 
             let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-            let c_tx = OpenTx::start(conn, isolation_level).await?;
+            let c_tx = OpenTx::start(conn, tx_opts.isolation_level.clone()).await?;
 
             self.itx_manager
                 .create_tx(
                     query_schema.clone(),
                     id.clone(),
                     c_tx,
-                    Duration::from_millis(valid_for_millis),
+                    Duration::from_millis(tx_opts.valid_for_millis),
                 )
                 .await;
 

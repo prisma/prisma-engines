@@ -1,7 +1,7 @@
 use super::models::TraceSpan;
 use once_cell::sync::Lazy;
 use opentelemetry::sdk::export::trace::SpanData;
-use opentelemetry::trace::{TraceContextExt, TraceId};
+use opentelemetry::trace::{SpanContext, SpanId, TraceContextExt, TraceFlags, TraceId, TraceState};
 use opentelemetry::Context;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -30,6 +30,9 @@ pub fn spans_to_json(spans: Vec<SpanData>) -> String {
 // set the parent context and return the traceparent
 pub fn set_parent_context_from_json_str(span: &Span, trace: &str) -> Option<String> {
     let trace: HashMap<String, String> = serde_json::from_str(trace).unwrap_or_default();
+    // TODO: miguelff investigate this, I think this is wrong, a traceparent is more than a traceid
+    // but this code asumes, a traceid is the string representation of a traceparent, and that's used
+    // in the node api
     let trace_id = trace.get("traceparent").map(String::from);
     let cx = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
     span.set_parent(cx);
@@ -38,10 +41,18 @@ pub fn set_parent_context_from_json_str(span: &Span, trace: &str) -> Option<Stri
 
 pub fn set_span_link_from_trace_id(span: &Span, trace_id: Option<String>) {
     if let Some(trace_id) = trace_id {
-        let trace: HashMap<String, String> = HashMap::from([("traceparent".to_string(), trace_id)]);
-        let cx = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-        let context_span = cx.span();
-        span.add_link(context_span.span_context().clone());
+        // TODO: miguelff. Investigate how the previous (wrong implementation) was silently broken
+        // this is a hack to get a link to the trace_id of an operation. Before this hack, this was
+        // wrong, links were not properly because it was trying to create a link assuming the traceparent
+        // was a traceid, thus leading to a wrong context.
+        let sc = SpanContext::new(
+            TraceId::from_hex(&trace_id).unwrap_or(TraceId::INVALID),
+            SpanId::from_hex("1").unwrap_or(SpanId::INVALID),
+            TraceFlags::default(),
+            false,
+            TraceState::default(),
+        );
+        span.add_link(sc);
     }
 }
 

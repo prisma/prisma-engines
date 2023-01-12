@@ -5,10 +5,10 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::trace::{SpanId, TraceContextExt, TraceId};
 use opentelemetry::{global, propagation::Extractor, Context};
-use query_core::telemetry;
 use query_core::{schema::QuerySchemaRenderer, TxId};
+use query_core::{telemetry, TransactionOptions};
 use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -277,22 +277,20 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let tx_id = tx_opts.with_predefined_transaction_id();
 
     let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
     if let Some(context) = cx {
         span.set_parent(context);
+    } else {
+        span.set_parent(tx_id.into());
     }
 
     match state
         .cx
         .executor
-        .start_tx(
-            state.cx.query_schema().clone(),
-            input.max_wait,
-            input.timeout,
-            input.isolation_level,
-        )
+        .start_tx(state.cx.query_schema().clone(), &tx_opts)
         .instrument(span)
         .await
     {
@@ -406,6 +404,8 @@ pub(crate) fn process_gql_req_headers(
     let cx = get_parent_span_context(req);
     if let Some(context) = cx {
         span.set_parent(context);
+    } else if let Some(tx_id) = tx_id.clone() {
+        span.set_parent(tx_id.into());
     }
 
     let context = span.context();
@@ -417,12 +417,13 @@ pub(crate) fn process_gql_req_headers(
     (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
-pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry::capturing::Capturer {
-    let settings = if let Some(h) = header {
-        h.to_str().unwrap_or("")
-    } else {
-        ""
-    };
+pub fn create_capture_config(_header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry::capturing::Capturer {
+    // let mut settings = if let Some(h) = header {
+    //     h.to_str().unwrap_or("")
+    // } else {
+    //     ""
+    // };
 
+    let settings = "query,info,tracing";
     telemetry::capturing::capturer(trace_id, settings)
 }

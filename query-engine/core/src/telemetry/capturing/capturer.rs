@@ -329,8 +329,8 @@ impl SyncedSpanProcessor {
 }
 
 impl SpanProcessor for SyncedSpanProcessor {
-    fn on_start(&self, span: &mut Span, cx: &opentelemetry::Context) {
-        self.0.lock().unwrap().on_start(span, cx)
+    fn on_start(&self, _: &mut Span, _: &opentelemetry::Context) {
+        // no-op
     }
 
     fn on_end(&self, span: SpanData) {

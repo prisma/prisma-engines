@@ -14,6 +14,7 @@ mod pipeline;
 
 pub use execute_operation::*;
 pub use loader::*;
+use serde::Deserialize;
 
 use crate::{
     query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, BatchDocumentTransaction, TxId,
@@ -53,20 +54,54 @@ pub trait QueryExecutor: TransactionManager {
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
 }
 
+#[derive(Debug, Deserialize)]
+pub struct TransactionOptions {
+    /// Maximum wait time for tx acquisition in milliseconds.
+    #[serde(rename(deserialize = "max_wait"))]
+    pub max_acquisition_millis: u64,
+
+    /// Time in milliseconds after which the transaction rolls back automatically.
+    #[serde(rename(deserialize = "timeout"))]
+    pub valid_for_millis: u64,
+
+    /// Isolation level to use for the transaction.
+    pub isolation_level: Option<String>,
+
+    /// An optional pre-defined transaction id. Some value might be provided in case we want a specific
+    /// id for the transaction. This is useful for clients of the transaction manager to be able to
+    /// capture telemetry data for the transaction. A synthetic "traceparent" is created for the whole
+    /// transaction, and derived consistenly derived from the predefined_id, in case no traceparent is
+    /// provided via headers
+    #[serde(default)]
+    pub predefined_id: Option<String>,
+}
+
+impl TransactionOptions {
+    pub fn new(max_acquisition_millis: u64, valid_for_millis: u64, isolation_level: Option<String>) -> Self {
+        Self {
+            max_acquisition_millis,
+            valid_for_millis,
+            isolation_level,
+            predefined_id: None,
+        }
+    }
+
+    /// Generates a new transaction id before the transaction is started and returns a modified version
+    /// of self with the new predefined_id set.
+    pub fn with_predefined_transaction_id(&mut self) -> TxId {
+        let tx_id: TxId = Default::default();
+        self.predefined_id = Some(tx_id.to_string());
+        tx_id
+    }
+}
 #[async_trait]
 pub trait TransactionManager {
     /// Starts a new transaction.
     /// Returns ID of newly opened transaction.
-    /// Expected to throw an error if no transaction could be opened for `max_acquisition_millis` milliseconds.
-    /// The new transaction must only live for `valid_for_millis` milliseconds before it automatically rolls back.
+    /// Expected to throw an error if no transaction could be opened for `opts.max_acquisition_millis` milliseconds.
+    /// The new transaction must only live for `opts.valid_for_millis` milliseconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    async fn start_tx(
-        &self,
-        query_schema: QuerySchemaRef,
-        max_acquisition_millis: u64,
-        valid_for_millis: u64,
-        isolation_level: Option<String>,
-    ) -> crate::Result<TxId>;
+    async fn start_tx(&self, query_schema: QuerySchemaRef, opts: &TransactionOptions) -> crate::Result<TxId>;
 
     /// Commits a transaction.
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;
