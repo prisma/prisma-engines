@@ -133,7 +133,7 @@ impl Datasource {
                     To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
 
                     More information about Data Proxy: https://pris.ly/d/data-proxy
-                "};
+                ", err_str=err_str};
 
                 Cow::from(s)
             } else {

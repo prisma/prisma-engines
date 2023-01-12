@@ -186,7 +186,12 @@ pub fn schema_with_relation(
 
                                     @@unique([c_1, c_2])
                                 }}
-                            "};
+                            ", 
+                                    parent_field=parent_field,
+                                    parent_id=parent_id,
+                                    child_field=child_field,
+                                    child_id=child_id
+                            };
 
                             let mut required_capabilities_for_dm = vec![];
 
