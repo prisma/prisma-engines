@@ -1,6 +1,8 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(MongoDb))]
+// https://stackoverflow.com/questions/4380813/how-to-get-rid-of-mysql-error-prepared-statement-needs-to-be-re-prepared
+// Looks like there's a bug with create view stmt on MariaDB
+#[test_suite(schema(schema), exclude(MongoDb, MySql("mariadb")))]
 mod views {
     use query_engine_tests::{connector_test, run_query, Runner};
 
