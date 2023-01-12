@@ -4,7 +4,6 @@ use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
-use tokio::sync::OnceCell;
 
 use quaint::{prelude::Queryable, single::Quaint};
 
@@ -15,24 +14,10 @@ pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
-    quaint: OnceCell<Quaint>,
     connection_url: String,
+    schema_name: String,
     current_tx_id: Option<TxId>,
     metrics: MetricRegistry,
-}
-
-impl DirectRunner {
-    // Avoid fetching a new database connection unless needed.
-    async fn quaint(&self) -> &Quaint {
-        if matches!(&self.connector_tag, ConnectorTag::MongoDb(_)) {
-            unimplemented!("quaint cannot be instantiated when the active connector is MongoDb");
-        }
-
-        self.quaint
-            .get_or_try_init(|| Quaint::new(&self.connection_url))
-            .await
-            .unwrap()
-    }
 }
 
 #[async_trait::async_trait]
@@ -42,7 +27,7 @@ impl RunnerInterface for DirectRunner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
-        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
+        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name.clone());
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
 
@@ -50,10 +35,10 @@ impl RunnerInterface for DirectRunner {
             executor,
             query_schema,
             connector_tag,
-            quaint: OnceCell::default(),
             connection_url: url,
             current_tx_id: None,
             metrics,
+            schema_name: db_name,
         })
     }
 
@@ -67,9 +52,11 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        let quaint = Quaint::new(&self.connection_url).await.unwrap();
+        let conn = Quaint::new(&self.connection_url).await?;
 
-        quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
     }
 
     async fn batch(
@@ -147,6 +134,6 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn schema_name(&self) -> &str {
-        self.quaint().await.connection_info().schema_name()
+        &self.schema_name
     }
 }

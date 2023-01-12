@@ -49,3 +49,9 @@ impl From<VarError> for TestError {
         Self::ConfigError(err.to_string())
     }
 }
+
+impl From<QuaintError> for TestError {
+    fn from(err: QuaintError) -> Self {
+        Self::RawExecute(err)
+    }
+}

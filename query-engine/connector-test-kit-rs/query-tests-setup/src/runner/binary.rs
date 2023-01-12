@@ -1,4 +1,5 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
+use query_core::db_name;
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
@@ -8,28 +9,13 @@ use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, Mul
 use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
 use std::env;
-use tokio::sync::OnceCell;
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
     state: State,
-    quaint: OnceCell<Quaint>,
     connection_url: String,
-}
-
-impl BinaryRunner {
-    // Avoid fetching a new database connection unless needed.
-    async fn quaint(&self) -> &Quaint {
-        if matches!(&self.connector_tag, ConnectorTag::MongoDb(_)) {
-            unimplemented!("quaint cannot be instantiated when the active connector is MongoDb");
-        }
-
-        self.quaint
-            .get_or_try_init(|| Quaint::new(&self.connection_url))
-            .await
-            .unwrap()
-    }
+    schema_name: String,
 }
 
 #[async_trait::async_trait]
@@ -40,13 +26,14 @@ impl RunnerInterface for BinaryRunner {
 
         let configuration = opts.configuration(true).unwrap();
         let data_source = configuration.datasources.first().unwrap();
-        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let connection_url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let schema_name = db_name(data_source, &connection_url)?;
 
         Ok(BinaryRunner {
             state,
             connector_tag,
-            quaint: OnceCell::default(),
-            connection_url: url,
+            connection_url,
+            schema_name,
             current_tx_id: None,
         })
     }
@@ -73,11 +60,11 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        self.quaint()
-            .await
-            .raw_cmd(&query)
-            .await
-            .map_err(crate::TestError::RawExecute)
+        let conn = Quaint::new(&self.connection_url).await?;
+
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
     }
 
     async fn batch(
@@ -224,7 +211,7 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn schema_name(&self) -> &str {
-        self.quaint().await.connection_info().schema_name()
+        &self.schema_name
     }
 }
 
