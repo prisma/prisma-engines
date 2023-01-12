@@ -1,6 +1,6 @@
-use std::sync::atomic::Ordering;
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
+use std::sync::atomic::Ordering;
 
 #[derive(Debug, Default, Clone)]
 pub struct PostgresConnectorTag {
