@@ -67,11 +67,9 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
-        self.quaint()
-            .await
-            .raw_cmd(&query)
-            .await
-            .map_err(crate::TestError::RawExecute)
+        let quaint = Quaint::new(&self.connection_url).await.unwrap();
+
+        quaint.raw_cmd(&query).await.map_err(crate::TestError::RawExecute)
     }
 
     async fn batch(
