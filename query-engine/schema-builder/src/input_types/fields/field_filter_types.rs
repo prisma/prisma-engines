@@ -39,15 +39,15 @@ pub(crate) fn get_field_filter_types(
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
-                &sf.type_identifier,
-                sf.native_type.as_ref(),
+                &sf.type_identifier(),
+                sf.native_type(),
                 sf.is_list(),
                 !sf.is_required(),
                 false,
                 include_aggregates,
             ))];
 
-            if sf.type_identifier != TypeIdentifier::Json {
+            if sf.type_identifier() != TypeIdentifier::Json {
                 types.push(map_scalar_input_type_for_field(ctx, sf)); // Scalar equality shorthand
             }
 
@@ -67,7 +67,7 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &Relatio
 fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let ident = Identifier::new(
-        format!("{}ListRelationFilter", capitalize(&related_model.name)),
+        format!("{}ListRelationFilter", capitalize(related_model.name())),
         PRISMA_NAMESPACE,
     );
 
@@ -95,7 +95,7 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let ident = Identifier::new(
-        format!("{}RelationFilter", capitalize(&related_model.name)),
+        format!("{}RelationFilter", capitalize(related_model.name())),
         PRISMA_NAMESPACE,
     );
 
@@ -206,7 +206,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        scalar_filter_name(&sf.type_identifier.to_string(), true, !sf.is_required(), false, false),
+        scalar_filter_name(&sf.type_identifier().to_string(), true, !sf.is_required(), false, false),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -217,7 +217,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false);
+    let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier(), false);
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
     let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 

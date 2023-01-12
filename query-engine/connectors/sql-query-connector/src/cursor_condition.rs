@@ -371,8 +371,8 @@ fn cursor_order_def_scalar(
     // Unwrap is safe: SQL connectors do not anything other than models as field containers.
     let cmp_column_alias = format!(
         "{}_{}_{}",
-        &order_by.field.container.as_model().unwrap().name,
-        &order_by.field.name,
+        &order_by.field.container().as_model().unwrap().name(),
+        &order_by.field.name(),
         index
     );
 
@@ -400,8 +400,8 @@ fn cursor_order_def_aggregation_scalar(
     // Unwrap is safe: SQL connectors do not anything other than models as field containers.
     let cmp_column_alias = format!(
         "aggr_{}_{}_{}",
-        &field.container.as_model().unwrap().name,
-        &field.name,
+        &field.container().as_model().unwrap().name(),
+        &field.name(),
         index
     );
 
@@ -441,7 +441,7 @@ fn cursor_order_def_aggregation_rel(
             .path
             .iter()
             .map(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.model().name.to_owned(),
+                OrderByHop::Relation(rf) => rf.model().name().to_owned(),
                 OrderByHop::Composite(_) => unreachable!("SQL connectors don't have composite support."),
             })
             .join("_"),
@@ -472,7 +472,7 @@ fn cursor_order_def_relevance(
     let order_column = &order_by_def.order_column;
     let cmp_column_alias = format!(
         "relevance_{}_{}",
-        order_by.fields.iter().map(|sf| sf.name.as_str()).join("_"),
+        order_by.fields.iter().map(|sf| sf.name()).join("_"),
         index
     );
 
@@ -492,12 +492,9 @@ fn foreign_keys_from_order_path(path: &[OrderByHop], joins: &[AliasedJoin]) -> O
     last_hop.map(|hop| {
         match hop {
             OrderByHop::Relation(rf) => {
-                rf.relation_info
-                    .fields
-                    .iter()
-                    .map(|fk_name| {
-                        let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
-
+                rf.scalar_fields()
+                    .into_iter()
+                    .map(|fk_field| {
                         // If there are _more than one_ hop, we need to refer to the fk fields using the
                         // join alias of the hop _before_ the last hop. eg:
                         //

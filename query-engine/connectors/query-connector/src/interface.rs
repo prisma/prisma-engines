@@ -125,7 +125,7 @@ impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => {
-                vec![(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
+                vec![(field.db_name().to_owned(), field.type_identifier(), field.arity())]
             }
 
             AggregationSelection::Count { all, fields } => {
@@ -154,7 +154,7 @@ impl AggregationSelection {
             .map(|f| {
                 (
                     f.db_name().to_owned(),
-                    fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
+                    fixed_type.clone().unwrap_or_else(|| f.type_identifier()),
                     FieldArity::Required,
                 )
             })
@@ -194,14 +194,14 @@ impl RelAggregationSelection {
     pub fn db_alias(&self) -> String {
         match self {
             RelAggregationSelection::Count(rf, _) => {
-                format!("_aggr_count_{}", rf.name.to_owned())
+                format!("_aggr_count_{}", rf.name())
             }
         }
     }
 
     pub fn field_name(&self) -> &str {
         match self {
-            RelAggregationSelection::Count(rf, _) => rf.name.as_str(),
+            RelAggregationSelection::Count(rf, _) => rf.name(),
         }
     }
 

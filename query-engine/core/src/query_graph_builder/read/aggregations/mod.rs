@@ -82,7 +82,7 @@ fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
                 None
             } else {
                 scalars.iter().find_map(|sf| {
-                    if sf.name == f.parsed_field.name {
+                    if sf.name() == f.parsed_field.name {
                         Some(sf.clone())
                     } else {
                         None

@@ -18,7 +18,7 @@ impl UpdateDataInputFieldMapper {
 
 impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
-        let base_update_type = match &sf.type_identifier {
+        let base_update_type = match sf.type_identifier() {
             TypeIdentifier::Float => InputType::object(update_operations_object_type(ctx, "Float", sf, true)),
             TypeIdentifier::Decimal => InputType::object(update_operations_object_type(ctx, "Decimal", sf, true)),
             TypeIdentifier::Int => InputType::object(update_operations_object_type(ctx, "Int", sf, true)),
@@ -38,10 +38,10 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         };
 
         let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
-        match &sf.type_identifier {
+        match sf.type_identifier() {
             TypeIdentifier::Json if has_adv_json => {
                 let enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
-                let input_field = input_field(sf.name.clone(), vec![enum_type, base_update_type], None);
+                let input_field = input_field(sf.name(), vec![enum_type, base_update_type], None);
 
                 input_field.optional()
             }
@@ -49,16 +49,16 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             _ => {
                 let types = vec![map_scalar_input_type_for_field(ctx, sf), base_update_type];
 
-                let input_field = input_field(sf.name.clone(), types, None);
+                let input_field = input_field(sf.name(), types, None);
                 input_field.optional().nullable_if(!sf.is_required())
             }
         }
     }
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
-        let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier, sf.is_list());
+        let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier(), sf.is_list());
         let ident = Identifier::new(
-            format!("{}Update{}Input", sf.container.name(), sf.name),
+            format!("{}Update{}Input", sf.container().name(), sf.name()),
             PRISMA_NAMESPACE,
         );
 
@@ -73,7 +73,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                         input_field(
                             operations::PUSH,
                             vec![
-                                map_scalar_input_type(ctx, &sf.type_identifier, false),
+                                map_scalar_input_type(ctx, &sf.type_identifier(), false),
                                 list_input_type.clone(),
                             ],
                             None,
@@ -93,7 +93,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         };
 
         let input_type = InputType::object(input_object);
-        input_field(sf.name.clone(), vec![input_type, list_input_type], None).optional()
+        input_field(sf.name(), vec![input_type, list_input_type], None).optional()
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
@@ -107,12 +107,15 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             (false, false) => "One",
         };
 
-        let without_part = format!("Without{}", capitalize(&related_field.name));
+        let without_part = format!("Without{}", capitalize(related_field.name()));
         let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
         let ident = Identifier::new(
             format!(
                 "{}{}Update{}{}NestedInput",
-                related_model.name, unchecked_part, arity_part, without_part
+                related_model.name(),
+                unchecked_part,
+                arity_part,
+                without_part
             ),
             PRISMA_NAMESPACE,
         );
@@ -134,7 +137,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             }
         };
 
-        input_field(rf.name.clone(), InputType::object(input_object), None).optional()
+        input_field(rf.name(), InputType::object(input_object), None).optional()
     }
 
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {

@@ -24,7 +24,7 @@ pub fn compute_aggr_join(
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
 ) -> AliasedJoin {
-    let join_alias = format!("{}_{}", join_alias, &rf.related_model().name);
+    let join_alias = format!("{}_{}", join_alias, &rf.related_model().name());
 
     if rf.relation().is_many_to_many() {
         compute_aggr_join_m2m(
@@ -230,7 +230,7 @@ pub fn compute_one2m_join(
         )
     };
 
-    let right_table_alias = format!("{}_{}", join_prefix, &rf.related_model().name);
+    let right_table_alias = format!("{}_{}", join_prefix, rf.related_model().name());
 
     let related_model = rf.related_model();
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());

@@ -12,21 +12,25 @@ pub type RelationFieldWeak = Weak<RelationField>;
 
 #[derive(Clone)]
 pub struct RelationField {
-    pub name: String,
+    pub(crate) name: String,
     pub arity: FieldArity,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
-    pub relation_info: RelationInfo,
+    pub(crate) relation_info: RelationInfo,
 
     pub on_delete_default: ReferentialAction,
     pub on_update_default: ReferentialAction,
 
-    pub model: ModelWeakRef,
+    pub(crate) model: ModelWeakRef,
     pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
 }
 
 impl RelationField {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     pub fn is_list(&self) -> bool {
         matches!(self.arity, FieldArity::List)
     }
@@ -233,6 +237,10 @@ impl RelationField {
 
     pub fn on_update(&self) -> Option<&ReferentialAction> {
         self.relation_info.on_update.as_ref()
+    }
+
+    pub fn relation_info(&self) -> &RelationInfo {
+        &self.relation_info
     }
 }
 

@@ -86,8 +86,8 @@ pub fn nested_update(
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &find_child_records_node,

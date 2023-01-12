@@ -99,7 +99,7 @@ where
         let sf = self.as_ref();
 
         // Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        let full_table_name = sf.container.as_model().unwrap().db_name_with_schema();
+        let full_table_name = sf.container().as_model().unwrap().db_name_with_schema();
         let col = sf.db_name().to_string();
 
         let column = Column::from((full_table_name, col)).type_family(sf.type_family());

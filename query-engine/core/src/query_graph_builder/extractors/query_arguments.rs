@@ -295,7 +295,8 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",
-                        field_name, model.name
+                        field_name,
+                        model.name()
                     )))
                 }
             },
@@ -323,7 +324,7 @@ fn extract_compound_cursor_field(
     let mut pairs = vec![];
 
     for field in fields {
-        let value = map.remove(&field.name).unwrap();
+        let value = map.remove(field.name()).unwrap();
         pairs.extend(extract_cursor_field(field, value)?);
     }
 

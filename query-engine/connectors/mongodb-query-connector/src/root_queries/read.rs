@@ -127,7 +127,8 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids } };
 
     // Scalar field name where the relation ids list is on `model`.
-    let relation_ids_field_name = from_field.relation_info.fields.get(0).unwrap();
+    let id_holder_field = from_field.scalar_fields().into_iter().next().unwrap();
+    let relation_ids_field_name = id_holder_field.name().to_owned();
     let find_options = FindOptions::builder()
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
         .build();
@@ -135,7 +136,6 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let cursor = observing(None, || coll.find_with_session(filter, Some(find_options), session)).await?;
     let docs = vacuum_cursor(cursor, session).await?;
     let parent_id_meta = output_meta::from_scalar_field(&id_field);
-    let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
     let related_ids_holder_meta = output_meta::from_scalar_field(&id_holder_field);
     let child_id_field = pick_singular_id(&from_field.related_model());
 
@@ -145,7 +145,7 @@ pub async fn get_related_m2m_record_ids<'conn>(
         let parent_id = value_from_bson(id_value, &parent_id_meta)?;
 
         let related_id_array = doc
-            .remove(relation_ids_field_name)
+            .remove(id_holder_field.name())
             .unwrap_or_else(|| Bson::Array(vec![]));
 
         let child_ids: Vec<PrismaValue> = match value_from_bson(related_id_array, &related_ids_holder_meta)? {

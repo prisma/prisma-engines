@@ -11,19 +11,18 @@ pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
 
 pub struct ScalarField {
-    pub name: String,
-    pub type_identifier: TypeIdentifier,
-    pub is_id: bool,
-    pub is_auto_generated_int_id: bool,
-    pub is_autoincrement: bool,
-    pub is_updated_at: bool,
-    pub internal_enum: Option<InternalEnum>,
-    pub arity: FieldArity,
-    pub db_name: Option<String>,
-    pub default_value: Option<DefaultValue>,
-    pub native_type: Option<NativeTypeInstance>,
-    pub container: ParentContainer,
-
+    pub(crate) name: String,
+    pub(crate) type_identifier: TypeIdentifier,
+    pub(crate) is_id: bool,
+    pub(crate) is_auto_generated_int_id: bool,
+    pub(crate) is_autoincrement: bool,
+    pub(crate) is_updated_at: bool,
+    pub(crate) internal_enum: Option<InternalEnum>,
+    pub(crate) arity: FieldArity,
+    pub(crate) db_name: Option<String>,
+    pub(crate) default_value: Option<DefaultValue>,
+    pub(crate) native_type: Option<NativeTypeInstance>,
+    pub(crate) container: ParentContainer,
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
 }
@@ -67,6 +66,42 @@ impl ScalarField {
 
     pub fn container(&self) -> &ParentContainer {
         &self.container
+    }
+
+    pub fn name(&self) -> &str {
+        self.name.as_ref()
+    }
+
+    pub fn type_identifier(&self) -> TypeIdentifier {
+        self.type_identifier.clone()
+    }
+
+    pub fn arity(&self) -> FieldArity {
+        self.arity
+    }
+
+    pub fn internal_enum(&self) -> Option<&InternalEnum> {
+        self.internal_enum.as_ref()
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        self.default_value.as_ref()
+    }
+
+    pub fn is_updated_at(&self) -> bool {
+        self.is_updated_at
+    }
+
+    pub fn is_auto_generated_int_id(&self) -> bool {
+        self.is_auto_generated_int_id
+    }
+
+    pub fn native_type(&self) -> Option<&NativeTypeInstance> {
+        self.native_type.as_ref()
+    }
+
+    pub fn is_autoincrement(&self) -> bool {
+        self.is_autoincrement
     }
 }
 

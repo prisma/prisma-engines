@@ -51,7 +51,7 @@ fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarField
     for selector in selectors {
         if let AggregationSelection::Field(field) = selector {
             if !group_by.contains(&field) {
-                missing_fields.push(field.name.clone());
+                missing_fields.push(field.name().to_owned());
             }
         }
     }
@@ -75,7 +75,7 @@ fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> Query
     for ordering in orderings {
         if let OrderBy::Scalar(by_scalar) = ordering {
             if !group_by.contains(&by_scalar.field) {
-                missing_fields.push(by_scalar.field.name.clone());
+                missing_fields.push(by_scalar.field.name().to_owned());
             }
         }
     }
@@ -108,7 +108,7 @@ fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) ->
                 if selector_fields.contains(&field) {
                     None
                 } else {
-                    Some(field.name.clone())
+                    Some(field.name().to_owned())
                 }
             })
             .collect();

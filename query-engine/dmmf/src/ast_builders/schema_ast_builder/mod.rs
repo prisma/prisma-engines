@@ -121,7 +121,7 @@ impl RenderContext {
     pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {
-                let model_name = model.name.clone();
+                let model_name = model.name();
                 let tag_str = match &info.tag {
                     // If it's a QueryRaw with a query_type, then use this query_type as operation name
                     // eg: findRaw, aggregateRaw..
@@ -139,7 +139,7 @@ impl RenderContext {
                 match model_op {
                     Some(existing) => existing.add_operation(tag_str, name),
                     None => {
-                        let new_mapping = DmmfModelOperations::new(model_name);
+                        let new_mapping = DmmfModelOperations::new(model_name.to_owned());
 
                         new_mapping.add_operation(tag_str, name);
                         self.mappings.model_operations.push(new_mapping);

@@ -73,14 +73,17 @@ impl Display for ReadQuery {
             Self::ManyRecordsQuery(q) => write!(
                 f,
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:?})"#,
-                q.name, q.model.name, q.selected_fields, q.args
+                q.name,
+                q.model.name(),
+                q.selected_fields,
+                q.args
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
-                q.parent_field.model().name,
-                q.parent_field.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
@@ -94,13 +97,15 @@ impl ToGraphviz for ReadQuery {
             Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.selected_fields),
             Self::ManyRecordsQuery(q) => format!(
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {})"#,
-                q.name, q.model.name, q.selected_fields
+                q.name,
+                q.model.name(),
+                q.selected_fields
             ),
             Self::RelatedRecordsQuery(q) => format!(
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
-                q.parent_field.model().name,
-                q.parent_field.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => format!("AggregateRecordsQuery: {}", q.name),

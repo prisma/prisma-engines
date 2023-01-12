@@ -18,7 +18,7 @@ use schema::{
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
 pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     let arguments = create_many_arguments(ctx, model);
-    let field_name = format!("createMany{}", model.name);
+    let field_name = format!("createMany{}", model.name());
 
     if ctx.has_capability(ConnectorCapability::CreateMany) {
         Some(field(
@@ -59,8 +59,8 @@ pub(crate) fn create_many_object_type(
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}CreateMany{}Input", model.name, capitalize(f.name.as_str())),
-        _ => format!("{}CreateManyInput", model.name),
+        Some(ref f) => format!("{}CreateMany{}Input", model.name(), capitalize(f.name())),
+        _ => format!("{}CreateManyInput", model.name()),
     };
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
@@ -103,7 +103,7 @@ fn filter_create_many_fields(
         ModelField::Scalar(sf) => {
             if linking_fields.contains(sf) {
                 false
-            } else if sf.is_autoincrement {
+            } else if sf.is_autoincrement() {
                 ctx.has_capability(ConnectorCapability::CreateManyWriteableAutoIncId)
             } else {
                 true

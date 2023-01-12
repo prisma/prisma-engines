@@ -1,10 +1,8 @@
+use super::{AsTable, ColumnIterator};
+use crate::model_extensions::AsColumns;
 use prisma_models::{ModelProjection, Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::{ast::Table, prelude::Column};
 use RelationLinkManifestation::*;
-
-use crate::model_extensions::AsColumns;
-
-use super::{AsTable, ColumnIterator};
 
 pub trait RelationFieldExt {
     fn m2m_columns(&self) -> Vec<Column<'static>>;
@@ -15,7 +13,7 @@ pub trait RelationFieldExt {
 
 impl RelationFieldExt for RelationField {
     fn m2m_columns(&self) -> Vec<Column<'static>> {
-        let references = &self.relation_info.references;
+        let references = &self.relation_info().references;
         let prefix = if self.relation_side.is_a() { "B" } else { "A" };
 
         if references.len() > 1 {
@@ -30,7 +28,7 @@ impl RelationFieldExt for RelationField {
     }
 
     fn join_columns(&self) -> ColumnIterator {
-        match (&self.relation().manifestation, &self.relation_side) {
+        match (self.relation().manifestation(), &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
             _ => ModelProjection::from(self.linking_fields()).as_columns(),
@@ -38,7 +36,7 @@ impl RelationFieldExt for RelationField {
     }
 
     fn identifier_columns(&self) -> ColumnIterator {
-        match (&self.relation().manifestation, &self.relation_side) {
+        match (self.relation().manifestation(), &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
             _ => ModelProjection::from(self.model().primary_identifier()).as_columns(),
@@ -62,7 +60,7 @@ impl AsTable for Relation {
     /// - A separate relation table for all relations, if using the deprecated
     ///   data model syntax.
     fn as_table(&self) -> Table<'static> {
-        match self.manifestation {
+        match self.manifestation() {
             // In this case we must define our unique indices for the relation
             // table, so MSSQL can convert the `INSERT .. ON CONFLICT IGNORE` into
             // a `MERGE` statement.

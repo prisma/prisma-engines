@@ -13,7 +13,7 @@ pub type RelationWeakRef = Weak<Relation>;
 /// A relation between two models. Can be either using a `RelationTable` or
 /// model a direct link between two `RelationField`s.
 pub struct Relation {
-    pub name: String,
+    pub(crate) name: String,
 
     pub(crate) model_a_name: String,
     pub(crate) model_b_name: String,
@@ -24,15 +24,19 @@ pub struct Relation {
     pub(crate) field_a: OnceCell<Weak<RelationField>>,
     pub(crate) field_b: OnceCell<Weak<RelationField>>,
 
-    pub manifestation: RelationLinkManifestation,
-    pub internal_data_model: InternalDataModelWeakRef,
-    pub relation_mode: RelationMode,
+    pub(crate) manifestation: RelationLinkManifestation,
+    pub(crate) internal_data_model: InternalDataModelWeakRef,
+    pub(crate) relation_mode: RelationMode,
 }
 
 impl Relation {
     pub const MODEL_A_DEFAULT_COLUMN: &'static str = "A";
     pub const MODEL_B_DEFAULT_COLUMN: &'static str = "B";
     pub const TABLE_ALIAS: &'static str = "RelationTable";
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 
     /// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
@@ -154,6 +158,10 @@ impl Relation {
             (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
             (action, _) => action,
         }
+    }
+
+    pub fn manifestation(&self) -> &RelationLinkManifestation {
+        &self.manifestation
     }
 }
 

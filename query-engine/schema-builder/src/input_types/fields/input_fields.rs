@@ -9,7 +9,7 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, i
     let nullable = !field.is_required()
         && !field.is_list()
         && match field {
-            ModelField::Scalar(sf) => sf.type_identifier != TypeIdentifier::Json,
+            ModelField::Scalar(sf) => sf.type_identifier() != TypeIdentifier::Json,
             _ => true,
         };
 
