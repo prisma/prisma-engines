@@ -41,7 +41,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
 
     match &source.active_provider {
         provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
-            postgres_setup(url, prisma_schema, db_schemas).await?
+            postgres_setup(url, prisma_schema).await?
         }
         provider if MSSQL.is_provider(provider) => mssql_setup(url, prisma_schema, db_schemas).await?,
         provider if MYSQL.is_provider(provider) => {
@@ -62,12 +62,12 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
 }
 
 /// Database teardown for connector-test-kit-rs.
-pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
+pub async fn teardown(prisma_schema: &str) -> ConnectorResult<()> {
     let (source, url, _) = parse_configuration(prisma_schema)?;
 
     match &source.active_provider {
         provider if [POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) => {
-            postgres_teardown(&url, db_schemas).await?;
+            postgres_teardown(&url).await?;
         }
 
         provider

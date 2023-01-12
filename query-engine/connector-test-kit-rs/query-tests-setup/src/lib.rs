@@ -48,8 +48,8 @@ pub async fn setup_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<(
 }
 
 /// Teardown of a test setup.
-pub async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
-    Ok(qe_setup::teardown(datamodel, db_schemas).await?)
+pub async fn teardown_project(datamodel: &str) -> TestResult<()> {
+    Ok(qe_setup::teardown(datamodel).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
@@ -172,7 +172,7 @@ fn run_relation_link_test_impl(
                 test_fn(&runner, &dm_with_params_json).await.unwrap();
 
                 if requires_teardown {
-                    teardown_project(&datamodel, Default::default()).await.unwrap();
+                    teardown_project(&datamodel).await.unwrap();
                 }
             }
             .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
@@ -284,7 +284,7 @@ pub fn run_connector_test_impl(
             test_fn(runner).await.unwrap();
 
             if requires_teardown {
-                crate::teardown_project(&datamodel, db_schemas).await.unwrap();
+                crate::teardown_project(&datamodel).await.unwrap();
             }
         }
         .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),

@@ -65,7 +65,7 @@ dev-postgres10: start-postgres10
 	cp $(CONFIG_PATH)/postgres10 $(CONFIG_FILE)
 
 start-postgres11:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres11
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres11
 
 dev-postgres11: start-postgres11
 	cp $(CONFIG_PATH)/postgres11 $(CONFIG_FILE)
