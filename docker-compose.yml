@@ -104,7 +104,7 @@ services:
   postgres15:
     image: postgres:15
     restart: always
-    command: postgres -c 'max_connections=100' -c 'temp_file_limit=256000' -c 'effective_io_concurrency=100' -c 'maintenance_io_concurrency=100'
+    command: postgres -c 'max_connections=100' -c 'temp_file_limit=256' -c 'effective_io_concurrency=100' -c 'maintenance_io_concurrency=100'
     shm_size: 1g
     environment:
       POSTGRES_PASSWORD: "prisma"
