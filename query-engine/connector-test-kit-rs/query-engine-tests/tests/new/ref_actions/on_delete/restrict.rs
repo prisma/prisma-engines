@@ -35,20 +35,12 @@ mod one2one_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -81,20 +73,12 @@ mod one2one_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -188,20 +172,12 @@ mod one2many_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -260,20 +236,12 @@ mod one2many_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            "mutation { deleteOneParent(where: { id: 1 }) { id }}",
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
