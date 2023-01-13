@@ -417,13 +417,11 @@ pub(crate) fn process_gql_req_headers(
     (tx_id, span, trace_capture, Some(trace_id.to_string()))
 }
 
-pub fn create_capture_config(_header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry::capturing::Capturer {
-    // let mut settings = if let Some(h) = header {
-    //     h.to_str().unwrap_or("")
-    // } else {
-    //     ""
-    // };
-
-    let settings = "query,info,tracing";
+pub fn create_capture_config(header: Option<&HeaderValue>, trace_id: TraceId) -> telemetry::capturing::Capturer {
+    let mut settings = if let Some(h) = header {
+        h.to_str().unwrap_or("")
+    } else {
+        ""
+    };
     telemetry::capturing::capturer(trace_id, settings)
 }
