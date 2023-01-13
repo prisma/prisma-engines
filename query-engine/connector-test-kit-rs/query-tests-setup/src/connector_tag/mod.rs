@@ -51,11 +51,6 @@ pub trait ConnectorTagInterface {
     /// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.
     fn is_versioned(&self) -> bool;
 
-    /// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).
-    fn requires_teardown(&self) -> bool {
-        false
-    }
-
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
     ///   - "foreignKeys" lets the database handle them

@@ -78,10 +78,6 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn is_versioned(&self) -> bool {
         true
     }
-
-    fn requires_teardown(&self) -> bool {
-        false
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
