@@ -30,6 +30,7 @@ mod metrics {
             Sqlite => assert_eq!(total_queries, 9),
             SqlServer(_) => assert_eq!(total_queries, 15),
             MongoDb(_) => assert_eq!(total_queries, 5),
+            ConnectorVersion::CockroachDb => assert_eq!(total_queries, 10),
             _ => assert_eq!(total_queries, 11),
         }
         assert_eq!(total_operations, 2);
