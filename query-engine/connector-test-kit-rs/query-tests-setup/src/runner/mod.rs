@@ -59,9 +59,6 @@ pub trait RunnerInterface: Sized {
 
     /// The query schema used for the test.
     fn query_schema(&self) -> &QuerySchemaRef;
-
-    /// The name of the schema used on the underlying database to which the connector is connected to.
-    async fn schema_name(&self) -> &str;
 }
 
 enum RunnerType {
@@ -244,14 +241,5 @@ impl Runner {
             RunnerType::NodeApi(_) => todo!(),
             RunnerType::Binary(r) => r.query_schema(),
         }
-    }
-
-    pub async fn schema_name(&self) -> &str {
-        match &self.inner {
-            RunnerType::Direct(r) => r.schema_name(),
-            RunnerType::Binary(r) => r.schema_name(),
-            RunnerType::NodeApi(_) => todo!(),
-        }
-        .await
     }
 }

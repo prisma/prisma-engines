@@ -39,7 +39,7 @@ mod views {
 
     #[connector_test]
     async fn simple_read(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+        create_test_data(&runner, "simple_read").await?;
 
         // find many
         insta::assert_snapshot!(
@@ -52,7 +52,7 @@ mod views {
 
     #[connector_test]
     async fn nested_read(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+        create_test_data(&runner, "nested_read").await?;
 
         // find many with nested read
         insta::assert_snapshot!(
@@ -65,7 +65,7 @@ mod views {
 
     #[connector_test]
     async fn filtered_read(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+        create_test_data(&runner, "filtered_read").await?;
 
         // Filter on column
         insta::assert_snapshot!(
@@ -90,7 +90,7 @@ mod views {
 
     #[connector_test]
     async fn sorted_read(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+        create_test_data(&runner, "sorted_read").await?;
 
         // Order by on computed column of the view
         insta::assert_snapshot!(
@@ -113,8 +113,8 @@ mod views {
         Ok(())
     }
 
-    async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        migrate_view(&runner).await?;
+    async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
+        migrate_view(&runner, schema_name).await?;
 
         create_test_model(runner, r#"{ id: 1, firstName: "John", lastName: "Doe" }"#).await?;
         create_test_model(runner, r#"{ id: 2, firstName: "Jane", lastName: "Doe" }"#).await?;
@@ -126,8 +126,8 @@ mod views {
         Ok(())
     }
 
-    async fn migrate_view(runner: &Runner) -> TestResult<()> {
-        let sql = migrate_view_sql(runner).await;
+    async fn migrate_view(runner: &Runner, schema_name: &str) -> TestResult<()> {
+        let sql = migrate_view_sql(runner, schema_name).await;
 
         runner.raw_execute(sql).await?;
 
@@ -135,7 +135,7 @@ mod views {
     }
 
     // schema name must be the name of the test in which it's called.
-    async fn migrate_view_sql(runner: &Runner) -> String {
+    async fn migrate_view_sql(runner: &Runner, schema_name: &str) -> String {
         match runner.connector() {
             ConnectorTag::Postgres(_)
             | ConnectorTag::Cockroach(_)
@@ -150,9 +150,7 @@ mod views {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#.to_owned()
             }
             ConnectorTag::SqlServer(_) => {
-              let schema_name = runner.schema_name().await;
-
-              format!(r#"CREATE VIEW [{schema_name}].[TestView] AS SELECT [{schema_name}].[TestModel].[id], [{schema_name}].[TestModel].[firstName], [{schema_name}].[TestModel].[lastName], CONCAT([{schema_name}].[TestModel].[firstName], ' ', [{schema_name}].[TestModel].[lastName]) as "fullName" FROM [{schema_name}].[TestModel];"#)
+              format!(r#"CREATE VIEW [views_{schema_name}].[TestView] AS SELECT [views_{schema_name}].[TestModel].[id], [views_{schema_name}].[TestModel].[firstName], [views_{schema_name}].[TestModel].[lastName], CONCAT([views_{schema_name}].[TestModel].[firstName], ' ', [views_{schema_name}].[TestModel].[lastName]) as "fullName" FROM [views_{schema_name}].[TestModel];"#)
             },
             ConnectorTag::MongoDb(_) => unreachable!(),
         }

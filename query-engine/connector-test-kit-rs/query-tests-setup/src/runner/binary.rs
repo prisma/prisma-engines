@@ -1,5 +1,4 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
-use query_core::db_name;
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
@@ -15,7 +14,6 @@ pub struct BinaryRunner {
     current_tx_id: Option<TxId>,
     state: State,
     connection_url: String,
-    schema_name: String,
 }
 
 #[async_trait::async_trait]
@@ -27,13 +25,11 @@ impl RunnerInterface for BinaryRunner {
         let configuration = opts.configuration(true).unwrap();
         let data_source = configuration.datasources.first().unwrap();
         let connection_url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let schema_name = db_name(data_source, &connection_url)?;
 
         Ok(BinaryRunner {
             state,
             connector_tag,
             connection_url,
-            schema_name,
             current_tx_id: None,
         })
     }
@@ -211,10 +207,6 @@ impl RunnerInterface for BinaryRunner {
 
     fn query_schema(&self) -> &QuerySchemaRef {
         self.state.query_schema()
-    }
-
-    async fn schema_name(&self) -> &str {
-        &self.schema_name
     }
 }
 

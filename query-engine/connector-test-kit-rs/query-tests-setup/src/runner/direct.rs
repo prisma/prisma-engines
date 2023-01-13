@@ -15,7 +15,6 @@ pub struct DirectRunner {
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
     connection_url: String,
-    schema_name: String,
     current_tx_id: Option<TxId>,
     metrics: MetricRegistry,
 }
@@ -27,7 +26,7 @@ impl RunnerInterface for DirectRunner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let (db_name, executor) = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
-        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name.clone());
+        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
 
@@ -38,7 +37,6 @@ impl RunnerInterface for DirectRunner {
             connection_url: url,
             current_tx_id: None,
             metrics,
-            schema_name: db_name,
         })
     }
 
@@ -134,9 +132,5 @@ impl RunnerInterface for DirectRunner {
 
     fn query_schema(&self) -> &QuerySchemaRef {
         &self.query_schema
-    }
-
-    async fn schema_name(&self) -> &str {
-        &self.schema_name
     }
 }
