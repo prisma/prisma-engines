@@ -15,10 +15,10 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         let validated_schema = std::sync::Arc::new(psl::validate(source_file));
 
         c.bench_function(&format!("prisma_models::convert ({name})"), |b| {
-            b.iter(|| black_box(prisma_models::convert(validated_schema.clone(), "".into())))
+            b.iter(|| black_box(prisma_models::convert(validated_schema.clone())))
         });
 
-        let idm = prisma_models::convert(validated_schema, "".into());
+        let idm = prisma_models::convert(validated_schema);
 
         c.bench_function(&format!("schema_builder::build ({name})"), |b| {
             b.iter(|| black_box(schema_builder::build(idm.clone(), true)));

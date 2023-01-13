@@ -32,7 +32,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let internal_data_model = prisma_models::convert(Arc::new(schema), "".into());
+    let internal_data_model = prisma_models::convert(Arc::new(schema));
     let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
     let dmmf = dmmf::render_dmmf(query_schema);
 

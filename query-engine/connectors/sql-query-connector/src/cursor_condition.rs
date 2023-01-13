@@ -3,6 +3,7 @@ use crate::{
     model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
     ordering::OrderByDefinition,
     query_arguments_ext::QueryArgumentsExt,
+    Context,
 };
 use connector_interface::QueryArguments;
 use itertools::Itertools;
@@ -122,13 +123,14 @@ pub(crate) fn build(
     query_arguments: &QueryArguments,
     model: &ModelRef,
     order_by_defs: &[OrderByDefinition],
+    ctx: &Context<'_>,
 ) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
             let cursor_fields: Vec<_> = cursor.as_scalar_fields().expect("Cursor fields contain non-scalars.");
             let cursor_values: Vec<_> = cursor.db_values();
-            let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns().collect();
+            let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns(ctx).collect();
             let cursor_row = Row::from(cursor_columns);
 
             // Invariant: Cursors are unique. This means we can create a subquery to find at most one row
@@ -138,12 +140,12 @@ pub(crate) fn build(
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let mut definitions = order_definitions(query_arguments, model, &order_by_defs);
+            let mut definitions = order_definitions(query_arguments, model, &order_by_defs, ctx);
 
             // Subquery to find the value of the order field(s) that we need for comparison. Builds part #1 of the query example in the docs.
             let order_subquery = definitions
                 .iter()
-                .fold(Select::from_table(model.as_table()), |select, definition| {
+                .fold(Select::from_table(model.as_table(ctx)), |select, definition| {
                     select.value(definition.cmp_column.clone())
                 })
                 .so_that(cursor_condition);
@@ -161,7 +163,7 @@ pub(crate) fn build(
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
                 let order_definition = definitions.pop().unwrap();
-                ConditionTree::Single(Box::new(map_orderby_condition(&order_definition, reverse, true)))
+                ConditionTree::Single(Box::new(map_orderby_condition(&order_definition, reverse, true, ctx)))
             } else {
                 let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
                     let (head, tail) = definitions.split_at(len - n - 1);
@@ -198,9 +200,9 @@ pub(crate) fn build(
                         //
                         // Said differently, we handle all the cases in which the prefixes are equal to len - 1 to account for possible identical comparators,
                         // but everything else must come strictly "after" the cursor.
-                        and_conditions.push(map_orderby_condition(order_definition, reverse, true));
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, true, ctx));
                     } else {
-                        and_conditions.push(map_orderby_condition(order_definition, reverse, false));
+                        and_conditions.push(map_orderby_condition(order_definition, reverse, false, ctx));
                     }
 
                     conditions_acc.push(ConditionTree::And(and_conditions));
@@ -221,6 +223,7 @@ fn map_orderby_condition(
     order_definition: &CursorOrderDefinition,
     reverse: bool,
     include_eq: bool,
+    ctx: &Context<'_>,
 ) -> Expression<'static> {
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, order_definition.cmp_column_alias.to_owned()));
     let cloned_cmp_column = cmp_column.clone();
@@ -283,7 +286,7 @@ fn map_orderby_condition(
                 let col = if let Some(alias) = &fk.alias {
                     Column::from((alias.to_owned(), fk.field.db_name().to_owned()))
                 } else {
-                    fk.field.as_column()
+                    fk.field.as_column(ctx)
                 }
                 .is_null();
 
@@ -318,6 +321,7 @@ fn order_definitions(
     query_arguments: &QueryArguments,
     model: &ModelRef,
     order_by_defs: &[OrderByDefinition],
+    ctx: &Context<'_>,
 ) -> Vec<CursorOrderDefinition> {
     if query_arguments.order_by.len() != order_by_defs.len() {
         unreachable!("There must be an equal amount of order by definition than there are order bys")
@@ -331,9 +335,9 @@ fn order_definitions(
             .into_iter()
             .map(|f| CursorOrderDefinition {
                 sort_order: SortOrder::Ascending,
-                order_column: f.as_column().into(),
+                order_column: f.as_column(ctx).into(),
                 order_fks: None,
-                cmp_column: f.as_column().into(),
+                cmp_column: f.as_column(ctx).into(),
                 cmp_column_alias: f.db_name().to_string(),
                 on_nullable_fields: !f.is_required(),
             })

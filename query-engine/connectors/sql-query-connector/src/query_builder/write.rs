@@ -1,4 +1,4 @@
-use crate::{model_extensions::*, sql_trace::SqlTraceComment};
+use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use itertools::Itertools;
 use prisma_models::*;
@@ -8,7 +8,7 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<&str>) -> Insert<'static> {
+pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -18,7 +18,7 @@ pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Opt
 
     let insert = fields
         .into_iter()
-        .fold(Insert::single_into(model.as_table()), |insert, field| {
+        .fold(Insert::single_into(model.as_table(ctx)), |insert, field| {
             let db_name = field.db_name();
             let value = args.take_field_value(db_name).unwrap();
             let value: PrismaValue = value
@@ -29,9 +29,9 @@ pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Opt
         });
 
     Insert::from(insert)
-        .returning(ModelProjection::from(model.primary_identifier()).as_columns())
+        .returning(ModelProjection::from(model.primary_identifier()).as_columns(ctx))
         .append_trace(&Span::current())
-        .add_trace_id(trace_id)
+        .add_trace_id(ctx.trace_id)
 }
 
 /// `INSERT` new records into the database based on the given write arguments,
@@ -43,7 +43,7 @@ pub(crate) fn create_records_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
-    trace_id: Option<&str>,
+    ctx: &Context<'_>,
 ) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
     // The easiest way to do this is to take go over all fields of the batch and apply the following:
@@ -72,11 +72,11 @@ pub(crate) fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields.iter().collect_vec().as_columns();
-    let insert = Insert::multi_into(model.as_table(), columns);
+    let columns = affected_fields.iter().collect_vec().as_columns(ctx);
+    let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
+    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -86,9 +86,9 @@ pub(crate) fn create_records_nonempty(
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: Option<&str>) -> Insert<'static> {
-    let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
+pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
+    let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
+    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -97,9 +97,9 @@ pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trac
     }
 }
 
-pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trace_id: Option<&str>) -> Update<'static> {
+pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
-    let table = model.as_table();
+    let table = model.as_table(ctx);
     let query = args
         .args
         .into_iter()
@@ -149,7 +149,7 @@ pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, trac
             acc.set(name, value)
         });
 
-    query.append_trace(&Span::current()).add_trace_id(trace_id)
+    query.append_trace(&Span::current()).add_trace_id(ctx.trace_id)
 }
 
 pub(crate) fn chunk_update_with_ids(
@@ -157,8 +157,11 @@ pub(crate) fn chunk_update_with_ids(
     model: &ModelRef,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
+    ctx: &Context<'_>,
 ) -> crate::Result<Vec<Query<'static>>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+        .as_columns(ctx)
+        .collect();
 
     let query = super::chunked_conditions(&columns, ids, |conditions| {
         update.clone().so_that(conditions.and(filter_condition.clone()))
@@ -171,15 +174,17 @@ pub(crate) fn delete_many(
     model: &ModelRef,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
-    trace_id: Option<&str>,
+    ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+        .as_columns(ctx)
+        .collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table())
+        Delete::from_table(model.as_table(ctx))
             .so_that(conditions.and(filter_condition.clone()))
             .append_trace(&Span::current())
-            .add_trace_id(trace_id)
+            .add_trace_id(ctx.trace_id)
     })
 }
 
@@ -187,14 +192,15 @@ pub(crate) fn create_relation_table_records(
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
+    ctx: &Context<'_>,
 ) -> Query<'static> {
     let relation = field.relation();
 
-    let parent_columns: Vec<_> = field.related_field().m2m_columns();
-    let child_columns: Vec<_> = field.m2m_columns();
+    let parent_columns: Vec<_> = field.related_field().m2m_columns(ctx);
+    let child_columns: Vec<_> = field.m2m_columns(ctx);
 
     let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
-    let insert = Insert::multi_into(relation.as_table(), columns);
+    let insert = Insert::multi_into(relation.as_table(ctx), columns);
 
     let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
         let mut values: Vec<_> = parent_id.db_values();
@@ -211,12 +217,12 @@ pub(crate) fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
-    trace_id: Option<&str>,
+    ctx: &Context<'_>,
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 
-    let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns();
-    let child_columns: Vec<_> = parent_field.m2m_columns();
+    let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns(ctx);
+    let child_columns: Vec<_> = parent_field.m2m_columns(ctx);
 
     let parent_id_values = parent_id.db_values();
     let parent_id_criteria = if parent_columns.len() > 1 {
@@ -227,8 +233,8 @@ pub(crate) fn delete_relation_table_records(
 
     let child_id_criteria = super::conditions(&child_columns, child_ids);
 
-    Delete::from_table(relation.as_table())
+    Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))
         .append_trace(&Span::current())
-        .add_trace_id(trace_id)
+        .add_trace_id(ctx.trace_id)
 }

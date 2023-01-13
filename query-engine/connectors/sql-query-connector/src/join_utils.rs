@@ -1,10 +1,10 @@
-use crate::{filter_conversion::AliasedCondition, model_extensions::*};
+use crate::{filter_conversion::AliasedCondition, model_extensions::*, Context};
 use connector_interface::Filter;
 use prisma_models::*;
 use quaint::prelude::*;
 
 #[derive(Debug, Clone)]
-pub struct AliasedJoin {
+pub(crate) struct AliasedJoin {
     // Actual join data to be passed to quaint
     pub(crate) data: JoinData<'static>,
     // Alias used for the join. eg: LEFT JOIN ... AS <alias>
@@ -12,17 +12,18 @@ pub struct AliasedJoin {
 }
 
 #[derive(Debug, Clone)]
-pub enum AggregationType {
+pub(crate) enum AggregationType {
     Count,
 }
 
-pub fn compute_aggr_join(
+pub(crate) fn compute_aggr_join(
     rf: &RelationFieldRef,
     aggregation: AggregationType,
     filter: Option<Filter>,
     aggregator_alias: &str,
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
+    ctx: &Context<'_>,
 ) -> AliasedJoin {
     let join_alias = format!("{}_{}", join_alias, &rf.related_model().name());
 
@@ -34,6 +35,7 @@ pub fn compute_aggr_join(
             aggregator_alias,
             join_alias.as_str(),
             previous_join,
+            ctx,
         )
     } else {
         compute_aggr_join_one2m(
@@ -43,6 +45,7 @@ pub fn compute_aggr_join(
             aggregator_alias,
             join_alias.as_str(),
             previous_join,
+            ctx,
         )
     }
 }
@@ -63,6 +66,7 @@ fn compute_aggr_join_one2m(
     aggregator_alias: &str,
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
+    ctx: &Context<'_>,
 ) -> AliasedJoin {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
@@ -72,13 +76,13 @@ fn compute_aggr_join_one2m(
             rf.related_field().scalar_fields(),
         )
     };
-    let select_columns = right_fields.iter().map(|f| f.as_column());
+    let select_columns = right_fields.iter().map(|f| f.as_column(ctx));
     let conditions: ConditionTree = filter
-        .map(|f| f.aliased_condition_from(None, false))
+        .map(|f| f.aliased_condition_from(None, false, ctx))
         .unwrap_or(ConditionTree::NoCondition);
 
     // + SELECT Child.<fk> FROM Child WHERE <FILTER>
-    let query = Select::from_table(rf.related_model().as_table())
+    let query = Select::from_table(rf.related_model().as_table(ctx))
         .columns(select_columns)
         .so_that(conditions);
     let aggr_expr = match aggregation {
@@ -92,14 +96,14 @@ fn compute_aggr_join_one2m(
 
     // SELECT Child.<fk>, COUNT(*) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
     // + GROUP BY Child.<fk>
-    let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
+    let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column(ctx)));
 
     let pairs = left_fields.into_iter().zip(right_fields.into_iter());
     let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
             let col_a = match previous_join {
                 Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
-                None => a.as_column(),
+                None => a.as_column(ctx),
             };
             let col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
@@ -138,11 +142,12 @@ fn compute_aggr_join_m2m(
     aggregator_alias: &str,
     join_alias: &str,
     previous_join: Option<&AliasedJoin>,
+    ctx: &Context<'_>,
 ) -> AliasedJoin {
     // m2m join table (_ParentToChild)
-    let m2m_table = rf.as_table();
+    let m2m_table = rf.as_table(ctx);
     // Child colums on the m2m join table (_ParentToChild.ChildId)
-    let m2m_child_columns = rf.related_field().m2m_columns();
+    let m2m_child_columns = rf.related_field().m2m_columns(ctx);
     // Child table
     let child_model = rf.related_model();
     // Child primary identifiers
@@ -151,11 +156,11 @@ fn compute_aggr_join_m2m(
     let parent_ids: ModelProjection = rf.model().primary_identifier().into();
     // Rendered filters
     let conditions: ConditionTree = filter
-        .map(|f| f.aliased_condition_from(None, false))
+        .map(|f| f.aliased_condition_from(None, false, ctx))
         .unwrap_or(ConditionTree::NoCondition);
 
     // + SELECT _ParentToChild.ChildId FROM Child WHERE <FILTER>
-    let query = Select::from_table(child_model.as_table())
+    let query = Select::from_table(child_model.as_table(ctx))
         .columns(m2m_child_columns.clone())
         .so_that(conditions);
 
@@ -169,9 +174,9 @@ fn compute_aggr_join_m2m(
     let query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
     let left_join_conditions: Vec<Expression> = child_ids
-        .as_columns()
+        .as_columns(ctx)
         .into_iter()
-        .map(|c| c.equals(rf.m2m_columns()).into())
+        .map(|c| c.equals(rf.m2m_columns(ctx)).into())
         .collect();
 
     // SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
@@ -183,7 +188,7 @@ fn compute_aggr_join_m2m(
     // + GROUP BY _ParentToChild.ChildId
     let query = rf
         .related_field()
-        .m2m_columns()
+        .m2m_columns(ctx)
         .into_iter()
         .fold(query, |acc, f| acc.group_by(f.clone()));
 
@@ -193,7 +198,7 @@ fn compute_aggr_join_m2m(
         .map(|(a, b)| {
             let col_a = match previous_join {
                 Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
-                None => a.as_column(),
+                None => a.as_column(ctx),
             };
             let col_b = Column::from((join_alias.to_owned(), b.name.to_string()));
 
@@ -216,10 +221,11 @@ fn compute_aggr_join_m2m(
     }
 }
 
-pub fn compute_one2m_join(
+pub(crate) fn compute_one2m_join(
     rf: &RelationFieldRef,
     join_prefix: &str,
     previous_join: Option<&AliasedJoin>,
+    ctx: &Context<'_>,
 ) -> AliasedJoin {
     let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
         (rf.scalar_fields(), rf.referenced_fields())
@@ -239,7 +245,7 @@ pub fn compute_one2m_join(
         .map(|(a, b)| {
             let a_col = match previous_join {
                 Some(prev_join) => Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
-                None => a.as_column(),
+                None => a.as_column(ctx),
             };
 
             let b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
@@ -251,7 +257,7 @@ pub fn compute_one2m_join(
     AliasedJoin {
         alias: right_table_alias.to_owned(),
         data: related_model
-            .as_table()
+            .as_table(ctx)
             .alias(right_table_alias)
             .on(ConditionTree::And(on_conditions)),
     }

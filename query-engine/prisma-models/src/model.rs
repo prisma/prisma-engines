@@ -32,16 +32,6 @@ impl Model {
         self.dml_model.schema.clone()
     }
 
-    pub fn db_name_with_schema(&self) -> (String, String) {
-        let schema_prefix = self
-            .schema_name()
-            .unwrap_or_else(|| self.internal_data_model().db_name.clone());
-
-        let model_db_name = self.db_name().to_string();
-
-        (schema_prefix, model_db_name)
-    }
-
     pub(crate) fn finalize(&self) {
         self.fields.get().unwrap().finalize();
     }

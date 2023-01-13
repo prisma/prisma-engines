@@ -129,6 +129,7 @@ impl WriteOperations for MongoDbConnection {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
         catch(async move { write::m2m_connect(&self.database, &mut self.session, field, parent_id, child_ids).await })
             .await
