@@ -73,13 +73,13 @@ fn serialize_aggregations(
         for result in row {
             match result {
                 AggregationResult::Field(field, value) => {
-                    let output_field = aggregate_object_type.find_field(&field.name).unwrap();
-                    flattened.insert(field.name.clone(), serialize_scalar(&output_field, value)?);
+                    let output_field = aggregate_object_type.find_field(field.name()).unwrap();
+                    flattened.insert(field.name().to_owned(), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Count(field, count) => {
                     if let Some(f) = field {
-                        flattened.insert(format!("_count_{}", &f.name), Item::Value(count));
+                        flattened.insert(format!("_count_{}", f.name()), Item::Value(count));
                     } else {
                         flattened.insert("_count__all".to_owned(), Item::Value(count));
                     }
@@ -87,30 +87,36 @@ fn serialize_aggregations(
 
                 AggregationResult::Average(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, &field.name);
-                    flattened.insert(format!("_avg_{}", &field.name), serialize_scalar(&output_field, value)?);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, field.name());
+                    flattened.insert(
+                        format!("_avg_{}", field.name()),
+                        serialize_scalar(&output_field, value)?,
+                    );
                 }
 
                 AggregationResult::Sum(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, &field.name);
-                    flattened.insert(format!("_sum_{}", &field.name), serialize_scalar(&output_field, value)?);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, field.name());
+                    flattened.insert(
+                        format!("_sum_{}", field.name()),
+                        serialize_scalar(&output_field, value)?,
+                    );
                 }
 
                 AggregationResult::Min(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, field.name());
                     flattened.insert(
-                        format!("_min_{}", &field.name),
+                        format!("_min_{}", field.name()),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }
 
                 AggregationResult::Max(field, value) => {
                     let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, &field.name);
+                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, field.name());
                     flattened.insert(
-                        format!("_max_{}", &field.name),
+                        format!("_max_{}", field.name()),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
                     );
                 }
@@ -169,12 +175,12 @@ fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, 
         match result {
             RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
                 Some(item) => match item {
-                    Item::Map(inner_map) => inner_map.insert(rf.name.clone(), Item::Value(count.clone())),
+                    Item::Map(inner_map) => inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
                     _ => unreachable!(),
                 },
                 None => {
                     let mut inner_map: Map = Map::new();
-                    inner_map.insert(rf.name.clone(), Item::Value(count.clone()));
+                    inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
                     map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
                 }
             },

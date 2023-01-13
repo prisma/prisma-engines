@@ -103,7 +103,7 @@ impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (prefix, rf) = self;
 
-        Ok(Bson::String(prefix.render_with(rf.relation().name.to_owned())))
+        Ok(Bson::String(prefix.render_with(rf.relation().name().to_owned())))
     }
 }
 
@@ -111,10 +111,10 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        let mongo_type: Option<&MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let mongo_type: Option<&MongoDbType> = sf.native_type().map(|nt| nt.deserialize_native_type());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
-        match (mongo_type, &sf.type_identifier, value) {
+        match (mongo_type, &sf.type_identifier(), value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
             (Some(mt), _, value) => (mt, value).into_bson(),

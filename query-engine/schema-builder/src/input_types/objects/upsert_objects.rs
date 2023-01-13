@@ -32,8 +32,8 @@ fn nested_upsert_list_input_object(
     let ident = Identifier::new(
         format!(
             "{}UpsertWithWhereUniqueWithout{}Input",
-            related_model.name,
-            capitalize(&parent_field.related_field().name)
+            related_model.name(),
+            capitalize(parent_field.related_field().name())
         ),
         PRISMA_NAMESPACE,
     );
@@ -72,8 +72,8 @@ fn nested_upsert_nonlist_input_object(
     let ident = Identifier::new(
         format!(
             "{}UpsertWithout{}Input",
-            related_model.name,
-            capitalize(&parent_field.related_field().name)
+            related_model.name(),
+            capitalize(parent_field.related_field().name())
         ),
         PRISMA_NAMESPACE,
     );

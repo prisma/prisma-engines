@@ -5,7 +5,7 @@ use std::convert::identity;
 /// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
 pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new(
-        format!("{}GroupByOutputType", capitalize(&model.name)),
+        format!("{}GroupByOutputType", capitalize(model.name())),
         PRISMA_NAMESPACE,
     );
     return_cached_output!(ctx, &ident);
@@ -100,13 +100,8 @@ fn scalar_output_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<Outpu
     fields
         .into_iter()
         .map(|f| {
-            field(
-                f.name.clone(),
-                vec![],
-                field::map_scalar_output_type_for_field(ctx, &f),
-                None,
-            )
-            .nullable_if(!f.is_required())
+            field(f.name(), vec![], field::map_scalar_output_type_for_field(ctx, &f), None)
+                .nullable_if(!f.is_required())
         })
         .collect()
 }

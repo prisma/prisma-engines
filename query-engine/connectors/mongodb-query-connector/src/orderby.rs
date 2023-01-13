@@ -75,7 +75,7 @@ impl OrderByData {
                 let mut parts = path
                     .iter()
                     .map(|hop| match hop {
-                        OrderByHop::Relation(rf) => rf.relation().name.clone(),
+                        OrderByHop::Relation(rf) => rf.relation().name().to_owned(),
                         OrderByHop::Composite(cf) => cf.db_name().to_owned(),
                     })
                     .collect_vec();
@@ -115,7 +115,7 @@ impl OrderByData {
             // TODO: Order by relevance won't work here
             let field = self.order_by.field().expect("a field on which to order by is expected");
             let right = field.db_name().to_owned();
-            let mut left = field.name.clone();
+            let mut left = field.name().to_owned();
 
             // Issue: https://github.com/prisma/prisma/issues/14001
             // Here we can assume the field name is ASCII, because it is the _client_ field name,

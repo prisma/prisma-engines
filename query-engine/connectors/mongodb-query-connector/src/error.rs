@@ -283,7 +283,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
     }
 
     fn decorate_with_scalar_field_info(self, sf: &ScalarFieldRef) -> Self {
-        self.map_err(|err| err.decorate_with_field_name(&sf.name))
+        self.map_err(|err| err.decorate_with_field_name(sf.name()))
     }
 
     fn decorate_with_field_name(self, field_name: &str) -> Self {

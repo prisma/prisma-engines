@@ -13,7 +13,7 @@ pub trait ScalarFieldExt {
 
 impl ScalarFieldExt for ScalarField {
     fn value<'a>(&self, pv: PrismaValue) -> Value<'a> {
-        match (pv, &self.type_identifier) {
+        match (pv, self.type_identifier()) {
             (PrismaValue::String(s), _) => s.into(),
             (PrismaValue::Float(f), _) => f.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
@@ -46,15 +46,14 @@ impl ScalarFieldExt for ScalarField {
     }
 
     fn type_family(&self) -> TypeFamily {
-        match self.type_identifier {
+        match self.type_identifier() {
             TypeIdentifier::String => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Int => TypeFamily::Int,
             TypeIdentifier::BigInt => TypeFamily::Int,
             TypeIdentifier::Float => TypeFamily::Double,
             TypeIdentifier::Decimal => {
                 let params = self
-                    .native_type
-                    .as_ref()
+                    .native_type()
                     .map(|nt| nt.args().into_iter())
                     .and_then(|mut args| Some((args.next()?, args.next()?)))
                     .and_then(|(p, s)| Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?)));
@@ -95,8 +94,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
 }
 
 fn parse_scalar_length(sf: &ScalarField) -> Option<TypeDataLength> {
-    sf.native_type
-        .as_ref()
+    sf.native_type()
         .and_then(|nt| nt.args().into_iter().next())
         .and_then(|len| match len.to_lowercase().as_str() {
             "max" => Some(TypeDataLength::Maximum),

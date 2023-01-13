@@ -10,7 +10,7 @@ pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
 pub struct Model {
-    pub name: String,
+    pub(crate) name: String,
     pub(crate) manifestation: Option<String>,
     pub(crate) fields: OnceCell<Fields>,
     pub(crate) indexes: OnceCell<Vec<Index>>,
@@ -22,6 +22,10 @@ pub struct Model {
 }
 
 impl Model {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// Returns the schema name for the model
     /// which is the contents of the @@schema("...") attribute
     pub fn schema_name(&self) -> Option<String> {

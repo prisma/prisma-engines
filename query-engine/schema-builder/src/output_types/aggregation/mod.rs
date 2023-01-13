@@ -5,7 +5,7 @@ pub(crate) mod group_by;
 pub(crate) mod plain;
 
 fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
-    match field.type_identifier {
+    match field.type_identifier() {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         _ => field::map_scalar_output_type_for_field(ctx, field),
@@ -17,7 +17,7 @@ pub fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<Scal
         .fields()
         .into_iter()
         .filter_map(|field| match field {
-            ModelField::Scalar(sf) if !sf.is_list() && sf.type_identifier != TypeIdentifier::Json => Some(sf),
+            ModelField::Scalar(sf) if !sf.is_list() && sf.type_identifier() != TypeIdentifier::Json => Some(sf),
             _ => None,
         })
         .collect()
@@ -81,7 +81,7 @@ where
     G: Fn(ObjectType) -> ObjectType,
 {
     let ident = Identifier::new(
-        format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix)),
+        format!("{}{}AggregateOutputType", capitalize(model.name()), capitalize(suffix)),
         PRISMA_NAMESPACE,
     );
     return_cached_output!(ctx, &ident);
@@ -90,7 +90,7 @@ where
     // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
+        .map(|sf| field(sf.name(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));

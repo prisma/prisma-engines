@@ -25,8 +25,8 @@ fn checked_update_one_input_type(
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}UpdateWithout{}Input", model.name, capitalize(f.name.as_str())),
-        _ => format!("{}UpdateInput", model.name),
+        Some(ref f) => format!("{}UpdateWithout{}Input", model.name(), capitalize(f.name())),
+        _ => format!("{}UpdateInput", model.name()),
     };
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
@@ -50,12 +50,8 @@ fn unchecked_update_one_input_type(
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!(
-            "{}UncheckedUpdateWithout{}Input",
-            model.name,
-            capitalize(f.name.as_str())
-        ),
-        _ => format!("{}UncheckedUpdateInput", model.name),
+        Some(ref f) => format!("{}UncheckedUpdateWithout{}Input", model.name(), capitalize(f.name())),
+        _ => format!("{}UncheckedUpdateInput", model.name()),
     };
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
@@ -87,14 +83,14 @@ pub(super) fn filter_checked_update_fields(
                 ModelField::Scalar(sf) => {
                     // We forbid updating auto-increment integer unique fields as this can create problems with the
                     // underlying sequences (checked inputs only).
-                    let is_not_autoinc = !sf.is_auto_generated_int_id
+                    let is_not_autoinc = !sf.is_auto_generated_int_id()
                         && !matches!(
-                            (&sf.type_identifier, sf.unique(), sf.is_autoincrement),
+                            (&sf.type_identifier(), sf.unique(), sf.is_autoincrement()),
                             (TypeIdentifier::Int, true, true)
                         );
 
-                    let model_id = sf.container.as_model().unwrap().primary_identifier();
-                    let is_not_disallowed_id = if model_id.contains(&sf.name) {
+                    let model_id = sf.container().as_model().unwrap().primary_identifier();
+                    let is_not_disallowed_id = if model_id.contains(sf.name()) {
                         // Is part of the id, connector must allow updating ID fields.
                         ctx.has_capability(ConnectorCapability::UpdateableId)
                     } else {
@@ -107,7 +103,9 @@ pub(super) fn filter_checked_update_fields(
                 // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
                 // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
                 ModelField::Relation(rf) => {
-                    let field_was_traversed_to = parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
+                    let field_was_traversed_to = parent_field
+                        .filter(|pf| pf.related_field().name() == rf.name())
+                        .is_some();
                     !field_was_traversed_to
                 }
 
@@ -169,7 +167,9 @@ pub(super) fn filter_unchecked_update_fields(
             // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
             ModelField::Relation(rf) => {
                 let is_not_inlined = !rf.is_inlined_on_enclosing_model();
-                let field_was_not_traversed_to = parent_field.filter(|pf| pf.related_field().name == rf.name).is_none();
+                let field_was_not_traversed_to = parent_field
+                    .filter(|pf| pf.related_field().name() == rf.name())
+                    .is_none();
 
                 field_was_not_traversed_to && is_not_inlined
             }
@@ -193,8 +193,8 @@ pub(crate) fn update_one_where_combination_object(
     let ident = Identifier::new(
         format!(
             "{}UpdateWithWhereUniqueWithout{}Input",
-            related_model.name,
-            capitalize(&parent_field.related_field().name)
+            related_model.name(),
+            capitalize(parent_field.related_field().name())
         ),
         PRISMA_NAMESPACE,
     );
@@ -224,8 +224,8 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     let ident = Identifier::new(
         format!(
             "{}UpdateToOneWithWhereWithout{}Input",
-            related_model.name,
-            capitalize(&parent_field.related_field().name)
+            related_model.name(),
+            capitalize(parent_field.related_field().name())
         ),
         PRISMA_NAMESPACE,
     );

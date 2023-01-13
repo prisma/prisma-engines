@@ -58,9 +58,9 @@ pub fn nested_delete(
             &delete_many_node,
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_name = parent_relation_field.model().name.clone();
-        let child_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_name = parent_relation_field.model().name().to_owned();
+        let child_name = child_model.name().to_owned();
 
         graph.create_edge(
             &find_child_records_node,
@@ -113,8 +113,8 @@ pub fn nested_delete(
                 &delete_record_node,
             )?;
 
-            let relation_name = parent_relation_field.relation().name.clone();
-            let child_model_name = child_model.name.clone();
+            let relation_name = parent_relation_field.relation().name().to_owned();
+            let child_model_name = child_model.name().to_owned();
 
             graph.create_edge(
                 &find_child_records_node,

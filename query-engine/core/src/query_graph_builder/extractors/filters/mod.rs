@@ -60,7 +60,8 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(format!(
                             "Unable to resolve field {} to a field or set of scalar fields on model {}",
-                            field_name, model.name
+                            field_name,
+                            model.name()
                         ))
                     })
                     .and_then(|fields| handle_compound_field(fields, value)),
@@ -77,7 +78,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|sf| {
-            let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+            let pv: PrismaValue = input_map.remove(sf.name()).unwrap().try_into()?;
             Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;

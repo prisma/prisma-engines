@@ -37,7 +37,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 /// Find one unique semantics.
 fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
-        let field_name = format!("findUnique{}", model.name);
+        let field_name = format!("findUnique{}", model.name());
 
         field(
             field_name,
@@ -56,7 +56,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 /// that will throw a NotFoundError if the item is not found
 fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
-        let field_name = format!("findUnique{}OrThrow", model.name);
+        let field_name = format!("findUnique{}OrThrow", model.name());
 
         field(
             field_name,
@@ -74,7 +74,7 @@ fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Opt
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
-    let field_name = format!("findFirst{}", model.name);
+    let field_name = format!("findFirst{}", model.name());
 
     field(
         field_name,
@@ -92,7 +92,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 /// not exist
 fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
-    let field_name = format!("findFirst{}OrThrow", model.name);
+    let field_name = format!("findFirst{}OrThrow", model.name());
 
     field(
         field_name,
@@ -109,7 +109,7 @@ fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Outp
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::relation_to_many_selection_arguments(ctx, model, true);
-    let field_name = format!("findMany{}", model.name);
+    let field_name = format!("findMany{}", model.name());
     let object_type = objects::model::map_type(ctx, model);
 
     field(
@@ -126,7 +126,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
-        format!("aggregate{}", model.name),
+        format!("aggregate{}", model.name()),
         arguments::relation_to_many_selection_arguments(ctx, model, false),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
@@ -139,7 +139,7 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
 /// Builds a "group by" aggregation query field (e.g. "groupByUser") for given model.
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
-        format!("groupBy{}", model.name),
+        format!("groupBy{}", model.name()),
         arguments::group_by_arguments(ctx, model),
         OutputType::list(OutputType::object(aggregation::group_by::group_by_output_object_type(
             ctx, model,
@@ -152,7 +152,7 @@ fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Out
 }
 
 fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
-    let field_name = format!("aggregate{}Raw", model.name);
+    let field_name = format!("aggregate{}Raw", model.name());
 
     field(
         field_name,
@@ -171,7 +171,7 @@ fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
 }
 
 fn mongo_find_raw_field(model: &ModelRef) -> OutputField {
-    let field_name = format!("find{}Raw", model.name);
+    let field_name = format!("find{}Raw", model.name());
 
     field(
         field_name,

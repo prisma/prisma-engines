@@ -35,7 +35,7 @@ pub struct QueryArguments {
 impl std::fmt::Debug for QueryArguments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("QueryArguments")
-            .field("model", &self.model.name)
+            .field("model", &self.model.name())
             .field("cursor", &self.cursor)
             .field("take", &self.take)
             .field("skip", &self.skip)

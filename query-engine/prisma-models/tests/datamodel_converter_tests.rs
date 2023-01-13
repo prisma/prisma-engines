@@ -114,10 +114,10 @@ fn converting_enums() {
     assert_eq!(enm.values, expected_values);
 
     let field = datamodel.assert_model("MyModel").assert_scalar_field("field");
-    assert_eq!(field.type_identifier, TypeIdentifier::Enum("MyEnum".to_string()));
+    assert_eq!(field.type_identifier(), TypeIdentifier::Enum("MyEnum".to_string()));
     assert_eq!(
-        field.internal_enum,
-        Some(InternalEnum {
+        field.internal_enum(),
+        Some(&InternalEnum {
             name: "MyEnum".to_string(),
             values: expected_values
         })
@@ -385,7 +385,7 @@ fn explicit_relation_fields() {
         .assert_name(relation_name)
         .assert_model_a("Blog")
         .assert_model_b("Post")
-        .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
+        .assert_manifestation(&RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
         }));
 }
@@ -427,7 +427,7 @@ fn many_to_many_relations() {
         .assert_name(relation_name)
         .assert_model_a("Blog")
         .assert_model_b("Post")
-        .assert_manifestation(RelationLinkManifestation::RelationTable(RelationTable {
+        .assert_manifestation(&RelationLinkManifestation::RelationTable(RelationTable {
             table: format!("_{}", relation_name),
             model_a_column: "A".to_string(),
             model_b_column: "B".to_string(),
@@ -597,7 +597,7 @@ impl ModelAssertions for Model {
             .iter()
             .find(|index| {
                 let has_right_type = index.typ == tpe;
-                let field_names: Vec<String> = index.fields().iter().map(|f| f.name.clone()).collect();
+                let field_names: Vec<String> = index.fields().iter().map(|f| f.name().to_owned()).collect();
                 let expected_field_names: Vec<String> = fields.iter().map(|f| f.to_string()).collect();
                 let is_for_right_fields = field_names == expected_field_names;
 
@@ -636,7 +636,7 @@ trait RelationFieldAssertions {
 
 impl FieldAssertions for ScalarField {
     fn assert_type_identifier(&self, ti: TypeIdentifier) -> &Self {
-        assert_eq!(self.type_identifier, ti);
+        assert_eq!(self.type_identifier(), ti);
         self
     }
 
@@ -653,12 +653,12 @@ impl FieldAssertions for ScalarField {
 
 impl ScalarFieldAssertions for ScalarField {
     fn assert_updated_at(&self) -> &Self {
-        assert!(self.is_updated_at);
+        assert!(self.is_updated_at());
         self
     }
 
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self {
-        assert!(self.is_auto_generated_int_id);
+        assert!(self.is_auto_generated_int_id());
         self
     }
 
@@ -705,24 +705,24 @@ trait RelationAssertions {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_model_a(&self, name: &str) -> &Self;
     fn assert_model_b(&self, name: &str) -> &Self;
-    fn assert_manifestation(&self, mani: RelationLinkManifestation) -> &Self;
+    fn assert_manifestation(&self, mani: &RelationLinkManifestation) -> &Self;
 }
 
 impl RelationAssertions for Relation {
     fn assert_name(&self, name: &str) -> &Self {
-        assert_eq!(self.name, name);
+        assert_eq!(self.name(), name);
         self
     }
     fn assert_model_a(&self, name: &str) -> &Self {
-        assert_eq!(self.model_a().name, name);
+        assert_eq!(self.model_a().name(), name);
         self
     }
     fn assert_model_b(&self, name: &str) -> &Self {
-        assert_eq!(self.model_b().name, name);
+        assert_eq!(self.model_b().name(), name);
         self
     }
-    fn assert_manifestation(&self, manifestation: RelationLinkManifestation) -> &Self {
-        assert_eq!(self.manifestation, manifestation);
+    fn assert_manifestation(&self, manifestation: &RelationLinkManifestation) -> &Self {
+        assert_eq!(self.manifestation(), manifestation);
         self
     }
 }

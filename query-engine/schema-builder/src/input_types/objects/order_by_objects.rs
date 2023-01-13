@@ -123,7 +123,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
             let related_model = rf.related_model();
             let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &related_model.into());
 
-            Some(input_field(rf.name.clone(), InputType::object(to_many_aggregate_type), None).optional())
+            Some(input_field(rf.name(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
         // To-one relation field.
@@ -131,7 +131,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
             let related_model = rf.related_model();
             let related_object_type = order_by_object_type(ctx, &related_model.into(), options);
 
-            Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
+            Some(input_field(rf.name(), InputType::object(related_object_type), None).optional())
         }
 
         // Scalar field.
@@ -146,7 +146,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
                 types.push(InputType::object(sort_nulls_object_type(ctx)));
             }
 
-            Some(input_field(sf.name.clone(), types, None).optional())
+            Some(input_field(sf.name(), types, None).optional())
         }
 
         // Composite field.
@@ -224,7 +224,7 @@ fn order_by_object_type_aggregate(
 
     let fields = scalar_fields
         .iter()
-        .map(|sf| input_field(sf.name.clone(), InputType::Enum(sort_order_enum(ctx)), None).optional())
+        .map(|sf| input_field(sf.name(), InputType::Enum(sort_order_enum(ctx)), None).optional())
         .collect();
 
     input_object.set_fields(fields);
@@ -269,7 +269,7 @@ fn order_by_field_text_search(ctx: &mut BuilderContext, container: &ParentContai
         .fields()
         .into_iter()
         .filter_map(|field| match field {
-            ModelField::Scalar(sf) if sf.type_identifier == TypeIdentifier::String => Some(sf),
+            ModelField::Scalar(sf) if sf.type_identifier() == TypeIdentifier::String => Some(sf),
             _ => None,
         })
         .collect();
@@ -303,7 +303,7 @@ fn order_by_object_type_text_search(
     let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
         &container.name(),
-        scalar_fields.iter().map(|sf| sf.name.clone()).collect_vec(),
+        scalar_fields.iter().map(|sf| sf.name().to_owned()).collect_vec(),
     ));
 
     let fields = vec![

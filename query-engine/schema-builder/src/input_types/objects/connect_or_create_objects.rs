@@ -17,8 +17,8 @@ pub(crate) fn nested_connect_or_create_input_object(
     let ident = Identifier::new(
         format!(
             "{}CreateOrConnectWithout{}Input",
-            related_model.name,
-            capitalize(parent_field.related_field().name.as_str())
+            related_model.name(),
+            capitalize(parent_field.related_field().name())
         ),
         PRISMA_NAMESPACE,
     );

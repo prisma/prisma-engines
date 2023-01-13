@@ -44,7 +44,7 @@ pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_name: &str) ->
 }
 
 pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> EnumTypeWeakRef {
-    let name = format!("{}ScalarFieldEnum", capitalize(&model.name));
+    let name = format!("{}ScalarFieldEnum", capitalize(model.name()));
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_enum!(ctx, &ident);
 
@@ -52,7 +52,7 @@ pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> En
         .fields()
         .scalar()
         .into_iter()
-        .map(|field| (field.name.clone(), field))
+        .map(|field| (field.name().to_owned(), field))
         .collect();
 
     let typ = Arc::new(EnumType::field_ref(ident.clone(), values));

@@ -93,7 +93,7 @@ pub fn from_scalar_field(field: &ScalarFieldRef) -> OutputMeta {
     let (ident, field_arity) = field.type_identifier_with_arity();
 
     // Only add a possible default return if the field is required.
-    let default = field.default_value.clone().and_then(|dv| match dv.into_kind() {
+    let default = field.default_value().cloned().and_then(|dv| match dv.into_kind() {
         psl::dml::DefaultKind::Single(pv) if field.is_required() => Some(pv),
         _ => None,
     });

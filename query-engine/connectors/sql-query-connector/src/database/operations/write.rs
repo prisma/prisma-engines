@@ -28,9 +28,8 @@ async fn generate_id(
     let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value.is_some() && !args.has_arg_for(x.db_name()) => x
-                .default_value
-                .clone()
+            SelectedField::Scalar(x) if x.default_value().is_some() && !args.has_arg_for(x.db_name()) => x
+                .default_value()
                 .unwrap()
                 .to_dbgenerated_func()
                 .map(|func| (field.db_name().to_string(), func)),

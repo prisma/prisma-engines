@@ -57,7 +57,7 @@ impl WriteArgsParser {
 
 fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperation, QueryGraphBuilderError> {
     match v {
-        ParsedInputValue::Single(PrismaValue::Enum(e)) if sf.type_identifier == TypeIdentifier::Json => {
+        ParsedInputValue::Single(PrismaValue::Enum(e)) if sf.type_identifier() == TypeIdentifier::Json => {
             let val = match e.as_str() {
                 json_null::DB_NULL => PrismaValue::Null,
                 json_null::JSON_NULL => PrismaValue::Json("null".to_owned()),
