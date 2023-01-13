@@ -3,7 +3,12 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "restrict_onD_1to1_req", schema(required), exclude(SqlServer))]
+#[test_suite(
+    suite = "restrict_onD_1to1_req",
+    schema(required),
+    exclude(SqlServer),
+    relation_mode = "prisma"
+)]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {

@@ -265,6 +265,7 @@ pub fn run_connector_test_impl(
 
     crate::run_with_tokio(
         async {
+            println!("Used datamodel:\n {}", datamodel.clone().yellow());
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
             let runner = Runner::load(

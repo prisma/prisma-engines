@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(suite = "cascade_onU_1to1_req", schema(required))]
+#[test_suite(suite = "cascade_onU_1to1_req", schema(required), relation_mode = "prisma")]
 mod one2one_req {
     use indoc::indoc;
     use query_engine_tests::run_query;

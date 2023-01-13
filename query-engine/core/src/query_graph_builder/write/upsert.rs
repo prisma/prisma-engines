@@ -81,6 +81,7 @@ pub fn upsert_record(
 
             create_write_args.add_datetimes(&model);
             update_write_args.add_datetimes(&model);
+
             graph.create_node(WriteQuery::native_upsert(
                 field.name,
                 model,
@@ -89,6 +90,7 @@ pub fn upsert_record(
                 update_write_args,
                 read,
             ));
+
             return Ok(());
         }
     }
@@ -238,6 +240,7 @@ fn can_use_connector_native_upsert(
         && !empty_update
         && !has_nested_selects
         && where_values_same_as_create
+        && !connector_ctx.relation_mode.is_prisma()
 }
 
 fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {

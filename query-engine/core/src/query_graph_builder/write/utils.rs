@@ -406,7 +406,7 @@ pub fn insert_emulated_on_delete(
                 emulate_on_delete_set_null(graph, connector_ctx, &rf, parent_node, child_node)?
             }
             ReferentialAction::Cascade => {
-                emulate_on_delete_cascade(graph, &rf, connector_ctx, model_to_delete, parent_node, child_node)?
+                emulate_on_delete_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
             }
             x => panic!("Unsupported referential action emulation: {}", x),
         }
@@ -516,7 +516,6 @@ pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
     connector_ctx: &ConnectorContext,
-    _model: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -615,19 +614,15 @@ pub fn emulate_on_delete_set_null(
     let dependent_model = relation_field.model();
     let parent_relation_field = relation_field.related_field();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
-    let child_fks = if relation_field.is_inlined_on_enclosing_model() {
-        relation_field.scalar_fields()
-    } else {
-        relation_field.related_field().referenced_fields()
-    };
+    let child_fks = relation_field.left_scalars();
 
     let child_update_args: IndexMap<_, _> = child_fks
-        .into_iter()
+        .iter()
         // Only the nullable fks should be updated to null
         .filter(|sf| !sf.is_required())
         .map(|child_fk| {
             (
-                DatasourceFieldName::from(&child_fk),
+                DatasourceFieldName::from(child_fk),
                 WriteOperation::scalar_set(PrismaValue::Null),
             )
         })
@@ -671,13 +666,33 @@ pub fn emulate_on_delete_set_null(
         QueryGraphDependency::ExecutionOrder,
     )?;
 
-    insert_emulated_on_delete(
-        graph,
-        connector_ctx,
-        &dependent_model,
-        &dependent_records_node,
-        &set_null_dependents_node,
-    )?;
+    // Collect other relation fields that share at least one common foreign key with the relation field we're dealing with
+    let overlapping_relation_fields = collect_overlapping_relation_fields(dependent_model, relation_field);
+
+    // For every relation fields sharing one common foreign key on the updated model, apply onUpdate emulations.
+    for rf in overlapping_relation_fields {
+        match rf.relation().on_update() {
+            ReferentialAction::NoAction => continue,
+            ReferentialAction::Restrict => {
+                emulate_on_update_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
+            }
+            ReferentialAction::SetNull => emulate_on_update_set_null(
+                graph,
+                &rf,
+                connector_ctx,
+                &dependent_records_node,
+                &set_null_dependents_node,
+            )?,
+            ReferentialAction::Cascade => emulate_on_update_cascade(
+                graph,
+                &rf,
+                connector_ctx,
+                &dependent_records_node,
+                &set_null_dependents_node,
+            )?,
+            x => panic!("Unsupported referential action emulation: {}", x),
+        }
+    }
 
     Ok(())
 }
@@ -796,33 +811,15 @@ pub fn emulate_on_update_set_null(
         QueryGraphDependency::ExecutionOrder,
     )?;
 
-    // Collect other relation fields that share at least one common foreign key with the relation key we're dealing with
-    let dependent_relation_fields: Vec<_> = dependent_model
-        .fields()
-        .relation()
-        .into_iter()
-        .filter(|rf| rf != relation_field)
-        .filter(|rf| {
-            let fks = if rf.is_inlined_on_enclosing_model() {
-                rf.scalar_fields()
-            } else {
-                rf.related_field().referenced_fields()
-            };
+    // Collect other relation fields that share at least one common foreign key with the relation field we're dealing with
+    let overlapping_relation_fields = collect_overlapping_relation_fields(dependent_model, relation_field);
 
-            fks.iter().any(|fk| child_fks.contains(fk))
-        })
-        .map(|rf| match rf.is_inlined_on_enclosing_model() {
-            true => rf,
-            false => rf.related_field(),
-        })
-        .collect();
-
-    // If there are any relation fields sharing one common foreign key, recurse
-    for rf in dependent_relation_fields {
+    // For every relation fields sharing one common foreign key, recurse
+    for rf in overlapping_relation_fields {
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue,
             ReferentialAction::Restrict => {
-                emulate_on_delete_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
+                emulate_on_update_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
             }
             ReferentialAction::SetNull => emulate_on_update_set_null(
                 graph,
@@ -1148,4 +1145,27 @@ pub fn emulate_on_update_cascade(
     )?;
 
     Ok(())
+}
+
+/// Collect relation fields that share at least one common foreign key with `relation_field`.
+fn collect_overlapping_relation_fields(model: ModelRef, relation_field: &RelationFieldRef) -> Vec<RelationFieldRef> {
+    let child_fks = relation_field.left_scalars();
+
+    let dependent_relation_fields: Vec<_> = model
+        .fields()
+        .relation()
+        .into_iter()
+        .filter(|rf| rf != relation_field)
+        .filter(|rf| {
+            let fks = rf.left_scalars();
+
+            fks.iter().any(|fk| child_fks.contains(fk))
+        })
+        .map(|rf| match rf.is_inlined_on_enclosing_model() {
+            true => rf,
+            false => rf.related_field(),
+        })
+        .collect();
+
+    dependent_relation_fields
 }
