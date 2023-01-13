@@ -3144,10 +3144,12 @@ name = "qe-setup"
 version = "0.1.0"
 dependencies = [
  "connection-string",
+ "crossbeam-channel",
  "enumflags2",
  "migration-core",
  "mongodb",
  "mongodb-client",
+ "once_cell",
  "parking_lot 0.12.1",
  "psl",
  "quaint",
