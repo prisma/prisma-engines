@@ -155,7 +155,6 @@ fn run_relation_link_test_impl(
     if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
         let connector = config.test_connector_tag().unwrap();
-        let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
         let (log_capture, log_tx) = TestLogCapture::new();
@@ -267,8 +266,6 @@ pub fn run_connector_test_impl(
     crate::run_with_tokio(
         async {
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
-
-            let requires_teardown = connector.requires_teardown();
 
             let runner = Runner::load(
                 crate::CONFIG.runner(),
