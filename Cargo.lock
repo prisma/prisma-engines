@@ -3246,7 +3246,6 @@ dependencies = [
  "futures",
  "indexmap",
  "itertools",
- "lazy_static",
  "lru",
  "mongodb-client",
  "mongodb-query-connector",
