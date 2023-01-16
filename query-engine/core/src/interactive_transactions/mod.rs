@@ -146,12 +146,6 @@ impl OpenTx {
     }
 }
 
-impl Into<CachedTx> for OpenTx {
-    fn into(self) -> CachedTx {
-        CachedTx::Open(self)
-    }
-}
-
 pub enum ClosedTx {
     Committed,
     RolledBack,

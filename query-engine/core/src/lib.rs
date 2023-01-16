@@ -17,7 +17,6 @@
     clippy::needless_return,
     clippy::derive_partial_eq_without_eq
 )]
-#![warn(warnings)] // Todo deny warnings once done
 
 #[macro_use]
 extern crate tracing;
