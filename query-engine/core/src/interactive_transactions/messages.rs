@@ -30,7 +30,6 @@ impl Display for TxOpRequest {
 pub enum TxOpResponse {
     Committed(crate::Result<()>),
     RolledBack(crate::Result<()>),
-    Expired,
     Single(crate::Result<ResponseData>),
     Batch(crate::Result<Vec<crate::Result<ResponseData>>>),
 }
@@ -40,7 +39,6 @@ impl Display for TxOpResponse {
         match self {
             Self::Committed(..) => write!(f, "Committed"),
             Self::RolledBack(..) => write!(f, "RolledBack"),
-            Self::Expired => write!(f, "Expired"),
             Self::Single(..) => write!(f, "Single"),
             Self::Batch(..) => write!(f, "Single"),
         }

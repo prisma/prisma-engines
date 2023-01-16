@@ -222,10 +222,6 @@ impl ITXClient {
 
     fn handle_error(&self, msg: TxOpResponse) -> TransactionError {
         match msg {
-            TxOpResponse::Expired => {
-                let reason = "Transaction is no longer valid. Last state: 'Expired'".to_string();
-                TransactionError::Closed { reason }
-            }
             TxOpResponse::Committed(..) => {
                 let reason = "Transaction is no longer valid. Last state: 'Committed'".to_string();
                 TransactionError::Closed { reason }
