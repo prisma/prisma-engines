@@ -5,8 +5,6 @@
     clippy::upper_case_acronyms,
     clippy::redundant_clone,
     clippy::explicit_counter_loop,
-    clippy::match_like_matches_macro,
-    clippy::from_over_into,
     clippy::or_fun_call,
     clippy::needless_question_mark,
     clippy::ptr_arg,
@@ -17,7 +15,6 @@
     clippy::needless_return,
     clippy::derive_partial_eq_without_eq
 )]
-#![warn(warnings)] // Todo deny warnings once done
 
 #[macro_use]
 extern crate tracing;

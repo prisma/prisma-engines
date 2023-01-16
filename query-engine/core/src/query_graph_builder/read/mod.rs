@@ -16,10 +16,10 @@ pub use related::*;
 use super::*;
 use crate::{Query, QueryGraph, ReadQuery};
 
-impl Into<QueryGraph> for ReadQuery {
-    fn into(self) -> QueryGraph {
+impl From<ReadQuery> for QueryGraph {
+    fn from(query: ReadQuery) -> Self {
         let mut graph = QueryGraph::new();
-        graph.create_node(Query::Read(self));
+        graph.create_node(Query::Read(query));
         graph
     }
 }
