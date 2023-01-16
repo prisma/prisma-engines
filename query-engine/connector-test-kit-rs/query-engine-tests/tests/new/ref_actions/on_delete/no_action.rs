@@ -54,7 +54,8 @@ mod one2one_req {
 #[test_suite(
     suite = "noaction_onD_1to1_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite),
+    relation_mode = "prisma"
 )]
 mod one2one_opt {
     fn optional() -> String {
@@ -85,15 +86,15 @@ mod one2one_opt {
         assert_error!(
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             runner,
             "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
@@ -251,7 +252,7 @@ mod one2many_req {
 #[test_suite(
     suite = "noaction_onD_1toM_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb),
+    exclude(Postgres, Sqlite),
     relation_mode = "prisma"
 )]
 mod one2many_opt {
@@ -283,15 +284,15 @@ mod one2many_opt {
         assert_error!(
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         assert_error!(
             runner,
             "mutation { deleteManyParent(where: { id: 1 }) { count }}",
-            2003,
-            "Foreign key constraint failed on the field"
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
 
         Ok(())
