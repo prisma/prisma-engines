@@ -5,6 +5,8 @@ use query_engine_metrics::MetricRegistry;
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
 use std::{env, sync::Arc};
 
+use quaint::{prelude::Queryable, single::Quaint};
+
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 /// Direct engine runner.
@@ -12,6 +14,7 @@ pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
+    connection_url: String,
     current_tx_id: Option<TxId>,
     metrics: MetricRegistry,
 }
@@ -31,6 +34,7 @@ impl RunnerInterface for DirectRunner {
             executor,
             query_schema,
             connector_tag,
+            connection_url: url,
             current_tx_id: None,
             metrics,
         })
@@ -43,6 +47,17 @@ impl RunnerInterface for DirectRunner {
         let query = GraphQlBody::Single(query.into());
 
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
+    }
+
+    async fn raw_execute(&self, query: String) -> TestResult<()> {
+        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
+            panic!("raw_execute is not supported for MongoDB yet");
+        }
+
+        let conn = Quaint::new(&self.connection_url).await?;
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
     }
 
     async fn batch(
