@@ -27,7 +27,7 @@ pub fn nested_disconnect(
             .into_iter()
             .map(|value: ParsedInputValue| {
                 let value: ParsedInputMap = value.try_into()?;
-                extract_unique_filter(value, &child_model)
+                extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
             .into_iter()
@@ -57,7 +57,7 @@ pub fn nested_disconnect(
                     .into_iter()
                     .map(|value: ParsedInputValue| {
                         let value: ParsedInputMap = value.try_into()?;
-                        extract_unique_filter(value, &child_model)
+                        extract_unique_filter(value, child_model)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
                     .into_iter()
@@ -154,7 +154,7 @@ fn handle_one_to_x(
 ) -> QueryGraphBuilderResult<()> {
     // Fetches the children to be disconnected.
     let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
 
     let child_relation_field = parent_relation_field.related_field();
 
@@ -195,7 +195,7 @@ fn handle_one_to_x(
             )
         };
 
-    let update_node = utils::update_records_node_placeholder(graph, filter.clone(), model_to_update);
+    let update_node = utils::update_records_node_placeholder(graph, filter, model_to_update);
 
     // Edge to inject the correct data into the update (either from the parent or child).
     graph.create_edge(

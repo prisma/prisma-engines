@@ -245,7 +245,7 @@ async fn execute_on(
 }
 
 fn build_graph(query_schema: QuerySchemaRef, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer)> {
-    let (query_graph, serializer) = QueryGraphBuilder::new(query_schema.clone()).build(operation.clone())?;
+    let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
     Ok((query_graph, serializer))
 }

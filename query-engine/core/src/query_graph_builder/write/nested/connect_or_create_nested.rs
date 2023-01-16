@@ -859,7 +859,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut create_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -977,7 +977,7 @@ fn one_to_one_inlined_child(
         graph.create_edge(
             &read_old_child_node,
             &update_old_child_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(move |mut update_old_child_node, mut old_child_ids| {
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(move |mut update_old_child_node, mut old_child_ids| {
                 if child_relation_field.is_required() && !old_child_ids.is_empty() {
                     return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
                 }

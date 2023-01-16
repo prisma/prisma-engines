@@ -215,7 +215,7 @@ fn merge_search_filters(filter: Filter) -> Filter {
     }
 }
 
-fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
+fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
     let mut output: Vec<Filter> = vec![];
@@ -306,7 +306,6 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
 
         // Complex relation filter
         ParsedInputValue::Map(filter_map) if filter_map.is_relation_envelope() => filter_map
-            .clone()
             .into_iter()
             .map(|(k, v)| relation::parse(&k, field, v))
             .collect::<QueryGraphBuilderResult<Vec<_>>>(),

@@ -25,7 +25,7 @@ pub fn nested_set(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-            extract_unique_filter(value, &child_model)
+            extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()

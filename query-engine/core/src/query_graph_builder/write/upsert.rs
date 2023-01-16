@@ -213,11 +213,11 @@ fn can_use_connector_native_upsert(
 
     let has_nested_create = create_argument
         .iter()
-        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok());
 
     let has_nested_update = update_argument
         .iter()
-        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok());
 
     let empty_update = update_argument.iter().len() == 0;
 
@@ -229,7 +229,7 @@ fn can_use_connector_native_upsert(
 
     let where_values_same_as_create = where_field
         .iter()
-        .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
+        .all(|(field_name, input)| where_and_create_equal(field_name, input, create_argument));
 
     connector_ctx.can_native_upsert()
         && has_one_unique
@@ -240,8 +240,8 @@ fn can_use_connector_native_upsert(
         && where_values_same_as_create
 }
 
-fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
-    match model.fields().find_from_scalar(&field_name) {
+fn is_unique_field(field_name: &str, model: &ModelRef) -> bool {
+    match model.fields().find_from_scalar(field_name) {
         Ok(field) => field.unique(),
         Err(_) => resolve_compound_field(field_name, model).is_some(),
     }

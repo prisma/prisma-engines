@@ -43,17 +43,13 @@ where
     T: Into<ParentContainer>,
 {
     let parent = parent.into();
-    let fields = pairs
+    pairs
         .iter()
         .filter_map(|pair| {
             parent
                 .find_field(&pair.parsed_field.name)
                 .map(|field| (pair.parsed_field.clone(), field))
         })
-        .collect::<Vec<(ParsedField, Field)>>();
-
-    fields
-        .into_iter()
         .flat_map(|field| match field {
             (_, Field::Relation(rf)) => rf.scalar_fields().into_iter().map(Into::into).collect(),
             (_, Field::Scalar(sf)) => vec![sf.into()],

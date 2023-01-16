@@ -71,7 +71,7 @@ fn extract_order_by(container: &ParentContainer, value: ParsedInputValue) -> Que
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(container, object, vec![], None)?)
+                process_order_object(container, object, vec![], None)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().flatten().collect()),
@@ -136,14 +136,9 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::scalar_aggregation(
-                            sf.clone(),
-                            vec![],
-                            sort_order,
-                            sort_aggr,
-                        )))
+                        Ok(Some(OrderBy::scalar_aggregation(sf, vec![], sort_order, sort_aggr)))
                     } else {
-                        Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order, nulls_order)))
+                        Ok(Some(OrderBy::scalar(sf, path, sort_order, nulls_order)))
                     }
                 }
 

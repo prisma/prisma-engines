@@ -156,7 +156,7 @@ fn parse_composite_envelope(
 fn parse_composite_update_many(
     cf: &CompositeFieldRef,
     mut value: ParsedInputMap,
-    path: &mut Vec<DatasourceFieldName>,
+    path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
     let filter = extract_filter(where_map, &cf.typ)?;
@@ -201,7 +201,7 @@ fn parse_composite_unset(pv: PrismaValue) -> WriteOperation {
 fn parse_composite_updates(
     cf: &CompositeFieldRef,
     map: ParsedInputMap,
-    path: &mut Vec<DatasourceFieldName>,
+    path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let mut writes = vec![];
 
@@ -216,8 +216,8 @@ fn parse_composite_updates(
 
         let write_op = match field {
             Field::Scalar(sf) if sf.is_list() => parse_scalar_list(v),
-            Field::Scalar(sf) => parse_scalar(&sf, v),
-            Field::Composite(cf) => parse_composite_writes(&cf, v, &mut path.clone()),
+            Field::Scalar(sf) => parse_scalar(sf, v),
+            Field::Composite(cf) => parse_composite_writes(cf, v, &mut path.to_owned()),
             _ => unreachable!(),
         }?;
 
