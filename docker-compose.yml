@@ -1,12 +1,9 @@
 version: "3"
 services:
   cockroach_22_1_0:
-    image: cockroachdb/cockroach:v22.1.13
+    image: prismagraphql/cockroachdb-custom:22.1.0
     restart: always
     command: start-single-node --insecure --store=type=mem,size=3GiB
-    environment:
-      COCKROACH_USER: prisma
-      COCKROACH_DATABASE: postgresql
     ports:
       - "26257:26257"
     networks:
