@@ -40,7 +40,7 @@ impl Display for TxOpResponse {
             Self::Committed(..) => write!(f, "Committed"),
             Self::RolledBack(..) => write!(f, "RolledBack"),
             Self::Single(..) => write!(f, "Single"),
-            Self::Batch(..) => write!(f, "Single"),
+            Self::Batch(..) => write!(f, "Batch"),
         }
     }
 }
