@@ -251,7 +251,8 @@ mod one2many_req {
 #[test_suite(
     suite = "noaction_onD_1toM_opt",
     schema(optional),
-    exclude(Postgres, Sqlite, MongoDb)
+    exclude(Postgres, Sqlite, MongoDb),
+    relation_mode = "prisma"
 )]
 mod one2many_opt {
     fn optional() -> String {

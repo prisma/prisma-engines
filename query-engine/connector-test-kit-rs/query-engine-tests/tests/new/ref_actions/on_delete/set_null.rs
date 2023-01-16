@@ -293,7 +293,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setnull_onD_1toM_opt", schema(optional), exclude(MongoDb))]
+#[test_suite(
+    suite = "setnull_onD_1toM_opt",
+    schema(optional),
+    exclude(MongoDb),
+    relation_mode = "prisma"
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {

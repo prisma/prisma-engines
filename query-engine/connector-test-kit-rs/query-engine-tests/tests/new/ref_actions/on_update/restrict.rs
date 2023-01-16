@@ -36,20 +36,12 @@ mod one2one_req {
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -61,20 +53,12 @@ mod one2one_req {
 
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -86,20 +70,12 @@ mod one2one_req {
 
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -114,7 +90,12 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "restrict_onU_1to1_opt", schema(optional), exclude(SqlServer))]
+#[test_suite(
+    suite = "restrict_onU_1to1_opt",
+    schema(optional),
+    exclude(SqlServer),
+    relation_mode = "prisma"
+)]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -142,20 +123,12 @@ mod one2one_opt {
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -167,20 +140,12 @@ mod one2one_opt {
 
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -192,20 +157,12 @@ mod one2one_opt {
 
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", child: { create: { id: 1 }} }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -220,7 +177,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "restrict_onU_1toM_req", schema(required), exclude(SqlServer))]
+#[test_suite(
+    suite = "restrict_onU_1toM_req",
+    schema(required),
+    exclude(SqlServer),
+    relation_mode = "prisma"
+)]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {
@@ -248,20 +210,12 @@ mod one2many_req {
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -273,20 +227,12 @@ mod one2many_req {
 
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -298,20 +244,12 @@ mod one2many_req {
 
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -362,7 +300,12 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "restrict_onU_1toM_opt", schema(optional), exclude(SqlServer))]
+#[test_suite(
+    suite = "restrict_onU_1toM_opt",
+    schema(optional),
+    exclude(SqlServer),
+    relation_mode = "prisma"
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -390,20 +333,12 @@ mod one2many_opt {
 
         let query = r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -415,20 +350,12 @@ mod one2many_opt {
 
         let query = r#"mutation { updateManyParent(where: { id: 1 }, data: { uniq: "u1" }) { count }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
@@ -440,20 +367,12 @@ mod one2many_opt {
 
         let query = r#"mutation { upsertOneParent(where: { id: 1 }, update: { uniq: "u1" }, create: { id: 1, name: "Bob", uniq: "1", children: { create: { id: 1 }} }) { id }}"#;
 
-        match runner.connector_version() {
-            ConnectorVersion::MongoDb(_) => assert_error!(
-                runner,
-                query,
-                2014,
-                "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
-            ),
-            _ => assert_error!(
-                runner,
-                query,
-                2003,
-                "Foreign key constraint failed on the field"
-            ),
-        };
+        assert_error!(
+            runner,
+            query,
+            2014,
+            "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
 
         Ok(())
     }
