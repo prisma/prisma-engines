@@ -11,10 +11,11 @@ mod actors;
 mod error;
 mod messages;
 
-pub use actor_manager::*;
-pub use actors::*;
 pub use error::*;
-pub use messages::*;
+
+pub(crate) use actor_manager::*;
+pub(crate) use actors::*;
+pub(crate) use messages::*;
 
 /// How Interactive Transactions work
 /// The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.
