@@ -172,13 +172,13 @@ pub fn insert_1to1_idempotent_connect_checks(
         ),
     )?;
     let read_old_child_node =
-        insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
     graph.create_edge(
         &read_old_child_node,
         &diff_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
+            child_model_identifier,
             Box::new(move |mut diff_node, child_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
                     diff.left = child_ids.into_iter().collect();
@@ -278,11 +278,11 @@ pub fn insert_existing_1to1_related_model_checks(
     let child_model = parent_relation_field.related_model();
     let child_side_required = parent_relation_field.related_field().is_required();
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
-    let rf = Arc::clone(&parent_relation_field);
+    let rf = Arc::clone(parent_relation_field);
 
     // Note: Also creates the edge between `parent` and the new node.
     let read_existing_children =
-        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
     let if_node = graph.create_node(Flow::default_if());
@@ -648,7 +648,7 @@ pub fn emulate_on_delete_set_null(
         &dependent_records_node,
         &set_null_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
+            child_model_identifier,
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
                 {
@@ -793,7 +793,7 @@ pub fn emulate_on_update_set_null(
         &dependent_records_node,
         &set_null_dependents_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_model_identifier.clone(),
+            child_model_identifier,
             Box::new(move |mut set_null_dependents_node, dependent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut dmr))) = set_null_dependents_node
                 {
@@ -950,7 +950,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     let join_node = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
-        &parent_node,
+        parent_node,
         &join_node,
         QueryGraphDependency::ProjectedDataDependency(
             model_to_update.primary_identifier(),
@@ -998,12 +998,12 @@ pub fn insert_emulated_on_update(
     for rf in relation_fields {
         match rf.relation().on_update() {
             ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, &parent_node, child_node)?,
+            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, parent_node, child_node)?,
             ReferentialAction::SetNull => {
-                emulate_on_update_set_null(graph, &rf, connector_ctx, &parent_node, child_node)?
+                emulate_on_update_set_null(graph, &rf, connector_ctx, parent_node, child_node)?
             }
             ReferentialAction::Cascade => {
-                emulate_on_update_cascade(graph, &rf, connector_ctx, &parent_node, child_node)?
+                emulate_on_update_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
             }
             x => panic!("Unsupported referential action emulation: {}", x),
         }

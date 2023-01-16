@@ -46,7 +46,7 @@ impl WriteQuery {
             Self::UpdateManyRecords(x) => x.set_selectors(selectors),
             Self::UpdateRecord(x) => x.set_selectors(selectors),
             Self::DeleteRecord(x) => x.set_selectors(selectors),
-            _ => return,
+            _ => (),
         }
     }
 

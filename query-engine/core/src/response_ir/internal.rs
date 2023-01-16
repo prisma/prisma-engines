@@ -353,7 +353,7 @@ fn serialize_objects(
                     .unique()
                     .collect()
             })
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
 
         let mut all_fields = result.fields.clone();
         all_fields.append(&mut aggr_fields);
@@ -465,7 +465,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
                 // This will cause clashes if one field has an @map("name") and the other field is named "field" directly.
                 let inner_field = composite_type
                     .find_field(&field_name)
-                    .or(composite_type.find_field_by_db_name(&field_name))
+                    .or_else(|| composite_type.find_field_by_db_name(&field_name))
                     .unwrap();
 
                 // The field on the output object type. Used for the actual serialization process.
@@ -546,9 +546,10 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
-        (ScalarType::Int, PrismaValue::Float(f)) => {
-            PrismaValue::Int(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
-        }
+        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(
+            f.to_i64()
+                .ok_or_else(|| CoreError::decimal_conversion_error(&f, "i64"))?,
+        ),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
@@ -559,9 +560,10 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
         (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
-        (ScalarType::BigInt, PrismaValue::Float(f)) => {
-            PrismaValue::BigInt(f.to_i64().ok_or(CoreError::decimal_conversion_error(&f, "i64"))?)
-        }
+        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(
+            f.to_i64()
+                .ok_or_else(|| CoreError::decimal_conversion_error(&f, "i64"))?,
+        ),
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),

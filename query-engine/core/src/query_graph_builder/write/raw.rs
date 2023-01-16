@@ -41,6 +41,6 @@ fn raw_query(
     Ok(RawQuery {
         model,
         inputs,
-        query_type: query_type.to_owned(),
+        query_type,
     })
 }

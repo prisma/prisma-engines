@@ -580,7 +580,7 @@ fn handle_one_to_one_parent_create(
         &parent_node,
         &read_new_child_node,
         QueryGraphDependency::ProjectedDataDependency(
-            child_linking_fields.clone(),
+            child_linking_fields,
             Box::new(move |mut read_new_child_node, mut child_links| {
                 // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
                 if relation_inlined_parent {

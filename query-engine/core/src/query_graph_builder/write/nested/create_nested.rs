@@ -69,7 +69,7 @@ fn handle_many_to_many(
     // Todo optimize with createMany
     for create_node in create_nodes {
         graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder)?;
-        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+        connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
     }
 
     Ok(())

@@ -3,17 +3,8 @@
     clippy::wrong_self_convention,
     clippy::vec_init_then_push,
     clippy::upper_case_acronyms,
-    clippy::redundant_clone,
-    clippy::explicit_counter_loop,
-    clippy::or_fun_call,
-    clippy::needless_question_mark,
-    clippy::ptr_arg,
-    clippy::mem_replace_with_default,
-    clippy::clone_on_copy,
-    clippy::needless_borrow,
-    clippy::needless_collect,
-    clippy::needless_return,
-    clippy::derive_partial_eq_without_eq
+    clippy::derive_partial_eq_without_eq,
+    clippy::needless_borrow
 )]
 
 #[macro_use]

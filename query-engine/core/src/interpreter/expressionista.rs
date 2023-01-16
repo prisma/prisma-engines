@@ -2,7 +2,6 @@ use super::{
     expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
 use crate::{query_graph::*, Query};
-use prisma_models::SelectionResult;
 use std::{collections::VecDeque, convert::TryInto};
 
 pub struct Expressionista;
@@ -168,8 +167,8 @@ impl Expressionista {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
                     Node::Computation(Computation::Diff(DiffNode { left, right })) => {
-                        let left_diff: Vec<&SelectionResult> = left.difference(&right).collect();
-                        let right_diff: Vec<&SelectionResult> = right.difference(&left).collect();
+                        let left_diff = left.difference(&right);
+                        let right_diff = right.difference(&left);
 
                         Ok(Expression::Return {
                             result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
@@ -364,12 +363,12 @@ impl Expressionista {
                                         _ => unreachable!(),
                                     };
 
-                                    Ok(res.map_err(|err| {
+                                    res.map_err(|err| {
                                         InterpreterError::InterpretationError(
                                             format!("Error for binding '{}'", parent_binding_name),
                                             Some(Box::new(err)),
                                         )
-                                    })?)
+                                    })
                                 });
 
                         into_expr(node?)

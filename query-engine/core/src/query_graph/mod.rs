@@ -870,7 +870,7 @@ impl ToGraphviz for QueryGraph {
             .into_iter()
             .map(|idx| (idx, self.graph.node_weight(idx).unwrap().borrow().unwrap()))
             .map(|(idx, node)| {
-                if self.is_result_node(&NodeRef { node_ix: idx.clone() }) {
+                if self.is_result_node(&NodeRef { node_ix: idx }) {
                     format!(
                         "    {} [label=\"{}\", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),
@@ -879,7 +879,7 @@ impl ToGraphviz for QueryGraph {
                 } else if self
                     .root_nodes()
                     .iter()
-                    .any(|root_node| root_node == &NodeRef { node_ix: idx.clone() })
+                    .any(|root_node| root_node == &NodeRef { node_ix: idx })
                 {
                     format!(
                         "    {} [label=\"{}\", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]",
