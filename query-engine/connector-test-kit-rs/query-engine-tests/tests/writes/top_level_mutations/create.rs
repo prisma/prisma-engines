@@ -38,6 +38,8 @@ mod create {
     // "A Create Mutation" should "create and return item"
     #[connector_test]
     async fn create_should_work(runner: Runner) -> TestResult<()> {
+        // This test is flaky on CockroachDB because of a TX write conflict.
+        // We mitigate this issue by retrying multiple times.
         let res = retry!(
             {
                 runner.query(format!(
