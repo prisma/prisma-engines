@@ -3,8 +3,9 @@ use crate::PrismaResponse;
 use futures::FutureExt;
 use indexmap::IndexMap;
 use query_core::{
-    schema::QuerySchemaRef, BatchDocument, BatchDocumentTransaction, CompactedDocument, Item, Operation, QueryDocument,
-    QueryExecutor, ResponseData, TxId,
+    response_ir::{Item, ResponseData},
+    schema::QuerySchemaRef,
+    BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor, TxId,
 };
 use std::{fmt, panic::AssertUnwindSafe};
 

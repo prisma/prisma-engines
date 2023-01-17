@@ -233,16 +233,6 @@ impl QueryGraph {
         Ok(())
     }
 
-    /// Returns a NodeRef to the result node that occurs in the subtree, if it exists.
-    /// Returns None if no such node is found.
-    pub fn find_result_node(&self, starting_node: &NodeRef) -> Option<NodeRef> {
-        if self.is_result_node(starting_node) {
-            Some(*starting_node)
-        } else {
-            todo!()
-        }
-    }
-
     pub fn result_nodes(&self) -> Vec<NodeRef> {
         self.result_nodes
             .iter()
@@ -425,17 +415,6 @@ impl QueryGraph {
                 } else {
                     None
                 }
-            })
-            .collect()
-    }
-
-    /// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
-    pub fn zip_source_nodes(&self, edges: Vec<EdgeRef>) -> Vec<(EdgeRef, NodeRef)> {
-        edges
-            .into_iter()
-            .map(|edge| {
-                let target = self.edge_source(&edge);
-                (edge, target)
             })
             .collect()
     }

@@ -1,6 +1,5 @@
-use tracing::Instrument;
-
 use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
+use tracing::Instrument;
 
 #[derive(Debug)]
 pub struct QueryPipeline<'conn> {
