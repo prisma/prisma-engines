@@ -17,3 +17,27 @@ pub enum TransactionError {
     #[error("Unexpected response: {reason}.")]
     Unknown { reason: String },
 }
+
+#[derive(Debug, serde::Serialize, PartialEq)]
+pub struct ExtendedTransactionUserFacingError {
+    #[serde(flatten)]
+    user_facing_error: user_facing_errors::Error,
+
+    #[serde(skip_serializing_if = "indexmap::IndexMap::is_empty")]
+    extensions: crate::Map,
+}
+
+impl ExtendedTransactionUserFacingError {
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
+        self.extensions.entry(key).or_insert(crate::Item::Json(val));
+    }
+}
+
+impl From<crate::CoreError> for ExtendedTransactionUserFacingError {
+    fn from(error: crate::CoreError) -> Self {
+        ExtendedTransactionUserFacingError {
+            user_facing_error: error.into(),
+            extensions: Default::default(),
+        }
+    }
+}
