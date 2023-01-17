@@ -140,7 +140,7 @@ impl From<opentelemetry::trace::Event> for Event {
 
         let level = attributes
             .remove("level")
-            .unwrap_or(serde_json::Value::String("unknown".to_owned()))
+            .unwrap_or_else(|| serde_json::Value::String("unknown".to_owned()))
             .to_string()
             .to_ascii_lowercase();
 

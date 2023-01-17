@@ -225,11 +225,11 @@ impl From<Candidate<'_, models::Event>> for Capture {
     fn from(candidate: Candidate<'_, models::Event>) -> Capture {
         if candidate.is_loggable_mongo_db_query() {
             // mongo events representing queries are transformed into a more meaningful log event
-            return Capture::LogEvent(candidate.query_event());
+            Capture::LogEvent(candidate.query_event())
         } else if candidate.is_loggable_event() {
-            return Capture::LogEvent(candidate.value);
+            Capture::LogEvent(candidate.value)
         } else {
-            return Capture::Discarded;
+            Capture::Discarded
         }
     }
 }
