@@ -4,16 +4,13 @@ use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use psl::dml::FieldArity;
-use quaint::{
-    ast::{Expression, Value},
-    connector::ResultRow,
-};
+use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
 #[derive(Debug, Clone, Default)]
-pub struct SqlRow {
+pub(crate) struct SqlRow {
     pub values: Vec<PrismaValue>,
 }
 
@@ -264,29 +261,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     })
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum SqlId {
-    String(String),
-    Int(usize),
-    UUID(Uuid),
-}
-
-impl From<SqlId> for Expression<'static> {
-    fn from(id: SqlId) -> Self {
-        match id {
-            SqlId::String(s) => s.into(),
-            SqlId::Int(i) => (i as i64).into(),
-            SqlId::UUID(u) => u.into(),
-        }
-    }
-}
-
-impl From<&SqlId> for Expression<'static> {
-    fn from(id: &SqlId) -> Self {
-        id.clone().into()
-    }
 }
 
 // We assume the bytes are stored as a big endian signed integer, because that is what
