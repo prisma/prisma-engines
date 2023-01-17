@@ -56,18 +56,15 @@ pub enum QueryEngineLogLevel {
 }
 
 impl QueryEngineLogLevel {
-    fn level(self) -> String {
+    fn level(self) -> Option<String> {
         match self {
-            Self::FromEnv => match std::env::var("QE_LOG_LEVEL") {
-                Ok(l) => l,
-                _ => "error".to_string(),
-            },
-            Self::Override(l) => l,
+            Self::FromEnv => std::env::var("QE_LOG_LEVEL").ok(),
+            Self::Override(l) => Some(l),
         }
     }
 }
 
-#[rustfmt::skip]
+#[cfg_attr(rustfmt, rustfmt_skip)]
 pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFilter {
     let mut filter = EnvFilter::from_default_env()
         .add_directive("tide=error".parse().unwrap())
@@ -76,14 +73,14 @@ pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFi
         .add_directive("hyper=error".parse().unwrap())
         .add_directive("tower=error".parse().unwrap());
 
-    let level = qe_log_level.level();
-
-    filter = filter
-        .add_directive(format!("query_engine={}", &level).parse().unwrap())
-        .add_directive(format!("query_core={}", &level).parse().unwrap())
-        .add_directive(format!("query_connector={}", &level).parse().unwrap())
-        .add_directive(format!("sql_query_connector={}", &level).parse().unwrap())
-        .add_directive(format!("mongodb_query_connector={}", &level).parse().unwrap());
+    if let Some(level) = qe_log_level.level() {
+        filter = filter
+            .add_directive(format!("query_engine={}", &level).parse().unwrap())
+            .add_directive(format!("query_core={}", &level).parse().unwrap())
+            .add_directive(format!("query_connector={}", &level).parse().unwrap())
+            .add_directive(format!("sql_query_connector={}", &level).parse().unwrap())
+            .add_directive(format!("mongodb_query_connector={}", &level).parse().unwrap());
+    }
 
     if log_queries {
         filter = filter
@@ -111,15 +108,5 @@ pub fn user_facing_filter(meta: &Metadata) -> bool {
         return true;
     }
 
-    // a quaint query event is always user facing
-    if meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query" {
-        return true;
-    }
-
-    // a mongo query event is always user facing
-    if meta.target() == "mongodb_query_connector::query" {
-        return true;
-    }
-
-    false
+    meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
 }
