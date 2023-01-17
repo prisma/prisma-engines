@@ -32,6 +32,7 @@ buildkite-script-*
 # Nix specific
 .direnv/
 /.envrc.local
+nixos.qcow2
 
 # Dev setup
 datamodel_v2.prisma
