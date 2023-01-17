@@ -64,7 +64,7 @@ impl QueryEngineLogLevel {
     }
 }
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
+#[rustfmt::skip]
 pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFilter {
     let mut filter = EnvFilter::from_default_env()
         .add_directive("tide=error".parse().unwrap())
