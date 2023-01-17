@@ -318,18 +318,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     };
 
     match result {
-        Ok(tx_id) => {
-            let result = json!({ "id": tx_id.to_string() });
-            let result_bytes = serde_json::to_vec(&result).unwrap();
-
-            let res = Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "application/json")
-                .body(Body::from(result_bytes))
-                .unwrap();
-
-            Ok(res)
-        }
+        Ok(tx_id) => Ok(tx_id_to_http_resp(tx_id, telemetry)),
         Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
@@ -367,6 +356,24 @@ impl<'a> Extractor for HeaderExtractor<'a> {
     fn keys(&self) -> Vec<&str> {
         self.0.keys().map(|hk| hk.as_str()).collect()
     }
+}
+
+fn tx_id_to_http_resp(
+    tx_id: TxId,
+    captured_telemetry: Option<telemetry::capturing::storage::Storage>,
+) -> Response<Body> {
+    let result = if let Some(telemetry) = captured_telemetry {
+        json!({ "id": tx_id.to_string(), "extensions": { "logs": json!(telemetry.logs), "traces": json!(telemetry.traces) } })
+    } else {
+        json!({ "id": tx_id.to_string() })
+    };
+    let result_bytes = serde_json::to_vec(&result).unwrap();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/json")
+        .body(dbg!(Body::from(result_bytes)))
+        .unwrap()
 }
 
 fn err_to_http_resp(
