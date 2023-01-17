@@ -225,7 +225,7 @@ fn json_to_gql_response(json_resp: &serde_json::Value) -> GQLResponse {
             let mut gql_response = GQLResponse::with_capacity(obj.keys().count());
 
             obj.iter().for_each(|(k, v)| {
-                gql_response.insert_data(k.to_string(), query_core::Item::Json(v.clone()));
+                gql_response.insert_data(k.to_string(), query_core::response_ir::Item::Json(v.clone()));
             });
             gql_response
         }

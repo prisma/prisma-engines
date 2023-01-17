@@ -6,6 +6,7 @@ use enumflags2::BitFlags;
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
 pub enum ReadQuery {
     RecordQuery(RecordQuery),
@@ -15,15 +16,6 @@ pub enum ReadQuery {
 }
 
 impl ReadQuery {
-    pub fn name(&self) -> &str {
-        match self {
-            ReadQuery::RecordQuery(x) => &x.name,
-            ReadQuery::ManyRecordsQuery(x) => &x.name,
-            ReadQuery::RelatedRecordsQuery(x) => &x.name,
-            ReadQuery::AggregateRecordsQuery(x) => &x.name,
-        }
-    }
-
     /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         match self {

@@ -1,4 +1,3 @@
-use crate::schema_builder;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
 /// Attempts to resolve a field name to a compound field.

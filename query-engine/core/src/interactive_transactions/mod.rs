@@ -84,17 +84,6 @@ impl Display for CachedTx {
 
 impl CachedTx {
     /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    /// Consumes self to remove the `CachedTx` indirection to get to the underlying `OpenTx`.
-    pub fn into_open(self) -> crate::Result<OpenTx> {
-        if let Self::Open(otx) = self {
-            Ok(otx)
-        } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{}'", self);
-            Err(CoreError::from(TransactionError::Closed { reason }))
-        }
-    }
-
-    /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
     pub fn as_open(&mut self) -> crate::Result<&mut OpenTx> {
         if let Self::Open(ref mut otx) = self {
             Ok(otx)
