@@ -1,5 +1,5 @@
 use super::catch;
-use crate::{database::operations::*, operations::upsert::native_upsert, sql_info::SqlInfo, Context, SqlError};
+use crate::{database::operations::*, sql_info::SqlInfo, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -39,7 +39,7 @@ impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     async fn commit(&mut self) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            Ok(self.inner.commit().await.map_err(SqlError::from)?)
+            self.inner.commit().await.map_err(SqlError::from)
         })
         .await
     }
@@ -226,7 +226,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     ) -> connector::Result<SingleRecord> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            native_upsert(&self.inner, upsert, &ctx).await
+            upsert::native_upsert(&self.inner, upsert, &ctx).await
         })
         .await
     }
