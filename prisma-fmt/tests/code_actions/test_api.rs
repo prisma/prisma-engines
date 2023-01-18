@@ -1,5 +1,6 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
+use prisma_fmt::offset_to_position;
 use psl::SourceFile;
 use std::{fmt::Write as _, io::Write as _, sync::Arc};
 
@@ -17,7 +18,10 @@ fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnosti
                 diagnostics.push(Diagnostic {
                     severity: Some(DiagnosticSeverity::WARNING),
                     message: warn.message().to_owned(),
-                    // ! important -- range: warn.span(),
+                    range: lsp_types::Range {
+                        start: offset_to_position(warn.span().start, schema.db.source()),
+                        end: offset_to_position(warn.span().end, schema.db.source()),
+                    },
                     ..Default::default()
                 });
             }
@@ -26,7 +30,10 @@ fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnosti
                 diagnostics.push(Diagnostic {
                     severity: Some(DiagnosticSeverity::ERROR),
                     message: error.message().to_owned(),
-                    // ! important -- range: error.span()
+                    range: lsp_types::Range {
+                        start: offset_to_position(error.span().start, schema.db.source()),
+                        end: offset_to_position(error.span().end, schema.db.source()),
+                    },
                     ..Default::default()
                 });
             }

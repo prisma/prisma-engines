@@ -7,15 +7,15 @@
         "range": {
           "start": {
             "line": 9,
-            "character": 2
+            "character": 4
           },
           "end": {
-            "line": 9,
-            "character": 71
+            "line": 10,
+            "character": 0
           }
         },
         "severity": 1,
-        "message": "The model needs a unique constraint (fields: bId1, bId2) due to a relation"
+        "message": "Error parsing attribute \"@relation\": A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([bId1, bId2])` attribute to the model, or change the relation to one-to-many."
       }
     ],
     "edit": {

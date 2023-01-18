@@ -174,7 +174,7 @@ pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
 
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
-pub(crate) fn offset_to_position(offset: usize, document: &str) -> Position {
+pub fn offset_to_position(offset: usize, document: &str) -> Position {
     let mut position = Position::default();
 
     for (i, chr) in document.chars().enumerate() {
