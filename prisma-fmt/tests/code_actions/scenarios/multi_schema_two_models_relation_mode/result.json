@@ -1,21 +1,21 @@
 [
   {
-    "title": "Make referenced field(s) unique",
+    "title": "Add `@@schema` attribute",
     "kind": "quickfix",
     "diagnostics": [
       {
         "range": {
           "start": {
-            "line": 16,
-            "character": 2
+            "line": 11,
+            "character": 0
           },
           "end": {
-            "line": 16,
-            "character": 71
+            "line": 13,
+            "character": 1
           }
         },
         "severity": 1,
-        "message": "The model needs a unique constraint (for fields: field1, field2) due to a relation"
+        "message": "This model is missing an `@@schema` attribute."
       }
     ],
     "edit": {
@@ -24,15 +24,15 @@
           {
             "range": {
               "start": {
-                "line": 10,
+                "line": 13,
                 "character": 0
               },
               "end": {
-                "line": 10,
+                "line": 13,
                 "character": 1
               }
             },
-            "newText": "\n  @@unique([field1, field2])\n}"
+            "newText": "\n    @@schema(\"\")\n}"
           }
         ]
       }
