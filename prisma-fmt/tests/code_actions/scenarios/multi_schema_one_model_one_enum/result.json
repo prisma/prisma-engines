@@ -15,7 +15,7 @@
           }
         },
         "severity": 1,
-        "message": "This model is missing an `@@schema` attribute."
+        "message": "Error validating model \"User\": This model is missing an `@@schema` attribute."
       }
     ],
     "edit": {
