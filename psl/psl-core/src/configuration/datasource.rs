@@ -244,7 +244,7 @@ impl Datasource {
     }
 }
 
-fn from_url<F>(url: &StringFromEnvVar, env: F) -> Result<String, UrlValidationError>
+pub(crate) fn from_url<F>(url: &StringFromEnvVar, env: F) -> Result<String, UrlValidationError>
 where
     F: Fn(&str) -> Option<String>,
 {

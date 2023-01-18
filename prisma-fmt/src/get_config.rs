@@ -153,4 +153,121 @@ mod tests {
         let response = get_config(&request.to_string()).unwrap();
         expected.assert_eq(&response);
     }
+
+    #[test]
+    fn get_config_direct_url_value() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("DBURL")
+                directUrl = "postgresql://example.com/direct"
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "env": {
+                "DBURL": "postgresql://example.com/mydb"
+            }
+        });
+        let expected = expect![[
+            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":null,"value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]}"#
+        ]];
+        let response = get_config(&request.to_string()).unwrap();
+        expected.assert_eq(&response);
+    }
+
+    #[test]
+    fn get_config_direct_url_env() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("DBURL")
+                directUrl = env("DBDIRURL")
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "env": {
+                "DBURL": "postgresql://example.com/mydb",
+                "DBDIRURL": "postgresql://example.com/direct"
+            }
+        });
+        let expected = expect![[
+            r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":"DBDIRURL","value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]}"#
+        ]];
+        let response = get_config(&request.to_string()).unwrap();
+        expected.assert_eq(&response);
+    }
+
+    #[test]
+    fn get_config_direct_url_direct_empty() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("DBURL")
+                directUrl = ""
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "env": {
+                "DBURL": "postgresql://example.com/mydb",
+            }
+        });
+        let expected = expect![[
+            r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91m\"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
+        ]];
+        let response = get_config(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
+    }
+
+    #[test]
+    fn get_config_direct_url_env_not_found() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("DBURL")
+                directUrl = env("DOES_NOT_EXIST")
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "env": {
+                "DBURL": "postgresql://example.com/mydb",
+            }
+        });
+        let expected = expect![[
+            r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: DOES_NOT_EXIST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
+        ]];
+        let response = get_config(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
+    }
+
+    #[test]
+    fn get_config_direct_url_env_is_empty() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("DBURL")
+                directUrl = env("DOES_NOT_EXIST")
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "env": {
+                "DBURL": "postgresql://example.com/mydb",
+                "DOES_NOT_EXIST": "",
+            }
+        });
+        let expected = expect![[
+            r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL. The environment variable `DOES_NOT_EXIST` resolved to an empty string.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
+        ]];
+        let response = get_config(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
+    }
 }
