@@ -2,22 +2,6 @@
   {
     "title": "Make referenced field(s) unique",
     "kind": "quickfix",
-    "diagnostics": [
-      {
-        "range": {
-          "start": {
-            "line": 16,
-            "character": 2
-          },
-          "end": {
-            "line": 16,
-            "character": 71
-          }
-        },
-        "severity": 1,
-        "message": "The model needs a unique constraint (for fields: field1, field2) due to a relation"
-      }
-    ],
     "edit": {
       "changes": {
         "file:///path/to/schema.prisma": [

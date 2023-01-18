@@ -2,22 +2,6 @@
   {
     "title": "Make referencing fields unique",
     "kind": "quickfix",
-    "diagnostics": [
-      {
-        "range": {
-          "start": {
-            "line": 8,
-            "character": 2
-          },
-          "end": {
-            "line": 8,
-            "character": 55
-          }
-        },
-        "severity": 1,
-        "message": "The field has to be unique due to a relation"
-      }
-    ],
     "edit": {
       "changes": {
         "file:///path/to/schema.prisma": [
