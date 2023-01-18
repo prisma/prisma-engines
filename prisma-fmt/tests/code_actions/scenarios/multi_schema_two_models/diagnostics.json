@@ -1,0 +1,16 @@
+[
+    {
+        "range": {
+            "start": {
+                "line": 11,
+                "character": 0
+            },
+            "end": {
+                "line": 13,
+                "character": 1
+            }
+        },
+        "severity": 1,
+        "message": "This model is missing an `@@schema` attribute."
+    }
+]
