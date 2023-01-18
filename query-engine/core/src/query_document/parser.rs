@@ -2,13 +2,10 @@ use super::*;
 use crate::schema::*;
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
-use indexmap::IndexMap;
 use prisma_value::PrismaValue;
 use psl::dml::ValueGeneratorFn;
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
+use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, hash::Hash, str::FromStr, sync::Arc};
 use uuid::Uuid;
-
-// todo: validate is one of!
 
 pub struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
@@ -96,7 +93,7 @@ impl QueryDocumentParser {
         &self,
         parent_path: QueryPath,
         schema_field: &OutputFieldRef,
-        given_arguments: &[(String, QueryValue)],
+        given_arguments: &[(String, PrismaValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
         let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
         let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
@@ -119,7 +116,7 @@ impl QueryDocumentParser {
             .iter()
             .filter_map(|schema_input_arg| {
                 // Match schema argument field to an argument field in the incoming document.
-                let selection_arg: Option<(String, QueryValue)> = given_arguments
+                let selection_arg: Option<(String, PrismaValue)> = given_arguments
                     .iter()
                     .find(|given_argument| given_argument.0 == schema_input_arg.name)
                     .cloned();
@@ -149,12 +146,12 @@ impl QueryDocumentParser {
             .collect()
     }
 
-    /// Parses and validates a QueryValue against possible input types.
+    /// Parses and validates a PrismaValue against possible input types.
     /// Matching is done in order of definition on the input type. First matching type wins.
     fn parse_input_value(
         &self,
         parent_path: QueryPath,
-        value: QueryValue,
+        value: PrismaValue,
         possible_input_types: &[InputType],
     ) -> QueryParserResult<ParsedInputValue> {
         let mut parse_results = vec![];
@@ -163,10 +160,10 @@ impl QueryDocumentParser {
             let value = value.clone();
             let result = match (&value, input_type) {
                 // Null handling
-                (QueryValue::Null, InputType::Scalar(ScalarType::Null)) => {
+                (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                     Ok(ParsedInputValue::Single(PrismaValue::Null))
                 }
-                (QueryValue::Null, _) => Err(QueryParserError {
+                (PrismaValue::Null, _) => Err(QueryParserError {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                 }),
@@ -177,17 +174,17 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::Single),
 
                 // Enum handling
-                (QueryValue::Enum(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
-                (QueryValue::String(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
-                (QueryValue::Boolean(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                (PrismaValue::Enum(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                (PrismaValue::String(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                (PrismaValue::Boolean(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
 
                 // List handling.
-                (QueryValue::List(values), InputType::List(l)) => self
+                (PrismaValue::List(values), InputType::List(l)) => self
                     .parse_list(&parent_path, values.clone(), &l)
                     .map(ParsedInputValue::List),
 
                 // Object handling
-                (QueryValue::Object(o), InputType::Object(obj)) => self
+                (PrismaValue::Object(o), InputType::Object(obj)) => self
                     .parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
                     .map(ParsedInputValue::Map),
 
@@ -231,50 +228,65 @@ impl QueryDocumentParser {
     fn parse_scalar(
         &self,
         parent_path: &QueryPath,
-        value: QueryValue,
+        value: PrismaValue,
         scalar_type: &ScalarType,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
-            (QueryValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
-            (QueryValue::String(s), ScalarType::JsonList) => self.parse_json_list(parent_path, &s),
-            (QueryValue::String(s), ScalarType::Bytes) => self.parse_bytes(parent_path, s),
-            (QueryValue::String(s), ScalarType::Decimal) => self.parse_decimal(parent_path, s),
-            (QueryValue::String(s), ScalarType::BigInt) => self.parse_bigint(parent_path, s),
-            (QueryValue::String(s), ScalarType::UUID) => {
+            // Identity matchers
+            (PrismaValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
+            (PrismaValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
+            (PrismaValue::Json(json), ScalarType::Json) => Ok(PrismaValue::Json(json)),
+            (PrismaValue::Xml(xml), ScalarType::Xml) => Ok(PrismaValue::Xml(xml)),
+            (PrismaValue::Uuid(uuid), ScalarType::UUID) => Ok(PrismaValue::Uuid(uuid)),
+            (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
+            (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
+            (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
+            (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
+
+            // String coercion matchers
+            (PrismaValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
+            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list(parent_path, &s),
+            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(parent_path, s),
+            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(parent_path, s),
+            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(parent_path, s),
+            (PrismaValue::String(s), ScalarType::UUID) => {
                 self.parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
-            (QueryValue::String(s), ScalarType::Json) => {
+            (PrismaValue::String(s), ScalarType::Json) => {
                 Ok(PrismaValue::Json(self.parse_json(parent_path, &s).map(|_| s)?))
             }
-            (QueryValue::String(s), ScalarType::DateTime) => {
+            (PrismaValue::String(s), ScalarType::DateTime) => {
                 self.parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
             }
-            (QueryValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
 
-            (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
-            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
+            // Int coercion matchers
+            (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (PrismaValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (PrismaValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (PrismaValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
-            (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int) => match f.to_i64() {
+            // Float coercion matchers
+            (PrismaValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
+            (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
+            (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
                 None => Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
                             format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
             },
 
-            (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
+            // // UUID coercion matchers
+            // (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // All other combinations are value type mismatches.
-            (qv, _) => Err(QueryParserError {
-                path: parent_path.clone(),
-                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                    have: qv,
-                    want: InputType::Scalar(scalar_type.clone()),
-                },
-            }),
+            (qv, _) => {
+                Err(QueryParserError {
+                    path: parent_path.clone(),
+                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                        have: qv,
+                        want: InputType::Scalar(scalar_type.clone()),
+                    },
+                })
+            },
         }
     }
 
@@ -356,7 +368,7 @@ impl QueryDocumentParser {
     fn parse_list(
         &self,
         path: &QueryPath,
-        values: Vec<QueryValue>,
+        values: Vec<PrismaValue>,
         value_type: &InputType,
     ) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
@@ -365,11 +377,11 @@ impl QueryDocumentParser {
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
-    fn parse_enum(&self, path: &QueryPath, val: QueryValue, typ: &EnumTypeRef) -> QueryParserResult<ParsedInputValue> {
+    fn parse_enum(&self, path: &QueryPath, val: PrismaValue, typ: &EnumTypeRef) -> QueryParserResult<ParsedInputValue> {
         let raw = match val {
-            QueryValue::Enum(s) => s,
-            QueryValue::String(s) => s,
-            QueryValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
+            PrismaValue::Enum(s) => s,
+            PrismaValue::String(s) => s,
+            PrismaValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
                 return Err(QueryParserError {
                     path: path.clone(),
@@ -412,7 +424,7 @@ impl QueryDocumentParser {
     fn parse_input_object(
         &self,
         parent_path: QueryPath,
-        object: IndexMap<String, QueryValue>,
+        object: Vec<(String, PrismaValue)>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
@@ -422,7 +434,7 @@ impl QueryDocumentParser {
             .map(|field| field.name.as_str())
             .collect();
 
-        let right: HashSet<&str> = object.keys().map(|k| k.as_str()).collect();
+        let right: HashSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
         let diff = Diff::new(&left, &right);
 
         // First, check that all fields **not** provided in the query (left diff) are optional,
@@ -439,16 +451,16 @@ impl QueryDocumentParser {
                 // If it's not optional and has no default, a required field has not been provided.
                 match &field.default_value {
                     Some(default_value) => {
-                        let query_value = match &default_value.kind {
+                        let default_pv = match &default_value.kind {
                             psl::dml::DefaultKind::Expression(ref expr)
                                 if matches!(expr.generator(), ValueGeneratorFn::Now) =>
                             {
-                                self.default_now.clone().into()
+                                self.default_now.clone()
                             }
-                            _ => default_value.get()?.into(),
+                            _ => default_value.get()?,
                         };
 
-                        match self.parse_input_value(path, query_value, &field.field_types) {
+                        match self.parse_input_value(path, default_pv, &field.field_types) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
                         }
@@ -531,13 +543,13 @@ impl QueryDocumentParser {
 }
 
 #[derive(Debug)]
-struct Diff<'a, T: std::cmp::Eq + std::hash::Hash> {
+struct Diff<'a, T: Eq + Hash> {
     pub left: Vec<&'a T>,
     pub right: Vec<&'a T>,
     pub _equal: Vec<&'a T>,
 }
 
-impl<'a, T: std::cmp::Eq + std::hash::Hash> Diff<'a, T> {
+impl<'a, T: Eq + Hash> Diff<'a, T> {
     fn new(left_side: &'a HashSet<T>, right_side: &'a HashSet<T>) -> Diff<'a, T> {
         let left: Vec<&T> = left_side.difference(right_side).collect();
         let right: Vec<&T> = right_side.difference(left_side).collect();

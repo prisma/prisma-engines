@@ -13,7 +13,7 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -258,6 +258,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_object(self) -> Option<Vec<(String, PrismaValue)>> {
+        match self {
+            PrismaValue::Object(obj) => Some(obj),
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
@@ -383,5 +390,37 @@ impl TryFrom<PrismaValue> for String {
             PrismaValue::String(s) => Ok(s),
             _ => Err(ConversionFailure::new("PrismaValue", "String")),
         }
+    }
+}
+
+impl PartialEq for PrismaValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::String(l0), Self::String(r0)) => l0 == r0,
+            (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
+            (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
+            (Self::Int(l0), Self::Int(r0)) => l0 == r0,
+            (Self::Uuid(l0), Self::Uuid(r0)) => l0 == r0,
+            (Self::List(l0), Self::List(r0)) => l0 == r0,
+            (Self::Json(l0), Self::Json(r0)) => l0 == r0,
+            (Self::Xml(l0), Self::Xml(r0)) => l0 == r0,
+            (Self::Object(l0), Self::Object(r0)) => l0 == r0,
+            (Self::DateTime(l0), Self::DateTime(r0)) => l0 == r0,
+            (Self::Float(l0), Self::Float(r0)) => l0 == r0,
+            (Self::BigInt(l0), Self::BigInt(r0)) => l0 == r0,
+            (Self::Bytes(l0), Self::Bytes(r0)) => l0 == r0,
+            (Self::String(t1), Self::DateTime(t2)) | (Self::DateTime(t2), Self::String(t1)) => {
+                chrono::DateTime::parse_from_rfc3339(t1)
+                    .map(|t1| &t1 == t2)
+                    .unwrap_or_else(|_| t1 == stringify_date(t2).as_str())
+            }
+            _ => false,
+        }
+    }
+}
+
+impl std::hash::Hash for PrismaValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
     }
 }
