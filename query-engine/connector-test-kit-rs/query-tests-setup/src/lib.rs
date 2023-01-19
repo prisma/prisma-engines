@@ -36,7 +36,7 @@ pub type TestResult<T> = Result<T, TestError>;
 
 lazy_static! {
     /// Test configuration, loaded once at runtime.
-    pub static ref CONFIG: TestConfig = TestConfig::load().unwrap();
+    pub static ref CONFIG: TestConfig = TestConfig::load();
 
     /// The log level from the environment.
     pub static ref ENV_LOG_LEVEL: String = std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned());
