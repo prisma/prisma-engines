@@ -3,7 +3,6 @@ use crate::{
     model_extensions::*,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
-    sql_info::SqlInfo,
     Context, QueryExt, SqlError,
 };
 use connector_interface::*;
@@ -54,7 +53,6 @@ pub(crate) async fn get_many_records(
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
-    sql_info: SqlInfo,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     let reversed = query_arguments.needs_reversed_order();
@@ -83,7 +81,7 @@ pub(crate) async fn get_many_records(
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
-    match sql_info.max_bind_values {
+    match ctx.max_bind_values {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             if query_arguments.has_unbatchable_ordering() {
                 return Err(SqlError::QueryParameterLimitExceeded(

@@ -1,8 +1,7 @@
 use crate::filter_conversion::AliasedCondition;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::{
-    error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, sql_trace::SqlTraceComment, Context,
-    QueryExt,
+    error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
 };
 use connector_interface::*;
 use itertools::Itertools;
@@ -156,7 +155,6 @@ pub(crate) async fn create_record(
 
 pub(crate) async fn create_records(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -187,7 +185,7 @@ pub(crate) async fn create_records(
         // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
         create_many_empty(conn, model, args.len(), skip_duplicates, ctx).await
     } else {
-        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields, ctx).await
+        create_many_nonempty(conn, model, args, skip_duplicates, affected_fields, ctx).await
     }
 }
 
@@ -195,14 +193,13 @@ pub(crate) async fn create_records(
 #[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let batches = if let Some(max_params) = sql_info.max_bind_values {
+    let batches = if let Some(max_params) = ctx.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
         // -> Horizontal partitioning by row number, vertical by number of args.
         args.into_iter()
@@ -243,7 +240,7 @@ async fn create_many_nonempty(
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = sql_info.max_rows {
+    let partitioned_batches = if let Some(max_rows) = ctx.max_rows {
         let capacity = batches.len();
         batches
             .into_iter()
@@ -471,11 +468,7 @@ pub(crate) async fn execute_raw(
 /// a JSON `Value`.
 pub(crate) async fn query_raw(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
-    features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(sql_info, features, inputs).await?;
-
-    Ok(value)
+    Ok(conn.raw_json(inputs).await?)
 }

@@ -1,5 +1,5 @@
 use super::{catch, transaction::SqlConnectorTransaction};
-use crate::{database::operations::*, sql_info::SqlInfo, Context, QueryExt, SqlError};
+use crate::{database::operations::*, Context, QueryExt, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -119,7 +119,6 @@ where
                 query_arguments,
                 &selected_fields.into(),
                 aggr_selections,
-                SqlInfo::from(&self.connection_info),
                 &ctx,
             )
             .await
@@ -184,15 +183,7 @@ where
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_records(
-                &self.inner,
-                SqlInfo::from(&self.connection_info),
-                model,
-                args,
-                skip_duplicates,
-                &ctx,
-            )
-            .await
+            write::create_records(&self.inner, model, args, skip_duplicates, &ctx).await
         })
         .await
     }
@@ -293,7 +284,7 @@ where
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(&self.inner, SqlInfo::from(&self.connection_info), self.features, inputs).await
+            write::query_raw(&self.inner, inputs).await
         })
         .await
     }

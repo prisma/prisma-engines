@@ -1,12 +1,12 @@
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_info::SqlInfo, sql_trace::trace_parent_to_string,
-    sql_trace::SqlTraceComment, value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, Context, SqlRow,
-    ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
+    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, Context, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
 use itertools::Itertools;
+use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
 use quaint::{
@@ -14,12 +14,10 @@ use quaint::{
     connector::{self, Queryable},
     pooled::PooledConnection,
 };
-use tracing_futures::Instrument;
-
-use opentelemetry::trace::TraceContextExt;
 use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
+use tracing_futures::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -66,8 +64,6 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
     /// JSON `Value` as a result.
     async fn raw_json<'a>(
         &'a self,
-        _sql_info: SqlInfo,
-        _features: psl::PreviewFeatures,
         mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
