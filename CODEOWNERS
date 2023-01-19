@@ -11,5 +11,8 @@
 /migration-engine @prisma/schema-team
 
 /prisma-fmt @prisma/schema-team
+/prisma-fmt-wasm @prisma/schema-team
 
 /psl @prisma/schema-team
+
+/query-engine @prisma/client-team-rust
