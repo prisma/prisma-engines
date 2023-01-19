@@ -1,5 +1,4 @@
 use quaint::prelude::ConnectionInfo;
-use std::env;
 
 pub(super) struct Context<'a> {
     connection_info: &'a ConnectionInfo,
@@ -34,7 +33,6 @@ impl<'a> Context<'a> {
     }
 }
 
-#[cfg(not(test))]
 fn get_batch_size(default: usize) -> Option<usize> {
     use once_cell::sync::Lazy;
 
@@ -44,14 +42,9 @@ fn get_batch_size(default: usize) -> Option<usize> {
     /// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
     /// value to a smaller number.
     static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> = Lazy::new(|| {
-        env::var("QUERY_BATCH_SIZE")
+        std::env::var("QUERY_BATCH_SIZE")
             .ok()
             .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
     });
     (*BATCH_SIZE_OVERRIDE).or(Some(default))
-}
-
-#[cfg(test)]
-fn get_batch_size(_: usize) -> Option<usize> {
-    env::var("QUERY_BATCH_SIZE").ok().and_then(|size| size.parse().ok())
 }
