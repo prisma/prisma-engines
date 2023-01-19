@@ -24,11 +24,7 @@ source .test_database_urls/mysql_5_6
 "#;
 
 static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
-    let database_url = if std::env::var("IS_BUILDKITE").is_ok() {
-        "sqlite".to_owned()
-    } else {
-        std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?
-    };
+    let database_url = std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?;
     let shadow_database_url = std::env::var("TEST_SHADOW_DATABASE_URL").ok();
     let prefix = database_url
         .find(':')
