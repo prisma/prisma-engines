@@ -33,8 +33,6 @@ mod upsert_uuid {
             }"#
         );
 
-        dbg!(&res);
-
         insta::assert_snapshot!(
           &res["data"]["upsertOneTodo"]["title"].to_string(),
           @r###""the title""###
