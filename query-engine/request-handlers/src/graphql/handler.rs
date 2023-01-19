@@ -2,12 +2,18 @@ use super::{GQLBatchResponse, GQLResponse, GraphQlBody};
 use crate::PrismaResponse;
 use futures::FutureExt;
 use indexmap::IndexMap;
+use psl::dml::{
+    prisma_value::{parse_datetime, stringify_datetime},
+    PrismaValue,
+};
 use query_core::{
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
     BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor, TxId,
 };
-use std::{fmt, panic::AssertUnwindSafe};
+use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
+
+type ArgsToResult = (HashMap<String, PrismaValue>, IndexMap<String, Item>);
 
 pub struct GraphQlHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
@@ -126,7 +132,7 @@ impl<'a> GraphQlHandler<'a> {
 
                 // At this point, many findUnique queries were converted to a single findMany query and that query was run.
                 // This means we have a list of results and we need to map each result back to their original findUnique query.
-                // `data` is the piece of logic that allows us to do that mapping.
+                // `args_to_results` is the data-structure that allows us to do that mapping.
                 // It takes the findMany response and converts it to a map of arguments to result.
                 // Let's take an example. Given the following batched queries:
                 // [
@@ -146,7 +152,7 @@ impl<'a> GraphQlHandler<'a> {
                 //    findUnique(where: { id: 1, name: "Bob" }) { id name age } -> { id: 1, name: "Bob", age: 18 }
                 //    findUnique(where: { id: 2, name: "Alice" }) { id name age } -> { id: 2, name: "Alice", age: 27 }
                 // ]
-                let args_to_results = gql_response
+                let args_to_results: Vec<ArgsToResult> = gql_response
                     .take_data(plural_name)
                     .unwrap()
                     .into_list()
@@ -157,13 +163,12 @@ impl<'a> GraphQlHandler<'a> {
                     .into_iter()
                     .map(|args| {
                         let mut responses = GQLResponse::with_capacity(1);
-
                         // This is step 5 of the comment above.
                         // Copying here is mandatory due to some of the queries
                         // might be repeated with the same arguments in the original
                         // batch. We need to give the same answer for both of them.
-                        match args_to_results.iter().find(|(a, _)| *a == args) {
-                            Some((_, result)) => {
+                        match Self::find_original_result_from_args(&args_to_results, &args) {
+                            Some(result) => {
                                 // Filter out all the keys not selected in the
                                 // original query.
                                 let result: IndexMap<String, Item> = result
@@ -205,5 +210,37 @@ impl<'a> GraphQlHandler<'a> {
         self.executor
             .execute(tx_id, query_doc, self.query_schema.clone(), trace_id)
             .await
+    }
+
+    fn find_original_result_from_args<'b>(
+        args_to_results: &'b [ArgsToResult],
+        input_args: &'b HashMap<String, PrismaValue>,
+    ) -> Option<&'b IndexMap<String, Item>> {
+        args_to_results
+            .iter()
+            .find(|(arg_from_result, _)| Self::compare_args(arg_from_result, input_args))
+            .map(|(_, result)| result)
+    }
+
+    fn compare_args(left: &HashMap<String, PrismaValue>, right: &HashMap<String, PrismaValue>) -> bool {
+        left.iter().all(|(key, left_value)| {
+            right
+                .get(key)
+                .map_or(false, |right_value| Self::compare_values(left_value, right_value))
+        })
+    }
+
+    /// Compares two PrismaValues but treats DateTime and String as equal when their parsed/stringified versions are equal.
+    /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
+    /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
+    /// This should likely _not_ be used outside of this specific context.
+    fn compare_values(left: &PrismaValue, right: &PrismaValue) -> bool {
+        match (left, right) {
+            (PrismaValue::String(t1), PrismaValue::DateTime(t2))
+            | (PrismaValue::DateTime(t2), PrismaValue::String(t1)) => parse_datetime(t1)
+                .map(|t1| &t1 == t2)
+                .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str()),
+            (left, right) => left == right,
+        }
     }
 }
