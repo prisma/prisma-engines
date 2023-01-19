@@ -221,7 +221,7 @@ mod to_many {
                 }
             }"#,
             2009,
-            "Query parsing/validation error at `Query.findManyTestModel.where.TestModelWhereInput.to_many_as.CompositeACompositeListFilter.equals`: Value types mismatch. Have: Object({\"a_1\": String(\"Test\"), \"a_2\": Int(0)}), want: Object(CompositeAObjectEqualityInput)"
+            "`Query.findManyTestModel.where.TestModelWhereInput.to_many_as.CompositeACompositeListFilter.equals`: Value types mismatch. Have: Object([(\"a_1\", String(\"Test\")), (\"a_2\", Int(0))]), want: Object(CompositeAObjectEqualityInput)"
         );
 
         Ok(())

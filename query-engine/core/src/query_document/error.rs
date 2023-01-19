@@ -1,6 +1,5 @@
 use crate::{query_document::PrismaValue, schema::InputType};
 use fmt::Display;
-use indexmap::IndexMap;
 use itertools::Itertools;
 use std::fmt;
 
@@ -87,19 +86,9 @@ impl Display for QueryParserErrorKind {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            Self::ValueTypeMismatchError { have, want } => match have {
-                PrismaValue::Object(obj) => {
-                    let obj = obj
-                        .iter()
-                        .map(ToOwned::to_owned)
-                        .collect::<IndexMap<String, PrismaValue>>();
-
-                    write!(f, "Value types mismatch. Have: Object({:?}), want: {:?}", obj, want)
-                }
-                _ => {
-                    write!(f, "Value types mismatch. Have: {:?}, want: {:?}", have, want)
-                }
-            },
+            Self::ValueTypeMismatchError { have, want } => {
+                write!(f, "Value types mismatch. Have: {:?}, want: {:?}", have, want)
+            }
             Self::ValueFitError(s) => write!(f, "{}", s),
         }
     }

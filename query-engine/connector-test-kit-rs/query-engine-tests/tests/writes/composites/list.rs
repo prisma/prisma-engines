@@ -414,7 +414,7 @@ mod update {
           runner,
           query,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Int(3)})}), want: Int"
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object([(\"update\", Object([(\"increment\", Int(3))]))]), want: Int"
         );
 
         // Ensure `update` cannot be used in the Unchecked type
@@ -422,7 +422,7 @@ mod update {
           runner,
           query,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Int(3)})}), want: Int"
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object([(\"update\", Object([(\"increment\", Int(3))]))]), want: Int"
         );
 
         Ok(())
