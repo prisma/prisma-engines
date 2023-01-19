@@ -3,18 +3,14 @@
 //! transaction progresses, the test uses separate engines inside
 //! actors to allow test to continue even if one query is blocking.
 
-use std::future::Future;
-
 use indoc::indoc;
-use once_cell::sync::Lazy;
 use query_engine_tests::{
     query_core::TxId, render_test_datamodel, setup_metrics, setup_project, test_tracing_subscriber, ConnectorTag,
-    LogEmit, QueryResult, Runner, TestConfig, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber,
+    LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG,
     ENV_LOG_LEVEL,
 };
+use std::future::Future;
 use tokio::sync::mpsc;
-
-static CONFIG: Lazy<TestConfig> = Lazy::new(|| TestConfig::load().unwrap());
 
 const SCHEMA: &str = indoc! {r#"
     model Country {

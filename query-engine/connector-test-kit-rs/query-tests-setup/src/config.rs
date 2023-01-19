@@ -29,7 +29,7 @@ pub struct TestConfig {
 
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
-    pub fn load() -> TestResult<Self> {
+    pub(crate) fn load() -> TestResult<Self> {
         let config = Self::from_file().or_else(Self::from_env);
 
         match config {
