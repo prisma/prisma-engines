@@ -1,8 +1,47 @@
+use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
-use std::{fmt::Write as _, io::Write as _};
+use prisma_fmt::offset_to_position;
+use psl::SourceFile;
+use std::{fmt::Write as _, io::Write as _, sync::Arc};
 
 const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_actions/scenarios");
 static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
+
+fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnostic>> {
+    let schema = psl::validate(file.into());
+
+    match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
+        ([], []) => None,
+        (warnings, errors) => {
+            let mut diagnostics = Vec::new();
+            for warn in warnings.iter() {
+                diagnostics.push(Diagnostic {
+                    severity: Some(DiagnosticSeverity::WARNING),
+                    message: warn.message().to_owned(),
+                    range: lsp_types::Range {
+                        start: offset_to_position(warn.span().start, schema.db.source()),
+                        end: offset_to_position(warn.span().end, schema.db.source()),
+                    },
+                    ..Default::default()
+                });
+            }
+
+            for error in errors.iter() {
+                diagnostics.push(Diagnostic {
+                    severity: Some(DiagnosticSeverity::ERROR),
+                    message: error.message().to_owned(),
+                    range: lsp_types::Range {
+                        start: offset_to_position(error.span().start, schema.db.source()),
+                        end: offset_to_position(error.span().end, schema.db.source()),
+                    },
+                    ..Default::default()
+                });
+            }
+
+            Some(diagnostics)
+        }
+    }
+}
 
 pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);
@@ -12,10 +51,12 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         std::fs::read_to_string(&path).unwrap()
     };
 
-    path.clear();
-    write!(path, "{}/{}/diagnostics.json", SCENARIOS_PATH, scenario_name).unwrap();
-    let diagnostics = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
-    let diagnostics = serde_json::from_str(&diagnostics).unwrap_or_default();
+    let source_file = psl::parser_database::SourceFile::new_allocated(Arc::from(schema.clone().into_boxed_str()));
+
+    let diagnostics = match parse_schema_diagnostics(source_file) {
+        Some(diagnostics) => diagnostics,
+        None => Vec::new(),
+    };
 
     path.clear();
     write!(path, "{}/{}/result.json", SCENARIOS_PATH, scenario_name).unwrap();
