@@ -20,7 +20,6 @@ mod query_arguments_ext;
 mod query_builder;
 mod query_ext;
 mod row;
-mod sql_info;
 mod sql_trace;
 mod value;
 mod value_ext;
