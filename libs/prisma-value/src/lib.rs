@@ -13,7 +13,7 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, Clone, Eq, Serialize, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -46,12 +46,18 @@ pub enum PrismaValue {
 
 /// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
-pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
+pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {
     // Warning: Be careful if you plan on changing the code below
     // The findUnique batch optimization expects date inputs to have exactly the same format as date outputs
     // This works today because clients always send date inputs in the same format as the serialized format below
     // Updating this without transforming date inputs to the same format WILL break the findUnique batch optimization
-    date.to_rfc3339_opts(SecondsFormat::Millis, true)
+    datetime.to_rfc3339_opts(SecondsFormat::Millis, true)
+}
+
+/// Parses an RFC 3339 and ISO 8601 date and time string such as 1996-12-19T16:39:57-08:00,
+/// then returns a new DateTime with a parsed FixedOffset.
+pub fn parse_datetime(datetime: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+    DateTime::parse_from_rfc3339(datetime)
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
@@ -135,7 +141,7 @@ fn serialize_date<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::O
 where
     S: Serializer,
 {
-    stringify_date(date).serialize(serializer)
+    stringify_datetime(date).serialize(serializer)
 }
 
 fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
@@ -270,7 +276,7 @@ impl PrismaValue {
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
-        PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
+        PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {
@@ -390,37 +396,5 @@ impl TryFrom<PrismaValue> for String {
             PrismaValue::String(s) => Ok(s),
             _ => Err(ConversionFailure::new("PrismaValue", "String")),
         }
-    }
-}
-
-impl PartialEq for PrismaValue {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::String(l0), Self::String(r0)) => l0 == r0,
-            (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
-            (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
-            (Self::Int(l0), Self::Int(r0)) => l0 == r0,
-            (Self::Uuid(l0), Self::Uuid(r0)) => l0 == r0,
-            (Self::List(l0), Self::List(r0)) => l0 == r0,
-            (Self::Json(l0), Self::Json(r0)) => l0 == r0,
-            (Self::Xml(l0), Self::Xml(r0)) => l0 == r0,
-            (Self::Object(l0), Self::Object(r0)) => l0 == r0,
-            (Self::DateTime(l0), Self::DateTime(r0)) => l0 == r0,
-            (Self::Float(l0), Self::Float(r0)) => l0 == r0,
-            (Self::BigInt(l0), Self::BigInt(r0)) => l0 == r0,
-            (Self::Bytes(l0), Self::Bytes(r0)) => l0 == r0,
-            (Self::String(t1), Self::DateTime(t2)) | (Self::DateTime(t2), Self::String(t1)) => {
-                chrono::DateTime::parse_from_rfc3339(t1)
-                    .map(|t1| &t1 == t2)
-                    .unwrap_or_else(|_| t1 == stringify_date(t2).as_str())
-            }
-            _ => false,
-        }
-    }
-}
-
-impl std::hash::Hash for PrismaValue {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        core::mem::discriminant(self).hash(state);
     }
 }

@@ -274,8 +274,8 @@ impl QueryDocumentParser {
                             format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
             },
 
-            // // UUID coercion matchers
-            // (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
+            // UUID coercion matchers
+            (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // All other combinations are value type mismatches.
             (qv, _) => {
@@ -291,7 +291,7 @@ impl QueryDocumentParser {
     }
 
     fn parse_datetime(&self, path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
-        DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
+        prisma_value::parse_datetime(s).map_err(|err| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!(
                 "Invalid DateTime: '{}' (must be ISO 8601 compatible). Underlying error: {}",
