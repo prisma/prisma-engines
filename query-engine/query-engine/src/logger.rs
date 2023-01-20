@@ -27,6 +27,9 @@ pub struct Logger {
 enum TracingConfig {
     // exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
     Http(String),
+    // captured means that traces will be captured in memory and exposed in the graphql response
+    // logs will be also exposed in the response when capturing is enabled
+    Captured,
     // stdout means that traces will be printed to standard output
     Stdout,
     // disabled means that tracing will be disabled
@@ -59,16 +62,17 @@ impl Logger {
         self.metrics = Some(metrics);
     }
 
-    pub fn setup_telemetry(&mut self, enable_telemetry: bool, endpoint: &str) {
+    pub fn setup_telemetry(&mut self, enable_telemetry: bool, enable_capturing: bool, endpoint: &str) {
         let endpoint = if endpoint.is_empty() {
             None
         } else {
             Some(endpoint.to_owned())
         };
 
-        self.tracing_config = match (enable_telemetry, endpoint) {
-            (true, Some(endpoint)) => TracingConfig::Http(endpoint),
-            (true, None) => TracingConfig::Stdout,
+        self.tracing_config = match (enable_telemetry, enable_capturing, endpoint) {
+            (_, true, _) => TracingConfig::Captured,
+            (true, _, Some(endpoint)) => TracingConfig::Http(endpoint),
+            (true, _, None) => TracingConfig::Stdout,
             _ => TracingConfig::Disabled,
         };
     }
@@ -83,6 +87,7 @@ impl Logger {
     pub fn install(&self) -> LoggerResult<()> {
         let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
+        let is_user_trace_or_event = filter_fn(telemetry::helpers::user_facing_filter);
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -100,6 +105,19 @@ impl Logger {
             .with(self.metrics.clone());
 
         match self.tracing_config {
+            TracingConfig::Captured => {
+                // Capturing is enabled, it overrides otel exporting.
+                let tracer = telemetry::capturing::tracer().to_owned();
+                let telemetry_layer = tracing_opentelemetry::layer()
+                    .with_tracer(tracer)
+                    .with_filter(is_user_trace_or_event)
+                    .with_filter(telemetry::helpers::env_filter(
+                        self.log_queries,
+                        telemetry::helpers::QueryEngineLogLevel::FromEnv,
+                    ));
+                let subscriber = subscriber.with(telemetry_layer);
+                subscriber::set_global_default(subscriber)?;
+            }
             TracingConfig::Http(ref endpoint) => {
                 // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
                 // the traces to.

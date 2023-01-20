@@ -12,6 +12,9 @@ pub struct GQLResponse {
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
+
+    #[serde(skip_serializing_if = "IndexMap::is_empty")]
+    extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
@@ -22,6 +25,9 @@ pub struct GQLBatchResponse {
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
+
+    #[serde(skip_serializing_if = "IndexMap::is_empty")]
+    extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]
@@ -66,6 +72,10 @@ impl GQLResponse {
 
     pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
         self.errors.iter()
+    }
+
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
+        self.extensions.entry(key).or_insert(Item::Json(val));
     }
 }
 
@@ -152,6 +162,10 @@ impl GQLBatchResponse {
         self.errors
             .iter()
             .chain(self.batch_result.iter().flat_map(|res| res.errors()))
+    }
+
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
+        self.extensions.entry(key).or_insert(Item::Json(val));
     }
 }
 

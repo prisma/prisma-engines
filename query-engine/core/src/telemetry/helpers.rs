@@ -41,6 +41,15 @@ pub fn set_span_link_from_traceparent(span: &Span, traceparent: Option<String>) 
     }
 }
 
+pub fn get_trace_id_from_traceparent(traceparent: Option<&str>) -> TraceId {
+    traceparent
+        .unwrap_or("0-0-0-0")
+        .split('-')
+        .nth(1)
+        .map(|id| TraceId::from_hex(id).unwrap_or(TraceId::INVALID))
+        .unwrap()
+}
+
 pub fn get_trace_id_from_context(context: &Context) -> TraceId {
     let context_span = context.span();
     context_span.span_context().trace_id()
