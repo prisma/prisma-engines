@@ -1,4 +1,5 @@
 mod multi_schema;
+mod relation_mode;
 mod relations;
 
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
@@ -25,37 +26,35 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let validated_schema = psl::validate(file);
 
+    let config = &validated_schema.configuration;
+
+    for source in validated_schema.db.ast().sources() {
+        relation_mode::edit_referential_integrity(&mut actions, &params, validated_schema.db.source(), source)
+    }
+
     for model in validated_schema
         .db
         .walk_models()
         .chain(validated_schema.db.walk_views())
     {
-        if validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(
                 &mut actions,
                 &params,
                 validated_schema.db.source(),
-                &validated_schema.configuration,
+                config,
                 model,
             )
         }
     }
 
     for enumerator in validated_schema.db.walk_enums() {
-        if validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_enum(
                 &mut actions,
                 &params,
                 validated_schema.db.source(),
-                &validated_schema.configuration,
+                config,
                 enumerator,
             )
         }
@@ -203,6 +202,32 @@ fn create_schema_attribute_edit(
     let text = TextEdit {
         range,
         new_text: formatted_attribute,
+    };
+
+    let mut changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), vec![text]);
+
+    WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    }
+}
+
+fn create_block_property(
+    schema: &str,
+    indentation: IndentationType,
+    newline: NewlineType,
+    span: Span,
+    params: &CodeActionParams,
+) -> WorkspaceEdit {
+    let separator = newline.as_ref();
+
+    let formatted_property = format!("relationMode");
+
+    let range = span_to_range(schema, span);
+    let text = TextEdit {
+        range,
+        new_text: formatted_property,
     };
 
     let mut changes = HashMap::new();
