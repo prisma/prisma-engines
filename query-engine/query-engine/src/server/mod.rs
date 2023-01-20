@@ -2,8 +2,11 @@ use crate::state::State;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
-use opentelemetry::propagation::Extractor;
-use query_core::{schema::QuerySchemaRenderer, TransactionOptions, TxId};
+use opentelemetry::trace::TraceContextExt;
+use opentelemetry::{global, propagation::Extractor};
+use query_core::{
+    schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
+};
 use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
 use serde_json::json;
@@ -12,6 +15,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
 use tracing::{field, Instrument, Span};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
 pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
@@ -113,8 +117,35 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let headers = req.headers();
     let span = info_span!("prisma:engine", user_facing = true);
 
-    let traceparent = traceparent(headers);
+    let capture_settings = capture_settings(headers);
+    let mut traceparent = traceparent(headers);
     let tx_id = transaction_id(headers);
+
+    // When log capturing (and not tracing capturing) is enabled in the scope of an interactive
+    // transaction the client won't send a traceparent header.
+    //
+    // In this scenario, we cannot correlate logs for queries happening within an iTX with a trace_id
+    // of such transaction, because no one is sending that trace id information through the
+    // traceparent header, which is the propagation mechanism.
+    //
+    // Fortunately, we can derive an artificial trace_id, when the client is interested in
+    // capturing logs and not traces, for all the queries happening within that transaction. We do
+    // that by deriving a trace_id (and consequently a traceparent and a telemetry Context)
+    // from a tx_id
+    if capture_settings.logs_enabled() && traceparent.is_none() && tx_id.is_some() {
+        let tx_id = tx_id.clone().unwrap();
+        traceparent = Some(tx_id.as_traceparent());
+        span.set_parent(tx_id.into())
+    } else if tx_id.is_none() {
+        span.set_parent(get_parent_span_context(headers))
+    }
+
+    let trace_id = span.context().span().span_context().trace_id();
+    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
 
     let work = async move {
         let body_start = req.into_body();
@@ -124,7 +155,15 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+                let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+
+                if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+                    let telemetry = capturer.fetch_captures().await;
+                    if let Some(telemetry) = telemetry {
+                        result.set_extension("traces".to_owned(), json!(telemetry.traces));
+                        result.set_extension("logs".to_owned(), json!(telemetry.logs));
+                    }
+                }
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
@@ -223,13 +262,13 @@ async fn transaction_handler(state: State, req: Request<Body>) -> Result<Respons
     }
 
     if sections.len() == 4 && sections[3] == "commit" {
-        return transaction_commit_handler(state, sections[2].into())
+        return transaction_commit_handler(state, req, sections[2].into())
             .instrument(span)
             .await;
     }
 
     if sections.len() == 4 && sections[3] == "rollback" {
-        return transaction_rollback_handler(state, sections[2].into())
+        return transaction_rollback_handler(state, req, sections[2].into())
             .instrument(span)
             .await;
     }
@@ -242,10 +281,19 @@ async fn transaction_handler(state: State, req: Request<Body>) -> Result<Respons
 }
 
 async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let headers = req.headers().to_owned();
+
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let tx_id = tx_opts.with_new_transaction_id();
+
+    let capture_config = capture_config(&headers, tx_id.clone());
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
 
     let result = state
         .cx
@@ -254,9 +302,19 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
         .instrument(Span::current())
         .await;
 
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
     match result {
         Ok(tx_id) => {
-            let result = json!({ "id": tx_id.to_string() });
+            let result = if let Some(telemetry) = telemetry {
+                json!({ "id": tx_id.to_string(), "extensions": { "logs": json!(telemetry.logs), "traces": json!(telemetry.traces) } })
+            } else {
+                json!({ "id": tx_id.to_string() })
+            };
             let result_bytes = serde_json::to_vec(&result).unwrap();
 
             let res = Response::builder()
@@ -266,23 +324,57 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
                 .unwrap();
             Ok(res)
         }
-        Err(err) => Ok(err_to_http_resp(err)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
 
-async fn transaction_commit_handler(state: State, tx_id: TxId) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_commit_handler(
+    state: State,
+    req: Request<Body>,
+    tx_id: TxId,
+) -> Result<Response<Body>, hyper::Error> {
+    let capture_config = capture_config(req.headers(), tx_id.clone());
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
     let result = state.cx.executor.commit_tx(tx_id).await;
+
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
     match result {
-        Ok(_) => Ok(empty_json_to_http_resp()),
-        Err(err) => Ok(err_to_http_resp(err)),
+        Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
 
-async fn transaction_rollback_handler(state: State, tx_id: TxId) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_rollback_handler(
+    state: State,
+    req: Request<Body>,
+    tx_id: TxId,
+) -> Result<Response<Body>, hyper::Error> {
+    let capture_config = capture_config(req.headers(), tx_id.clone());
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
     let result = state.cx.executor.rollback_tx(tx_id).await;
+
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
     match result {
-        Ok(_) => Ok(empty_json_to_http_resp()),
-        Err(err) => Ok(err_to_http_resp(err)),
+        Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
 
@@ -321,8 +413,12 @@ impl<'a> Extractor for HeaderExtractor<'a> {
     }
 }
 
-fn empty_json_to_http_resp() -> Response<Body> {
-    let result = json!({});
+fn empty_json_to_http_resp(captured_telemetry: Option<telemetry::capturing::storage::Storage>) -> Response<Body> {
+    let result = if let Some(telemetry) = captured_telemetry {
+        json!({ "extensions": { "logs": json!(telemetry.logs), "traces": json!(telemetry.traces) } })
+    } else {
+        json!({})
+    };
     let result_bytes = serde_json::to_vec(&result).unwrap();
 
     Response::builder()
@@ -332,7 +428,10 @@ fn empty_json_to_http_resp() -> Response<Body> {
         .unwrap()
 }
 
-fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
+fn err_to_http_resp(
+    err: query_core::CoreError,
+    captured_telemetry: Option<telemetry::capturing::storage::Storage>,
+) -> Response<Body> {
     let status = match err {
         query_core::CoreError::TransactionError(ref err) => match err {
             query_core::TransactionError::AcquisitionTimeout => 504,
@@ -346,9 +445,40 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
         _ => 500,
     };
 
-    let user_error: user_facing_errors::Error = err.into();
-    let body = Body::from(serde_json::to_vec(&user_error).unwrap());
+    let mut err: ExtendedTransactionUserFacingError = err.into();
+    if let Some(telemetry) = captured_telemetry {
+        err.set_extension("traces".to_owned(), json!(telemetry.traces));
+        err.set_extension("logs".to_owned(), json!(telemetry.logs));
+    }
+    let body = Body::from(serde_json::to_vec(&err).unwrap());
     Response::builder().status(status).body(body).unwrap()
+}
+
+fn capture_config(headers: &HeaderMap, tx_id: TxId) -> telemetry::capturing::Capturer {
+    let span = Span::current();
+    let capture_settings = capture_settings(headers);
+    let traceparent = traceparent(headers);
+
+    if traceparent.is_none() && capture_settings.is_enabled() {
+        span.set_parent(tx_id.into())
+    } else {
+        span.set_parent(get_parent_span_context(headers))
+    }
+
+    let trace_id = span.context().span().span_context().trace_id();
+    telemetry::capturing::capturer(trace_id, capture_settings)
+}
+
+#[allow(clippy::bind_instead_of_map)]
+fn capture_settings(headers: &HeaderMap) -> telemetry::capturing::Settings {
+    const CAPTURE_TELEMETRY_HEADER: &str = "X-capture-telemetry";
+    let s = if let Some(hv) = headers.get(CAPTURE_TELEMETRY_HEADER) {
+        hv.to_str().unwrap_or("")
+    } else {
+        ""
+    };
+
+    telemetry::capturing::Settings::from(s)
 }
 
 fn traceparent(headers: &HeaderMap) -> Option<String> {
@@ -374,4 +504,11 @@ fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
         .get(TRANSACTION_ID_HEADER)
         .and_then(|h| h.to_str().ok())
         .and_then(|s| Some(TxId::from(s)))
+}
+
+/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
+    let extractor = HeaderExtractor(headers);
+    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
 }

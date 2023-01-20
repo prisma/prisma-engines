@@ -19,3 +19,12 @@ pub enum PrismaResponse {
     Single(GQLResponse),
     Multi(GQLBatchResponse),
 }
+
+impl PrismaResponse {
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
+        match self {
+            Self::Single(r) => r.set_extension(key, val),
+            Self::Multi(r) => r.set_extension(key, val),
+        }
+    }
+}
