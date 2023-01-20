@@ -162,9 +162,7 @@ fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
         ],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw {
-                query_type: Some("aggregateRaw".to_owned()),
-            },
+            tag: QueryTag::AggregateRaw,
             model: Some(model.clone()),
         }),
     )
@@ -181,9 +179,7 @@ fn mongo_find_raw_field(model: &ModelRef) -> OutputField {
         ],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw {
-                query_type: Some("findRaw".to_owned()),
-            },
+            tag: QueryTag::FindRaw,
             model: Some(model.clone()),
         }),
     )

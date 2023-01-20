@@ -131,7 +131,7 @@ fn create_query_raw_field() -> OutputField {
         ],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw { query_type: None },
+            tag: QueryTag::QueryRaw,
             model: None,
         }),
     )
@@ -143,9 +143,7 @@ fn create_mongodb_run_command_raw() -> OutputField {
         vec![input_field("command", InputType::json(), None)],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw {
-                query_type: Some("runCommandRaw".to_string()),
-            },
+            tag: QueryTag::RunCommandRaw,
             model: None,
         }),
     )

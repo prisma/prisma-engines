@@ -83,7 +83,11 @@ impl QueryGraphBuilder {
             (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
             (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
             (QueryTag::ExecuteRaw, _) => QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
-            (QueryTag::QueryRaw { query_type }, m) => QueryGraph::root(|g| write::query_raw(g, m, query_type, parsed_field)),
+            (QueryTag::QueryRaw, m) => QueryGraph::root(|g| write::query_raw(g, m, None, parsed_field)),
+            // MongoDB specific raw operations
+            (QueryTag::FindRaw, m) => QueryGraph::root(|g| write::query_raw(g, m, Some(QueryTag::FindRaw.to_string()), parsed_field)),
+            (QueryTag::AggregateRaw, m) => QueryGraph::root(|g| write::query_raw(g, m, Some(QueryTag::AggregateRaw.to_string()), parsed_field)),
+            (QueryTag::RunCommandRaw, m) => QueryGraph::root(|g| write::query_raw(g, m, Some(QueryTag::RunCommandRaw.to_string()), parsed_field)),
             _ => unreachable!("Query builder dispatching failed."),
         }?;
 
