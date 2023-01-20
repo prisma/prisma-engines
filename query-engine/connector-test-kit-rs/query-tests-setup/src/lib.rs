@@ -40,6 +40,9 @@ lazy_static! {
 
     /// The log level from the environment.
     pub static ref ENV_LOG_LEVEL: String = std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned());
+
+    /// Engine protocol used to run tests. Either 'graphql' or 'json'.
+    pub static ref ENGINE_PROTOCOL: String = std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned());
 }
 
 /// Setup of everything as defined in the passed datamodel.

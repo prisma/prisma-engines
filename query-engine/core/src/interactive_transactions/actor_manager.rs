@@ -1,4 +1,4 @@
-use crate::{ClosedTx, Operation, ResponseData};
+use crate::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
@@ -63,7 +63,14 @@ impl TransactionActorManager {
         }
     }
 
-    pub async fn create_tx(&self, query_schema: QuerySchemaRef, tx_id: TxId, value: OpenTx, timeout: Duration) {
+    pub async fn create_tx(
+        &self,
+        query_schema: QuerySchemaRef,
+        tx_id: TxId,
+        value: OpenTx,
+        timeout: Duration,
+        engine_protocol: EngineProtocol,
+    ) {
         let client = spawn_itx_actor(
             query_schema.clone(),
             tx_id.clone(),
@@ -71,6 +78,7 @@ impl TransactionActorManager {
             timeout,
             CHANNEL_SIZE,
             self.send_done.clone(),
+            engine_protocol,
         );
 
         self.clients.write().await.insert(tx_id, client);

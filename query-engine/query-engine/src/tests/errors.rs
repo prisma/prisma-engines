@@ -1,4 +1,5 @@
 use indoc::{formatdoc, indoc};
+use query_core::protocol::EngineProtocol;
 use serde_json::json;
 
 use crate::context::PrismaContext;
@@ -32,7 +33,7 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let dml = psl::parse_schema(dm).unwrap();
 
-        let error = PrismaContext::builder(dml)
+        let error = PrismaContext::builder(dml, EngineProtocol::Graphql)
             .enable_raw_queries(true)
             .build()
             .await

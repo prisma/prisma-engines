@@ -1,6 +1,6 @@
 use crate::{context::PrismaContext, logger::Logger, opt::PrismaOpt, PrismaResult};
 use psl::PreviewFeature;
-use query_core::schema::QuerySchemaRef;
+use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef};
 use query_engine_metrics::{setup as metric_setup, MetricRegistry};
 use std::sync::Arc;
 use tracing::Instrument;
@@ -32,6 +32,10 @@ impl State {
     pub fn query_schema(&self) -> &QuerySchemaRef {
         self.cx.query_schema()
     }
+
+    pub fn engine_protocol(&self) -> &EngineProtocol {
+        self.cx.engine_protocol()
+    }
 }
 
 pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<MetricRegistry>) -> PrismaResult<State> {
@@ -62,7 +66,7 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
     let span = tracing::info_span!("prisma:engine:connect");
 
-    let cx = PrismaContext::builder(datamodel)
+    let cx = PrismaContext::builder(datamodel, opts.engine_protocol())
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()

@@ -23,6 +23,13 @@ pub enum DomainError {
         container_type: &'static str,
     },
 
+    #[error("CompositeField `{}` on {} `{}` not found", name, container_type, container_name)]
+    CompositeFieldNotFound {
+        name: String,
+        container_name: String,
+        container_type: &'static str,
+    },
+
     #[error("RelationField `{}` on model `{}` not found", name, model)]
     RelationFieldNotFound { name: String, model: String },
 

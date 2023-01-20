@@ -1,4 +1,5 @@
 use crate::{error::PrismaError, PrismaResult};
+use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -113,6 +114,10 @@ pub struct PrismaOpt {
     #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
 
+    /// The protocol the Query Engine will used. Affects mostly the request and response format.
+    #[structopt(long, env = "PRISMA_ENGINE_PROTOCOL")]
+    pub engine_protocol: Option<String>,
+
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
 }
@@ -212,6 +217,13 @@ impl PrismaOpt {
     // Ok to unwrap here as this is only used in tests
     pub fn from_list(list: &[&str]) -> Self {
         PrismaOpt::from_iter_safe(list).unwrap()
+    }
+
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
+            .as_ref()
+            .map(EngineProtocol::from)
+            .unwrap_or_else(|| EngineProtocol::Graphql)
     }
 }
 

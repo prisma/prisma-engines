@@ -10,7 +10,7 @@ use query_core::{
     schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
 };
 use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -55,7 +55,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
     }
 
     let mut res = match (req.method(), req.uri().path()) {
-        (&Method::POST, "/") => graphql_handler(state, req).await?,
+        (&Method::POST, "/") => request_handler(state, req).await?,
         (&Method::GET, "/") if state.enable_playground => playground_handler(),
         (&Method::GET, "/status") => Response::builder()
             .status(StatusCode::OK)
@@ -108,9 +108,9 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
     Ok(res)
 }
 
-/// The main query handler. This handles incoming GraphQL queries and passes it
+/// The main query handler. This handles incoming requests and passes it
 /// to the query engine.
-async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn request_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     // Check for debug headers if enabled.
     if state.enable_debug_mode {
         return Ok(handle_debug_headers(&req));
@@ -170,15 +170,56 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         capturer.start_capturing().await;
     }
 
-    let work = async move {
-        let body_start = req.into_body();
-        // block and buffer request until the request has completed
-        let full_body = hyper::body::to_bytes(body_start).await?;
+    let mut traceparent = traceparent(headers);
+    let mut trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
 
-        match serde_json::from_slice(full_body.as_ref()) {
-            Ok(body) => {
-                let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+    if traceparent.is_none() {
+        // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
+        // during the different operations within a transaction. The trace_id is propagated in the
+        // traceparent header, but if it's not present, we need to synthetically create one for the
+        // transaction. This is needed, in case the client is interested in capturing logs and not
+        // traces, because:
+        //  - The client won't send a traceparent header
+        //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
+        //    ITXServer for that transaction
+        //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
+        //    to start capturing logs, and for that we need a trace_id. There are two places were we
+        //    could get that information from:
+        //      - First, it's the traceparent, but the client didn't send it, because they are only
+        //      interested in logs.
+        //      - Second, it's the root span for the transaction, but it's not in scope but instead
+        //      stored in the ITXServer, in a different tokio task.
+        //
+        // For the above reasons, we need to create a trace_id that we can predict and use accross the
+        // different operations happening within a transaction. So we do it by converting the tx_id
+        // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
+        // information loss.
+        if capture_settings.logs_enabled() && tx_id.is_some() {
+            let tx_id = tx_id.clone().unwrap();
+            traceparent = Some(tx_id.as_traceparent());
+            trace_id = tx_id.into_trace_id();
+        } else {
+            // this is the root span, and we are in a single operation.
+            traceparent = Some(get_trace_parent_from_span(&span));
+            trace_id = get_trace_id_from_span(&span);
+        }
+    }
+    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
+    let body_start = req.into_body();
+    // block and buffer request until the request has completed
+    let full_body = hyper::body::to_bytes(body_start).await?;
+
+    let body = RequestBody::try_from_slice(full_body.as_ref(), state.engine_protocol());
+
+    match body {
+        Ok(body) => {
+            let handler = RequestHandler::new(&*state.cx.executor, state.cx.query_schema(), *state.engine_protocol());
+            let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
                     let telemetry = capturer.fetch_captures().await;
@@ -188,28 +229,25 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
                     }
                 }
 
-                let result_bytes = serde_json::to_vec(&result).unwrap();
+            let result_bytes = serde_json::to_vec(&result).unwrap();
 
-                let res = Response::builder()
-                    .status(StatusCode::OK)
-                    .header(CONTENT_TYPE, "application/json")
-                    .body(Body::from(result_bytes))
-                    .unwrap();
+            let res = Response::builder()
+                .status(StatusCode::OK)
+                .header(CONTENT_TYPE, "application/json")
+                .body(Body::from(result_bytes))
+                .unwrap();
 
-                Ok(res)
-            }
-            Err(_e) => {
-                let res = Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(Body::empty())
-                    .unwrap();
-
-                Ok(res)
-            }
+            Ok(res)
         }
-    };
+        Err(_e) => {
+            let res = Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body(Body::empty())
+                .unwrap();
 
-    work.await
+            Ok(res)
+        }
+    }
 }
 
 /// Expose the GraphQL playground if enabled.
@@ -347,7 +385,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let result = state
         .cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), tx_opts)
+        .start_tx(state.cx.query_schema().clone(), *state.engine_protocol(), tx_opts)
         .instrument(span)
         .await;
 

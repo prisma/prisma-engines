@@ -3,10 +3,14 @@
 pub mod dmmf;
 
 mod error;
-mod graphql;
+mod handler;
+mod protocols;
+mod response;
 
 pub use error::HandlerError;
-pub use graphql::*;
+pub use handler::*;
+pub use protocols::{graphql::*, json::*, RequestBody};
+pub use response::*;
 
 pub type Result<T> = std::result::Result<T, HandlerError>;
 
@@ -18,6 +22,13 @@ pub enum PrismaResponse {
 }
 
 impl PrismaResponse {
+    pub fn has_errors(&self) -> bool {
+        match self {
+            PrismaResponse::Single(x) => x.has_errors(),
+            PrismaResponse::Multi(x) => x.has_errors(),
+        }
+    }
+
     pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
         match self {
             Self::Single(r) => r.set_extension(key, val),

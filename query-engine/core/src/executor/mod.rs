@@ -11,13 +11,16 @@ mod execute_operation;
 mod interpreting_executor;
 mod loader;
 mod pipeline;
+mod request_context;
 
 pub use execute_operation::*;
 pub use loader::*;
+pub(crate) use request_context::*;
 use serde::Deserialize;
 
 use crate::{
-    query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, BatchDocumentTransaction, TxId,
+    protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
+    BatchDocumentTransaction, TxId,
 };
 use async_trait::async_trait;
 use connector::Connector;
@@ -34,6 +37,7 @@ pub trait QueryExecutor: TransactionManager {
         operation: Operation,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData>;
 
     /// Executes a collection of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
@@ -49,6 +53,7 @@ pub trait QueryExecutor: TransactionManager {
         transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
@@ -98,7 +103,12 @@ pub trait TransactionManager {
     /// Expected to throw an error if no transaction could be opened for `opts.max_acquisition_millis` milliseconds.
     /// The new transaction must only live for `opts.valid_for_millis` milliseconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    async fn start_tx(&self, query_schema: QuerySchemaRef, opts: TransactionOptions) -> crate::Result<TxId>;
+    async fn start_tx(
+        &self,
+        query_schema: QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+        opts: TransactionOptions,
+    ) -> crate::Result<TxId>;
 
     /// Commits a transaction.
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;
@@ -122,41 +132,4 @@ pub trait TransactionManager {
 
 pub fn get_current_dispatcher() -> Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
-}
-
-tokio::task_local! {
-    static REQUEST_NOW: prisma_value::PrismaValue;
-}
-
-/// A timestamp that should be the `NOW()` value for the whole duration of a request. So all
-/// `@default(now())` and `@updatedAt` should use it.
-///
-/// That panics if REQUEST_NOW has not been set with with_request_now().
-///
-/// If we had a query context we carry for all the lifetime of the query, it would belong there.
-pub(crate) fn get_request_now() -> prisma_value::PrismaValue {
-    REQUEST_NOW.with(|rn| rn.clone())
-}
-
-/// Execute a future with the current "now" timestamp that can be retrieved through
-/// `get_request_now()`, initializing it if necessary.
-pub(crate) async fn with_request_now<F, R>(fut: F) -> R
-where
-    F: std::future::Future<Output = R>,
-{
-    use chrono::{Duration, DurationRound};
-
-    let is_set = REQUEST_NOW.try_with(|_| async {}).is_ok();
-
-    if is_set {
-        fut.await
-    } else {
-        let timestamp_precision = Duration::milliseconds(1);
-        // We round because in create operations, we select after creation and we will fail to
-        // select back what we inserted if the timestamp we have is higher precision than the one
-        // the database persisted.
-        let dt = chrono::Utc::now().duration_round(timestamp_precision).unwrap();
-        let now = prisma_value::PrismaValue::DateTime(dt.into());
-        REQUEST_NOW.scope(now, fut).await
-    }
 }

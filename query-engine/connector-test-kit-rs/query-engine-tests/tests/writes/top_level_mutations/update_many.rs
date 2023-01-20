@@ -405,7 +405,7 @@ mod json_update_many {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Scalar(Enum(\"AnyNull\"))"
+            "Enum value 'AnyNull' is invalid for enum type NullableJsonNullValueInput"
         );
 
         Ok(())

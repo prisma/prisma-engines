@@ -1,8 +1,13 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
+use crate::{ConnectorTag, JsonRequest, JsonResponse, RunnerInterface, TestResult, TxResult};
 use colored::Colorize;
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId};
+use query_core::{
+    executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
+};
 use query_engine_metrics::MetricRegistry;
-use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
+use request_handlers::{
+    BatchTransactionOption, GraphQlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
+    RequestHandler,
+};
 use std::{env, sync::Arc};
 
 use quaint::{prelude::Queryable, single::Quaint};
@@ -40,13 +45,44 @@ impl RunnerInterface for DirectRunner {
         })
     }
 
-    async fn query(&self, query: String) -> TestResult<crate::QueryResult> {
+    async fn query_graphql(&self, query: String, protocol: &EngineProtocol) -> TestResult<crate::QueryResult> {
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, *protocol);
+
+        let request_body = match protocol {
+            EngineProtocol::Json => {
+                // Translate the GraphQL query to JSON
+                let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
+                println!("{}", serde_json::to_string_pretty(&json_query).unwrap().green());
+
+                RequestBody::Json(JsonBody::Single(json_query))
+            }
+            EngineProtocol::Graphql => {
+                println!("{}", query.bright_green());
+
+                RequestBody::Graphql(GraphQlBody::Single(query.into()))
+            }
+        };
+
+        let response = handler.handle(request_body, self.current_tx_id.clone(), None).await;
+
+        match protocol {
+            EngineProtocol::Json => Ok(JsonResponse::from_graphql(response).into()),
+            EngineProtocol::Graphql => Ok(response.into()),
+        }
+    }
+
+    async fn query_json(&self, query: String) -> TestResult<crate::QueryResult> {
         println!("{}", query.bright_green());
 
-        let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
-        let query = GraphQlBody::Single(query.into());
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, EngineProtocol::Json);
 
-        Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
+        let serialized_query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
+        let request_body = RequestBody::Json(JsonBody::Single(serialized_query));
+
+        Ok(handler
+            .handle(request_body, self.current_tx_id.clone(), None)
+            .await
+            .into())
     }
 
     async fn raw_execute(&self, query: String) -> TestResult<()> {
@@ -65,15 +101,42 @@ impl RunnerInterface for DirectRunner {
         queries: Vec<String>,
         transaction: bool,
         isolation_level: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> TestResult<crate::QueryResult> {
-        let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
-        let query = GraphQlBody::Multi(MultiQuery::new(
-            queries.into_iter().map(Into::into).collect(),
-            transaction,
-            isolation_level,
-        ));
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, engine_protocol);
+        let body = match engine_protocol {
+            EngineProtocol::Json => {
+                // Translate the GraphQL query to JSON
+                let batch = queries
+                    .into_iter()
+                    .map(|query| JsonRequest::from_graphql(&query, self.query_schema()))
+                    .collect::<TestResult<Vec<_>>>()
+                    .unwrap();
+                let transaction_opts = match transaction {
+                    true => Some(BatchTransactionOption { isolation_level }),
+                    false => None,
+                };
 
-        Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
+                println!("{}", serde_json::to_string_pretty(&batch).unwrap().green());
+
+                RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+                    batch,
+                    transaction: transaction_opts,
+                }))
+            }
+            EngineProtocol::Graphql => RequestBody::Graphql(GraphQlBody::Multi(MultiQuery::new(
+                queries.into_iter().map(Into::into).collect(),
+                transaction,
+                isolation_level,
+            ))),
+        };
+
+        let res = handler.handle(body, self.current_tx_id.clone(), None).await;
+
+        match engine_protocol {
+            EngineProtocol::Json => Ok(JsonResponse::from_graphql(res).into()),
+            EngineProtocol::Graphql => Ok(res.into()),
+        }
     }
 
     async fn start_tx(
@@ -81,10 +144,14 @@ impl RunnerInterface for DirectRunner {
         max_acquisition_millis: u64,
         valid_for_millis: u64,
         isolation_level: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> TestResult<TxId> {
         let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
 
-        let id = self.executor.start_tx(self.query_schema.clone(), tx_opts).await?;
+        let id = self
+            .executor
+            .start_tx(self.query_schema.clone(), engine_protocol, tx_opts)
+            .await?;
         Ok(id)
     }
 

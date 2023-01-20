@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, telemetry::helpers::set_span_link_from_traceparent, ClosedTx,
-    OpenTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
+    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, OpenTx, Operation, ResponseData, TxId,
 };
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
@@ -250,6 +250,7 @@ pub fn spawn_itx_actor(
     timeout: Duration,
     channel_size: usize,
     send_done: Sender<(TxId, Option<ClosedTx>)>,
+    engine_protocol: EngineProtocol,
 ) -> ITXClient {
     let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
 
@@ -272,7 +273,7 @@ pub fn spawn_itx_actor(
     span.record("itx_id", &tx_id_str.as_str());
 
     tokio::task::spawn(
-        crate::executor::with_request_now(async move {
+        crate::executor::with_request_context(engine_protocol, async move {
             let start_time = Instant::now();
             let sleep = time::sleep(timeout);
             tokio::pin!(sleep);
