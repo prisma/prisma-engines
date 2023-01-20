@@ -3,6 +3,7 @@
 mod default;
 mod extensions;
 
+use either::Either;
 pub use extensions::{DatabaseExtension, ExtensionId, ExtensionWalker};
 
 use self::default::get_default_value;
@@ -684,6 +685,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         sql_schema.views = views;
+
         Ok(())
     }
 
@@ -743,9 +745,13 @@ impl<'a> SqlSchemaDescriber<'a> {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
 
-            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
-                Some(t_walker) => t_walker.id,
-                None => continue, // we only care about columns in tables we have access to
+            let table_id = sql_schema.table_walker_ns(&namespace, &table_name);
+            let view_id = sql_schema.view_walker_ns(&namespace, &table_name);
+
+            let container_id = match (table_id, view_id) {
+                (Some(t_walker), _) => Either::Left(t_walker.id),
+                (_, Some(v_walker)) => Either::Right(v_walker.id),
+                (None, None) => continue, // we only care about columns in tables we have access to
             };
 
             let name = col.get_expect_string("column_name");
@@ -780,7 +786,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
-            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let column_id = ColumnId(sql_schema.table_columns.len() as u32);
             let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             let col = Column {
@@ -790,13 +796,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            sql_schema.columns.push((table_id, col));
+            match container_id {
+                Either::Left(table_id) => {
+                    sql_schema.push_table_column(table_id, col);
+                }
+                Either::Right(view_id) => {
+                    sql_schema.push_view_column(view_id, col);
+                }
+            }
         }
 
         // We need to sort because the collation in the system tables (pg_class) is different from
         // that of the information schema, so tables come out of different order in the tables
         // query and the columns query.
-        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.view_columns.sort_by_key(|(table_id, _)| *table_id);
 
         Ok(())
     }

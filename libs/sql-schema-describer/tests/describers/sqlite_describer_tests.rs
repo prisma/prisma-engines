@@ -73,7 +73,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -196,6 +196,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -283,7 +284,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -358,6 +359,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -389,7 +391,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -431,6 +433,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -480,7 +483,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -628,6 +631,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,

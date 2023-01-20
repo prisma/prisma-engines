@@ -1773,7 +1773,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     variant_name: "b",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2504,6 +2504,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2644,7 +2645,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2791,6 +2792,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2821,7 +2823,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2865,6 +2867,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2896,7 +2899,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2975,6 +2978,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -3006,7 +3010,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -3050,6 +3054,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -3106,7 +3111,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     variant_name: "x-small",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -3531,6 +3536,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,

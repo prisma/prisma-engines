@@ -137,7 +137,7 @@ impl<'a> ColumnWalker<'a> {
     }
 
     fn get(self) -> &'a (TableId, Column) {
-        &self.schema.columns[self.id.0 as usize]
+        &self.schema.table_columns[self.id.0 as usize]
     }
 
     /// Returns whether the column has the enum default value of the given enum type.
@@ -295,7 +295,7 @@ impl<'a> TableWalker<'a> {
     }
 
     fn columns_range(self) -> Range<usize> {
-        range_for_key(&self.schema.columns, self.id, |(tid, _)| *tid)
+        range_for_key(&self.schema.table_columns, self.id, |(tid, _)| *tid)
     }
 
     /// Traverse the table's columns.

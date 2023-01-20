@@ -62,8 +62,8 @@ pub struct SqlSchema {
     /// The schema's enums.
     enums: Vec<Enum>,
     enum_variants: Vec<EnumVariant>,
-    /// The schema's columns.
-    columns: Vec<(TableId, Column)>,
+    /// The schema's columns that are in tables.
+    table_columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
     /// All default values.
@@ -76,6 +76,8 @@ pub struct SqlSchema {
     index_columns: Vec<IndexColumn>,
     /// The schema's views,
     views: Vec<View>,
+    /// The schema's columns that are in views.
+    view_columns: Vec<(ViewId, Column)>,
     /// The stored procedures.
     procedures: Vec<Procedure>,
     /// The user-defined types procedures.
@@ -93,7 +95,7 @@ impl SqlSchema {
 
     /// The id of the next column
     pub fn next_column_id(&self) -> ColumnId {
-        ColumnId(self.columns.len() as u32)
+        ColumnId(self.table_columns.len() as u32)
     }
 
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -176,10 +178,17 @@ impl SqlSchema {
         }
     }
 
-    /// Add a column to the schema.
-    pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
-        let id = ColumnId(self.columns.len() as u32);
-        self.columns.push((table_id, column));
+    /// Add a table column to the schema.
+    pub fn push_table_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
+        let id = ColumnId(self.table_columns.len() as u32);
+        self.table_columns.push((table_id, column));
+        id
+    }
+
+    /// Add a view column to the schema.
+    pub fn push_view_column(&mut self, view_id: ViewId, column: Column) -> ColumnId {
+        let id = ColumnId(self.view_columns.len() as u32);
+        self.view_columns.push((view_id, column));
         id
     }
 
@@ -323,7 +332,19 @@ impl SqlSchema {
             .tables
             .iter()
             .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
+
         Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn view_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<ViewWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let view_idx = self
+            .views
+            .iter()
+            .position(|view| view.name == name && view.namespace_id == namespace_idx)?;
+
+        Some(self.walk(ViewId(view_idx as u32)))
     }
 
     pub fn table_walkers(&self) -> impl ExactSizeIterator<Item = TableWalker<'_>> {
@@ -356,7 +377,7 @@ impl SqlSchema {
 
     /// Traverse all the columns in the schema.
     pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
-        (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+        (0..self.table_columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
     }
 
     /// Traverse all namespaces in the catalog.

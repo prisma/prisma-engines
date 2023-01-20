@@ -241,7 +241,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -386,6 +386,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,

@@ -73,7 +73,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         let table_names = self.get_table_names(schema, &mut sql_schema).await?;
         sql_schema.tables.reserve(table_names.len());
-        sql_schema.columns.reserve(table_names.len());
+        sql_schema.table_columns.reserve(table_names.len());
 
         Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
         push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
@@ -487,7 +487,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let column_id = ColumnId(sql_schema.table_columns.len() as u32);
             let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             let col = Column {
@@ -497,10 +497,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            sql_schema.columns.push((table_id, col));
+            sql_schema.table_columns.push((table_id, col));
         }
 
-        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
 
         Ok(())
     }
