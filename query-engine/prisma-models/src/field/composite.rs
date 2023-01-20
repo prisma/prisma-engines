@@ -19,6 +19,10 @@ pub struct CompositeField {
 }
 
 impl CompositeField {
+    pub fn name(&self) -> &str {
+        self.name.as_ref()
+    }
+
     pub fn is_list(&self) -> bool {
         matches!(self.arity, FieldArity::List)
     }

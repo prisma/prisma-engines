@@ -1,7 +1,8 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
+use super::request_context;
 use crate::{
-    BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
-    TransactionError, TransactionManager, TransactionOptions, TxId,
+    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData,
+    TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
 use async_trait::async_trait;
@@ -47,12 +48,13 @@ where
         operation: Operation,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData> {
         // If a Tx id is provided, execute on that one. Else execute normally as a single operation.
         if let Some(tx_id) = tx_id {
             self.itx_manager.execute(&tx_id, operation, trace_id).await
         } else {
-            super::with_request_now(async move {
+            request_context::with_request_context(engine_protocol, async move {
                 execute_single_self_contained(
                     &self.connector,
                     query_schema,
@@ -85,6 +87,7 @@ where
         transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
             let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
@@ -103,12 +106,10 @@ where
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
             let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
 
-            let results = super::with_request_now(execute_many_operations(
-                query_schema,
-                tx.as_connection_like(),
-                &operations,
-                trace_id,
-            ))
+            let results = request_context::with_request_context(
+                engine_protocol,
+                execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id),
+            )
             .await;
 
             if results.is_err() {
@@ -119,13 +120,14 @@ where
 
             results
         } else {
-            super::with_request_now(async move {
+            request_context::with_request_context(engine_protocol, async move {
                 execute_many_self_contained(
                     &self.connector,
                     query_schema,
                     &operations,
                     trace_id,
                     self.force_transactions,
+                    engine_protocol,
                 )
                 .await
             })
@@ -143,8 +145,13 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(&self, query_schema: QuerySchemaRef, tx_opts: TransactionOptions) -> crate::Result<TxId> {
-        super::with_request_now(async move {
+    async fn start_tx(
+        &self,
+        query_schema: QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+        tx_opts: TransactionOptions,
+    ) -> crate::Result<TxId> {
+        super::with_request_context(engine_protocol, async move {
             let isolation_level = tx_opts.isolation_level;
             let valid_for_millis = tx_opts.valid_for_millis;
             let id = tx_opts.new_tx_id.unwrap_or_default();
@@ -171,6 +178,7 @@ where
                     id.clone(),
                     c_tx,
                     Duration::from_millis(valid_for_millis),
+                    engine_protocol,
                 )
                 .await;
 

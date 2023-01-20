@@ -8,7 +8,9 @@
 #[macro_use]
 extern crate tracing;
 
+pub mod constants;
 pub mod executor;
+pub mod protocol;
 pub mod query_document;
 pub mod response_ir;
 pub mod telemetry;

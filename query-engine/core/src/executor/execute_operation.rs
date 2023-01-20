@@ -1,7 +1,10 @@
 use std::time::{Duration, Instant};
 
 use super::pipeline::QueryPipeline;
-use crate::{CoreError, IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
+use crate::{
+    executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
+    QueryGraphBuilder, QueryInterpreter, ResponseData,
+};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
 use query_engine_metrics::{
@@ -35,7 +38,7 @@ pub async fn execute_many_operations(
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let queries = operations
         .iter()
-        .map(|operation| QueryGraphBuilder::new(query_schema.clone()).build(operation.clone()))
+        .map(|operation| build_graph(query_schema.clone(), operation.clone()))
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
     let mut results = Vec::with_capacity(queries.len());
@@ -90,6 +93,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     operations: &[Operation],
     trace_id: Option<String>,
     force_transactions: bool,
+    engine_protocol: EngineProtocol,
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let mut futures = Vec::with_capacity(operations.len());
 
@@ -105,14 +109,17 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         let conn = connector.get_connection().instrument(conn_span).await?;
 
         futures.push(tokio::spawn(
-            crate::with_request_now(execute_self_contained(
-                conn,
-                query_schema.clone(),
-                op.clone(),
-                force_transactions,
-                connector.should_retry_on_transient_error(),
-                trace_id.clone(),
-            ))
+            request_context::with_request_context(
+                engine_protocol,
+                execute_self_contained(
+                    conn,
+                    query_schema.clone(),
+                    op.clone(),
+                    force_transactions,
+                    connector.should_retry_on_transient_error(),
+                    trace_id.clone(),
+                ),
+            )
             .with_subscriber(dispatcher.clone()),
         ));
     }
@@ -127,7 +134,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 }
 
 /// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
-async fn execute_self_contained<'a>(
+async fn execute_self_contained(
     mut conn: Box<dyn Connection>,
     query_schema: QuerySchemaRef,
     operation: Operation,

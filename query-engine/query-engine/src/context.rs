@@ -1,5 +1,5 @@
 use crate::{PrismaError, PrismaResult};
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use query_core::{executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::MetricRegistry;
 use std::{env, fmt, sync::Arc};
 
@@ -12,6 +12,7 @@ pub struct PrismaContext {
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+    pub engine_protocol: EngineProtocol,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -24,6 +25,7 @@ pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
+    protocol: EngineProtocol,
 }
 
 impl ContextBuilder {
@@ -38,7 +40,13 @@ impl ContextBuilder {
     }
 
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.schema, self.enable_raw_queries, self.metrics.unwrap_or_default()).await
+        PrismaContext::new(
+            self.schema,
+            self.enable_raw_queries,
+            self.protocol,
+            self.metrics.unwrap_or_default(),
+        )
+        .await
     }
 }
 
@@ -47,6 +55,7 @@ impl PrismaContext {
     async fn new(
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
+        protocol: EngineProtocol,
         metrics: MetricRegistry,
     ) -> PrismaResult<Self> {
         let config = &schema.configuration;
@@ -71,6 +80,7 @@ impl PrismaContext {
             query_schema,
             executor,
             metrics,
+            engine_protocol: protocol,
         };
 
         context.verify_connection().await?;
@@ -83,11 +93,12 @@ impl PrismaContext {
         Ok(())
     }
 
-    pub fn builder(schema: psl::ValidatedSchema) -> ContextBuilder {
+    pub fn builder(schema: psl::ValidatedSchema, protocol: EngineProtocol) -> ContextBuilder {
         ContextBuilder {
             enable_raw_queries: false,
             schema,
             metrics: None,
+            protocol,
         }
     }
 
@@ -97,5 +108,9 @@ impl PrismaContext {
 
     pub fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector().name()
+    }
+
+    pub fn engine_protocol(&self) -> &EngineProtocol {
+        &self.engine_protocol
     }
 }

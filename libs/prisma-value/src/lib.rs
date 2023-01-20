@@ -5,6 +5,7 @@ mod error;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
 use serde::de::Unexpected;
+use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
@@ -26,6 +27,7 @@ pub enum PrismaValue {
     Xml(String),
 
     /// A collections of key-value pairs constituting an object.
+    #[serde(serialize_with = "serialize_object")]
     Object(Vec<(String, PrismaValue)>),
 
     #[serde(serialize_with = "serialize_null")]
@@ -177,6 +179,19 @@ where
     D: Deserializer<'de>,
 {
     deserializer.deserialize_f64(BigDecimalVisitor)
+}
+
+fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(obj.len()))?;
+
+    for (k, v) in obj {
+        map.serialize_entry(k, v)?;
+    }
+
+    map.end()
 }
 
 struct BigDecimalVisitor;

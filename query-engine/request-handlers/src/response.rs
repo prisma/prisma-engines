@@ -12,9 +12,6 @@ pub struct GQLResponse {
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
-
-    #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
@@ -25,9 +22,6 @@ pub struct GQLBatchResponse {
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
-
-    #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]
@@ -51,6 +45,13 @@ impl GQLError {
 }
 
 impl GQLResponse {
+    pub fn new(data: Map) -> Self {
+        Self {
+            data,
+            ..Default::default()
+        }
+    }
+
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: IndexMap::with_capacity(capacity),
@@ -74,8 +75,12 @@ impl GQLResponse {
         self.errors.iter()
     }
 
-    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
-        self.extensions.entry(key).or_insert(Item::Json(val));
+    pub fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    pub fn into_data(self) -> Map {
+        self.data
     }
 }
 
@@ -121,7 +126,7 @@ impl From<user_facing_errors::Error> for GQLError {
 impl From<CoreError> for GQLError {
     fn from(err: CoreError) -> GQLError {
         GQLError {
-            error: format!("{err}"),
+            error: format!("{}", err),
             user_facing_error: err.into(),
         }
     }
@@ -164,8 +169,12 @@ impl GQLBatchResponse {
             .chain(self.batch_result.iter().flat_map(|res| res.errors()))
     }
 
-    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
-        self.extensions.entry(key).or_insert(Item::Json(val));
+    pub fn into_responses(self) -> Vec<GQLResponse> {
+        self.batch_result
+    }
+
+    pub fn has_errors(&self) -> bool {
+        !self.errors.is_empty() || self.batch_result.iter().any(|res| res.has_errors())
     }
 }
 

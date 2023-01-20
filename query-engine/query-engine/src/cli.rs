@@ -3,14 +3,15 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use query_core::{schema::QuerySchemaRef, schema_builder};
-use request_handlers::{dmmf, GraphQlHandler};
+use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder};
+use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
     query: String,
     schema: psl::ValidatedSchema,
     enable_raw_queries: bool,
+    engine_protocol: EngineProtocol,
 }
 
 pub struct DmmfRequest {
@@ -57,6 +58,7 @@ impl CliCommand {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     schema: opts.schema(false)?,
+                    engine_protocol: opts.engine_protocol(),
                 }))),
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
@@ -114,17 +116,17 @@ impl CliCommand {
             .configuration
             .validate_that_one_datasource_is_provided()?;
 
-        let cx = PrismaContext::builder(request.schema)
+        let cx = PrismaContext::builder(request.schema, request.engine_protocol)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;
 
         let cx = Arc::new(cx);
 
-        let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let res = handler
-            .handle(serde_json::from_str(&decoded_request)?, None, None)
-            .await;
+        let handler = RequestHandler::new(&*cx.executor, cx.query_schema(), *cx.engine_protocol());
+        let body = RequestBody::try_from_str(&decoded_request, cx.engine_protocol())?;
+
+        let res = handler.handle(body, None, None).await;
         let res = serde_json::to_string(&res).unwrap();
 
         let encoded_response = base64::encode(res);

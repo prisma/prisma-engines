@@ -5,7 +5,7 @@ use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-use std::{borrow::Borrow, fmt};
+use std::{borrow::Borrow, collections::HashMap, fmt};
 
 /// The query schema.
 /// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
@@ -30,6 +30,9 @@ pub struct QuerySchema {
 
     /// Internal abstraction over the datamodel AST.
     pub internal_data_model: InternalDataModelRef,
+
+    pub query_map: HashMap<QueryInfo, OutputFieldRef>,
+    pub mutation_map: HashMap<QueryInfo, OutputFieldRef>,
 
     /// Information about the connector this schema was build for.
     pub context: ConnectorContext,
@@ -84,9 +87,26 @@ impl QuerySchema {
     ) -> Self {
         let features = internal_data_model.schema.configuration.preview_features();
         let relation_mode = internal_data_model.schema.relation_mode();
+        let mut query_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
+        let mut mutation_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
+
+        for field in query.as_object_type().unwrap().get_fields() {
+            if let Some(query_info) = field.query_info() {
+                query_map.insert(query_info.to_owned(), field.clone());
+            }
+        }
+
+        for field in mutation.as_object_type().unwrap().get_fields() {
+            if let Some(query_info) = field.query_info() {
+                mutation_map.insert(query_info.to_owned(), field.clone());
+            }
+        }
+
         QuerySchema {
             query,
             mutation,
+            query_map,
+            mutation_map,
             _input_object_types,
             _output_object_types,
             _enum_types,
@@ -109,6 +129,28 @@ impl QuerySchema {
     {
         let name = name.into();
         self.query().get_fields().iter().find(|f| f.name == name).cloned()
+    }
+
+    pub fn find_query_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<OutputFieldRef> {
+        let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
+        let query_info = QueryInfo { model, tag };
+
+        self.query_map.get(&query_info).cloned()
+    }
+
+    pub fn find_mutation_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<OutputFieldRef> {
+        let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
+        let query_info = QueryInfo { model, tag };
+
+        self.mutation_map.get(&query_info).cloned()
     }
 
     pub fn mutation(&self) -> ObjectTypeStrongRef {
@@ -135,14 +177,14 @@ impl QuerySchema {
 }
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct QueryInfo {
     pub model: Option<ModelRef>,
     pub tag: QueryTag,
 }
 
 /// A `QueryTag` designates a top level query possible with Prisma.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 pub enum QueryTag {
     FindUnique,
     FindUniqueOrThrow,
@@ -158,6 +200,7 @@ pub enum QueryTag {
     UpsertOne,
     Aggregate,
     GroupBy,
+    // Raw operations
     ExecuteRaw,
     QueryRaw,
     RunCommandRaw,
@@ -190,6 +233,33 @@ impl fmt::Display for QueryTag {
         };
 
         write!(f, "{s}")
+    }
+}
+
+impl From<String> for QueryTag {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "findUnique" => Self::FindUnique,
+            "findUniqueOrThrow" => Self::FindUniqueOrThrow,
+            "findFirst" => Self::FindFirst,
+            "findFirstOrThrow" => Self::FindFirstOrThrow,
+            "findMany" => Self::FindMany,
+            "createOne" => Self::CreateOne,
+            "createMany" => Self::CreateMany,
+            "updateOne" => Self::UpdateOne,
+            "updateMany" => Self::UpdateMany,
+            "deleteOne" => Self::DeleteOne,
+            "deleteMany" => Self::DeleteMany,
+            "upsertOne" => Self::UpsertOne,
+            "aggregate" => Self::Aggregate,
+            "groupBy" => Self::GroupBy,
+            "executeRaw" => Self::ExecuteRaw,
+            "queryRaw" => Self::QueryRaw,
+            "findRaw" => Self::FindRaw,
+            "aggregateRaw" => Self::AggregateRaw,
+            "runCommandRaw" => Self::RunCommandRaw,
+            v => panic!("Unknown query tag: {}", v),
+        }
     }
 }
 
