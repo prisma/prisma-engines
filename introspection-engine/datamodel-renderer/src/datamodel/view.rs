@@ -1,29 +1,12 @@
-mod relation;
-
-pub use relation::Relation;
-
-use super::{attributes::BlockAttribute, field::Field, IdDefinition, IndexDefinition};
-use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
 
-#[derive(Debug, Clone, Copy)]
-pub(super) enum Commented {
-    On,
-    Off,
-}
+use crate::value::{Constant, Documentation, Function};
 
-impl fmt::Display for Commented {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Commented::On => f.write_str("// "),
-            Commented::Off => Ok(()),
-        }
-    }
-}
+use super::{attributes::BlockAttribute, model::Commented, Field, IdDefinition, IndexDefinition};
 
 /// Defines a model block.
 #[derive(Debug)]
-pub struct Model<'a> {
+pub struct View<'a> {
     name: Constant<Cow<'a, str>>,
     documentation: Option<Documentation<'a>>,
     commented_out: Commented,
@@ -35,11 +18,11 @@ pub struct Model<'a> {
     schema: Option<BlockAttribute<'a>>,
 }
 
-impl<'a> Model<'a> {
-    /// Create a new model declaration.
+impl<'a> View<'a> {
+    /// Create a new view declaration.
     ///
     /// ```ignore
-    /// model User {
+    /// view User {
     /// //    ^^^^ name
     /// }
     /// ```
@@ -59,12 +42,12 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Documentation of the model. If called repeteadly,
+    /// Documentation of the view. If called repeteadly,
     /// adds the new docs to the end with a newline.
     ///
     /// ```ignore
     /// /// This is the documentation.
-    /// model Foo {
+    /// view Foo {
     ///   ....
     /// }
     /// ```
@@ -75,10 +58,10 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Ignore the model.
+    /// Ignore the view.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@ignore
     ///   ^^^^^^^^ this
     /// }
@@ -87,10 +70,10 @@ impl<'a> Model<'a> {
         self.ignore = Some(BlockAttribute(Function::new("ignore")));
     }
 
-    /// Add a model-level id definition.
+    /// Add a view-level id definition.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@id([field1, field2(sort: Desc)])
     ///   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -99,10 +82,10 @@ impl<'a> Model<'a> {
         self.id = Some(id);
     }
 
-    /// Add a model-level mapping.
+    /// Add a view-level mapping.
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@map("1Foo")
     ///   ^^^^^^^^^^^^^ this
     /// }
@@ -114,10 +97,10 @@ impl<'a> Model<'a> {
         self.map = Some(BlockAttribute(fun));
     }
 
-    /// The schema attribute of the model block
+    /// The schema attribute of the view block
     ///
     /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@schema("public")
     ///   ^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -129,23 +112,11 @@ impl<'a> Model<'a> {
         self.schema = Some(BlockAttribute(fun));
     }
 
-    /// Comments the complete model block out.
+    /// Push a new field to the view.
     ///
     /// ```ignore
-    /// // model Foo {
-    /// //   id Int @id
-    /// // }
-    /// ```
-    pub fn comment_out(&mut self) {
-        self.commented_out = Commented::On
-    }
-
-    /// Push a new field to the end of the model.
-    ///
-    /// ```ignore
-    /// model Foo {
-    ///   id  Int    @id
-    ///   foo String
+    /// view Foo {
+    ///   id Int @id
     ///   ^^^^^^^^^^ this
     /// }
     /// ```
@@ -153,24 +124,10 @@ impl<'a> Model<'a> {
         self.fields.push(field);
     }
 
-    /// Push a new field to the beginning of the model.
-    /// Extremely inefficient, prefer `push_field` if you can.
+    /// Push a new index to the view.
     ///
     /// ```ignore
-    /// model Foo {
-    ///   id  Int    @id
-    ///   ^^^^^^^^^^^^^^ this
-    ///   foo String
-    /// }
-    /// ```
-    pub fn insert_field_front(&mut self, field: Field<'a>) {
-        self.fields.insert(0, field);
-    }
-
-    /// Push a new index to the model.
-    ///
-    /// ```ignore
-    /// model Foo {
+    /// view Foo {
     ///   @@index([field1, field2])
     ///   ^^^^^^^^^^^^^^^^^^^^^^^^^ this
     /// }
@@ -180,7 +137,7 @@ impl<'a> Model<'a> {
     }
 }
 
-impl<'a> fmt::Display for Model<'a> {
+impl<'a> fmt::Display for View<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Prefix everything with this, so if the model is commented out, so
         // is your line.
@@ -190,7 +147,7 @@ impl<'a> fmt::Display for Model<'a> {
             docs.fmt(f)?;
         }
 
-        writeln!(f, "{comment}model {} {{", self.name)?;
+        writeln!(f, "{comment}view {} {{", self.name)?;
 
         for field in self.fields.iter() {
             writeln!(f, "{comment}{field}")?;
@@ -231,7 +188,7 @@ mod tests {
 
     #[test]
     fn kitchen_sink() {
-        let mut model = Model::new("Country");
+        let mut model = View::new("Country");
         model.map("1Country");
         model.documentation("Do not fear death\nIf you love the trail of streaking fire\nDo not fear death\nIf you desire a speed king to become!");
 
@@ -330,7 +287,7 @@ mod tests {
             /// If you love the trail of streaking fire
             /// Do not fear death
             /// If you desire a speed king to become!
-            model Country {
+            view Country {
               id          String              @id(sort: Desc, length: 32, clustered: false) @default(uuid()) @db.VarChar(255)
               /// NOPEUSKUNINGAS
               value       Bytes?              @default("AQIDBA==")
@@ -347,30 +304,6 @@ mod tests {
               @@ignore
               @@schema("public")
             }
-        "#]];
-
-        let rendered = psl::reformat(&model.to_string(), 2).unwrap();
-        expected.assert_eq(&rendered);
-    }
-
-    #[test]
-    fn commented_out() {
-        let mut model = Model::new("Country");
-
-        let mut field = Field::new("id", "String");
-        field.id(IdFieldDefinition::default());
-        field.native_type("db", "VarChar", vec![String::from("255")]);
-        field.default(DefaultValue::function(Function::new("uuid")));
-        model.push_field(field);
-
-        model.schema("public");
-        model.comment_out();
-
-        let expected = expect![[r#"
-            // model Country {
-            // id String @id @default(uuid()) @db.VarChar(255)
-            // @@schema("public")
-            // }
         "#]];
 
         let rendered = psl::reformat(&model.to_string(), 2).unwrap();
