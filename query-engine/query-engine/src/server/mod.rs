@@ -113,11 +113,17 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     }
 
     let headers = req.headers();
-    let span = info_span!("prisma:engine", user_facing = true);
-    span.set_parent(get_parent_span_context(headers));
-
     let traceparent = traceparent(headers);
     let tx_id = transaction_id(headers);
+    let cx = get_parent_span_context(headers);
+
+    let span = if tx_id.is_none() {
+        let span = info_span!("prisma:engine", user_facing = true);
+        span.set_parent(cx);
+        span
+    } else {
+        Span::none()
+    };
 
     let work = async move {
         let body_start = req.into_body();
@@ -219,22 +225,17 @@ async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 async fn transaction_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
     let sections: Vec<&str> = path.split('/').collect();
-    let span = info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
 
     if sections.len() == 3 && sections[2] == "start" {
-        return transaction_start_handler(state, req).instrument(span).await;
+        return transaction_start_handler(state, req).await;
     }
 
     if sections.len() == 4 && sections[3] == "commit" {
-        return transaction_commit_handler(state, sections[2].into())
-            .instrument(span)
-            .await;
+        return transaction_commit_handler(state, sections[2].into()).await;
     }
 
     if sections.len() == 4 && sections[3] == "rollback" {
-        return transaction_rollback_handler(state, sections[2].into())
-            .instrument(span)
-            .await;
+        return transaction_rollback_handler(state, sections[2].into()).await;
     }
 
     let res = Response::builder()
@@ -245,16 +246,20 @@ async fn transaction_handler(state: State, req: Request<Body>) -> Result<Respons
 }
 
 async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let cx = get_parent_span_context(req.headers());
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
     let tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
 
+    let span = info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+    span.set_parent(cx);
+
     let result = state
         .cx
         .executor
         .start_tx(state.cx.query_schema().clone(), &tx_opts)
-        .instrument(Span::current())
+        .instrument(span)
         .await;
 
     match result {
