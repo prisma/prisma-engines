@@ -2,6 +2,7 @@ use crate::state::State;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
+use opentelemetry::global;
 use opentelemetry::propagation::Extractor;
 use query_core::{schema::QuerySchemaRenderer, TransactionOptions, TxId};
 use query_engine_metrics::MetricFormat;
@@ -12,6 +13,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
 use tracing::{field, Instrument, Span};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
 pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
@@ -112,6 +114,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
     let headers = req.headers();
     let span = info_span!("prisma:engine", user_facing = true);
+    span.set_parent(get_parent_span_context(headers));
 
     let traceparent = traceparent(headers);
     let tx_id = transaction_id(headers);
@@ -374,4 +377,11 @@ fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
         .get(TRANSACTION_ID_HEADER)
         .and_then(|h| h.to_str().ok())
         .and_then(|s| Some(TxId::from(s)))
+}
+
+/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
+    let extractor = HeaderExtractor(headers);
+    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
 }
