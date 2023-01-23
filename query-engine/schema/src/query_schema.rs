@@ -159,7 +159,10 @@ pub enum QueryTag {
     Aggregate,
     GroupBy,
     ExecuteRaw,
-    QueryRaw { query_type: Option<String> },
+    QueryRaw,
+    RunCommandRaw,
+    FindRaw,
+    AggregateRaw,
 }
 
 impl fmt::Display for QueryTag {
@@ -180,7 +183,10 @@ impl fmt::Display for QueryTag {
             Self::Aggregate => "aggregate",
             Self::GroupBy => "groupBy",
             Self::ExecuteRaw => "executeRaw",
-            Self::QueryRaw { query_type: _ } => "queryRaw",
+            Self::QueryRaw => "queryRaw",
+            Self::RunCommandRaw => "runCommandRaw",
+            Self::FindRaw => "findRaw",
+            Self::AggregateRaw => "aggregateRaw",
         };
 
         write!(f, "{}", s)

@@ -14,10 +14,10 @@ pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuil
 pub fn query_raw(
     graph: &mut QueryGraph,
     model: Option<ModelRef>,
-    query_type: &Option<String>,
+    query_type: Option<String>,
     field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
-    let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(model, query_type.to_owned(), field)?));
+    let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(model, query_type, field)?));
 
     graph.create_node(raw_query);
     Ok(())
