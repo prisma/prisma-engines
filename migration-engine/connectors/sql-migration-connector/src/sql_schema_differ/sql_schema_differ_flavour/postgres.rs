@@ -174,8 +174,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 let b_class = pg_ext_next.get_opclass(col_b.id);
                 let a_kind = a_class.map(|c| c.kind.as_ref());
                 let b_kind = b_class.map(|c| c.kind.as_ref());
-                let a_kind_is_empty = a_kind.map(|k| k == "").unwrap_or(true);
-                let b_kind_is_empty = b_kind.map(|k| k == "").unwrap_or(true);
+                let a_kind_is_empty = a_kind.map(|k| k.is_empty()).unwrap_or(true);
+                let b_kind_is_empty = b_kind.map(|k| k.is_empty()).unwrap_or(true);
                 let a_is_default = a_class.map(|c| c.is_default).unwrap_or(false);
                 let b_is_default = b_class.map(|c| c.is_default).unwrap_or(false);
 
