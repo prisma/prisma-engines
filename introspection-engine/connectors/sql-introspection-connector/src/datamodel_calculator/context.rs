@@ -85,11 +85,21 @@ impl<'a> InputContext<'a> {
             })
     }
 
-    pub(crate) fn view_pairs(self) -> impl ExactSizeIterator<Item = ViewPair<'a>> {
-        self.schema.view_walkers().map(move |next| {
-            let previous = self.existing_view(next.id);
-            Pair::new(self, previous, next)
-        })
+    /// Iterate over the database views, combined together with a
+    /// possible existing view in the PSL.
+    pub(crate) fn view_pairs(self) -> impl Iterator<Item = ViewPair<'a>> {
+        // Right now all connectors introspect views for db reset.
+        // Filtering the ones with columns will not cause
+        // empty view blocks with these connectors.
+        //
+        // Removing the filter when all connectors are done.
+        self.schema
+            .view_walkers()
+            .filter(|v| !v.columns().len() > 0)
+            .map(move |next| {
+                let previous = self.existing_view(next.id);
+                Pair::new(self, previous, next)
+            })
     }
 
     /// Given a SQL enum from the database, this method returns the enum that matches it (by name)
