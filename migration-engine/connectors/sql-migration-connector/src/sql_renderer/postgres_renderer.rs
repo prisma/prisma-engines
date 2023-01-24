@@ -699,7 +699,7 @@ fn render_alter_column(
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
                 if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous.default().map(|d| d.kind()) {
-                    let sequence_is_still_used = columns.next.schema.walk_columns().any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next));
+                    let sequence_is_still_used = columns.next.schema.walk_table_columns().any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -948,7 +948,7 @@ fn render_postgres_alter_enum(
 
     // Alter type of the current columns to new, with a cast
     {
-        let affected_columns = schemas.next.walk_columns().filter(
+        let affected_columns = schemas.next.walk_table_columns().filter(
             |column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(id) if *id == enums.next.id),
         );
 

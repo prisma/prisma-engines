@@ -55,22 +55,22 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
     }
 
     if field.remapped_name_from_psl() {
-        let mf = crate::warnings::ModelAndField {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-        };
+        // let mf = crate::warnings::ModelAndField {
+        //     model: field.model().name().to_string(),
+        //     field: field.name().to_string(),
+        // };
 
-        warnings.remapped_fields.push(mf);
+        // warnings.remapped_fields.push(mf);
     }
 
     if field.is_unsupported() {
-        let mf = crate::warnings::ModelAndFieldAndType {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-            tpe: field.prisma_type().to_string(),
-        };
+        // let mf = crate::warnings::ModelAndFieldAndType {
+        //     model: field.model().name().to_string(),
+        //     field: field.name().to_string(),
+        //     tpe: field.prisma_type().to_string(),
+        // };
 
-        warnings.unsupported_types.push(mf)
+        // warnings.unsupported_types.push(mf)
     }
 
     if field.remapped_name_empty() {
@@ -78,12 +78,12 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
         rendered.documentation(docs);
         rendered.commented_out();
 
-        let mf = crate::warnings::ModelAndField {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-        };
+        // let mf = crate::warnings::ModelAndField {
+        //     model: field.model().name().to_string(),
+        //     field: field.name().to_string(),
+        // };
 
-        warnings.fields_with_empty_names.push(mf);
+        // warnings.fields_with_empty_names.push(mf);
     }
 
     rendered

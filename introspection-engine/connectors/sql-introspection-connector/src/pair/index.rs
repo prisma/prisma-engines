@@ -1,13 +1,16 @@
 use crate::SqlFamilyTrait;
 use psl::{
-    datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers, schema_ast::ast, PreviewFeature,
+    datamodel_connector::constraint_names::ConstraintNames,
+    parser_database::{walkers, IndexType},
+    schema_ast::ast,
+    PreviewFeature,
 };
 use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt};
 use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, Pair};
 
-pub(crate) type IndexPair<'a> = Pair<'a, walkers::IndexWalker<'a>, sql::IndexWalker<'a>>;
+pub(crate) type IndexPair<'a> = Pair<'a, walkers::IndexWalker<'a>, Option<sql::IndexWalker<'a>>>;
 
 impl<'a> IndexPair<'a> {
     /// The position of the index from the PSL, if existing. Used for
@@ -24,18 +27,43 @@ impl<'a> IndexPair<'a> {
 
     /// The constraint name in the database, if non-default.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        (self.next.name() != self.default_constraint_name()).then(|| self.next.name())
+        match self.next {
+            Some(next) => {
+                let columns = next.column_names().collect::<Vec<_>>();
+
+                let default = match next.index_type() {
+                    sql::IndexType::Unique => ConstraintNames::unique_index_name(
+                        next.table().name(),
+                        &columns,
+                        self.context.active_connector(),
+                    ),
+                    _ => ConstraintNames::non_unique_index_name(
+                        next.table().name(),
+                        &columns,
+                        self.context.active_connector(),
+                    ),
+                };
+
+                (next.name() != default).then(|| next.name())
+            }
+            None => self.previous.and_then(|prev| prev.mapped_name()),
+        }
     }
 
     /// The type of the index.
     pub(crate) fn index_type(self) -> sql::IndexType {
         let preview_features = self.context.config.preview_features();
 
-        match self.next.index_type() {
-            sql::IndexType::Fulltext if !preview_features.contains(PreviewFeature::FullTextIndex) => {
+        match self.next.map(|next| next.index_type()) {
+            Some(sql::IndexType::Fulltext) if !preview_features.contains(PreviewFeature::FullTextIndex) => {
                 sql::IndexType::Normal
             }
-            typ => typ,
+            Some(typ) => typ,
+            None => match self.previous.map(|prev| prev.index_type()) {
+                Some(IndexType::Unique) => sql::IndexType::Unique,
+                Some(IndexType::Fulltext) => sql::IndexType::Fulltext,
+                _ => sql::IndexType::Normal,
+            },
         }
     }
 
@@ -46,14 +74,19 @@ impl<'a> IndexPair<'a> {
             return None;
         }
 
-        let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
-        let clustered = ext.index_is_clustered(self.next.id);
+        let clustered = match self.next {
+            Some(next) => {
+                let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
+                ext.index_is_clustered(next.id)
+            }
+            None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(false),
+        };
 
         if !clustered {
-            return None;
+            None
+        } else {
+            Some(clustered)
         }
-
-        Some(clustered)
     }
 
     /// A PostgreSQL specific algorithm. Defines the data structure
@@ -63,26 +96,57 @@ impl<'a> IndexPair<'a> {
             return None;
         }
 
-        let data: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
+        match (self.next, self.previous.and_then(|i| i.algorithm())) {
+            // Index is defined in a table to the database.
+            (Some(next), _) => {
+                let data: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
 
-        match data.index_algorithm(self.next.id) {
-            sql::postgres::SqlIndexAlgorithm::BTree => None,
-            sql::postgres::SqlIndexAlgorithm::Hash => Some("Hash"),
-            sql::postgres::SqlIndexAlgorithm::Gist => Some("Gist"),
-            sql::postgres::SqlIndexAlgorithm::Gin => Some("Gin"),
-            sql::postgres::SqlIndexAlgorithm::SpGist => Some("SpGist"),
-            sql::postgres::SqlIndexAlgorithm::Brin => Some("Brin"),
+                match data.index_algorithm(next.id) {
+                    sql::postgres::SqlIndexAlgorithm::BTree => None,
+                    sql::postgres::SqlIndexAlgorithm::Hash => Some("Hash"),
+                    sql::postgres::SqlIndexAlgorithm::Gist => Some("Gist"),
+                    sql::postgres::SqlIndexAlgorithm::Gin => Some("Gin"),
+                    sql::postgres::SqlIndexAlgorithm::SpGist => Some("SpGist"),
+                    sql::postgres::SqlIndexAlgorithm::Brin => Some("Brin"),
+                }
+            }
+            // For views, we copy whatever is written in PSL.
+            (None, Some(algo)) => match algo {
+                psl::parser_database::IndexAlgorithm::BTree => None,
+                psl::parser_database::IndexAlgorithm::Hash => Some("Hash"),
+                psl::parser_database::IndexAlgorithm::Gist => Some("Gist"),
+                psl::parser_database::IndexAlgorithm::Gin => Some("Gin"),
+                psl::parser_database::IndexAlgorithm::SpGist => Some("SpGist"),
+                psl::parser_database::IndexAlgorithm::Brin => Some("Brin"),
+            },
+            _ => None,
         }
     }
 
     /// The fields that are defining the index.
-    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldPair<'a>> {
-        self.next.columns().enumerate().map(move |(i, next)| {
-            let previous = self
-                .previous
-                .and_then(|p| p.fields().nth(i).and_then(|f| f.as_scalar_field()));
-            Pair::new(self.context, previous, next)
-        })
+    pub(crate) fn fields(self) -> Box<dyn Iterator<Item = IndexFieldPair<'a>> + 'a> {
+        match (self.next, self.previous) {
+            (Some(next), _) => {
+                let iter = next.columns().enumerate().map(move |(i, next)| {
+                    let previous = self
+                        .previous
+                        .and_then(|p| p.fields().nth(i).and_then(|f| f.as_scalar_field()));
+
+                    Pair::new(self.context, previous, Some(next))
+                });
+
+                Box::new(iter)
+            }
+            (None, Some(prev)) => {
+                let iter = prev
+                    .fields()
+                    .filter_map(|f| f.as_scalar_field())
+                    .map(move |prev| Pair::new(self.context, Some(prev), None));
+
+                Box::new(iter)
+            }
+            _ => Box::new(std::iter::empty()),
+        }
     }
 
     /// If one field defines the index, returns that field.
@@ -95,21 +159,10 @@ impl<'a> IndexPair<'a> {
             return false;
         }
 
-        self.fields().len() == 1
-    }
-
-    fn default_constraint_name(self) -> String {
-        let columns = self.next.column_names().collect::<Vec<_>>();
-
-        match self.next.index_type() {
-            sql::IndexType::Unique => {
-                ConstraintNames::unique_index_name(self.next.table().name(), &columns, self.context.active_connector())
-            }
-            _ => ConstraintNames::non_unique_index_name(
-                self.next.table().name(),
-                &columns,
-                self.context.active_connector(),
-            ),
+        match (self.next, self.previous) {
+            (Some(next), _) => next.columns().len() == 1,
+            (_, Some(prev)) => prev.fields().len() == 1,
+            _ => false,
         }
     }
 }

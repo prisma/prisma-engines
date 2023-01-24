@@ -244,7 +244,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             sql::Column {
                 name: model_a_column.into(),
                 tpe: column_a_type,
-                default_value_id: None,
                 auto_increment: false,
             },
         );
@@ -253,7 +252,6 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             sql::Column {
                 name: model_b_column.into(),
                 tpe: column_b_type,
-                default_value_id: None,
                 auto_increment: false,
             },
         );
@@ -388,10 +386,10 @@ fn push_column_for_model_enum_scalar_field(
         }),
     });
 
-    let default_value_id = default.map(|default| {
+    if let Some(default) = default {
         let column_id = ctx.schema.describer_schema.next_table_column_id();
-        ctx.schema.describer_schema.push_table_default_value(column_id, default)
-    });
+        ctx.schema.describer_schema.push_table_default_value(column_id, default);
+    }
 
     let column = sql::Column {
         name: field.database_name().to_owned(),
@@ -399,7 +397,6 @@ fn push_column_for_model_enum_scalar_field(
             sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
             column_arity(field.ast_field().arity),
         ),
-        default_value_id,
         auto_increment: false,
     };
 
@@ -423,10 +420,10 @@ fn push_column_for_model_unsupported_scalar_field(
         }
     });
 
-    let default_value_id = default.map(|default| {
+    if let Some(default) = default {
         let column_id = ctx.schema.describer_schema.next_table_column_id();
-        ctx.schema.describer_schema.push_table_default_value(column_id, default)
-    });
+        ctx.schema.describer_schema.push_table_default_value(column_id, default);
+    }
 
     let column = sql::Column {
         name: field.database_name().to_owned(),
@@ -434,7 +431,6 @@ fn push_column_for_model_unsupported_scalar_field(
             field,
             field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
         ),
-        default_value_id,
         auto_increment: false,
     };
 
@@ -507,12 +503,10 @@ fn push_column_for_builtin_scalar_type(
 
     let default_is_prisma_level = matches!(default, Some(ColumnDefault::PrismaGenerated));
 
-    let default_value_id = if let Some(ColumnDefault::Available(d)) = default {
+    if let Some(ColumnDefault::Available(d)) = default {
         let column_id = ctx.schema.describer_schema.next_table_column_id();
-        Some(ctx.schema.describer_schema.push_table_default_value(column_id, d))
-    } else {
-        None
-    };
+        ctx.schema.describer_schema.push_table_default_value(column_id, d);
+    }
 
     let column = sql::Column {
         name: field.database_name().to_owned(),
@@ -523,7 +517,6 @@ fn push_column_for_builtin_scalar_type(
             native_type: Some(native_type),
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
-        default_value_id,
     };
 
     let column_id = ctx.schema.describer_schema.push_table_column(table_id, column);

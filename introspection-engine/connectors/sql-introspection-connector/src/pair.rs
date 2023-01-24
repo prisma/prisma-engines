@@ -11,6 +11,7 @@ mod index_field;
 mod model;
 mod relation_field;
 mod scalar_field;
+mod view;
 
 use crate::datamodel_calculator::InputContext;
 pub(crate) use default::{DefaultKind, DefaultValuePair};
@@ -21,6 +22,7 @@ pub(crate) use index_field::{IndexFieldPair, IndexOps};
 pub(crate) use model::ModelPair;
 pub(crate) use relation_field::{RelationFieldDirection, RelationFieldPair};
 pub(crate) use scalar_field::ScalarFieldPair;
+pub(crate) use view::ViewPair;
 
 /// Holds the introspected item from the database, and a possible
 /// previous value from the PSL.

@@ -226,7 +226,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .constrained_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)
@@ -246,7 +246,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .referenced_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)

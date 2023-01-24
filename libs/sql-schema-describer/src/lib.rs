@@ -22,6 +22,8 @@ pub use self::{
 };
 pub use prisma_value::PrismaValue;
 
+pub use either::Either;
+
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -151,6 +153,16 @@ impl SqlSchema {
             .iter()
             .position(|t| t.name == name && ns_id.map(|id| id == t.namespace_id).unwrap_or(true))
             .map(|i| TableId(i as u32))
+    }
+
+    /// Try to find a table by name.
+    pub fn find_view(&self, name: &str, namespace: Option<&str>) -> Option<ViewId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.views
+            .iter()
+            .position(|t| t.name == name && ns_id.map(|id| id == t.namespace_id).unwrap_or(true))
+            .map(|i| ViewId(i as u32))
     }
 
     /// Get a procedure.
@@ -334,6 +346,10 @@ impl SqlSchema {
         self.tables.len()
     }
 
+    pub fn views_count(&self) -> usize {
+        self.views.len()
+    }
+
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
         Some(self.walk(TableId(table_idx as u32)))
@@ -389,9 +405,14 @@ impl SqlSchema {
         Walker { id, schema: self }
     }
 
-    /// Traverse all the columns in the schema.
-    pub fn walk_columns(&self) -> impl Iterator<Item = TableColumnWalker<'_>> {
+    /// Traverse all the table columns in the schema.
+    pub fn walk_table_columns(&self) -> impl Iterator<Item = TableColumnWalker<'_>> {
         (0..self.table_columns.len()).map(|idx| self.walk(TableColumnId(idx as u32)))
+    }
+
+    /// Traverse all the table columns in the schema.
+    pub fn walk_view_columns(&self) -> impl Iterator<Item = ViewColumnWalker<'_>> {
+        (0..self.view_columns.len()).map(|idx| self.walk(ViewColumnId(idx as u32)))
     }
 
     /// Traverse all namespaces in the catalog.

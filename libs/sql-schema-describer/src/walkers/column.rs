@@ -106,6 +106,11 @@ impl<'a> ColumnWalker<'a> {
         }
     }
 
+    /// True if the column is defined in a view.
+    pub fn is_in_view(self) -> bool {
+        self.id.is_right()
+    }
+
     fn get(self) -> &'a Column {
         match self.id {
             Either::Left(table_column_id) => &self.schema.table_columns[table_column_id.0 as usize].1,

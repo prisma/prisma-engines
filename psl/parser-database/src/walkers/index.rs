@@ -136,6 +136,11 @@ impl<'db> IndexWalker<'db> {
             })
     }
 
+    /// True, if given field is a part of the indexed fields.
+    pub fn contains_field(self, field: ScalarFieldWalker<'db>) -> bool {
+        self.fields().filter_map(|f| f.as_scalar_field()).any(|f| f == field)
+    }
+
     /// True if the field contains exactly the same fields in the same order,
     /// and with the same attributes.
     pub fn contains_exactly_the_fields(

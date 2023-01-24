@@ -153,7 +153,7 @@ fn inline_relation_name<'a>(
         relation_name.push('_');
         let mut cols = fk.constrained_columns().peekable();
         while let Some(col) = cols.next() {
-            relation_name.push_str(input.column_prisma_name(col.id).prisma_name().as_ref());
+            relation_name.push_str(input.table_column_prisma_name(col.id).prisma_name().as_ref());
             if cols.peek().is_some() {
                 relation_name.push('_');
             }
@@ -238,7 +238,7 @@ fn inline_relation_ambiguousness(
     let default_field_name = input.table_prisma_name(fk.referenced_table().id).prisma_name();
     if fk
         .constrained_columns()
-        .any(|col| default_field_name == input.column_prisma_name(col.id).prisma_name())
+        .any(|col| default_field_name == input.table_column_prisma_name(col.id).prisma_name())
     {
         ambiguous_relations.insert(tables);
     }

@@ -2,12 +2,12 @@ use crate::{
     datamodel_calculator::{InputContext, OutputContext},
     introspection_helpers as helpers,
     pair::ViewPair,
-    warnings::{self, Warnings},
+    warnings::Warnings,
 };
 use datamodel_renderer::datamodel as renderer;
 use psl::parser_database::{walkers, SortOrder};
 
-use super::scalar_field;
+use super::{id, indexes, scalar_field};
 
 /// Render all view blocks to the PSL.
 pub(super) fn render<'a>(input: InputContext<'a>, output: &mut OutputContext<'a>) {
@@ -55,28 +55,20 @@ fn render_view<'a>(view: ViewPair<'a>, input: InputContext<'a>, warnings: &mut W
     }
 
     if let Some(id) = view.id() {
-        rendered.id(render_id(id));
+        rendered.id(id::render(id, warnings));
     }
 
     if !view.has_usable_identifier() {
         let docs = "The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.";
         rendered.documentation(docs);
-
-        warnings.views_without_identifiers.push(warnings::View {
-            view: view.name().to_string(),
-        });
-    }
-
-    if view.uses_duplicate_name() {
-        warnings.duplicate_names.push(warnings::TopLevelItem {
-            r#type: warnings::TopLevelType::View,
-            name: view.name().to_string(),
-        })
     }
 
     for field in view.scalar_fields() {
-        dbg!((field.name(), field.arity()));
         rendered.push_field(scalar_field::render(field, warnings));
+    }
+
+    for definition in view.indexes().map(indexes::render) {
+        rendered.push_index(definition);
     }
 
     // TODO: relation fields

@@ -4,7 +4,7 @@ use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, Pair};
 
-pub(crate) type IdPair<'a> = Pair<'a, walkers::PrimaryKeyWalker<'a>, sql::IndexWalker<'a>>;
+pub(crate) type IdPair<'a> = Pair<'a, walkers::PrimaryKeyWalker<'a>, Option<sql::IndexWalker<'a>>>;
 
 impl<'a> IdPair<'a> {
     /// The user-facing name of the identifier, defined solely in the
@@ -15,8 +15,15 @@ impl<'a> IdPair<'a> {
 
     /// The constraint name in the database, if non-default.
     pub(crate) fn mapped_name(self) -> Option<&'a str> {
-        let name = self.next.name();
-        (!name.is_empty() && name != self.default_constraint_name()).then_some(name)
+        match self.next {
+            Some(next) => {
+                let default = ConstraintNames::primary_key_name(next.table().name(), self.context.active_connector());
+                let name = next.name();
+
+                (!name.is_empty() && name != default).then_some(name)
+            }
+            None => self.previous.and_then(|prev| prev.mapped_name()),
+        }
     }
 
     /// SQL Server specific clustering setting. A value is returned if
@@ -26,8 +33,13 @@ impl<'a> IdPair<'a> {
             return None;
         }
 
-        let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
-        let clustered = ext.index_is_clustered(self.next.id);
+        let clustered = match self.next {
+            Some(next) => {
+                let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
+                ext.index_is_clustered(next.id)
+            }
+            None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(true),
+        };
 
         if clustered {
             return None;
@@ -48,14 +60,18 @@ impl<'a> IdPair<'a> {
     }
 
     /// The fields the primary key is consisting of.
-    pub(crate) fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldPair<'a>> {
-        self.next.columns().enumerate().map(move |(i, c)| {
-            let previous = self.previous.and_then(|prev| prev.fields().nth(i));
-            Pair::new(self.context, previous, c)
-        })
-    }
-
-    fn default_constraint_name(self) -> String {
-        ConstraintNames::primary_key_name(self.next.table().name(), self.context.active_connector())
+    pub(crate) fn fields(self) -> Box<dyn ExactSizeIterator<Item = IndexFieldPair<'a>> + 'a> {
+        match self.next {
+            Some(next) => Box::new(next.columns().enumerate().map(move |(i, c)| {
+                let previous = self.previous.and_then(|prev| prev.fields().nth(i));
+                Pair::new(self.context, previous, Some(c))
+            })),
+            None => Box::new(
+                self.previous
+                    .unwrap()
+                    .fields()
+                    .map(move |previous| Pair::new(self.context, Some(previous), None)),
+            ),
+        }
     }
 }

@@ -74,21 +74,21 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
                 Some(renderer::DefaultValue::array(vals))
             }
             DefaultKind::Prisma1Uuid => {
-                let warn = crate::warnings::ModelAndField {
-                    model: field.model().name().to_string(),
-                    field: field.name().to_string(),
-                };
+                // let warn = crate::warnings::ModelAndField {
+                //     model: field.model().name().to_string(),
+                //     field: field.name().to_string(),
+                // };
 
-                warnings.prisma_1_uuid_defaults.push(warn);
+                // warnings.prisma_1_uuid_defaults.push(warn);
                 Some(renderer::DefaultValue::function(Function::new("uuid")))
             }
             DefaultKind::Prisma1Cuid => {
-                let warn = crate::warnings::ModelAndField {
-                    model: field.model().name().to_string(),
-                    field: field.name().to_string(),
-                };
+                // let warn = crate::warnings::ModelAndField {
+                //     model: field.model().name().to_string(),
+                //     field: field.name().to_string(),
+                // };
 
-                warnings.prisma_1_cuid_defaults.push(warn);
+                // warnings.prisma_1_cuid_defaults.push(warn);
                 Some(renderer::DefaultValue::function(Function::new("cuid")))
             }
         },

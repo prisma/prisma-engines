@@ -59,6 +59,11 @@ impl<'a> TableDefaultValueWalker<'a> {
         self.coarsen().constraint_name()
     }
 
+    /// The actual value struct
+    pub fn inner(self) -> &'a DefaultValue {
+        self.coarsen().value()
+    }
+
     fn get(self) -> &'a (TableColumnId, DefaultValue) {
         &self.schema.table_default_values[self.id.0 as usize]
     }

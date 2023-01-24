@@ -58,8 +58,8 @@ impl<'a> ModelPair<'a> {
     /// Iterating over the scalar fields.
     pub(crate) fn scalar_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldPair<'a>> {
         self.next.columns().map(move |next| {
-            let previous = self.context.existing_scalar_field(next.id);
-            Pair::new(self.context, previous, next)
+            let previous = self.context.existing_table_scalar_field(next.id);
+            Pair::new(self.context, previous, next.coarsen())
         })
     }
 
@@ -168,7 +168,7 @@ impl<'a> ModelPair<'a> {
                     })
                 });
 
-                Pair::new(self.context, previous, next)
+                Pair::new(self.context, previous, Some(next))
             })
     }
 
@@ -181,7 +181,7 @@ impl<'a> ModelPair<'a> {
             .filter(|pk| pk.columns().len() > 1)
             .and_then(move |pk| {
                 let id = self.previous.and_then(|model| model.primary_key());
-                let pair = Pair::new(self.context, id, pk);
+                let pair = Pair::new(self.context, id, Some(pk));
 
                 (!pair.defined_in_a_field()).then_some(pair)
             })
