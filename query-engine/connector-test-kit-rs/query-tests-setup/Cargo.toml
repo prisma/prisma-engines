@@ -1,7 +1,6 @@
 [package]
 name = "query-tests-setup"
 version = "0.1.0"
-authors = ["Dominic Petrick <dompetrick@gmail.com>"]
 edition = "2021"
 
 [dependencies]
