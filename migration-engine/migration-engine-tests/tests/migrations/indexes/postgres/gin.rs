@@ -300,3 +300,57 @@ fn gin_raw_ops_default(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn btree_gin_raw_ops(api: TestApi) {
+    api.raw_cmd("CREATE EXTENSION btree_gin;");
+
+    let dm = r#"
+        model A {
+          id   Int                      @id @default(autoincrement())
+          data String
+
+          @@index([data(ops: raw("text_ops"))], type: Gin)
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_has_column("data")
+            .assert_index_on_columns(&["data"], |idx| {
+                idx.assert_algorithm(SqlIndexAlgorithm::Gin)
+                    .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
+            })
+    });
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn btree_gin_raw_ops_default(api: TestApi) {
+    api.raw_cmd("CREATE EXTENSION btree_gin;");
+
+    let dm = r#"
+        model A {
+          id   Int                      @id @default(autoincrement())
+          data String
+
+          @@index([data(ops: raw(""))], type: Gin)
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table
+            .assert_has_column("data")
+            .assert_index_on_columns(&["data"], |idx| {
+                idx.assert_algorithm(SqlIndexAlgorithm::Gin)
+                    .assert_column("data", |attrs| attrs.assert_ops(SQLOperatorClassKind::TextOps))
+            })
+    });
+
+    api.schema_push_w_datasource(dm).send().assert_no_steps();
+}
