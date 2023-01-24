@@ -4,7 +4,7 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::{global, propagation::Extractor};
-use query_core::helpers::get_trace_id_from_traceparent;
+use query_core::helpers::*;
 use query_core::{
     schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
 };
@@ -132,30 +132,36 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let mut traceparent = traceparent(headers);
     let mut trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
 
-    // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
-    // during the different operations within a transaction. The trace_id is propagated in the
-    // traceparent header, but if it's not present, we need to synthetically create one for the
-    // transaction. This is needed, in case the client is interested in capturing logs and not
-    // traces, because:
-    //  - The client won't send a traceparent header
-    //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
-    //    ITXServer for that transaction
-    //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
-    //    to start capturing logs, and for that we need a trace_id. There are two places were we
-    //    could get that information from:
-    //      - First, it's the traceparent, but the client didn't send it, because they are only
-    //      interested in logs.
-    //      - Second, it's the root span for the transaction, but it's not in scope but instead
-    //      stored in the ITXServer, in a different tokio task.
-    //
-    // For the above reasons, we need to create a trace_id that we can predict and use accross the
-    // different operations happening within a transaction. So we do it by converting the tx_id
-    // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
-    // information loss.
-    if capture_settings.logs_enabled() && traceparent.is_none() && tx_id.is_some() {
-        let tx_id = tx_id.clone().unwrap();
-        traceparent = Some(tx_id.as_traceparent());
-        trace_id = tx_id.into();
+    if traceparent.is_none() {
+        // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
+        // during the different operations within a transaction. The trace_id is propagated in the
+        // traceparent header, but if it's not present, we need to synthetically create one for the
+        // transaction. This is needed, in case the client is interested in capturing logs and not
+        // traces, because:
+        //  - The client won't send a traceparent header
+        //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
+        //    ITXServer for that transaction
+        //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
+        //    to start capturing logs, and for that we need a trace_id. There are two places were we
+        //    could get that information from:
+        //      - First, it's the traceparent, but the client didn't send it, because they are only
+        //      interested in logs.
+        //      - Second, it's the root span for the transaction, but it's not in scope but instead
+        //      stored in the ITXServer, in a different tokio task.
+        //
+        // For the above reasons, we need to create a trace_id that we can predict and use accross the
+        // different operations happening within a transaction. So we do it by converting the tx_id
+        // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
+        // information loss.
+        if capture_settings.logs_enabled() && tx_id.is_some() {
+            let tx_id = tx_id.clone().unwrap();
+            traceparent = Some(tx_id.as_traceparent());
+            trace_id = tx_id.into();
+        } else {
+            // this is the root span, and we are in a single operation.
+            traceparent = Some(get_trace_parent_from_span(&span));
+            trace_id = get_trace_id_from_span(&span);
+        }
     }
     let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
 
