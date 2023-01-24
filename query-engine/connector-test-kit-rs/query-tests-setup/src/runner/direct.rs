@@ -84,7 +84,7 @@ impl RunnerInterface for DirectRunner {
     ) -> TestResult<TxId> {
         let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
 
-        let id = self.executor.start_tx(self.query_schema.clone(), &tx_opts).await?;
+        let id = self.executor.start_tx(self.query_schema.clone(), tx_opts).await?;
         Ok(id)
     }
 

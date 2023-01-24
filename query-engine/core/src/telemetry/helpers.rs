@@ -10,7 +10,7 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::EnvFilter;
 
 pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_SHOW_ALL_TRACES") {
-    Ok(enabled) => enabled.to_lowercase() == *("true"),
+    Ok(enabled) => enabled.eq_ignore_ascii_case("true"),
     Err(_) => false,
 });
 
@@ -20,11 +20,7 @@ pub fn spans_to_json(spans: Vec<SpanData>) -> String {
         "span": true,
         "spans": json_spans
     });
-
-    match serde_json::to_string(&span_result) {
-        Ok(json_string) => json_string,
-        Err(_) => "".to_string(),
-    }
+    serde_json::to_string(&span_result).unwrap_or_default()
 }
 
 // set the parent context and return the traceparent

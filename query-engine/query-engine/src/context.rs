@@ -44,7 +44,7 @@ impl ContextBuilder {
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    pub async fn new(
+    async fn new(
         schema: psl::ValidatedSchema,
         enable_raw_queries: bool,
         metrics: MetricRegistry,
