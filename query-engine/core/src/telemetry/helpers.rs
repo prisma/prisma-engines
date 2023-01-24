@@ -41,6 +41,24 @@ pub fn set_span_link_from_traceparent(span: &Span, traceparent: Option<String>) 
     }
 }
 
+pub fn get_trace_parent_from_span(span: &Span) -> String {
+    let cx = span.context();
+    let binding = cx.span();
+    let span_context = binding.span_context();
+
+    format!("00-{}-{}-01", span_context.trace_id(), span_context.span_id())
+}
+
+pub fn get_trace_id_from_span(span: &Span) -> TraceId {
+    let cx = span.context();
+    get_trace_id_from_context(&cx)
+}
+
+pub fn get_trace_id_from_context(context: &Context) -> TraceId {
+    let context_span = context.span();
+    context_span.span_context().trace_id()
+}
+
 pub fn get_trace_id_from_traceparent(traceparent: Option<&str>) -> TraceId {
     traceparent
         .unwrap_or("0-0-0-0")
@@ -48,11 +66,6 @@ pub fn get_trace_id_from_traceparent(traceparent: Option<&str>) -> TraceId {
         .nth(1)
         .map(|id| TraceId::from_hex(id).unwrap_or(TraceId::INVALID))
         .unwrap()
-}
-
-pub fn get_trace_id_from_context(context: &Context) -> TraceId {
-    let context_span = context.span();
-    context_span.span_context().trace_id()
 }
 
 pub enum QueryEngineLogLevel {
