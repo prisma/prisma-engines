@@ -172,14 +172,16 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             && columns_previous.zip(columns_next).all(|(col_a, col_b)| {
                 let a_class = pg_ext_previous.get_opclass(col_a.id);
                 let b_class = pg_ext_next.get_opclass(col_b.id);
-                let a_kind = a_class.map(|c| &c.kind);
-                let b_kind = b_class.map(|c| &c.kind);
+                let a_kind = a_class.map(|c| c.kind.as_ref());
+                let b_kind = b_class.map(|c| c.kind.as_ref());
+                let a_kind_is_empty = a_kind.map(|k| k == "").unwrap_or(true);
+                let b_kind_is_empty = b_kind.map(|k| k == "").unwrap_or(true);
                 let a_is_default = a_class.map(|c| c.is_default).unwrap_or(false);
                 let b_is_default = b_class.map(|c| c.is_default).unwrap_or(false);
 
                 // the dml doesn't always have opclass defined if it's the
                 // default.
-                a_kind == b_kind || (a_class.is_none() && b_is_default) || (b_class.is_none() && a_is_default)
+                a_kind == b_kind || (a_kind_is_empty && b_is_default) || (b_kind_is_empty && a_is_default)
             })
     }
 
