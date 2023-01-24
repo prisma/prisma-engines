@@ -8,6 +8,7 @@ mod models;
 mod postgres;
 mod relation_field;
 mod scalar_field;
+mod views;
 
 use crate::datamodel_calculator::{InputContext, OutputContext};
 pub(crate) use crate::SqlError;
