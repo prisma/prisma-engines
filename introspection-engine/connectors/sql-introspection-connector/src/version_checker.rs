@@ -11,7 +11,7 @@ use psl::builtin_connectors::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::ForeignKeyWalker;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, TableWalker},
+    walkers::{TableColumnWalker, TableWalker},
     ForeignKeyAction,
 };
 
@@ -122,7 +122,7 @@ pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
 
 impl VersionChecker {
     /// Check if using only types supported by a legacy version of Prisma.
-    fn check_column_for_type_and_default_value(&mut self, column: ColumnWalker<'_>) {
+    fn check_column_for_type_and_default_value(&mut self, column: TableColumnWalker<'_>) {
         match self.sql_family {
             SqlFamily::Postgres if self.is_cockroachdb => {
                 self.uses_non_prisma_types = true; // we can be sure it's not prisma 1

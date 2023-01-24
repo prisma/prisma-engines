@@ -66,8 +66,10 @@ pub struct SqlSchema {
     table_columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
-    /// All default values.
-    default_values: Vec<(ColumnId, DefaultValue)>,
+    /// All table column default values.
+    table_default_values: Vec<(TableColumnId, DefaultValue)>,
+    /// All view column default values.
+    view_default_values: Vec<(ViewColumnId, DefaultValue)>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
@@ -94,8 +96,13 @@ impl SqlSchema {
     }
 
     /// The id of the next column
-    pub fn next_column_id(&self) -> ColumnId {
-        ColumnId(self.table_columns.len() as u32)
+    pub fn next_table_column_id(&self) -> TableColumnId {
+        TableColumnId(self.table_columns.len() as u32)
+    }
+
+    /// The id of the next column
+    pub fn next_view_column_id(&self) -> ViewColumnId {
+        ViewColumnId(self.view_columns.len() as u32)
     }
 
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -179,15 +186,15 @@ impl SqlSchema {
     }
 
     /// Add a table column to the schema.
-    pub fn push_table_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
-        let id = ColumnId(self.table_columns.len() as u32);
+    pub fn push_table_column(&mut self, table_id: TableId, column: Column) -> TableColumnId {
+        let id = TableColumnId(self.table_columns.len() as u32);
         self.table_columns.push((table_id, column));
         id
     }
 
     /// Add a view column to the schema.
-    pub fn push_view_column(&mut self, view_id: ViewId, column: Column) -> ColumnId {
-        let id = ColumnId(self.view_columns.len() as u32);
+    pub fn push_view_column(&mut self, view_id: ViewId, column: Column) -> ViewColumnId {
+        let id = ViewColumnId(self.view_columns.len() as u32);
         self.view_columns.push((view_id, column));
         id
     }
@@ -231,10 +238,17 @@ impl SqlSchema {
         id
     }
 
-    /// Add an index to the schema.
-    pub fn push_default_value(&mut self, column_id: ColumnId, value: DefaultValue) -> DefaultValueId {
-        let id = DefaultValueId(self.default_values.len() as u32);
-        self.default_values.push((column_id, value));
+    /// Add table default value to the schema.
+    pub fn push_table_default_value(&mut self, column_id: TableColumnId, value: DefaultValue) -> TableDefaultValueId {
+        let id = TableDefaultValueId(self.table_default_values.len() as u32);
+        self.table_default_values.push((column_id, value));
+        id
+    }
+
+    /// Add table default value to the schema.
+    pub fn push_view_default_value(&mut self, column_id: ViewColumnId, value: DefaultValue) -> ViewDefaultValueId {
+        let id = ViewDefaultValueId(self.view_default_values.len() as u32);
+        self.view_default_values.push((column_id, value));
         id
     }
 
@@ -286,7 +300,7 @@ impl SqlSchema {
     pub fn push_foreign_key_column(
         &mut self,
         foreign_key_id: ForeignKeyId,
-        [constrained_column, referenced_column]: [ColumnId; 2],
+        [constrained_column, referenced_column]: [TableColumnId; 2],
     ) {
         self.foreign_key_columns.push(ForeignKeyColumn {
             foreign_key_id,
@@ -376,8 +390,8 @@ impl SqlSchema {
     }
 
     /// Traverse all the columns in the schema.
-    pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
-        (0..self.table_columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+    pub fn walk_columns(&self) -> impl Iterator<Item = TableColumnWalker<'_>> {
+        (0..self.table_columns.len()).map(|idx| self.walk(TableColumnId(idx as u32)))
     }
 
     /// Traverse all namespaces in the catalog.
@@ -442,7 +456,7 @@ impl fmt::Display for SQLSortOrder {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct IndexColumn {
     pub index_id: IndexId,
-    pub column_id: ColumnId,
+    pub column_id: TableColumnId,
     pub sort_order: Option<SQLSortOrder>,
     pub length: Option<u32>,
 }
@@ -483,8 +497,6 @@ pub struct Column {
     pub name: String,
     /// Column type.
     pub tpe: ColumnType,
-    /// Column default.
-    pub default_value_id: Option<DefaultValueId>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -663,8 +675,8 @@ struct ForeignKey {
 #[derive(Serialize, Deserialize, Debug)]
 struct ForeignKeyColumn {
     foreign_key_id: ForeignKeyId,
-    constrained_column: ColumnId,
-    referenced_column: ColumnId,
+    constrained_column: TableColumnId,
+    referenced_column: TableColumnId,
 }
 
 /// A SQL enum.

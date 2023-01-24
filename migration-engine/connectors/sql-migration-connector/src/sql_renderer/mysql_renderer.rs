@@ -11,14 +11,14 @@ use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
-        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
+        EnumWalker, ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write as _};
 
 impl MysqlFlavour {
-    fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
+    fn render_column<'a>(&self, col: TableColumnWalker<'a>) -> ddl::Column<'a> {
         let default = col
             .default()
             .filter(|default| {
@@ -348,7 +348,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: ColumnWalker<'_>,
+    next_column: TableColumnWalker<'_>,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
@@ -386,7 +386,7 @@ fn render_mysql_modify(
     )
 }
 
-fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
         let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
 
@@ -472,7 +472,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
+    fn new(columns: Pair<TableColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next.default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
@@ -497,7 +497,7 @@ impl MysqlAlterColumn {
     }
 }
 
-fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
+fn render_default<'a>(column: TableColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
         DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {

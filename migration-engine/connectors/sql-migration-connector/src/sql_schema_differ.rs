@@ -16,7 +16,7 @@ use crate::{
     SqlFlavour,
 };
 use column::ColumnTypeChange;
-use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, IndexId};
+use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId};
 use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
@@ -330,7 +330,7 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
         }
 
         if db.flavour.indexes_should_be_recreated_after_column_drop() {
-            let dropped_and_recreated_column_ids_next: HashSet<ColumnId> = tables
+            let dropped_and_recreated_column_ids_next: HashSet<TableColumnId> = tables
                 .column_pairs()
                 .filter(|columns| {
                     matches!(
@@ -521,7 +521,7 @@ fn push_foreign_key_pair_changes(
     }
 }
 
-fn next_column_has_virtual_default(column_id: ColumnId, db: &DifferDatabase<'_>) -> bool {
+fn next_column_has_virtual_default(column_id: TableColumnId, db: &DifferDatabase<'_>) -> bool {
     db.schemas.next.prisma_level_defaults.binary_search(&column_id).is_ok()
 }
 

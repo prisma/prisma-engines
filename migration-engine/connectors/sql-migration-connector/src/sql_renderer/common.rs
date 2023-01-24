@@ -1,4 +1,4 @@
-use sql_schema_describer::{walkers::ColumnWalker, *};
+use sql_schema_describer::{walkers::TableColumnWalker, *};
 use std::fmt::{Display, Write as _};
 
 pub(super) const SQL_INDENTATION: &str = "    ";
@@ -89,7 +89,7 @@ where
     }
 }
 
-pub(crate) fn render_nullability(column: ColumnWalker<'_>) -> &'static str {
+pub(crate) fn render_nullability(column: TableColumnWalker<'_>) -> &'static str {
     if column.arity().is_required() {
         " NOT NULL"
     } else {

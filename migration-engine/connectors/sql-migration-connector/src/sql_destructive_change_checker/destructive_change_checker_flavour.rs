@@ -9,7 +9,7 @@ use super::{
 };
 use crate::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
 use migration_connector::{BoxFuture, ConnectorError, ConnectorResult};
-use sql_schema_describer::walkers::ColumnWalker;
+use sql_schema_describer::walkers::TableColumnWalker;
 
 /// Flavour-specific destructive change checks and queries.
 pub(crate) trait DestructiveChangeCheckerFlavour {
@@ -17,7 +17,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     );
@@ -25,7 +25,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     /// Check a DropAndRecreateColumn step.
     fn check_drop_and_recreate_column(
         &self,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
@@ -38,7 +38,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
 
 /// Display a column type for warnings/errors.
 fn display_column_type(
-    column: sql_schema_describer::walkers::ColumnWalker<'_>,
+    column: sql_schema_describer::walkers::TableColumnWalker<'_>,
     connector: &dyn psl::datamodel_connector::Connector,
 ) -> String {
     match &column.column_type().native_type {

@@ -21,7 +21,7 @@ use sql_schema_describer::{
 use std::borrow::Cow;
 
 impl PostgresFlavour {
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: TableColumnWalker<'_>) -> String {
         let column_name = Quoted::postgres_ident(column.name());
         let tpe_str = render_column_type(column, self);
         let nullability_str = render_nullability(column);
@@ -530,7 +530,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
+fn render_column_type(col: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
     if let Some(enm) = col.column_type_family_as_enum() {
         let name = QuotedWithPrefix::pg_new(enm.namespace(), enm.name());
@@ -549,7 +549,7 @@ fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'
     }
 }
 
-fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
@@ -596,7 +596,7 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     }
 }
 
-fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_cockroachdb(col: TableColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let native_type = col
         .column_native_type()
@@ -679,7 +679,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 }
 
 fn render_alter_column(
-    columns: Pair<ColumnWalker<'_>>,
+    columns: Pair<TableColumnWalker<'_>>,
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
@@ -752,7 +752,10 @@ fn render_alter_column(
     }
 }
 
-fn expand_alter_column(columns: Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<PostgresAlterColumn> {
+fn expand_alter_column(
+    columns: Pair<TableColumnWalker<'_>>,
+    column_changes: &ColumnChanges,
+) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
     let mut set_type = false;
 
@@ -1077,7 +1080,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>
     }
 }
 
-fn render_column_identity_str(column: ColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
+fn render_column_identity_str(column: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
     if !flavour.is_cockroachdb() {
         return String::new();
     }

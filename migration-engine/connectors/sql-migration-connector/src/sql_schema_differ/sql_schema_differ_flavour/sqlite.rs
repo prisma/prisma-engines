@@ -3,7 +3,7 @@ use crate::{
     flavour::SqliteFlavour, pair::Pair, sql_schema_differ::column::ColumnTypeChange,
     sql_schema_differ::differ_database::DifferDatabase,
 };
-use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily};
+use sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
     fn can_rename_foreign_key(&self) -> bool {
@@ -18,11 +18,11 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         false
     }
 
-    fn column_autoincrement_changed(&self, _columns: Pair<ColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, _columns: Pair<TableColumnWalker<'_>>) -> bool {
         false
     }
 
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,
             (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),

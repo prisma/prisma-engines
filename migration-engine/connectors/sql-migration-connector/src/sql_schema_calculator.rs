@@ -389,8 +389,8 @@ fn push_column_for_model_enum_scalar_field(
     });
 
     let default_value_id = default.map(|default| {
-        let column_id = ctx.schema.describer_schema.next_column_id();
-        ctx.schema.describer_schema.push_default_value(column_id, default)
+        let column_id = ctx.schema.describer_schema.next_table_column_id();
+        ctx.schema.describer_schema.push_table_default_value(column_id, default)
     });
 
     let column = sql::Column {
@@ -424,8 +424,8 @@ fn push_column_for_model_unsupported_scalar_field(
     });
 
     let default_value_id = default.map(|default| {
-        let column_id = ctx.schema.describer_schema.next_column_id();
-        ctx.schema.describer_schema.push_default_value(column_id, default)
+        let column_id = ctx.schema.describer_schema.next_table_column_id();
+        ctx.schema.describer_schema.push_table_default_value(column_id, default)
     });
 
     let column = sql::Column {
@@ -508,8 +508,8 @@ fn push_column_for_builtin_scalar_type(
     let default_is_prisma_level = matches!(default, Some(ColumnDefault::PrismaGenerated));
 
     let default_value_id = if let Some(ColumnDefault::Available(d)) = default {
-        let column_id = ctx.schema.describer_schema.next_column_id();
-        Some(ctx.schema.describer_schema.push_default_value(column_id, d))
+        let column_id = ctx.schema.describer_schema.next_table_column_id();
+        Some(ctx.schema.describer_schema.push_table_default_value(column_id, d))
     } else {
         None
     };

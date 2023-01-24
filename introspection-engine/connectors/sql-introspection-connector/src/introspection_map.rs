@@ -21,7 +21,7 @@ pub(crate) struct IntrospectionMap<'a> {
     pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
     pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
     pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
-    pub(crate) existing_scalar_fields: HashMap<sql::ColumnId, (ast::ModelId, ast::FieldId)>,
+    pub(crate) existing_scalar_fields: HashMap<sql::TableColumnId, (ast::ModelId, ast::FieldId)>,
     pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
     pub(crate) existing_m2m_relations: HashMap<sql::TableId, parser_database::ManyToManyRelationId>,
     pub(crate) relation_names: RelationNames<'a>,

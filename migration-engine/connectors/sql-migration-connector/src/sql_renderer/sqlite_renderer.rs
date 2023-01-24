@@ -310,7 +310,7 @@ fn copy_current_table_into_new_table(
     steps.push(query)
 }
 
-fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
+fn render_column<'a>(column: &TableColumnWalker<'a>) -> ddl::Column<'a> {
     sql_ddl::sqlite::Column {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column

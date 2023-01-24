@@ -384,18 +384,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            let column_id = ColumnId(sql_schema.table_columns.len() as u32);
-            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+            let column_id = TableColumnId(sql_schema.table_columns.len() as u32);
+
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(column_id, default);
+            }
 
             let column = Column {
                 name,
                 tpe,
-                default_value_id,
                 auto_increment,
             };
 
             sql_schema.table_columns.push((table_id, column));
         }
+
+        sql_schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
 
         Ok(())
     }
@@ -670,7 +674,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             referenced_column_name: &str,
             table_ids: &IndexMap<(String, String), TableId>,
             sql_schema: &SqlSchema,
-        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+        ) -> Option<(TableId, TableColumnId, TableId, TableColumnId)> {
             let table_id = *table_ids.get(&(namespace, table_name))?;
             let referenced_table_id = *table_ids.get(&(referenced_schema_name, referenced_table_name))?;
             let column_id = sql_schema.walk(table_id).column(column_name)?.id;

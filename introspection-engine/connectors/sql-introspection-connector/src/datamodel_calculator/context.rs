@@ -151,14 +151,14 @@ impl<'a> InputContext<'a> {
             .map(|id| self.previous_schema.db.walk(*id))
     }
 
-    pub(crate) fn existing_scalar_field(self, id: sql::ColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
+    pub(crate) fn existing_scalar_field(self, id: sql::TableColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
         self.introspection_map
             .existing_scalar_fields
             .get(&id)
             .map(|(model_id, field_id)| self.previous_schema.db.walk(*model_id).scalar_field(*field_id))
     }
 
-    pub(crate) fn column_prisma_name(self, id: sql::ColumnId) -> crate::IntrospectedName<'a> {
+    pub(crate) fn column_prisma_name(self, id: sql::TableColumnId) -> crate::IntrospectedName<'a> {
         self.existing_scalar_field(id)
             .map(|sf| IntrospectedName::FromPsl {
                 name: sf.name(),

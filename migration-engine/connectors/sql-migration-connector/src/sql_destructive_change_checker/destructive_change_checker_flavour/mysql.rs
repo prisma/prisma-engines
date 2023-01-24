@@ -12,13 +12,13 @@ use crate::{
     sql_schema_differ::ColumnChanges,
 };
 use migration_connector::{BoxFuture, ConnectorResult};
-use sql_schema_describer::walkers::ColumnWalker;
+use sql_schema_describer::walkers::TableColumnWalker;
 
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -87,7 +87,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
@@ -151,7 +151,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 }
 
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
-fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
+fn is_safe_enum_change(
+    columns: &Pair<TableColumnWalker<'_>>,
+    plan: &mut DestructiveCheckPlan,
+    step_index: usize,
+) -> bool {
     if let (Some(previous_enum), Some(next_enum)) = (
         columns.previous.column_type_family_as_enum(),
         columns.next.column_type_family_as_enum(),

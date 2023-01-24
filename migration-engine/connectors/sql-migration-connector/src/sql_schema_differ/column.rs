@@ -1,8 +1,9 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
 use enumflags2::BitFlags;
-use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, PrismaValue};
 
-pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {
+use sql_schema_describer::{walkers::TableColumnWalker, DefaultKind, PrismaValue};
+
+pub(crate) fn all_changes(cols: Pair<TableColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {
     let mut changes = BitFlags::empty();
     let type_change = flavour.column_type_change(cols);
 
@@ -28,7 +29,7 @@ pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour
 /// There are workarounds to cope with current migration and introspection limitations.
 ///
 /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
-fn defaults_match(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
+fn defaults_match(cols: Pair<TableColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> bool {
     // JSON defaults on MySQL should be ignored.
     if flavour.should_ignore_json_defaults()
         && (cols.previous.column_type_family().is_json() || cols.next.column_type_family().is_json())

@@ -2,8 +2,8 @@ use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
-    walkers::{ColumnWalker, EnumWalker, TableWalker},
-    ColumnId, NamespaceId, NamespaceWalker, TableId,
+    walkers::{EnumWalker, TableColumnWalker, TableWalker},
+    NamespaceId, NamespaceWalker, TableColumnId, TableId,
 };
 use std::{
     borrow::Cow,
@@ -23,9 +23,9 @@ pub(crate) struct DifferDatabase<'a> {
     tables: HashMap<Table<'a>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
     /// queries (-> all the columns in a table).
-    columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<ColumnId>>>,
+    columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<TableColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
-    column_changes: HashMap<Pair<ColumnId>, column::ColumnChanges>,
+    column_changes: HashMap<Pair<TableColumnId>, column::ColumnChanges>,
     /// Postgres extension name -> extension indexes.
     pub(super) extensions: HashMap<&'a str, Pair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
@@ -156,23 +156,23 @@ impl<'a> DifferDatabase<'a> {
         db
     }
 
-    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
+    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<TableColumnId>> + '_ {
         self.columns.iter().filter_map(|(_, cols)| cols.transpose())
     }
 
-    pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<ColumnId>> + '_ {
+    pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<TableColumnId>> + '_ {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }
 
-    pub(crate) fn column_changes(&self, column: Pair<ColumnId>) -> column::ColumnChanges {
+    pub(crate) fn column_changes(&self, column: Pair<TableColumnId>) -> column::ColumnChanges {
         self.column_changes[&column]
     }
 
-    pub(crate) fn column_changes_for_walkers(&self, walkers: Pair<ColumnWalker<'_>>) -> column::ColumnChanges {
+    pub(crate) fn column_changes_for_walkers(&self, walkers: Pair<TableColumnWalker<'_>>) -> column::ColumnChanges {
         self.column_changes(walkers.map(|c| c.id))
     }
 
-    pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
+    pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
         self.range_columns(table)
             .filter(|(_k, v)| v.previous.is_none())
             .filter_map(|(_k, v)| v.next)
@@ -194,7 +194,7 @@ impl<'a> DifferDatabase<'a> {
             .map(move |namespace_id| self.schemas.next.walk(namespace_id))
     }
 
-    pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = ColumnId> + '_ {
+    pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
         self.range_columns(table)
             .filter(|(_k, v)| v.next.is_none())
             .filter_map(|(_k, v)| v.previous)
@@ -211,7 +211,7 @@ impl<'a> DifferDatabase<'a> {
     fn range_columns(
         &self,
         table: Pair<TableId>,
-    ) -> impl Iterator<Item = (&(Pair<TableId>, &'a str), &Pair<Option<ColumnId>>)> {
+    ) -> impl Iterator<Item = (&(Pair<TableId>, &'a str), &Pair<Option<TableColumnId>>)> {
         self.columns
             .range((Bound::Included(&(table, "")), Bound::Unbounded))
             .take_while(move |((t, _), _)| *t == table)

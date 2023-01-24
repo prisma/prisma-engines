@@ -10,7 +10,7 @@ use std::{borrow::Cow, fmt};
 
 use super::Pair;
 
-pub(crate) type DefaultValuePair<'a> = Pair<'a, walkers::DefaultValueWalker<'a>, sql::ColumnWalker<'a>>;
+pub(crate) type DefaultValuePair<'a> = Pair<'a, walkers::DefaultValueWalker<'a>, sql::TableColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {
     Sequence(&'a sql::postgres::Sequence),

@@ -6,7 +6,7 @@ use crate::{
 };
 use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, IndexWalker},
+    walkers::{IndexWalker, TableColumnWalker},
     ColumnTypeFamily,
 };
 
@@ -23,7 +23,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         false
     }
 
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
         if self.is_mariadb() {
             match (

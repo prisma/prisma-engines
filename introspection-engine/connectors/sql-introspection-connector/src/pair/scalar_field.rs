@@ -9,7 +9,7 @@ use std::borrow::Cow;
 
 use super::{DefaultValuePair, IdPair, IndexPair, ModelPair, Pair};
 
-pub(crate) type ScalarFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, sql::ColumnWalker<'a>>;
+pub(crate) type ScalarFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, sql::TableColumnWalker<'a>>;
 
 impl<'a> ScalarFieldPair<'a> {
     /// The client name of the field.

@@ -487,13 +487,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            let column_id = ColumnId(sql_schema.table_columns.len() as u32);
-            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+            let column_id = TableColumnId(sql_schema.table_columns.len() as u32);
+
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(column_id, default);
+            }
 
             let col = Column {
                 name,
                 tpe,
-                default_value_id,
                 auto_increment,
             };
 
@@ -501,6 +503,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
 
         Ok(())
     }
@@ -722,7 +725,7 @@ async fn push_foreign_keys(
         row: &ResultRow,
         table_ids: &IndexMap<String, TableId>,
         sql_schema: &SqlSchema,
-    ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+    ) -> Option<(TableId, TableColumnId, TableId, TableColumnId)> {
         let table_name = row.get_expect_string("table_name");
         let column_name = row.get_expect_string("column_name");
         let referenced_table_name = row.get_expect_string("referenced_table_name");

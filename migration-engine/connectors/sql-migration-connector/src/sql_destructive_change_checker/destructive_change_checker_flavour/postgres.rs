@@ -12,13 +12,13 @@ use crate::{
     sql_schema_differ::ColumnChanges,
 };
 use migration_connector::{BoxFuture, ConnectorResult};
-use sql_schema_describer::walkers::ColumnWalker;
+use sql_schema_describer::walkers::TableColumnWalker;
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -84,7 +84,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,

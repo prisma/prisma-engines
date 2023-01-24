@@ -26,7 +26,7 @@ impl MssqlFlavour {
         QuotedWithPrefix(Some(Quoted::mssql_ident(ns)), Quoted::mssql_ident(name))
     }
 
-    fn render_column(&self, column: sql::ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: sql::TableColumnWalker<'_>) -> String {
         let column_name = Quoted::mssql_ident(column.name());
 
         let r#type = render_column_type(column);
@@ -462,7 +462,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 }
 
-fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: sql::TableColumnWalker<'_>) -> Cow<'static, str> {
     fn format_u32_arg(arg: Option<u32>) -> String {
         match arg {
             None => "".to_string(),
