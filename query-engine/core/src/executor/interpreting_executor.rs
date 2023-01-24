@@ -143,13 +143,11 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(&self, query_schema: QuerySchemaRef, tx_opts: &TransactionOptions) -> crate::Result<TxId> {
+    async fn start_tx(&self, query_schema: QuerySchemaRef, tx_opts: TransactionOptions) -> crate::Result<TxId> {
         super::with_request_now(async move {
-            let id = if let Some(predefined_tx_id) = tx_opts.new_tx_id.clone() {
-                predefined_tx_id.into()
-            } else {
-                TxId::default()
-            };
+            let isolation_level = tx_opts.isolation_level;
+            let valid_for_millis = tx_opts.valid_for_millis;
+            let id = tx_opts.new_tx_id.unwrap_or_default();
 
             trace!("[{}] Starting...", id);
             let conn_span = info_span!(
@@ -165,14 +163,14 @@ where
             .await;
 
             let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-            let c_tx = OpenTx::start(conn, tx_opts.isolation_level.clone()).await?;
+            let c_tx = OpenTx::start(conn, isolation_level).await?;
 
             self.itx_manager
                 .create_tx(
                     query_schema.clone(),
                     id.clone(),
                     c_tx,
-                    Duration::from_millis(tx_opts.valid_for_millis),
+                    Duration::from_millis(valid_for_millis),
                 )
                 .await;
 

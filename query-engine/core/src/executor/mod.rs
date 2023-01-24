@@ -69,8 +69,8 @@ pub struct TransactionOptions {
 
     /// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    #[serde(default)]
-    pub new_tx_id: Option<String>,
+    #[serde(skip_deserializing)]
+    pub new_tx_id: Option<TxId>,
 }
 
 impl TransactionOptions {
@@ -87,7 +87,7 @@ impl TransactionOptions {
     /// of self with the new predefined_id set.
     pub fn with_new_transaction_id(&mut self) -> TxId {
         let tx_id: TxId = Default::default();
-        self.new_tx_id = Some(tx_id.to_string());
+        self.new_tx_id = Some(tx_id.clone());
         tx_id
     }
 }
@@ -98,7 +98,7 @@ pub trait TransactionManager {
     /// Expected to throw an error if no transaction could be opened for `opts.max_acquisition_millis` milliseconds.
     /// The new transaction must only live for `opts.valid_for_millis` milliseconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    async fn start_tx(&self, query_schema: QuerySchemaRef, opts: &TransactionOptions) -> crate::Result<TxId>;
+    async fn start_tx(&self, query_schema: QuerySchemaRef, opts: TransactionOptions) -> crate::Result<TxId>;
 
     /// Commits a transaction.
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;

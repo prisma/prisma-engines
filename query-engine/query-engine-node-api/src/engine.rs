@@ -337,7 +337,7 @@ impl QueryEngine {
                 let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine
                     .executor()
-                    .start_tx(engine.query_schema().clone(), &tx_opts)
+                    .start_tx(engine.query_schema().clone(), tx_opts)
                     .instrument(span)
                     .await
                 {

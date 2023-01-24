@@ -258,7 +258,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let result = state
         .cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), &tx_opts)
+        .start_tx(state.cx.query_schema().clone(), tx_opts)
         .instrument(span)
         .await;
 
@@ -369,19 +369,15 @@ fn traceparent(headers: &HeaderMap) -> Option<String> {
 
     let is_valid_traceparent = |s: &String| s.split_terminator('-').count() >= 4;
 
-    match &value {
-        Some(str) if is_valid_traceparent(str) => value,
-        _ => None,
-    }
+    value.filter(is_valid_traceparent)
 }
 
-#[allow(clippy::bind_instead_of_map)]
 fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
     const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
     headers
         .get(TRANSACTION_ID_HEADER)
         .and_then(|h| h.to_str().ok())
-        .and_then(|s| Some(TxId::from(s)))
+        .map(TxId::from)
 }
 
 /// If the client sends us a trace and span id, extracting a new context if the

@@ -26,7 +26,7 @@ pub struct Logger {
 #[derive(Debug, Clone)]
 enum TracingConfig {
     // exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
-    Exposed(String),
+    Http(String),
     // stdout means that traces will be printed to standard output
     Stdout,
     // disabled means that tracing will be disabled
@@ -67,7 +67,7 @@ impl Logger {
         };
 
         self.tracing_config = match (enable_telemetry, endpoint) {
-            (true, Some(endpoint)) => TracingConfig::Exposed(endpoint),
+            (true, Some(endpoint)) => TracingConfig::Http(endpoint),
             (true, None) => TracingConfig::Stdout,
             _ => TracingConfig::Disabled,
         };
@@ -100,7 +100,7 @@ impl Logger {
             .with(self.metrics.clone());
 
         match self.tracing_config {
-            TracingConfig::Exposed(ref endpoint) => {
+            TracingConfig::Http(ref endpoint) => {
                 // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
                 // the traces to.
                 let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);

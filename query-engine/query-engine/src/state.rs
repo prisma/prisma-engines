@@ -6,6 +6,7 @@ use std::sync::Arc;
 use tracing::Instrument;
 
 //// Shared application state.
+#[derive(Clone)]
 pub struct State {
     pub cx: Arc<PrismaContext>,
     pub enable_playground: bool,
@@ -33,23 +34,8 @@ impl State {
     }
 }
 
-impl Clone for State {
-    fn clone(&self) -> Self {
-        Self {
-            cx: self.cx.clone(),
-            enable_playground: self.enable_playground,
-            enable_debug_mode: self.enable_debug_mode,
-            enable_metrics: self.enable_metrics,
-        }
-    }
-}
-
 pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<MetricRegistry>) -> PrismaResult<State> {
-    let metrics = if metrics.is_none() {
-        MetricRegistry::new()
-    } else {
-        metrics.unwrap()
-    };
+    let metrics = metrics.unwrap_or_default();
 
     let mut logger = Logger::new("prisma-engine-http");
     logger.log_format(opts.log_format());
@@ -72,7 +58,7 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
     let span = tracing::info_span!("prisma:engine:connect");
 
-    let cx = PrismaContext::builder(datamodel) //  opts.enable_raw_queries, metrics, logs_capture)
+    let cx = PrismaContext::builder(datamodel)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
