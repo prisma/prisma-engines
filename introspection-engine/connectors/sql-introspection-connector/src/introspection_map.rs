@@ -3,7 +3,10 @@
 mod relation_names;
 
 use crate::{datamodel_calculator::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
-use psl::parser_database::{self, ast};
+use psl::{
+    parser_database::{self, ast},
+    PreviewFeature,
+};
 use relation_names::RelationNames;
 use sql_schema_describer as sql;
 use std::{
@@ -22,6 +25,7 @@ pub(crate) struct IntrospectionMap<'a> {
     pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
     pub(crate) existing_views: HashMap<sql::ViewId, ast::ModelId>,
     pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
+    pub(crate) missing_views_for_previous_models: HashSet<ast::ModelId>,
     pub(crate) existing_model_scalar_fields: HashMap<sql::TableColumnId, (ast::ModelId, ast::FieldId)>,
     pub(crate) existing_view_scalar_fields: HashMap<sql::ViewColumnId, (ast::ModelId, ast::FieldId)>,
     pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
@@ -83,6 +87,26 @@ fn populate_top_level_names<'a>(
 
         let count = map.top_level_names.entry(name).or_default();
         *count += 1;
+    }
+
+    // we do not want dupe warnings for models clashing with views,
+    // if not using the preview.
+    if prisma_schema
+        .configuration
+        .preview_features()
+        .contains(PreviewFeature::Views)
+    {
+        for view in sql_schema.view_walkers() {
+            let name = map
+                .existing_views
+                .get(&view.id)
+                .map(|id| prisma_schema.db.walk(*id))
+                .map(|m| Cow::Borrowed(m.name()))
+                .unwrap_or_else(|| crate::sanitize_datamodel_names::sanitize_string(view.name()));
+
+            let count = map.top_level_names.entry(name).or_default();
+            *count += 1;
+        }
     }
 }
 
@@ -189,8 +213,14 @@ fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::Validated
 /// ones found in the database.
 fn match_existing_views(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
     for view in prisma_schema.db.walk_views() {
-        if let Some(sql_id) = sql_schema.find_view(view.database_name(), view.schema_name()) {
-            map.existing_views.insert(sql_id, view.id);
+        match sql_schema.find_view(view.database_name(), view.schema_name()) {
+            Some(sql_id) => {
+                map.existing_views.insert(sql_id, view.id);
+            }
+
+            None => {
+                map.missing_views_for_previous_models.insert(view.id);
+            }
         }
     }
 }

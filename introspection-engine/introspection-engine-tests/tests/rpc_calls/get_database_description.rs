@@ -177,7 +177,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
           ],
           "enums": [],
           "enum_variants": [],
-          "columns": [
+          "table_columns": [
             [
               0,
               {
@@ -187,7 +187,6 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                   "family": "Int",
                   "arity": "Required"
                 },
-                "default_value_id": 0,
                 "auto_increment": true
               }
             ],
@@ -200,13 +199,12 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
                   "family": "String",
                   "arity": "Required"
                 },
-                "default_value_id": null,
                 "auto_increment": false
               }
             ]
           ],
           "foreign_keys": [],
-          "default_values": [
+          "table_default_values": [
             [
               0,
               {
@@ -217,6 +215,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
               }
             ]
           ],
+          "view_default_values": [],
           "foreign_key_columns": [],
           "indexes": [
             {
@@ -234,6 +233,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             }
           ],
           "views": [],
+          "view_columns": [],
           "procedures": [],
           "user_defined_types": [],
           "connector_data": null

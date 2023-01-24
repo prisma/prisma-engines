@@ -336,6 +336,10 @@ impl<'a> InputContext<'a> {
         self.introspection_map.missing_tables_for_previous_models.contains(id)
     }
 
+    pub(crate) fn view_missing_for_model(self, id: &ast::ModelId) -> bool {
+        self.introspection_map.missing_views_for_previous_models.contains(id)
+    }
+
     pub(crate) fn inline_relations_for_table(
         self,
         table_id_filter: sql::TableId,

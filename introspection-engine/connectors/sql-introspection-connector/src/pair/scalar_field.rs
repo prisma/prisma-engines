@@ -10,7 +10,11 @@ use std::borrow::Cow;
 
 use super::{DefaultValuePair, IdPair, IndexPair, ModelPair, Pair, ViewPair};
 
-pub(crate) type ScalarFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, sql::ColumnWalker<'a>>;
+/// Comparing a possible previous PSL scalar field
+/// to a column from the database. Re-introspection
+/// can use some of the previous values in the new
+/// rendering.
+pub(crate) type ScalarFieldPair<'a> = Pair<'a, Option<walkers::ScalarFieldWalker<'a>>, sql::ColumnWalker<'a>>;
 
 impl<'a> ScalarFieldPair<'a> {
     /// The client name of the field.

@@ -16,22 +16,33 @@ pub(crate) struct Warnings {
     /// Fields that are using Prisma 1 CUID defaults.
     pub(crate) prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub(crate) fields_with_empty_names: Vec<ModelAndField>,
-    /// Field names we remapped during introspection.
-    pub(crate) remapped_fields: Vec<ModelAndField>,
+    pub(crate) fields_with_empty_names_in_model: Vec<ModelAndField>,
+    /// Fields having an empty name.
+    pub(crate) fields_with_empty_names_in_view: Vec<ViewAndField>,
+    /// Field names in models we remapped during introspection.
+    pub(crate) remapped_fields_in_model: Vec<ModelAndField>,
+    /// Field names in views we remapped during introspection.
+    pub(crate) remapped_fields_in_view: Vec<ViewAndField>,
     /// Enum values that are empty strings.
     pub(crate) enum_values_with_empty_names: Vec<EnumAndValue>,
     /// Models that have no fields.
     pub(crate) models_without_columns: Vec<Model>,
     /// Models missing a id or unique constraint.
     pub(crate) models_without_identifiers: Vec<Model>,
-    /// If the id attribute has a name taken from a previous data
-    /// model.
-    pub(crate) reintrospected_id_names: Vec<Model>,
-    /// The field has a type we do not currently support in Prisma.
-    pub(crate) unsupported_types: Vec<ModelAndFieldAndType>,
+    /// Views missing a id or unique constraint.
+    pub(crate) views_without_identifiers: Vec<View>,
+    /// If the id attribute has a name taken from a previous model.
+    pub(crate) reintrospected_id_names_in_model: Vec<Model>,
+    /// If the id attribute has a name taken from a previous view.
+    pub(crate) reintrospected_id_names_in_view: Vec<View>,
+    /// The field in model has a type we do not currently support in Prisma.
+    pub(crate) unsupported_types_in_model: Vec<ModelAndFieldAndType>,
+    /// The field in view has a type we do not currently support in Prisma.
+    pub(crate) unsupported_types_in_view: Vec<ViewAndFieldAndType>,
     /// The name of the model is taken from a previous data model.
     pub(crate) remapped_models: Vec<Model>,
+    /// The name of the model is taken from a previous data model.
+    pub(crate) remapped_views: Vec<View>,
     /// The relation is copied from a previous data model, only if
     /// `relationMode` is `prisma`.
     pub(crate) reintrospected_relations: Vec<Model>,
@@ -66,7 +77,23 @@ impl Warnings {
             &mut self.warnings,
         );
 
-        maybe_warn(&self.unsupported_types, warning_unsupported_types, &mut self.warnings);
+        maybe_warn(
+            &self.views_without_identifiers,
+            warning_views_without_identifier,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.unsupported_types_in_model,
+            warning_unsupported_types_in_models,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.unsupported_types_in_view,
+            warning_unsupported_types_in_views,
+            &mut self.warnings,
+        );
 
         maybe_warn(
             &self.remapped_models,
@@ -75,8 +102,20 @@ impl Warnings {
         );
 
         maybe_warn(
-            &self.remapped_fields,
-            warning_enriched_with_map_on_field,
+            &self.remapped_views,
+            warning_enriched_with_map_on_view,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.remapped_fields_in_model,
+            warning_enriched_with_map_on_field_in_models,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.remapped_fields_in_view,
+            warning_enriched_with_map_on_field_in_views,
             &mut self.warnings,
         );
 
@@ -87,8 +126,14 @@ impl Warnings {
         );
 
         maybe_warn(
-            &self.reintrospected_id_names,
-            warning_enriched_with_custom_primary_key_names,
+            &self.reintrospected_id_names_in_model,
+            warning_enriched_with_custom_primary_key_names_in_models,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.reintrospected_id_names_in_view,
+            warning_enriched_with_custom_primary_key_names_in_views,
             &mut self.warnings,
         );
 
@@ -111,8 +156,14 @@ impl Warnings {
         );
 
         maybe_warn(
-            &self.fields_with_empty_names,
-            warning_fields_with_empty_names,
+            &self.fields_with_empty_names_in_model,
+            warning_fields_with_empty_names_in_models,
+            &mut self.warnings,
+        );
+
+        maybe_warn(
+            &self.fields_with_empty_names_in_view,
+            warning_fields_with_empty_names_in_views,
             &mut self.warnings,
         );
 
@@ -138,6 +189,11 @@ pub(crate) struct Model {
 }
 
 #[derive(Serialize, Debug, Clone)]
+pub(crate) struct View {
+    pub(crate) view: String,
+}
+
+#[derive(Serialize, Debug, Clone)]
 pub(crate) struct Enum {
     pub(crate) enm: String,
 }
@@ -155,6 +211,12 @@ pub(crate) struct ModelAndField {
 }
 
 #[derive(Serialize, Debug, Clone)]
+pub(crate) struct ViewAndField {
+    pub(crate) view: String,
+    pub(crate) field: String,
+}
+
+#[derive(Serialize, Debug, Clone)]
 pub(crate) struct ModelAndIndex {
     pub(crate) model: String,
     pub(crate) index_db_name: String,
@@ -163,6 +225,13 @@ pub(crate) struct ModelAndIndex {
 #[derive(Serialize, Debug)]
 pub(crate) struct ModelAndFieldAndType {
     pub(crate) model: String,
+    pub(crate) field: String,
+    pub(crate) tpe: String,
+}
+
+#[derive(Serialize, Debug)]
+pub(crate) struct ViewAndFieldAndType {
+    pub(crate) view: String,
     pub(crate) field: String,
     pub(crate) tpe: String,
 }
@@ -177,6 +246,7 @@ pub(crate) struct EnumAndValue {
 pub(crate) enum TopLevelType {
     Model,
     Enum,
+    View,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -193,7 +263,7 @@ pub(crate) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     }
 }
 
-pub(crate) fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> Warning {
+pub(crate) fn warning_fields_with_empty_names_in_models(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 2,
         message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
@@ -202,7 +272,7 @@ pub(crate) fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> War
     }
 }
 
-pub(crate) fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Warning {
+pub(crate) fn warning_unsupported_types_in_models(affected: &[ModelAndFieldAndType]) -> Warning {
     Warning {
         code: 3,
         message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
@@ -247,7 +317,7 @@ pub(crate) fn warning_enriched_with_map_on_model(affected: &[Model]) -> Warning 
     }
 }
 
-pub(crate) fn warning_enriched_with_map_on_field(affected: &[ModelAndField]) -> Warning {
+pub(crate) fn warning_enriched_with_map_on_field_in_models(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 8,
         message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
@@ -282,7 +352,7 @@ pub(crate) fn warning_models_without_columns(affected: &[Model]) -> Warning {
     }
 }
 
-pub(crate) fn warning_enriched_with_custom_primary_key_names(affected: &[Model]) -> Warning {
+pub(crate) fn warning_enriched_with_custom_primary_key_names_in_models(affected: &[Model]) -> Warning {
     Warning {
         code: 18,
         message: "These models were enriched with custom compound id names taken from the previous Prisma schema."
@@ -299,14 +369,73 @@ pub(crate) fn warning_relations_added_from_the_previous_data_model(affected: &[M
     }
 }
 
+pub(crate) fn warning_unsupported_types_in_views(affected: &[ViewAndFieldAndType]) -> Warning {
+    Warning {
+        code: 20,
+        message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_enriched_with_map_on_field_in_views(affected: &[ViewAndField]) -> Warning {
+    Warning {
+        code: 21,
+        message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_enriched_with_map_on_view(affected: &[View]) -> Warning {
+    Warning {
+        code: 22,
+        message: "These views were enriched with `@@map` information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_views_without_identifier(affected: &[View]) -> Warning {
+    Warning {
+        code: 23,
+        message: "The following views were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.".into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_enriched_with_custom_primary_key_names_in_views(affected: &[View]) -> Warning {
+    Warning {
+        code: 24,
+        message: "These views were enriched with custom compound id names taken from the previous Prisma schema."
+            .into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn warning_fields_with_empty_names_in_views(affected: &[ViewAndField]) -> Warning {
+    Warning {
+        code: 25,
+        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
+            .into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
 pub(crate) fn warning_top_level_item_name_is_a_dupe(affected: &[TopLevelItem]) -> Warning {
     let has_enums = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Enum));
     let has_models = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Model));
+    let has_views = affected.iter().any(|i| matches!(i.r#type, TopLevelType::View));
 
-    let message = if has_models && has_enums {
+    let message = if has_models && has_enums && has_views {
+        "These models, views and enums were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else if has_models && has_enums {
         "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else if has_models && has_views {
+        "These models and views were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else if has_enums && has_views {
+        "These enums and views were renamed due to their names being duplicates in the Prisma Schema Language."
     } else if has_models {
         "These models were renamed due to their names being duplicates in the Prisma Schema Language."
+    } else if has_views {
+        "These views were renamed due to their names being duplicates in the Prisma Schema Language."
     } else {
         "These enums were renamed due to their names being duplicates in the Prisma Schema Language."
     };

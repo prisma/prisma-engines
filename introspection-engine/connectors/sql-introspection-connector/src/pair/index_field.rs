@@ -5,7 +5,15 @@ use std::borrow::Cow;
 
 use super::{Pair, ScalarFieldPair};
 
-pub(crate) type IndexFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, Option<sql::IndexColumnWalker<'a>>>;
+/// Pairing PSL index field to field in database index definition.
+/// Both values are optional, due to in some cases we plainly just copy
+/// the PSL argument to the rendered data model.
+///
+/// This happens with views, where we need at least one unique
+/// field in the view definition, but the database does not
+/// hold constraints on views.
+pub(crate) type IndexFieldPair<'a> =
+    Pair<'a, Option<walkers::ScalarFieldWalker<'a>>, Option<sql::IndexColumnWalker<'a>>>;
 
 pub(crate) enum IndexOps<'a> {
     Managed(&'a str),

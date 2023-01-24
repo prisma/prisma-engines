@@ -787,10 +787,17 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
-            let column_id = TableColumnId(sql_schema.table_columns.len() as u32);
-
             if let Some(default) = default {
-                sql_schema.push_table_default_value(column_id, default);
+                match container_id {
+                    Either::Left(_) => {
+                        let column_id = sql_schema.next_table_column_id();
+                        sql_schema.push_table_default_value(column_id, default);
+                    }
+                    Either::Right(_) => {
+                        let column_id = sql_schema.next_view_column_id();
+                        sql_schema.push_view_default_value(column_id, default);
+                    }
+                }
             }
 
             let col = Column {

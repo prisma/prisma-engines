@@ -36,7 +36,7 @@ where
     U: Copy,
 {
     /// The previous state, taken from the PSL.
-    previous: Option<T>,
+    previous: T,
     /// The next state, taken from the database.
     next: U,
     /// The configuration object of the introspection.
@@ -48,7 +48,7 @@ where
     T: Copy,
     U: Copy,
 {
-    pub(crate) fn new(context: InputContext<'a>, previous: Option<T>, next: U) -> Self {
+    pub(crate) fn new(context: InputContext<'a>, previous: T, next: U) -> Self {
         Self {
             context,
             previous,

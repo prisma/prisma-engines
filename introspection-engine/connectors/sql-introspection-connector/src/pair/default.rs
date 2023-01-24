@@ -16,7 +16,10 @@ use std::{borrow::Cow, fmt};
 
 use super::Pair;
 
-pub(crate) type DefaultValuePair<'a> = Pair<'a, walkers::DefaultValueWalker<'a>, sql::ColumnWalker<'a>>;
+/// Comparing PSL default value of a scalar field to a value from database.
+/// For re-introspection, some values are copied from the `previous`, if
+/// finding a PSL definition.
+pub(crate) type DefaultValuePair<'a> = Pair<'a, Option<walkers::DefaultValueWalker<'a>>, sql::ColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {
     Sequence(&'a sql::postgres::Sequence),

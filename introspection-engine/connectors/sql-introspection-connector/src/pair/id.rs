@@ -4,7 +4,14 @@ use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, Pair};
 
-pub(crate) type IdPair<'a> = Pair<'a, walkers::PrimaryKeyWalker<'a>, Option<sql::IndexWalker<'a>>>;
+/// Pairing PSL id to database primary keys. Both values are
+/// optional, due to in some cases we plainly just copy
+/// the PSL attribute to the rendered data model.
+///
+/// This happens with views, where we need at least one unique
+/// field in the view definition, but the database does not
+/// hold constraints on views.
+pub(crate) type IdPair<'a> = Pair<'a, Option<walkers::PrimaryKeyWalker<'a>>, Option<sql::IndexWalker<'a>>>;
 
 impl<'a> IdPair<'a> {
     /// The user-facing name of the identifier, defined solely in the
@@ -52,6 +59,11 @@ impl<'a> IdPair<'a> {
     /// `@@id`.
     pub(crate) fn defined_in_a_field(self) -> bool {
         self.fields().len() == 1
+    }
+
+    /// The existing model in the PSL.
+    pub(crate) fn model(self) -> Option<walkers::ModelWalker<'a>> {
+        self.previous.map(|prev| prev.model())
     }
 
     /// If defined in a single field, returns the given field.

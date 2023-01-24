@@ -10,7 +10,14 @@ use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, Pair};
 
-pub(crate) type IndexPair<'a> = Pair<'a, walkers::IndexWalker<'a>, Option<sql::IndexWalker<'a>>>;
+/// Pairing a PSL index to a database index. Both values are
+/// optional, due to in some cases we plainly just copy
+/// the PSL attribute to the rendered data model.
+///
+/// This happens with views, where we need at least one unique
+/// field in the view definition, but the database does not
+/// hold constraints on views.
+pub(crate) type IndexPair<'a> = Pair<'a, Option<walkers::IndexWalker<'a>>, Option<sql::IndexWalker<'a>>>;
 
 impl<'a> IndexPair<'a> {
     /// The position of the index from the PSL, if existing. Used for

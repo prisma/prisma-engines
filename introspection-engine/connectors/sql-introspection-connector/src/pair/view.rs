@@ -6,9 +6,12 @@ use psl::{
 };
 use sql_schema_describer as sql;
 
-use super::{IdPair, IndexPair, Pair, ScalarFieldPair};
+use super::{IdPair, IndexPair, Pair, RelationFieldPair, ScalarFieldPair};
 
-pub(crate) type ViewPair<'a> = Pair<'a, walkers::ModelWalker<'a>, sql::ViewWalker<'a>>;
+/// Comparing a PSL view (which currently utilizes the
+/// model structure due to them being completely the same
+/// things) to a database view.
+pub(crate) type ViewPair<'a> = Pair<'a, Option<walkers::ModelWalker<'a>>, sql::ViewWalker<'a>>;
 
 impl<'a> ViewPair<'a> {
     /// The position of the view from the PSL, if existing. Used for
@@ -57,6 +60,22 @@ impl<'a> ViewPair<'a> {
         })
     }
 
+    /// Iterating over the relation fields.
+    pub(crate) fn relation_fields(self) -> Box<dyn Iterator<Item = RelationFieldPair<'a>> + 'a> {
+        match self.previous {
+            Some(prev) => {
+                let iter = prev
+                    .relation_fields()
+                    .filter(move |rf| !self.context.table_missing_for_model(&rf.related_model().id))
+                    .filter(move |rf| !self.context.view_missing_for_model(&rf.related_model().id))
+                    .map(move |prev| RelationFieldPair::emulated(self.context, prev));
+
+                Box::new(iter)
+            }
+            None => Box::new(std::iter::empty()),
+        }
+    }
+
     /// True, if the user has explicitly mapped the view's name in
     /// the PSL.
     pub(crate) fn remapped_name(self) -> bool {
@@ -92,7 +111,7 @@ impl<'a> ViewPair<'a> {
             })
             .unwrap_or(false);
 
-        dbg!(identifier_in_indices) || dbg!(identifier_in_id)
+        identifier_in_indices || identifier_in_id
     }
 
     /// True, if the view uses the same name as another top-level item from

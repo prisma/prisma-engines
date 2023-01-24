@@ -8,8 +8,11 @@ use std::borrow::Cow;
 
 use super::Pair;
 
-pub(crate) type EnumPair<'a> = Pair<'a, walkers::EnumWalker<'a>, sql::EnumWalker<'a>>;
-pub(crate) type EnumVariantPair<'a> = Pair<'a, walkers::EnumValueWalker<'a>, sql::EnumVariantWalker<'a>>;
+/// Pairing the PSL enums (previous) to database enums (next).
+pub(crate) type EnumPair<'a> = Pair<'a, Option<walkers::EnumWalker<'a>>, sql::EnumWalker<'a>>;
+
+/// Pairing the PSL enum values (previous) to database enums (next).
+pub(crate) type EnumVariantPair<'a> = Pair<'a, Option<walkers::EnumValueWalker<'a>>, sql::EnumVariantWalker<'a>>;
 
 impl<'a> EnumPair<'a> {
     /// The documentation on top of the enum.

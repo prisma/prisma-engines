@@ -1,4 +1,7 @@
-use crate::{pair::IdPair, warnings::Warnings};
+use crate::{
+    pair::IdPair,
+    warnings::{self, Warnings},
+};
 use datamodel_renderer::datamodel as renderer;
 
 /// Render a model/view level `@@id` definition.
@@ -22,9 +25,19 @@ pub(super) fn render<'a>(id: IdPair<'a>, warnings: &mut Warnings) -> renderer::I
     if let Some(name) = id.name() {
         definition.name(name);
 
-        // warnings.reintrospected_id_names.push(warnings::Model {
-        //     model: model.name().to_string(),
-        // });
+        match id.model() {
+            Some(model) if model.ast_model().is_view() => {
+                warnings.reintrospected_id_names_in_view.push(warnings::View {
+                    view: model.name().to_string(),
+                });
+            }
+            Some(model) => {
+                warnings.reintrospected_id_names_in_model.push(warnings::Model {
+                    model: model.name().to_string(),
+                });
+            }
+            None => (),
+        }
     }
 
     if let Some(map) = id.mapped_name() {
