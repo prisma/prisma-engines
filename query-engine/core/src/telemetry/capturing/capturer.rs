@@ -7,7 +7,6 @@ use opentelemetry::{
     },
     trace::{TraceId, TraceResult},
 };
-use std::fmt;
 use std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 /// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
@@ -127,22 +126,21 @@ impl SpanProcessor for Processor {
 
             let (events, span) = models::TraceSpan::from(span_data).split_events();
 
-            let candidate_span = Candidate {
-                value: span,
-                settings: &settings,
-            };
-
-            let capture: Capture = candidate_span.into();
-            capture.add_to(&mut storage.traces, &mut storage.logs);
+            if settings.traces_enabled() {
+                storage.traces.push(span);
+            }
 
             if storage.settings.logs_enabled() {
                 events.into_iter().for_each(|log| {
-                    let candidate_event = Candidate {
+                    let candidate = Candidate {
                         value: log,
                         settings: &settings,
                     };
-                    let capture: Capture = candidate_event.into();
-                    capture.add_to(&mut storage.traces, &mut storage.logs);
+                    if candidate.is_loggable_query_event() {
+                        storage.logs.push(candidate.query_event())
+                    } else if candidate.is_loggable_event() {
+                        storage.logs.push(candidate.value)
+                    }
                 });
             }
         }
@@ -162,12 +160,12 @@ const VALID_QUERY_ATTRS: [&str; 3] = ["query", "params", "duration_ms"];
 /// A Candidate represents either a span or an event that is being considered for capturing.
 /// A Candidate can be converted into a [`Capture`].
 #[derive(Debug, Clone)]
-struct Candidate<'batch_iter, T: Clone + fmt::Debug> {
-    value: T,
+struct Candidate<'batch_iter> {
+    value: models::LogEvent,
     settings: &'batch_iter Settings,
 }
 
-impl Candidate<'_, models::LogEvent> {
+impl Candidate<'_> {
     #[inline(always)]
     fn is_loggable_query_event(&self) -> bool {
         if self.settings.included_log_levels.contains("query") {
@@ -195,58 +193,6 @@ impl Candidate<'_, models::LogEvent> {
     #[inline(always)]
     fn is_loggable_event(&self) -> bool {
         self.settings.included_log_levels.contains(&self.value.level)
-    }
-}
-
-/// Capture provides mechanisms to transform a candidate into one of the enum variants.
-/// This is necessary because a candidate span might also be transformed into a log event
-/// (for quaint queries), or log events need to be transformed to a slightly different format
-/// (for mongo queries). In addition some span and events are discarded.
-enum Capture {
-    Span(models::TraceSpan),
-    LogEvent(models::LogEvent),
-    Discarded,
-}
-
-impl Capture {
-    /// Add the capture to the traces and logs vectors. We pass the vectors in to allow for
-    /// a recursive implementation for the case of a candidate transforming into a Capture::Multiple
-    fn add_to(self, traces: &mut Vec<models::TraceSpan>, logs: &mut Vec<models::LogEvent>) {
-        match self {
-            Capture::Span(span) => {
-                traces.push(span);
-            }
-            Capture::LogEvent(log) => {
-                logs.push(log);
-            }
-            Capture::Discarded => {}
-        }
-    }
-}
-
-/// A Candidate Event can be transformed into either a slightly different LogEvent (for mongo queries)
-/// be captrured as-is if its log level is among the levels to capture, or be discarded.
-impl From<Candidate<'_, models::Event>> for Capture {
-    fn from(candidate: Candidate<'_, models::Event>) -> Capture {
-        if candidate.is_loggable_query_event() {
-            Capture::LogEvent(candidate.query_event())
-        } else if candidate.is_loggable_event() {
-            Capture::LogEvent(candidate.value)
-        } else {
-            Capture::Discarded
-        }
-    }
-}
-
-/// A Candidate TraceSpan can be transformed into a LogEvent (for quaint queries) if query logging
-/// is enabled; captured as-is, if tracing is enabled; or be discarded.
-impl From<Candidate<'_, models::TraceSpan>> for Capture {
-    fn from(candidate: Candidate<'_, models::TraceSpan>) -> Capture {
-        if candidate.settings.traces_enabled() {
-            Capture::Span(candidate.value)
-        } else {
-            Capture::Discarded
-        }
     }
 }
 
