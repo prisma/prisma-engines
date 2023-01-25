@@ -213,6 +213,49 @@ async fn re_intro_keeps_column_arity_and_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn re_intro_does_not_keep_column_arity_if_list(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "User" (
+            id SERIAL PRIMARY KEY,
+            val INT [] NOT NULL
+        );
+
+        CREATE VIEW "Schwuser" AS
+            SELECT id, val FROM "User";
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        model User {
+          id  Int   @id @default(autoincrement())
+          val Int[]
+        }
+
+        view Schwuser {
+          id  Int @unique
+          val Int
+        }
+    "#};
+
+    let expected = expect![[r#"
+        model User {
+          id  Int   @id @default(autoincrement())
+          val Int[]
+        }
+
+        view Schwuser {
+          id  Int   @unique
+          val Int[]
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
 async fn re_intro_keeps_id(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "User" (
