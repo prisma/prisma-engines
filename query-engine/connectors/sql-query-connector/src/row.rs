@@ -230,12 +230,21 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
+        TypeIdentifier::Int => match p_value {
             Value::Int32(Some(i)) => PrismaValue::Int(i as i64),
             Value::Int64(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
             Value::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
+            }
+            other => to_prisma_value(other)?,
+        },
+        TypeIdentifier::BigInt => match p_value {
+            Value::Int32(Some(i)) => PrismaValue::BigInt(i as i64),
+            Value::Int64(Some(i)) => PrismaValue::BigInt(i),
+            Value::Bytes(Some(bytes)) => PrismaValue::BigInt(interpret_bytes_as_i64(&bytes)),
+            Value::Text(Some(ref txt)) => {
+                PrismaValue::BigInt(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
             other => to_prisma_value(other)?,
         },
