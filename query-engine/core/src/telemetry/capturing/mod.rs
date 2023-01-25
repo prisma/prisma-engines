@@ -143,6 +143,7 @@ pub fn capturer(trace_id: trace::TraceId, settings: Settings) -> Capturer {
 
 /// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
 /// global, default subscriber
+#[allow(clippy::type_complexity)]
 pub fn install_capturing_layer(
     subscriber: Layered<Option<MetricRegistry>, Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>>,
     log_queries: bool,
