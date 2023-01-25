@@ -25,7 +25,5 @@ pub(crate) fn get_dmmf(params: &str) -> String {
 fn get_dmmf_impl(params: GetDmmfParams) -> String {
     // Note:
     // - if the Prisma schema is not valid, this panics
-    // - we can't have a `psl::get_dmmf()` invocation here that mimics what we did in `get_config`, as that would create a circular dependency
-    //   between the `dmmf` and `psl` crates
     internal::get_dmmf(&params.prisma_schema)
 }
