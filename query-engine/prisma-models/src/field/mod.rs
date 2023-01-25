@@ -6,11 +6,9 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-// use crate::prelude::*;
-use psl::dml::ScalarType;
-use std::{hash::Hash, sync::Arc};
-
 use crate::ModelRef;
+use dml::ScalarType;
+use std::{hash::Hash, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {

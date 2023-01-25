@@ -1,5 +1,5 @@
 use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
-use psl::dml::{DefaultValue, FieldArity};
+use dml::{DefaultValue, FieldArity};
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]

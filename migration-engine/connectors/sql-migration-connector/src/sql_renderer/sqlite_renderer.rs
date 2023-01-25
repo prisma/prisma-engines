@@ -6,7 +6,6 @@ use crate::{
 };
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
-use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};

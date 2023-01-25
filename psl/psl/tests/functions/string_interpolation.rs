@@ -1,5 +1,5 @@
 use crate::common::*;
-use psl::dml::{self, PrismaValue, ScalarType};
+use dml::{self, PrismaValue, ScalarType};
 
 #[test]
 fn should_not_remove_whitespace() {
