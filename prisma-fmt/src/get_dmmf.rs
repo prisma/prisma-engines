@@ -1,10 +1,5 @@
 use serde::Deserialize;
 
-/// The implementation of the CLI getDmmf() utility and its JSON format.
-pub mod internal {
-    pub use dmmf::*;
-}
-
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GetDmmfParams {
@@ -25,5 +20,5 @@ pub(crate) fn get_dmmf(params: &str) -> String {
 fn get_dmmf_impl(params: GetDmmfParams) -> String {
     // Note:
     // - if the Prisma schema is not valid, this panics
-    internal::dmmf_json_from_schema(&params.prisma_schema)
+    dmmf::dmmf_json_from_schema(&params.prisma_schema)
 }
