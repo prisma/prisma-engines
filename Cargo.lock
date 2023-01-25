@@ -4087,6 +4087,7 @@ dependencies = [
  "async-trait",
  "bigdecimal",
  "datamodel-renderer",
+ "either",
  "enumflags2",
  "expect-test",
  "introspection-connector",

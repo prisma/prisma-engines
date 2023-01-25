@@ -4,7 +4,7 @@ use crate::pair::{IndexOps, IndexPair};
 use datamodel_renderer::datamodel as renderer;
 use sql_schema_describer as sql;
 
-pub(super) fn render<'a>(index: IndexPair<'a>) -> renderer::IndexDefinition<'a> {
+pub(super) fn render(index: IndexPair<'_>) -> renderer::IndexDefinition<'_> {
     let fields = index.fields().map(|field| {
         let mut definition = renderer::IndexFieldInput::new(field.name());
 
