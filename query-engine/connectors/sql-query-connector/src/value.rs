@@ -1,50 +1,26 @@
+use crate::row::{sanitize_f32, sanitize_f64};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use prisma_models::PrismaValue;
-use prisma_value::ConversionFailure;
 use quaint::Value;
 
 pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
     let val = match quaint_value {
         Value::Int32(i) => i.map(|i| PrismaValue::Int(i as i64)).unwrap_or(PrismaValue::Null),
         Value::Int64(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
-        Value::Float(Some(f)) => match f {
-            f if f.is_nan() => {
-                return Err(ConversionFailure {
-                    from: "NaN",
-                    to: "BigDecimal",
-                }
-                .into())
-            }
-            f if f.is_infinite() => {
-                return Err(ConversionFailure {
-                    from: "Infinity",
-                    to: "BigDecimal",
-                }
-                .into())
-            }
-            _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
-        },
+        Value::Float(Some(f)) => {
+            sanitize_f32(f, "BigDecimal")?;
+
+            PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized())
+        }
 
         Value::Float(None) => PrismaValue::Null,
 
-        Value::Double(Some(f)) => match f {
-            f if f.is_nan() => {
-                return Err(ConversionFailure {
-                    from: "NaN",
-                    to: "BigDecimal",
-                }
-                .into())
-            }
-            f if f.is_infinite() => {
-                return Err(ConversionFailure {
-                    from: "Infinity",
-                    to: "BigDecimal",
-                }
-                .into())
-            }
-            _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
-        },
+        Value::Double(Some(f)) => {
+            sanitize_f64(f, "BigDecimal")?;
+
+            PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized())
+        }
 
         Value::Double(None) => PrismaValue::Null,
 

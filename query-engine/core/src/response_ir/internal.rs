@@ -559,10 +559,6 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
-        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(
-            f.to_i64()
-                .ok_or_else(|| CoreError::decimal_conversion_error(&f, "i64"))?,
-        ),
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),
