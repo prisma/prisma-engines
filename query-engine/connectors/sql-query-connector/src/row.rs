@@ -241,14 +241,14 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             Value::Float(Some(f)) => {
                 sanitize_f32(f, "Int")?;
 
-                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "Float32", "Int")?)
+                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "Int")?)
             }
             Value::Double(Some(f)) => {
                 sanitize_f64(f, "Int")?;
 
-                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "Float64", "Int")?)
+                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "Int")?)
             }
-            Value::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "BigDecimal", "Int")?),
+            Value::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "Int")?),
             other => to_prisma_value(other)?,
         },
         TypeIdentifier::BigInt => match p_value {
@@ -262,22 +262,14 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             Value::Float(Some(f)) => {
                 sanitize_f32(f, "BigInt")?;
 
-                PrismaValue::BigInt(big_decimal_to_i64(
-                    BigDecimal::from_f32(f).unwrap(),
-                    "Float32",
-                    "BigInt",
-                )?)
+                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "BigInt")?)
             }
             Value::Double(Some(f)) => {
                 sanitize_f64(f, "BigInt")?;
 
-                PrismaValue::BigInt(big_decimal_to_i64(
-                    BigDecimal::from_f64(f).unwrap(),
-                    "Float64",
-                    "BigInt",
-                )?)
+                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "BigInt")?)
             }
-            Value::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigDecimal", "BigInt")?),
+            Value::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigInt")?),
             other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value {
@@ -330,11 +322,11 @@ fn interpret_bytes_as_i64(bytes: &[u8]) -> i64 {
 
 pub fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
     if n.is_nan() {
-        return Err(ConversionFailure { from: "NaN", to }.into());
+        return Err(ConversionFailure::new("NaN", to).into());
     }
 
     if n.is_infinite() {
-        return Err(ConversionFailure { from: "Infinity", to }.into());
+        return Err(ConversionFailure::new("Infinity", to).into());
     }
 
     Ok(())
@@ -342,20 +334,20 @@ pub fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
 
 pub fn sanitize_f64(n: f64, to: &'static str) -> crate::Result<()> {
     if n.is_nan() {
-        return Err(ConversionFailure { from: "NaN", to }.into());
+        return Err(ConversionFailure::new("NaN", to).into());
     }
 
     if n.is_infinite() {
-        return Err(ConversionFailure { from: "Infinity", to }.into());
+        return Err(ConversionFailure::new("Infinity", to).into());
     }
 
     Ok(())
 }
 
-pub fn big_decimal_to_i64(dec: BigDecimal, from: &'static str, to: &'static str) -> Result<i64, SqlError> {
+pub fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i64, SqlError> {
     dec.normalized()
         .to_i64()
-        .ok_or_else(|| SqlError::from(ConversionFailure { from, to }))
+        .ok_or_else(|| SqlError::from(ConversionFailure::new(format!("BigDecimal({dec})"), to)))
 }
 
 #[cfg(test)]

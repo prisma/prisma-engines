@@ -24,7 +24,35 @@ mod conversion_error {
         schema.to_owned()
     }
 
-    async fn test(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_int))]
+    async fn convert_to_int(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel { field } }"#,
+            2023,
+            "Inconsistent column data: Could not convert from `BigDecimal(18446744072438800000)` to `Int`"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_bigint))]
+    async fn convert_to_bigint(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel { field } }"#,
+            2023,
+            "Inconsistent column data: Could not convert from `BigDecimal(18446744072438800000)` to `BigInt`"
+        );
+
+        Ok(())
+    }
+
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
             fmt_query_raw(
@@ -33,23 +61,6 @@ mod conversion_error {
             )
         );
 
-        let res = runner.query(r#"query { findManyTestModel { field } }"#).await?;
-
-        res.assert_failure(
-            2020,
-            Some("Unable to convert BigDecimal value \"18446744072438800000\" to type i64".into()),
-        );
-
         Ok(())
-    }
-
-    #[connector_test(schema(schema_int))]
-    async fn convert_to_int(runner: Runner) -> TestResult<()> {
-        test(runner).await
-    }
-
-    #[connector_test(schema(schema_bigint))]
-    async fn convert_to_bigint(runner: Runner) -> TestResult<()> {
-        test(runner).await
     }
 }

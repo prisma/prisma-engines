@@ -41,6 +41,6 @@ pub enum DomainError {
 
 impl From<super::ConversionFailure> for DomainError {
     fn from(err: ConversionFailure) -> Self {
-        Self::ConversionFailure(err.from.to_owned(), err.to.to_owned())
+        Self::ConversionFailure(err.from.into_owned(), err.to.into_owned())
     }
 }
