@@ -1072,3 +1072,45 @@ async fn dupes_are_renamed(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("public", "private")
+)]
+async fn dupe_views_are_not_considered_without_preview_feature(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE SCHEMA IF NOT EXISTS "private";
+        CREATE VIEW public."A" AS SELECT 1 AS id;
+        CREATE TABLE private."A" (id INT PRIMARY KEY);
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["multiSchema"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+          schemas  = ["private", "public"]
+        }
+
+        model A {
+          id Int @id
+
+          @@schema("private")
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"[]"#]];
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
