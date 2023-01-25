@@ -112,6 +112,7 @@ impl From<SpanData> for TraceSpan {
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct Event {
     pub(super) span_id: Option<String>,
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub(super) name: String,
     pub(super) level: String,
     pub(super) timestamp: HrTime,
