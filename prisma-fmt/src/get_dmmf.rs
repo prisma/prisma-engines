@@ -29,8 +29,3 @@ fn get_dmmf_impl(params: GetDmmfParams) -> String {
     //   between the `dmmf` and `psl` crates
     internal::get_dmmf(&params.prisma_schema)
 }
-
-#[cfg(test)]
-mod tests {
-    // TODO: add tests
-}
