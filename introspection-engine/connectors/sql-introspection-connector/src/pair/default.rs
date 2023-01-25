@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-use prisma_value::PrismaValue;
-=======
-use std::{borrow::Cow, fmt};
-
 use either::Either;
->>>>>>> 3b4402c8a3 (wip: Introspecting views on PostgreSQL)
+use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MySqlType, PostgresType},
     datamodel_connector::constraint_names::ConstraintNames,
@@ -16,9 +11,6 @@ use std::{borrow::Cow, fmt};
 
 use super::Pair;
 
-/// Comparing PSL default value of a scalar field to a value from database.
-/// For re-introspection, some values are copied from the `previous`, if
-/// finding a PSL definition.
 pub(crate) type DefaultValuePair<'a> = Pair<'a, Option<walkers::DefaultValueWalker<'a>>, sql::ColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {

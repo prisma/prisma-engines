@@ -256,7 +256,6 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -274,7 +273,6 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -292,13 +290,13 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -328,7 +326,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -340,7 +338,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         1,
                     ),
                     sort_order: Some(
@@ -352,7 +350,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         2,
                     ),
                     sort_order: Some(
@@ -364,7 +362,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     index_id: IndexId(
                         2,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         2,
                     ),
                     sort_order: Some(
@@ -376,7 +374,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     index_id: IndexId(
                         2,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         1,
                     ),
                     sort_order: Some(

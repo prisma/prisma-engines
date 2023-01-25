@@ -1,7 +1,7 @@
 use crate::sanitize_datamodel_names;
 use either::Either;
 use psl::{
-    datamodel_connector::walker_ext_traits::IndexWalkerExt, dml, parser_database::walkers,
+    datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers,
     schema_ast::ast::WithDocumentation,
 };
 use sql::ColumnArity;
@@ -81,8 +81,8 @@ impl<'a> ScalarFieldPair<'a> {
     pub fn arity(self) -> ColumnArity {
         if self.next.is_in_view() && self.next.column_type().arity.is_nullable() {
             match self.previous.map(|prev| prev.ast_field().arity) {
-                Some(dml::FieldArity::Required) => ColumnArity::Required,
-                Some(dml::FieldArity::List) => ColumnArity::List,
+                Some(arity) if arity.is_required() => ColumnArity::Required,
+                Some(arity) if arity.is_list() => ColumnArity::List,
                 _ => self.next.column_type().arity,
             }
         } else {

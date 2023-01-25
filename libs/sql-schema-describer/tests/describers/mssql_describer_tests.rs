@@ -155,7 +155,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -173,7 +172,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -191,7 +189,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -209,7 +206,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -227,7 +223,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -245,7 +240,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -263,7 +257,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -281,7 +274,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -299,7 +291,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -317,7 +308,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -335,7 +325,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -353,7 +342,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -371,7 +359,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -389,7 +376,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -407,7 +393,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -425,7 +410,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -443,7 +427,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -461,7 +444,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -479,7 +461,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -497,7 +478,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -515,7 +495,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -533,7 +512,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -551,7 +529,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -569,7 +546,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -587,7 +563,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -605,7 +580,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -623,7 +597,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -641,7 +614,6 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -659,13 +631,13 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -681,7 +653,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -866,7 +838,6 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -884,7 +855,6 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -902,7 +872,6 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -920,13 +889,13 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -949,7 +918,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -961,7 +930,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         1,
                     ),
                     sort_order: Some(
@@ -1058,7 +1027,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1076,7 +1044,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -1094,7 +1061,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1112,7 +1078,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -1130,7 +1095,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -1148,7 +1112,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1166,7 +1129,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1184,7 +1146,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -1202,7 +1163,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1235,16 +1195,17 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     on_update_action: NoAction,
                 },
             ],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
                         0,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         6,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         2,
                     ),
                 },
@@ -1252,10 +1213,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     foreign_key_id: ForeignKeyId(
                         1,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         8,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         2,
                     ),
                 },
@@ -1288,7 +1249,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         2,
                     ),
                     sort_order: Some(
@@ -1300,7 +1261,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         4,
                     ),
                     sort_order: Some(
@@ -1312,7 +1273,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     index_id: IndexId(
                         2,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         7,
                     ),
                     sort_order: Some(

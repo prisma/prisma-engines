@@ -86,7 +86,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -102,7 +101,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -118,7 +116,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -134,7 +131,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -150,7 +146,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -166,13 +161,13 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -188,7 +183,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         4,
                     ),
                     sort_order: None,
@@ -297,11 +292,6 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -317,19 +307,14 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                1,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -342,7 +327,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         1,
                     ),
                     DefaultValue {
@@ -355,6 +340,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
@@ -404,19 +390,14 @@ fn backslashes_in_string_literals(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -429,6 +410,7 @@ fn backslashes_in_string_literals(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
@@ -496,7 +478,6 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -512,7 +493,6 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -528,7 +508,6 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -544,7 +523,6 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -560,7 +538,6 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -578,16 +555,17 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     on_update_action: NoAction,
                 },
             ],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
                         0,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         2,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         4,
                     ),
                 },
@@ -613,7 +591,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: None,
@@ -623,7 +601,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         4,
                     ),
                     sort_order: None,
