@@ -229,7 +229,7 @@ fn render_relation_fields(
 
         (rendered_parent, rendered_child)
     } else {
-        let rendered_parent = format!(
+        let mut rendered_parent = format!(
             "{} {} {}",
             parent.field_name(),
             parent.type_name(),
@@ -244,7 +244,20 @@ fn render_relation_fields(
         );
 
         if !child.is_list() && !parent.is_list() {
-            let unique_attribute = match child_ref_to_parent {
+            let child_unique = match child_ref_to_parent {
+                RelationReference::SimpleChildId(_) => r#"@@unique([childId])"#,
+                RelationReference::SimpleParentId(_) => r#"@@unique([parentId])"#,
+                RelationReference::CompoundParentId(_) => r#"@@unique([parent_id_1, parent_id_2])"#,
+                RelationReference::CompoundChildId(_) => r#"@@unique([child_id_1, child_id_2])"#,
+                RelationReference::ParentReference(_) => r#"@@unique([parentRef])"#,
+                RelationReference::CompoundParentReference(_) => r#"@@unique([parent_p_1, parent_p_2])"#,
+                RelationReference::ChildReference(_) => r#"@@unique([parent_c])"#,
+                RelationReference::CompoundChildReference(_) => r#"@@unique([child_c_1, child_c_2])"#,
+                RelationReference::IdReference => "",
+                RelationReference::NoRef => "",
+            };
+
+            let parent_unique = match parent_ref_to_child {
                 RelationReference::SimpleChildId(_) => r#"@@unique([childId])"#,
                 RelationReference::SimpleParentId(_) => r#"@@unique([parentId])"#,
                 RelationReference::CompoundParentId(_) => r#"@@unique([parent_id_1, parent_id_2])"#,
@@ -258,7 +271,10 @@ fn render_relation_fields(
             };
 
             rendered_child.push('\n');
-            rendered_child.push_str(unique_attribute);
+            rendered_child.push_str(child_unique);
+
+            rendered_parent.push('\n');
+            rendered_parent.push_str(parent_unique);
         }
 
         (rendered_parent, rendered_child)

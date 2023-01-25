@@ -70,6 +70,9 @@ pub enum CoreError {
 
     #[error("{}", _0)]
     FieldConversionError(#[from] FieldConversionError),
+
+    #[error("Error in batch request {request_idx}: {error}")]
+    BatchError { request_idx: usize, error: Box<CoreError> },
 }
 
 impl CoreError {
@@ -85,6 +88,14 @@ impl CoreError {
             value: decimal.to_string(),
             from_type: "BigDecimal".into(),
             to_type: to_type.into(),
+        }
+    }
+
+    pub fn is_transient(&self) -> bool {
+        match self {
+            CoreError::InterpreterError(InterpreterError::ConnectorError(err)) => err.is_transient(),
+            CoreError::ConnectorError(err) => err.is_transient(),
+            _ => false,
         }
     }
 }
@@ -267,6 +278,12 @@ impl From<CoreError> for user_facing_errors::Error {
                     details: err.to_string(),
                 })
                 .into()
+            }
+
+            CoreError::BatchError { request_idx, error } => {
+                let mut inner_error = user_facing_errors::Error::from(*error);
+                inner_error.set_batch_request_idx(request_idx);
+                inner_error
             }
 
             _ => user_facing_errors::Error::from_dyn_error(&err),

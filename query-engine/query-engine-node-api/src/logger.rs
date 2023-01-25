@@ -1,5 +1,5 @@
 use core::fmt;
-use query_core::is_user_facing_trace_filter;
+use query_core::telemetry;
 use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -48,7 +48,7 @@ impl Logger {
         };
 
         let log_callback_arc = Arc::new(log_callback);
-        let is_user_trace = filter_fn(is_user_facing_trace_filter);
+        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()

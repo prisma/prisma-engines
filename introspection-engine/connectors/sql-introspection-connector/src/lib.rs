@@ -1,16 +1,35 @@
+//! Handles the introspection from SQL database schema definition to
+//! the Prisma Schema Language (PSL).
+//!
+//! The introspection consists the following parts:
+//!
+//! - Describe the database schema using the `sql-schema-describer`.
+//! - Combine the describe result with a parsed and validated PSL
+//!   definition, happens in [`introspection_map::IntrospectionMap`]
+//! - Using the `Pair` apis, provide information about the
+//!   data model for rendering, see [`pair::Pair`] and its submodules.
+//! - By using the `Pair` apis, create a rendering structure together
+//!   with possible warnings utilizing the `datamodel-renderer`
+//!   crate in the [`rendering`] module.
+//! - Check the Prisma version to warn and guide people upgrading
+//!   from older versions of Prisma.
+//! - Convert the rendering structure into a string. Reformat the
+//!   string using the `psl::reformat` module.
+//!
+//! A good place to start digging into the mechanics of this crate is
+//! to start reading from the
+//! [`SqlIntrospectionConnector::introspect`] method.
+
 #![allow(clippy::vec_init_then_push)]
 #![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
-pub mod calculate_datamodel; // only exported to be able to unit test it
+pub mod datamodel_calculator; // only exported to be able to unit test it
+mod pair;
 
-mod commenting_out_guardrails;
-mod defaults;
 mod error;
-mod introspection;
 mod introspection_helpers;
 mod introspection_map;
-mod prisma_1_defaults;
-mod re_introspection;
+mod rendering;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
 mod version_checker;
@@ -18,14 +37,17 @@ mod warnings;
 
 pub use error::*;
 
+use self::sanitize_datamodel_names::*;
 use enumflags2::BitFlags;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
 };
 use psl::PreviewFeature;
-use quaint::prelude::SqlFamily;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{
+    prelude::{ConnectionInfo, SqlFamily},
+    single::Quaint,
+};
 use schema_describer_loading::load_describer;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
@@ -146,27 +168,27 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     }
 
     async fn introspect(&self, ctx: &IntrospectionContext) -> ConnectorResult<IntrospectionResult> {
-        //TODO(matthias) do we even need extra preview flagging here?
-        let namespaces = &mut ctx
-            .datasource()
-            .namespaces
-            .iter()
-            .map(|(ns, _)| ns.as_ref())
-            .collect::<Vec<&str>>();
+        let mut namespaces = match ctx.namespaces() {
+            Some(namespaces) => namespaces.iter().map(|ns| ns.as_str()).collect(),
+            None => ctx
+                .datasource()
+                .namespaces
+                .iter()
+                .map(|(ns, _)| ns.as_ref())
+                .collect::<Vec<&str>>(),
+        };
+
         if namespaces.is_empty() {
             namespaces.push(self.connection.connection_info().schema_name())
         }
 
         let sql_schema = self
-            .catch(self.describe(Some(ctx.datasource().active_provider), namespaces))
+            .catch(self.describe(Some(ctx.datasource().active_provider), &namespaces))
             .await?;
 
-        let introspection_result =
-            calculate_datamodel::calculate_datamodel(&sql_schema, ctx).map_err(|sql_introspection_error| {
-                sql_introspection_error.into_connector_error(self.connection.connection_info())
-            })?;
-
-        Ok(introspection_result)
+        datamodel_calculator::calculate(&sql_schema, ctx).map_err(|sql_introspection_error| {
+            sql_introspection_error.into_connector_error(self.connection.connection_info())
+        })
     }
 }
 
@@ -187,7 +209,7 @@ impl SqlFamilyTrait for IntrospectionContext {
     }
 }
 
-impl SqlFamilyTrait for calculate_datamodel::CalculateDatamodelContext<'_> {
+impl SqlFamilyTrait for datamodel_calculator::InputContext<'_> {
     fn sql_family(&self) -> SqlFamily {
         self.sql_family
     }

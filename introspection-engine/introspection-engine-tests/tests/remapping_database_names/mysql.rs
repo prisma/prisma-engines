@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn remapping_enum_names(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `123Book` (
@@ -26,13 +26,13 @@ async fn remapping_enum_names(api: &TestApi) -> TestResult {
         }
 
         model Book {
-          id    Int         @id @default(autoincrement())
-          color Book_color? @map("1color")
+          id    Int          @id @default(autoincrement())
+          color Book_1color? @map("1color")
 
           @@map("123Book")
         }
 
-        enum Book_color {
+        enum Book_1color {
           black
 
           @@map("123Book_1color")

@@ -10,3 +10,12 @@ prisma-models = { path = "../prisma-models" }
 once_cell = "1.3"
 itertools = "0.10"
 lazy_static = "1.4"
+
+[dev-dependencies.criterion]
+version = "0.4.0"
+default-features = false
+features = ["cargo_bench_support"]
+
+[[bench]]
+name = "schema_builder_bench"
+harness = false

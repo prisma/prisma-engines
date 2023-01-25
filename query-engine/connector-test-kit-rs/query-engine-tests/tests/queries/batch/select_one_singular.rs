@@ -3,6 +3,10 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod singular_batch {
     use indoc::indoc;
+    use query_engine_tests::{
+        query_core::{BatchDocument, QueryDocument},
+        run_query, Runner, TestResult,
+    };
 
     fn schema() -> String {
         let schema = indoc! {
@@ -228,8 +232,20 @@ mod singular_batch {
         create_test_data(&runner).await?;
 
         let queries = vec![
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
-            r#"query { findUniqueArtist(where: { ArtistId: 1}) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { ArtistId: 1 }) { Name }}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findUniqueArtist":{"Name":"ArtistWithoutAlbums"}}}]}"###
+        );
+
+        // With non unique filters
+        let queries = vec![
+            r#"query { findUniqueArtist(where: { ArtistId: 1, Name: "ArtistWithoutAlbums" }) { Name }}"#.to_string(),
+            r#"query { findUniqueArtist(where: { Name: "ArtistWithoutAlbums", ArtistId: 1 }) { Name }}"#.to_string(),
         ];
 
         let batch_results = runner.batch(queries, false, None).await?;
@@ -239,6 +255,108 @@ mod singular_batch {
         );
 
         Ok(())
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/16548
+    #[connector_test(schema(schemas::generic))]
+    async fn repro_16548(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id } }"#);
+
+        // Working case
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModelOrThrow(where: { id: 1 }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModelOrThrow(where: { id: 2 }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":1}}},{"data":{"findUniqueTestModelOrThrow":{"id":2}}}]}"###
+        );
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Failing case
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModelOrThrow(where: { id: 2 }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModelOrThrow(where: { id: 3 }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist, transient: false })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+        );
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModel(where: { id: 3 }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModelOrThrow(where: { id: 2 }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":null}},{"data":{"findUniqueTestModelOrThrow":{"id":2}}}]}"###
+        );
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModel(where: { id: 2 }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModelOrThrow(where: { id: 4 }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist, transient: false })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+        );
+        assert_eq!(compact_doc.is_compact(), false);
+
+        // Mix of findUnique & findUniqueOrThrow
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModelOrThrow(where: { id: 2 }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModel(where: { id: 3 }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"data":{"findUniqueTestModel":null}}]}"###
+        );
+        assert_eq!(compact_doc.is_compact(), false);
+
+        Ok(())
+    }
+
+    async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<(QueryResult, BatchDocument)> {
+        let res = runner.batch(queries.clone(), false, None).await?;
+
+        let doc = GraphQlBody::Multi(MultiQuery::new(
+            queries.into_iter().map(Into::into).collect(),
+            false,
+            None,
+        ))
+        .into_doc()
+        .unwrap();
+        let batch = match doc {
+            QueryDocument::Multi(batch) => batch.compact(runner.query_schema()),
+            _ => unreachable!(),
+        };
+
+        Ok((res, batch.compact(runner.query_schema())))
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {

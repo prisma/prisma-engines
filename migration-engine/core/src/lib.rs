@@ -109,7 +109,7 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_c
 
     let mut connector = connector_for_provider(source.active_provider)?;
 
-    if let Ok(connection_string) = source.load_url(|key| env::var(key).ok()) {
+    if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
         connector.set_params(ConnectorParams {
             connection_string,
             preview_features,
@@ -189,7 +189,7 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
     let url = source
-        .load_url(|key| env::var(key).ok())
+        .load_direct_url(|key| env::var(key).ok())
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let shadow_database_url = source

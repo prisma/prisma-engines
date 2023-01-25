@@ -27,7 +27,7 @@ enum UserType {
   Eukaryote
 }
 
-// [1;91merror[0m: [1mThis model is missing an `@@schema` attribute.[0m
+// [1;91merror[0m: [1mError validating model "Test": This model is missing an `@@schema` attribute.[0m
 //   [1;94m-->[0m  [4mschema.prisma:15[0m
 // [1;94m   | [0m
 // [1;94m14 | [0m

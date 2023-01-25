@@ -1,0 +1,17 @@
+// no missing relation index validation on mongodb.
+
+datasource db {
+    provider = "mongodb"
+    url = env("TEST_DATABASE_URL")
+}
+
+model SomeUser {
+    id String @id @map("_id") @default(auto()) @db.ObjectId
+    posts Post[]
+}
+
+model Post {
+    id String @id @map("_id") @default(auto()) @db.ObjectId
+    userId String @db.ObjectId
+    user SomeUser @relation(fields: [userId], references: [id])
+}

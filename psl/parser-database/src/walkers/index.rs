@@ -1,11 +1,10 @@
+use super::CompositeTypeFieldWalker;
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase, ScalarFieldType,
 };
-
-use super::CompositeTypeFieldWalker;
 
 /// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
@@ -112,7 +111,7 @@ impl<'db> IndexWalker<'db> {
 
             match path.type_holding_the_indexed_field() {
                 Some(ctid) => {
-                    let walker = self.db.walk_composite_type(ctid).field(field_id);
+                    let walker = self.db.walk((ctid, field_id));
                     IndexFieldWalker::new(walker)
                 }
                 None => {
@@ -194,19 +193,13 @@ impl<'db> IndexWalker<'db> {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
-pub(super) enum InnerIndexFieldWalker<'db> {
-    Scalar(ScalarFieldWalker<'db>),
-    Composite(CompositeTypeFieldWalker<'db>),
-}
-
-impl<'db> From<ScalarFieldWalker<'db>> for InnerIndexFieldWalker<'db> {
+impl<'db> From<ScalarFieldWalker<'db>> for IndexFieldWalker<'db> {
     fn from(sf: ScalarFieldWalker<'db>) -> Self {
         Self::Scalar(sf)
     }
 }
 
-impl<'db> From<CompositeTypeFieldWalker<'db>> for InnerIndexFieldWalker<'db> {
+impl<'db> From<CompositeTypeFieldWalker<'db>> for IndexFieldWalker<'db> {
     fn from(cf: CompositeTypeFieldWalker<'db>) -> Self {
         Self::Composite(cf)
     }
@@ -215,96 +208,107 @@ impl<'db> From<CompositeTypeFieldWalker<'db>> for InnerIndexFieldWalker<'db> {
 /// A field in an index definition. It can point to a scalar field in the
 /// current model, or through embedding a field in a composite type.
 #[derive(Copy, Clone, PartialEq)]
-pub struct IndexFieldWalker<'db> {
-    inner: InnerIndexFieldWalker<'db>,
+pub enum IndexFieldWalker<'db> {
+    /// A field on a model.
+    Scalar(ScalarFieldWalker<'db>),
+    /// The path to a field in a composite type.
+    Composite(CompositeTypeFieldWalker<'db>),
 }
 
 impl<'db> IndexFieldWalker<'db> {
-    pub(super) fn new(inner: impl Into<InnerIndexFieldWalker<'db>>) -> Self {
-        Self { inner: inner.into() }
+    pub(super) fn new(inner: impl Into<IndexFieldWalker<'db>>) -> Self {
+        inner.into()
     }
 
     /// Is the field optional / nullable?
     pub fn is_optional(self) -> bool {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.is_optional(),
-            InnerIndexFieldWalker::Composite(cf) => cf.arity().is_optional(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.is_optional(),
+            IndexFieldWalker::Composite(cf) => cf.arity().is_optional(),
+        }
+    }
+
+    /// Is the field a list?
+    pub fn is_list(self) -> bool {
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.is_list(),
+            IndexFieldWalker::Composite(cf) => cf.arity().is_list(),
         }
     }
 
     /// Is the type of the field `Unsupported("...")`?
     pub fn is_unsupported(self) -> bool {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.is_unsupported(),
-            InnerIndexFieldWalker::Composite(cf) => cf.r#type().is_unsupported(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.is_unsupported(),
+            IndexFieldWalker::Composite(cf) => cf.r#type().is_unsupported(),
         }
     }
 
     /// The ID of the field node in the AST.
     pub fn field_id(self) -> ast::FieldId {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.field_id(),
-            InnerIndexFieldWalker::Composite(cf) => cf.field_id(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.field_id(),
+            IndexFieldWalker::Composite(cf) => cf.field_id(),
         }
     }
 
     /// The name of the field.
     pub fn name(self) -> &'db str {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.name(),
-            InnerIndexFieldWalker::Composite(cf) => cf.name(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.name(),
+            IndexFieldWalker::Composite(cf) => cf.name(),
         }
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
     pub fn database_name(self) -> &'db str {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.database_name(),
-            InnerIndexFieldWalker::Composite(cf) => cf.database_name(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.database_name(),
+            IndexFieldWalker::Composite(cf) => cf.database_name(),
         }
     }
 
     /// The type of the field.
     pub fn scalar_field_type(self) -> ScalarFieldType {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.scalar_field_type(),
-            InnerIndexFieldWalker::Composite(cf) => *cf.r#type(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.scalar_field_type(),
+            IndexFieldWalker::Composite(cf) => *cf.r#type(),
         }
     }
 
     /// Convert the walker to a scalar field, if the underlying field is in a
     /// model.
     pub fn as_scalar_field(self) -> Option<ScalarFieldWalker<'db>> {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => Some(sf),
-            InnerIndexFieldWalker::Composite(_) => None,
+        match self {
+            IndexFieldWalker::Scalar(sf) => Some(sf),
+            IndexFieldWalker::Composite(_) => None,
         }
     }
 
     /// Convert the walker to a composite field, if the underlying field is in a
     /// composite type.
     pub fn as_composite_field(self) -> Option<CompositeTypeFieldWalker<'db>> {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(_) => None,
-            InnerIndexFieldWalker::Composite(cf) => Some(cf),
+        match self {
+            IndexFieldWalker::Scalar(_) => None,
+            IndexFieldWalker::Composite(cf) => Some(cf),
         }
     }
 
     /// True if the index field is a scalar field.
     pub fn is_scalar_field(self) -> bool {
-        matches!(self.inner, InnerIndexFieldWalker::Scalar(_))
+        matches!(self, IndexFieldWalker::Scalar(_))
     }
 
     /// True if the index field is a composite field.
     pub fn is_composite_field(self) -> bool {
-        matches!(self.inner, InnerIndexFieldWalker::Composite(_))
+        matches!(self, IndexFieldWalker::Composite(_))
     }
 
     /// Does the field define a primary key by its own.
     pub fn is_single_pk(self) -> bool {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.is_single_pk(),
-            InnerIndexFieldWalker::Composite(_) => false,
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.is_single_pk(),
+            IndexFieldWalker::Composite(_) => false,
         }
     }
 
@@ -312,17 +316,17 @@ impl<'db> IndexFieldWalker<'db> {
     ///
     /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
     pub fn raw_native_type(self) -> Option<(&'db str, &'db str, &'db [String], ast::Span)> {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.raw_native_type(),
-            InnerIndexFieldWalker::Composite(cf) => cf.raw_native_type(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.raw_native_type(),
+            IndexFieldWalker::Composite(cf) => cf.raw_native_type(),
         }
     }
 
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
-        match self.inner {
-            InnerIndexFieldWalker::Scalar(sf) => sf.ast_field(),
-            InnerIndexFieldWalker::Composite(cf) => cf.ast_field(),
+        match self {
+            IndexFieldWalker::Scalar(sf) => sf.ast_field(),
+            IndexFieldWalker::Composite(cf) => cf.ast_field(),
         }
     }
 }

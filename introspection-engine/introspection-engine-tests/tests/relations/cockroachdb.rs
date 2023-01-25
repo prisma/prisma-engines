@@ -106,10 +106,10 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
           id                                  BigInt @id @default(autoincrement())
           recruited_by                        Int?
           direct_report                       Int?
-          User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
-          User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
-          other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-          other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+          User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
+          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
+          other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
         }
     "#]];
 

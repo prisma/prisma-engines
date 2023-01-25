@@ -60,9 +60,31 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                 &mut names.tops
             }
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) if model.is_view() => {
+                validate_identifier(model.identifier(), "view", ctx);
+                validate_model_name(model, "view", ctx.diagnostics);
+                validate_attribute_identifiers(model, ctx);
+
+                for (field_id, field) in model.iter_fields() {
+                    validate_identifier(field.identifier(), "field", ctx);
+                    validate_attribute_identifiers(field, ctx);
+                    let field_name_id = ctx.interner.intern(field.name());
+
+                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                        ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            model.name(),
+                            field.name(),
+                            "view",
+                            field.identifier().span,
+                        ))
+                    }
+                }
+
+                &mut names.tops
+            }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
                 validate_identifier(model.identifier(), "Model", ctx);
-                validate_model_name(model, ctx.diagnostics);
+                validate_model_name(model, "model", ctx.diagnostics);
                 validate_attribute_identifiers(model, ctx);
 
                 for (field_id, field) in model.iter_fields() {
@@ -74,6 +96,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
+                            "model",
                             field.identifier().span,
                         ))
                     }

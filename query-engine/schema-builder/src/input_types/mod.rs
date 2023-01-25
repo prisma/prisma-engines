@@ -8,7 +8,7 @@ use prisma_models::ScalarFieldRef;
 use schema::*;
 
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
-    map_scalar_input_type(ctx, &field.type_identifier, field.is_list())
+    map_scalar_input_type(ctx, &field.type_identifier(), field.is_list())
 }
 
 fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {
@@ -54,7 +54,7 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
 
 fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {
-        let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
+        let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(field.name())).collect();
         field_names.join("")
     })
 }

@@ -1,0 +1,15 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+view foo {
+  1id Int @unique
+}
+
+// [1;91merror[0m: [1mError validating: The name of a field must not start with a number.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mview foo {
+// [1;94m 7 | [0m  [1;91m1id[0m Int @unique
+// [1;94m   | [0m

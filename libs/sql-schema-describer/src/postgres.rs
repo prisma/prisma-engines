@@ -574,6 +574,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
@@ -622,9 +623,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
+
         let names = rows
             .into_iter()
             .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
+
         let mut map = IndexMap::default();
 
         for (table_name, namespace) in names {
@@ -705,6 +708,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.numeric_precision_radix,
                 info.datetime_precision,
                 info.data_type,
+                info.udt_schema as type_schema_name,
                 info.udt_name as full_data_type,
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
@@ -738,6 +742,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         for col in rows {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
+
             let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
                 Some(t_walker) => t_walker.id,
                 None => continue, // we only care about columns in tables we have access to
@@ -761,23 +766,27 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 get_column_type_postgresql(&col, sql_schema)
             };
+
             let default = col
                 .get("column_default")
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
             let auto_increment = is_identity
-                || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::Sequence(_)))
+                || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
                     && matches!(
-                        default.as_ref().map(|d| d.kind()),
+                        default.as_ref().map(|d| &d.kind),
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
+
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
 
             let col = Column {
                 name,
                 tpe,
-                default,
+                default_value_id,
                 auto_increment,
             };
 
@@ -948,9 +957,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             if !sql_schema.namespaces.contains(&referenced_schema_name) {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", sql_schema.namespaces[0], table_name), //TODO(matthias)
+                    from: format!("{}.{}", sql_schema.namespaces[0], table_name),
                     to: format!("{}.{}", referenced_schema_name, referenced_table),
                     constraint: constraint_name,
+                    missing_namespace: referenced_schema_name,
                 }));
             }
 
@@ -1242,8 +1252,14 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
-        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
-        _ => schema.find_enum(&full_data_type),
+        "ARRAY" if full_data_type.starts_with('_') => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+        }
+        _ => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(&full_data_type, namespace.as_deref())
+        }
     };
 
     let (family, native_type) = match full_data_type.as_str() {
@@ -1330,8 +1346,14 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
-        "ARRAY" if full_data_type.starts_with('_') => schema.find_enum(full_data_type.trim_start_matches('_')),
-        _ => schema.find_enum(&full_data_type),
+        "ARRAY" if full_data_type.starts_with('_') => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+        }
+        _ => {
+            let namespace = row.get_string("type_schema_name");
+            schema.find_enum(&full_data_type, namespace.as_deref())
+        }
     };
 
     let (family, native_type) = match full_data_type.as_str() {

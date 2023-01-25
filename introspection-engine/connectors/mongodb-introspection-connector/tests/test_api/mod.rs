@@ -1,4 +1,5 @@
 use enumflags2::BitFlags;
+use expect_test::Expect;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
 use mongodb::Database;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
@@ -34,6 +35,12 @@ pub struct TestResult {
 impl TestResult {
     pub fn datamodel(&self) -> &str {
         &self.datamodel
+    }
+
+    #[track_caller]
+    pub fn expect_warnings(&self, expect: &Expect) {
+        let warnings = serde_json::to_string_pretty(&self.warnings).unwrap();
+        expect.assert_eq(&warnings);
     }
 
     #[track_caller]
@@ -104,7 +111,7 @@ where
     );
 
     let validated_schema = psl::parse_schema(datamodel_string).unwrap();
-    let mut ctx = IntrospectionContext::new(validated_schema, composite_type_depth);
+    let mut ctx = IntrospectionContext::new(validated_schema, composite_type_depth, None);
     ctx.render_config = false;
 
     RT.block_on(async move {

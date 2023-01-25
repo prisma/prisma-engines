@@ -201,6 +201,13 @@ pub enum IndexFieldProperty {
     Descending,
 }
 
+impl IndexFieldProperty {
+    /// If the property is descending.
+    pub fn is_descending(self) -> bool {
+        matches!(self, Self::Descending)
+    }
+}
+
 impl fmt::Display for IndexFieldProperty {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

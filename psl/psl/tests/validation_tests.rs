@@ -2,7 +2,36 @@ mod panic_with_diff;
 
 use std::{fs, io::Write as _, path, sync::Arc};
 
+use psl::{SourceFile, ValidatedSchema};
+
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/validation");
+
+/// Parse and analyze a Prisma schema, returning Err if there are any diagnostics (warnings or errors).
+fn parse_schema_fail_on_diagnostics(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
+    let schema = psl::validate(file.into());
+
+    let file_name = "schema.prisma";
+    let datamodel_string = schema.db.source();
+
+    match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
+        ([], []) => Ok(schema),
+        (warnings, errors) => {
+            let mut message: Vec<u8> = Vec::new();
+
+            for warn in warnings {
+                warn.pretty_print(&mut message, file_name, datamodel_string)
+                    .expect("printing datamodel warning");
+            }
+
+            for err in errors {
+                err.pretty_print(&mut message, file_name, datamodel_string)
+                    .expect("printing datamodel error");
+            }
+
+            Err(String::from_utf8_lossy(&message).into_owned())
+        }
+    }
+}
 
 #[inline(never)] // we want to compile fast
 fn run_validation_test(test_file_path: &str) {
@@ -39,13 +68,14 @@ fn run_validation_test(test_file_path: &str) {
         .unwrap_or_default();
 
     let source_file = psl::parser_database::SourceFile::new_allocated(Arc::from(text.into_boxed_str()));
-    let validation_result = psl::parse_schema(source_file.clone());
 
-    let errors = match (last_comment_contents.is_empty(), validation_result) {
+    let validation_result = parse_schema_fail_on_diagnostics(source_file.clone());
+
+    let diagnostics = match (last_comment_contents.is_empty(), validation_result) {
         (true, Ok(_)) => return, // expected and got a valid schema
-        (false, Err(errors)) if last_comment_contents == errors => return, // we expected the errors we got
-        (_, Err(errors)) => errors,
-        (false, Ok(_)) => String::new(), // expected errors, got none
+        (false, Err(diagnostics)) if last_comment_contents == diagnostics => return, // we expected the diagnostics we got
+        (_, Err(diagnostics)) => diagnostics,
+        (false, Ok(_)) => String::new(), // expected diagnostics, got none
     };
 
     if std::env::var("UPDATE_EXPECT").is_ok() {
@@ -56,13 +86,13 @@ fn run_validation_test(test_file_path: &str) {
             .unwrap_or(source_file.as_str());
         file.write_all(schema.as_bytes()).unwrap();
 
-        for line in errors.lines() {
+        for line in diagnostics.lines() {
             writeln!(file, "// {line}").unwrap();
         }
         return;
     }
 
-    panic_with_diff::panic_with_diff(&last_comment_contents, &errors)
+    panic_with_diff::panic_with_diff(&last_comment_contents, &diagnostics)
 }
 
 include!(concat!(env!("OUT_DIR"), "/validation_tests.rs"));

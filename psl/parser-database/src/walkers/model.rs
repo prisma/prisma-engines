@@ -63,6 +63,7 @@ impl<'db> ModelWalker<'db> {
     }
 
     /// The parsed attributes.
+    #[track_caller]
     pub(crate) fn attributes(self) -> &'db ModelAttributes {
         &self.db.types.model_attributes[&self.id]
     }

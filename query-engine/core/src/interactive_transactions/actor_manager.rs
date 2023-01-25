@@ -1,4 +1,4 @@
-use crate::{Operation, ResponseData};
+use crate::{ClosedTx, Operation, ResponseData};
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
@@ -26,9 +26,9 @@ pub struct TransactionActorManager {
     pub clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    pub closed_txs: Arc<RwLock<LruCache<TxId, ()>>>,
+    pub closed_txs: Arc<RwLock<LruCache<TxId, Option<ClosedTx>>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
-    send_done: Sender<TxId>,
+    send_done: Sender<(TxId, Option<ClosedTx>)>,
     /// Handle to the task in charge of clearing actors.
     /// Used to abort the task when the TransactionActorManager is dropped.
     bg_reader_clear: JoinHandle<()>,
@@ -49,10 +49,10 @@ impl Default for TransactionActorManager {
 
 impl TransactionActorManager {
     pub fn new() -> Self {
-        let clients: Arc<RwLock<HashMap<TxId, ITXClient>>> = Arc::new(RwLock::new(HashMap::new()));
-        let closed_txs: Arc<RwLock<LruCache<TxId, ()>>> = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
+        let clients = Arc::new(RwLock::new(HashMap::new()));
+        let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
 
-        let (send_done, rx) = channel::<TxId>(CHANNEL_SIZE);
+        let (send_done, rx) = channel(CHANNEL_SIZE);
         let handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);
 
         Self {
@@ -79,9 +79,30 @@ impl TransactionActorManager {
     async fn get_client(&self, tx_id: &TxId, from_operation: &str) -> crate::Result<ITXClient> {
         if let Some(client) = self.clients.read().await.get(tx_id) {
             Ok(client.clone())
-        } else if self.closed_txs.read().await.contains(tx_id) {
+        } else if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
             Err(TransactionError::Closed {
-                reason: format!("A {from_operation} cannot be executed on a closed transaction."),
+                reason: match closed_tx {
+                    Some(ClosedTx::Committed) => {
+                        format!("A {from_operation} cannot be executed on a committed transaction")
+                    }
+                    Some(ClosedTx::RolledBack) => {
+                        format!("A {from_operation} cannot be executed on a transaction that was rolled back")
+                    }
+                    Some(ClosedTx::Expired { start_time, timeout }) => {
+                        format!(
+                            "A {from_operation} cannot be executed on an expired transaction. \
+                             The timeout for this transaction was {} ms, however {} ms passed since the start \
+                             of the transaction. Consider increasing the interactive transaction timeout \
+                             or doing less work in the transaction",
+                            timeout.as_millis(),
+                            start_time.elapsed().as_millis(),
+                        )
+                    }
+                    None => {
+                        error!("[{tx_id}] no details about closed transaction");
+                        format!("A {from_operation} cannot be executed on a closed transaction")
+                    }
+                },
             }
             .into())
         } else {
@@ -93,22 +114,22 @@ impl TransactionActorManager {
         &self,
         tx_id: &TxId,
         operation: Operation,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let client = self.get_client(tx_id, "query").await?;
 
-        client.execute(operation, trace_id).await
+        client.execute(operation, traceparent).await
     }
 
     pub async fn batch_execute(
         &self,
         tx_id: &TxId,
         operations: Vec<Operation>,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let client = self.get_client(tx_id, "batch query").await?;
 
-        client.batch_execute(operations, trace_id).await
+        client.batch_execute(operations, traceparent).await
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {

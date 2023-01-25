@@ -10,7 +10,10 @@ pub(crate) fn scalar_filter_object_type(
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
     let aggregate = if include_aggregates { "WithAggregates" } else { "" };
-    let ident = Identifier::new(format!("{}ScalarWhere{}Input", model.name, aggregate), PRISMA_NAMESPACE);
+    let ident = Identifier::new(
+        format!("{}ScalarWhere{}Input", model.name(), aggregate),
+        PRISMA_NAMESPACE,
+    );
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -93,7 +96,7 @@ where
 }
 
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}WhereUniqueInput", model.name), PRISMA_NAMESPACE);
+    let ident = Identifier::new(format!("{}WhereUniqueInput", model.name()), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
     // Split unique & ID fields vs all the other fields
@@ -133,7 +136,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     let mut x = init_input_object_type(ident.clone());
 
-    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         x.require_at_least_one_field();
         x.apply_constraints_on_fields(constrained_fields);
     } else {
@@ -147,7 +150,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .into_iter()
         .map(|f| {
             let sf = f.as_scalar().unwrap();
-            let name = sf.name.clone();
+            let name = sf.name();
             let typ = map_scalar_input_type_for_field(ctx, sf);
 
             input_field(name, typ, None).optional()
@@ -189,7 +192,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     fields.extend(compound_unique_fields);
     fields.extend(compound_id_field);
 
-    if ctx.has_feature(&PreviewFeature::ExtendedWhereUnique) {
+    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         fields.extend(boolean_operators);
         fields.extend(rest_fields);
     }
@@ -209,7 +212,7 @@ fn compound_field_unique_object_type(
     let ident = Identifier::new(
         format!(
             "{}{}CompoundUniqueInput",
-            model.name,
+            model.name(),
             compound_object_name(alias, &from_fields)
         ),
         PRISMA_NAMESPACE,
@@ -223,7 +226,7 @@ fn compound_field_unique_object_type(
     let object_fields = from_fields
         .into_iter()
         .map(|field| {
-            let name = field.name.clone();
+            let name = field.name();
             let typ = map_scalar_input_type_for_field(ctx, &field);
 
             input_field(name, typ, None)
@@ -246,7 +249,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
     let mut fields = vec![];
 
     let input_fields = cf.typ.fields().iter().map(|f| match f {
-        ModelField::Scalar(sf) => input_field(sf.name.clone(), map_scalar_input_type_for_field(ctx, sf), None)
+        ModelField::Scalar(sf) => input_field(sf.name(), map_scalar_input_type_for_field(ctx, sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),
 

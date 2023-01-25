@@ -3,6 +3,7 @@ use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
+use psl_core::parser_database::IndexType;
 use std::{borrow::Cow, fmt};
 
 /// Represents a model in a prisma schema.
@@ -28,6 +29,8 @@ pub struct Model {
     pub is_ignored: bool,
     /// The contents of the `@@schema("...")` attribute.
     pub schema: Option<String>,
+    /// If the model is defined as a view in the database.
+    pub is_view: bool,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -243,7 +246,7 @@ impl OperatorClass {
     }
 }
 
-///A field in an index that optionally defines a sort order and length limit.
+/// A field in an index that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexField {
     pub path: Vec<(String, Option<String>)>,
@@ -290,7 +293,7 @@ pub struct PrimaryKeyDefinition {
     pub clustered: Option<bool>,
 }
 
-///A field in a Primary Key that optionally defines a sort order and length limit.
+/// A field in a Primary Key that optionally defines a sort order and length limit.
 #[derive(Debug, PartialEq, Clone)]
 pub struct PrimaryKeyField {
     pub name: String,
@@ -310,19 +313,6 @@ impl PrimaryKeyField {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub enum IndexType {
-    Unique,
-    Normal,
-    Fulltext,
-}
-
-impl IndexType {
-    pub fn is_fulltext(self) -> bool {
-        matches!(self, IndexType::Fulltext)
-    }
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SortOrder {
     Asc,
     Desc,
@@ -337,15 +327,15 @@ impl AsRef<str> for SortOrder {
     }
 }
 
-/// A unique criteria is a set of fields through which a record can be uniquely identified.
+/// A unique criterion is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
-pub struct UniqueCriteria<'a> {
+pub struct UniqueCriterion<'a> {
     pub fields: Vec<&'a ScalarField>,
 }
 
-impl<'a> UniqueCriteria<'a> {
-    pub fn new(fields: Vec<&'a ScalarField>) -> UniqueCriteria<'a> {
-        UniqueCriteria { fields }
+impl<'a> UniqueCriterion<'a> {
+    pub fn new(fields: Vec<&'a ScalarField>) -> UniqueCriterion<'a> {
+        UniqueCriterion { fields }
     }
 }
 
@@ -362,6 +352,7 @@ impl Model {
             is_generated: false,
             is_commented_out: false,
             is_ignored: false,
+            is_view: false,
             schema: None,
         }
     }
@@ -464,36 +455,23 @@ impl Model {
         }
     }
 
-    /// optional unique fields are NOT considered a unique criteria
-    /// used for: A Model must have at least one STRICT unique criteria.
-    pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(false, false)
+    /// Optional unique fields are NOT considered a unique criterion.
+    ///
+    /// Used for: A Model must have at least one STRICT unique criteria.
+    pub fn strict_unique_criterias(&self) -> Vec<UniqueCriterion> {
+        self.unique_criterias(false)
     }
 
-    /// optional unique fields are NOT considered a unique criteria
-    /// used for: A Model must have at least one STRICT unique criteria.
-    /// Ignores unsupported, used for introspection to decide when to ignore
-    pub fn strict_unique_criterias_disregarding_unsupported(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(false, true)
+    /// Optional unique fields are considered a unique criterion
+    ///
+    /// Used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
+    pub fn loose_unique_criterias(&self) -> Vec<UniqueCriterion> {
+        self.unique_criterias(true)
     }
 
-    /// optional unique fields are considered a unique criteria
-    /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
-    pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(true, false)
-    }
-
-    /// returns the order of unique criterias ordered based on their precedence
-    fn unique_criterias(&self, allow_optional: bool, disregard_unsupported: bool) -> Vec<UniqueCriteria> {
+    /// Returns the order of unique criterias ordered based on their precedence
+    fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriterion> {
         let mut result = Vec::new();
-
-        let in_eligible = |field: &ScalarField| {
-            if disregard_unsupported {
-                field.is_commented_out || matches!(field.field_type, FieldType::Unsupported(_))
-            } else {
-                field.is_commented_out
-            }
-        };
 
         // first candidate: primary key
         {
@@ -525,16 +503,16 @@ impl Model {
                 if !id_fields.is_empty()
                     && !id_fields
                         .iter()
-                        .any(|f| in_eligible(f) || (f.is_optional() && !allow_optional))
+                        .any(|f| f.is_commented_out || (f.is_optional() && !allow_optional))
                 {
-                    result.push(UniqueCriteria::new(id_fields));
+                    result.push(UniqueCriterion::new(id_fields));
                 }
             }
         }
 
         // second candidate: any unique constraint where all fields are required
         {
-            let mut unique_field_combi: Vec<UniqueCriteria> = self
+            let mut unique_field_combi: Vec<UniqueCriterion> = self
                 .indices
                 .iter()
                 .filter(|id| id.is_unique())
@@ -547,10 +525,10 @@ impl Model {
                         .map(|f| &f.path.first().unwrap().0)
                         .map(|name| self.find_scalar_field(name).unwrap())
                         .collect();
-                    let no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
+                    let no_fields_are_ineligible = !fields.iter().any(|f| f.is_commented_out);
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
-                        .then(|| UniqueCriteria::new(fields))
+                        .then(|| UniqueCriterion::new(fields))
                 })
                 .collect();
 

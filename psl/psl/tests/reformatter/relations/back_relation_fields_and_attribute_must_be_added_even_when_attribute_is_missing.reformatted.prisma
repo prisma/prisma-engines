@@ -1,0 +1,10 @@
+model User {
+  id     Int  @id
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int
+}
+
+model Post {
+  id   Int    @id
+  User User[]
+}

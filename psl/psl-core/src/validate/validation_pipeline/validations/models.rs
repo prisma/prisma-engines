@@ -10,7 +10,7 @@ use crate::{
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
 
-/// A model must have either a primary key, or a unique criteria
+/// A model must have either a primary key, or a unique criterion
 /// with no optional, commented-out or unsupported fields.
 pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
     if model.is_ignored() {
@@ -33,8 +33,10 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
         })
         .peekable();
 
+    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
     let msg =
-        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.";
+        format!("Each {container_type} must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the {container_type}.");
 
     let msg = if loose_criterias.peek().is_some() {
         let suffix = format!(
@@ -49,6 +51,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
 
     ctx.push_error(DatamodelError::new_model_validation_error(
         msg.as_ref(),
+        container_type,
         model.name(),
         model.ast_model().span(),
     ))
@@ -222,9 +225,12 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
         return;
     };
 
+    let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
     if primary_key.mapped_name().is_some() && !ctx.connector.supports_named_primary_keys() {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
+            container_type,
             model.name(),
             model.ast_model().span(),
         ));
@@ -233,6 +239,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
     if primary_key.fields().len() > 1 && !ctx.connector.supports_compound_ids() {
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
+            container_type,
             model.name(),
             primary_key.ast_attribute().span,
         ));
@@ -240,7 +247,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
 }
 
 pub(super) fn connector_specific(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_model(model, ctx.diagnostics)
+    ctx.connector.validate_model(model, ctx.relation_mode, ctx.diagnostics)
 }
 
 pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
@@ -267,8 +274,11 @@ pub(super) fn id_client_name_does_not_clash_with_field(model: ModelWalker<'_>, c
 
     let id_client_name = id.fields().map(|f| f.name()).collect::<Vec<_>>().join("_");
     if model.scalar_fields().any(|f| f.name() == id_client_name) {
+        let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
         ctx.push_error(DatamodelError::new_model_validation_error(
             &format!("The field `{id_client_name}` clashes with the `@@id` attribute's name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \"custom_name\")`"),
+            container_type,
             model.name(),
             id.ast_attribute().span,
         ));
@@ -333,11 +343,12 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx
-        .db
-        .schema_flags()
-        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
-    {
+    let datasource = match ctx.datasource {
+        Some(datasource) => datasource,
+        None => return,
+    };
+
+    if datasource.schemas_span.is_none() {
         return;
     }
 
@@ -349,8 +360,12 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    ctx.push_error(DatamodelError::new_static(
-        "This model is missing an `@@schema` attribute.",
+    let container = if model.ast_model().is_view() { "view" } else { "model" };
+
+    ctx.push_error(DatamodelError::new_model_validation_error(
+        &format!("This {container} is missing an `@@schema` attribute."),
+        container,
+        model.name(),
         model.ast_model().span(),
     ))
 }
@@ -359,7 +374,7 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     // (schema_name, model_database_name) -> ModelId
     let mut database_names: HashMap<(Option<&str>, &str), ast::ModelId> = HashMap::with_capacity(ctx.db.models_count());
 
-    for model in ctx.db.walk_models() {
+    for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
         let key = (model.schema().map(|(name, _)| name), model.database_name());
         match database_names.insert(key, model.model_id()) {
             // Two branches because we want to put the error on the @@map attribute, and it can be

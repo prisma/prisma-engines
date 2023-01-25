@@ -1,0 +1,24 @@
+datasource db {
+  provider = "mongodb"
+  url = "mongodb://"
+}
+
+model Parent {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  childId String @unique
+  child   Child? @relation(fields: [childId], references: [parentId])
+}
+
+model Child {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  parentId String  @unique @db.ObjectId
+  parent   Parent?
+}
+// [1;93mwarning[0m: [1mWarning validating field `child` in model `Parent`: Field Parent.childId and Child.parentId must have the same native type for MongoDB to join those collections correctly. Consider either removing Child.parentId's native type attribute or adding '@db.ObjectId' to Parent.childId. Beware that this will become an error in the future.[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m
+// [1;94m 9 | [0m  [1;93mchildId String @unique[0m
+// [1;94m10 | [0m  child   Child? @relation(fields: [childId], references: [parentId])
+// [1;94m   | [0m

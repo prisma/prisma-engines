@@ -27,6 +27,7 @@ CREATE UNIQUE INDEX `_Frenemyship_AB_unique` ON `_Frenemyship`(`A`, `B`);
 CREATE INDEX `_Frenemyship_B_index` ON `_Frenemyship`(`B`);
 
 
+
 /*
 generator client {
   provider = "prisma-client-js"
@@ -38,10 +39,10 @@ datasource db {
 }
 
 model User {
-  id     Int    @id @default(autoincrement())
-  User_A User[] @relation("Frenemyship")
-  User_B User[] @relation("Frenemyship")
-  User_A User[] @relation("Friendship")
-  User_B User[] @relation("Friendship")
+  id                 Int    @id @default(autoincrement())
+  User_Frenemyship_A User[] @relation("Frenemyship")
+  User_Frenemyship_B User[] @relation("Frenemyship")
+  User_Friendship_A  User[] @relation("Friendship")
+  User_Friendship_B  User[] @relation("Friendship")
 }
 */

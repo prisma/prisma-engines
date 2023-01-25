@@ -70,7 +70,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Sqlite))]
-async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_field_names(api: &TestApi) -> TestResult {
     // We do not have enough information to correctly assign which field should point to column A in the
     // join table and which one to B
     // Upon table creation this is dependant on lexicographic order of the names of the fields, but we
@@ -104,8 +104,8 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
     let expectation = expect![[r#"
         model User {
           id     Int    @id @default(autoincrement())
-          User_B User[] @relation("FollowRelation")
           User_A User[] @relation("FollowRelation")
+          User_B User[] @relation("FollowRelation")
         }
     "#]];
 

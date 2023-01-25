@@ -1,10 +1,12 @@
 //! Prisma read query AST
 use super::FilteredQuery;
+use crate::ToGraphviz;
 use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use enumflags2::BitFlags;
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
 pub enum ReadQuery {
     RecordQuery(RecordQuery),
@@ -14,15 +16,6 @@ pub enum ReadQuery {
 }
 
 impl ReadQuery {
-    pub fn name(&self) -> &str {
-        match self {
-            ReadQuery::RecordQuery(x) => &x.name,
-            ReadQuery::ManyRecordsQuery(x) => &x.name,
-            ReadQuery::RelatedRecordsQuery(x) => &x.name,
-            ReadQuery::AggregateRecordsQuery(x) => &x.name,
-        }
-    }
-
     /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         match self {
@@ -72,17 +65,42 @@ impl Display for ReadQuery {
             Self::ManyRecordsQuery(q) => write!(
                 f,
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:?})"#,
-                q.name, q.model.name, q.selected_fields, q.args
+                q.name,
+                q.model.name(),
+                q.selected_fields,
+                q.args
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
-                q.parent_field.model().name,
-                q.parent_field.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
+        }
+    }
+}
+
+impl ToGraphviz for ReadQuery {
+    fn to_graphviz(&self) -> String {
+        match self {
+            Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.selected_fields),
+            Self::ManyRecordsQuery(q) => format!(
+                r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {})"#,
+                q.name,
+                q.model.name(),
+                q.selected_fields
+            ),
+            Self::RelatedRecordsQuery(q) => format!(
+                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
+                q.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
+                q.selected_fields
+            ),
+            Self::AggregateRecordsQuery(q) => format!("AggregateRecordsQuery: {}", q.name),
         }
     }
 }

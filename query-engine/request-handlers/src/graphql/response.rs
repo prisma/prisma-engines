@@ -38,6 +38,10 @@ impl GQLError {
     pub fn message(&self) -> &str {
         self.user_facing_error.message()
     }
+
+    pub fn batch_request_idx(&self) -> Option<usize> {
+        self.user_facing_error.batch_request_idx()
+    }
 }
 
 impl GQLResponse {
@@ -145,7 +149,9 @@ impl GQLBatchResponse {
     }
 
     pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
-        self.errors.iter()
+        self.errors
+            .iter()
+            .chain(self.batch_result.iter().flat_map(|res| res.errors()))
     }
 }
 

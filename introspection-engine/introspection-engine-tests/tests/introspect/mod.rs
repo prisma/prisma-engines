@@ -30,6 +30,7 @@ fn introspect_force_with_invalid_schema() {
         schema,
         true,
         Default::default(),
+        None,
     ))
     .unwrap()
     .datamodel
@@ -80,6 +81,7 @@ fn introspect_no_force_with_invalid_schema() {
         schema,
         false,
         Default::default(),
+        None,
     ))
     .unwrap_err()
     .data

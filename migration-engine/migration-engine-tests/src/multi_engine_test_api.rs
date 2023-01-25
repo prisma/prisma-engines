@@ -105,7 +105,7 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn datasource_block(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(self.args.database_url(), &[])
+        self.args.datasource_block(self.args.database_url(), &[], &[])
     }
 
     /// Returns true only when testing on MSSQL.
@@ -202,6 +202,7 @@ impl TestApi {
             connector,
             connection_info,
             tags: self.args.tags(),
+            namespaces: self.args.namespaces(),
         }
     }
 
@@ -227,7 +228,12 @@ impl TestApi {
 
     /// Render a valid datasource block, including database URL.
     pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        write!(out, "{}", self.args.datasource_block(self.args.database_url(), &[])).unwrap()
+        write!(
+            out,
+            "{}",
+            self.args.datasource_block(self.args.database_url(), &[], &[])
+        )
+        .unwrap()
     }
 
     /// Currently enabled preview features.
@@ -265,12 +271,19 @@ pub struct EngineTestApi {
     pub(crate) connector: SqlMigrationConnector,
     connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
+    namespaces: &'static [&'static str],
 }
 
 impl EngineTestApi {
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&mut self.connector, migrations_directory)
+        let mut namespaces = vec![self.connection_info.schema_name().to_string()];
+
+        for namespace in self.namespaces {
+            namespaces.push(namespace.to_string());
+        }
+
+        ApplyMigrations::new(&mut self.connector, migrations_directory, namespaces)
     }
 
     /// Plan a `createMigration` command

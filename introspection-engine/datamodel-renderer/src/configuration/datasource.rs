@@ -1,7 +1,7 @@
 use crate::value::{Array, Documentation, Env, Text, Value};
 use core::fmt;
 use psl::datamodel_connector::RelationMode;
-use std::default::Default;
+use std::{borrow::Cow, default::Default};
 
 /// The datasource block in a PSL file.
 #[derive(Debug)]
@@ -9,11 +9,12 @@ pub struct Datasource<'a> {
     name: &'a str,
     provider: Text<&'a str>,
     url: Env<'a>,
+    direct_url: Option<Env<'a>>,
     shadow_database_url: Option<Env<'a>>,
     relation_mode: Option<RelationMode>,
     custom_properties: Vec<(&'a str, Value<'a>)>,
     documentation: Option<Documentation<'a>>,
-    namespaces: Array<Text<&'a str>>,
+    namespaces: Array<Text<Cow<'a, str>>>,
 }
 
 impl<'a> Datasource<'a> {
@@ -33,6 +34,7 @@ impl<'a> Datasource<'a> {
             name,
             provider: Text(provider),
             url: url.into(),
+            direct_url: None,
             shadow_database_url: None,
             relation_mode: None,
             custom_properties: Default::default(),
@@ -99,22 +101,36 @@ impl<'a> Datasource<'a> {
     ///   url      = env("DATABASE_URL")
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Create a rendering from a PSL datasource.
-    pub fn from_psl(psl_ds: &'a psl::Datasource) -> Self {
+    pub fn from_psl(psl_ds: &'a psl::Datasource, force_namespaces: Option<&'a [String]>) -> Self {
         let shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, _)| Env::from(url));
-        let namespaces: Vec<Text<_>> = psl_ds.namespaces.iter().map(|(ns, _)| Text(ns.as_str())).collect();
+
+        let namespaces: Vec<Text<_>> = match force_namespaces {
+            Some(namespaces) => namespaces
+                .iter()
+                .map(AsRef::as_ref)
+                .map(Cow::Borrowed)
+                .map(Text)
+                .collect(),
+            None => psl_ds
+                .namespaces
+                .iter()
+                .map(|(ns, _)| Text(Cow::Owned(ns.clone())))
+                .collect(),
+        };
 
         Self {
             name: &psl_ds.name,
             provider: Text(&psl_ds.provider),
             url: Env::from(&psl_ds.url),
+            direct_url: psl_ds.direct_url.as_ref().map(Env::from),
             shadow_database_url,
             relation_mode: psl_ds.relation_mode,
-            documentation: psl_ds.documentation.as_deref().map(Documentation),
+            documentation: psl_ds.documentation.as_deref().map(Cow::Borrowed).map(Documentation),
             custom_properties: Default::default(),
             namespaces: Array::from(namespaces),
         }
@@ -130,6 +146,9 @@ impl<'a> fmt::Display for Datasource<'a> {
         writeln!(f, "datasource {} {{", self.name)?;
         writeln!(f, "provider = {}", self.provider)?;
         writeln!(f, "url = {}", self.url)?;
+        if let Some(direct_url) = self.direct_url {
+            writeln!(f, "directUrl = {}", direct_url)?;
+        }
 
         if let Some(url) = self.shadow_database_url {
             writeln!(f, "shadowDatabaseUrl = {}", url)?;
@@ -169,7 +188,11 @@ mod tests {
 
         let mut extensions = Array::new();
         extensions.push(Function::new("postgis"));
-        extensions.push(Function::new("uuid-ossp"));
+        {
+            let mut ext = Function::new("uuid_ossp");
+            ext.push_param(("map", Text::new("uuid-ossp")));
+            extensions.push(ext);
+        }
 
         datasource.push_custom_property("extensions", extensions);
 

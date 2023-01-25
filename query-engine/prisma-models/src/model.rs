@@ -10,7 +10,7 @@ pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
 pub struct Model {
-    pub name: String,
+    pub(crate) name: String,
     pub(crate) manifestation: Option<String>,
     pub(crate) fields: OnceCell<Fields>,
     pub(crate) indexes: OnceCell<Vec<Index>>,
@@ -22,20 +22,14 @@ pub struct Model {
 }
 
 impl Model {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// Returns the schema name for the model
     /// which is the contents of the @@schema("...") attribute
     pub fn schema_name(&self) -> Option<String> {
         self.dml_model.schema.clone()
-    }
-
-    pub fn db_name_with_schema(&self) -> (String, String) {
-        let schema_prefix = self
-            .schema_name()
-            .unwrap_or_else(|| self.internal_data_model().db_name.clone());
-
-        let model_db_name = self.db_name().to_string();
-
-        (schema_prefix, model_db_name)
     }
 
     pub(crate) fn finalize(&self) {

@@ -25,7 +25,7 @@ pub fn nested_set(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-            extract_unique_filter(value, &child_model)
+            extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
@@ -101,8 +101,8 @@ fn handle_many_to_many(
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Edge from parent to disconnect
     graph.create_edge(
@@ -278,8 +278,8 @@ fn handle_one_to_many(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
     graph.create_edge(&connect_if_node, &update_connect_node, QueryGraphDependency::Then)?;

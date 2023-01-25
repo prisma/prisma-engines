@@ -1,7 +1,10 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
-pub use migration_core::json_rpc::types::{
-    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+pub use migration_core::{
+    json_rpc::types::{
+        DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+    },
+    migration_connector::Namespaces,
 };
 pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
@@ -10,10 +13,10 @@ use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use migration_core::{
     commands::diff,
     migration_connector::{
-        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence, Namespaces,
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
     },
 };
-use psl::{parser_database::SourceFile, PreviewFeature};
+use psl::parser_database::SourceFile;
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -61,7 +64,14 @@ impl TestApi {
 
     /// Plan an `applyMigrations` command
     pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
-        ApplyMigrations::new(&mut self.connector, migrations_directory)
+        let search_path = self.root.admin_conn.connection_info().schema_name();
+        let mut namespaces = vec![search_path.to_string()];
+
+        for namespace in self.root.args.namespaces() {
+            namespaces.push(namespace.to_string());
+        }
+
+        ApplyMigrations::new(&mut self.connector, migrations_directory, namespaces)
     }
 
     pub fn connection_string(&self) -> &str {
@@ -235,7 +245,9 @@ impl TestApi {
     }
 
     pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
-        self.root.args.datasource_block(self.root.connection_string(), params)
+        self.root
+            .args
+            .datasource_block(self.root.connection_string(), params, &[])
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
@@ -319,28 +331,29 @@ impl TestApi {
     }
 
     /// Render a valid datasource block, including database URL.
-    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
-        let no_foreign_keys = self.is_vitess()
-            && self
-                .root
-                .preview_features()
-                .contains(PreviewFeature::ReferentialIntegrity);
+    pub fn write_datasource_block(
+        &self,
+        out: &mut dyn std::fmt::Write,
+        params: &[(&str, &str)],
+        preview_features: &'static [&'static str],
+    ) {
+        let no_foreign_keys = self.is_vitess();
 
-        let params = if no_foreign_keys {
+        let used_params = if no_foreign_keys && params.is_empty() {
             vec![("relationMode", r#""prisma""#)]
         } else {
-            Vec::new()
+            params.to_vec()
         };
 
-        write!(
-            out,
-            "{}",
-            self.root.args.datasource_block(self.root.args.database_url(), &params)
-        )
-        .unwrap()
+        let ds_block = self
+            .root
+            .args
+            .datasource_block(self.root.args.database_url(), &used_params, preview_features);
+
+        write!(out, "{}", ds_block).unwrap()
     }
 
-    fn generator_block(&self) -> String {
+    pub fn generator_block(&self) -> String {
         let preview_feature_string = if self.root.preview_features().is_empty() {
             "".to_string()
         } else {
@@ -366,7 +379,23 @@ impl TestApi {
     pub fn datamodel_with_provider(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        self.write_datasource_block(&mut out);
+        self.write_datasource_block(&mut out, &[], &[]);
+        out.push('\n');
+        out.push_str(&self.generator_block());
+        out.push_str(schema);
+
+        out
+    }
+
+    pub fn datamodel_with_provider_and_features(
+        &self,
+        schema: &str,
+        params: &[(&str, &str)],
+        preview_features: &'static [&'static str],
+    ) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out, params, preview_features);
         out.push('\n');
         out.push_str(&self.generator_block());
         out.push_str(schema);

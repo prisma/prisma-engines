@@ -55,6 +55,10 @@ impl MysqlFlavour {
         self.circumstances().contains(Circumstances::LowerCasesTableNames)
     }
 
+    pub(crate) fn database_name(&self) -> &str {
+        self.state.params().map(|p| p.url.dbname()).unwrap_or("mysql")
+    }
+
     fn circumstances(&self) -> BitFlags<Circumstances> {
         match self.state {
             super::State::Initial | super::State::WithParams(_) => Default::default(),
@@ -97,6 +101,39 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let select = r#"
+                SELECT DISTINCT BINARY table_info.table_name AS table_name
+                FROM information_schema.tables AS table_info
+                JOIN information_schema.columns AS column_info
+                    ON BINARY column_info.table_name = BINARY table_info.table_name
+                WHERE
+                    table_info.table_schema = ?
+                    AND column_info.table_schema = ?
+                    -- Exclude views.
+                    AND table_info.table_type = 'BASE TABLE'
+                ORDER BY BINARY table_info.table_name
+            "#;
+
+            let database_name = self.database_name();
+
+            let rows = self
+                .query_raw(
+                    select,
+                    &[database_name.to_string().into(), database_name.to_string().into()],
+                )
+                .await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
+        })
+    }
+
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -136,6 +173,21 @@ impl SqlFlavour for MysqlFlavour {
             })
         } else {
             None
+        }
+    }
+
+    fn check_schema_features(&self, schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
+        let has_namespaces = schema
+            .configuration
+            .datasources
+            .first()
+            .map(|ds| !ds.namespaces.is_empty());
+        if let Some(true) = has_namespaces {
+            Err(ConnectorError::from_msg(
+                "multiSchema migrations and introspection are not implemented on MySQL yet".to_owned(),
+            ))
+        } else {
+            Ok(())
         }
     }
 
@@ -231,7 +283,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, circumstances, connection| async move {
             if circumstances.contains(Circumstances::IsVitess) {
                 return Err(ConnectorError::from_msg(
@@ -307,7 +359,7 @@ impl SqlFlavour for MysqlFlavour {
                 shadow_database.ensure_connection_validity().await?;
 
                 tracing::info!("Connecting to user-provided shadow database.");
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(None).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces).await?;
                 }
 

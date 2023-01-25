@@ -1,0 +1,38 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url = "mysql://"
+    relationMode = "prisma"
+}
+
+model A {
+    id Int @id
+    bs B[]
+}
+
+model B {
+    id Int   @id
+    aId Int? @default(3)
+    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, onDelete: SetDefault)
+}
+// [1;93mwarning[0m: [1mWith `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes" [0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m    aId Int? @default(3)
+// [1;94m19 | [0m    a   A?   [1;93m@relation(fields: [aId], references: [id], onUpdate: SetDefault, onDelete: SetDefault)[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m    aId Int? @default(3)
+// [1;94m19 | [0m    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, [1;91monDelete: SetDefault[0m)
+// [1;94m   | [0m
+// [1;91merror[0m: [1mError validating: Invalid referential action: `SetDefault`. Allowed values: (`Cascade`, `Restrict`, `NoAction`, `SetNull`)[0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m    aId Int? @default(3)
+// [1;94m19 | [0m    a   A?   @relation(fields: [aId], references: [id], [1;91monUpdate: SetDefault[0m, onDelete: SetDefault)
+// [1;94m   | [0m

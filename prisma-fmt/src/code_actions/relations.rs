@@ -1,9 +1,11 @@
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, TextEdit, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
+    walkers::{CompleteInlineRelationWalker, RelationFieldWalker},
 };
 use std::collections::HashMap;
+
+use super::format_attribute;
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -65,7 +67,13 @@ pub(super) fn add_referencing_side_unique(
         _ => (),
     }
 
-    let text = create_missing_unique(schema, relation.referencing_model(), relation.referencing_fields());
+    let attribute_name = "unique";
+    let text = super::create_missing_attribute(
+        schema,
+        relation.referencing_model(),
+        relation.referencing_fields(),
+        attribute_name,
+    );
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -151,7 +159,13 @@ pub(super) fn add_referenced_side_unique(
         _ => (),
     }
 
-    let text = create_missing_unique(schema, relation.referenced_model(), relation.referenced_fields());
+    let attribute_name = "unique";
+    let text = super::create_missing_attribute(
+        schema,
+        relation.referenced_model(),
+        relation.referenced_fields(),
+        attribute_name,
+    );
 
     let mut changes = HashMap::new();
     changes.insert(params.text_document.uri.clone(), vec![text]);
@@ -180,44 +194,116 @@ pub(super) fn add_referenced_side_unique(
     actions.push(CodeActionOrCommand::CodeAction(action));
 }
 
-fn create_missing_unique<'a>(
+/// For schema's with emulated relations,
+/// If the referenced side of the relation does not point to a unique
+/// constraint, the action adds the attribute.
+///
+/// If referencing a single field:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId], references: [id])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId     Int
+///
+///     // <- suggest @@index([bId]) here
+/// }
+///
+/// model B {
+///     id Int @id
+///     as A[]
+/// }
+/// ```
+///
+/// If referencing multiple fields:
+///
+/// ```ignore
+/// model A {
+///     id      Int @id
+///     field1  B   @relation(fields: [bId1, bId2, bId3], references: [id1, id2, id3])
+///                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // Warn
+///     bId1    Int
+///     bId2    Int
+///     bId3    Int
+///
+///     // <- suggest @@index([bId1, bId2, bId3]) here
+/// }
+///
+/// model B {
+///     id1 Int
+///     id2 Int
+///     id3 Int
+///     as  A[]
+///
+///     @@id([id1, id2, id3])
+/// }
+/// ```
+pub(super) fn add_index_for_relation_fields(
+    actions: &mut Vec<CodeActionOrCommand>,
+    params: &CodeActionParams,
     schema: &str,
-    model: ModelWalker<'a>,
-    mut fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'a>> + 'a,
-) -> TextEdit {
-    let (new_text, range) = if fields.len() == 1 {
-        let new_text = String::from(" @unique");
+    relation: RelationFieldWalker<'_>,
+) {
+    let fields = match relation.fields() {
+        Some(fields) => fields,
+        None => return,
+    };
+    if relation.model().indexes().any(|index| {
+        index
+            .fields()
+            .zip(fields.clone())
+            .all(|(index_field, relation_field)| index_field.field_id() == relation_field.field_id())
+    }) {
+        return;
+    }
 
-        let field = fields.next().unwrap();
-        let position = crate::position_after_span(field.ast_field().span(), schema);
+    let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
 
-        let range = Range {
-            start: position,
-            end: position,
-        };
+    let attribute_name = "index";
+    let attribute = format!("{attribute_name}([{fields}])");
+    let formatted_attribute = format_attribute(
+        &attribute,
+        relation.model().indentation(),
+        relation.model().newline(),
+        &relation.model().ast_model().attributes,
+    );
 
-        (new_text, range)
-    } else {
-        let fields = fields.map(|f| f.name()).collect::<Vec<_>>().join(", ");
-
-        let indentation = model.indentation();
-        let newline = model.newline();
-
-        let separator = if model.ast_model().attributes.is_empty() {
-            newline.as_ref()
-        } else {
-            ""
-        };
-
-        let new_text = format!("{separator}{indentation}@@unique([{fields}]){newline}}}");
-
-        let start = crate::offset_to_position(model.ast_model().span().end - 1, schema).unwrap();
-        let end = crate::offset_to_position(model.ast_model().span().end, schema).unwrap();
-
-        let range = Range { start, end };
-
-        (new_text, range)
+    let range = super::span_to_range(schema, relation.model().ast_model().span());
+    let text = TextEdit {
+        range,
+        new_text: formatted_attribute,
     };
 
-    TextEdit { range, new_text }
+    let mut changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), vec![text]);
+
+    let edit = WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    };
+
+    let span_diagnostics = match super::diagnostics_for_span(
+        schema,
+        &params.context.diagnostics,
+        relation.relation_attribute().unwrap().span(),
+    ) {
+        Some(sd) => sd,
+        None => return,
+    };
+
+    let diagnostics = match super::filter_diagnostics(span_diagnostics, "relationMode = \"prisma\"") {
+        Some(value) => value,
+        None => return,
+    };
+
+    let action = CodeAction {
+        title: String::from("Add an index for the relation's field(s)"),
+        kind: Some(CodeActionKind::QUICKFIX),
+        edit: Some(edit),
+        diagnostics: Some(diagnostics),
+        ..Default::default()
+    };
+
+    actions.push(CodeActionOrCommand::CodeAction(action))
 }

@@ -29,6 +29,9 @@ pub trait RunnerInterface: Sized {
         isolation_level: Option<String>,
     ) -> TestResult<QueryResult>;
 
+    /// Execute a raw query on the underlying connected database.
+    async fn raw_execute(&self, query: String) -> TestResult<()>;
+
     /// start a transaction for a batch run
     async fn start_tx(
         &self,
@@ -112,6 +115,20 @@ impl Runner {
         }
 
         Ok(response)
+    }
+
+    pub async fn raw_execute<T>(&self, sql: T) -> TestResult<()>
+    where
+        T: Into<String>,
+    {
+        let sql = sql.into();
+        tracing::debug!("Raw execute: {}", sql.clone().green());
+
+        match &self.inner {
+            RunnerType::Direct(r) => r.raw_execute(sql).await,
+            RunnerType::Binary(r) => r.raw_execute(sql).await,
+            RunnerType::NodeApi(_) => todo!(),
+        }
     }
 
     pub async fn start_tx(

@@ -405,7 +405,47 @@ fn new_lines_in_source_must_work() {
             "url": {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
-            }
+            },
+            "schemas": []
+          }
+        ]"#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn multischema_must_work() {
+    let schema = indoc! {r#"
+      generator client {
+        provider        = "prisma-client-js"
+        previewFeatures = ["multiSchema"]
+      }
+
+      datasource ds {
+        provider = "postgresql"
+        url = "postgresql://localhost"
+        schemas = ["transactional", "public"]
+      }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = psl::render_sources_to_json(&config.datasources);
+
+    // schemas are sorted in ascending order
+    let expected = expect![[r#"
+        [
+          {
+            "name": "ds",
+            "provider": "postgresql",
+            "activeProvider": "postgresql",
+            "url": {
+              "fromEnvVar": null,
+              "value": "postgresql://localhost"
+            },
+            "schemas": [
+              "public",
+              "transactional"
+            ]
           }
         ]"#]];
 
@@ -586,7 +626,7 @@ fn fail_when_no_source_is_declared() {
 }
 
 #[test]
-fn referential_integrity_without_preview_feature_errors() {
+fn referential_integrity_works() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
@@ -596,83 +636,6 @@ fn referential_integrity_without_preview_feature_errors() {
 
         generator client {
           provider = "prisma-client-js"
-        }
-    "#};
-
-    let error = parse_config(schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `ps`: 
-        This option can only be set if the preview feature is enabled in a generator block.
-
-        Example:
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
-        }
-        [0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  [1;91mreferentialIntegrity = "prisma"[0m
-        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn relation_mode_without_preview_feature_errors() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          relationMode = "prisma"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-        }
-    "#};
-
-    let error = parse_config(schema).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `ps`: 
-        This option can only be set if the preview feature is enabled in a generator block.
-
-        Example:
-
-        generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["referentialIntegrity"]
-        }
-        [0m
-          [1;94m-->[0m  [4mschema.prisma:3[0m
-        [1;94m   | [0m
-        [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  [1;91mrelationMode = "prisma"[0m
-        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
-fn referential_integrity_with_preview_feature_works() {
-    let schema = indoc! {r#"
-        datasource ps {
-          provider = "sqlserver"
-          referentialIntegrity = "prisma"
-          url = "mysql://root:prisma@localhost:3306/mydb"
-        }
-
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -682,7 +645,7 @@ fn referential_integrity_with_preview_feature_works() {
 }
 
 #[test]
-fn relation_mode_with_preview_feature_works() {
+fn relation_mode_works() {
     let schema = indoc! {r#"
         datasource ps {
           provider = "sqlserver"
@@ -692,7 +655,6 @@ fn relation_mode_with_preview_feature_works() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -711,7 +673,6 @@ fn relation_mode_default() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
         }
     "#};
 
@@ -720,36 +681,94 @@ fn relation_mode_default() {
     assert_eq!(config.relation_mode(), Some(RelationMode::ForeignKeys));
 }
 
+fn load_env_var(key: &str) -> Option<String> {
+    std::env::var(key).ok()
+}
+
 #[test]
-fn relation_mode_and_referential_integrity_cannot_cooccur() {
-    let schema = indoc! {r#"
-        datasource ps {
+fn must_error_for_empty_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
           provider = "sqlite"
-          url = "sqlite"
-          relationMode = "prisma"
-          referentialIntegrity = "foreignKeys"
-        }
-        generator client {
-          provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          directUrl = ""
+          url = "file://hostfoo"
         }
     "#};
 
-    let config = parse_config(schema);
-    let error = config.unwrap_err();
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.[0m
-          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 4 | [0m  relationMode = "prisma"
-        [1;94m 5 | [0m  [1;91mreferentialIntegrity = "foreignKeys"[0m
-        [1;94m 6 | [0m}
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91m""[0m
         [1;94m   | [0m
     "#]];
-    expectation.assert_eq(&error);
+
+    expectation.assert_eq(&error)
 }
 
-fn load_env_var(key: &str) -> Option<String> {
-    std::env::var(key).ok()
+#[test]
+fn must_error_for_empty_env_direct_urls() {
+    std::env::set_var("DB_DIRECT_URL_EMPTY_0001", "  ");
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("DB_DIRECT_URL_EMPTY_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL. The environment variable `DB_DIRECT_URL_EMPTY_0001` resolved to an empty string.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("DB_DIRECT_URL_EMPTY_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_for_missing_env_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("MISSING_DIRECT_ENV_VAR_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mEnvironment variable not found: MISSING_DIRECT_ENV_VAR_0001.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("MISSING_DIRECT_ENV_VAR_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
 }

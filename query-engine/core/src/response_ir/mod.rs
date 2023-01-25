@@ -12,11 +12,10 @@ mod internal;
 mod ir_serializer;
 mod response;
 
-use crate::QueryValue;
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
-use std::{fmt, sync::Arc};
+use std::{collections::HashMap, fmt, sync::Arc};
 
 pub use ir_serializer::*;
 pub use response::*;
@@ -44,16 +43,14 @@ impl List {
         self.len() == 0
     }
 
-    pub fn index_by(self, keys: &[String]) -> Vec<(Vec<QueryValue>, Map)> {
-        let mut map = Vec::with_capacity(self.len());
+    pub fn index_by(self, keys: &[String]) -> Vec<(HashMap<String, PrismaValue>, Map)> {
+        let mut map: Vec<(HashMap<String, PrismaValue>, Map)> = Vec::with_capacity(self.len());
 
         for item in self.into_iter() {
             let inner = item.into_map().unwrap();
-
-            let key: Vec<QueryValue> = keys
+            let key: HashMap<String, PrismaValue> = keys
                 .iter()
-                .map(|key| inner.get(key).unwrap().clone().into_value().unwrap())
-                .map(QueryValue::from)
+                .map(|key| (key.clone(), inner.get(key).unwrap().clone().into_value().unwrap()))
                 .collect();
 
             map.push((key, inner));

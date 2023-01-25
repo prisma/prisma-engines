@@ -1,0 +1,22 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["A", "B"]
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views", "multiSchema"]
+}
+
+model A {
+  id Int @id
+
+  @@schema("B")
+}
+
+view Mountain {
+  id Int @unique
+
+  @@schema("A")
+}

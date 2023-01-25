@@ -1,7 +1,10 @@
 use super::*;
 use fmt::Debug;
-use prisma_models::{psl::PreviewFeature, InternalDataModelRef, ModelRef};
-use psl::datamodel_connector::{ConnectorCapability, RelationMode};
+use prisma_models::{InternalDataModelRef, ModelRef};
+use psl::{
+    datamodel_connector::{ConnectorCapability, RelationMode},
+    PreviewFeatures,
+};
 use std::{borrow::Borrow, fmt};
 
 /// The query schema.
@@ -48,18 +51,14 @@ pub struct ConnectorContext {
     pub capabilities: Vec<ConnectorCapability>,
 
     /// Enabled preview features.
-    pub features: Vec<PreviewFeature>,
+    pub features: PreviewFeatures,
 
     /// Relation mode of the provider
     pub relation_mode: RelationMode,
 }
 
 impl ConnectorContext {
-    pub fn new(
-        capabilities: Vec<ConnectorCapability>,
-        features: Vec<PreviewFeature>,
-        relation_mode: RelationMode,
-    ) -> Self {
+    pub fn new(capabilities: Vec<ConnectorCapability>, features: PreviewFeatures, relation_mode: RelationMode) -> Self {
         Self {
             capabilities,
             features,
@@ -82,9 +81,9 @@ impl QuerySchema {
         _enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
-        features: Vec<PreviewFeature>,
-        relation_mode: RelationMode,
     ) -> Self {
+        let features = internal_data_model.schema.configuration.preview_features();
+        let relation_mode = internal_data_model.schema.relation_mode();
         QuerySchema {
             query,
             mutation,
@@ -160,7 +159,10 @@ pub enum QueryTag {
     Aggregate,
     GroupBy,
     ExecuteRaw,
-    QueryRaw { query_type: Option<String> },
+    QueryRaw,
+    RunCommandRaw,
+    FindRaw,
+    AggregateRaw,
 }
 
 impl fmt::Display for QueryTag {
@@ -181,7 +183,10 @@ impl fmt::Display for QueryTag {
             Self::Aggregate => "aggregate",
             Self::GroupBy => "groupBy",
             Self::ExecuteRaw => "executeRaw",
-            Self::QueryRaw { query_type: _ } => "queryRaw",
+            Self::QueryRaw => "queryRaw",
+            Self::RunCommandRaw => "runCommandRaw",
+            Self::FindRaw => "findRaw",
+            Self::AggregateRaw => "aggregateRaw",
         };
 
         write!(f, "{}", s)

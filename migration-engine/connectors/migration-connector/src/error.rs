@@ -105,6 +105,18 @@ impl ConnectorError {
         }))
     }
 
+    /// Turn the error into a nested, user-facing IntrospectionResultEmpty error.
+    pub fn into_introspection_result_empty_error() -> Self {
+        let user_facing_error = user_facing_errors::introspection_engine::IntrospectionResultEmpty;
+
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            user_facing_error: Some(KnownError::new(user_facing_error)),
+            source: None,
+            message: None,
+            context: SpanTrace::capture(),
+        }))
+    }
+
     /// Turn the error into a nested, user-facing MigrationDoesNotApplyCleanly error.
     pub fn into_migration_does_not_apply_cleanly(self, migration_name: String) -> Self {
         let context = self.0.context.clone();

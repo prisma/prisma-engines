@@ -101,10 +101,10 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, TableName(None, Quoted::sqlite_ident(table.name())))
+        self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::sqlite_ident(table.name())))
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         let mut create_table = sql_ddl::sqlite::CreateTable {
             table_name: &table_name,
             columns: table.columns().map(|col| render_column(&col)).collect(),
@@ -193,7 +193,7 @@ impl SqlRenderer for SqliteFlavour {
 
             result.push(self.render_create_table_as(
                 tables.next,
-                TableName(None, Quoted::sqlite_ident(&temporary_table_name)),
+                QuotedWithPrefix(None, Quoted::sqlite_ident(&temporary_table_name)),
             ));
 
             copy_current_table_into_new_table(&mut result, redefine_table, tables, &temporary_table_name);
@@ -217,7 +217,7 @@ impl SqlRenderer for SqliteFlavour {
         result
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
         format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
     }
 
@@ -287,8 +287,13 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.previous.name()),
-                default_value =
-                    render_default(columns.next.default().expect("default on required column with default"),)
+                default_value = render_default(
+                    columns
+                        .next
+                        .default()
+                        .expect("default on required column with default")
+                        .inner()
+                )
             )
         } else {
             Quoted::sqlite_ident(columns.previous.name()).to_string()
@@ -317,6 +322,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
                     DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None)
                 )
             })
+            .map(|d| d.inner())
             .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),

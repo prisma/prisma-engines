@@ -70,6 +70,7 @@ pub(crate) fn parse_composite_type(
             }
             Rule::field_declaration => match parse_field(
                 &name.as_ref().unwrap().name,
+                "type",
                 current,
                 pending_field_comment.take(),
                 diagnostics,

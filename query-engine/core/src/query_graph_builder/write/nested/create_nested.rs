@@ -69,7 +69,7 @@ fn handle_many_to_many(
     // Todo optimize with createMany
     for create_node in create_nodes {
         graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder)?;
-        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+        connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
     }
 
     Ok(())
@@ -144,9 +144,9 @@ fn handle_one_to_many(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
-        let child_model_name = parent_relation_field.related_model().name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
 
         // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
         graph.create_edge(
@@ -173,9 +173,9 @@ fn handle_one_to_many(
             let parent_link = parent_relation_field.linking_fields();
             let child_link = parent_relation_field.related_field().linking_fields();
 
-            let relation_name = parent_relation_field.relation().name.clone();
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
+            let relation_name = parent_relation_field.relation().name().to_owned();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
 
             graph.create_edge(
                 &parent_node,
@@ -337,9 +337,9 @@ fn handle_one_to_one(
         )
     };
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = extractor_model.name.clone();
-    let child_model_name = assimilator_model.name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = extractor_model.name().to_owned();
+    let child_model_name = assimilator_model.name().to_owned();
 
     graph.create_edge(
         &parent_node,
@@ -367,9 +367,9 @@ fn handle_one_to_one(
     // For explanation see end of doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_model.name.clone();
-        let child_model_name = parent_relation_field.related_model().name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_model.name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
         let parent_link = parent_relation_field.linking_fields();
 
@@ -394,8 +394,8 @@ fn handle_one_to_one(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
 
         graph.create_edge(
             &parent_node,
@@ -460,9 +460,9 @@ pub fn nested_create_many(
     let linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
-    let child_model_name = child_model.name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = child_model.name().to_owned();
 
     graph.create_edge(
         &parent_node,

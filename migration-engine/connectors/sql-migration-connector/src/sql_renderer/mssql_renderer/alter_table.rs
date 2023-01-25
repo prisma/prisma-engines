@@ -92,7 +92,7 @@ impl<'a> AlterTableConstructor<'a> {
         if !self.drop_constraints.is_empty() {
             statements.push(format!(
                 "ALTER TABLE {} DROP CONSTRAINT {}",
-                self.renderer.quote_with_schema(self.tables.previous.name()),
+                self.renderer.table_name(self.tables.previous),
                 self.drop_constraints.iter().join(",\n"),
             ));
         }
@@ -100,7 +100,10 @@ impl<'a> AlterTableConstructor<'a> {
         if self.rename_primary_key {
             let with_schema = format!(
                 "{}.{}",
-                self.renderer.schema_name(),
+                self.tables
+                    .previous
+                    .namespace()
+                    .unwrap_or_else(|| self.renderer.schema_name()),
                 self.tables.previous.primary_key().unwrap().name()
             );
 
@@ -118,7 +121,7 @@ impl<'a> AlterTableConstructor<'a> {
         if !self.drop_columns.is_empty() {
             statements.push(format!(
                 "ALTER TABLE {} DROP COLUMN {}",
-                self.renderer.quote_with_schema(self.tables.previous.name()),
+                self.renderer.table_name(self.tables.previous),
                 self.drop_columns.join(",\n"),
             ));
         }
@@ -126,7 +129,7 @@ impl<'a> AlterTableConstructor<'a> {
         if !self.add_constraints.is_empty() {
             statements.push(format!(
                 "ALTER TABLE {} ADD {}",
-                self.renderer.quote_with_schema(self.tables.previous.name()),
+                self.renderer.table_name(self.tables.previous),
                 self.add_constraints.iter().join(", ")
             ));
         }
@@ -134,7 +137,7 @@ impl<'a> AlterTableConstructor<'a> {
         if !self.add_columns.is_empty() {
             statements.push(format!(
                 "ALTER TABLE {} ADD {}",
-                self.renderer.quote_with_schema(self.tables.previous.name()),
+                self.renderer.table_name(self.tables.previous),
                 self.add_columns.join(",\n"),
             ));
         }
@@ -240,7 +243,7 @@ impl<'a> AlterTableConstructor<'a> {
 
                     self.column_mods.push(format!(
                         "ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}",
-                        table = self.renderer.quote_with_schema(self.tables.previous.name()),
+                        table = self.renderer.table_name(self.tables.previous),
                         column_name = self.renderer.quote(columns.next.name()),
                         column_type = super::render_column_type(columns.next),
                         nullability = nullability,
@@ -277,7 +280,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
         }
 
         if let Some(next_default) = columns.next.default() {
-            changes.push(MsSqlAlterColumn::SetDefault(next_default.clone()));
+            changes.push(MsSqlAlterColumn::SetDefault(next_default.inner().clone()));
         }
     } else {
         changes.push(MsSqlAlterColumn::Modify);

@@ -3,7 +3,7 @@ mod error;
 pub use error::{ConnectorError, ErrorKind};
 
 use enumflags2::BitFlags;
-use psl::{dml::Datamodel, Datasource, PreviewFeature};
+use psl::{Datasource, PreviewFeature};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -36,6 +36,12 @@ pub enum Version {
     Prisma2,
 }
 
+impl Version {
+    pub fn is_prisma1(self) -> bool {
+        matches!(self, Self::Prisma1 | Self::Prisma11)
+    }
+}
+
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
@@ -66,24 +72,35 @@ pub struct IntrospectionResultOutput {
 }
 
 pub struct IntrospectionContext {
-    pub previous_data_model: Datamodel,
     /// This should always be true. TODO: change everything where it's
     /// set to false to take the config into account.
     pub render_config: bool,
     pub composite_type_depth: CompositeTypeDepth,
     previous_schema: psl::ValidatedSchema,
+    namespaces: Option<Vec<String>>,
 }
 
 impl IntrospectionContext {
-    pub fn new(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
-        let mut ctx = Self::new_naive(previous_schema, composite_type_depth);
-        ctx.previous_data_model = psl::lift(&ctx.previous_schema);
-        ctx
+    pub fn new(
+        previous_schema: psl::ValidatedSchema,
+        composite_type_depth: CompositeTypeDepth,
+        namespaces: Option<Vec<String>>,
+    ) -> Self {
+        IntrospectionContext {
+            previous_schema,
+            composite_type_depth,
+            render_config: true,
+            namespaces,
+        }
     }
 
     /// Take the previous schema _but ignore all the datamodel part_, keeping just the
     /// configuration blocks.
-    pub fn new_config_only(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
+    pub fn new_config_only(
+        previous_schema: psl::ValidatedSchema,
+        composite_type_depth: CompositeTypeDepth,
+        namespaces: Option<Vec<String>>,
+    ) -> Self {
         let mut config_blocks = String::new();
 
         for source in previous_schema.db.ast().sources() {
@@ -98,16 +115,7 @@ impl IntrospectionContext {
 
         let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
 
-        Self::new_naive(previous_schema_config_only, composite_type_depth)
-    }
-
-    fn new_naive(previous_schema: psl::ValidatedSchema, composite_type_depth: CompositeTypeDepth) -> Self {
-        IntrospectionContext {
-            previous_data_model: psl::dml::Datamodel::new(),
-            previous_schema,
-            composite_type_depth,
-            render_config: true,
-        }
+        Self::new(previous_schema_config_only, composite_type_depth, namespaces)
     }
 
     pub fn previous_schema(&self) -> &psl::ValidatedSchema {
@@ -132,6 +140,10 @@ impl IntrospectionContext {
 
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.previous_schema.configuration.preview_features()
+    }
+
+    pub fn namespaces(&self) -> Option<&[String]> {
+        self.namespaces.as_deref()
     }
 }
 

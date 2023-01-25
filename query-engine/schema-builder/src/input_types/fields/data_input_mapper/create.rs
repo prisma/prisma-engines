@@ -21,16 +21,16 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let typ = map_scalar_input_type_for_field(ctx, sf);
         let supports_advanced_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
-        match &sf.type_identifier {
+        match &sf.type_identifier() {
             TypeIdentifier::Json if supports_advanced_json => {
                 let enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
 
-                input_field(sf.name.clone(), vec![enum_type, typ], sf.default_value.clone())
-                    .optional_if(!sf.is_required() || sf.default_value.is_some() || sf.is_updated_at)
+                input_field(sf.name(), vec![enum_type, typ], sf.default_value().cloned())
+                    .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
             }
 
-            _ => input_field(sf.name.clone(), typ, sf.default_value.clone())
-                .optional_if(!sf.is_required() || sf.default_value.is_some() || sf.is_updated_at)
+            _ => input_field(sf.name(), typ, sf.default_value().cloned())
+                .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
                 .nullable_if(!sf.is_required()),
         }
     }
@@ -38,7 +38,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
         let ident = Identifier::new(
-            format!("{}Create{}Input", sf.container.name(), sf.name),
+            format!("{}Create{}Input", sf.container().name(), sf.name()),
             PRISMA_NAMESPACE,
         );
 
@@ -59,7 +59,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_type = InputType::object(input_object);
 
         // Shorthand type (`list_field: <typ>`) + full object (`list_field: { set: { <typ> }}`)
-        input_field(sf.name.clone(), vec![input_type, typ], sf.default_value.clone()).optional()
+        input_field(sf.name(), vec![input_type, typ], sf.default_value().cloned()).optional()
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
@@ -68,12 +68,15 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 
         // Compute input object name
         let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
-        let without_part = format!("Without{}", capitalize(&related_field.name));
+        let without_part = format!("Without{}", capitalize(related_field.name()));
         let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
         let ident = Identifier::new(
             format!(
                 "{}{}Create{}{}Input",
-                related_model.name, unchecked_part, arity_part, without_part
+                related_model.name(),
+                unchecked_part,
+                arity_part,
+                without_part
             ),
             PRISMA_NAMESPACE,
         );
@@ -101,9 +104,9 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             .as_scalar_fields()
             .expect("Expected linking fields to be scalar.")
             .into_iter()
-            .all(|scalar_field| scalar_field.default_value.is_some());
+            .all(|scalar_field| scalar_field.default_value().is_some());
 
-        let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
+        let input_field = input_field(rf.name(), InputType::object(input_object), None);
 
         if rf.is_required() && !all_required_scalar_fields_have_defaults {
             input_field

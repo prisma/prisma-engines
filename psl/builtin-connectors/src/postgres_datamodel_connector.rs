@@ -8,7 +8,8 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
@@ -266,6 +267,12 @@ impl Connector for PostgresDatamodelConnector {
         Restrict | SetNull | Cascade
     }
 
+    /// Postgres accepts table definitions with a SET NULL referential action referencing a non-nullable field,
+    /// although that would lead to a runtime error once the action is actually triggered.
+    fn allows_set_null_referential_action_on_non_nullable_fields(&self, relation_mode: RelationMode) -> bool {
+        relation_mode.uses_foreign_keys()
+    }
+
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
         let native_type: &PostgresType = native_type.downcast_ref();
 
@@ -361,7 +368,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: walkers::ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::compatible_native_types(index, self, errors);
             validations::generalized_index_validations(index, self, errors);
@@ -471,6 +478,7 @@ impl Connector for PostgresDatamodelConnector {
 
                 let index_field = db
                     .walk_models()
+                    .chain(db.walk_views())
                     .find(|model| model.model_id() == model_id)
                     .and_then(|model| {
                         model.indexes().find(|index| {

@@ -21,6 +21,7 @@ pub use self::{
     relation_info::*, scalars::*, traits::*,
 };
 pub use prisma_value::{self, PrismaValue};
+pub use psl_core::parser_database::{ast::FieldArity, IndexType, ReferentialAction};
 
 use psl_core::ValidatedSchema;
 

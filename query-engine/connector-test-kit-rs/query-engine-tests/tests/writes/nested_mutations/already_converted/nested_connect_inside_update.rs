@@ -440,7 +440,7 @@ mod connect_inside_update {
         Ok(())
     }
 
-    // "a P1 to C1!  relation with the child and the parent already in a relation" should "should error in a nested mutation"
+    // "a P1 to C1  relation with the child and the parent already in a relation" should "should error in a nested mutation"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
     async fn p1_c1req_rel_child_parnt_error(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let child = t.child().parse(
@@ -499,6 +499,88 @@ mod connect_inside_update {
               }}"#, parent = parent, child = child),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1!  relation with the child and the parent already in a relation" should not error if connected to the same record it's already connected to
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    async fn p1_c1_rel_child_idempotent(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneParent(data: {{
+                            p: "p2", p_1: "p", p_2: "2",
+                            childOpt: {{
+                                create: {{c: "c2", c_1: "c", c_2: "2"}}
+                            }}
+                        }}){{
+                            {selection}
+                        }}
+                      }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+              where: {parent}
+              data:{{
+                childOpt: {{connect: {{ c: "c2", c_1: "c", c_2: "2" }} }}
+              }}){{
+                childOpt {{
+                  c
+                }}
+              }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c2"}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // "a P1 to C1!  relation with the child and the parent already in a relation" should not error if connected to the same record it's already connected to
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneReq")]
+    async fn p1_c1req_rel_child_idempotent(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        let parent = t.parent().parse(
+            run_query_json!(
+                runner,
+                format!(
+                    r#"mutation {{
+                        createOneParent(data: {{
+                            p: "p2", p_1: "p", p_2: "2",
+                            childOpt: {{
+                                create: {{c: "c2", c_1: "c", c_2: "2"}}
+                            }}
+                        }}){{
+                            {selection}
+                        }}
+                      }}"#,
+                    selection = t.parent().selection()
+                )
+            ),
+            &["data", "createOneParent"],
+        )?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, format!(r#"mutation {{
+            updateOneParent(
+              where: {parent}
+              data:{{
+                childOpt: {{connect: {{ c: "c2", c_1: "c", c_2: "2" }} }}
+              }}){{
+                childOpt {{
+                  c
+                }}
+              }}
+          }}"#, parent = parent)),
+          @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c2"}}}}"###
         );
 
         Ok(())

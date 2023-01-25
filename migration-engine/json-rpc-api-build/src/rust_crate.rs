@@ -4,7 +4,7 @@ use std::{borrow::Cow, fs::File, io::Write as _, path::Path};
 
 pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
     let librs = out_dir.join("methods.rs");
-    let mut librs = std::io::BufWriter::new(File::create(&librs)?);
+    let mut librs = std::io::BufWriter::new(File::create(librs)?);
     let mut method_names: Vec<&str> = api.methods.keys().map(String::as_str).collect();
     method_names.sort_unstable();
 
@@ -156,7 +156,9 @@ fn rustify_type_name(name: &str) -> Cow<'static, str> {
     match name {
         "bool" => Cow::Borrowed("bool"),
         "u32" => Cow::Borrowed("u32"),
+        "isize" => Cow::Borrowed("isize"),
         "string" => Cow::Borrowed("String"),
+        "serde_json::Value" => Cow::Borrowed("serde_json::Value"),
         other => other.to_camel_case().into(),
     }
 }

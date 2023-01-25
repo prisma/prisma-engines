@@ -1,0 +1,24 @@
+// add missing relation index validation warning on relationMode = "prisma".
+
+datasource db {
+    provider = "mysql"
+    url = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model SomeUser {
+    id Int @id
+    posts Post[]
+}
+
+model Post {
+    id Int @id
+    userId Int
+    user SomeUser @relation(fields: [userId], references: [id])
+}
+// [1;93mwarning[0m: [1mWith `relationMode = "prisma"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes" [0m
+//   [1;94m-->[0m  [4mschema.prisma:17[0m
+// [1;94m   | [0m
+// [1;94m16 | [0m    userId Int
+// [1;94m17 | [0m    user SomeUser [1;93m@relation(fields: [userId], references: [id])[0m
+// [1;94m   | [0m

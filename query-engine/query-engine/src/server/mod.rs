@@ -1,12 +1,12 @@
-use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
+use crate::state::State;
+use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
-use opentelemetry::{global, propagation::Extractor, Context};
-use psl::PreviewFeature;
-use query_core::schema::QuerySchemaRef;
-use query_core::{schema::QuerySchemaRenderer, TxId};
-use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use opentelemetry::global;
+use opentelemetry::propagation::Extractor;
+use query_core::{schema::QuerySchemaRenderer, TransactionOptions, TxId};
+use query_engine_metrics::MetricFormat;
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -15,90 +15,8 @@ use std::time::Instant;
 use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
-
-//// Shared application state.
-pub struct State {
-    cx: Arc<PrismaContext>,
-    enable_playground: bool,
-    enable_debug_mode: bool,
-    enable_itx: bool,
-    enable_metrics: bool,
-}
-
-impl State {
-    /// Create a new instance of `State`.
-    fn new(
-        cx: PrismaContext,
-        enable_playground: bool,
-        enable_debug_mode: bool,
-        enable_itx: bool,
-        enable_metrics: bool,
-    ) -> Self {
-        Self {
-            cx: Arc::new(cx),
-            enable_playground,
-            enable_debug_mode,
-            enable_itx,
-            enable_metrics,
-        }
-    }
-
-    pub fn get_metrics(&self) -> MetricRegistry {
-        self.cx.metrics.clone()
-    }
-
-    pub fn query_schema(&self) -> &QuerySchemaRef {
-        self.cx.query_schema()
-    }
-}
-
-impl Clone for State {
-    fn clone(&self) -> Self {
-        Self {
-            cx: self.cx.clone(),
-            enable_playground: self.enable_playground,
-            enable_debug_mode: self.enable_debug_mode,
-            enable_itx: self.enable_itx,
-            enable_metrics: self.enable_metrics,
-        }
-    }
-}
-
-pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let datamodel = opts.schema(false)?;
-    let config = &datamodel.configuration;
-    config.validate_that_one_datasource_is_provided()?;
-
-    let span = tracing::info_span!("prisma:engine:connect");
-
-    let enable_itx = config
-        .preview_features()
-        .contains(PreviewFeature::InteractiveTransactions);
-
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
-
-    let cx = PrismaContext::builder(datamodel)
-        .set_metrics(metrics)
-        .enable_raw_queries(opts.enable_raw_queries)
-        .build()
-        .instrument(span)
-        .await?;
-
-    let state = State::new(
-        cx,
-        opts.enable_playground,
-        opts.enable_debug_mode,
-        enable_itx,
-        enable_metrics,
-    );
-    Ok(state)
-}
-
 /// Starts up the graphql query engine server
-pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()> {
-    let state = setup(&opts, metrics).await?;
-
+pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
     let query_engine = make_service_fn(move |_| {
         let state = state.clone();
         async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(state.clone(), req))) }
@@ -121,15 +39,15 @@ pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()
 pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
-    if req.method() == Method::POST && req.uri().path().contains("transaction") && state.enable_itx {
-        return handle_transaction(state, req).await;
+    if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
+        return transaction_handler(state, req).await;
     }
 
     if [Method::POST, Method::GET].contains(req.method())
-        && req.uri().path().contains("metrics")
+        && req.uri().path().starts_with("/metrics")
         && state.enable_metrics
     {
-        return handle_metrics(state, req).await;
+        return metrics_handler(state, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
@@ -152,7 +70,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(state.cx.datamodel(), Arc::clone(state.cx.query_schema()));
+            let schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -194,23 +112,17 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(handle_debug_headers(&req));
     }
 
-    let tx_id = get_transaction_id_from_header(&req);
+    let headers = req.headers();
+    let traceparent = traceparent(headers);
+    let tx_id = transaction_id(headers);
+    let cx = get_parent_span_context(headers);
 
     let span = if tx_id.is_none() {
-        let cx = get_parent_span_context(&req);
         let span = info_span!("prisma:engine", user_facing = true);
         span.set_parent(cx);
         span
     } else {
         Span::none()
-    };
-
-    let trace_id = match req.headers().get("traceparent") {
-        Some(traceparent) => {
-            let s = traceparent.to_str().unwrap_or_default().to_string();
-            Some(s)
-        }
-        _ => None,
     };
 
     let work = async move {
@@ -221,7 +133,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
+                let result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
@@ -263,7 +175,7 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let format = if let Some(query) = req.uri().query() {
         if query.contains("format=json") {
             MetricFormat::Json
@@ -310,72 +222,47 @@ async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Bod
 /// POST /transaction/start -> start a transaction
 /// POST /transaction/{tx_id}/commit -> commit a transaction
 /// POST /transaction/{tx_id}/rollback -> rollback a transaction
-async fn handle_transaction(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let path = req.uri().path();
+async fn transaction_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let path = req.uri().path().to_owned();
+    let sections: Vec<&str> = path.split('/').collect();
 
-    if path.contains("start") {
+    if sections.len() == 3 && sections[2] == "start" {
         return transaction_start_handler(state, req).await;
     }
 
-    let sections: Vec<&str> = path.split('/').collect();
-
-    if sections.len() < 2 {
-        return Ok(Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body(Body::from("Request does not contain the transaction id"))
-            .unwrap());
+    if sections.len() == 4 && sections[3] == "commit" {
+        return transaction_commit_handler(state, sections[2].into()).await;
     }
 
-    let tx_id: TxId = sections[2].into();
+    if sections.len() == 4 && sections[3] == "rollback" {
+        return transaction_rollback_handler(state, sections[2].into()).await;
+    }
 
-    let succuss_resp = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(r#"{}"#))
+    let res = Response::builder()
+        .status(StatusCode::BAD_REQUEST)
+        .body(Body::from(format!("wrong transaction handler path: {}", &path)))
         .unwrap();
-
-    if path.contains("commit") {
-        match state.cx.executor.commit_tx(tx_id).await {
-            Ok(_) => Ok(succuss_resp),
-            Err(err) => Ok(err_to_http_resp(err)),
-        }
-    } else if path.contains("rollback") {
-        match state.cx.executor.rollback_tx(tx_id).await {
-            Ok(_) => Ok(succuss_resp),
-            Err(err) => Ok(err_to_http_resp(err)),
-        }
-    } else {
-        let res = Response::builder()
-            .status(StatusCode::BAD_REQUEST)
-            .body(Body::empty())
-            .unwrap();
-        Ok(res)
-    }
+    Ok(res)
 }
 
 async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let cx = get_parent_span_context(&req);
-
+    let cx = get_parent_span_context(req.headers());
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
 
-    let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+    let span = info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
     span.set_parent(cx);
 
-    match state
+    let result = state
         .cx
         .executor
-        .start_tx(
-            state.cx.query_schema().clone(),
-            input.max_wait,
-            input.timeout,
-            input.isolation_level,
-        )
+        .start_tx(state.cx.query_schema().clone(), tx_opts)
         .instrument(span)
-        .await
-    {
+        .await;
+
+    match result {
         Ok(tx_id) => {
             let result = json!({ "id": tx_id.to_string() });
             let result_bytes = serde_json::to_vec(&result).unwrap();
@@ -385,22 +272,25 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
                 .header(CONTENT_TYPE, "application/json")
                 .body(Body::from(result_bytes))
                 .unwrap();
-
             Ok(res)
         }
         Err(err) => Ok(err_to_http_resp(err)),
     }
 }
 
-fn get_transaction_id_from_header(req: &Request<Body>) -> Option<TxId> {
-    match req.headers().get(TRANSACTION_ID_HEADER) {
-        Some(id_header) => {
-            let msg = format!("{} has not been correctly set.", TRANSACTION_ID_HEADER);
-            let id = id_header.to_str().unwrap_or(msg.as_str());
-            Some(TxId::from(id))
-        }
+async fn transaction_commit_handler(state: State, tx_id: TxId) -> Result<Response<Body>, hyper::Error> {
+    let result = state.cx.executor.commit_tx(tx_id).await;
+    match result {
+        Ok(_) => Ok(empty_json_to_http_resp()),
+        Err(err) => Ok(err_to_http_resp(err)),
+    }
+}
 
-        None => None,
+async fn transaction_rollback_handler(state: State, tx_id: TxId) -> Result<Response<Body>, hyper::Error> {
+    let result = state.cx.executor.rollback_tx(tx_id).await;
+    match result {
+        Ok(_) => Ok(empty_json_to_http_resp()),
+        Err(err) => Ok(err_to_http_resp(err)),
     }
 }
 
@@ -439,11 +329,15 @@ impl<'a> Extractor for HeaderExtractor<'a> {
     }
 }
 
-/// If the client sends us a trace and span id, extracting a new context if the
-/// headers are set. If not, returns current context.
-fn get_parent_span_context(req: &Request<Body>) -> Context {
-    let extractor = HeaderExtractor(req.headers());
-    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+fn empty_json_to_http_resp() -> Response<Body> {
+    let result = json!({});
+    let result_bytes = serde_json::to_vec(&result).unwrap();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(result_bytes))
+        .unwrap()
 }
 
 fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
@@ -462,6 +356,33 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
 
     let user_error: user_facing_errors::Error = err.into();
     let body = Body::from(serde_json::to_vec(&user_error).unwrap());
-
     Response::builder().status(status).body(body).unwrap()
+}
+
+fn traceparent(headers: &HeaderMap) -> Option<String> {
+    const TRACEPARENT_HEADER: &str = "traceparent";
+
+    let value = headers
+        .get(TRACEPARENT_HEADER)
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_owned());
+
+    let is_valid_traceparent = |s: &String| s.split_terminator('-').count() >= 4;
+
+    value.filter(is_valid_traceparent)
+}
+
+fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
+    const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
+    headers
+        .get(TRANSACTION_ID_HEADER)
+        .and_then(|h| h.to_str().ok())
+        .map(TxId::from)
+}
+
+/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
+    let extractor = HeaderExtractor(headers);
+    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
 }

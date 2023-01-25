@@ -1,5 +1,6 @@
 mod mssql;
 mod mysql;
+mod postgresql;
 mod relation_mode;
 mod sqlite;
 mod vitess;
@@ -404,91 +405,6 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
         "code": 9,
         "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
         "affected": [{ "enm": "BlackNWhite" }],
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
-async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
-    let sql_family = api.sql_family();
-
-    if sql_family.is_postgres() {
-        let sql = "CREATE Type color as ENUM (\'black\', \'white\')";
-        api.database().execute_raw(sql, &[]).await?;
-    }
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("User", move |t| {
-                t.add_column("id", types::primary());
-
-                let typ = if sql_family.is_postgres() {
-                    "color"
-                } else {
-                    "ENUM ('black', 'white')"
-                };
-
-                t.add_column("color", types::custom(typ).nullable(false).default("black"));
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await?;
-
-    let enum_name = if sql_family.is_postgres() {
-        "color"
-    } else {
-        "User_color"
-    };
-
-    let input_dm = format!(
-        r#"
-        model User {{
-            id               Int @id @default(autoincrement())
-            color            {0} @default(BLACK)
-        }}
-
-        enum {0} {{
-            BLACK @map("black")
-            white
-        }}
-    "#,
-        enum_name
-    );
-
-    let final_dm = format!(
-        r#"
-        model User {{
-            id               Int @id @default(autoincrement())
-            color            {0} @default(BLACK)
-        }}
-
-        model Unrelated {{
-            id               Int @id @default(autoincrement())
-        }}
-
-        enum {0} {{
-            BLACK @map("black")
-            white
-        }}
-    "#,
-        enum_name
-    );
-
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
-
-    let expected = json!([{
-        "code": 10,
-        "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
-        "affected" :[{
-            "enm": enum_name,
-            "value": "BLACK"
-        }]
     }]);
 
     assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
@@ -1063,6 +979,10 @@ async fn virtual_cuid_default(api: &TestApi) {
                 t.add_column("id", types::varchar(36).primary(true));
             });
 
+            migration.create_table("User3", |t| {
+                t.add_column("id", types::varchar(21).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -1079,6 +999,10 @@ async fn virtual_cuid_default(api: &TestApi) {
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
         }
+
+        model User3 {
+            id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1089,6 +1013,10 @@ async fn virtual_cuid_default(api: &TestApi) {
 
         model User2 {
             id        String    @id @default(uuid()) @db.VarChar(36)
+        }
+
+        model User3 {
+            id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
 
         model Unrelated {
@@ -1187,28 +1115,28 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
         /// just floating around here
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         /// A really helpful comment about the model
         model User {
-            /// A really helpful comment about the field
-            id         Int @id @default(autoincrement())
+          /// A really helpful comment about the field
+          id Int @id @default(autoincrement())
         }
 
         model User2 {
-            id         Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         /// A really helpful comment about the enum
         enum a {
-            A
+          A
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }
@@ -1319,13 +1247,13 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
     let final_dm = expect![[r#"
         model B {
           id        Int @id @default(autoincrement())
-          custom_A  A[]
+          custom_A  A[] @relation("AToB")
           special_A A[] @relation("AToB2")
         }
 
         model A {
           id        Int @id @default(autoincrement())
-          custom_B  B[]
+          custom_B  B[] @relation("AToB")
           special_B B[] @relation("AToB2")
         }
 
@@ -1594,76 +1522,15 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model User {
-          id            Int         @id @default(autoincrement())
-          User_A        User[]      @relation("FollowRelation")
-          User_B        User[]      @relation("FollowRelation")
+          id     Int    @id @default(autoincrement())
+          User_A User[] @relation("FollowRelation")
+          User_B User[] @relation("FollowRelation")
         }
-    "#};
+    "#]];
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_index(
-                    "User.something@invalid-and/weird",
-                    types::index(["first", "last"]).unique(true),
-                );
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-     "#};
-
-    let final_dm = indoc! {r#"
-         model User {
-             id     Int @id @default(autoincrement()) 
-             first  Int
-             last   Int
-
-             @@unique([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#};
-
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "User.something@invalid-and/weird"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
     Ok(())
 }
@@ -1712,97 +1579,6 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
      "#};
 
     api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
-
-    let expected = json!([{
-        "code": 17,
-        "message": "These Indices were enriched with custom index names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User", "index_db_name": "compound"},
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Postgres, Mssql), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint(
-                    "User.something@invalid-and/weird",
-                    types::primary_constraint(["first", "last"]),
-                );
-            });
-
-            migration.create_table("User2", |t| {
-                t.add_column("first", types::integer());
-                t.add_column("last", types::integer());
-                t.add_constraint("User2_pkey", types::primary_constraint(["first", "last"]));
-            });
-
-            migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true).nullable(false));
-                t.add_constraint("Unrelated_pkey", types::primary_constraint(["id"]));
-            });
-        })
-        .await?;
-
-    let input_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-     "#;
-
-    let final_dm = r#"
-         model User {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
-         }
-
-         model User2 {
-             first  Int
-             last   Int
-
-             @@id([first, last], name: "compound")
-         }
-
-         model Unrelated {
-             id    Int @id @default(autoincrement())
-         }
-     "#;
-
-    let re_introspected = api.re_introspect(input_dm).await?;
-
-    api.assert_eq_datamodels(final_dm, &re_introspected);
-
-    let expected = json!([{
-        "code": 18,
-        "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
-        "affected" :[
-            {"model": "User"},
-            {"model": "User2"}
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
-
     Ok(())
 }
 

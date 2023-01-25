@@ -166,14 +166,16 @@ impl MigrationConnector for MongoDbMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
-        _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let url: String = ctx.datasource().load_url(|v| std::env::var(v).ok()).map_err(|err| {
-                migration_connector::ConnectorError::new_schema_parser_error(
-                    err.to_pretty_string("schema.prisma", ctx.schema_string()),
-                )
-            })?;
+            let url: String = ctx
+                .datasource()
+                .load_direct_url(|v| std::env::var(v).ok())
+                .map_err(|err| {
+                    migration_connector::ConnectorError::new_schema_parser_error(
+                        err.to_pretty_string("schema.prisma", ctx.schema_string()),
+                    )
+                })?;
             let connector = mongodb_introspection_connector::MongoDbIntrospectionConnector::new(&url)
                 .await
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;

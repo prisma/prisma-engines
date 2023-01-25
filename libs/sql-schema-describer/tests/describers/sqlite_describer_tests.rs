@@ -86,7 +86,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -102,7 +102,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -118,7 +118,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -134,7 +134,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -150,7 +150,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -166,12 +166,13 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -295,15 +296,10 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "meow, says the cat",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: false,
                     },
@@ -320,21 +316,44 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "\"That's a lot of fish!\"\n- Godzilla, 1998",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                1,
+                            ),
                         ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "meow, says the cat",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "\"That's a lot of fish!\"\n- Godzilla, 1998",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
@@ -383,21 +402,31 @@ fn backslashes_in_string_literals(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "xyz\\Datasource\\Model",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "xyz\\Datasource\\Model",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
@@ -464,7 +493,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -480,7 +509,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -496,7 +525,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -512,7 +541,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -528,7 +557,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -546,6 +575,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     on_update_action: NoAction,
                 },
             ],
+            default_values: [],
             foreign_key_columns: [
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(

@@ -30,7 +30,7 @@ impl<'a> Configuration<'a> {
     }
 
     /// Create a rendering from a PSL datasource.
-    pub fn from_psl(psl_cfg: &'a psl::Configuration) -> Self {
+    pub fn from_psl(psl_cfg: &'a psl::Configuration, force_namespaces: Option<&'a [String]>) -> Self {
         let mut config = Self::default();
 
         for generator in psl_cfg.generators.iter() {
@@ -38,7 +38,7 @@ impl<'a> Configuration<'a> {
         }
 
         for datasource in psl_cfg.datasources.iter() {
-            config.push_datasource(Datasource::from_psl(datasource));
+            config.push_datasource(Datasource::from_psl(datasource, force_namespaces));
         }
 
         config

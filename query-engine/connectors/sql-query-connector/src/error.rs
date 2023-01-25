@@ -5,7 +5,7 @@ use std::{any::Any, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
-pub enum RawError {
+pub(crate) enum RawError {
     IncorrectNumberOfParameters {
         expected: usize,
         actual: usize,
@@ -181,14 +181,9 @@ pub enum SqlError {
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
-            SqlError::UniqueConstraintViolation { constraint } => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::UniqueKeyViolation {
-                        constraint: constraint.clone(),
-                    },
-                )),
-                kind: ErrorKind::UniqueConstraintViolation { constraint },
-            },
+            SqlError::UniqueConstraintViolation { constraint } => {
+                ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation { constraint })
+            }
             SqlError::NullConstraintViolation { constraint } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { constraint })
             }
@@ -201,6 +196,7 @@ impl SqlError {
             SqlError::ConnectionError(e) => ConnectorError {
                 user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info),
                 kind: ErrorKind::ConnectionError(e.into()),
+                transient: false,
             },
             SqlError::ColumnReadFailure(e) => ConnectorError::from_kind(ErrorKind::ColumnReadFailure(e)),
             SqlError::FieldCannotBeNull { field } => ConnectorError::from_kind(ErrorKind::FieldCannotBeNull { field }),
@@ -240,40 +236,19 @@ impl SqlError {
                             connection_info,
                         ),
                         kind: ErrorKind::QueryError(e),
+                        transient: false,
                     },
                     None => ConnectorError::from_kind(ErrorKind::QueryError(e)),
                 }
             }
-            SqlError::RawError { code, message } => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::RawQueryFailed {
-                        code: code.clone(),
-                        message: message.clone(),
-                    },
-                )),
-                kind: ErrorKind::RawDatabaseError { code, message },
-            },
-            SqlError::ConnectionClosed => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::common::ConnectionClosed,
-                )),
-                kind: ErrorKind::ConnectionClosed,
-            },
-            SqlError::TransactionAlreadyClosed(message) => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::common::TransactionAlreadyClosed {
-                        message: message.clone(),
-                    },
-                )),
-                kind: ErrorKind::TransactionAlreadyClosed { message },
-            },
-
-            SqlError::TransactionWriteConflict => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::TransactionWriteConflict {},
-                )),
-                kind: ErrorKind::TransactionWriteConflict,
-            },
+            SqlError::RawError { code, message } => {
+                ConnectorError::from_kind(ErrorKind::RawDatabaseError { code, message })
+            }
+            SqlError::ConnectionClosed => ConnectorError::from_kind(ErrorKind::ConnectionClosed),
+            SqlError::TransactionAlreadyClosed(message) => {
+                ConnectorError::from_kind(ErrorKind::TransactionAlreadyClosed { message })
+            }
+            SqlError::TransactionWriteConflict => ConnectorError::from_kind(ErrorKind::TransactionWriteConflict),
             SqlError::RollbackWithoutBegin => ConnectorError::from_kind(ErrorKind::RollbackWithoutBegin),
             SqlError::QueryParameterLimitExceeded(e) => {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))

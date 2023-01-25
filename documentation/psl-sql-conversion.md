@@ -72,7 +72,22 @@ CREATE TABLE "test"."Blog" (
 );
 ```
 
-🚨 The `cuid()` and `uuid()` expressions have no manifestation in the database, and therefore can later not be inferred.
+Prisma Schema Example with NanoID:
+```groovy
+model Blog {
+    id        String @id @default(nanoid())
+}
+```
+
+Resulting SQL Example (Postgres):
+```sql
+CREATE TABLE "test"."Blog" (
+  "id" text NOT NULL  ,
+  PRIMARY KEY ("id")
+);
+```
+
+🚨 The `cuid()`, `uuid()`, and `nanoid()` expressions have no manifestation in the database, and therefore can later not be inferred.
 
 ### Mapping a model with a compound Id field
 Prisma Schema Example:

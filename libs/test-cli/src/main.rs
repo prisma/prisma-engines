@@ -214,6 +214,7 @@ async fn main() -> anyhow::Result<()> {
                 schema,
                 false,
                 CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
+                None,
             )
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
@@ -223,7 +224,7 @@ async fn main() -> anyhow::Result<()> {
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
 
-            let mut file = std::fs::File::open(&cmd.schema_path).expect("error opening datamodel file");
+            let mut file = std::fs::File::open(cmd.schema_path).expect("error opening datamodel file");
 
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
@@ -236,8 +237,7 @@ async fn main() -> anyhow::Result<()> {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
             let api = migration_core::migration_api(Some(schema), None)?;
 
-            // TODO(MultiSchema): Perhaps read namespaces from the schema somehow.
-            api.reset(None).await?;
+            api.reset().await?;
         }
         Command::CreateDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
@@ -318,7 +318,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let skeleton = minimal_schema_from_url(url)?;
             //todo make this configurable
             let introspected =
-                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite)
+                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite, None)
                     .await
                     .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 

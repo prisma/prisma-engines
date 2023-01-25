@@ -10,6 +10,7 @@ mod parse_model;
 mod parse_schema;
 mod parse_source_and_generator;
 mod parse_types;
+mod parse_view;
 
 pub use parse_schema::parse_schema;
 

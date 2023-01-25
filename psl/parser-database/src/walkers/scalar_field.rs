@@ -36,6 +36,26 @@ impl<'db> ScalarFieldWalker<'db> {
         &self.db.ast[self.model_id][self.field_id]
     }
 
+    /// Is this field unique? This method will return true if:
+    ///
+    /// - The field has an `@id` or `@unique` attribute.
+    /// - There is an `@@id` or `@@unique` on the model that contains __only__ this field.
+    pub fn is_unique(self) -> bool {
+        let model = self.model();
+
+        if let Some(true) = model
+            .primary_key()
+            .map(|pk| pk.contains_exactly_fields_by_id(&[self.field_id]))
+        {
+            return true;
+        }
+
+        self.model().indexes().any(|idx| {
+            let mut fields = idx.fields();
+            idx.is_unique() && fields.len() == 1 && fields.next().map(|f| f.field_id()) == Some(self.field_id)
+        })
+    }
+
     /// The name of the field.
     pub fn name(self) -> &'db str {
         self.ast_field().name()
@@ -81,6 +101,11 @@ impl<'db> ScalarFieldWalker<'db> {
     /// Is the field optional / nullable?
     pub fn is_optional(self) -> bool {
         self.ast_field().arity.is_optional()
+    }
+
+    /// Is the field a list
+    pub fn is_list(self) -> bool {
+        self.ast_field().arity.is_list()
     }
 
     /// Is there an `@updatedAt` attribute on the field?
@@ -186,6 +211,11 @@ impl<'db> DefaultValueWalker<'db> {
     /// Is this an `@default(cuid())`?
     pub fn is_cuid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "cuid")
+    }
+
+    /// Is this an `@default(nanoid())`?
+    pub fn is_nanoid(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "nanoid")
     }
 
     /// Is this an `@default(dbgenerated())`?
@@ -339,7 +369,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
                 IndexFieldWalker::new(walker)
             }
             Some(ctid) => {
-                let walker = self.db.walk_composite_type(ctid).field(field_id);
+                let walker = self.db.walk((ctid, field_id));
                 IndexFieldWalker::new(walker)
             }
         }

@@ -1,0 +1,14 @@
+datasource db {
+  provider = "mysql"
+  url = "does_not_matter"
+}
+
+model Category {
+  id String @id @default(nanoid(1))
+}
+// [1;91merror[0m: [1mError parsing attribute "@default": `nanoid()` takes either no argument, or a single integer argument >= 2.[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mmodel Category {
+// [1;94m 7 | [0m  id String @id [1;91m@default(nanoid(1))[0m
+// [1;94m   | [0m

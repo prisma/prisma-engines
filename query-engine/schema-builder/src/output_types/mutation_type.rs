@@ -131,7 +131,7 @@ fn create_query_raw_field() -> OutputField {
         ],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw { query_type: None },
+            tag: QueryTag::QueryRaw,
             model: None,
         }),
     )
@@ -143,9 +143,7 @@ fn create_mongodb_run_command_raw() -> OutputField {
         vec![input_field("command", InputType::json(), None)],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw {
-                query_type: Some("runCommandRaw".to_string()),
-            },
+            tag: QueryTag::RunCommandRaw,
             model: None,
         }),
     )
@@ -154,7 +152,7 @@ fn create_mongodb_run_command_raw() -> OutputField {
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
 fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::delete_one_arguments(ctx, model).map(|args| {
-        let field_name = format!("deleteOne{}", model.name);
+        let field_name = format!("deleteOne{}", model.name());
 
         field(
             field_name,
@@ -172,7 +170,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
 fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::delete_many_arguments(ctx, model);
-    let field_name = format!("deleteMany{}", model.name);
+    let field_name = format!("deleteMany{}", model.name());
 
     field(
         field_name,
@@ -188,7 +186,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 /// Builds an update mutation field (e.g. updateUser) for given model.
 fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::update_one_arguments(ctx, model).map(|args| {
-        let field_name = format!("updateOne{}", model.name);
+        let field_name = format!("updateOne{}", model.name());
 
         field(
             field_name,
@@ -206,7 +204,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
 fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::update_many_arguments(ctx, model);
-    let field_name = format!("updateMany{}", model.name);
+    let field_name = format!("updateMany{}", model.name());
 
     field(
         field_name,
@@ -222,7 +220,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
 fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::upsert_arguments(ctx, model).map(|args| {
-        let field_name = format!("upsertOne{}", model.name);
+        let field_name = format!("upsertOne{}", model.name());
 
         field(
             field_name,

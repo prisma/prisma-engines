@@ -81,23 +81,10 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let datasource = request.schema.configuration.datasources.first();
-        let connector = datasource
-            .map(|ds| ds.active_connector)
-            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector);
-        let relation_mode = datasource.map(|ds| ds.relation_mode()).unwrap_or_default();
-
-        // temporary code duplication
-        let internal_data_model = prisma_models::convert(&request.schema, "".into());
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-            internal_data_model,
-            request.enable_raw_queries,
-            connector,
-            request.schema.configuration.preview_features().iter().collect(),
-            relation_mode,
-        ));
-
-        let dmmf = dmmf::render_dmmf(&psl::lift(&request.schema), query_schema);
+        let internal_data_model = prisma_models::convert(Arc::new(request.schema));
+        let query_schema: QuerySchemaRef =
+            Arc::new(schema_builder::build(internal_data_model, request.enable_raw_queries));
+        let dmmf = dmmf::render_dmmf(query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{}", serialized);
@@ -142,7 +129,7 @@ impl CliCommand {
             .await;
         let res = serde_json::to_string(&res).unwrap();
 
-        let encoded_response = base64::encode(&res);
+        let encoded_response = base64::encode(res);
         println!("Response: {}", encoded_response); // reason for prefix is explained in TestServer.scala
 
         Ok(())

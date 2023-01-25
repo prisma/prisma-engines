@@ -147,6 +147,10 @@ pub(super) fn generalized_index_validations(
             match (&native_type, opclass) {
                 // Jsonb / JsonbOps + JsonbPathOps
                 (None, None) if r#type.is_json() => (),
+
+                // Array fields + ArrayOps
+                (_, None) if field.as_index_field().is_list() => (),
+
                 (Some(PostgresType::JsonB), Some(JsonbOps | JsonbPathOps) | None) => (),
 
                 (None, Some(JsonbOps | JsonbPathOps)) => {

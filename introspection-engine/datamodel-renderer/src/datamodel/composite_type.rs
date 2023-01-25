@@ -1,16 +1,14 @@
-mod field;
-
 use crate::value::{Constant, Documentation};
-pub use field::CompositeTypeField;
-use psl::dml;
-use std::fmt;
+use std::{borrow::Cow, fmt};
+
+use super::Field;
 
 /// A type block in a PSL file.
 #[derive(Debug)]
 pub struct CompositeType<'a> {
-    name: Constant<&'a str>,
+    name: Constant<Cow<'a, str>>,
     documentation: Option<Documentation<'a>>,
-    fields: Vec<CompositeTypeField<'a>>,
+    fields: Vec<Field<'a>>,
 }
 
 impl<'a> CompositeType<'a> {
@@ -22,8 +20,8 @@ impl<'a> CompositeType<'a> {
     /// //   ^^^^^^^ name
     /// }
     /// ```
-    pub fn new(name: &'a str) -> Self {
-        let name = Constant::new_no_validate(name);
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        let name = Constant::new_no_validate(name.into());
 
         Self {
             name,
@@ -40,8 +38,8 @@ impl<'a> CompositeType<'a> {
     ///   ....
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: &'a str) {
-        self.documentation = Some(Documentation(documentation));
+    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+        self.documentation = Some(Documentation(documentation.into()));
     }
 
     /// Add a new field to the type.
@@ -52,21 +50,8 @@ impl<'a> CompositeType<'a> {
     /// //  ^^^^^^^^^^ this
     /// }
     /// ```
-    pub fn push_field(&mut self, field: CompositeTypeField<'a>) {
+    pub fn push_field(&mut self, field: Field<'a>) {
         self.fields.push(field);
-    }
-
-    /// Generate a composite type rendering from the deprecated DML structure.
-    ///
-    /// Remove when destroying the DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_ct: &'a dml::CompositeType) -> Self {
-        let mut composite_type = CompositeType::new(&dml_ct.name);
-
-        for dml_field in dml_ct.fields.iter() {
-            composite_type.push_field(CompositeTypeField::from_dml(datasource, dml_field));
-        }
-
-        composite_type
     }
 }
 
@@ -99,26 +84,31 @@ mod tests {
         let mut composite_type = CompositeType::new("Address");
         composite_type.documentation("...so many tears 🎵");
 
-        let mut field = CompositeTypeField::new_required("Street", "String");
+        let mut field = Field::new("Street", "String");
         field.native_type("db", "VarChar", vec!["255".into()]);
         field.default(DefaultValue::text("Prenzlauer Allee 193"));
         field.map("Shield");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("Number", "Int");
+        let field = Field::new("Number", "Int");
         composite_type.push_field(field);
 
-        let mut field = CompositeTypeField::new_optional("City", "String");
+        let mut field = Field::new("City", "String");
+        field.optional();
         field.documentation("...soooooooo many tears 🎵");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_array("Other", "String");
+        let mut field = Field::new("Other", "String");
+        field.array();
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("1Invalid", "Float");
+        let mut field = Field::new("Invalid", "Float");
+        field.map("1Invalid");
         composite_type.push_field(field);
 
-        let field = CompositeTypeField::new_required("11111", "Float");
+        let mut field = Field::new("11111", "Float");
+        field.commented_out();
+        field.map("11111");
         composite_type.push_field(field);
 
         let expected = expect![[r#"

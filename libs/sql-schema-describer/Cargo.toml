@@ -21,7 +21,7 @@ quaint.workspace = true
 
 [dev-dependencies]
 expect-test = "1.2.2"
-pretty_assertions = "0.6"
+pretty_assertions = "1"
 test-macros = { path = "../test-macros" }
 test-setup = { path = "../test-setup" }
 tokio.workspace = true

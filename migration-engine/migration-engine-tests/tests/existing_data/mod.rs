@@ -779,7 +779,7 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 }
 
 // exclude: there is a cockroach-specific test. It's unexecutable there.
-#[test_connector(preview_features("referentialIntegrity"), exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {

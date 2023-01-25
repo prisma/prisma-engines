@@ -1,8 +1,7 @@
-use crate::model_extensions::ScalarFieldExt;
+use crate::{model_extensions::ScalarFieldExt, Context};
 use itertools::Itertools;
 use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
 use quaint::ast::{Column, Row};
-use std::convert::AsRef;
 
 pub struct ColumnIterator {
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
@@ -24,19 +23,19 @@ impl From<Vec<Column<'static>>> for ColumnIterator {
     }
 }
 
-pub trait AsRow {
-    fn as_row(&self) -> Row<'static>;
+pub(crate) trait AsRow {
+    fn as_row(&self, ctx: &Context<'_>) -> Row<'static>;
 }
 
-pub trait AsColumns {
-    fn as_columns(&self) -> ColumnIterator;
+pub(crate) trait AsColumns {
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
 }
 
 impl AsColumns for ModelProjection {
-    fn as_columns(&self) -> ColumnIterator {
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
         let cols: Vec<Column<'static>> = self
             .fields()
-            .flat_map(|f| f.as_columns())
+            .flat_map(|f| f.as_columns(ctx))
             .unique_by(|c| c.name.clone())
             .collect();
 
@@ -45,29 +44,29 @@ impl AsColumns for ModelProjection {
 }
 
 impl AsRow for ModelProjection {
-    fn as_row(&self) -> Row<'static> {
-        let cols: Vec<Column<'static>> = self.as_columns().collect();
+    fn as_row(&self, ctx: &Context<'_>) -> Row<'static> {
+        let cols: Vec<Column<'static>> = self.as_columns(ctx).collect();
         Row::from(cols)
     }
 }
 
-pub trait AsColumn {
-    fn as_column(&self) -> Column<'static>;
+pub(crate) trait AsColumn {
+    fn as_column(&self, ctx: &Context<'_>) -> Column<'static>;
 }
 
 impl AsColumns for Field {
-    fn as_columns(&self) -> ColumnIterator {
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
         match self {
-            Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
-            Field::Relation(ref rf) => rf.as_columns(),
+            Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column(ctx)]),
+            Field::Relation(ref rf) => rf.as_columns(ctx),
             Field::Composite(_) => unimplemented!(),
         }
     }
 }
 
 impl AsColumns for RelationField {
-    fn as_columns(&self) -> ColumnIterator {
-        self.scalar_fields().as_columns()
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
+        self.scalar_fields().as_columns(ctx)
     }
 }
 
@@ -75,8 +74,8 @@ impl<T> AsColumns for &[T]
 where
     T: AsColumn,
 {
-    fn as_columns(&self) -> ColumnIterator {
-        let inner: Vec<_> = self.iter().map(|x| x.as_column()).collect();
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
+        let inner: Vec<_> = self.iter().map(|x| x.as_column(ctx)).collect();
         ColumnIterator::from(inner)
     }
 }
@@ -85,8 +84,8 @@ impl<T> AsColumns for Vec<T>
 where
     T: AsColumn,
 {
-    fn as_columns(&self) -> ColumnIterator {
-        let inner: Vec<_> = self.iter().map(|x| x.as_column()).collect();
+    fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator {
+        let inner: Vec<_> = self.iter().map(|x| x.as_column(ctx)).collect();
         ColumnIterator::from(inner)
     }
 }
@@ -95,11 +94,11 @@ impl<T> AsColumn for T
 where
     T: AsRef<ScalarField>,
 {
-    fn as_column(&self) -> Column<'static> {
+    fn as_column(&self, ctx: &Context<'_>) -> Column<'static> {
         let sf = self.as_ref();
 
         // Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        let full_table_name = sf.container.as_model().unwrap().db_name_with_schema();
+        let full_table_name = super::table::db_name_with_schema(&sf.container().as_model().unwrap(), ctx);
         let col = sf.db_name().to_string();
 
         let column = Column::from((full_table_name, col)).type_family(sf.type_family());

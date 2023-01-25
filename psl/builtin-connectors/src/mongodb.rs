@@ -59,7 +59,7 @@ impl Connector for MongoDbDatamodelConnector {
         BitFlags::empty()
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         validations::id_must_be_defined(model, errors);
 
         if let Some(pk) = model.primary_key() {
@@ -77,6 +77,14 @@ impl Connector for MongoDbDatamodelConnector {
             validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
             validations::unique_cannot_be_defined_to_id_field(index, errors);
         }
+    }
+
+    fn validate_relation_field(
+        &self,
+        field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
+        errors: &mut Diagnostics,
+    ) {
+        validations::relation_same_native_type(field, errors);
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
@@ -131,5 +139,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn allowed_relation_mode_settings(&self) -> enumflags2::BitFlags<RelationMode> {
         RelationMode::Prisma.into()
+    }
+
+    /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
+    fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
+        false
     }
 }

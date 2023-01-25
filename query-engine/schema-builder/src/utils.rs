@@ -104,7 +104,7 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 pub fn compound_index_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
         let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
+        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name()).collect();
 
         field_names.join("_")
     })
@@ -114,7 +114,7 @@ pub fn compound_index_field_name(index: &Index) -> String {
 pub fn compound_id_field_name(pk: &PrimaryKey) -> String {
     pk.alias.clone().unwrap_or_else(|| {
         let pk_fields = pk.fields();
-        let field_names: Vec<&str> = pk_fields.iter().map(|sf| sf.name.as_ref()).collect();
+        let field_names: Vec<&str> = pk_fields.iter().map(|sf| sf.name()).collect();
 
         field_names.join("_")
     })

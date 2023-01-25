@@ -14,6 +14,8 @@ pub struct Datasource {
     pub active_provider: &'static str,
     pub url: StringFromEnvVar,
     pub url_span: Span,
+    pub direct_url: Option<StringFromEnvVar>,
+    pub direct_url_span: Option<Span>,
     pub documentation: Option<String>,
     /// the connector of the active provider
     pub active_connector: &'static dyn Connector,
@@ -25,6 +27,13 @@ pub struct Datasource {
     pub namespaces: Vec<(String, Span)>,
     pub schemas_span: Option<Span>,
     pub connector_data: DatasourceConnectorData,
+}
+
+pub enum UrlValidationError {
+    EmptyUrlValue,
+    EmptyEnvValue(String),
+    NoEnvValue(String),
+    NoUrlOrEnv,
 }
 
 #[derive(Default)]
@@ -89,15 +98,14 @@ impl Datasource {
     where
         F: Fn(&str) -> Option<String>,
     {
-        let url = match (&self.url.value, &self.url.from_env_var) {
-            (Some(lit), _) if lit.trim().is_empty() => {
-                let msg = "You must provide a nonempty URL";
-
-                return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
-            }
-            (Some(lit), _) => lit.clone(),
-            (None, Some(env_var)) => match env(env_var) {
-                Some(var) if var.trim().is_empty() => {
+        let url = match from_url(&self.url, env) {
+            Ok(result) => result,
+            Err(error) => match error {
+                UrlValidationError::EmptyUrlValue => {
+                    let msg = "You must provide a nonempty URL";
+                    return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
+                }
+                UrlValidationError::EmptyEnvValue(env_var) => {
                     return Err(DatamodelError::new_source_validation_error(
                         &format!(
                         "You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.",
@@ -108,16 +116,13 @@ impl Datasource {
                     )
                     .into())
                 }
-                Some(var) => var,
-                None => {
-                    return Err(DatamodelError::new_environment_functional_evaluation_error(
-                        env_var.to_owned(),
-                        self.url_span,
+                UrlValidationError::NoEnvValue(env_var) => {
+                    return Err(
+                        DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into(),
                     )
-                    .into())
                 }
+                UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
             },
-            (None, None) => unreachable!("Missing url in datasource"),
         };
 
         self.active_connector.validate_url(&url).map_err(|err_str| {
@@ -139,6 +144,50 @@ impl Datasource {
         })?;
 
         Ok(url)
+    }
+
+    /// Load the direct database URL, validating it and resolving env vars in the
+    /// process. If there is no `directUrl` passed, it will default to `load_url()`.
+    ///
+    pub fn load_direct_url<F>(&self, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        self.direct_url.clone()
+            .and_then(|url| self.direct_url_span.map(|span| (url, span)))
+            .map_or_else(
+            || self.load_url(&env),
+            |(url, span)| {
+                from_url(&url, &env).map_or_else(
+                    |err| match err {
+                        UrlValidationError::EmptyUrlValue => {
+                            let msg = "You must provide a nonempty direct URL";
+                            Err(DatamodelError::new_source_validation_error(msg, &self.name, span).into())
+                        }
+                        UrlValidationError::EmptyEnvValue(env_var) => {
+                            Err(DatamodelError::new_source_validation_error(
+                                &format!(
+                        "You must provide a nonempty direct URL. The environment variable `{}` resolved to an empty string.",
+                        env_var
+                    ),
+                                &self.name,
+                                span,
+                            )
+                            .into())
+                        }
+                        UrlValidationError::NoEnvValue(env_var) => {
+                            Err(DatamodelError::new_environment_functional_evaluation_error(
+                                env_var,
+                                span,
+                            )
+                            .into())
+                        }
+                        UrlValidationError::NoUrlOrEnv => self.load_url(&env),
+                    },
+                    Result::Ok,
+                )
+            },
+        )
     }
 
     /// Same as `load_url()`, with the following difference.
@@ -193,4 +242,26 @@ impl Datasource {
 
         Ok(Some(url))
     }
+}
+
+pub(crate) fn from_url<F>(url: &StringFromEnvVar, env: F) -> Result<String, UrlValidationError>
+where
+    F: Fn(&str) -> Option<String>,
+{
+    let url = match (&url.value, &url.from_env_var) {
+        (Some(lit), _) if lit.trim().is_empty() => {
+            return Err(UrlValidationError::EmptyUrlValue);
+        }
+        (Some(lit), _) => lit.clone(),
+        (None, Some(env_var)) => match env(env_var) {
+            Some(var) if var.trim().is_empty() => {
+                return Err(UrlValidationError::EmptyEnvValue(env_var.clone()));
+            }
+            Some(var) => var,
+            None => return Err(UrlValidationError::NoEnvValue(env_var.clone())),
+        },
+        (None, None) => return Err(UrlValidationError::NoUrlOrEnv),
+    };
+
+    Ok(url)
 }

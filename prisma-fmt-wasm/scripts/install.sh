@@ -1,16 +1,21 @@
-set -euxo pipefail
+#!/usr/bin/env bash
 
-echo 'Creating out dir...'
-mkdir -p $out/src;
+set -euo pipefail
 
-echo 'Copying package.json...'
-cp ./prisma-fmt-wasm/package.json $out/;
+printf '%s\n' "entering install.sh"
 
-echo 'Copying README.md...'
-cp ./prisma-fmt-wasm/README.md $out/;
+printf '%s\n' " -> Creating out dir..."
+# shellcheck disable=SC2154
+mkdir -p "$out"/src
 
-echo 'Generating node package...'
+printf '%s\n' " -> Copying package.json"
+cp ./prisma-fmt-wasm/package.json "$out"/
+
+printf '%s\n' " -> Copying README.md"
+cp ./prisma-fmt-wasm/README.md "$out"/
+
+printf '%s\n' " -> Generating node package"
 wasm-bindgen \
   --target nodejs \
-  --out-dir $out/src \
-  target/wasm32-unknown-unknown/release/prisma_fmt_build.wasm;
+  --out-dir "$out"/src \
+  target/wasm32-unknown-unknown/release/prisma_fmt_build.wasm

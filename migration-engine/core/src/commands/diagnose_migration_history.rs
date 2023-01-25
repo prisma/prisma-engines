@@ -1,6 +1,6 @@
 use crate::CoreResult;
 use migration_connector::{
-    migrations_directory::*, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord,
+    migrations_directory::*, ConnectorError, DiffTarget, MigrationConnector, MigrationRecord, Namespaces,
     PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
@@ -65,6 +65,7 @@ impl DiagnoseMigrationHistoryOutput {
 /// reads, it does not write to the dev database nor the migrations directory.
 pub async fn diagnose_migration_history(
     input: DiagnoseMigrationHistoryInput,
+    namespaces: Option<Namespaces>,
     connector: &mut dyn MigrationConnector,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
@@ -132,10 +133,10 @@ pub async fn diagnose_migration_history(
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = connector
-                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, None)
+                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None, namespaces.clone())
                 .await;
             let to = connector
-                .database_schema_from_diff_target(DiffTarget::Database, None, None)
+                .database_schema_from_diff_target(DiffTarget::Database, None, namespaces.clone())
                 .await;
             let drift = match from.and_then(|from| to.map(|to| connector.diff(from, to))).map(|mig| {
                 if connector.migration_is_empty(&mig) {
@@ -156,7 +157,7 @@ pub async fn diagnose_migration_history(
                 // TODO(MultiSchema): Not entirely sure passing no namespaces here is correct. Probably should
                 // also grab this as a CLI argument.
                 connector
-                    .validate_migrations(&migrations_from_filesystem, None)
+                    .validate_migrations(&migrations_from_filesystem, namespaces)
                     .await
                     .err()
             } else {

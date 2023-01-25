@@ -16,7 +16,6 @@ pub(crate) trait DatasourceAsserts {
 pub(crate) trait FieldAsserts {
     fn assert_arity(&self, arity: &dml::FieldArity) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
-    fn assert_is_generated(&self, b: bool) -> &Self;
 }
 
 pub(crate) trait ScalarFieldAsserts {
@@ -109,11 +108,6 @@ impl FieldAsserts for dml::ScalarField {
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-        self
-    }
-
-    fn assert_is_generated(&self, b: bool) -> &Self {
-        assert_eq!(self.is_generated, b);
         self
     }
 }
@@ -215,11 +209,6 @@ impl FieldAsserts for dml::RelationField {
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(t.to_owned()));
-        self
-    }
-
-    fn assert_is_generated(&self, b: bool) -> &Self {
-        assert_eq!(self.is_generated, b);
         self
     }
 }

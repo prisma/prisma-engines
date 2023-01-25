@@ -7,7 +7,7 @@ use std::{fmt::Display, io::Write as _};
 #[derive(Debug)]
 pub(crate) struct DbUnderTest {
     pub(crate) capabilities: BitFlags<Capabilities>,
-    database_url: String,
+    pub(crate) database_url: String,
     shadow_database_url: Option<String>,
     provider: &'static str,
     pub(crate) tags: BitFlags<Tags>,
@@ -24,11 +24,7 @@ source .test_database_urls/mysql_5_6
 "#;
 
 static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
-    let database_url = if std::env::var("IS_BUILDKITE").is_ok() {
-        "sqlite".to_owned()
-    } else {
-        std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?
-    };
+    let database_url = std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?;
     let shadow_database_url = std::env::var("TEST_SHADOW_DATABASE_URL").ok();
     let prefix = database_url
         .find(':')
@@ -117,8 +113,6 @@ pub struct TestApiArgs {
     db: &'static DbUnderTest,
 }
 
-const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
-
 impl TestApiArgs {
     pub fn new(
         test_function_name: &'static str,
@@ -172,12 +166,17 @@ impl TestApiArgs {
         self.db.database_url.as_str()
     }
 
-    pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+    pub fn datasource_block<'a>(
+        &'a self,
+        url: &'a str,
+        params: &'a [(&'a str, &'a str)],
+        preview_features: &'static [&'static str],
+    ) -> DatasourceBlock<'a> {
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
-            preview_features: EMPTY_PREVIEW_FEATURES,
+            preview_features,
         }
     }
 

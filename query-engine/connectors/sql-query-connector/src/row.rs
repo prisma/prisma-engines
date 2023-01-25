@@ -4,16 +4,13 @@ use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use psl::dml::FieldArity;
-use quaint::{
-    ast::{Expression, Value},
-    connector::ResultRow,
-};
+use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
 #[derive(Debug, Clone, Default)]
-pub struct SqlRow {
+pub(crate) struct SqlRow {
     pub values: Vec<PrismaValue>,
 }
 
@@ -80,7 +77,7 @@ impl From<SqlRow> for Record {
     }
 }
 
-pub trait ToSqlRow {
+pub(crate) trait ToSqlRow {
     /// Conversion from a database specific row to an allocated `SqlRow`. To
     /// help deciding the right types, the provided `ColumnMetadata`s should map
     /// to the returned columns in the right order.
@@ -177,7 +174,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             value if value.is_integer() => {
                 let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
-                let secs = (ts / 1000) as i64;
+                let secs = ts / 1000;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
                 let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
 
@@ -264,29 +261,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     })
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum SqlId {
-    String(String),
-    Int(usize),
-    UUID(Uuid),
-}
-
-impl From<SqlId> for Expression<'static> {
-    fn from(id: SqlId) -> Self {
-        match id {
-            SqlId::String(s) => s.into(),
-            SqlId::Int(i) => (i as i64).into(),
-            SqlId::UUID(u) => u.into(),
-        }
-    }
-}
-
-impl From<&SqlId> for Expression<'static> {
-    fn from(id: &SqlId) -> Self {
-        id.clone().into()
-    }
 }
 
 // We assume the bytes are stored as a big endian signed integer, because that is what

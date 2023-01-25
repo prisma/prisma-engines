@@ -121,15 +121,8 @@ impl RenderContext {
     pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {
-                let model_name = model.name.clone();
-                let tag_str = match &info.tag {
-                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
-                    // eg: findRaw, aggregateRaw..
-                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
-                        query_type.as_ref().unwrap().to_owned()
-                    }
-                    tag => format!("{}", tag),
-                };
+                let model_name = model.name();
+                let tag_str = format!("{}", &info.tag);
                 let model_op = self
                     .mappings
                     .model_operations
@@ -139,7 +132,7 @@ impl RenderContext {
                 match model_op {
                     Some(existing) => existing.add_operation(tag_str, name),
                     None => {
-                        let new_mapping = DmmfModelOperations::new(model_name);
+                        let new_mapping = DmmfModelOperations::new(model_name.to_owned());
 
                         new_mapping.add_operation(tag_str, name);
                         self.mappings.model_operations.push(new_mapping);
@@ -147,15 +140,7 @@ impl RenderContext {
                 };
             } else {
                 match &info.tag {
-                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
-                    // eg: runCommandRaw
-                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
-                        self.mappings
-                            .other_operations
-                            .write
-                            .push(query_type.as_ref().unwrap().to_owned());
-                    }
-                    QueryTag::ExecuteRaw | QueryTag::QueryRaw { query_type: _ } => {
+                    QueryTag::ExecuteRaw | QueryTag::QueryRaw | QueryTag::RunCommandRaw => {
                         self.mappings.other_operations.write.push(info.tag.to_string());
                     }
                     _ => unreachable!("Invalid operations mapping."),

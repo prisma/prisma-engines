@@ -19,7 +19,7 @@ use crate::{
 use enumflags2::BitFlags;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
-    MigrationRecord, Namespaces, PersistenceNotInitializedError,
+    IntrospectionContext, MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
@@ -124,6 +124,11 @@ pub(crate) trait SqlFlavour:
         None
     }
 
+    /// Check a schema for preview features not implemented in migrate/introspection.
+    fn check_schema_features(&self, _schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     /// The connection string received in set_params().
     fn connection_string(&self) -> Option<&str>;
 
@@ -147,6 +152,10 @@ pub(crate) trait SqlFlavour:
     /// Drop the migrations table
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
+    /// List all visible tables in the given namespaces,
+    /// including the search path.
+    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
+
     /// Return an empty database schema. This happens in the flavour, because we need
     /// SqlSchema::connector_data to be set.
     fn empty_database_schema(&self) -> SqlSchema {
@@ -157,6 +166,15 @@ pub(crate) trait SqlFlavour:
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+
+    /// Same as [describe_schema], but only called for introspection.
+    fn introspect<'a>(
+        &'a mut self,
+        namespaces: Option<Namespaces>,
+        _ctx: &'a IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+        self.describe_schema(namespaces)
+    }
 
     fn load_migrations_table(
         &mut self,
@@ -241,7 +259,7 @@ pub(crate) trait SqlFlavour:
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Drop the database and recreate it empty.
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
     fn scan_migration_script(&self, _script: &str) {}

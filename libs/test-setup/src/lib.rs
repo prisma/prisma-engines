@@ -5,6 +5,7 @@
 //! engines.
 
 pub mod mysql;
+pub mod postgres;
 /// Tokio test runtime utils.
 pub mod runtime;
 
@@ -12,7 +13,6 @@ mod capabilities;
 mod diff;
 mod logging;
 mod mssql;
-mod postgres;
 mod sqlite;
 mod tags;
 mod test_api_args;
@@ -30,10 +30,10 @@ type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 #[macro_export]
 macro_rules! only {
     ($($tag:ident),*) => {
-        ::test_setup::only!($($tag,)* ; exclude: )
+        ::test_setup::only!($($tag),* ; exclude: )
     };
 
-    ($($tag:ident,)* ; exclude: $($excludeTag:ident),*) => {
+    ($($tag:ident),* ; exclude: $($excludeTag:ident),*) => {
         {
             use ::test_setup::Tags;
             let (skip, db) = ::test_setup::only_impl(
@@ -47,6 +47,12 @@ macro_rules! only {
 }
 
 pub struct TestDb(&'static test_api_args::DbUnderTest);
+
+impl TestDb {
+    pub fn url(&self) -> &'static str {
+        &self.0.database_url
+    }
+}
 
 #[doc(hidden)]
 #[inline(never)]

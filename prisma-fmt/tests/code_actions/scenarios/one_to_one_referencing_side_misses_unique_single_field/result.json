@@ -10,12 +10,12 @@
             "character": 2
           },
           "end": {
-            "line": 8,
-            "character": 55
+            "line": 9,
+            "character": 0
           }
         },
         "severity": 1,
-        "message": "The field has to be unique due to a relation"
+        "message": "Error parsing attribute \"@relation\": A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `bId`, or change the relation to one-to-many."
       }
     ],
     "edit": {

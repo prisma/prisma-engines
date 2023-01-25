@@ -158,7 +158,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -176,7 +176,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -194,7 +194,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -212,7 +212,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -230,7 +230,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -248,7 +248,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -266,7 +266,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -284,7 +284,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -302,7 +302,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -320,13 +320,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "User_bigserial_col_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -345,7 +342,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -363,7 +360,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -381,7 +378,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -399,7 +396,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -417,7 +414,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -435,7 +432,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -453,7 +450,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -471,7 +468,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -489,7 +486,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -507,7 +504,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -525,7 +522,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -543,7 +540,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -561,7 +558,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -579,7 +576,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -597,7 +594,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -615,7 +612,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -633,7 +630,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -651,7 +648,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -669,13 +666,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "User_smallserial_col_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                1,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -694,13 +688,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "User_serial_col_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                2,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -719,13 +710,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "User_primary_col_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                3,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -744,7 +732,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -762,7 +750,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -780,7 +768,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -798,7 +786,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -816,7 +804,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -834,7 +822,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -852,7 +840,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -870,7 +858,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -888,7 +876,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -906,7 +894,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -924,7 +912,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -942,12 +930,58 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        9,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "User_bigserial_col_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        28,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "User_smallserial_col_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        29,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "User_serial_col_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        30,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "User_primary_col_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -1083,12 +1117,10 @@ fn cross_schema_references_are_not_allowed(api: TestApi) {
     api.raw_cmd(&sql);
 
     let err = api.describe_error();
-    let fk_name = "User_city_fkey";
 
-    assert_eq!(
-        format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
-        err.to_string()
-    );
+    let expected = expect!["The schema of the introspected database was inconsistent: Cross schema references are only allowed when the target schema is listed in the schemas property of your datasource. `prisma-tests.User` points to `prisma-tests_2.City` in constraint `User_city_fkey`. Please add `prisma-tests_2` to your `schemas` property and run this command again."];
+
+    expected.assert_eq(&err.to_string());
 }
 
 #[test_connector(tags(Postgres))]
@@ -1149,7 +1181,7 @@ fn postgres_enums_must_work(api: TestApi) {
         api.schema_name()
     ));
     let schema = api.describe();
-    let got_enum = schema.walk(schema.find_enum("mood").expect("get enum"));
+    let got_enum = schema.walk(schema.find_enum("mood", None).expect("get enum"));
     let values = &["sad", "ok", "happy"];
 
     assert_eq!(got_enum.name(), "mood");
@@ -1293,7 +1325,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1311,15 +1343,10 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "meow, says the cat",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: false,
                     },
@@ -1338,15 +1365,10 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "\"That's a lot of fish!\" - Godzilla, 1998",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                1,
+                            ),
                         ),
                         auto_increment: false,
                     },
@@ -1365,21 +1387,57 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "\"That's a lot of fish!\" - Godzilla, 1998",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                2,
+                            ),
                         ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "meow, says the cat",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "\"That's a lot of fish!\" - Godzilla, 1998",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        3,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "\"That's a lot of fish!\" - Godzilla, 1998",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -1453,21 +1511,31 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    String(
-                                        "xyz\\Datasource\\Model",
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            String(
+                                "xyz\\Datasource\\Model",
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
@@ -1803,13 +1871,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_0_id_0_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -1828,15 +1893,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    Int(
-                                        0,
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                1,
+                            ),
                         ),
                         auto_increment: false,
                     },
@@ -1855,13 +1915,10 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_0_id_1_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                2,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -1880,21 +1937,66 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Value(
-                                    Int(
-                                        1,
-                                    ),
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                3,
+                            ),
                         ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
+            default_values: [
+                (
+                    ColumnId(
+                        0,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_0_id_0_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                0,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_0_id_1_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        3,
+                    ),
+                    DefaultValue {
+                        kind: Value(
+                            Int(
+                                1,
+                            ),
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+            ],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -2023,7 +2125,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2041,13 +2143,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_0_id_0_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                0,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -2066,13 +2165,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_1_id_1_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                1,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -2091,7 +2187,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2109,13 +2205,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_0_id_2_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                2,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -2134,13 +2227,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_1_id_3_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                3,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -2159,7 +2249,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2177,13 +2267,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: Some(
-                            DefaultValue {
-                                kind: Sequence(
-                                    "Table_2_id_4_seq",
-                                ),
-                                constraint_name: None,
-                            },
+                        default_value_id: Some(
+                            DefaultValueId(
+                                4,
+                            ),
                         ),
                         auto_increment: true,
                     },
@@ -2202,7 +2289,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default: None,
+                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2247,6 +2334,63 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     on_delete_action: NoAction,
                     on_update_action: NoAction,
                 },
+            ],
+            default_values: [
+                (
+                    ColumnId(
+                        1,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_0_id_0_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        2,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_1_id_1_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        4,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_0_id_2_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        5,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_1_id_3_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
+                (
+                    ColumnId(
+                        7,
+                    ),
+                    DefaultValue {
+                        kind: Sequence(
+                            "Table_2_id_4_seq",
+                        ),
+                        constraint_name: None,
+                    },
+                ),
             ],
             foreign_key_columns: [
                 ForeignKeyColumn {

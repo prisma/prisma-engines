@@ -1,26 +1,36 @@
 use crate::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
-use hyper::{Body, Method, Request, Response};
 use query_core::{schema::QuerySchemaRef, TxId};
 use query_engine::opt::PrismaOpt;
-use query_engine::server::{routes, setup, State};
+use query_engine::server::routes;
+use query_engine::state::{setup, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
+
+use hyper::{Body, Method, Request, Response};
+use quaint::{prelude::Queryable, single::Quaint};
+use std::env;
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
     state: State,
+    connection_url: String,
 }
 
 #[async_trait::async_trait]
 impl RunnerInterface for BinaryRunner {
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self> {
         let opts = PrismaOpt::from_list(&["binary", "--enable-raw-queries", "--datamodel", &datamodel]);
-        let state = setup(&opts, metrics).await.unwrap();
+        let state = setup(&opts, false, Some(metrics)).await.unwrap();
+
+        let configuration = opts.configuration(true).unwrap();
+        let data_source = configuration.datasources.first().unwrap();
+        let connection_url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
         Ok(BinaryRunner {
             state,
             connector_tag,
+            connection_url,
             current_tx_id: None,
         })
     }
@@ -44,6 +54,17 @@ impl RunnerInterface for BinaryRunner {
         let gql_response = json_to_gql_response(&json_resp);
 
         Ok(PrismaResponse::Single(gql_response).into())
+    }
+
+    async fn raw_execute(&self, query: String) -> TestResult<()> {
+        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
+            panic!("raw_execute is not supported for MongoDB yet");
+        }
+
+        let conn = Quaint::new(&self.connection_url).await?;
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
     }
 
     async fn batch(
@@ -205,7 +226,7 @@ fn json_to_gql_response(json_resp: &serde_json::Value) -> GQLResponse {
             let mut gql_response = GQLResponse::with_capacity(obj.keys().count());
 
             obj.iter().for_each(|(k, v)| {
-                gql_response.insert_data(k.to_string(), query_core::Item::Json(v.clone()));
+                gql_response.insert_data(k.to_string(), query_core::response_ir::Item::Json(v.clone()));
             });
             gql_response
         }

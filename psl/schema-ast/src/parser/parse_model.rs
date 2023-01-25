@@ -22,6 +22,7 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
             Rule::field_declaration => match parse_field(
                 &name.as_ref().unwrap().name,
+                "model",
                 current,
                 pending_field_comment.take(),
                 diagnostics,
@@ -44,6 +45,7 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             fields,
             attributes,
             documentation: doc_comment.and_then(parse_comment_block),
+            is_view: false,
             span: Span::from(pair_span),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),

@@ -66,6 +66,8 @@ pub struct SqlSchema {
     columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
+    /// All default values.
+    default_values: Vec<(ColumnId, DefaultValue)>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
@@ -87,6 +89,11 @@ impl SqlSchema {
     #[track_caller]
     pub fn downcast_connector_data<T: 'static>(&self) -> &T {
         self.connector_data.data.as_ref().unwrap().downcast_ref().unwrap()
+    }
+
+    /// The id of the next column
+    pub fn next_column_id(&self) -> ColumnId {
+        ColumnId(self.columns.len() as u32)
     }
 
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -111,15 +118,29 @@ impl SqlSchema {
     }
 
     /// Try to find an enum by name.
-    pub fn find_enum(&self, name: &str) -> Option<EnumId> {
-        self.enums.iter().position(|e| e.name == name).map(|i| EnumId(i as u32))
+    pub fn find_enum(&self, name: &str, namespace: Option<&str>) -> Option<EnumId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.enums
+            .iter()
+            .position(|e| e.name == name && ns_id.map(|id| id == e.namespace_id).unwrap_or(true))
+            .map(|i| EnumId(i as u32))
+    }
+
+    fn get_namespace(&self, name: &str) -> Option<NamespaceId> {
+        self.namespaces
+            .iter()
+            .position(|ns| ns == name)
+            .map(|i| NamespaceId(i as u32))
     }
 
     /// Try to find a table by name.
-    pub fn find_table(&self, name: &str) -> Option<TableId> {
+    pub fn find_table(&self, name: &str, namespace: Option<&str>) -> Option<TableId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
         self.tables
             .iter()
-            .position(|t| t.name == name)
+            .position(|t| t.name == name && ns_id.map(|id| id == t.namespace_id).unwrap_or(true))
             .map(|i| TableId(i as u32))
     }
 
@@ -198,6 +219,13 @@ impl SqlSchema {
             index_name,
             tpe: IndexType::Normal,
         });
+        id
+    }
+
+    /// Add an index to the schema.
+    pub fn push_default_value(&mut self, column_id: ColumnId, value: DefaultValue) -> DefaultValueId {
+        let id = DefaultValueId(self.default_values.len() as u32);
+        self.default_values.push((column_id, value));
         id
     }
 
@@ -310,7 +338,7 @@ impl SqlSchema {
         (0..self.user_defined_types.len()).map(move |udt_index| self.walk(UdtId(udt_index as u32)))
     }
 
-    pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
+    pub fn enum_walkers(&self) -> impl ExactSizeIterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| self.walk(EnumId(enum_index as u32)))
     }
 
@@ -420,6 +448,8 @@ pub struct Procedure {
 /// A user-defined type. Can map to another type, or be declared as assembly.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct UserDefinedType {
+    ///Namespace of the procedure
+    namespace_id: NamespaceId,
     /// Type name
     pub name: String,
     /// Type mapping
@@ -433,7 +463,7 @@ pub struct Column {
     /// Column type.
     pub tpe: ColumnType,
     /// Column default.
-    pub default: Option<DefaultValue>,
+    pub default_value_id: Option<DefaultValueId>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -535,6 +565,10 @@ impl ColumnTypeFamily {
 
     pub fn is_string(&self) -> bool {
         matches!(self, ColumnTypeFamily::String)
+    }
+
+    pub fn is_unsupported(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Unsupported(_))
     }
 }
 
@@ -663,6 +697,10 @@ impl DefaultValue {
         Self::new(DefaultKind::DbGenerated(Some(val.into())))
     }
 
+    pub fn constraint_name(&self) -> Option<&str> {
+        self.constraint_name.as_deref()
+    }
+
     pub fn now() -> Self {
         Self::new(DefaultKind::Now)
     }
@@ -675,6 +713,10 @@ impl DefaultValue {
         Self::new(DefaultKind::Sequence(val.to_string()))
     }
 
+    pub fn kind(&self) -> &DefaultKind {
+        &self.kind
+    }
+
     pub fn new(kind: DefaultKind) -> Self {
         Self {
             kind,
@@ -682,49 +724,27 @@ impl DefaultValue {
         }
     }
 
-    pub fn kind(&self) -> &DefaultKind {
-        &self.kind
-    }
-
-    pub fn into_kind(self) -> DefaultKind {
-        self.kind
-    }
-
     pub fn set_constraint_name(&mut self, name: impl ToString) {
         self.constraint_name = Some(name.to_string())
     }
 
-    pub fn constraint_name(&self) -> Option<&str> {
-        self.constraint_name.as_deref()
-    }
-
-    pub fn as_sequence(&self) -> Option<&str> {
-        match &self.kind {
-            DefaultKind::Sequence(name) => Some(name),
-            _ => None,
-        }
-    }
-
-    pub fn as_value(&self) -> Option<&PrismaValue> {
+    pub(crate) fn as_value(&self) -> Option<&PrismaValue> {
         match self.kind {
             DefaultKind::Value(ref v) => Some(v),
             _ => None,
         }
     }
 
-    pub fn is_value(&self) -> bool {
-        matches!(self.kind, DefaultKind::Value(_))
+    #[cfg(test)]
+    pub(crate) fn as_sequence<'a>(&'a self) -> Option<&'a str> {
+        match self.kind {
+            DefaultKind::Sequence(ref name) => Some(name),
+            _ => None,
+        }
     }
 
-    pub fn is_now(&self) -> bool {
-        matches!(self.kind, DefaultKind::Now)
-    }
-
-    pub fn is_sequence(&self) -> bool {
-        matches!(self.kind, DefaultKind::Sequence(_))
-    }
-
-    pub fn is_db_generated(&self) -> bool {
+    #[cfg(test)]
+    pub(crate) fn is_db_generated(&self) -> bool {
         matches!(self.kind, DefaultKind::DbGenerated(_))
     }
 
@@ -735,6 +755,12 @@ impl DefaultValue {
     pub fn with_constraint_name(mut self, constraint_name: Option<String>) -> Self {
         self.constraint_name = constraint_name;
         self
+    }
+
+    /// If the default value is the deprecated `dbgenerated()`
+    /// variant.
+    pub fn is_empty_dbgenerated(&self) -> bool {
+        matches!(self.kind, DefaultKind::DbGenerated(None))
     }
 }
 

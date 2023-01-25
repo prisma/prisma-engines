@@ -1,7 +1,11 @@
+use indoc::formatdoc;
+use psl_core::diagnostics::{DatamodelWarning, Span};
+use psl_core::parser_database::ast::WithSpan;
+use psl_core::parser_database::ReferentialAction;
 use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::Diagnostics,
-    parser_database::walkers::{IndexWalker, PrimaryKeyWalker},
+    parser_database::walkers::{IndexWalker, PrimaryKeyWalker, RelationFieldWalker},
 };
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
@@ -87,5 +91,39 @@ pub(crate) fn field_types_can_be_used_in_a_primary_key(
         errors.push_error(error);
 
         break;
+    }
+}
+
+pub(crate) fn uses_native_referential_action_set_default(
+    connector: &dyn Connector,
+    field: RelationFieldWalker<'_>,
+    diagnostics: &mut Diagnostics,
+) {
+    let get_span = |referential_action_type: &str| -> Span {
+        field
+            .ast_field()
+            .span_for_argument("relation", referential_action_type)
+            .unwrap_or_else(|| field.ast_field().span())
+    };
+
+    let warning_msg = || {
+        formatdoc!(
+            r#"
+            {connector_name} does not actually support the `{set_default}` referential action, so using it may result in unexpected errors.
+            Read more at https://pris.ly/d/mysql-set-default
+            "#,
+            connector_name = connector.name(),
+            set_default = ReferentialAction::SetDefault.as_str(),
+        ).replace('\n', " ")
+    };
+
+    if let Some(ReferentialAction::SetDefault) = field.explicit_on_delete() {
+        let span = get_span("onDelete");
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
+    }
+
+    if let Some(ReferentialAction::SetDefault) = field.explicit_on_update() {
+        let span = get_span("onUpdate");
+        diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
     }
 }

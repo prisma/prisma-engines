@@ -1,13 +1,13 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
 use psl::PreviewFeature;
 use query_core::{
     executor,
     schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, set_parent_context_from_json_str, QueryExecutor, TxId,
+    schema_builder, telemetry, QueryExecutor, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -206,7 +206,7 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect");
-            let _ = set_parent_context_from_json_str(&span, &trace);
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -220,25 +220,20 @@ impl QueryEngine {
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                let preview_features: Vec<_> = builder.schema.configuration.preview_features().iter().collect();
+                let preview_features = builder.schema.configuration.preview_features();
                 let url = data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
                     .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
 
-                let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
+                let executor = executor::load(data_source, preview_features, &url).await?;
                 let connector = executor.primary_connector();
                 connector.get_connection().await?;
 
                 // Build internal data model
-                let internal_data_model = prisma_models::convert(&builder.schema, db_name);
+                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
 
-                let query_schema = schema_builder::build(
-                    internal_data_model,
-                    true, // enable raw queries
-                    data_source.active_connector,
-                    preview_features,
-                    data_source.relation_mode(),
-                );
+                let enable_raw_queries = true;
+                let query_schema = schema_builder::build(internal_data_model, enable_raw_queries);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
@@ -269,7 +264,7 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = set_parent_context_from_json_str(&span, &trace);
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             async {
                 let mut inner = self.inner.write().await;
@@ -310,7 +305,7 @@ impl QueryEngine {
                     Span::none()
                 };
 
-                let trace_id = set_parent_context_from_json_str(&span, &trace);
+                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
                 let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                 let response = handler
@@ -337,17 +332,12 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-                set_parent_context_from_json_str(&span, &trace);
+                telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-                let input: TxInput = serde_json::from_str(&input)?;
+                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine
                     .executor()
-                    .start_tx(
-                        engine.query_schema().clone(),
-                        input.max_wait,
-                        input.timeout,
-                        input.isolation_level,
-                    )
+                    .start_tx(engine.query_schema().clone(), tx_opts)
                     .instrument(span)
                     .await
                 {
@@ -378,6 +368,18 @@ impl QueryEngine {
             }
             .with_subscriber(dispatcher)
             .await
+        })
+        .await
+    }
+
+    #[napi]
+    pub async fn dmmf(&self) -> napi::Result<String> {
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
+
+            Ok(serde_json::to_string(&dmmf)?)
         })
         .await
     }

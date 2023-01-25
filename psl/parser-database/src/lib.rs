@@ -40,9 +40,7 @@ pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 pub use schema_ast::{ast, SourceFile};
-pub use types::{
-    IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
-};
+pub use types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
 
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
@@ -71,7 +69,7 @@ pub struct ParserDatabase {
     ast: ast::SchemaAst,
     file: schema_ast::SourceFile,
     interner: interner::StringInterner,
-    _names: Names,
+    names: Names,
     types: Types,
     relations: Relations,
 }
@@ -96,7 +94,7 @@ impl ParserDatabase {
                 ast,
                 file,
                 interner,
-                _names: names,
+                names,
                 types,
                 relations,
             };
@@ -111,7 +109,7 @@ impl ParserDatabase {
                 ast,
                 file,
                 interner,
-                _names: names,
+                names,
                 types,
                 relations,
             };
@@ -129,7 +127,7 @@ impl ParserDatabase {
             ast,
             file,
             interner,
-            _names: names,
+            names,
             types,
             relations,
         }
@@ -153,11 +151,6 @@ impl ParserDatabase {
     /// The source file contents.
     pub fn source(&self) -> &str {
         self.file.as_str()
-    }
-
-    /// Global properties of the schema.
-    pub fn schema_flags(&self) -> enumflags2::BitFlags<types::SchemaFlags> {
-        self.types.flags
     }
 }
 

@@ -192,6 +192,25 @@ mod compound_batch {
         Ok(())
     }
 
+    #[connector_test]
+    async fn two_equal_queries(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        let queries = vec![
+            r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"} }) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtist(where:{firstName_lastName:{lastName:"Naukio",firstName:"Musti"} }) {firstName lastName}}"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findUniqueArtist":{"firstName":"Musti","lastName":"Naukio"}}}]}"###
+        );
+
+        Ok(())
+    }
+
     fn should_batch_schema() -> String {
         let schema = indoc! {
             r#"model Artist {
@@ -261,56 +280,56 @@ mod compound_batch {
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, OR: [{ non_unique: 0 }] }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, OR: [{ non_unique: 0 }] }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: Queries use boolean operators
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, AND: [{ non_unique: 0 }] }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, AND: [{ non_unique: 0 }] }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: Queries use boolean operators
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, NOT: [{ non_unique: 0 }] }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, NOT: [{ non_unique: 1 }] }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: Queries use relation
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, songs: { some: { title: "Bohemian Rapsody" } } }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, songs: { some: { title: "Somebody To Love" } } }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: Queries use non unique filter that's not EQUALS
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: One of the query uses a non unique filter that's not EQUALS
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"} }) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: One of the query is not a findUnique
         let doc = compact_batch(&runner, vec![
             r#"query {findManyArtist {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: { gt: 1 } }) {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         // NO COMPACT: One of the query is not a findUnique
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}, non_unique: 1 }) {firstName lastName}}"#.to_string(),
             r#"query {findManyArtist {firstName lastName}}"#.to_string(),
         ]).await?;
-        assert!(doc.is_compact() == false);
+        assert!(!doc.is_compact());
 
         Ok(())
     }

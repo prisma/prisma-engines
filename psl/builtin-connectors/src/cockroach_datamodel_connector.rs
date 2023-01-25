@@ -7,7 +7,8 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -50,6 +51,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::OrderByNullsFirstLast,
     ConnectorCapability::SupportsTxIsolationSerializable,
     ConnectorCapability::NativeUpsert,
+    ConnectorCapability::MultiSchema,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
@@ -192,7 +194,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_>, diagnostics: &mut Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, diagnostics: &mut Diagnostics) {
         validations::autoincrement_validations(model, diagnostics);
 
         for index in model.indexes() {

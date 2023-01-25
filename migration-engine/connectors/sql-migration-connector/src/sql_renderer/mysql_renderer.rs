@@ -20,22 +20,24 @@ use std::{borrow::Cow, fmt::Write as _};
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
-        ddl::Column {
-            column_name: col.name().into(),
-            not_null: col.arity().is_required(),
-            column_type: render_column_type(col),
-            default: col
-                .default()
-                .filter(|default| {
-                    !matches!(default.kind(),  DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None))
+        let default = col
+            .default()
+            .filter(|default| {
+                !matches!(default.kind(),  DefaultKind::Sequence(_) | DefaultKind::DbGenerated(None))
                     // We do not want to render JSON defaults because
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Binary if !default.is_db_generated())
-                })
-                .map(|default| render_default(col, default)),
+            })
+            .map(|default| render_default(col, default.inner()));
+
+        ddl::Column {
+            column_name: col.name().into(),
+            not_null: col.arity().is_required(),
+            column_type: render_column_type(col),
+            default,
             auto_increment: col.is_autoincrement(),
             ..Default::default()
         }
@@ -220,7 +222,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: TableName<&str>) -> String {
+    fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
         ddl::CreateTable {
             table_name: &table_name,
             columns: table.columns().map(|col| self.render_column(col)).collect(),
@@ -317,7 +319,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_redefine_table on MySQL")
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+    fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
         sql_ddl::mysql::AlterTable {
             table_name: name.into(),
             changes: vec![sql_ddl::mysql::AlterTableClause::RenameTo {
@@ -328,7 +330,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table(&self, table: TableWalker<'_>) -> String {
-        self.render_create_table_as(table, TableName(None, Quoted::mysql_ident(table.name())))
+        self.render_create_table_as(table, QuotedWithPrefix(None, Quoted::mysql_ident(table.name())))
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
@@ -361,6 +363,7 @@ fn render_mysql_modify(
         .unwrap_or_else(|| render_column_type(next_column));
 
     let default = new_default
+        .filter(|default| !default.is_empty_dbgenerated())
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {}", expression))
@@ -488,7 +491,7 @@ impl MysqlAlterColumn {
             {
                 Some(DefaultValue::db_generated(previous.clone()))
             }
-            _ => columns.next.default().cloned(),
+            _ => columns.next.default().map(|d| d.inner()).cloned(),
         };
 
         MysqlAlterColumn::Modify { changes, new_default }

@@ -1,7 +1,8 @@
 //! Composite types defined with the `type` keyword.
 
 use crate::{
-    default_value::DefaultValue, field::FieldArity, native_type_instance::NativeTypeInstance, scalars::ScalarType,
+    default_value::DefaultValue, native_type_instance::NativeTypeInstance, scalars::ScalarType, Field, FieldArity,
+    FieldType, ScalarField,
 };
 
 #[derive(Debug, PartialEq, Clone)]
@@ -27,6 +28,25 @@ pub struct CompositeTypeField {
 
     /// Should we comment this field out.
     pub is_commented_out: bool,
+}
+
+impl From<CompositeTypeField> for Field {
+    fn from(f: CompositeTypeField) -> Self {
+        let sf = ScalarField {
+            name: f.name,
+            field_type: FieldType::from(f.r#type),
+            arity: f.arity,
+            database_name: f.database_name,
+            default_value: f.default_value,
+            documentation: f.documentation,
+            is_generated: false,
+            is_updated_at: false,
+            is_commented_out: f.is_commented_out,
+            is_ignored: false,
+        };
+
+        Self::ScalarField(sf)
+    }
 }
 
 impl CompositeType {

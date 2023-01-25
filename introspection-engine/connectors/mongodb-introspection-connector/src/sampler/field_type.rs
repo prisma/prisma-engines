@@ -62,6 +62,48 @@ impl FieldType {
     pub(super) fn is_array(&self) -> bool {
         matches!(self, Self::Array(_))
     }
+
+    pub(super) fn is_unsupported(&self) -> bool {
+        matches!(self, Self::Unsupported(_))
+    }
+
+    pub(super) fn is_document(&self) -> bool {
+        matches!(self, Self::Document(_))
+    }
+
+    pub(super) fn has_documents(&self) -> bool {
+        match self {
+            Self::Document(_) | Self::Json => true,
+            Self::Array(typ) => typ.is_document(),
+            _ => false,
+        }
+    }
+
+    pub(super) fn prisma_type(&self) -> &str {
+        match self {
+            FieldType::String => "String",
+            FieldType::Double => "Float",
+            FieldType::BinData => "Bytes",
+            FieldType::ObjectId => "String",
+            FieldType::Bool => "Boolean",
+            FieldType::Date => "DateTime",
+            FieldType::Int32 => "Int",
+            FieldType::Timestamp => "DateTime",
+            FieldType::Int64 => "BigInt",
+            FieldType::Json => "Json",
+            FieldType::Document(ref s) => s,
+            FieldType::Array(ref r#type) => r#type.prisma_type(),
+            FieldType::Unsupported(r#type) => r#type,
+        }
+    }
+
+    pub(super) fn native_type(&self) -> Option<&str> {
+        match self {
+            Self::ObjectId => Some("ObjectId"),
+            FieldType::Date => Some("Date"),
+            _ => None,
+        }
+    }
 }
 
 impl fmt::Display for FieldType {

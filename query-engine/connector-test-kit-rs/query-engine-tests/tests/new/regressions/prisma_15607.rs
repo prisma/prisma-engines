@@ -3,18 +3,14 @@
 //! transaction progresses, the test uses separate engines inside
 //! actors to allow test to continue even if one query is blocking.
 
-use std::future::Future;
-
 use indoc::indoc;
-use once_cell::sync::Lazy;
 use query_engine_tests::{
     query_core::TxId, render_test_datamodel, setup_metrics, setup_project, test_tracing_subscriber, ConnectorTag,
-    LogEmit, QueryResult, Runner, TestConfig, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber,
+    LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG,
     ENV_LOG_LEVEL,
 };
+use std::future::Future;
 use tokio::sync::mpsc;
-
-static CONFIG: Lazy<TestConfig> = Lazy::new(|| TestConfig::load().unwrap());
 
 const SCHEMA: &str = indoc! {r#"
     model Country {
@@ -56,8 +52,12 @@ impl Actor {
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
         async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
-            fut.with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, setup_metrics(), log_tx))
-                .await
+            fut.with_subscriber(test_tracing_subscriber(
+                ENV_LOG_LEVEL.to_string(),
+                setup_metrics(),
+                log_tx,
+            ))
+            .await
         }
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);
@@ -235,21 +235,10 @@ async fn sqlserver_can_recover_from_deadlocks() -> TestResult<()> {
     let res2 = conn2.recv_query_response().await?;
 
     if res1.failed() {
-        insta::assert_snapshot!(&res1.to_string_pretty(), @r###"
-        {
-          "errors": [
-            {
-              "error": "Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Transaction failed due to a write conflict or a deadlock. Please retry your transaction\", meta: Object {}, error_code: \"P2034\" }), kind: TransactionWriteConflict })",
-              "user_facing_error": {
-                "is_panic": false,
-                "message": "Transaction failed due to a write conflict or a deadlock. Please retry your transaction",
-                "meta": {},
-                "error_code": "P2034"
-              }
-            }
-          ]
-        }
-        "###);
+        res1.assert_failure(
+            2034,
+            Some("Transaction failed due to a write conflict or a deadlock.".to_string()),
+        );
 
         // Rollback the successful transaction, so the failed one can continue.
         conn2.rollback(tx2.clone()).await?;
@@ -258,21 +247,10 @@ async fn sqlserver_can_recover_from_deadlocks() -> TestResult<()> {
         // connection must be usable at this point.
         conn1.run_query(r#"query { findManyCity(where: {}) { id } }"#).await?;
     } else if res2.failed() {
-        insta::assert_snapshot!(&res2.to_string_pretty(), @r###"
-        {
-          "errors": [
-            {
-              "error": "Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Transaction failed due to a write conflict or a deadlock. Please retry your transaction\", meta: Object {}, error_code: \"P2034\" }), kind: TransactionWriteConflict })",
-              "user_facing_error": {
-                "is_panic": false,
-                "message": "Transaction failed due to a write conflict or a deadlock. Please retry your transaction",
-                "meta": {},
-                "error_code": "P2034"
-              }
-            }
-          ]
-        }
-        "###);
+        res2.assert_failure(
+            2034,
+            Some("Transaction failed due to a write conflict or a deadlock".to_string()),
+        );
 
         // Rollback the successful transaction, so the failed one can continue.
         conn1.rollback(tx1.clone()).await?;

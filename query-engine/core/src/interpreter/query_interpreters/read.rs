@@ -264,9 +264,8 @@ pub fn extract_aggregation_rows_from_scalars(
         .collect();
 
     let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
-    let mut n_record_removed = 0;
 
-    for (index_to_remove, aggr_sel) in indexes_to_remove.into_iter() {
+    for (n_record_removed, (index_to_remove, aggr_sel)) in indexes_to_remove.into_iter().enumerate() {
         let index_to_remove = index_to_remove - n_record_removed;
 
         // Remove all aggr field names
@@ -283,7 +282,6 @@ pub fn extract_aggregation_rows_from_scalars(
                 None => aggregation_rows.push(vec![aggr_result]),
             }
         }
-        n_record_removed += 1;
     }
 
     (scalars, Some(aggregation_rows))
@@ -299,6 +297,7 @@ fn record_not_found() -> InterpretationResult<QueryResult> {
             },
         )),
         kind: connector::error::ErrorKind::RecordDoesNotExist,
+        transient: false,
     }
     .into())
 }

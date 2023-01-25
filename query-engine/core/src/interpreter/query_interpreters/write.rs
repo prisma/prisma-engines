@@ -17,7 +17,7 @@ pub async fn execute(
         WriteQuery::DeleteRecord(q) => delete_one(tx, q, trace_id).await,
         WriteQuery::UpdateManyRecords(q) => update_many(tx, q, trace_id).await,
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q, trace_id).await,
-        WriteQuery::ConnectRecords(q) => connect(tx, q).await,
+        WriteQuery::ConnectRecords(q) => connect(tx, q, trace_id).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q, trace_id).await,
         WriteQuery::ExecuteRaw(q) => execute_raw(tx, q).await,
         WriteQuery::QueryRaw(q) => query_raw(tx, q).await,
@@ -113,7 +113,7 @@ async fn update_many(
 ) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(&q.model, q.record_filter, q.args, trace_id).await?;
 
-    Ok(QueryResult::Count(res as usize))
+    Ok(QueryResult::Count(res))
 }
 
 async fn delete_many(
@@ -126,11 +126,16 @@ async fn delete_many(
     Ok(QueryResult::Count(res))
 }
 
-async fn connect(tx: &mut dyn ConnectionLike, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+async fn connect(
+    tx: &mut dyn ConnectionLike,
+    q: ConnectRecords,
+    trace_id: Option<String>,
+) -> InterpretationResult<QueryResult> {
     tx.m2m_connect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for connect"),
         &q.child_ids,
+        trace_id,
     )
     .await?;
 

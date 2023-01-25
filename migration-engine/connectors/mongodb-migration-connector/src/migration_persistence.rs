@@ -1,12 +1,12 @@
 use crate::MongoDbMigrationConnector;
-use migration_connector::{BoxFuture, ConnectorResult, MigrationPersistence};
+use migration_connector::{BoxFuture, ConnectorResult, MigrationPersistence, Namespaces};
 
 impl MigrationPersistence for MongoDbMigrationConnector {
     fn baseline_initialize(&mut self) -> migration_connector::BoxFuture<'_, ConnectorResult<()>> {
         unsupported_command_error()
     }
 
-    fn initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn initialize(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         unsupported_command_error()
     }
 

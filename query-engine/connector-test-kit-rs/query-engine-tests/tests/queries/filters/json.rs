@@ -216,14 +216,14 @@ mod json {
             &runner,
             r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
             2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": String(\"{}\")}), want: Json"
+            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object([(\"equals\", String(\"{}\"))]), want: Json"
         );
 
         assert_error!(
             &runner,
             r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
             2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Null}), want: Json"
+            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object([(\"equals\", Null)]), want: Json"
         );
 
         Ok(())

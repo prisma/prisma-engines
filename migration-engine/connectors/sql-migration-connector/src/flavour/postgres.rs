@@ -8,9 +8,9 @@ use indoc::indoc;
 use migration_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
-use quaint::connector::PostgresUrl;
+use quaint::{connector::PostgresUrl, Value};
 use sql_schema_describer::SqlSchema;
-use std::{collections::HashMap, future, time};
+use std::{borrow::Cow, collections::HashMap, future, time};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -76,6 +76,10 @@ impl PostgresFlavour {
                 .map(|c| c.contains(Circumstances::IsCockroachDb))
                 .unwrap_or(false)
     }
+
+    pub(crate) fn schema_name(&self) -> &str {
+        self.state.params().map(|p| p.url.schema()).unwrap_or("public")
+    }
 }
 
 impl SqlFlavour for PostgresFlavour {
@@ -118,6 +122,34 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
+    fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let search_path = self.schema_name().to_string();
+
+            let mut namespaces: Vec<_> = namespaces
+                .map(|ns| ns.into_iter().map(Value::text).collect())
+                .unwrap_or_default();
+
+            namespaces.push(Value::text(search_path));
+
+            let select = r#"
+                SELECT tbl.relname AS table_name
+                FROM pg_class AS tbl
+                INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
+                WHERE tbl.relkind = 'r' AND namespace.nspname = ANY ( $1 )
+            "#;
+
+            let rows = self.query_raw(select, &[Value::array(namespaces)]).await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
+        })
+    }
+
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector {
         if self.is_cockroachdb() {
             psl::builtin_connectors::COCKROACH
@@ -129,6 +161,22 @@ impl SqlFlavour for PostgresFlavour {
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(self, |params, circumstances, conn| async move {
             conn.describe_schema(circumstances, params, namespaces).await
+        })
+    }
+
+    fn introspect<'a>(
+        &'a mut self,
+        namespaces: Option<Namespaces>,
+        ctx: &'a migration_connector::IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+        with_connection(self, move |params, circumstances, conn| async move {
+            let mut enriched_circumstances = circumstances;
+            if circumstances.contains(Circumstances::IsCockroachDb)
+                && ctx.previous_schema().connector.is_provider("postgresql")
+            {
+                enriched_circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
+            }
+            conn.describe_schema(enriched_circumstances, params, namespaces).await
         })
     }
 
@@ -250,7 +298,7 @@ impl SqlFlavour for PostgresFlavour {
 
     fn empty_database_schema(&self) -> SqlSchema {
         let mut schema = SqlSchema::default();
-        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        schema.set_connector_data(Box::<sql_schema_describer::postgres::PostgresSchemaExt>::default());
         schema
     }
 
@@ -264,14 +312,27 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
-            let schema_name = params.url.schema();
+            let schemas_to_reset = match namespaces {
+                Some(ns) => ns.into_iter().map(Cow::Owned).collect(),
+                None => vec![Cow::Borrowed(params.url.schema())],
+            };
 
-            conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
-                .await?;
-            conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
-                .await?;
+            tracing::info!(?schemas_to_reset, "Resetting schema(s)");
+
+            for schema_name in schemas_to_reset {
+                conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
+                    .await?;
+                conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
+                    .await?;
+            }
+
+            // Drop the migrations table in the main schema, otherwise migrate dev will not
+            // perceive that as a reset, since migrations are still marked as applied.
+            //
+            // We don't care if this fails.
+            conn.raw_cmd("DROP TABLE _prisma_migrations", &params.url).await.ok();
 
             Ok(())
         })
@@ -342,7 +403,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 tracing::info!("Connecting to user-provided shadow database.");
 
-                if shadow_database.reset().await.is_err() {
+                if shadow_database.reset(namespaces.clone()).await.is_err() {
                     crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
                 }
 
@@ -448,6 +509,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection
 #[repr(u8)]
 pub(crate) enum Circumstances {
     IsCockroachDb,
+    CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
 }
 
 #[allow(clippy::needless_collect)] // clippy is wrong
@@ -515,6 +577,7 @@ where
                             //     let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
 
                             //     return Err(ConnectorError::from_msg(msg.to_owned()));
+                            // }
 
                             if !db_is_cockroach && provider_is_cockroachdb {
                                 let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";

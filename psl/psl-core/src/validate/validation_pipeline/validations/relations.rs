@@ -7,7 +7,8 @@ mod visited_relation;
 use super::constraint_namespace::ConstraintName;
 use crate::datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, RelationMode};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use indoc::indoc;
+use diagnostics::DatamodelWarning;
+use indoc::formatdoc;
 use itertools::Itertools;
 use parser_database::ReferentialAction;
 use parser_database::{
@@ -145,9 +146,9 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: 
     let model = relation.referenced_model().name();
 
     let message = if fields.len() == 1 {
-        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
+        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.", fields.join(", "), model)
     } else {
-        format!("The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
+        format!("The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.", fields.join(", "), model)
     };
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -199,7 +200,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
 
     ctx.push_error(DatamodelError::new_validation_error(
         &format!(
-            "The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
+            "The argument `references` must refer to a unique criterion in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
@@ -545,25 +546,56 @@ pub(crate) fn required_relation_cannot_use_set_null(relation: InlineRelationWalk
         return;
     }
 
-    if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            indoc! {r#"
-                The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
-                Either choose another referential action, or make the referenced fields optional.
-            "#},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
-    }
+    let span = forward.ast_field().span();
 
-    if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            indoc! {r#"
-                The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
+    if ctx
+        .connector
+        .allows_set_null_referential_action_on_non_nullable_fields(ctx.relation_mode)
+    {
+        // the database allows SetNull on non-nullable fields, we add a validation warning to avoid breaking changes
+        let warning_template = |referential_action_type: &str| {
+            formatdoc!(
+                    r#"
+                    The `{referential_action_type}` referential action of a relation should not be set to `{set_null}` when a referenced field is required.
+                    We recommend either to choose another referential action, or to make the referenced fields optional.
+                    Read more at https://pris.ly/d/postgres-set-null
+                    "#,
+                    set_null = ReferentialAction::SetNull.as_str(),
+                ).replace('\n', " ")
+        };
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_warning(DatamodelWarning::new(warning_template("onDelete"), span))
+        }
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_warning(DatamodelWarning::new(warning_template("onUpdate"), span))
+        }
+    } else {
+        // the database allows does not allow SetNull on non-nullable fields, we add a validation error
+        let error_template = |referential_action_type: &str| {
+            let set_null = ReferentialAction::SetNull.as_str();
+            let msg = formatdoc! {r#"
+                The `{referential_action_type}` referential action of a relation must not be set to `{set_null}` when a referenced field is required.
                 Either choose another referential action, or make the referenced fields optional.
-            "#},
-            RELATION_ATTRIBUTE_NAME,
-            forward.ast_field().span(),
-        ))
+            "#};
+            msg
+        };
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &error_template("onDelete"),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
+
+        if let Some(ReferentialAction::SetNull) = forward.explicit_on_update() {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &error_template("onUpdate"),
+                RELATION_ATTRIBUTE_NAME,
+                span,
+            ))
+        }
     }
 }

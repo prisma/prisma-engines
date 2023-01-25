@@ -22,7 +22,7 @@ pub(crate) fn map_field_output_type(ctx: &mut BuilderContext, model_field: &Mode
 }
 
 pub(crate) fn map_scalar_output_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
-    map_scalar_output_type(ctx, &field.type_identifier, field.is_list())
+    map_scalar_output_type(ctx, &field.type_identifier(), field.is_list())
 }
 
 pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> OutputType {
@@ -111,7 +111,7 @@ where
     F: Fn(&mut BuilderContext, &RelationFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
-    let ident = Identifier::new(format!("{}CountOutputType", capitalize(&model.name)), PRISMA_NAMESPACE);
+    let ident = Identifier::new(format!("{}CountOutputType", capitalize(model.name())), PRISMA_NAMESPACE);
     return_cached_output!(ctx, &ident);
 
     let fields: Vec<OutputField> = fields
@@ -119,11 +119,11 @@ where
         .map(|rf| {
             let mut args = vec![];
 
-            if ctx.has_feature(&PreviewFeature::FilteredRelationCount) {
+            if ctx.has_feature(PreviewFeature::FilteredRelationCount) {
                 args.push(arguments::where_argument(ctx, &rf.related_model()))
             }
 
-            field(rf.name.clone(), args, type_mapper(ctx, rf), None)
+            field(rf.name(), args, type_mapper(ctx, rf), None)
         })
         .collect();
 

@@ -3,10 +3,10 @@
 //! Why this rather than using connectors directly? We must be able to use the migration engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
+use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector, Namespaces};
-use psl::parser_database::SourceFile;
+use psl::{parser_database::SourceFile, PreviewFeature};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
@@ -19,7 +19,7 @@ use tracing_futures::Instrument;
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
-    initial_datamodel: Option<String>,
+    initial_datamodel: Option<psl::ValidatedSchema>,
     host: Arc<dyn ConnectorHost>,
     // A map from either:
     //
@@ -46,10 +46,20 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
         EngineState {
-            initial_datamodel,
+            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
             host: host.unwrap_or_else(|| Arc::new(migration_connector::EmptyHost)),
             connectors: Default::default(),
         }
+    }
+
+    fn namespaces(&self) -> Option<Namespaces> {
+        self.initial_datamodel
+            .as_ref()
+            .and_then(|schema| schema.configuration.datasources.first())
+            .and_then(|ds| {
+                let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
+                Namespaces::from_vec(&mut names)
+            })
     }
 
     async fn with_connector_from_schema_path<O: Send + 'static>(
@@ -170,7 +180,7 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema, None, f).await
+        self.with_connector_for_schema(schema.db.source(), None, f).await
     }
 }
 
@@ -182,8 +192,13 @@ impl GenericApi for EngineState {
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
+        let namespaces = self.namespaces();
+
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(commands::apply_migrations(input, connector).instrument(tracing::info_span!("ApplyMigrations")))
+            Box::pin(
+                commands::apply_migrations(input, connector, namespaces)
+                    .instrument(tracing::info_span!("ApplyMigrations")),
+            )
         }))
         .await
     }
@@ -247,8 +262,13 @@ impl GenericApi for EngineState {
     }
 
     async fn dev_diagnostic(&self, input: DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
-        self.with_default_connector(Box::new(|connector| {
-            Box::pin(commands::dev_diagnostic(input, connector).instrument(tracing::info_span!("DevDiagnostic")))
+        let namespaces = self.namespaces();
+        self.with_default_connector(Box::new(move |connector| {
+            Box::pin(async move {
+                commands::dev_diagnostic(input, namespaces, connector)
+                    .instrument(tracing::info_span!("DevDiagnostic"))
+                    .await
+            })
         }))
         .await
     }
@@ -266,11 +286,13 @@ impl GenericApi for EngineState {
         &self,
         input: commands::DiagnoseMigrationHistoryInput,
     ) -> CoreResult<commands::DiagnoseMigrationHistoryOutput> {
-        self.with_default_connector(Box::new(|connector| {
-            Box::pin(
-                commands::diagnose_migration_history(input, connector)
-                    .instrument(tracing::info_span!("DiagnoseMigrationHistory")),
-            )
+        let namespaces = self.namespaces();
+        self.with_default_connector(Box::new(move |connector| {
+            Box::pin(async move {
+                commands::diagnose_migration_history(input, namespaces, connector)
+                    .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
+                    .await
+            })
         }))
         .await
     }
@@ -299,30 +321,60 @@ impl GenericApi for EngineState {
     }
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
+        tracing::info!("{:?}", params.schema);
         let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
-        let schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+
+        let has_some_namespaces = params.schemas.is_some();
+        let composite_type_depth = From::from(params.composite_type_depth);
+
+        let ctx = if params.force {
+            let previous_schema = psl::validate(source_file);
+            migration_connector::IntrospectionContext::new_config_only(
+                previous_schema,
+                composite_type_depth,
+                params.schemas,
+            )
+        } else {
+            let previous_schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
+            migration_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
+        };
+
+        if !ctx
+            .configuration()
+            .preview_features()
+            .contains(PreviewFeature::MultiSchema)
+            && has_some_namespaces
+        {
+            let msg =
+                "The preview feature `multiSchema` must be enabled before using --schemas command line parameter.";
+
+            return Err(CoreError::from_msg(msg.to_string()));
+        }
+
         self.with_connector_for_schema(
             &params.schema,
             None,
             Box::new(move |connector| {
-                let composite_type_depth = From::from(params.composite_type_depth as isize);
-                let ctx = migration_connector::IntrospectionContext::new(schema, composite_type_depth);
                 Box::pin(async move {
-                    // TODO(MultiSchema): Grab namespaces from introspect params?
-                    let result = connector.introspect(&ctx, None).await?;
+                    let result = connector.introspect(&ctx).await?;
 
-                    Ok(IntrospectResult {
-                        datamodel: result.data_model,
-                        version: format!("{:?}", result.version),
-                        warnings: result
-                            .warnings
-                            .into_iter()
-                            .map(|warning| crate::json_rpc::types::IntrospectionWarning {
-                                code: warning.code as u32,
-                                message: warning.message,
-                            })
-                            .collect(),
-                    })
+                    if result.is_empty {
+                        Err(ConnectorError::into_introspection_result_empty_error())
+                    } else {
+                        Ok(IntrospectResult {
+                            datamodel: result.data_model,
+                            version: format!("{:?}", result.version),
+                            warnings: result
+                                .warnings
+                                .into_iter()
+                                .map(|warning| crate::json_rpc::types::IntrospectionWarning {
+                                    code: warning.code,
+                                    message: warning.message,
+                                    affected: warning.affected,
+                                })
+                                .collect(),
+                        })
+                    }
                 })
             }),
         )
@@ -366,9 +418,9 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn reset(&self, namespaces: Option<Namespaces>) -> CoreResult<()> {
+    async fn reset(&self) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
-
+        let namespaces = self.namespaces();
         self.with_default_connector(Box::new(move |connector| {
             Box::pin(MigrationConnector::reset(connector, false, namespaces).instrument(tracing::info_span!("Reset")))
         }))

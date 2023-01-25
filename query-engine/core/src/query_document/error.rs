@@ -1,4 +1,4 @@
-use crate::{query_document::QueryValue, schema::InputType};
+use crate::{query_document::PrismaValue, schema::InputType};
 use fmt::Display;
 use itertools::Itertools;
 use std::fmt;
@@ -63,7 +63,7 @@ pub enum QueryParserErrorKind {
     ArgumentNotFoundError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
-    ValueTypeMismatchError { have: QueryValue, want: InputType },
+    ValueTypeMismatchError { have: PrismaValue, want: InputType },
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
     ValueFitError(String),
 }

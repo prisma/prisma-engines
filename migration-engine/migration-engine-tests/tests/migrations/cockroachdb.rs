@@ -55,7 +55,7 @@ fn soft_resets_work_on_cockroachdb(mut api: TestApi) {
 
     api.raw_cmd(initial);
     api.assert_schema().assert_tables_count(1).assert_has_table("Cat");
-    api.reset().soft(true).send_sync();
+    api.reset().soft(true).send_sync(None);
     api.assert_schema().assert_tables_count(0);
 }
 
@@ -1328,4 +1328,62 @@ fn schema_from_introspection_docs_works(api: TestApi) {
 
     let expected = expect!["-- This is an empty migration."];
     expected.assert_eq(&migration);
+}
+
+#[test]
+fn cockroach_introspection_with_postgres_provider_works() {
+    let test_db = test_setup::only!(CockroachDb);
+    let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
+        test_db.url(),
+        "cockroach_introspection_with_postgres_provider_works",
+    ))
+    .unwrap();
+
+    let me = migration_core::migration_api(None, None).unwrap();
+
+    tok(me.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),
+        script: r#"
+            CREATE TABLE "prisma-tests"."Post" (
+                "id" TEXT NOT NULL,
+                "title" VARCHAR NOT NULL,
+                "content" STRING,
+                "authorId" CHARACTER VARYING,
+                "exampleChar" CHAR,
+                "exampleCharLength" CHAR(16),
+                "exampleBit" BIT,
+                "exampleBitLength" BIT(16),
+                PRIMARY KEY ("id")
+            );
+
+            CREATE TABLE "prisma-tests"."User" (
+                "id" TEXT,
+                "email" STRING(32) NOT NULL,
+                "name" CHARACTER VARYING(32),
+                PRIMARY KEY ("id")
+            );
+            "#
+        .to_owned(),
+    }))
+    .unwrap();
+
+    let schema = format! {
+        r#"
+            datasource db {{
+                provider = "postgres"
+                url = "{url_str}"
+            }}
+        "#,
+    };
+
+    let result = tok(me.introspect(migration_core::json_rpc::types::IntrospectParams {
+        composite_type_depth: -1,
+        force: false,
+        schema,
+        schemas: None,
+    }))
+    .unwrap();
+
+    assert_eq!(result.version, "NonPrisma");
+    assert!(result.datamodel.contains("@db.VarChar(32)"));
 }

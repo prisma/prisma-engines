@@ -6,30 +6,29 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::{Datasource, PreviewFeature};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct Mysql {
     pool: Quaint,
     connection_info: ConnectionInfo,
-    features: Vec<PreviewFeature>,
+    features: psl::PreviewFeatures,
 }
 
 impl Mysql {
     /// Get MySQL's preview features.
-    pub fn features(&self) -> &[PreviewFeature] {
-        self.features.as_ref()
+    pub fn features(&self) -> psl::PreviewFeatures {
+        self.features
     }
 }
 
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(
-        _source: &Datasource,
+        _source: &psl::Datasource,
         url: &str,
-        features: &[PreviewFeature],
-    ) -> connector_interface::Result<Self> {
+        features: psl::PreviewFeatures,
+    ) -> connector_interface::Result<Mysql> {
         let database_str = url;
 
         let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
@@ -62,14 +61,18 @@ impl Connector for Mysql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features.clone());
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
     }
 
-    fn name(&self) -> String {
-        "mysql".to_owned()
+    fn name(&self) -> &'static str {
+        "mysql"
+    }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
     }
 }

@@ -1,0 +1,10 @@
+model PostableEntity {
+  id     String  @id
+  Post   Post?   @relation(fields: [postId], references: [id])
+  postId String?
+}
+
+model Post {
+  id               String           @id
+  postableEntities PostableEntity[]
+}

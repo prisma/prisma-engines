@@ -57,6 +57,20 @@ impl SqlFlavour for SqliteFlavour {
             .map(|p| p.connector_params.connection_string.as_str())
     }
 
+    fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
+        Box::pin(async move {
+            let select = r#"SELECT name AS table_name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
+            let rows = self.query_raw(select, &[]).await?;
+
+            let table_names: Vec<String> = rows
+                .into_iter()
+                .flat_map(|row| row.get("table_name").and_then(|s| s.to_string()))
+                .collect();
+
+            Ok(table_names)
+        })
+    }
+
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -241,11 +255,36 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.query_raw(sql, params)))
     }
 
+    fn introspect(
+        &mut self,
+        namespaces: Option<Namespaces>,
+        _ctx: &migration_connector::IntrospectionContext,
+    ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+        Box::pin(async move {
+            if let Some(params) = self.state.params() {
+                let path = std::path::Path::new(&params.file_path);
+                if std::fs::metadata(path).is_err() {
+                    return Err(ConnectorError::user_facing(
+                        user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                            database_file_name: path
+                                .file_name()
+                                .map(|name| name.to_string_lossy().into_owned())
+                                .unwrap_or_default(),
+                            database_file_path: params.file_path.clone(),
+                        },
+                    ));
+                }
+            }
+
+            self.describe_schema(namespaces).await
+        })
+    }
+
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, |_, conn| conn.raw_cmd(sql)))
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, move |params, connection| {
             let file_path = &params.file_path;
 

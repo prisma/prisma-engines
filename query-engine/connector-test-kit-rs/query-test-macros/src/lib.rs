@@ -37,9 +37,9 @@ trait IntoDarlingError<T> {
 impl<T> IntoDarlingError<T> for std::result::Result<T, TestError> {
     fn into_darling_error(self, span: &Span) -> std::result::Result<T, darling::Error> {
         self.map_err(|err| match err {
-            TestError::ParseError(msg) => darling::Error::custom(&format!("Parsing error: {}.", msg)).with_span(span),
+            TestError::ParseError(msg) => darling::Error::custom(format!("Parsing error: {}.", msg)).with_span(span),
             TestError::ConfigError(msg) => {
-                darling::Error::custom(&format!("Configuration error: {}.", msg)).with_span(span)
+                darling::Error::custom(format!("Configuration error: {}.", msg)).with_span(span)
             }
             err => unimplemented!("{:?} not yet handled for test setup compilation", err),
         })

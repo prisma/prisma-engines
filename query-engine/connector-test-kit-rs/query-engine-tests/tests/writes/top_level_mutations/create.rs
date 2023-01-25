@@ -38,26 +38,32 @@ mod create {
     // "A Create Mutation" should "create and return item"
     #[connector_test]
     async fn create_should_work(runner: Runner) -> TestResult<()> {
+        // This test is flaky on CockroachDB because of a TX write conflict.
+        // We mitigate this issue by retrying multiple times.
+        let res = retry!(
+            {
+                runner.query(format!(
+                    r#"mutation {{
+                      createOneScalarModel(data: {{
+                        id: "1",
+                        optString: "lala{}",
+                        optInt: 1337,
+                        optFloat: 1.234,
+                        optBoolean: true,
+                        optEnum: A,
+                        optDateTime: "2016-07-31T23:59:01.000Z"
+                      }}) {{
+                        id, optString, optInt, optFloat, optBoolean, optEnum, optDateTime
+                      }}
+                    }}"#,
+                    TROUBLE_CHARS
+                ))
+            },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(
-            runner,
-            format!(
-                r#"mutation {{
-                  createOneScalarModel(data: {{
-                    id: "1",
-                    optString: "lala{}",
-                    optInt: 1337,
-                    optFloat: 1.234,
-                    optBoolean: true,
-                    optEnum: A,
-                    optDateTime: "2016-07-31T23:59:01.000Z"
-                  }}) {{
-                    id, optString, optInt, optFloat, optBoolean, optEnum, optDateTime
-                  }}
-                }}"#,
-                TROUBLE_CHARS
-            )
-        ),
+          res.to_string(),
           @r###"{"data":{"createOneScalarModel":{"id":"1","optString":"lala¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀","optInt":1337,"optFloat":1.234,"optBoolean":true,"optEnum":"A","optDateTime":"2016-07-31T23:59:01.000Z"}}}"###
         );
 

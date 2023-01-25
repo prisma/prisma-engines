@@ -155,14 +155,13 @@ fn run_relation_link_test_impl(
     if ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
         let connector = config.test_connector_tag().unwrap();
-        let requires_teardown = connector.requires_teardown();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
         let (log_capture, log_tx) = TestLogCapture::new();
 
         run_with_tokio(
             async move {
-                tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                println!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
                 let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
@@ -171,11 +170,13 @@ fn run_relation_link_test_impl(
 
                 test_fn(&runner, &dm_with_params_json).await.unwrap();
 
-                if requires_teardown {
-                    teardown_project(&datamodel, Default::default()).await.unwrap();
-                }
+                teardown_project(&datamodel, Default::default()).await.unwrap();
             }
-            .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
+            .with_subscriber(test_tracing_subscriber(
+                ENV_LOG_LEVEL.to_string(),
+                metrics_for_subscriber,
+                log_tx,
+            )),
         );
     }
 }
@@ -268,9 +269,9 @@ pub fn run_connector_test_impl(
 
     crate::run_with_tokio(
         async {
+            println!("Used datamodel:\n {}", datamodel.clone().yellow());
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
-            let requires_teardown = connector.requires_teardown();
             let runner = Runner::load(
                 crate::CONFIG.runner(),
                 datamodel.clone(),
@@ -283,11 +284,13 @@ pub fn run_connector_test_impl(
 
             test_fn(runner).await.unwrap();
 
-            if requires_teardown {
-                crate::teardown_project(&datamodel, db_schemas).await.unwrap();
-            }
+            crate::teardown_project(&datamodel, db_schemas).await.unwrap();
         }
-        .with_subscriber(test_tracing_subscriber(&ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
+        .with_subscriber(test_tracing_subscriber(
+            ENV_LOG_LEVEL.to_string(),
+            metrics_for_subscriber,
+            log_tx,
+        )),
     );
 }
 

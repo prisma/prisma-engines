@@ -12,13 +12,8 @@ pub struct InternalDataModel {
     pub(crate) relations: OnceCell<Vec<RelationRef>>,
     pub(crate) relation_fields: OnceCell<Vec<RelationFieldRef>>,
 
-    /// Todo clarify / rename.
-    /// The db name influences how data is queried from the database.
-    /// E.g. this influences the schema part of a postgres query: `database`.`schema`.`table`.
-    /// Other connectors do not use `schema`, like postgres does, and this variable would
-    /// influence the `database` part instead.
-    pub db_name: String,
     pub enums: Vec<InternalEnumRef>,
+    pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {

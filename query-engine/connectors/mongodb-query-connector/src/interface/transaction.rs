@@ -42,9 +42,8 @@ impl<'conn> MongoDbTransaction<'conn> {
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
-        self.connection
-            .session
-            .commit_transaction()
+
+        utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
@@ -53,6 +52,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
+
         self.connection
             .session
             .abort_transaction()
@@ -176,6 +176,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_connect(

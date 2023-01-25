@@ -295,9 +295,9 @@ fn one_to_many_inlined_child(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &parent_node,
@@ -322,9 +322,9 @@ fn one_to_many_inlined_child(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
         let child_link = parent_relation_field.related_field().linking_fields();
 
         graph.create_edge(
@@ -666,9 +666,9 @@ fn one_to_one_inlined_parent(
 
         let parent_model = parent_relation_field.model();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_model.name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_model.name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &parent_node,
@@ -690,9 +690,9 @@ fn one_to_one_inlined_parent(
             })),
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_model.name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_model.name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &if_node,
@@ -825,9 +825,9 @@ fn one_to_one_inlined_child(
 
     // *** Then branch handling ***
     let update_new_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
-    let child_model_name = child_model.name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = child_model.name().to_owned();
 
     // Edge: Parent node -> update new child node
     graph.create_edge(
@@ -850,16 +850,16 @@ fn one_to_one_inlined_child(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
-    let child_model_name = child_model.name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = child_model.name().to_owned();
     let child_link = parent_relation_field.related_field().linking_fields();
 
     // Edge: Parent node -> create new child node
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut create_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -876,9 +876,9 @@ fn one_to_one_inlined_child(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
-    let child_model_name = child_model.name.clone();
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = child_model.name().to_owned();
     let child_link = parent_relation_field.related_field().linking_fields();
 
     // Edge: Read new child node -> update new child node
@@ -968,18 +968,23 @@ fn one_to_one_inlined_child(
 
         // update old child, set link to null
         let update_old_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
+        let rf = Arc::clone(&parent_relation_field);
 
         // Edge: Read old child node -> update old child
         graph.create_edge(
             &read_old_child_node,
             &update_old_child_node,
-            QueryGraphDependency::ProjectedDataDependency(child_model_identifier.clone(), Box::new(move |mut update_old_child_node, mut old_child_ids| {
+            QueryGraphDependency::ProjectedDataDependency(child_model_identifier, Box::new(move |mut update_old_child_node, mut old_child_ids| {
                 if child_relation_field.is_required() && !old_child_ids.is_empty() {
-                    // Error out, this violates the relation because we'd disconnect the old relation, but it's required.
-                    todo!()
+                    return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
+                }
+
+                // If there's no child connected, don't attempt to disconnect it.
+                if old_child_ids.is_empty() {
+                    return Ok(update_old_child_node);
                 }
 
                 let old_child_id = match old_child_ids.pop() {

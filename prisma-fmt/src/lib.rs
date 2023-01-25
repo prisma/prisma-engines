@@ -143,7 +143,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
                 Some(_) => {
                     offset += 1;
                 }
-                None => return None,
+                None => return Some(offset),
             }
         }
 
@@ -152,7 +152,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
     while character_offset > 0 {
         match chars.next() {
-            Some('\n') | None => return None,
+            Some('\n') | None => return Some(offset),
             Some(_) => {
                 offset += 1;
                 character_offset -= 1;
@@ -163,6 +163,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     Some(offset)
 }
 
+#[track_caller]
 /// Converts an LSP range to a span.
 pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
@@ -173,18 +174,18 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
 
 /// Gives the LSP position right after the given span.
 pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
-    offset_to_position(span.end - 1, document).unwrap()
+    offset_to_position(span.end - 1, document)
 }
 
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
-pub(crate) fn offset_to_position(offset: usize, document: &str) -> Option<Position> {
+pub fn offset_to_position(offset: usize, document: &str) -> Position {
     let mut position = Position::default();
 
     for (i, chr) in document.chars().enumerate() {
         match chr {
             _ if i == offset => {
-                return Some(position);
+                return position;
             }
             '\n' => {
                 position.character = 0;
@@ -196,7 +197,7 @@ pub(crate) fn offset_to_position(offset: usize, document: &str) -> Option<Positi
         }
     }
 
-    None
+    position
 }
 
 #[cfg(test)]

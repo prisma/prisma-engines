@@ -109,7 +109,10 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(schema, &mut sql_schema).await?.len();
+
+        self.get_namespaces(&mut sql_schema, &[schema]).await?;
+
+        let table_count = self.get_table_names(&mut sql_schema).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -119,20 +122,22 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn describe(&self, schemas: &[&str]) -> DescriberResult<SqlSchema> {
-        let schema = schemas[0];
         let mut sql_schema = SqlSchema::default();
         let mut mssql_ext = MssqlSchemaExt::default();
 
-        let table_names = self.get_table_names(schema, &mut sql_schema).await?;
+        self.get_namespaces(&mut sql_schema, schemas).await?;
 
-        sql_schema.columns = self.get_all_columns(&table_names, schema).await?;
-        self.get_all_indices(schema, &mut mssql_ext, &table_names, &mut sql_schema)
+        let table_names = self.get_table_names(&mut sql_schema).await?;
+
+        self.get_columns(&mut sql_schema).await?;
+        self.get_all_indices(&mut mssql_ext, &table_names, &mut sql_schema)
             .await?;
-        self.get_foreign_keys(schema, &table_names, &mut sql_schema).await?;
+        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
 
-        sql_schema.views = self.get_views(schema).await?;
-        sql_schema.procedures = self.get_procedures(schema).await?;
-        sql_schema.user_defined_types = self.get_user_defined_types(schema).await?;
+        self.get_views(&mut sql_schema).await?;
+        self.get_procedures(&mut sql_schema).await?;
+        self.get_user_defined_types(&mut sql_schema).await?;
+
         sql_schema.connector_data = crate::connector_data::ConnectorData {
             data: Some(Box::new(mssql_ext)),
         };
@@ -158,52 +163,70 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(rows.into_iter().map(|row| row.get_expect_string("name")).collect())
     }
 
-    async fn get_procedures(&self, schema: &str) -> DescriberResult<Vec<Procedure>> {
+    async fn get_procedures(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let sql = r#"
-            SELECT name, OBJECT_DEFINITION(object_id) AS definition
+            SELECT
+                name,
+                OBJECT_DEFINITION(object_id) AS definition,
+                SCHEMA_NAME(schema_id) AS namespace
             FROM sys.objects
-            WHERE SCHEMA_NAME(schema_id) = @P1
-                AND is_ms_shipped = 0
-                AND type = 'P'
+            WHERE is_ms_shipped = 0 AND type = 'P'
             ORDER BY name;
         "#;
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[]).await?;
         let mut procedures = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
+            let namespace_id = match sql_schema.get_namespace_id(&row.get_expect_string("namespace")) {
+                Some(id) => id,
+                None => continue,
+            };
+
             procedures.push(Procedure {
-                namespace_id: NamespaceId(0),
+                namespace_id,
                 name: row.get_expect_string("name"),
                 definition: row.get_string("definition"),
             });
         }
 
-        Ok(procedures)
+        sql_schema.procedures = procedures;
+
+        Ok(())
     }
 
     async fn get_table_names(
         &self,
-        schema: &str,
         sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<IndexMap<String, TableId>> {
+    ) -> DescriberResult<IndexMap<(String, String), TableId>> {
         let select = r#"
-            SELECT tbl.name AS table_name
+            SELECT
+                tbl.name AS table_name,
+                SCHEMA_NAME(tbl.schema_id) AS namespace
             FROM sys.tables tbl
-            WHERE SCHEMA_NAME(tbl.schema_id) = @P1
-                AND tbl.is_ms_shipped = 0
-                AND tbl.type = 'U'
+            WHERE tbl.is_ms_shipped = 0 AND tbl.type = 'U'
             ORDER BY tbl.name;
         "#;
 
-        let rows = self.conn.query_raw(select, &[schema.into()]).await?;
-        let names = rows.into_iter().map(|row| row.get_expect_string("table_name"));
+        let rows = self.conn.query_raw(select, &[]).await?;
+
+        let names = rows
+            .into_iter()
+            .filter(|row| sql_schema.namespaces.contains(&row.get_expect_string("namespace")))
+            .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")))
+            .collect::<Vec<_>>();
+
         let mut map = IndexMap::new();
 
-        for name in names {
-            let cloned_name = name.clone();
-            let id = sql_schema.push_table(name, Default::default());
-            map.insert(cloned_name, id);
+        for (table_name, namespace) in names {
+            let namespace_id = match sql_schema.get_namespace_id(&namespace) {
+                Some(id) => id,
+                None => continue,
+            };
+
+            let cloned_name = table_name.clone();
+            let id = sql_schema.push_table(table_name, namespace_id);
+            map.insert((namespace, cloned_name), id);
         }
 
         Ok(map)
@@ -239,11 +262,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             .expect("Invariant violation: size is not a valid usize value."))
     }
 
-    async fn get_all_columns(
-        &self,
-        table_ids: &IndexMap<String, TableId>,
-        schema: &str,
-    ) -> DescriberResult<Vec<(TableId, Column)>> {
+    async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -261,24 +280,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                     END) AS numeric_precision,
                 convert(int, CASE
                     WHEN c.system_type_id IN (40, 41, 42, 43, 58, 61) THEN NULL
-                    ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale
+                    ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale,
+                OBJECT_SCHEMA_NAME(c.object_id) AS namespace
             FROM sys.columns c
                     INNER JOIN sys.tables t ON c.object_id = t.object_id
                     INNER JOIN sys.types typ ON c.user_type_id = typ.user_type_id
-            WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
-            AND t.is_ms_shipped = 0
+            WHERE t.is_ms_shipped = 0
             ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
-        let mut columns = Vec::new();
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[]).await?;
 
         for col in rows {
+            let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
-            let table_id = if let Some(table_id) = table_ids.get(&table_name) {
-                *table_id
-            } else {
-                continue;
+
+            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
+                Some(t_walker) => t_walker.id,
+                None => continue, // we only care about columns in tables we have access to
             };
 
             let name = col.get_expect_string("column_name");
@@ -365,25 +384,26 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            columns.push((
-                table_id,
-                Column {
-                    name,
-                    tpe,
-                    default,
-                    auto_increment,
-                },
-            ));
+            let column_id = ColumnId(sql_schema.columns.len() as u32);
+            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+
+            let column = Column {
+                name,
+                tpe,
+                default_value_id,
+                auto_increment,
+            };
+
+            sql_schema.columns.push((table_id, column));
         }
 
-        Ok(columns)
+        Ok(())
     }
 
     async fn get_all_indices(
         &self,
-        schema: &str,
         mssql_ext: &mut MssqlSchemaExt,
-        table_ids: &IndexMap<String, TableId>,
+        table_ids: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let sql = indoc! {r#"
@@ -396,7 +416,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
                 ic.is_descending_key AS is_descending,
-                t.name AS table_name
+                t.name AS table_name,
+                SCHEMA_NAME(t.schema_id) AS namespace
             FROM
                 sys.indexes ind
             INNER JOIN sys.index_columns ic
@@ -405,10 +426,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ON ic.object_id = col.object_id AND ic.column_id = col.column_id
             INNER JOIN
                 sys.tables t ON ind.object_id = t.object_id
-            WHERE SCHEMA_NAME(t.schema_id) = @P1
+            WHERE t.is_ms_shipped = 0
                 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-index-columns-transact-sql?view=sql-server-ver16
                 AND ic.key_ordinal != 0
-                AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
                 AND ind.type_desc IN (
@@ -420,12 +440,18 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY table_name, index_name, seq_in_index
         "#};
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[]).await?;
         let mut current_index: Option<IndexId> = None;
 
         for row in rows {
+            let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
-            let table_id = table_ids[table_name.as_str()];
+
+            let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+                Some(id) => *id,
+                None => continue,
+            };
+
             let index_name = row.get_expect_string("index_name");
 
             let sort_order = match row.get_expect_bool("is_descending") {
@@ -481,29 +507,56 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    async fn get_views(&self, schema: &str) -> DescriberResult<Vec<View>> {
+    async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
+        let rows = self
+            .conn
+            .query_raw("SELECT name FROM sys.schemas ORDER BY name", &[])
+            .await?;
+
+        let names = rows
+            .into_iter()
+            .map(|row| row.get_expect_string("name"))
+            .filter(|name| namespaces.contains(&name.as_str()));
+
+        for name in names {
+            sql_schema.push_namespace(name);
+        }
+
+        Ok(())
+    }
+
+    async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let sql = indoc! {r#"
-            SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql
+            SELECT
+                name AS view_name,
+                OBJECT_DEFINITION(object_id) AS view_sql,
+                SCHEMA_NAME(schema_id) AS namespace
             FROM sys.views
             WHERE is_ms_shipped = 0
-            AND SCHEMA_NAME(schema_id) = @P1
         "#};
 
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let result_set = self.conn.query_raw(sql, &[]).await?;
         let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
+            let namespace_id = match sql_schema.get_namespace_id(&row.get_expect_string("namespace")) {
+                Some(id) => id,
+                None => continue,
+            };
+
             views.push(View {
-                namespace_id: NamespaceId(0),
+                namespace_id,
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
             })
         }
 
-        Ok(views)
+        sql_schema.views = views;
+
+        Ok(())
     }
 
-    async fn get_user_defined_types(&self, schema: &str) -> DescriberResult<Vec<UserDefinedType>> {
+    async fn get_user_defined_types(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT
                 udt.name AS user_type_name,
@@ -529,19 +582,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                             -- numeric, decimal
                             WHEN udt.system_type_id IN (106, 108) THEN udt.scale
                             ELSE null
-                            END) AS scale
+                            END) AS scale,
+                SCHEMA_NAME(udt.schema_id) AS namespace
             FROM sys.types udt
                     LEFT JOIN sys.types systyp
                             ON udt.system_type_id = systyp.user_type_id
-            WHERE SCHEMA_NAME(udt.schema_id) = @P1
-            AND udt.is_user_defined = 1
+            WHERE udt.is_user_defined = 1
         "#};
 
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let result_set = self.conn.query_raw(sql, &[]).await?;
 
-        let types: Vec<UserDefinedType> = result_set
+        sql_schema.user_defined_types = result_set
             .into_iter()
-            .map(|row| {
+            .flat_map(|row| {
+                let namespace_id = match sql_schema.get_namespace_id(&row.get_expect_string("namespace")) {
+                    Some(id) => id,
+                    None => return None,
+                };
+
                 let name = row.get_expect_string("user_type_name");
                 let max_length = row.get_i64("max_length");
                 let precision = row.get_u32("precision");
@@ -556,29 +614,33 @@ impl<'a> SqlSchemaDescriber<'a> {
                         _ => name,
                     });
 
-                UserDefinedType { name, definition }
+                Some(UserDefinedType {
+                    namespace_id,
+                    name,
+                    definition,
+                })
             })
             .collect();
 
-        Ok(types)
+        Ok(())
     }
 
     async fn get_foreign_keys(
         &self,
-        schema: &str,
-        table_ids: &IndexMap<String, TableId>,
+        table_ids: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let sql = indoc! {r#"
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
-                parent_table.name                       AS table_name,
-                referenced_table.name                   AS referenced_table_name,
-                SCHEMA_NAME(referenced_table.schema_id) AS referenced_schema_name,
-                parent_column.name                      AS column_name,
-                referenced_column.name                  AS referenced_column_name,
-                fk.delete_referential_action            AS delete_referential_action,
-                fk.update_referential_action            AS update_referential_action,
-                fkc.constraint_column_id                AS ordinal_position
+                parent_table.name                        AS table_name,
+                referenced_table.name                    AS referenced_table_name,
+                SCHEMA_NAME(referenced_table.schema_id)  AS referenced_schema_name,
+                parent_column.name                       AS column_name,
+                referenced_column.name                   AS referenced_column_name,
+                fk.delete_referential_action             AS delete_referential_action,
+                fk.update_referential_action             AS update_referential_action,
+                fkc.constraint_column_id                 AS ordinal_position,
+                OBJECT_SCHEMA_NAME(fkc.parent_object_id) AS schema_name
             FROM sys.foreign_key_columns AS fkc
                     INNER JOIN sys.tables AS parent_table
                                 ON fkc.parent_object_id = parent_table.object_id
@@ -595,30 +657,38 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     AND fkc.parent_object_id = fk.parent_object_id
             WHERE parent_table.is_ms_shipped = 0
             AND referenced_table.is_ms_shipped = 0
-            AND OBJECT_SCHEMA_NAME(fkc.parent_object_id) = @P1
             ORDER BY table_name, constraint_name, ordinal_position
         "#};
 
+        #[allow(clippy::too_many_arguments)]
         fn get_ids(
-            table_name: &str,
+            namespace: String,
+            table_name: String,
             column_name: &str,
-            referenced_table_name: &str,
+            referenced_schema_name: String,
+            referenced_table_name: String,
             referenced_column_name: &str,
-            table_ids: &IndexMap<String, TableId>,
+            table_ids: &IndexMap<(String, String), TableId>,
             sql_schema: &SqlSchema,
         ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
-            let table_id = *table_ids.get(table_name)?;
-            let referenced_table_id = *table_ids.get(referenced_table_name)?;
+            let table_id = *table_ids.get(&(namespace, table_name))?;
+            let referenced_table_id = *table_ids.get(&(referenced_schema_name, referenced_table_name))?;
             let column_id = sql_schema.walk(table_id).column(column_name)?.id;
             let referenced_column_id = sql_schema.walk(referenced_table_id).column(referenced_column_name)?.id;
 
             Some((table_id, column_id, referenced_table_id, referenced_column_id))
         }
 
-        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let result_set = self.conn.query_raw(sql, &[]).await?;
         let mut current_fk: Option<(String, ForeignKeyId)> = None;
 
         for row in result_set.into_iter() {
+            let namespace = row.get_expect_string("schema_name");
+
+            if !sql_schema.namespaces.contains(&namespace) {
+                continue;
+            }
+
             let table_name = row.get_expect_string("table_name");
             let constraint_name = row.get_expect_string("constraint_name");
             let column = row.get_expect_string("column_name");
@@ -626,18 +696,21 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_column = row.get_expect_string("referenced_column_name");
             let referenced_table = row.get_expect_string("referenced_table_name");
 
-            if schema != referenced_schema_name {
+            if !sql_schema.namespaces.contains(&referenced_schema_name) {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{schema}.{table_name}"),
+                    from: format!("{namespace}.{table_name}"),
                     to: format!("{referenced_schema_name}.{referenced_table}"),
                     constraint: constraint_name,
+                    missing_namespace: referenced_schema_name,
                 }));
             }
 
             let (table_id, column_id, referenced_table_id, referenced_column_id) = if let Some(ids) = get_ids(
-                &table_name,
+                namespace,
+                table_name,
                 &column,
-                &referenced_table,
+                referenced_schema_name,
+                referenced_table,
                 &referenced_column,
                 table_ids,
                 sql_schema,

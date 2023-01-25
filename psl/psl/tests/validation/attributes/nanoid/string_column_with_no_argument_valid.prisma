@@ -1,0 +1,8 @@
+datasource db {
+  provider = "mysql"
+  url = "does_not_matter"
+}
+
+model Category {
+  id String @id @default(nanoid())
+}

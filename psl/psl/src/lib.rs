@@ -17,7 +17,7 @@ pub use psl_core::{
     DatasourceConnectorData,
     Generator,
     PreviewFeature,
-    RelationNames,
+    PreviewFeatures,
     StringFromEnvVar,
     ValidatedSchema,
     ALL_PREVIEW_FEATURES,

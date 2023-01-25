@@ -92,3 +92,29 @@ macro_rules! assert_error {
         $runner.query($q).await?.assert_failure($code, Some($msg.to_string()));
     };
 }
+
+#[macro_export]
+macro_rules! retry {
+    ($body:block, $times:expr) => {{
+        use std::time::Duration;
+        use tokio::time::sleep;
+
+        let mut retries = $times;
+
+        loop {
+            let res = $body.await?;
+
+            if !res.failed() {
+                break res;
+            }
+
+            if retries > 0 {
+                retries -= 1;
+                sleep(Duration::from_millis(5)).await;
+                continue;
+            }
+
+            break res;
+        }
+    }};
+}

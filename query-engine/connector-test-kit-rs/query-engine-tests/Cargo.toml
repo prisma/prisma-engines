@@ -1,5 +1,4 @@
 [package]
-authors = ["Dominic Petrick <dompetrick@gmail.com>"]
 edition = "2018"
 name = "query-engine-tests"
 version = "0.1.0"
@@ -22,6 +21,7 @@ user-facing-errors.workspace = true
 prisma-value = { path = "../../../libs/prisma-value" }
 query-engine-metrics = { path = "../../metrics"}
 once_cell = "1.15.0"
+futures = "0.3"
 
 [dev-dependencies]
 insta = "1.7.1"

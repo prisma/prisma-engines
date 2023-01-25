@@ -56,7 +56,7 @@ impl<'a> LiftAstToDml<'a> {
         // (model_idx, field_name) -> sort_key
         let mut field_ids_for_sorting: HashMap<(&str, &str), ast::FieldId> = HashMap::new();
 
-        for model in self.db.walk_models() {
+        for model in self.db.walk_models().chain(self.db.walk_views()) {
             schema.models.push(self.lift_model(model, &mut field_ids_for_sorting));
         }
 
@@ -128,8 +128,8 @@ impl<'a> LiftAstToDml<'a> {
 
                         let forward_field_walker = relation.forward_relation_field().unwrap();
                         // Construct a relation field in the DML for an existing relation field in the source.
-                        let arity = forward_field_walker.ast_field().arity.into();
-                        let referential_arity = forward_field_walker.referential_arity().into();
+                        let arity = forward_field_walker.ast_field().arity;
+                        let referential_arity = forward_field_walker.referential_arity();
                         let mut relation_field =
                             RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
 
@@ -185,8 +185,8 @@ impl<'a> LiftAstToDml<'a> {
 
                         let mut field = if let Some(relation_field) = relation.back_relation_field() {
                             let ast_field = relation_field.ast_field();
-                            let arity = ast_field.arity.into();
-                            let referential_arity = relation_field.referential_arity().into();
+                            let arity = ast_field.arity;
+                            let referential_arity = relation_field.referential_arity();
                             let mut field =
                                 RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
@@ -219,9 +219,9 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::ImplicitManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
-                        let arity = ast_field.arity.into();
+                        let arity = ast_field.arity;
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = relation_field.referential_arity().into();
+                        let referential_arity = relation_field.referential_arity();
                         let mut field =
                             RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
@@ -249,9 +249,9 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
-                        let arity = ast_field.arity.into();
+                        let arity = ast_field.arity;
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
-                        let referential_arity = relation_field.referential_arity().into();
+                        let referential_arity = relation_field.referential_arity();
 
                         let mut field =
                             RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
@@ -291,7 +291,7 @@ impl<'a> LiftAstToDml<'a> {
             let field = CompositeTypeField {
                 name: field.name().to_owned(),
                 r#type: self.lift_composite_type_field_type(field, field.r#type()),
-                arity: field.arity().into(),
+                arity: field.arity(),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),
                 default_value: field.default_value().map(|value| DefaultValue {
@@ -323,6 +323,7 @@ impl<'a> LiftAstToDml<'a> {
         model.database_name = walker.mapped_name().map(String::from);
         model.is_ignored = walker.is_ignored();
         model.schema = walker.schema().map(|(s, _)| s.to_owned());
+        model.is_view = walker.ast_model().is_view();
 
         model.primary_key = walker.primary_key().map(|pk| PrimaryKeyDefinition {
             name: pk.name().map(String::from),
@@ -370,12 +371,6 @@ impl<'a> LiftAstToDml<'a> {
                     })
                     .collect();
 
-                let tpe = match idx.index_type() {
-                    db::IndexType::Unique => IndexType::Unique,
-                    db::IndexType::Normal => IndexType::Normal,
-                    db::IndexType::Fulltext => IndexType::Fulltext,
-                };
-
                 let algorithm = idx.algorithm().map(|using| match using {
                     IndexAlgorithm::BTree => model::IndexAlgorithm::BTree,
                     IndexAlgorithm::Hash => model::IndexAlgorithm::Hash,
@@ -389,7 +384,7 @@ impl<'a> LiftAstToDml<'a> {
                     name: idx.name().map(String::from),
                     db_name: Some(idx.constraint_name(self.connector).into_owned()),
                     fields,
-                    tpe,
+                    tpe: idx.index_type(),
                     algorithm,
                     defined_on_field: idx.is_defined_on_field(),
                     // By default an index that is not a primary key is always non-clustered in any database.
@@ -412,7 +407,7 @@ impl<'a> LiftAstToDml<'a> {
                     field.documentation = ast_field.documentation().map(String::from);
                     field.is_ignored = scalar_field.is_ignored();
                     field.database_name = scalar_field.mapped_name().map(String::from);
-                    field.arity = ast_field.arity.into();
+                    field.arity = ast_field.arity;
 
                     model.add_field(Field::CompositeField(field));
                     continue;
@@ -420,7 +415,7 @@ impl<'a> LiftAstToDml<'a> {
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
-            let mut field = ScalarField::new(ast_field.name(), ast_field.arity.into(), field_type);
+            let mut field = ScalarField::new(ast_field.name(), ast_field.arity, field_type);
 
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = scalar_field.is_ignored();
@@ -580,6 +575,14 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
         }
         ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
             DefaultKind::Expression(ValueGenerator::new_cuid())
+        }
+        ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
+            DefaultKind::Expression(ValueGenerator::new_nanoid(
+                args.arguments
+                    .get(0)
+                    .and_then(|arg| arg.value.as_numeric_value())
+                    .map(|(val, _)| val.parse::<u8>().unwrap()),
+            ))
         }
         ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
             DefaultKind::Expression(ValueGenerator::new_now())

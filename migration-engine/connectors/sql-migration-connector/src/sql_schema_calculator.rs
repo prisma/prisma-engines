@@ -9,7 +9,7 @@ use psl::{
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
-        ReferentialAction, ScalarFieldType, ScalarType, SchemaFlags, SortOrder,
+        ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
     ValidatedSchema,
 };
@@ -28,13 +28,11 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if datamodel.db.schema_flags().contains(SchemaFlags::UsesSchemaAttribute) {
-        if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
-            for (schema, _) in &ds.namespaces {
-                context
-                    .schemas
-                    .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
-            }
+    if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
+        for (schema, _) in &ds.namespaces {
+            context
+                .schemas
+                .insert(schema, context.schema.describer_schema.push_namespace(schema.clone()));
         }
     }
 
@@ -134,6 +132,10 @@ fn push_model_indexes(model: ModelWalker<'_>, table_id: sql::TableId, ctx: &mut 
 
 fn push_inline_relations(ctx: &mut Context<'_>) {
     for relation in ctx.datamodel.db.walk_relations().filter_map(|r| r.refine().as_inline()) {
+        if relation.referencing_model().ast_model().is_view() || relation.referenced_model().ast_model().is_view() {
+            continue;
+        }
+
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
@@ -243,7 +245,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             sql::Column {
                 name: model_a_column.into(),
                 tpe: column_a_type,
-                default: None,
+                default_value_id: None,
                 auto_increment: false,
             },
         );
@@ -252,7 +254,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             sql::Column {
                 name: model_b_column.into(),
                 tpe: column_b_type,
-                default: None,
+                default_value_id: None,
                 auto_increment: false,
             },
         );
@@ -386,18 +388,23 @@ fn push_column_for_model_enum_scalar_field(
             sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def))
         }),
     });
-    ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            tpe: sql::ColumnType::pure(
-                sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
-                column_arity(field.ast_field().arity),
-            ),
-            default,
-            auto_increment: false,
-        },
-    );
+
+    let default_value_id = default.map(|default| {
+        let column_id = ctx.schema.describer_schema.next_column_id();
+        ctx.schema.describer_schema.push_default_value(column_id, default)
+    });
+
+    let column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType::pure(
+            sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
+            column_arity(field.ast_field().arity),
+        ),
+        default_value_id,
+        auto_increment: false,
+    };
+
+    ctx.schema.describer_schema.push_column(table_id, column);
 }
 
 fn push_column_for_model_unsupported_scalar_field(
@@ -405,28 +412,34 @@ fn push_column_for_model_unsupported_scalar_field(
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
-    ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            tpe: ctx.flavour.column_type_for_unsupported_type(
-                field,
-                field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
-            ),
-            default: field.default_value().and_then(|def| {
-                // This is validated as @default(dbgenerated("...")), we can unwrap.
-                let dbgenerated_contents = unwrap_dbgenerated(def.value());
-                if let Some(value) = dbgenerated_contents {
-                    let default = sql::DefaultValue::db_generated(value)
-                        .with_constraint_name(ctx.flavour.default_constraint_name(def));
-                    Some(default)
-                } else {
-                    None
-                }
-            }),
-            auto_increment: false,
-        },
-    );
+    let default = field.default_value().and_then(|def| {
+        // This is validated as @default(dbgenerated("...")), we can unwrap.
+        let dbgenerated_contents = unwrap_dbgenerated(def.value());
+        if let Some(value) = dbgenerated_contents {
+            let default =
+                sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def));
+            Some(default)
+        } else {
+            None
+        }
+    });
+
+    let default_value_id = default.map(|default| {
+        let column_id = ctx.schema.describer_schema.next_column_id();
+        ctx.schema.describer_schema.push_default_value(column_id, default)
+    });
+
+    let column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: ctx.flavour.column_type_for_unsupported_type(
+            field,
+            field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
+        ),
+        default_value_id,
+        auto_increment: false,
+    };
+
+    ctx.schema.describer_schema.push_column(table_id, column);
 }
 
 fn push_column_for_builtin_scalar_type(
@@ -494,25 +507,27 @@ fn push_column_for_builtin_scalar_type(
     });
 
     let default_is_prisma_level = matches!(default, Some(ColumnDefault::PrismaGenerated));
-    let column_id = ctx.schema.describer_schema.push_column(
-        table_id,
-        sql::Column {
-            name: field.database_name().to_owned(),
-            default: if let Some(ColumnDefault::Available(d)) = default {
-                Some(d)
-            } else {
-                None
-            },
 
-            tpe: sql::ColumnType {
-                family,
-                full_data_type: String::new(),
-                arity: column_arity(field.ast_field().arity),
-                native_type: Some(native_type),
-            },
-            auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+    let default_value_id = if let Some(ColumnDefault::Available(d)) = default {
+        let column_id = ctx.schema.describer_schema.next_column_id();
+        Some(ctx.schema.describer_schema.push_default_value(column_id, d))
+    } else {
+        None
+    };
+
+    let column = sql::Column {
+        name: field.database_name().to_owned(),
+        tpe: sql::ColumnType {
+            family,
+            full_data_type: String::new(),
+            arity: column_arity(field.ast_field().arity),
+            native_type: Some(native_type),
         },
-    );
+        auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        default_value_id,
+    };
+
+    let column_id = ctx.schema.describer_schema.push_column(table_id, column);
 
     if default_is_prisma_level {
         ctx.schema.prisma_level_defaults.push(column_id);

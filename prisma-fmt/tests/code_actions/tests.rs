@@ -23,4 +23,8 @@ scenarios! {
     one_to_one_referencing_side_misses_unique_single_field
     one_to_one_referencing_side_misses_unique_compound_field
     one_to_one_referencing_side_misses_unique_compound_field_indentation_four_spaces
+    relation_mode_prisma_missing_index
+    multi_schema_one_model
+    multi_schema_one_model_one_enum
+    multi_schema_two_models
 }

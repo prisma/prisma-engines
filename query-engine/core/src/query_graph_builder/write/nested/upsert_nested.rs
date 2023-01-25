@@ -161,8 +161,8 @@ pub fn nested_upsert(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &read_children_node,
@@ -213,11 +213,11 @@ pub fn nested_upsert(
         // Specific handling based on relation type and inlining side.
         if parent_relation_field.relation().is_many_to_many() {
             // Many to many only needs a connect node.
-            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
         } else if parent_relation_field.is_inlined_on_enclosing_model() {
             let parent_model = parent_relation_field.model();
-            let parent_model_name = parent_model.name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_model.name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
             let parent_model_id = parent_model.primary_identifier();
             let update_node = utils::update_records_node_placeholder(graph, filter, parent_model);
 
@@ -242,9 +242,9 @@ pub fn nested_upsert(
                 })),
             )?;
 
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
 
             // Edge to retrieve the child ID to inject
             graph.create_edge(
@@ -267,9 +267,9 @@ pub fn nested_upsert(
                 })),
             )?;
         } else {
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
 
             // Inlined on child
             // Edge to retrieve the child ID to inject (inject into the create)

@@ -3,12 +3,13 @@ use super::{
     HistoryDiagnostic,
 };
 use crate::json_rpc::types::{DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput};
-use migration_connector::{migrations_directory, ConnectorResult, MigrationConnector};
+use migration_connector::{migrations_directory, ConnectorResult, MigrationConnector, Namespaces};
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
 pub async fn dev_diagnostic(
     input: DevDiagnosticInput,
+    namespaces: Option<Namespaces>,
     connector: &mut dyn MigrationConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
@@ -18,7 +19,7 @@ pub async fn dev_diagnostic(
         opt_in_to_shadow_database: true,
     };
 
-    let diagnose_migration_history_output = diagnose_migration_history(diagnose_input, connector).await?;
+    let diagnose_migration_history_output = diagnose_migration_history(diagnose_input, namespaces, connector).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 

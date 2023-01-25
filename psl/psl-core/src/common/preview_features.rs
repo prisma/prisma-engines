@@ -2,6 +2,9 @@ use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
 
+/// A set of preview features.
+pub type PreviewFeatures = enumflags2::BitFlags<PreviewFeature>;
+
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
         #[enumflags2::bitflags]
@@ -70,14 +73,14 @@ features!(
     PostgresqlExtensions,
     ClientExtensions,
     Deno,
-    ExtendedWhereUnique
+    ExtendedWhereUnique,
+    Views,
 );
 
 /// Generator preview features
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
-        ReferentialIntegrity
-         | InteractiveTransactions
+        Deno
          | FullTextSearch
          | FullTextIndex
          | Tracing
@@ -86,8 +89,10 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
-         | Deno
          | ExtendedWhereUnique
+         | ClientExtensions
+         | MultiSchema
+         | Views
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -110,35 +115,34 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | OrderByAggregateGroup
         | OrderByRelation
         | ReferentialActions
+        | ReferentialIntegrity
         | NApi
         | ImprovedQueryRaw
         | DataProxy
+        | InteractiveTransactions
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        MultiSchema
-        | ClientExtensions
-    }),
+    hidden: BitFlags::EMPTY,
 };
 
 #[derive(Debug)]
 pub struct FeatureMap {
     /// Valid, visible features.
-    active: BitFlags<PreviewFeature>,
+    active: PreviewFeatures,
 
     /// Deprecated features.
-    deprecated: BitFlags<PreviewFeature>,
+    deprecated: PreviewFeatures,
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
-    hidden: BitFlags<PreviewFeature>,
+    hidden: PreviewFeatures,
 }
 
 impl FeatureMap {
-    pub const fn active_features(&self) -> BitFlags<PreviewFeature> {
+    pub const fn active_features(&self) -> PreviewFeatures {
         self.active
     }
 
-    pub const fn hidden_features(&self) -> BitFlags<PreviewFeature> {
+    pub const fn hidden_features(&self) -> PreviewFeatures {
         self.hidden
     }
 

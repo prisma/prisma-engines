@@ -21,6 +21,7 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use psl::ValidatedSchema;
+use sql_introspection_connector::datamodel_calculator;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::sync::Arc;
@@ -37,7 +38,7 @@ impl SqlMigrationConnector {
     /// Initialize a PostgreSQL migration connector.
     pub fn new_postgres() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(PostgresFlavour::default()),
+            flavour: Box::<PostgresFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -53,7 +54,7 @@ impl SqlMigrationConnector {
     /// Initialize a SQLite migration connector.
     pub fn new_sqlite() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(SqliteFlavour::default()),
+            flavour: Box::<SqliteFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -61,7 +62,7 @@ impl SqlMigrationConnector {
     /// Initialize a MySQL migration connector.
     pub fn new_mysql() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(MysqlFlavour::default()),
+            flavour: Box::<MysqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -69,7 +70,7 @@ impl SqlMigrationConnector {
     /// Initialize a MSSQL migration connector.
     pub fn new_mssql() -> Self {
         SqlMigrationConnector {
-            flavour: Box::new(MssqlFlavour::default()),
+            flavour: Box::<MssqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -122,6 +123,7 @@ impl SqlMigrationConnector {
         match target {
             DiffTarget::Datamodel(schema) => {
                 let schema = psl::parse_schema(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                self.flavour.check_schema_features(&schema)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
                     self.flavour.as_ref(),
@@ -234,11 +236,16 @@ impl MigrationConnector for SqlMigrationConnector {
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
-        namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let sql_schema = self.flavour.describe_schema(namespaces).await?;
-            let datamodel = sql_introspection_connector::calculate_datamodel::calculate_datamodel(&sql_schema, ctx)
+            let mut namespace_names = match ctx.namespaces() {
+                Some(namespaces) => namespaces.iter().map(|s| s.to_string()).collect(),
+                None => ctx.datasource().namespaces.iter().map(|(s, _)| s.to_string()).collect(),
+            };
+
+            let namespaces = Namespaces::from_vec(&mut namespace_names);
+            let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
+            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
             Ok(datamodel)
         })
@@ -262,7 +269,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
-            if soft || self.flavour.reset().await.is_err() {
+            if soft || self.flavour.reset(namespaces.clone()).await.is_err() {
                 best_effort_reset(self.flavour.as_mut(), namespaces).await?;
             }
 

@@ -6,18 +6,19 @@ mod attributes;
 mod composite_type;
 mod default;
 mod enumerator;
+mod field;
 mod field_type;
+mod index;
 mod model;
 
-pub use composite_type::{CompositeType, CompositeTypeField};
+pub use composite_type::CompositeType;
 pub use default::DefaultValue;
 pub use enumerator::{Enum, EnumVariant};
+pub use field::Field;
 pub use field_type::FieldType;
-pub use model::{
-    IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexFieldOptions, IndexOps, Model, ModelField,
-    Relation,
-};
-use psl::dml;
+pub use index::{IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexOps, UniqueFieldAttribute};
+pub use model::{Model, Relation};
+
 use std::fmt;
 
 /// The PSL data model declaration.
@@ -67,25 +68,9 @@ impl<'a> Datamodel<'a> {
         self.composite_types.push(composite_type);
     }
 
-    /// A throwaway function to help generate a rendering from the DML structures.
-    ///
-    /// Delete when removing DML.
-    pub fn from_dml(datasource: &'a psl::Datasource, dml_data_model: &'a dml::Datamodel) -> Datamodel<'a> {
-        let mut data_model = Self::new();
-
-        for dml_model in dml_data_model.models() {
-            data_model.push_model(Model::from_dml(datasource, dml_model));
-        }
-
-        for dml_ct in dml_data_model.composite_types() {
-            data_model.push_composite_type(CompositeType::from_dml(datasource, dml_ct));
-        }
-
-        for dml_enum in dml_data_model.enums() {
-            data_model.push_enum(Enum::from_dml(dml_enum));
-        }
-
-        data_model
+    /// True if the render output would be an empty string.
+    pub fn is_empty(&self) -> bool {
+        self.models.is_empty() && self.enums.is_empty() && self.composite_types.is_empty()
     }
 }
 
@@ -119,14 +104,14 @@ mod tests {
         let mut data_model = Datamodel::new();
 
         let mut composite = CompositeType::new("Address");
-        let field = CompositeTypeField::new_required("street", "String");
+        let field = Field::new("street", "String");
         composite.push_field(field);
 
         data_model.push_composite_type(composite);
 
         let mut model = Model::new("User");
 
-        let mut field = ModelField::new_required("id", "Int");
+        let mut field = Field::new("id", "Int");
         field.id(IdFieldDefinition::default());
 
         let dv = DefaultValue::function(Function::new("autoincrement"));

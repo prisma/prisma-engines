@@ -24,3 +24,6 @@ url = "2.1.1"
 
 [build-dependencies]
 json-rpc-api-build = { path = "../json-rpc-api-build" }
+
+[features]
+vendored-openssl = ["sql-migration-connector/vendored-openssl"]

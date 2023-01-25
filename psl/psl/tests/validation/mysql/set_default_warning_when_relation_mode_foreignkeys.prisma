@@ -1,0 +1,32 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url = "mysql://"
+    relationMode = "foreignKeys"
+}
+
+model A {
+    id Int @id
+    bs B[]
+}
+
+model B {
+    id Int   @id
+    aId Int? @default(3)
+    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, onDelete: SetDefault)
+}
+// [1;93mwarning[0m: [1mMySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors. Read more at https://pris.ly/d/mysql-set-default [0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m    aId Int? @default(3)
+// [1;94m19 | [0m    a   A?   @relation(fields: [aId], references: [id], onUpdate: SetDefault, [1;93monDelete: SetDefault[0m)
+// [1;94m   | [0m
+// [1;93mwarning[0m: [1mMySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors. Read more at https://pris.ly/d/mysql-set-default [0m
+//   [1;94m-->[0m  [4mschema.prisma:19[0m
+// [1;94m   | [0m
+// [1;94m18 | [0m    aId Int? @default(3)
+// [1;94m19 | [0m    a   A?   @relation(fields: [aId], references: [id], [1;93monUpdate: SetDefault[0m, onDelete: SetDefault)
+// [1;94m   | [0m

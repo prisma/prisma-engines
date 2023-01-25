@@ -535,7 +535,7 @@ fn no_additional_unique_created(api: TestApi) {
         });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
@@ -764,7 +764,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
         });
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Vitess))]
 fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"

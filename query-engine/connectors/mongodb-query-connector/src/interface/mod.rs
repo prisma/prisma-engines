@@ -1,5 +1,6 @@
 mod connection;
 mod transaction;
+mod utils;
 
 pub use connection::*;
 pub use transaction::*;
@@ -69,8 +70,12 @@ impl Connector for MongoDb {
         }))
     }
 
-    fn name(&self) -> String {
-        "mongodb".to_owned()
+    fn name(&self) -> &'static str {
+        "mongodb"
+    }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        true
     }
 }
 

@@ -5,9 +5,4 @@ mod scalar_field;
 mod selection_result;
 mod table;
 
-pub use column::*;
-pub use record::*;
-pub use relation::*;
-pub use scalar_field::*;
-pub use selection_result::*;
-pub use table::*;
+pub(crate) use self::{column::*, record::*, relation::*, scalar_field::*, selection_result::*, table::*};

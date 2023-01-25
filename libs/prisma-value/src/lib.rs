@@ -13,7 +13,7 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -46,12 +46,18 @@ pub enum PrismaValue {
 
 /// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
-pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
+pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {
     // Warning: Be careful if you plan on changing the code below
     // The findUnique batch optimization expects date inputs to have exactly the same format as date outputs
     // This works today because clients always send date inputs in the same format as the serialized format below
     // Updating this without transforming date inputs to the same format WILL break the findUnique batch optimization
-    date.to_rfc3339_opts(SecondsFormat::Millis, true)
+    datetime.to_rfc3339_opts(SecondsFormat::Millis, true)
+}
+
+/// Parses an RFC 3339 and ISO 8601 date and time string such as 1996-12-19T16:39:57-08:00,
+/// then returns a new DateTime with a parsed FixedOffset.
+pub fn parse_datetime(datetime: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+    DateTime::parse_from_rfc3339(datetime)
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
@@ -135,7 +141,7 @@ fn serialize_date<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::O
 where
     S: Serializer,
 {
-    stringify_date(date).serialize(serializer)
+    stringify_datetime(date).serialize(serializer)
 }
 
 fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
@@ -232,6 +238,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self {
+            PrismaValue::Bytes(s) => Some(s),
+            _ => None,
+        }
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }
@@ -251,12 +264,19 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_object(self) -> Option<Vec<(String, PrismaValue)>> {
+        match self {
+            PrismaValue::Object(obj) => Some(obj),
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
-        PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
+        PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {

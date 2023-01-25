@@ -85,7 +85,7 @@ fn validate(api: &Api) {
 }
 
 fn shape_exists(shape: &str, api: &Api) -> bool {
-    let builtin_scalars = ["string", "bool", "u32"];
+    let builtin_scalars = ["string", "bool", "u32", "isize", "serde_json::Value"];
 
     if builtin_scalars.contains(&shape) {
         return true;

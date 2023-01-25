@@ -24,8 +24,6 @@ pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 
-use crate::{ast, ParserDatabase};
-
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
 pub struct Walker<'db, I> {
@@ -35,7 +33,32 @@ pub struct Walker<'db, I> {
     pub id: I,
 }
 
-impl ParserDatabase {
+impl<'db, I> Walker<'db, I> {
+    /// Traverse something else in the same schema.
+    pub fn walk<J>(self, other: J) -> Walker<'db, J> {
+        self.db.walk(other)
+    }
+}
+
+impl<'db, I> PartialEq for Walker<'db, I>
+where
+    I: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.id.eq(&other.id)
+    }
+}
+
+impl crate::ParserDatabase {
+    /// Find an enum by name.
+    pub fn find_enum<'db>(&'db self, name: &str) -> Option<EnumWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|top_id| top_id.as_enum_id())
+            .map(|enum_id| self.walk(enum_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }
@@ -55,11 +78,16 @@ impl ParserDatabase {
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_model_id())
             .map(move |model_id| self.walk(model_id))
+            .filter(|m| !m.ast_model().is_view())
     }
 
-    /// Walk a specific composite type by ID.
-    pub fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'_> {
-        CompositeTypeWalker { ctid, db: self }
+    /// Walk all the views in the schema.
+    pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
+        self.ast()
+            .iter_tops()
+            .filter_map(|(top_id, _)| top_id.as_model_id())
+            .map(move |model_id| self.walk(model_id))
+            .filter(|m| m.ast_model().is_view())
     }
 
     /// Walk all the composite types in the schema.
@@ -67,7 +95,7 @@ impl ParserDatabase {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_composite_type_id())
-            .map(move |ctid| CompositeTypeWalker { ctid, db: self })
+            .map(|id| self.walk(id))
     }
 
     /// Walk all scalar field defaults with a function not part of the common ones.
@@ -88,7 +116,7 @@ impl ParserDatabase {
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
-    pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'_>> + '_ {
+    pub fn walk_relations(&self) -> impl ExactSizeIterator<Item = RelationWalker<'_>> + Clone + '_ {
         self.relations.iter().map(move |relation_id| Walker {
             db: self,
             id: relation_id,
