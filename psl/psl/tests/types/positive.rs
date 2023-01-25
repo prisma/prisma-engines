@@ -1,6 +1,6 @@
 use crate::common::*;
+use dml::{DefaultValue, ValueGenerator};
 use psl::builtin_connectors::{MySqlType, PostgresType};
-use psl::dml::{DefaultValue, ValueGenerator};
 
 #[test]
 fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attribute() {

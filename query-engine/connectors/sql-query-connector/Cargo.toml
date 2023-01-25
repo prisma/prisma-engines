@@ -7,6 +7,8 @@ version = "0.1.0"
 vendored-openssl = ["quaint/vendored-openssl"]
 
 [dependencies]
+psl.workspace = true
+dml = { path = "../../../libs/dml" }
 anyhow = "1.0"
 async-trait = "0.1"
 bigdecimal = "0.3"
@@ -37,10 +39,6 @@ path = "../../../libs/prisma-value"
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
-
-[dependencies.psl]
-workspace = true
-features = ["default_generators"]
 
 [dependencies.serde]
 features = ["derive"]

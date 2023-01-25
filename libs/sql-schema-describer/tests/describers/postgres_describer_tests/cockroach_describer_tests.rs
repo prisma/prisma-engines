@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use psl::dml::PrismaValue;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, ColumnTypeFamily};
 
 #[test_connector(tags(CockroachDb))]

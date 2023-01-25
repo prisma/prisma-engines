@@ -8,10 +8,8 @@ use crate::{
     IndexType, InlineRelation, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
     TypeIdentifier,
 };
-use psl::{
-    datamodel_connector::RelationMode,
-    dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName},
-};
+use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+use psl::datamodel_connector::RelationMode;
 
 pub(crate) fn model_builders(
     datamodel: &Datamodel,

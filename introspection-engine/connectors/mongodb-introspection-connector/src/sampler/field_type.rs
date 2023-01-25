@@ -1,10 +1,5 @@
 use super::statistics::Name;
 use mongodb::bson::Bson;
-use psl::{
-    builtin_connectors::MongoDbType,
-    datamodel_connector,
-    dml::{self, NativeTypeInstance, ScalarType},
-};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -122,70 +117,6 @@ impl fmt::Display for FieldType {
             FieldType::Document(s) => f.write_str(s),
             FieldType::Array(r#type) => write!(f, "Array({})", r#type),
             FieldType::Unsupported(r#type) => write!(f, "{}", r#type),
-        }
-    }
-}
-
-impl From<FieldType> for dml::CompositeTypeFieldType {
-    fn from(r#type: FieldType) -> Self {
-        match r#type {
-            FieldType::String => dml::CompositeTypeFieldType::Scalar(ScalarType::String, None),
-            FieldType::Double => dml::CompositeTypeFieldType::Scalar(ScalarType::Float, None),
-            FieldType::BinData => dml::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None),
-            FieldType::ObjectId => dml::CompositeTypeFieldType::Scalar(
-                ScalarType::String,
-                Some(NativeTypeInstance::new(
-                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::ObjectId),
-                    psl::builtin_connectors::MONGODB,
-                )),
-            ),
-            FieldType::Bool => dml::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None),
-            FieldType::Date => dml::CompositeTypeFieldType::Scalar(
-                ScalarType::DateTime,
-                Some(NativeTypeInstance::new(
-                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::Date),
-                    psl::builtin_connectors::MONGODB,
-                )),
-            ),
-            FieldType::Int32 => dml::CompositeTypeFieldType::Scalar(ScalarType::Int, None),
-            FieldType::Timestamp => dml::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None),
-            FieldType::Int64 => dml::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None),
-            FieldType::Json => dml::CompositeTypeFieldType::Scalar(ScalarType::Json, None),
-            FieldType::Document(name) => dml::CompositeTypeFieldType::CompositeType(name),
-            FieldType::Array(r#type) => dml::CompositeTypeFieldType::from(*r#type),
-            FieldType::Unsupported(name) => dml::CompositeTypeFieldType::Unsupported(name.to_string()),
-        }
-    }
-}
-
-impl From<FieldType> for dml::FieldType {
-    fn from(r#type: FieldType) -> Self {
-        match r#type {
-            FieldType::String => dml::FieldType::Scalar(ScalarType::String, None),
-            FieldType::Double => dml::FieldType::Scalar(ScalarType::Float, None),
-            FieldType::BinData => dml::FieldType::Scalar(ScalarType::Bytes, None),
-            FieldType::ObjectId => dml::FieldType::Scalar(
-                ScalarType::String,
-                Some(NativeTypeInstance::new(
-                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::ObjectId),
-                    psl::builtin_connectors::MONGODB,
-                )),
-            ),
-            FieldType::Bool => dml::FieldType::Scalar(ScalarType::Boolean, None),
-            FieldType::Date => dml::FieldType::Scalar(
-                ScalarType::DateTime,
-                Some(NativeTypeInstance::new(
-                    datamodel_connector::NativeTypeInstance::new::<MongoDbType>(MongoDbType::Date),
-                    psl::builtin_connectors::MONGODB,
-                )),
-            ),
-            FieldType::Int32 => dml::FieldType::Scalar(ScalarType::Int, None),
-            FieldType::Timestamp => dml::FieldType::Scalar(ScalarType::DateTime, None),
-            FieldType::Int64 => dml::FieldType::Scalar(ScalarType::BigInt, None),
-            FieldType::Json => dml::FieldType::Scalar(ScalarType::Json, None),
-            FieldType::Document(name) => dml::FieldType::CompositeType(name),
-            FieldType::Array(r#type) => dml::FieldType::from(*r#type),
-            FieldType::Unsupported(type_name) => dml::FieldType::Unsupported(type_name.to_string()),
         }
     }
 }

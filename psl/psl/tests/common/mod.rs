@@ -1,6 +1,6 @@
 pub use ::indoc::{formatdoc, indoc};
 pub use expect_test::expect;
-pub use psl::{dml, dml::*};
+pub use dml::*;
 
 use psl::{diagnostics::*, Configuration, StringFromEnvVar};
 
@@ -408,7 +408,7 @@ pub(crate) fn parse_unwrap_err(schema: &str) -> String {
 #[track_caller]
 pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
     let schema = psl::parse_schema(datamodel_string).unwrap();
-    psl::lift(&schema)
+    dml::lift(&schema)
 }
 
 pub(crate) fn parse_config(schema: &str) -> Result<Configuration, String> {

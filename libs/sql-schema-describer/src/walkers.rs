@@ -2,13 +2,12 @@
 
 #![deny(missing_docs)]
 
-use psl::dml::PrismaValue;
-
 use crate::{
     ids::*, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey,
     ForeignKeyAction, ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType,
     View,
 };
+use prisma_value::PrismaValue;
 use std::ops::Range;
 
 /// A generic reference to a schema item. It holds a reference to the schema so it can offer a

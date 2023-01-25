@@ -2,7 +2,7 @@ use super::{GQLBatchResponse, GQLResponse, GraphQlBody};
 use crate::PrismaResponse;
 use futures::FutureExt;
 use indexmap::IndexMap;
-use psl::dml::{
+use prisma_models::dml::{
     prisma_value::{parse_datetime, stringify_datetime},
     PrismaValue,
 };

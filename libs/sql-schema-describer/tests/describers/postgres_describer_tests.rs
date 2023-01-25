@@ -2,7 +2,7 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use pretty_assertions::assert_eq;
-use psl::dml::PrismaValue;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{postgres::PostgresSchemaExt, *};
 
 #[test_connector(tags(Postgres))]

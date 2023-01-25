@@ -2,8 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{PrismaValue, Record, TypeIdentifier};
-use psl::dml::FieldArity;
+use prisma_models::{dml::FieldArity, PrismaValue, Record, TypeIdentifier};
 use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;

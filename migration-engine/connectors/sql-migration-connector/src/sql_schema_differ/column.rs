@@ -1,7 +1,6 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
 use enumflags2::BitFlags;
-use psl::dml::PrismaValue;
-use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
+use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, PrismaValue};
 
 pub(crate) fn all_changes(cols: Pair<ColumnWalker<'_>>, flavour: &dyn SqlFlavour) -> ColumnChanges {
     let mut changes = BitFlags::empty();

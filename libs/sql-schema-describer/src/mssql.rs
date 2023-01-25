@@ -12,8 +12,8 @@ use once_cell::sync::Lazy;
 use psl::{
     builtin_connectors::{MsSqlType, MsSqlTypeParameter},
     datamodel_connector::NativeTypeInstance,
-    dml::prisma_value::PrismaValue,
 };
+use prisma_value::PrismaValue;
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
