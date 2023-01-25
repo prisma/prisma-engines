@@ -114,10 +114,6 @@ pub fn user_facing_span_only_filter(meta: &Metadata) -> bool {
         return false;
     }
 
-    user_facing_filter(meta)
-}
-
-pub fn user_facing_filter(meta: &Metadata) -> bool {
     if *SHOW_ALL_TRACES {
         return true;
     }
@@ -126,5 +122,7 @@ pub fn user_facing_filter(meta: &Metadata) -> bool {
         return true;
     }
 
+    // spans describing a quaint query.
+    // TODO: should this span be made user_facing in quaint?
     meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
 }

@@ -127,9 +127,13 @@ pub use self::settings::Settings;
 use self::capturer::Processor;
 use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
+use query_engine_metrics::MetricRegistry;
+use tracing::subscriber;
+use tracing_subscriber::{
+    filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,
+};
 
 static PROCESSOR: Lazy<capturer::Processor> = Lazy::new(Processor::default);
-static TRACER: Lazy<sdk::trace::Tracer> = Lazy::new(setup_and_install_tracer_globally);
 
 /// Creates a new capturer, which is configured to export traces and log events happening during a
 /// particular request
@@ -137,24 +141,41 @@ pub fn capturer(trace_id: trace::TraceId, settings: Settings) -> Capturer {
     Capturer::new(PROCESSOR.to_owned(), trace_id, settings)
 }
 
-/// Returns a clone to the global tracer used when capturing telemetry in the response
-pub fn tracer() -> &'static sdk::trace::Tracer {
-    &TRACER
-}
-
-/// Installs an opentelemetry tracer globally, which is configured to proecss
-/// spans and export them to global exporter.
-fn setup_and_install_tracer_globally() -> sdk::trace::Tracer {
+/// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
+/// global, default subscriber
+pub fn install_capturing_layer(
+    subscriber: Layered<Option<MetricRegistry>, Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>>,
+    log_queries: bool,
+) {
+    // set a trace context propagator, so that the trace context is propagated via the
+    // `traceparent` header from other systems
     global::set_text_map_propagator(sdk::propagation::TraceContextPropagator::new());
-
-    let provider_builder = sdk::trace::TracerProvider::builder().with_span_processor(PROCESSOR.to_owned());
-    let provider = provider_builder.build();
+    // create a tracer provider that is configured to use our custom processor to process spans
+    let provider = sdk::trace::TracerProvider::builder()
+        .with_span_processor(PROCESSOR.to_owned())
+        .build();
+    // create a tracer out of the provider
     let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "opentelemetry");
-
+    // set the provider as the global provider
     global::set_tracer_provider(provider);
-    tracer
+
+    // create a layer that will filter initial events and spans based on the log level configuration
+    // from the environment and a specific filter to discard things that we are not interested in
+    // from a capturiong perspective
+    let telemetry_layer = tracing_opentelemetry::layer()
+        .with_tracer(tracer)
+        .with_filter(crate::helpers::env_filter(
+            log_queries,
+            crate::helpers::QueryEngineLogLevel::FromEnv,
+        ))
+        .with_filter(filter_fn(helpers::span_and_event_filter));
+    // decorate the given subscriber (more layers were added before this one) with the telemetry layer
+    let subscriber = subscriber.with(telemetry_layer);
+    // and finally set the subscriber as the global, default subscriber
+    subscriber::set_global_default(subscriber).unwrap();
 }
 
 mod capturer;
+mod helpers;
 mod settings;
 pub mod storage;
