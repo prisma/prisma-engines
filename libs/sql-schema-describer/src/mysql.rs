@@ -342,6 +342,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY ordinal_position
         ";
 
+        let mut defaults = Vec::new();
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for col in rows {
@@ -487,11 +488,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            let column_id = TableColumnId(sql_schema.table_columns.len() as u32);
-
-            if let Some(default) = default {
-                sql_schema.push_table_default_value(column_id, default);
-            }
+            // defaults has to be in the same order as the columns
+            defaults.push((table_id, default));
 
             let col = Column {
                 name,
@@ -503,7 +501,13 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
-        sql_schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
+        defaults.sort_by_key(|(table_id, _)| *table_id);
+
+        for (i, (_, default)) in defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(TableColumnId(i as u32), default);
+            }
+        }
 
         Ok(())
     }

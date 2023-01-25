@@ -692,6 +692,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
+        let mut table_defaults = Vec::new();
+        let mut view_defaults = Vec::new();
 
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
@@ -787,16 +789,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
-            if let Some(default) = default {
-                match container_id {
-                    Either::Left(_) => {
-                        let column_id = sql_schema.next_table_column_id();
-                        sql_schema.push_table_default_value(column_id, default);
-                    }
-                    Either::Right(_) => {
-                        let column_id = sql_schema.next_view_column_id();
-                        sql_schema.push_view_default_value(column_id, default);
-                    }
+            match container_id {
+                Either::Left(table_id) => {
+                    table_defaults.push((table_id, default));
+                }
+                Either::Right(view_id) => {
+                    view_defaults.push((view_id, default));
                 }
             }
 
@@ -821,7 +819,21 @@ impl<'a> SqlSchemaDescriber<'a> {
         // query and the columns query.
         sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
         sql_schema.view_columns.sort_by_key(|(table_id, _)| *table_id);
-        sql_schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
+
+        table_defaults.sort_by_key(|(table_id, _)| *table_id);
+        view_defaults.sort_by_key(|(view_id, _)| *view_id);
+
+        for (i, (_, default)) in table_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(TableColumnId(i as u32), default);
+            }
+        }
+
+        for (i, (_, default)) in view_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_view_default_value(ViewColumnId(i as u32), default);
+            }
+        }
 
         Ok(())
     }
