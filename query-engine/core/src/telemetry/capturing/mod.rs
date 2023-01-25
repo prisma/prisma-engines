@@ -158,7 +158,6 @@ pub fn install_capturing_layer(
     let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "opentelemetry");
     // set the provider as the global provider
     global::set_tracer_provider(provider);
-
     // create a layer that will filter initial events and spans based on the log level configuration
     // from the environment and a specific filter to discard things that we are not interested in
     // from a capturiong perspective
