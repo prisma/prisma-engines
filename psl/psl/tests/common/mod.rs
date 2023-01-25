@@ -1,6 +1,6 @@
 pub use ::indoc::{formatdoc, indoc};
-pub use expect_test::expect;
 pub use dml::*;
+pub use expect_test::expect;
 
 use psl::{diagnostics::*, Configuration, StringFromEnvVar};
 

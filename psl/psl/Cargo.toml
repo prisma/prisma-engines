@@ -9,6 +9,6 @@ psl-core = { path = "../psl-core" }
 
 [dev-dependencies]
 dissimilar = "1.0.4"
-dml = { path = "../../libs/dml" }
+dml = { path = "../../query-engine/dml" }
 expect-test = "1.1.0"
 indoc = "1"
