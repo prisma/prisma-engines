@@ -2,7 +2,7 @@ mod cockroachdb;
 mod vitess;
 
 use migration_engine_tests::test_api::*;
-use psl::dml::ReferentialAction;
+use psl::parser_database::ReferentialAction;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 
 #[test_connector(exclude(Vitess))]

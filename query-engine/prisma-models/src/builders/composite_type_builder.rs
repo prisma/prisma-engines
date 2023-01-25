@@ -1,9 +1,7 @@
-use std::sync::Arc;
-
-use once_cell::sync::OnceCell;
-
 use super::FieldBuilder;
 use crate::{CompositeType, CompositeTypeRef, InternalDataModelWeakRef};
+use once_cell::sync::OnceCell;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct CompositeTypeBuilder {

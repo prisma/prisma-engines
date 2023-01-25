@@ -9,10 +9,10 @@ use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MsSqlType, MsSqlTypeParameter},
     datamodel_connector::NativeTypeInstance,
-    dml::prisma_value::PrismaValue,
 };
 use quaint::prelude::Queryable;
 use regex::Regex;

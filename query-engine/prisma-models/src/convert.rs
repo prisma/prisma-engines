@@ -3,7 +3,7 @@ use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
 pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
-    let datamodel = psl::lift(&schema);
+    let datamodel = dml::lift(&schema);
     let relation_mode = schema.relation_mode();
 
     let relation_placeholders = builders::relation_placeholders(&datamodel);

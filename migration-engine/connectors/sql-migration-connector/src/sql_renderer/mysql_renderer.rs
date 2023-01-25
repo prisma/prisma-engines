@@ -7,14 +7,13 @@ use crate::{
 };
 use once_cell::sync::Lazy;
 use psl::builtin_connectors::MySqlType;
-use psl::dml::PrismaValue;
 use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write as _};
 

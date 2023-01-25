@@ -3,7 +3,7 @@ use bigdecimal::{BigDecimal, FromPrimitive};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
-use psl::dml::PrismaValue;
+use prisma_models::dml::PrismaValue;
 use query_core::query_document::*;
 
 /// Protocol adapter for GraphQL -> Query Document.

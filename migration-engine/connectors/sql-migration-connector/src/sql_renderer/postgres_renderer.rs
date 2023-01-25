@@ -9,7 +9,6 @@ use crate::{
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use psl::builtin_connectors::{CockroachType, PostgresType};
-use psl::dml::PrismaValue;
 use sql_ddl::{
     postgres::{self as ddl, PostgresIdentifier},
     IndexColumn, SortOrder,
@@ -17,7 +16,7 @@ use sql_ddl::{
 use sql_schema_describer::{
     postgres::{PostgresSchemaExt, SqlIndexAlgorithm},
     walkers::*,
-    ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
+    ColumnArity, ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 

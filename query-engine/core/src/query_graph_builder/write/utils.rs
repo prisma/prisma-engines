@@ -6,7 +6,7 @@ use crate::{
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
-use psl::dml::ReferentialAction;
+use psl::parser_database::ReferentialAction;
 use schema::ConnectorContext;
 use std::sync::Arc;
 

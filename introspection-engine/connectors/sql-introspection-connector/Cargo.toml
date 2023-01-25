@@ -10,6 +10,7 @@ vendored-openssl = ["quaint/vendored-openssl"]
 anyhow = "1.0.26"
 async-trait = "0.1.17"
 psl.workspace = true
+prisma-value = { path = "../../../libs/prisma-value" }
 introspection-connector = { path = "../introspection-connector" }
 datamodel-renderer = { path = "../../datamodel-renderer" }
 once_cell = "1.3"

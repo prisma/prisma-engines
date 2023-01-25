@@ -20,9 +20,9 @@ pub use self::{
     ids::*,
     walkers::*,
 };
+pub use prisma_value::PrismaValue;
 
 use once_cell::sync::Lazy;
-use psl::dml::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{
