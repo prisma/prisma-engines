@@ -20,7 +20,7 @@ impl<'a> ViewPair<'a> {
         self.previous.map(|m| m.id)
     }
 
-    /// The namespace of the model, if using the multi-schema feature.
+    /// The namespace of the view, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
         if self.context.uses_namespaces() {
             self.next.namespace()
@@ -29,7 +29,7 @@ impl<'a> ViewPair<'a> {
         }
     }
 
-    /// Name of the model in the PSL. The value can be sanitized if it
+    /// Name of the view in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.
     pub(crate) fn name(self) -> Cow<'a, str> {
