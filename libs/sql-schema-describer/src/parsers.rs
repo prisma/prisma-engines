@@ -2,7 +2,7 @@
 
 use bigdecimal::BigDecimal;
 use once_cell::sync::Lazy;
-use psl::dml::PrismaValue;
+use prisma_value::PrismaValue;
 use regex::Regex;
 use std::str::FromStr;
 use tracing::debug;

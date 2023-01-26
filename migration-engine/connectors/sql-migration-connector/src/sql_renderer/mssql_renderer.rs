@@ -8,8 +8,7 @@ use crate::{
 };
 use indoc::{formatdoc, indoc};
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
-use psl::dml::PrismaValue;
-use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt};
+use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, PrismaValue};
 use std::{borrow::Cow, fmt::Write};
 
 impl MssqlFlavour {

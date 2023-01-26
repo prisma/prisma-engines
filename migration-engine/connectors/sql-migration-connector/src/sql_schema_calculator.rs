@@ -5,7 +5,6 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use psl::{
     datamodel_connector::walker_ext_traits::*,
-    dml::{prisma_value, PrismaValue},
     parser_database::{
         ast,
         walkers::{ModelWalker, ScalarFieldWalker},
@@ -13,7 +12,7 @@ use psl::{
     },
     ValidatedSchema,
 };
-use sql_schema_describer as sql;
+use sql_schema_describer::{self as sql, PrismaValue};
 use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
@@ -546,7 +545,7 @@ fn constant_expression_to_sql_default(expr: &ast::Expression, scalar_type: Scala
             ScalarType::String => PrismaValue::String(val.clone()),
             ScalarType::DateTime => PrismaValue::DateTime(val.parse().unwrap()),
             ScalarType::Json => PrismaValue::Json(val.parse().unwrap()),
-            ScalarType::Bytes => PrismaValue::Bytes(prisma_value::decode_bytes(val).unwrap()),
+            ScalarType::Bytes => PrismaValue::Bytes(PrismaValue::decode_bytes(val).unwrap()),
             ScalarType::Decimal => PrismaValue::Float(val.parse().unwrap()),
             other => unreachable!("{:?}", other),
         },

@@ -4,7 +4,7 @@ mod failure_modes;
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
-use psl::{dml::ReferentialAction, parser_database::SourceFile};
+use psl::parser_database::*;
 use quaint::prelude::Insert;
 use serde_json::json;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};

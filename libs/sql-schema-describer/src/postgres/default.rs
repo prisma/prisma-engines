@@ -2,7 +2,7 @@ mod c_style_scalar_lists;
 mod tokenize;
 
 use crate::{ColumnType, ColumnTypeFamily, DefaultKind, DefaultValue};
-use psl::dml::prisma_value::PrismaValue;
+use prisma_value::PrismaValue;
 use tokenize::{tokenize, Token};
 
 #[derive(Debug)]

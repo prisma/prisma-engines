@@ -245,6 +245,11 @@ impl PrismaValue {
         }
     }
 
+    /// For reexport convenience.
+    pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+        decode_bytes(s)
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }

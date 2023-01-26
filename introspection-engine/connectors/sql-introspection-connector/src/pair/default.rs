@@ -1,13 +1,12 @@
-use std::{borrow::Cow, fmt};
-
+use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MySqlType, PostgresType},
     datamodel_connector::constraint_names::ConstraintNames,
-    dml,
     parser_database::walkers,
 };
 use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
+use std::{borrow::Cow, fmt};
 
 use super::Pair;
 
@@ -61,13 +60,13 @@ impl<'a> DefaultValuePair<'a> {
 
             (Some(sql::DefaultKind::Now), sql::ColumnTypeFamily::DateTime) => Some(DefaultKind::Now),
 
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Null)), _) => Some(DefaultKind::Constant(&"null")),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::String(val))), _) => Some(DefaultKind::String(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Json(val))), _) => Some(DefaultKind::String(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Xml(val))), _) => Some(DefaultKind::String(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Null)), _) => Some(DefaultKind::Constant(&"null")),
+            (Some(sql::DefaultKind::Value(PrismaValue::String(val))), _) => Some(DefaultKind::String(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Json(val))), _) => Some(DefaultKind::String(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Xml(val))), _) => Some(DefaultKind::String(val)),
 
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Boolean(val))), _) => Some(DefaultKind::Constant(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
+            (Some(sql::DefaultKind::Value(PrismaValue::Boolean(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
                 let variant = self
                     .context
                     .schema
@@ -84,37 +83,37 @@ impl<'a> DefaultValuePair<'a> {
                     Some(DefaultKind::DbGenerated(variant_name.mapped_name()))
                 }
             }
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Int(val))), _) => Some(DefaultKind::Constant(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Uuid(val))), _) => Some(DefaultKind::Constant(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::DateTime(val))), _) => Some(DefaultKind::Constant(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Float(val))), _) => Some(DefaultKind::Constant(val)),
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::BigInt(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Int(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Uuid(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::DateTime(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Float(val))), _) => Some(DefaultKind::Constant(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::BigInt(val))), _) => Some(DefaultKind::Constant(val)),
 
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::Bytes(val))), _) => Some(DefaultKind::Bytes(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::Bytes(val))), _) => Some(DefaultKind::Bytes(val)),
 
-            (Some(sql::DefaultKind::Value(dml::PrismaValue::List(vals))), _) => match vals.first() {
+            (Some(sql::DefaultKind::Value(PrismaValue::List(vals))), _) => match vals.first() {
                 None => Some(DefaultKind::ConstantList(Vec::new())),
-                Some(dml::PrismaValue::String(_) | dml::PrismaValue::Xml(_) | dml::PrismaValue::Json(_)) => {
+                Some(PrismaValue::String(_) | PrismaValue::Xml(_) | PrismaValue::Json(_)) => {
                     let vals = vals.iter().filter_map(|val| val.as_string()).collect();
                     Some(DefaultKind::StringList(vals))
                 }
                 Some(
-                    dml::PrismaValue::Boolean(_)
-                    | dml::PrismaValue::Enum(_)
-                    | dml::PrismaValue::Int(_)
-                    | dml::PrismaValue::Uuid(_)
-                    | dml::PrismaValue::DateTime(_)
-                    | dml::PrismaValue::Float(_)
-                    | dml::PrismaValue::BigInt(_),
+                    PrismaValue::Boolean(_)
+                    | PrismaValue::Enum(_)
+                    | PrismaValue::Int(_)
+                    | PrismaValue::Uuid(_)
+                    | PrismaValue::DateTime(_)
+                    | PrismaValue::Float(_)
+                    | PrismaValue::BigInt(_),
                 ) => {
                     let vals = vals.iter().map(|val| val as &'a dyn fmt::Display).collect();
                     Some(DefaultKind::ConstantList(vals))
                 }
-                Some(dml::PrismaValue::Null) => {
+                Some(PrismaValue::Null) => {
                     let vals = vals.iter().map(|_| &"null" as &'a dyn fmt::Display).collect();
                     Some(DefaultKind::ConstantList(vals))
                 }
-                Some(dml::PrismaValue::Bytes(_)) => {
+                Some(PrismaValue::Bytes(_)) => {
                     let vals = vals.iter().filter_map(|val| val.as_bytes()).collect();
                     Some(DefaultKind::BytesList(vals))
                 }

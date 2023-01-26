@@ -2,8 +2,8 @@ use super::*;
 use crate::schema::*;
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
+use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
-use psl::dml::ValueGeneratorFn;
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, hash::Hash, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -452,7 +452,7 @@ impl QueryDocumentParser {
                 match &field.default_value {
                     Some(default_value) => {
                         let default_pv = match &default_value.kind {
-                            psl::dml::DefaultKind::Expression(ref expr)
+                            dml::DefaultKind::Expression(ref expr)
                                 if matches!(expr.generator(), ValueGeneratorFn::Now) =>
                             {
                                 self.default_now.clone()

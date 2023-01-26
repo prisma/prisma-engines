@@ -1,5 +1,5 @@
 use crate::common::*;
-use psl::dml::{DefaultValue, ScalarType, ValueGenerator};
+use dml::{DefaultValue, ScalarType, ValueGenerator};
 
 #[test]
 fn correctly_handle_server_side_now_function() {

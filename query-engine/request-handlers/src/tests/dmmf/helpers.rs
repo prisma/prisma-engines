@@ -4,7 +4,7 @@ use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchema, schema_builder};
 use std::collections::HashMap;
 
-pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, psl::dml::Datamodel) {
+pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, dml::Datamodel) {
     let config = psl::parse_configuration(datamodel_string).unwrap();
     let datasource = config.subject.datasources.first();
     let dm = psl::parse_datamodel(datamodel_string).unwrap().subject;

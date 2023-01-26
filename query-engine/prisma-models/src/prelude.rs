@@ -12,4 +12,4 @@ pub use crate::record::*;
 pub use crate::relation::*;
 pub use crate::selection_result::*;
 
-pub use psl::dml::{self, prisma_value::*};
+pub use dml::{self, prisma_value::*};

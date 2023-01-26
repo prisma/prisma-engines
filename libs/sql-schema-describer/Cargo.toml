@@ -4,6 +4,7 @@ name = "sql-schema-describer"
 version = "0.1.0"
 
 [dependencies]
+prisma-value = { path = "../prisma-value" }
 psl.workspace = true
 
 async-trait = "0.1.17"
