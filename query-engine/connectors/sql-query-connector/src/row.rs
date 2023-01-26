@@ -249,6 +249,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "Int")?)
             }
             Value::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "Int")?),
+            Value::Boolean(Some(bool)) => PrismaValue::Int(bool as i64),
             other => to_prisma_value(other)?,
         },
         TypeIdentifier::BigInt => match p_value {
@@ -270,6 +271,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "BigInt")?)
             }
             Value::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigInt")?),
+            Value::Boolean(Some(bool)) => PrismaValue::BigInt(bool as i64),
             other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value {

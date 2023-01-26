@@ -333,10 +333,12 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (TypeIdentifier::Int, Bson::Int64(i)) => PrismaValue::Int(i),
         (TypeIdentifier::Int, Bson::Int32(i)) => PrismaValue::Int(i as i64),
         (TypeIdentifier::Int, Bson::Double(i)) => PrismaValue::Int(i as i64),
+        (TypeIdentifier::Int, Bson::Boolean(bool)) => PrismaValue::Int(bool as i64),
 
         // BigInt
         (TypeIdentifier::BigInt, Bson::Int64(i)) => PrismaValue::BigInt(i),
         (TypeIdentifier::BigInt, Bson::Int32(i)) => PrismaValue::BigInt(i as i64),
+        (TypeIdentifier::BigInt, Bson::Boolean(bool)) => PrismaValue::BigInt(bool as i64),
 
         // Floats
         (TypeIdentifier::Float, Bson::Double(f)) => {

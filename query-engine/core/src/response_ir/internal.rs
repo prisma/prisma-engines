@@ -1,6 +1,5 @@
 use super::*;
 use crate::{CoreError, QueryResult, RecordAggregations, RecordSelection};
-use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
@@ -541,29 +540,25 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
 
 fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
+        // Identity matchers
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
-
-        (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
-
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
-
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
-        (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Int(i),
-
-        (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
-        (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
-
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
-
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
-        (ScalarType::Int, PrismaValue::Boolean(b)) => PrismaValue::Int(b as i64),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
-
         (ScalarType::Xml, PrismaValue::Xml(b)) => PrismaValue::Xml(b),
-        (ScalarType::String, PrismaValue::Xml(s)) => PrismaValue::String(s),
+
+        // The Decimal type doesn't have a corresponding PrismaValue variant. We need to serialize it
+        // to String so that client can deserialize it as Decimal again.
+        (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
+        (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
+        // TODO: Remove this, it is a hack. The Xml type no longer exists as a Prisma native type.
+        // TODO: It should not exist as a ScalarType, TypeIdentifier, or PrismaValue.
+        (ScalarType::String, PrismaValue::Xml(xml)) => PrismaValue::String(xml),
 
         (st, pv) => {
             return Err(crate::FieldConversionError::create(
