@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Rename property to relationMode",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 3,
+            "character": 4
+          },
+          "end": {
+            "line": 4,
+            "character": 0
+          }
+        },
+        "severity": 2,
+        "message": "The `referentialIntegrity` attribute is deprecated. Please use `relationMode` instead. Learn more at https://pris.ly/d/relation-mode"
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 4
+              },
+              "end": {
+                "line": 3,
+                "character": 24
+              }
+            },
+            "newText": "relationMode"
+          }
+        ]
+      }
+    }
+  }
+]
