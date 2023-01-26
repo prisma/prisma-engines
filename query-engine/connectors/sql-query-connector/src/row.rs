@@ -322,7 +322,7 @@ fn interpret_bytes_as_i64(bytes: &[u8]) -> i64 {
     }
 }
 
-pub fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
+pub(crate) fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
     if n.is_nan() {
         return Err(ConversionFailure::new("NaN", to).into());
     }
@@ -334,7 +334,7 @@ pub fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
     Ok(())
 }
 
-pub fn sanitize_f64(n: f64, to: &'static str) -> crate::Result<()> {
+pub(crate) fn sanitize_f64(n: f64, to: &'static str) -> crate::Result<()> {
     if n.is_nan() {
         return Err(ConversionFailure::new("NaN", to).into());
     }
@@ -346,7 +346,7 @@ pub fn sanitize_f64(n: f64, to: &'static str) -> crate::Result<()> {
     Ok(())
 }
 
-pub fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i64, SqlError> {
+pub(crate) fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i64, SqlError> {
     dec.normalized()
         .to_i64()
         .ok_or_else(|| SqlError::from(ConversionFailure::new(format!("BigDecimal({dec})"), to)))
