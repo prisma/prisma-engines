@@ -546,10 +546,6 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
         (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
 
-        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(
-            f.to_i64()
-                .ok_or_else(|| CoreError::decimal_conversion_error(&f, "i64"))?,
-        ),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
