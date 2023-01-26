@@ -37,14 +37,14 @@ pub(super) fn add_schema_block_attribute_model(
             None => return,
         };
 
-    let edit = super::create_schema_attribute_edit(
-        schema,
+    let formatted_attribute = super::format_attribute(
+        "schema()",
         model.indentation(),
         model.newline(),
         &model.ast_model().attributes,
-        model.ast_model().span(),
-        params,
     );
+
+    let edit = super::create_text_edit(schema, formatted_attribute, true, model.ast_model().span(), params);
 
     let action = CodeAction {
         title: String::from("Add `@@schema` attribute"),
@@ -89,14 +89,14 @@ pub(super) fn add_schema_block_attribute_enum(
         None => return,
     };
 
-    let edit = super::create_schema_attribute_edit(
-        schema,
+    let formatted_attribute = super::format_attribute(
+        "schema()",
         enumerator.indentation(),
         enumerator.newline(),
         &enumerator.ast_enum().attributes,
-        enumerator.ast_enum().span(),
-        params,
     );
+
+    let edit = super::create_text_edit(schema, formatted_attribute, true, enumerator.ast_enum().span(), params);
 
     let action = CodeAction {
         title: String::from("Add `@@schema` attribute"),

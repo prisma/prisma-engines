@@ -195,38 +195,21 @@ fn format_attribute(
     formatted_attribute
 }
 
-fn create_schema_attribute_edit(
+fn create_text_edit(
     schema: &str,
-    indentation: IndentationType,
-    newline: NewlineType,
-    attributes: &Vec<Attribute>,
+    formatted_attribute: String,
+    append: bool,
     span: Span,
     params: &CodeActionParams,
 ) -> WorkspaceEdit {
-    let formatted_attribute = format_attribute("schema()", indentation, newline, attributes);
+    let range = match append {
+        true => range_after_span(schema, span),
+        false => span_to_range(schema, span),
+    };
 
-    let range = range_after_span(schema, span);
     let text = TextEdit {
         range,
         new_text: formatted_attribute,
-    };
-
-    let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
-
-    WorkspaceEdit {
-        changes: Some(changes),
-        ..Default::default()
-    }
-}
-
-fn create_block_property(schema: &str, span: Span, params: &CodeActionParams) -> WorkspaceEdit {
-    let formatted_property = "relationMode".to_owned();
-
-    let range = span_to_range(schema, span);
-    let text = TextEdit {
-        range,
-        new_text: formatted_property,
     };
 
     let mut changes = HashMap::new();

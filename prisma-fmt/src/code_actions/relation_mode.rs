@@ -23,7 +23,7 @@ pub(crate) fn edit_referential_integrity(
             None => return,
         };
 
-    let edit = super::create_block_property(schema, prop.name.span, params);
+    let edit = super::create_text_edit(schema, "relationMode".to_owned(), false, prop.name.span, params);
 
     let action = CodeAction {
         title: String::from("Rename property to relationMode"),
