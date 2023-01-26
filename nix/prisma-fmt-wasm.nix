@@ -1,8 +1,9 @@
 { pkgs, system, self', ... }:
 
 let
-  toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+  toolchain = pkgs.rust-bin.fromRustupToolchainFile ../prisma-fmt-wasm/rust-toolchain.toml;
   deps = self'.packages.prisma-engines-deps;
+  scriptsDir = ../prisma-fmt-wasm/scripts;
   inherit (pkgs) jq nodejs coreutils wasm-bindgen-cli stdenv;
   inherit (builtins) readFile replaceStrings;
 in
@@ -14,7 +15,7 @@ in
 
     configurePhase = "mkdir .cargo && ln -s ${deps}/config.toml .cargo/config.toml";
     buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-fmt-build";
-    installPhase = readFile ./scripts/install.sh;
+    installPhase = readFile "${scriptsDir}/install.sh";
   };
 
   # Takes a package version as its single argument, and produces
@@ -35,7 +36,7 @@ in
       '';
     };
 
-  packages.syncWasmBindgenVersions = let template = readFile ./scripts/syncWasmBindgenVersions.sh; in
+  packages.syncWasmBindgenVersions = let template = readFile "${scriptsDir}/syncWasmBindgenVersions.sh"; in
     pkgs.writeShellApplication {
       name = "syncWasmBindgenVersions";
       runtimeInputs = [ coreutils toolchain ];
@@ -44,5 +45,5 @@ in
 
   checks.prismaFmtWasmE2E = pkgs.runCommand "prismaFmtWasmE2E"
     { PRISMA_FMT_WASM = self'.packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
-    (readFile ./scripts/check.sh);
+    (readFile "${scriptsDir}/check.sh");
 }
