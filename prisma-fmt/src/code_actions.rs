@@ -161,15 +161,22 @@ fn create_missing_attribute<'a>(
             &model.ast_model().attributes,
         );
 
-        let range = span_to_range(schema, model.ast_model().span());
+        let range = range_after_span(schema, model.ast_model().span());
         (formatted_attribute, range)
     };
 
     TextEdit { range, new_text }
 }
 
-fn span_to_range(schema: &str, span: Span) -> Range {
+fn range_after_span(schema: &str, span: Span) -> Range {
     let start = crate::offset_to_position(span.end - 1, schema);
+    let end = crate::offset_to_position(span.end, schema);
+
+    Range { start, end }
+}
+
+fn span_to_range(schema: &str, span: Span) -> Range {
+    let start = crate::offset_to_position(span.start, schema);
     let end = crate::offset_to_position(span.end, schema);
 
     Range { start, end }
@@ -198,7 +205,7 @@ fn create_schema_attribute_edit(
 ) -> WorkspaceEdit {
     let formatted_attribute = format_attribute("schema()", indentation, newline, attributes);
 
-    let range = span_to_range(schema, span);
+    let range = range_after_span(schema, span);
     let text = TextEdit {
         range,
         new_text: formatted_attribute,
