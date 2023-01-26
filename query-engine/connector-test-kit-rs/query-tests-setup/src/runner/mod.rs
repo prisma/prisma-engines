@@ -1,112 +1,59 @@
-mod binary;
-mod direct;
-mod node_api;
-
-pub use binary::*;
-pub use direct::*;
-pub use node_api::*;
-use query_core::{schema::QuerySchemaRef, TxId};
-use query_engine_metrics::MetricRegistry;
-
-use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
 use colored::*;
+use quaint::{prelude::Queryable, single::Quaint};
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId};
+use query_engine_metrics::MetricRegistry;
+use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
+use std::{env, sync::Arc};
+
+use crate::{ConnectorTag, ConnectorVersion, TestResult};
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
 
-#[async_trait::async_trait]
-pub trait RunnerInterface: Sized {
-    /// Initializes the runner.
-    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
+pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-    /// Queries the engine.
-    async fn query(&self, query: String) -> TestResult<QueryResult>;
-
-    /// Queries the engine with a batch.
-    async fn batch(
-        &self,
-        queries: Vec<String>,
-        transaction: bool,
-        isolation_level: Option<String>,
-    ) -> TestResult<QueryResult>;
-
-    /// Execute a raw query on the underlying connected database.
-    async fn raw_execute(&self, query: String) -> TestResult<()>;
-
-    /// start a transaction for a batch run
-    async fn start_tx(
-        &self,
-        max_acquisition_millis: u64,
-        valid_for_millis: u64,
-        isolation_level: Option<String>,
-    ) -> TestResult<TxId>;
-
-    /// commit transaction
-    async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
-
-    /// rollback transaction
-    async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
-
-    /// The connector tag used to load this runner.
-    fn connector(&self) -> &ConnectorTag;
-
-    /// Instructs this runner to use a specific ITX ID for queries.
-    fn set_active_tx(&mut self, tx_id: TxId);
-
-    /// Clears ITX ID for queries.
-    fn clear_active_tx(&mut self);
-
-    fn get_metrics(&self) -> MetricRegistry;
-
-    /// The query schema used for the test.
-    fn query_schema(&self) -> &QuerySchemaRef;
-}
-
-enum RunnerType {
-    /// Using the QE crate directly for queries.
-    Direct(DirectRunner),
-
-    /// Using a NodeJS runner.
-    NodeApi(NodeApiRunner),
-
-    /// Using the HTTP bridge
-    Binary(BinaryRunner),
-}
-
+/// Direct engine runner.
 pub struct Runner {
-    log_capture: TestLogCapture,
-    inner: RunnerType,
+    executor: Executor,
+    query_schema: QuerySchemaRef,
+    connector_tag: ConnectorTag,
+    connection_url: String,
+    current_tx_id: Option<TxId>,
+    metrics: MetricRegistry,
 }
 
 impl Runner {
-    pub async fn load(
-        ident: &str,
+    pub(crate) async fn load(
         datamodel: String,
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
-        log_capture: TestLogCapture,
     ) -> TestResult<Self> {
-        let inner = match ident {
-            "direct" => Self::direct(datamodel, connector_tag, metrics).await,
-            "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
-            unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
-        }?;
+        let schema = psl::parse_schema(datamodel).unwrap();
+        let data_source = schema.configuration.datasources.first().unwrap();
+        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let executor = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
+        let internal_data_model = prisma_models::convert(Arc::new(schema));
 
-        Ok(Self { log_capture, inner })
+        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
+
+        Ok(Self {
+            executor,
+            query_schema,
+            connector_tag,
+            connection_url: url,
+            current_tx_id: None,
+            metrics,
+        })
     }
 
-    pub async fn query<T>(&self, gql_query: T) -> TestResult<QueryResult>
-    where
-        T: Into<String>,
-    {
-        let gql_query = gql_query.into();
-        tracing::debug!("Querying: {}", gql_query.clone().green());
+    pub async fn query<T: Into<String>>(&self, query: T) -> TestResult<crate::QueryResult> {
+        let query = query.into();
+        tracing::debug!("Querying: {}", query.green());
+        println!("{}", query.bright_green());
 
-        let response = match &self.inner {
-            RunnerType::Direct(r) => r.query(gql_query).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query(gql_query).await,
-        }?;
+        let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
+        let query = GraphQlBody::Single(query.into());
+
+        let response: crate::QueryResult = handler.handle(query, self.current_tx_id.clone(), None).await.into();
 
         if response.failed() {
             tracing::debug!("Response: {}", response.to_string().red());
@@ -117,18 +64,34 @@ impl Runner {
         Ok(response)
     }
 
-    pub async fn raw_execute<T>(&self, sql: T) -> TestResult<()>
-    where
-        T: Into<String>,
-    {
-        let sql = sql.into();
-        tracing::debug!("Raw execute: {}", sql.clone().green());
-
-        match &self.inner {
-            RunnerType::Direct(r) => r.raw_execute(sql).await,
-            RunnerType::Binary(r) => r.raw_execute(sql).await,
-            RunnerType::NodeApi(_) => todo!(),
+    pub async fn raw_execute<T: Into<String>>(&self, query: T) -> TestResult<()> {
+        let query = query.into();
+        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
+            panic!("raw_execute is not supported for MongoDB yet");
         }
+
+        tracing::debug!("Raw execute: {}", query.green());
+
+        let conn = Quaint::new(&self.connection_url).await?;
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
+    }
+
+    pub async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
+        let handler = GraphQlHandler::new(&*self.executor, &self.query_schema);
+        let query = GraphQlBody::Multi(MultiQuery::new(
+            queries.into_iter().map(Into::into).collect(),
+            transaction,
+            isolation_level,
+        ));
+
+        Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
     }
 
     pub async fn start_tx(
@@ -137,109 +100,53 @@ impl Runner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
-        match &self.inner {
-            RunnerType::Direct(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
-                    .await
-            }
-            RunnerType::Binary(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
-                    .await
-            }
-            RunnerType::NodeApi(_) => todo!(),
-        }
+        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+
+        let id = self.executor.start_tx(self.query_schema.clone(), tx_opts).await?;
+        Ok(id)
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.commit_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.commit_tx(tx_id).await,
+        let res = self.executor.commit_tx(tx_id).await;
+
+        if let Err(error) = res {
+            return Ok(Err(error.into()));
+        } else {
+            Ok(Ok(()))
         }
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.rollback_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.rollback_tx(tx_id).await,
+        let res = self.executor.rollback_tx(tx_id).await;
+
+        if let Err(error) = res {
+            return Ok(Err(error.into()));
+        } else {
+            Ok(Ok(()))
         }
-    }
-
-    pub async fn batch(
-        &self,
-        queries: Vec<String>,
-        transaction: bool,
-        isolation_level: Option<String>,
-    ) -> TestResult<QueryResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level).await,
-        }
-    }
-
-    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
-
-        Ok(RunnerType::Direct(runner))
-    }
-
-    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
-
-        Ok(RunnerType::Binary(runner))
     }
 
     pub fn connector(&self) -> &ConnectorTag {
-        match &self.inner {
-            RunnerType::Direct(r) => r.connector(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.connector(),
-        }
+        &self.connector_tag
     }
 
     pub fn connector_version(&self) -> ConnectorVersion {
-        match &self.inner {
-            RunnerType::Direct(r) => ConnectorVersion::from(r.connector()),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => ConnectorVersion::from(r.connector()),
-        }
+        ConnectorVersion::from(self.connector())
     }
 
-    pub fn set_active_tx(&mut self, tx_id: TxId) {
-        match &mut self.inner {
-            RunnerType::Direct(r) => r.set_active_tx(tx_id),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.set_active_tx(tx_id),
-        }
+    pub fn set_active_tx(&mut self, tx_id: query_core::TxId) {
+        self.current_tx_id = Some(tx_id);
     }
 
     pub fn clear_active_tx(&mut self) {
-        match &mut self.inner {
-            RunnerType::Direct(r) => r.clear_active_tx(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.clear_active_tx(),
-        }
+        self.current_tx_id = None;
     }
 
     pub fn get_metrics(&self) -> MetricRegistry {
-        match &self.inner {
-            RunnerType::Direct(r) => r.get_metrics(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.get_metrics(),
-        }
-    }
-
-    pub async fn get_logs(&mut self) -> Vec<String> {
-        self.log_capture.get_logs().await
+        self.metrics.clone()
     }
 
     pub fn query_schema(&self) -> &QuerySchemaRef {
-        match &self.inner {
-            RunnerType::Direct(r) => r.query_schema(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query_schema(),
-        }
+        &self.query_schema
     }
 }

@@ -4,7 +4,7 @@ use query_engine_tests::*;
 mod native_upsert {
 
     #[connector_test(schema(user))]
-    async fn should_upsert_on_single_unique(mut runner: Runner) -> TestResult<()> {
+    async fn should_upsert_on_single_unique(runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
             upsertOneUser(
@@ -30,20 +30,16 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         insta::assert_snapshot!(
           run_query!(&runner, upsert),
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world-updated"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         Ok(())
     }
 
     #[connector_test(schema(user))]
-    async fn should_upsert_on_id(mut runner: Runner) -> TestResult<()> {
+    async fn should_upsert_on_id(runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
             upsertOneUser(
@@ -73,20 +69,16 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world","first_name":"hello","email":"hello@example.com"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         insta::assert_snapshot!(
           run_query!(&runner, upsert),
           @r###"{"data":{"upsertOneUser":{"id":2,"last_name":"world-updated","first_name":"hello","email":"hello-updated@example.com"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         Ok(())
     }
 
     #[connector_test(schema(user))]
-    async fn should_upsert_on_unique_list(mut runner: Runner) -> TestResult<()> {
+    async fn should_upsert_on_unique_list(runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
             upsertOneUser(
@@ -117,20 +109,16 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world","first_name":"hello","email":"hello@example.com"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         insta::assert_snapshot!(
           run_query!(&runner, upsert),
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world","first_name":"hello","email":"hello-updated@example.com"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         Ok(())
     }
 
     #[connector_test(schema(user))]
-    async fn should_not_use_native_upsert_on_two_uniques(mut runner: Runner) -> TestResult<()> {
+    async fn should_not_use_native_upsert_on_two_uniques(runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
             upsertOneUser(
@@ -161,14 +149,10 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world","first_name":"hello","email":"hello@example.com"}}}"###
         );
 
-        assert_not_used_native_upsert(&mut runner).await;
-
         insta::assert_snapshot!(
           run_query!(&runner, upsert),
           @r###"{"data":{"upsertOneUser":{"id":1,"last_name":"world","first_name":"hello","email":"hello-updated@example.com"}}}"###
         );
-
-        assert_not_used_native_upsert(&mut runner).await;
 
         Ok(())
     }
@@ -176,7 +160,7 @@ mod native_upsert {
     // Should not use native upsert when the unique field values defined in the where clause
     // do not match the same uniques fields in the create clause
     #[connector_test(schema(user))]
-    async fn should_not_use_if_where_and_create_different(mut runner: Runner) -> TestResult<()> {
+    async fn should_not_use_if_where_and_create_different(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
             r#"mutation {
@@ -214,8 +198,6 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"email":"email-updated"}}}"###
         );
 
-        assert_not_used_native_upsert(&mut runner).await;
-
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
             findUniqueUser(where: {id: 1}){
@@ -229,7 +211,7 @@ mod native_upsert {
     }
 
     #[connector_test(schema(user))]
-    async fn should_not_if_missing_update(mut runner: Runner) -> TestResult<()> {
+    async fn should_not_if_missing_update(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             upsertOneUser(
@@ -250,7 +232,6 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"email":"email1"}}}"###
         );
 
-        assert_not_used_native_upsert(&mut runner).await;
         Ok(())
     }
 
@@ -279,7 +260,7 @@ mod native_upsert {
     }
 
     #[connector_test(schema(relations))]
-    async fn should_not_if_has_nested_select(mut runner: Runner) -> TestResult<()> {
+    async fn should_not_if_has_nested_select(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             upsertOneUser(
@@ -304,7 +285,6 @@ mod native_upsert {
           @r###"{"data":{"upsertOneUser":{"id":1,"email":"email1","location":null}}}"###
         );
 
-        assert_not_used_native_upsert(&mut runner).await;
         Ok(())
     }
 
@@ -323,7 +303,7 @@ mod native_upsert {
     }
 
     #[connector_test(schema(compound_id))]
-    async fn should_upsert_on_compound_id(mut runner: Runner) -> TestResult<()> {
+    async fn should_upsert_on_compound_id(runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
             upsertOneTestModel(
@@ -352,26 +332,11 @@ mod native_upsert {
           @r###"{"data":{"upsertOneTestModel":{"id1":1,"id2":2,"field":"hello"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
         insta::assert_snapshot!(
           run_query!(&runner, upsert),
           @r###"{"data":{"upsertOneTestModel":{"id1":1,"id2":2,"field":"hello-updated"}}}"###
         );
 
-        assert_used_native_upsert(&mut runner).await;
-
         Ok(())
-    }
-
-    async fn assert_used_native_upsert(runner: &mut Runner) {
-        let logs = runner.get_logs().await;
-        let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));
-        assert!(did_upsert);
-    }
-
-    async fn assert_not_used_native_upsert(runner: &mut Runner) {
-        let logs = runner.get_logs().await;
-        let did_upsert = logs.iter().any(|l| l.contains("ON CONFLICT"));
-        assert!(!did_upsert);
     }
 }

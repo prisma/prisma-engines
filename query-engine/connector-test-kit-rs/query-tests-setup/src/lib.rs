@@ -4,7 +4,6 @@ mod config;
 mod connector_tag;
 mod datamodel_rendering;
 mod error;
-mod logging;
 mod query_result;
 mod runner;
 mod schema_gen;
@@ -14,7 +13,6 @@ pub use config::*;
 pub use connector_tag::*;
 pub use datamodel_rendering::*;
 pub use error::*;
-pub use logging::*;
 pub use query_core;
 pub use query_result::*;
 pub use request_handlers::{GraphQlBody, MultiQuery};
@@ -29,8 +27,6 @@ use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;
 use tokio::runtime::Builder;
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
-use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;
 
@@ -156,28 +152,17 @@ fn run_relation_link_test_impl(
         let datamodel = render_test_datamodel(config, test_database, template, &[], None, Default::default(), None);
         let connector = config.test_connector_tag().unwrap();
         let metrics = setup_metrics();
-        let metrics_for_subscriber = metrics.clone();
-        let (log_capture, log_tx) = TestLogCapture::new();
 
-        run_with_tokio(
-            async move {
-                println!("Used datamodel:\n {}", datamodel.clone().yellow());
-                setup_project(&datamodel, Default::default()).await.unwrap();
+        run_with_tokio(async move {
+            println!("Used datamodel:\n {}", datamodel.clone().yellow());
+            setup_project(&datamodel, Default::default()).await.unwrap();
 
-                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
-                    .await
-                    .unwrap();
+            let runner = Runner::load(datamodel.clone(), connector, metrics).await.unwrap();
 
-                test_fn(&runner, &dm_with_params_json).await.unwrap();
+            test_fn(&runner, &dm_with_params_json).await.unwrap();
 
-                teardown_project(&datamodel, Default::default()).await.unwrap();
-            }
-            .with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                metrics_for_subscriber,
-                log_tx,
-            )),
-        );
+            teardown_project(&datamodel, Default::default()).await.unwrap();
+        });
     }
 }
 
@@ -263,54 +248,15 @@ pub fn run_connector_test_impl(
     );
     let connector = config.test_connector_tag().unwrap();
     let metrics = crate::setup_metrics();
-    let metrics_for_subscriber = metrics.clone();
 
-    let (log_capture, log_tx) = TestLogCapture::new();
+    crate::run_with_tokio(async {
+        println!("Used datamodel:\n {}", datamodel.clone().yellow());
+        crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
-    crate::run_with_tokio(
-        async {
-            println!("Used datamodel:\n {}", datamodel.clone().yellow());
-            crate::setup_project(&datamodel, db_schemas).await.unwrap();
+        let runner = Runner::load(datamodel.clone(), connector, metrics).await.unwrap();
 
-            let runner = Runner::load(
-                crate::CONFIG.runner(),
-                datamodel.clone(),
-                connector,
-                metrics,
-                log_capture,
-            )
-            .await
-            .unwrap();
+        test_fn(runner).await.unwrap();
 
-            test_fn(runner).await.unwrap();
-
-            crate::teardown_project(&datamodel, db_schemas).await.unwrap();
-        }
-        .with_subscriber(test_tracing_subscriber(
-            ENV_LOG_LEVEL.to_string(),
-            metrics_for_subscriber,
-            log_tx,
-        )),
-    );
-}
-
-pub type LogEmit = UnboundedSender<String>;
-pub struct TestLogCapture {
-    rx: UnboundedReceiver<String>,
-}
-
-impl TestLogCapture {
-    pub fn new() -> (Self, LogEmit) {
-        let (tx, rx) = unbounded_channel();
-        (Self { rx }, tx)
-    }
-
-    pub async fn get_logs(&mut self) -> Vec<String> {
-        let mut logs = Vec::new();
-        while let Ok(log_line) = self.rx.try_recv() {
-            logs.push(log_line)
-        }
-
-        logs
-    }
+        crate::teardown_project(&datamodel, db_schemas).await.unwrap();
+    });
 }
