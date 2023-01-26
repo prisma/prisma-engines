@@ -7,6 +7,6 @@ pub fn span_and_event_filter(meta: &Metadata) -> bool {
         return true;
     }
 
-    // relevant quaint connector spans and events
-    meta.target() == "quaint::connector::metrics"
+    // relevant quaint connector or mongodb connector spans and events
+    meta.target() == "quaint::connector::metrics" || meta.target() == "mongodb_query_connector::query"
 }
