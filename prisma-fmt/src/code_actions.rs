@@ -220,16 +220,8 @@ fn create_schema_attribute_edit(
     }
 }
 
-fn create_block_property(
-    schema: &str,
-    indentation: IndentationType,
-    newline: NewlineType,
-    span: Span,
-    params: &CodeActionParams,
-) -> WorkspaceEdit {
-    let separator = newline.as_ref();
-
-    let formatted_property = format!("relationMode");
+fn create_block_property(schema: &str, span: Span, params: &CodeActionParams) -> WorkspaceEdit {
+    let formatted_property = "relationMode".to_owned();
 
     let range = span_to_range(schema, span);
     let text = TextEdit {

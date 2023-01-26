@@ -1,5 +1,5 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::schema_ast::ast::{IndentationType, NewlineType, SourceConfig};
+use psl::schema_ast::ast::SourceConfig;
 
 pub(crate) fn edit_referential_integrity(
     actions: &mut Vec<CodeActionOrCommand>,
@@ -23,7 +23,7 @@ pub(crate) fn edit_referential_integrity(
             None => return,
         };
 
-    let edit = super::create_block_property(schema, IndentationType::Tabs, NewlineType::Unix, prop.name.span, params);
+    let edit = super::create_block_property(schema, prop.name.span, params);
 
     let action = CodeAction {
         title: String::from("Rename property to relationMode"),
