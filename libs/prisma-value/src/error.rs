@@ -1,10 +1,11 @@
+use std::borrow::Cow;
 use std::error::Error;
 use std::fmt::Display;
 
 #[derive(Debug)]
 pub struct ConversionFailure {
-    pub from: &'static str,
-    pub to: &'static str,
+    pub from: Cow<'static, str>,
+    pub to: Cow<'static, str>,
 }
 
 impl Error for ConversionFailure {}
@@ -16,7 +17,14 @@ impl Display for ConversionFailure {
 }
 
 impl ConversionFailure {
-    pub fn new(from: &'static str, to: &'static str) -> ConversionFailure {
-        ConversionFailure { from, to }
+    pub fn new<A, B>(from: A, to: B) -> ConversionFailure
+    where
+        A: Into<Cow<'static, str>>,
+        B: Into<Cow<'static, str>>,
+    {
+        ConversionFailure {
+            from: from.into(),
+            to: to.into(),
+        }
     }
 }

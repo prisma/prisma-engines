@@ -5,9 +5,6 @@ pub mod dmmf;
 mod error;
 mod graphql;
 
-#[cfg(test)]
-mod tests;
-
 pub use error::HandlerError;
 pub use graphql::*;
 

@@ -1,8 +1,8 @@
 use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{dml::FieldArity, PrismaValue, Record, TypeIdentifier};
+use prisma_models::{dml::FieldArity, ConversionFailure, PrismaValue, Record, TypeIdentifier};
 use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
@@ -230,13 +230,48 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
+        TypeIdentifier::Int => match p_value {
+            value if value.is_null() => PrismaValue::Null,
             Value::Int32(Some(i)) => PrismaValue::Int(i as i64),
             Value::Int64(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
             Value::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
+            Value::Float(Some(f)) => {
+                sanitize_f32(f, "Int")?;
+
+                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "Int")?)
+            }
+            Value::Double(Some(f)) => {
+                sanitize_f64(f, "Int")?;
+
+                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "Int")?)
+            }
+            Value::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "Int")?),
+            Value::Boolean(Some(bool)) => PrismaValue::Int(bool as i64),
+            other => to_prisma_value(other)?,
+        },
+        TypeIdentifier::BigInt => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Int32(Some(i)) => PrismaValue::BigInt(i as i64),
+            Value::Int64(Some(i)) => PrismaValue::BigInt(i),
+            Value::Bytes(Some(bytes)) => PrismaValue::BigInt(interpret_bytes_as_i64(&bytes)),
+            Value::Text(Some(ref txt)) => {
+                PrismaValue::BigInt(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
+            }
+            Value::Float(Some(f)) => {
+                sanitize_f32(f, "BigInt")?;
+
+                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "BigInt")?)
+            }
+            Value::Double(Some(f)) => {
+                sanitize_f64(f, "BigInt")?;
+
+                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "BigInt")?)
+            }
+            Value::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigInt")?),
+            Value::Boolean(Some(bool)) => PrismaValue::BigInt(bool as i64),
             other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value {
@@ -285,6 +320,36 @@ fn interpret_bytes_as_i64(bytes: &[u8]) -> i64 {
         0 => 0,
         _ => panic!("Attempted to interpret more than 8 bytes as an integer."),
     }
+}
+
+pub(crate) fn sanitize_f32(n: f32, to: &'static str) -> crate::Result<()> {
+    if n.is_nan() {
+        return Err(ConversionFailure::new("NaN", to).into());
+    }
+
+    if n.is_infinite() {
+        return Err(ConversionFailure::new("Infinity", to).into());
+    }
+
+    Ok(())
+}
+
+pub(crate) fn sanitize_f64(n: f64, to: &'static str) -> crate::Result<()> {
+    if n.is_nan() {
+        return Err(ConversionFailure::new("NaN", to).into());
+    }
+
+    if n.is_infinite() {
+        return Err(ConversionFailure::new("Infinity", to).into());
+    }
+
+    Ok(())
+}
+
+pub(crate) fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i64, SqlError> {
+    dec.normalized()
+        .to_i64()
+        .ok_or_else(|| SqlError::from(ConversionFailure::new(format!("BigDecimal({dec})"), to)))
 }
 
 #[cfg(test)]
