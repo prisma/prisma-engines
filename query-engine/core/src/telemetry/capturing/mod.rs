@@ -123,6 +123,7 @@
 //!  
 pub use self::capturer::Capturer;
 pub use self::settings::Settings;
+pub use tx_ext::TxTraceExt;
 
 use self::capturer::Processor;
 use once_cell::sync::Lazy;
@@ -179,3 +180,4 @@ mod capturer;
 mod helpers;
 mod settings;
 pub mod storage;
+mod tx_ext;

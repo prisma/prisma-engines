@@ -5,6 +5,7 @@ use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Se
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::{global, propagation::Extractor};
 use query_core::helpers::*;
+use query_core::telemetry::capturing::TxTraceExt;
 use query_core::{
     schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
 };
@@ -156,7 +157,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         if capture_settings.logs_enabled() && tx_id.is_some() {
             let tx_id = tx_id.clone().unwrap();
             traceparent = Some(tx_id.as_traceparent());
-            trace_id = tx_id.into();
+            trace_id = tx_id.into_trace_id();
         } else {
             // this is the root span, and we are in a single operation.
             traceparent = Some(get_trace_parent_from_span(&span));
@@ -332,7 +333,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let capture_settings = capture_settings(&headers);
     let traceparent = traceparent(&headers);
     if traceparent.is_none() && capture_settings.logs_enabled() {
-        span.set_parent(tx_id.into())
+        span.set_parent(tx_id.into_trace_context())
     } else {
         span.set_parent(get_parent_span_context(&headers))
     }
