@@ -7,7 +7,7 @@ pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Ca
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
 use std::future::Future;
@@ -256,7 +256,7 @@ impl TableAssertion<'_> {
 }
 
 pub struct ColumnAssertion<'a> {
-    column: ColumnWalker<'a>,
+    column: TableColumnWalker<'a>,
 }
 
 impl ColumnAssertion<'_> {

@@ -1,7 +1,7 @@
 use crate::{
     introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
     introspection_map::RelationName,
-    pair::{EnumPair, ModelPair, Pair, RelationFieldDirection},
+    pair::{EnumPair, ModelPair, Pair, RelationFieldDirection, ViewPair},
     warnings, EnumVariantName, IntrospectedName, ModelName,
 };
 use introspection_connector::{Version, Warning};
@@ -85,6 +85,23 @@ impl<'a> InputContext<'a> {
             })
     }
 
+    /// Iterate over the database views, combined together with a
+    /// possible existing view in the PSL.
+    pub(crate) fn view_pairs(self) -> impl Iterator<Item = ViewPair<'a>> {
+        // Right now all connectors introspect views for db reset.
+        // Filtering the ones with columns will not cause
+        // empty view blocks with these connectors.
+        //
+        // Removing the filter when all connectors are done.
+        self.schema
+            .view_walkers()
+            .filter(|v| !v.columns().len() > 0)
+            .map(move |next| {
+                let previous = self.existing_view(next.id);
+                Pair::new(self, previous, next)
+            })
+    }
+
     /// Given a SQL enum from the database, this method returns the enum that matches it (by name)
     /// in the Prisma schema.
     pub(crate) fn existing_enum(self, id: sql::EnumId) -> Option<walkers::EnumWalker<'a>> {
@@ -151,15 +168,48 @@ impl<'a> InputContext<'a> {
             .map(|id| self.previous_schema.db.walk(*id))
     }
 
-    pub(crate) fn existing_scalar_field(self, id: sql::ColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
+    pub(crate) fn existing_view(self, id: sql::ViewId) -> Option<walkers::ModelWalker<'a>> {
         self.introspection_map
-            .existing_scalar_fields
+            .existing_views
+            .get(&id)
+            .map(|id| self.previous_schema.db.walk(*id))
+    }
+
+    pub(crate) fn existing_table_scalar_field(self, id: sql::TableColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
+        self.introspection_map
+            .existing_model_scalar_fields
             .get(&id)
             .map(|(model_id, field_id)| self.previous_schema.db.walk(*model_id).scalar_field(*field_id))
     }
 
-    pub(crate) fn column_prisma_name(self, id: sql::ColumnId) -> crate::IntrospectedName<'a> {
-        self.existing_scalar_field(id)
+    pub(crate) fn existing_view_scalar_field(self, id: sql::ViewColumnId) -> Option<walkers::ScalarFieldWalker<'a>> {
+        self.introspection_map
+            .existing_view_scalar_fields
+            .get(&id)
+            .map(|(model_id, field_id)| self.previous_schema.db.walk(*model_id).scalar_field(*field_id))
+    }
+
+    pub(crate) fn column_prisma_name(
+        self,
+        id: sql::Either<sql::TableColumnId, sql::ViewColumnId>,
+    ) -> crate::IntrospectedName<'a> {
+        match id {
+            sql::Either::Left(id) => self.table_column_prisma_name(id),
+            sql::Either::Right(id) => self.view_column_prisma_name(id),
+        }
+    }
+
+    pub(crate) fn table_column_prisma_name(self, id: sql::TableColumnId) -> crate::IntrospectedName<'a> {
+        self.existing_table_scalar_field(id)
+            .map(|sf| IntrospectedName::FromPsl {
+                name: sf.name(),
+                mapped_name: sf.mapped_name(),
+            })
+            .unwrap_or_else(|| IntrospectedName::new_from_sql(self.schema.walk(id).name()))
+    }
+
+    pub(crate) fn view_column_prisma_name(self, id: sql::ViewColumnId) -> crate::IntrospectedName<'a> {
+        self.existing_view_scalar_field(id)
             .map(|sf| IntrospectedName::FromPsl {
                 name: sf.name(),
                 mapped_name: sf.mapped_name(),
@@ -178,6 +228,19 @@ impl<'a> InputContext<'a> {
 
         let table = self.schema.walk(id);
         ModelName::new_from_sql(table.name(), table.namespace(), self)
+    }
+
+    // Use the existing view name when available.
+    pub(crate) fn view_prisma_name(self, id: sql::ViewId) -> crate::ModelName<'a> {
+        if let Some(view) = self.existing_view(id) {
+            return ModelName::FromPsl {
+                name: view.name(),
+                mapped_name: view.mapped_name(),
+            };
+        }
+
+        let view = self.schema.walk(id);
+        ModelName::new_from_sql(view.name(), view.namespace(), self)
     }
 
     pub(crate) fn name_is_unique(self, name: &'a str) -> bool {
@@ -271,6 +334,10 @@ impl<'a> InputContext<'a> {
 
     pub(crate) fn table_missing_for_model(self, id: &ast::ModelId) -> bool {
         self.introspection_map.missing_tables_for_previous_models.contains(id)
+    }
+
+    pub(crate) fn view_missing_for_model(self, id: &ast::ModelId) -> bool {
+        self.introspection_map.missing_views_for_previous_models.contains(id)
     }
 
     pub(crate) fn inline_relations_for_table(

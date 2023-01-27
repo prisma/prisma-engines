@@ -12,13 +12,13 @@ use crate::{
     sql_schema_differ::ColumnChanges,
 };
 use migration_connector::{BoxFuture, ConnectorResult};
-use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
+use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
 
 impl DestructiveChangeCheckerFlavour for SqliteFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<ColumnWalker<'_>>,
+        columns: &Pair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -71,7 +71,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        _columns: &Pair<ColumnWalker<'_>>,
+        _columns: &Pair<TableColumnWalker<'_>>,
         _changes: &ColumnChanges,
         _plan: &mut DestructiveCheckPlan,
         _step_index: usize,

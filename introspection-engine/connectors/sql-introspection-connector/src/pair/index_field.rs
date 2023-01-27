@@ -5,7 +5,15 @@ use std::borrow::Cow;
 
 use super::{Pair, ScalarFieldPair};
 
-pub(crate) type IndexFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, sql::IndexColumnWalker<'a>>;
+/// Pairing PSL index field to field in database index definition.
+/// Both values are optional, due to in some cases we plainly just copy
+/// the PSL argument to the rendered data model.
+///
+/// This happens with views, where we need at least one unique
+/// field in the view definition, but the database does not
+/// hold constraints on views.
+pub(crate) type IndexFieldPair<'a> =
+    Pair<'a, Option<walkers::ScalarFieldWalker<'a>>, Option<sql::IndexColumnWalker<'a>>>;
 
 pub(crate) enum IndexOps<'a> {
     Managed(&'a str),
@@ -15,21 +23,27 @@ pub(crate) enum IndexOps<'a> {
 impl<'a> IndexFieldPair<'a> {
     /// The name of the field (as used in Prisma).
     pub(crate) fn name(self) -> Cow<'a, str> {
-        self.field().name()
+        match self.field() {
+            Some(field) => field.name(),
+            None => Cow::Borrowed(self.previous.unwrap().name()),
+        }
     }
 
     /// The ordering of the column in the database. Returns a value if
     /// non-default.
     pub(crate) fn sort_order(self) -> Option<&'static str> {
-        self.next
-            .sort_order()
-            .filter(|so| matches!(so, sql::SQLSortOrder::Desc))
-            .map(|_| "Desc")
+        match self.next {
+            Some(next) => next
+                .sort_order()
+                .filter(|so| matches!(so, sql::SQLSortOrder::Desc))
+                .map(|_| "Desc"),
+            None => None,
+        }
     }
 
     /// A MySQL specific length definition for the indexed column.
     pub(crate) fn length(self) -> Option<u32> {
-        self.next.length()
+        self.next.and_then(|next| next.length())
     }
 
     /// A PostgreSQL specific operator class for the indexed column.
@@ -40,7 +54,12 @@ impl<'a> IndexFieldPair<'a> {
 
         let ext: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
 
-        let opclass = match ext.get_opclass(self.next.id) {
+        let next = match self.next {
+            Some(next) => next,
+            None => return None,
+        };
+
+        let opclass = match ext.get_opclass(next.id) {
             Some(opclass) => opclass,
             None => return None,
         };
@@ -121,10 +140,15 @@ impl<'a> IndexFieldPair<'a> {
         }
     }
 
-    fn field(self) -> ScalarFieldPair<'a> {
-        let previous = self.context.existing_scalar_field(self.next.as_column().id);
-        let next = self.next.as_column();
+    fn field(self) -> Option<ScalarFieldPair<'a>> {
+        let next = match self.next {
+            Some(next) => next,
+            None => return None,
+        };
 
-        Pair::new(self.context, previous, next)
+        let previous = self.context.existing_table_scalar_field(next.as_column().id);
+        let next = next.as_column();
+
+        Some(Pair::new(self.context, previous, next.coarsen()))
     }
 }

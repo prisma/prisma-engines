@@ -10,7 +10,7 @@ use prisma_value::PrismaValue;
 use psl::datamodel_connector::Connector;
 use sql::{
     postgres::{ExtensionWalker, PostgresSchemaExt},
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ViewWalker,
 };
 use sql_schema_describer::{
@@ -526,7 +526,7 @@ impl<'a> TableAssertion<'a> {
 }
 
 pub struct ColumnAssertion<'a> {
-    column: ColumnWalker<'a>,
+    column: TableColumnWalker<'a>,
 }
 
 impl<'a> ColumnAssertion<'a> {

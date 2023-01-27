@@ -1,3 +1,4 @@
+use either::Either;
 use prisma_value::PrismaValue;
 use psl::{
     builtin_connectors::{MySqlType, PostgresType},
@@ -10,7 +11,7 @@ use std::{borrow::Cow, fmt};
 
 use super::Pair;
 
-pub(crate) type DefaultValuePair<'a> = Pair<'a, walkers::DefaultValueWalker<'a>, sql::ColumnWalker<'a>>;
+pub(crate) type DefaultValuePair<'a> = Pair<'a, Option<walkers::DefaultValueWalker<'a>>, sql::ColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {
     Sequence(&'a sql::postgres::Sequence),
@@ -171,10 +172,11 @@ impl<'a> DefaultValuePair<'a> {
     }
 
     fn default_name(self) -> String {
-        ConstraintNames::default_name(
-            self.next.table().name(),
-            self.next.name(),
-            self.context.active_connector(),
-        )
+        let container_name = match self.next.refine() {
+            Either::Left(col) => col.table().name(),
+            Either::Right(col) => col.view().name(),
+        };
+
+        ConstraintNames::default_name(container_name, self.next.name(), self.context.active_connector())
     }
 }

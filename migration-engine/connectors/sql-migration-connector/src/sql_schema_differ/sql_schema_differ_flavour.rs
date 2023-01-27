@@ -1,8 +1,8 @@
 use super::{differ_database::DifferDatabase, ColumnTypeChange};
 use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, IndexWalker, TableWalker},
-    ColumnId,
+    walkers::{IndexWalker, TableColumnWalker, TableWalker},
+    TableColumnId,
 };
 
 mod mssql;
@@ -37,12 +37,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn can_rename_foreign_key(&self) -> bool;
 
     /// This method must return whether a column became or ceased to be autoincrementing.
-    fn column_autoincrement_changed(&self, columns: Pair<ColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, columns: Pair<TableColumnWalker<'_>>) -> bool {
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
     /// Return whether a column's type needs to be migrated, and how.
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange>;
+    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange>;
 
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
@@ -84,7 +84,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         _table: &sql_schema_differ::TableDiffer<'_, '_>,
-        _column_index: Pair<ColumnId>,
+        _column_index: Pair<TableColumnId>,
         _column_changes: sql_schema_differ::ColumnChanges,
         _steps: &mut Vec<SqlMigrationStep>,
     ) {

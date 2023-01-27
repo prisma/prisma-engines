@@ -1,4 +1,5 @@
 use crate::sanitize_datamodel_names;
+use either::Either;
 use psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt, parser_database::walkers,
     schema_ast::ast::WithDocumentation,
@@ -7,9 +8,13 @@ use sql::ColumnArity;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-use super::{DefaultValuePair, IdPair, IndexPair, ModelPair, Pair};
+use super::{DefaultValuePair, IdPair, IndexPair, ModelPair, Pair, ViewPair};
 
-pub(crate) type ScalarFieldPair<'a> = Pair<'a, walkers::ScalarFieldWalker<'a>, sql::ColumnWalker<'a>>;
+/// Comparing a possible previous PSL scalar field
+/// to a column from the database. Re-introspection
+/// can use some of the previous values in the new
+/// rendering.
+pub(crate) type ScalarFieldPair<'a> = Pair<'a, Option<walkers::ScalarFieldWalker<'a>>, sql::ColumnWalker<'a>>;
 
 impl<'a> ScalarFieldPair<'a> {
     /// The client name of the field.
@@ -39,12 +44,20 @@ impl<'a> ScalarFieldPair<'a> {
         self.previous.map(|f| f.is_ignored()).unwrap_or(false)
     }
 
-    /// The model where the field is defined.
-    pub fn model(self) -> ModelPair<'a> {
+    /// The container where the field is defined, view or model.
+    pub fn container(self) -> Either<ModelPair<'a>, ViewPair<'a>> {
         let previous = self.previous.map(|f| f.model());
-        let next = self.next.table();
 
-        Pair::new(self.context, previous, next)
+        match self.next.refine() {
+            Either::Left(f) => {
+                let pair = Pair::new(self.context, previous, f.table());
+                Either::Left(pair)
+            }
+            Either::Right(v) => {
+                let pair = Pair::new(self.context, previous, v.view());
+                Either::Right(pair)
+            }
+        }
     }
 
     /// True if we took the name from the PSL.
@@ -62,9 +75,19 @@ impl<'a> ScalarFieldPair<'a> {
         self.previous.and_then(|f| f.ast_field().documentation())
     }
 
-    /// Optional, required or a list.
+    /// Optional, required or a list. For columns in views, if changed in PSL,
+    /// we use the changed arity instead of the always optional value from the
+    /// database.
     pub fn arity(self) -> ColumnArity {
-        self.next.column_type().arity
+        if self.next.is_in_view() && self.next.column_type().arity.is_nullable() {
+            match self.previous.map(|prev| prev.ast_field().arity) {
+                Some(arity) if arity.is_required() => ColumnArity::Required,
+                Some(arity) if arity.is_list() => ColumnArity::List,
+                _ => self.next.column_type().arity,
+            }
+        } else {
+            self.next.column_type().arity
+        }
     }
 
     /// If we cannot support the field type in the client.
@@ -130,45 +153,67 @@ impl<'a> ScalarFieldPair<'a> {
 
     /// The primary key of the field.
     pub fn id(self) -> Option<IdPair<'a>> {
-        self.next
-            .table()
-            .primary_key()
-            .filter(|pk| pk.columns().len() == 1)
-            .filter(|pk| pk.contains_column(self.next.id))
-            .map(move |next| {
-                let previous = self.previous.and_then(|field| field.model().primary_key());
-                Pair::new(self.context, previous, next)
-            })
+        match self.next.refine() {
+            // Only rendering for tables, if having the primary key in the database.
+            Either::Left(table_col) => table_col
+                .table()
+                .primary_key()
+                .filter(|pk| pk.columns().len() == 1)
+                .filter(|pk| pk.contains_column(table_col.id))
+                .map(move |next| {
+                    let previous = self.previous.and_then(|field| field.model().primary_key());
+                    Pair::new(self.context, previous, Some(next))
+                }),
+            // Rendering the id for views, if user has explicitly written it in PSL.
+            Either::Right(_) => self
+                .previous
+                .and_then(|prev| prev.model().primary_key().map(|pk| (prev, pk)))
+                .filter(|(prev, pk)| pk.contains_exactly_fields(std::iter::once(*prev)))
+                .map(|(_, pk)| Pair::new(self.context, Some(pk), None)),
+        }
     }
 
     /// If the field itself defines a unique constraint.
     pub fn unique(self) -> Option<IndexPair<'a>> {
-        let next = self
-            .next
-            .table()
-            .indexes()
-            .filter(|i| i.is_unique())
-            .filter(|i| i.columns().len() == 1)
-            .find(|i| i.contains_column(self.next.id));
+        match self.next.refine() {
+            Either::Left(table_col) => {
+                let next = table_col
+                    .table()
+                    .indexes()
+                    .filter(|i| i.is_unique())
+                    .filter(|i| i.columns().len() == 1)
+                    .find(|i| i.contains_column(table_col.id));
 
-        next.map(move |next| {
-            let previous = self.previous.and_then(|field| {
-                field.model().indexes().find(|idx| {
-                    // Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
-                    // argument. If we infer that an index in the database was produced using that logic, we
-                    // match up the existing index.
-                    if idx.mapped_name().is_none() && idx.name() == Some(next.name()) {
-                        return true;
-                    }
+                next.map(move |next| {
+                    let previous = self.previous.and_then(|field| {
+                        field.model().indexes().find(|idx| {
+                            // Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
+                            // argument. If we infer that an index in the database was produced using that logic, we
+                            // match up the existing index.
+                            if idx.mapped_name().is_none() && idx.name() == Some(next.name()) {
+                                return true;
+                            }
 
-                    // Compare the constraint name (implicit or mapped name) from the Prisma schema with the
-                    // constraint name from the database.
-                    idx.constraint_name(self.context.active_connector()) == next.name()
+                            // Compare the constraint name (implicit or mapped name) from the Prisma schema with the
+                            // constraint name from the database.
+                            idx.constraint_name(self.context.active_connector()) == next.name()
+                        })
+                    });
+
+                    Pair::new(self.context, previous, Some(next))
                 })
-            });
-
-            Pair::new(self.context, previous, next)
-        })
+            }
+            // A view column is unique, if explicitly defined in PSL.
+            Either::Right(_) => self.previous.and_then(move |prev| {
+                prev.model()
+                    .indexes()
+                    .filter(|idx| idx.is_unique())
+                    .filter(|idx| idx.is_defined_on_field())
+                    .filter(|idx| idx.contains_field(prev))
+                    .map(|idx| Pair::new(self.context, Some(idx), None))
+                    .next()
+            }),
+        }
     }
 
     /// The default value constraint.

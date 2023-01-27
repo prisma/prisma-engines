@@ -31,7 +31,7 @@ use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{
     BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration,
 };
-use sql_schema_describer::{walkers::ColumnWalker, ColumnArity};
+use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -55,7 +55,7 @@ impl SqlMigrationConnector {
     }
 
     /// Emit a warning when we drop a column that contains non-null values.
-    fn check_column_drop(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
+    fn check_column_drop(&self, column: &TableColumnWalker<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyColumnDrop {
                 table: column.table().name().to_owned(),
@@ -73,7 +73,7 @@ impl SqlMigrationConnector {
     /// - There is no default value for the new column
     fn check_add_column(
         &self,
-        column: &ColumnWalker<'_>,
+        column: &TableColumnWalker<'_>,
         has_virtual_default: bool,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,

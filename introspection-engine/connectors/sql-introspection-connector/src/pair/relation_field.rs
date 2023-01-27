@@ -86,8 +86,14 @@ struct EmulatedRelationField<'a> {
 
 #[derive(Clone, Copy)]
 enum RelationType<'a> {
+    /// At least one of the sides is not array.
     Inline(InlineRelationField<'a>),
+    /// Both sides are arrays.
     Many2Many(Many2ManyRelationField<'a>),
+    /// Copied from the PSL. Used either
+    /// when handling the referential integrity
+    /// in the query engine, or when using a relation
+    /// attribute to or from a view.
     Emulated(EmulatedRelationField<'a>),
 }
 
@@ -226,7 +232,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .constrained_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)
@@ -246,7 +252,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .referenced_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)

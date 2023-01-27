@@ -6,8 +6,8 @@ use crate::{
 use enumflags2::BitFlags;
 use sql_schema_describer::{
     postgres::{self, PostgresSchemaExt},
-    walkers::{ColumnWalker, TableWalker},
-    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId, UdtId, ViewId,
+    walkers::{TableColumnWalker, TableWalker},
+    EnumId, ForeignKeyId, IndexId, SqlSchema, TableColumnId, TableId, UdtId, ViewId,
 };
 use std::{collections::BTreeSet, fmt::Write as _};
 
@@ -412,7 +412,7 @@ impl SqlMigration {
     }
 }
 
-fn render_column_changes(columns: Pair<ColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
+fn render_column_changes(columns: Pair<TableColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
     let readable_changes = changes
         .iter()
         .map(|change| match change {
@@ -565,15 +565,15 @@ pub(crate) struct AlterTable {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum TableChange {
     AddColumn {
-        column_id: ColumnId,
+        column_id: TableColumnId,
         has_virtual_default: bool,
     },
     AlterColumn(AlterColumn),
     DropColumn {
-        column_id: ColumnId,
+        column_id: TableColumnId,
     },
     DropAndRecreateColumn {
-        column_id: Pair<ColumnId>,
+        column_id: Pair<TableColumnId>,
         /// The change mask for the column.
         changes: ColumnChanges,
     },
@@ -606,7 +606,7 @@ impl DropUserDefinedType {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterColumn {
-    pub column_id: Pair<ColumnId>,
+    pub column_id: Pair<TableColumnId>,
     pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
@@ -627,7 +627,7 @@ pub(crate) struct AlterEnum {
     /// is `Some` _only_ when the next column has the same enum as a default, such that the default
     /// would need to be reinstalled after the drop.
     #[allow(clippy::type_complexity)]
-    pub previous_usages_as_default: Vec<(ColumnId, Option<ColumnId>)>,
+    pub previous_usages_as_default: Vec<(TableColumnId, Option<TableColumnId>)>,
 }
 
 impl AlterEnum {
@@ -638,11 +638,11 @@ impl AlterEnum {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct RedefineTable {
-    pub added_columns: Vec<ColumnId>,
-    pub added_columns_with_virtual_defaults: Vec<ColumnId>,
-    pub dropped_columns: Vec<ColumnId>,
+    pub added_columns: Vec<TableColumnId>,
+    pub added_columns_with_virtual_defaults: Vec<TableColumnId>,
+    pub dropped_columns: Vec<TableColumnId>,
     pub dropped_primary_key: bool,
-    pub column_pairs: Vec<(Pair<ColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub column_pairs: Vec<(Pair<TableColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,
     pub table_ids: Pair<TableId>,
 }
 

@@ -3,9 +3,10 @@
 use crate::{
     pair::{IdPair, IndexPair, ScalarFieldPair},
     rendering::defaults,
-    warnings::Warnings,
+    warnings::{self, Warnings},
 };
 use datamodel_renderer::datamodel as renderer;
+use either::Either;
 use sql_schema_describer::ColumnArity;
 
 /// Render a scalar field to be added in a model.
@@ -55,22 +56,47 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
     }
 
     if field.remapped_name_from_psl() {
-        let mf = crate::warnings::ModelAndField {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-        };
+        match field.container() {
+            Either::Left(model) => {
+                let mf = crate::warnings::ModelAndField {
+                    model: model.name().to_string(),
+                    field: field.name().to_string(),
+                };
 
-        warnings.remapped_fields.push(mf);
+                warnings.remapped_fields_in_model.push(mf);
+            }
+            Either::Right(view) => {
+                let mf = crate::warnings::ViewAndField {
+                    view: view.name().to_string(),
+                    field: field.name().to_string(),
+                };
+
+                warnings.remapped_fields_in_view.push(mf);
+            }
+        }
     }
 
     if field.is_unsupported() {
-        let mf = crate::warnings::ModelAndFieldAndType {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-            tpe: field.prisma_type().to_string(),
-        };
+        match field.container() {
+            Either::Left(model) => {
+                let mf = warnings::ModelAndFieldAndType {
+                    model: model.name().to_string(),
+                    field: field.name().to_string(),
+                    tpe: field.prisma_type().to_string(),
+                };
 
-        warnings.unsupported_types.push(mf)
+                warnings.unsupported_types_in_model.push(mf)
+            }
+            Either::Right(view) => {
+                let mf = warnings::ViewAndFieldAndType {
+                    view: view.name().to_string(),
+                    field: field.name().to_string(),
+                    tpe: field.prisma_type().to_string(),
+                };
+
+                warnings.unsupported_types_in_view.push(mf)
+            }
+        }
     }
 
     if field.remapped_name_empty() {
@@ -78,12 +104,24 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
         rendered.documentation(docs);
         rendered.commented_out();
 
-        let mf = crate::warnings::ModelAndField {
-            model: field.model().name().to_string(),
-            field: field.name().to_string(),
-        };
+        match field.container() {
+            Either::Left(model) => {
+                let mf = crate::warnings::ModelAndField {
+                    model: model.name().to_string(),
+                    field: field.name().to_string(),
+                };
 
-        warnings.fields_with_empty_names.push(mf);
+                warnings.fields_with_empty_names_in_model.push(mf);
+            }
+            Either::Right(view) => {
+                let mf = crate::warnings::ViewAndField {
+                    view: view.name().to_string(),
+                    field: field.name().to_string(),
+                };
+
+                warnings.fields_with_empty_names_in_view.push(mf);
+            }
+        }
     }
 
     rendered

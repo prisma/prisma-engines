@@ -6,7 +6,7 @@ use crate::{
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
-use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnId, ColumnTypeFamily};
+use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnTypeFamily, TableColumnId};
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn can_rename_foreign_key(&self) -> bool {
@@ -53,7 +53,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             .collect();
     }
 
-    fn column_type_change(&self, differ: Pair<sql::ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: Pair<sql::TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<&MsSqlType> = differ.previous.column_native_type();
@@ -76,7 +76,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         table: &TableDiffer<'_, '_>,
-        column_id: Pair<ColumnId>,
+        column_id: Pair<TableColumnId>,
         column_changes: ColumnChanges,
         steps: &mut Vec<SqlMigrationStep>,
     ) {

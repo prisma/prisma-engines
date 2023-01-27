@@ -22,6 +22,8 @@ pub use self::{
 };
 pub use prisma_value::PrismaValue;
 
+pub use either::Either;
+
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -62,12 +64,14 @@ pub struct SqlSchema {
     /// The schema's enums.
     enums: Vec<Enum>,
     enum_variants: Vec<EnumVariant>,
-    /// The schema's columns.
-    columns: Vec<(TableId, Column)>,
+    /// The schema's columns that are in tables.
+    table_columns: Vec<(TableId, Column)>,
     /// All foreign keys.
     foreign_keys: Vec<ForeignKey>,
-    /// All default values.
-    default_values: Vec<(ColumnId, DefaultValue)>,
+    /// All table column default values.
+    table_default_values: Vec<(TableColumnId, DefaultValue)>,
+    /// All view column default values.
+    view_default_values: Vec<(ViewColumnId, DefaultValue)>,
     /// Constrained and referenced columns of foreign keys.
     foreign_key_columns: Vec<ForeignKeyColumn>,
     /// All indexes and unique constraints.
@@ -76,6 +80,8 @@ pub struct SqlSchema {
     index_columns: Vec<IndexColumn>,
     /// The schema's views,
     views: Vec<View>,
+    /// The schema's columns that are in views.
+    view_columns: Vec<(ViewId, Column)>,
     /// The stored procedures.
     procedures: Vec<Procedure>,
     /// The user-defined types procedures.
@@ -92,8 +98,13 @@ impl SqlSchema {
     }
 
     /// The id of the next column
-    pub fn next_column_id(&self) -> ColumnId {
-        ColumnId(self.columns.len() as u32)
+    pub fn next_table_column_id(&self) -> TableColumnId {
+        TableColumnId(self.table_columns.len() as u32)
+    }
+
+    /// The id of the next column
+    pub fn next_view_column_id(&self) -> ViewColumnId {
+        ViewColumnId(self.view_columns.len() as u32)
     }
 
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
@@ -144,6 +155,16 @@ impl SqlSchema {
             .map(|i| TableId(i as u32))
     }
 
+    /// Try to find a table by name.
+    pub fn find_view(&self, name: &str, namespace: Option<&str>) -> Option<ViewId> {
+        let ns_id = namespace.and_then(|ns| self.get_namespace(ns));
+
+        self.views
+            .iter()
+            .position(|t| t.name == name && ns_id.map(|id| id == t.namespace_id).unwrap_or(true))
+            .map(|i| ViewId(i as u32))
+    }
+
     /// Get a procedure.
     pub fn get_procedure(&self, name: &str) -> Option<&Procedure> {
         self.procedures.iter().find(|x| x.name == name)
@@ -176,10 +197,17 @@ impl SqlSchema {
         }
     }
 
-    /// Add a column to the schema.
-    pub fn push_column(&mut self, table_id: TableId, column: Column) -> ColumnId {
-        let id = ColumnId(self.columns.len() as u32);
-        self.columns.push((table_id, column));
+    /// Add a table column to the schema.
+    pub fn push_table_column(&mut self, table_id: TableId, column: Column) -> TableColumnId {
+        let id = TableColumnId(self.table_columns.len() as u32);
+        self.table_columns.push((table_id, column));
+        id
+    }
+
+    /// Add a view column to the schema.
+    pub fn push_view_column(&mut self, view_id: ViewId, column: Column) -> ViewColumnId {
+        let id = ViewColumnId(self.view_columns.len() as u32);
+        self.view_columns.push((view_id, column));
         id
     }
 
@@ -222,10 +250,17 @@ impl SqlSchema {
         id
     }
 
-    /// Add an index to the schema.
-    pub fn push_default_value(&mut self, column_id: ColumnId, value: DefaultValue) -> DefaultValueId {
-        let id = DefaultValueId(self.default_values.len() as u32);
-        self.default_values.push((column_id, value));
+    /// Add table default value to the schema.
+    pub fn push_table_default_value(&mut self, column_id: TableColumnId, value: DefaultValue) -> TableDefaultValueId {
+        let id = TableDefaultValueId(self.table_default_values.len() as u32);
+        self.table_default_values.push((column_id, value));
+        id
+    }
+
+    /// Add table default value to the schema.
+    pub fn push_view_default_value(&mut self, column_id: ViewColumnId, value: DefaultValue) -> ViewDefaultValueId {
+        let id = ViewDefaultValueId(self.view_default_values.len() as u32);
+        self.view_default_values.push((column_id, value));
         id
     }
 
@@ -277,7 +312,7 @@ impl SqlSchema {
     pub fn push_foreign_key_column(
         &mut self,
         foreign_key_id: ForeignKeyId,
-        [constrained_column, referenced_column]: [ColumnId; 2],
+        [constrained_column, referenced_column]: [TableColumnId; 2],
     ) {
         self.foreign_key_columns.push(ForeignKeyColumn {
             foreign_key_id,
@@ -311,6 +346,10 @@ impl SqlSchema {
         self.tables.len()
     }
 
+    pub fn views_count(&self) -> usize {
+        self.views.len()
+    }
+
     pub fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         let table_idx = self.tables.iter().position(|table| table.name == name)?;
         Some(self.walk(TableId(table_idx as u32)))
@@ -323,7 +362,19 @@ impl SqlSchema {
             .tables
             .iter()
             .position(|table| table.name == name && table.namespace_id == namespace_idx)?;
+
         Some(self.walk(TableId(table_idx as u32)))
+    }
+
+    pub fn view_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<ViewWalker<'a>> {
+        let namespace_idx = self.namespace_walker(namespace)?.id;
+
+        let view_idx = self
+            .views
+            .iter()
+            .position(|view| view.name == name && view.namespace_id == namespace_idx)?;
+
+        Some(self.walk(ViewId(view_idx as u32)))
     }
 
     pub fn table_walkers(&self) -> impl ExactSizeIterator<Item = TableWalker<'_>> {
@@ -354,9 +405,14 @@ impl SqlSchema {
         Walker { id, schema: self }
     }
 
-    /// Traverse all the columns in the schema.
-    pub fn walk_columns(&self) -> impl Iterator<Item = ColumnWalker<'_>> {
-        (0..self.columns.len()).map(|idx| self.walk(ColumnId(idx as u32)))
+    /// Traverse all the table columns in the schema.
+    pub fn walk_table_columns(&self) -> impl Iterator<Item = TableColumnWalker<'_>> {
+        (0..self.table_columns.len()).map(|idx| self.walk(TableColumnId(idx as u32)))
+    }
+
+    /// Traverse all the table columns in the schema.
+    pub fn walk_view_columns(&self) -> impl Iterator<Item = ViewColumnWalker<'_>> {
+        (0..self.view_columns.len()).map(|idx| self.walk(ViewColumnId(idx as u32)))
     }
 
     /// Traverse all namespaces in the catalog.
@@ -421,7 +477,7 @@ impl fmt::Display for SQLSortOrder {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct IndexColumn {
     pub index_id: IndexId,
-    pub column_id: ColumnId,
+    pub column_id: TableColumnId,
     pub sort_order: Option<SQLSortOrder>,
     pub length: Option<u32>,
 }
@@ -462,8 +518,6 @@ pub struct Column {
     pub name: String,
     /// Column type.
     pub tpe: ColumnType,
-    /// Column default.
-    pub default_value_id: Option<DefaultValueId>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -642,8 +696,8 @@ struct ForeignKey {
 #[derive(Serialize, Deserialize, Debug)]
 struct ForeignKeyColumn {
     foreign_key_id: ForeignKeyId,
-    constrained_column: ColumnId,
-    referenced_column: ColumnId,
+    constrained_column: TableColumnId,
+    referenced_column: TableColumnId,
 }
 
 /// A SQL enum.

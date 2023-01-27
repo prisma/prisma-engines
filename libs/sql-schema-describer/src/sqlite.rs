@@ -201,14 +201,14 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
         let result_set = self.conn.query_raw(&sql, &[]).await?;
         let mut current_foreign_key: Option<(i64, ForeignKeyId)> = None;
-        let mut current_foreign_key_columns: Vec<(i64, ColumnId, Option<ColumnId>)> = Vec::new();
+        let mut current_foreign_key_columns: Vec<(i64, TableColumnId, Option<TableColumnId>)> = Vec::new();
 
         fn get_ids(
             row: &ResultRow,
             table_id: TableId,
             table_ids: &IndexMap<String, TableId>,
             schema: &SqlSchema,
-        ) -> Option<(ColumnId, TableId, Option<ColumnId>)> {
+        ) -> Option<(TableColumnId, TableId, Option<TableColumnId>)> {
             let column = schema.walk(table_id).column(&row.get_expect_string("from"))?.id;
             let referenced_table = schema.walk(*table_ids.get(&row.get_expect_string("table"))?);
             // this can be null if the primary key and shortened fk syntax was used
@@ -241,7 +241,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         fn flush_current_fk(
             current_foreign_key: &mut Option<(i64, ForeignKeyId)>,
-            current_columns: &mut Vec<(i64, ColumnId, Option<ColumnId>)>,
+            current_columns: &mut Vec<(i64, TableColumnId, Option<TableColumnId>)>,
             schema: &mut SqlSchema,
         ) {
             current_columns.sort_by_key(|(seq, _, _)| *seq);
@@ -324,7 +324,7 @@ async fn push_columns(
 ) -> DescriberResult<()> {
     let sql = format!(r#"PRAGMA table_info ("{}")"#, table_name);
     let result_set = conn.query_raw(&sql, &[]).await?;
-    let mut pk_cols: BTreeMap<i64, ColumnId> = BTreeMap::new();
+    let mut pk_cols: BTreeMap<i64, TableColumnId> = BTreeMap::new();
     for row in result_set {
         trace!("Got column row {:?}", row);
         let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
@@ -392,15 +392,17 @@ async fn push_columns(
         };
 
         let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
-        let column_id = ColumnId(schema.columns.len() as u32);
-        let default_value_id = default.map(|default| schema.push_default_value(column_id, default));
+        let column_id = TableColumnId(schema.table_columns.len() as u32);
 
-        let column_id = schema.push_column(
+        if let Some(default) = default {
+            schema.push_table_default_value(column_id, default);
+        }
+
+        let column_id = schema.push_table_column(
             table_id,
             Column {
                 name: row.get_expect_string("name"),
                 tpe,
-                default_value_id,
                 auto_increment: false,
             },
         );
@@ -424,7 +426,7 @@ async fn push_columns(
         // Integer ID columns are always implemented with either row id or autoincrement
         if pk_cols.len() == 1 {
             let pk_col_id = *pk_cols.values().next().unwrap();
-            let pk_col = &mut schema.columns[pk_col_id.0 as usize];
+            let pk_col = &mut schema.table_columns[pk_col_id.0 as usize];
             // See https://www.sqlite.org/lang_createtable.html for the exact logic.
             if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
                 pk_col.1.auto_increment = true;
@@ -432,6 +434,8 @@ async fn push_columns(
             }
         }
     }
+
+    schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
 
     Ok(())
 }

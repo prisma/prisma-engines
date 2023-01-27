@@ -1,10 +1,10 @@
 //! Rendering of model blocks.
 
-use super::{relation_field, scalar_field};
+use super::{id, relation_field, scalar_field};
 use crate::{
     datamodel_calculator::{InputContext, OutputContext},
-    introspection_helpers as helpers,
-    pair::{IdPair, ModelPair},
+    introspection_helpers::{self as helpers, compare_options_none_last},
+    pair::ModelPair,
     warnings::{self, Warnings},
 };
 use datamodel_renderer::datamodel as renderer;
@@ -60,7 +60,7 @@ fn render_model<'a>(model: ModelPair<'a>, input: InputContext<'a>, warnings: &mu
     }
 
     if let Some(id) = model.id() {
-        rendered.id(render_id(model, id, warnings));
+        rendered.id(id::render(id, warnings));
     }
 
     if model.scalar_fields().len() == 0 {
@@ -101,46 +101,18 @@ fn render_model<'a>(model: ModelPair<'a>, input: InputContext<'a>, warnings: &mu
         rendered.push_field(relation_field::render(field, warnings));
     }
 
-    indexes::render(model, &mut rendered);
+    let mut ordered_indexes: Vec<_> = model
+        .indexes()
+        .map(|idx| (idx.previous_position(), indexes::render(idx)))
+        .collect();
+
+    ordered_indexes.sort_by(|(idx, _), (idx_b, _)| compare_options_none_last(*idx, *idx_b));
+
+    for (_, definition) in ordered_indexes {
+        rendered.push_index(definition);
+    }
 
     rendered
-}
-
-/// Render a model level `@@id` definition.
-fn render_id<'a>(model: ModelPair<'a>, id: IdPair<'a>, warnings: &mut Warnings) -> renderer::IdDefinition<'a> {
-    let fields = id.fields().map(|field| {
-        let mut rendered = renderer::IndexFieldInput::new(field.name());
-
-        if let Some(sort_order) = field.sort_order() {
-            rendered.sort_order(sort_order);
-        }
-
-        if let Some(length) = field.length() {
-            rendered.length(length);
-        }
-
-        rendered
-    });
-
-    let mut definition = renderer::IdDefinition::new(fields);
-
-    if let Some(name) = id.name() {
-        definition.name(name);
-
-        warnings.reintrospected_id_names.push(warnings::Model {
-            model: model.name().to_string(),
-        });
-    }
-
-    if let Some(map) = id.mapped_name() {
-        definition.map(map);
-    }
-
-    if let Some(clustered) = id.clustered() {
-        definition.clustered(clustered);
-    }
-
-    definition
 }
 
 fn empty_table_comment(input: InputContext<'_>) -> &'static str {

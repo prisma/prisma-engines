@@ -3,11 +3,15 @@
 mod configuration;
 mod defaults;
 mod enums;
+mod id;
 mod indexes;
 mod models;
 mod postgres;
 mod relation_field;
 mod scalar_field;
+mod views;
+
+use psl::PreviewFeature;
 
 use crate::datamodel_calculator::{InputContext, OutputContext};
 pub(crate) use crate::SqlError;
@@ -20,6 +24,10 @@ pub(crate) fn to_psl_string<'a>(
 ) -> Result<(String, bool), SqlError> {
     enums::render(input, output);
     models::render(input, output);
+
+    if input.config.preview_features().contains(PreviewFeature::Views) {
+        views::render(input, output);
+    }
 
     let psl_string = if input.render_config {
         let config = configuration::render(input.config, input.schema, input.force_namespaces);
