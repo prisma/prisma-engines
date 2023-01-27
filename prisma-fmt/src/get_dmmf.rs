@@ -10,7 +10,7 @@ pub(crate) fn get_dmmf(params: &str) -> String {
     let params: GetDmmfParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
-            panic!("Failed to deserialize GetDmmfParams: {}", serde_err,);
+            panic!("Failed to deserialize GetDmmfParams: {serde_err}");
         }
     };
 
