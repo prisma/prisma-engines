@@ -156,7 +156,7 @@ impl SpanProcessor for Processor {
         Ok(())
     }
 }
-const VALID_QUERY_ATTRS: [&str; 3] = ["query", "params", "duration_ms"];
+const VALID_QUERY_ATTRS: [&str; 4] = ["query", "params", "target", "duration_ms"];
 /// A Candidate represents either a span or an event that is being considered for capturing.
 /// A Candidate can be converted into a [`Capture`].
 #[derive(Debug, Clone)]
