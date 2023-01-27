@@ -152,8 +152,7 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
         .send_unwrap_err();
 
     assert!(err.to_string().starts_with(&format!(
-        "The migration `{}` is already recorded as applied in the database.\n",
-        second_migration_name
+        "The migration `{second_migration_name}` is already recorded as applied in the database.\n"
     )));
 
     let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();

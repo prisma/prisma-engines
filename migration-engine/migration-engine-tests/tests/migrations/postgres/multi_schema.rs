@@ -413,7 +413,7 @@ fn multi_schema_tests(_api: TestApi) {
           @@schema("two")
         } "#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &[] ,
@@ -934,7 +934,7 @@ fn multi_schema_tests(_api: TestApi) {
           @@schema("two")
         } "#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -1267,7 +1267,7 @@ fn multi_schema_tests(_api: TestApi) {
                     }"#
                 }.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &["The values [Second] on the enum `SomeEnum` will be removed. If these variants are still used in the database, this will fail."],
@@ -1344,7 +1344,7 @@ fn multi_schema_tests(_api: TestApi) {
         @@schema("two")
       }"#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::RawCmdAnd("insert into \"one\".\"SomeModel\" values(1, 'First');",
                              &SchemaPush::PushCustomAnd(CustomPushStep {

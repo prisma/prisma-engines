@@ -180,8 +180,7 @@ fn handle_one_to_many(
                     let child_link = match child_links.pop() {
                         Some(cl) => Ok(cl),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on one-to-many relation '{}'.",
-                            child_model_name, parent_model_name, relation_name
+                            "No '{child_model_name}' record(s) (needed to inline the relation on '{parent_model_name}' record(s)) was found for a nested connect on one-to-many relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -210,8 +209,7 @@ fn handle_one_to_many(
                     let parent_link = match parent_links.pop() {
                         Some(pl) => Ok(pl),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on one-to-many relation '{}'.",
-                            parent_model_name, child_model_name, relation_name
+                            "No '{parent_model_name}' record(s) (needed to inline the relation on '{child_model_name}' record(s)) was found for a nested connect on one-to-many relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -236,8 +234,7 @@ fn handle_one_to_many(
                 if let QueryResult::Count(c) = query_result {
                     if c != &expected_id_count {
                         return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "Expected {} records to be connected after connect operation on one-to-many relation '{}', found {}.",
-                            expected_id_count, relation_name, c,
+                            "Expected {expected_id_count} records to be connected after connect operation on one-to-many relation '{relation_name}', found {c}.",
                         )));
                     }
                 }
@@ -431,8 +428,7 @@ fn handle_one_to_one_parent_update(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record to connect was found was found for a nested connect on one-to-one relation '{}'.",
-                            child_model_name, relation_name
+                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -462,10 +458,7 @@ fn handle_one_to_one_parent_update(
                  let parent_link = match parent_links.pop() {
                      Some(link) => Ok(link),
                      None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to update inlined relation on '{}') was found for a nested connect on one-to-one relation '{}'.",
-                        parent_model_name,
-                        child_model_name,
-                        relation_name
+                        "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested connect on one-to-one relation '{relation_name}'."
                     ))),
                  }?;
 
@@ -493,10 +486,7 @@ fn handle_one_to_one_parent_update(
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to update inlined relation on '{}') was found for a nested connect on one-to-one relation '{}'.",
-                        parent_model_name,
-                        child_model_name,
-                        relation_name
+                        "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested connect on one-to-one relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -526,10 +516,7 @@ fn handle_one_to_one_parent_update(
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to update inlined relation on '{}') was found for a nested connect on relation '{}'.",
-                        parent_model_name,
-                        child_model_name,
-                        relation_name
+                        "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested connect on relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -587,8 +574,7 @@ fn handle_one_to_one_parent_create(
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to inline connect on create for '{}' record) was found for a nested connect on one-to-one relation '{}'.",
-                            child_model_name, parent_model_name, relation_name
+                            "No '{child_model_name}' record (needed to inline connect on create for '{parent_model_name}' record) was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -623,8 +609,7 @@ fn handle_one_to_one_parent_create(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record to connect was found was found for a nested connect on one-to-one relation '{}'.",
-                            child_model_name, relation_name
+                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -648,10 +633,7 @@ fn handle_one_to_one_parent_create(
                  let parent_link = match parent_links.pop() {
                      Some(link) => Ok(link),
                      None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to update inlined relation on '{}') was found for a nested connect on one-to-one relation '{}'.",
-                        parent_model_name,
-                        child_model_name,
-                        relation_name
+                        "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested connect on one-to-one relation '{relation_name}'."
                     ))),
                  }?;
 

@@ -46,7 +46,7 @@ mod create {
                     r#"mutation {{
                       createOneScalarModel(data: {{
                         id: "1",
-                        optString: "lala{}",
+                        optString: "lala{TROUBLE_CHARS}",
                         optInt: 1337,
                         optFloat: 1.234,
                         optBoolean: true,
@@ -55,8 +55,7 @@ mod create {
                       }}) {{
                         id, optString, optInt, optFloat, optBoolean, optEnum, optDateTime
                       }}
-                    }}"#,
-                    TROUBLE_CHARS
+                    }}"#
                 ))
             },
             5

@@ -78,7 +78,6 @@ where
     }
 
     /// Convenience wrapper to transition from WithParams to Connected.
-    #[track_caller]
     async fn try_connect(
         &mut self,
         f: impl for<'b> FnOnce(&'b P) -> BoxFuture<'b, ConnectorResult<C>>,

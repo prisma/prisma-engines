@@ -283,7 +283,7 @@ mod combinations {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneItem(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneItem(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 
@@ -519,7 +519,7 @@ mod decimal_combinations {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneItem(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneItem(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

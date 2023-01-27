@@ -12,7 +12,7 @@ use tracing_subscriber::{
 pub(crate) fn init_logger() {
     tracing::subscriber::set_global_default(test_tracing_subscriber())
         .map_err(|err| {
-            eprintln!("Error initializing the global logger: {}", err);
+            eprintln!("Error initializing the global logger: {err}");
             std::process::exit(1);
         })
         .ok();

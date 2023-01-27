@@ -19,8 +19,8 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::ConnectorError(err) => write!(f, "Error in connector: {}", err),
-            Error::DatamodelError(err) => write!(f, "Error in datamodel:\n{}", err),
+            Error::ConnectorError(err) => write!(f, "Error in connector: {err}"),
+            Error::DatamodelError(err) => write!(f, "Error in datamodel:\n{err}"),
             Error::InvalidDatabaseUrl(err) => f.write_str(err),
             Error::IntrospectionResultEmpty => f.write_str("The introspected database was empty"),
             Error::Generic(err) => f.write_str(err),

@@ -413,7 +413,7 @@ mod order_by_dependent {
         c_to_a: Option<u32>,
     ) -> TestResult<()> {
         let (follow_up, inline) = match c_to_a {
-            Some(id) if id != a_id => (None, Some(format!("a: {{ create: {{ id: {} }} }}", id))),
+            Some(id) if id != a_id => (None, Some(format!("a: {{ create: {{ id: {id} }} }}"))),
             Some(id) => (
                 Some(format!(
                     "mutation {{ updateOneModelC(where: {{ id: {} }}, data: {{ a_id: {} }}) {{ id }} }}",
@@ -431,14 +431,14 @@ mod order_by_dependent {
         };
 
         let model_b = match b_id {
-            Some(id) => format!("b: {{ create: {{ id: {}\n {} }} }}", id, model_c),
+            Some(id) => format!("b: {{ create: {{ id: {id}\n {model_c} }} }}"),
             None => "".to_string(),
         };
 
-        let model_a = format!("{{ id: {} \n {} }}", a_id, model_b);
+        let model_a = format!("{{ id: {a_id} \n {model_b} }}");
 
         runner
-            .query(format!("mutation {{ createOneModelA(data: {}) {{ id }} }}", model_a))
+            .query(format!("mutation {{ createOneModelA(data: {model_a}) {{ id }} }}"))
             .await?
             .assert_success();
 

@@ -88,8 +88,7 @@ impl DatamodelError {
         span: Span,
     ) -> DatamodelError {
         let msg = format!(
-            "Native type {} is not compatible with declared field type {}, expected field type {}.",
-            native_type, field_type, expected_types
+            "Native type {native_type} is not compatible with declared field type {field_type}, expected field type {expected_types}.",
         );
         Self::new(msg, span)
     }
@@ -100,10 +99,7 @@ impl DatamodelError {
         expected: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!(
-            "Invalid argument for type {}: {}. Allowed values: {}.",
-            native_type, got, expected
-        );
+        let msg = format!("Invalid argument for type {native_type}: {got}. Allowed values: {expected}.");
         Self::new(msg, span)
     }
 
@@ -113,7 +109,7 @@ impl DatamodelError {
         suggestion: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg =  format!("The prefix {} is invalid. It must be equal to the name of an existing datasource e.g. {}. Did you mean to use {}?", given_prefix, expected_prefix, suggestion);
+        let msg =  format!("The prefix {given_prefix} is invalid. It must be equal to the name of an existing datasource e.g. {expected_prefix}. Did you mean to use {suggestion}?");
         DatamodelError::new(msg, span)
     }
 
@@ -137,10 +133,7 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The model with database name \"{}\" could not be defined because another model or view with this name exists: \"{}\"",
-          model_database_name,
-          existing_model_name
-        );
+        let msg = format!("The model with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
         Self::new(msg, span)
     }
 
@@ -149,23 +142,19 @@ impl DatamodelError {
         existing_model_name: &str,
         span: Span,
     ) -> DatamodelError {
-        let msg = format!("The view with database name \"{}\" could not be defined because another model or view with this name exists: \"{}\"",
-          model_database_name,
-          existing_model_name
-        );
+        let msg = format!("The view with database name \"{model_database_name}\" could not be defined because another model or view with this name exists: \"{existing_model_name}\"");
         Self::new(msg, span)
     }
 
     pub fn new_duplicate_top_error(name: &str, top_type: &str, existing_top_type: &str, span: Span) -> DatamodelError {
         let msg = format!(
-            "The {} \"{}\" cannot be defined because a {} with that name already exists.",
-            top_type, name, existing_top_type
+            "The {top_type} \"{name}\" cannot be defined because a {existing_top_type} with that name already exists.",
         );
         Self::new(msg, span)
     }
 
     pub fn new_duplicate_config_key_error(conf_block_name: &str, key_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("Key \"{}\" is already defined in {}.", key_name, conf_block_name);
+        let msg = format!("Key \"{key_name}\" is already defined in {conf_block_name}.");
         Self::new(msg, span)
     }
 
@@ -183,7 +172,7 @@ impl DatamodelError {
     }
 
     pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str, span: Span) -> DatamodelError {
-        let msg = format!("Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name);
+        let msg = format!("Value \"{value_name}\" is already defined on enum \"{enum_name}\".",);
         Self::new(msg, span)
     }
 
@@ -228,10 +217,7 @@ impl DatamodelError {
     }
 
     pub fn new_composite_type_validation_error(message: &str, composite_type_name: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "Error validating composite type \"{}\": {}",
-            composite_type_name, message
-        );
+        let msg = format!("Error validating composite type \"{composite_type_name}\": {message}",);
         Self::new(msg, span)
     }
 
@@ -282,9 +268,9 @@ impl DatamodelError {
         span: Span,
     ) -> DatamodelError {
         let msg = format!(
-            "Native type {} takes {} optional arguments, but received {}.",
-            native_type, optional_count, given_count
+            "Native type {native_type} takes {optional_count} optional arguments, but received {given_count}.",
         );
+
         DatamodelError::new(msg, span)
     }
 
@@ -332,7 +318,7 @@ impl DatamodelError {
     }
 
     pub fn new_invalid_model_error(msg: &str, span: Span) -> DatamodelError {
-        DatamodelError::new(format!("Invalid model: {}", msg), span)
+        DatamodelError::new(format!("Invalid model: {msg}"), span)
     }
 
     pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
@@ -350,8 +336,7 @@ impl DatamodelError {
         span: Span,
     ) -> DatamodelError {
         let msg = format!(
-            "The preview feature \"{}\" is not known. Expected one of: {}",
-            preview_feature, expected_preview_features
+            "The preview feature \"{preview_feature}\" is not known. Expected one of: {expected_preview_features}",
         );
         Self::new(msg, span)
     }
@@ -372,10 +357,7 @@ impl DatamodelError {
     }
 
     pub fn new_native_type_name_unknown(connector_name: &str, native_type: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "Native type {} is not supported for {} connector.",
-            native_type, connector_name
-        );
+        let msg = format!("Native type {native_type} is not supported for {connector_name} connector.");
         DatamodelError::new(msg, span)
     }
 

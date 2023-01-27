@@ -265,8 +265,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
 
             if related_model.id == parent_model.id {
                 let msg = format!(
-                    "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
-                    visited_relations
+                    "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {visited_relations}."
                 );
 
                 ctx.push_error(cascade_error_with_default_values(
@@ -411,10 +410,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         }
     }
 
-    let models = reachable
-        .iter()
-        .map(|model_name| format!("`{}`", model_name))
-        .join(", ");
+    let models = reachable.iter().map(|model_name| format!("`{model_name}`")).join(", ");
 
     #[allow(clippy::comparison_chain)] // match looks horrible here...
     if reachable.len() == 1 {

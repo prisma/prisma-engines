@@ -180,8 +180,7 @@ fn extract_order_by_relevance(
         PrismaValue::Enum(e) => Ok(vec![PrismaValue::String(e)]),
         PrismaValue::List(l) => Ok(l),
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {:?}",
-            x
+            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {x:?}"
         ))),
     }?;
 
@@ -191,8 +190,7 @@ fn extract_order_by_relevance(
         .map(|field_name| match container.find_field(&field_name) {
             Some(Field::Scalar(sf)) => Ok(sf),
             _ => Err(QueryGraphBuilderError::InputError(format!(
-                "Invalid order-by reference input: Field {} is not a valid scalar field.",
-                field_name
+                "Invalid order-by reference input: Field {field_name} is not a valid scalar field."
             ))),
         })
         .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
@@ -270,8 +268,7 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
 
     match val {
         Some(val) if val < 0 => Err(QueryGraphBuilderError::AssertionError(format!(
-            "Invalid value for skip argument: Value can only be positive, found: {}",
-            val,
+            "Invalid value for skip argument: Value can only be positive, found: {val}",
         ))),
 
         val => Ok(val),

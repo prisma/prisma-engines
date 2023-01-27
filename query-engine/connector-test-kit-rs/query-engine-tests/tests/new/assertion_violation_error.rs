@@ -10,21 +10,16 @@ mod raw_params {
         let ids: Vec<u32> = (1..n + 1).collect();
 
         // "$1,$2,...,$n"
-        let params: String = ids
-            .iter()
-            .map(|id| format!("${}", id))
-            .collect::<Vec<String>>()
-            .join(",");
+        let params: String = ids.iter().map(|id| format!("${id}")).collect::<Vec<String>>().join(",");
 
         let mutation = format!(
             r#"
             mutation {{
               queryRaw(
-                query: "SELECT * FROM \"TestModel\" WHERE id IN ({})",
-                parameters: "{:?}"
+                query: "SELECT * FROM \"TestModel\" WHERE id IN ({params})",
+                parameters: "{ids:?}"
               )
             }}"#,
-            params, ids,
         );
 
         assert_error!(

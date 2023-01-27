@@ -67,7 +67,7 @@ impl FormatChecksum for [u8; 32] {
         let mut checksum_string = String::with_capacity(32 * 2);
 
         for byte in self {
-            write!(checksum_string, "{:02x}", byte).unwrap();
+            write!(checksum_string, "{byte:02x}").unwrap();
         }
 
         assert_eq!(checksum_string.len(), CHECKSUM_STR_LEN);
@@ -87,7 +87,7 @@ impl FormatChecksum for [u8; 32] {
         let mut checksum_string = String::with_capacity(32 * 2);
 
         for byte in self {
-            write!(checksum_string, "{:x}", byte).unwrap();
+            write!(checksum_string, "{byte:x}").unwrap();
         }
 
         checksum_string

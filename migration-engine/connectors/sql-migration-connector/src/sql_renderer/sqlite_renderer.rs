@@ -217,7 +217,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
+        format!(r#"ALTER TABLE "{name}" RENAME TO "{new_name}""#)
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {

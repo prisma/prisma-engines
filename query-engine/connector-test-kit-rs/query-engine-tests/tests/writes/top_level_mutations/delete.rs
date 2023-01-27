@@ -134,7 +134,7 @@ mod delete {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneScalarModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

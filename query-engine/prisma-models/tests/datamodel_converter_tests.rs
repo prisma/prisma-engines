@@ -428,7 +428,7 @@ fn many_to_many_relations() {
         .assert_model_a("Blog")
         .assert_model_b("Post")
         .assert_manifestation(&RelationLinkManifestation::RelationTable(RelationTable {
-            table: format!("_{}", relation_name),
+            table: format!("_{relation_name}"),
             model_a_column: "A".to_string(),
             model_b_column: "B".to_string(),
         }));
@@ -603,7 +603,7 @@ impl ModelAssertions for Model {
 
                 is_for_right_fields && has_right_type
             })
-            .unwrap_or_else(|| panic!("Could not find the index for fields {:?} and type {:?}", fields, tpe));
+            .unwrap_or_else(|| panic!("Could not find the index for fields {fields:?} and type {tpe:?}"));
         self
     }
 

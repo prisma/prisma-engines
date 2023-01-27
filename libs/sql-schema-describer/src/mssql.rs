@@ -337,7 +337,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
-                            .ok_or_else(|| format!("Couldn't parse default value: `{}`", default_string))
+                            .ok_or_else(|| format!("Couldn't parse default value: `{default_string}`"))
                             .unwrap();
 
                         let mut default = match tpe.family {
@@ -612,9 +612,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                 let definition = row
                     .get_string("system_type_name")
                     .map(|name| match (max_length, precision, scale) {
-                        (Some(len), _, _) if len == -1 => format!("{}(max)", name),
-                        (Some(len), _, _) => format!("{}({})", name, len),
-                        (_, Some(p), Some(s)) => format!("{}({},{})", name, p, s),
+                        (Some(len), _, _) if len == -1 => format!("{name}(max)"),
+                        (Some(len), _, _) => format!("{name}({len})"),
+                        (_, Some(p), Some(s)) => format!("{name}({p},{s})"),
                         _ => name,
                     });
 
@@ -729,7 +729,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!("Unrecognized on delete action '{}'", s),
+                s => panic!("Unrecognized on delete action '{s}'"),
             };
 
             let on_update_action = match row.get_expect_i64("update_referential_action") {
@@ -737,7 +737,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 1 => ForeignKeyAction::Cascade,
                 2 => ForeignKeyAction::SetNull,
                 3 => ForeignKeyAction::SetDefault,
-                s => panic!("Unrecognized on delete action '{}'", s),
+                s => panic!("Unrecognized on delete action '{s}'"),
             };
 
             match &current_fk {
@@ -774,28 +774,28 @@ impl<'a> SqlSchemaDescriber<'a> {
         // TODO: can we achieve this more elegantly?
         let params = match data_type {
             "numeric" | "decimal" => match (numeric_precision, numeric_scale) {
-                (Some(p), Some(s)) => Cow::from(format!("({},{})", p, s)),
+                (Some(p), Some(s)) => Cow::from(format!("({p},{s})")),
                 (None, None) => Cow::from(""),
                 _ => unreachable!("Unexpected params for a decimal field."),
             },
             "float" => match numeric_precision {
-                Some(p) => Cow::from(format!("({})", p)),
+                Some(p) => Cow::from(format!("({p})")),
                 None => Cow::from(""),
             },
             "varchar" | "nvarchar" | "varbinary" => match character_maximum_length {
                 Some(-1) => Cow::from("(max)"),
-                Some(length) => Cow::from(format!("({})", length)),
+                Some(length) => Cow::from(format!("({length})")),
                 None => Cow::from(""),
             },
             "char" | "nchar" | "binary" => match character_maximum_length {
                 Some(-1) => unreachable!("Cannot have a `max` variant for type `{}`", data_type),
-                Some(length) => Cow::from(format!("({})", length)),
+                Some(length) => Cow::from(format!("({length})")),
                 None => Cow::from(""),
             },
             _ => Cow::from(""),
         };
 
-        let full_data_type = format!("{}{}", data_type, params);
+        let full_data_type = format!("{data_type}{params}");
 
         let casted_character_maximum_length = character_maximum_length.map(|x| x as u32);
         let type_parameter = parse_type_parameter(character_maximum_length);

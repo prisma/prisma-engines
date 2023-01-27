@@ -66,7 +66,7 @@ mod byoid {
               createOneParent(data: {p: "Parent2", id: "Own Id"}){p, id}
             }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -94,7 +94,7 @@ mod byoid {
                   createOneParent(data: {p: "Parent2", id: "Own Id"}){p, id}
                 }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -152,7 +152,7 @@ mod byoid {
               createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
             }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -180,7 +180,7 @@ mod byoid {
                   createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
                 }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())

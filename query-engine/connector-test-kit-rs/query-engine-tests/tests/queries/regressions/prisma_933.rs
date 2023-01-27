@@ -57,7 +57,7 @@ mod prisma_933_spec {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneBuyer(data: {}) {{ buyer_id }} }}", data))
+            .query(format!("mutation {{ createOneBuyer(data: {data}) {{ buyer_id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -53,7 +53,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
     let setup = format!("CREATE SCHEMA {other_name}");
     api.database().raw_cmd(&setup).await?;
 
-    let setup = format!("CREATE SCHEMA third");
+    let setup = "CREATE SCHEMA third".to_string();
     api.database().raw_cmd(&setup).await?;
 
     let setup = formatdoc!(
@@ -132,7 +132,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResu
     let setup = format!("CREATE SCHEMA {other_name}");
     api.database().raw_cmd(&setup).await?;
 
-    let setup = format!("CREATE SCHEMA third");
+    let setup = "CREATE SCHEMA third".to_string();
     api.database().raw_cmd(&setup).await?;
 
     let setup = formatdoc!(

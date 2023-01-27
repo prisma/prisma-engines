@@ -74,7 +74,7 @@ impl std::io::Write for PrintWriter {
             let plain_log = std::str::from_utf8(&plain_bytes).unwrap_or("<invalid UTF-8>");
             let _ = self.tx.send(plain_log.to_string());
         }
-        eprint!("{}", log);
+        eprint!("{log}");
         Ok(buf.len())
     }
 

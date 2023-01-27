@@ -115,8 +115,8 @@ impl fmt::Display for FieldType {
             FieldType::Int64 => f.write_str("BigInt"),
             FieldType::Json => f.write_str("Json"),
             FieldType::Document(s) => f.write_str(s),
-            FieldType::Array(r#type) => write!(f, "Array({})", r#type),
-            FieldType::Unsupported(r#type) => write!(f, "{}", r#type),
+            FieldType::Array(r#type) => write!(f, "Array({type})"),
+            FieldType::Unsupported(r#type) => write!(f, "{type}"),
         }
     }
 }

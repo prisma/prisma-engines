@@ -98,9 +98,7 @@ impl<'a> CreateMigrationAssertion<'a> {
         assert!(
             // the lock file is counted as an entry
             expected_count == count,
-            "Assertion failed. Expected {expected} migrations in the migrations directory, found {actual}.",
-            expected = expected_count,
-            actual = count
+            "Assertion failed. Expected {expected_count} migrations in the migrations directory, found {count}."
         );
 
         self
@@ -131,10 +129,7 @@ impl<'a> CreateMigrationAssertion<'a> {
 
                 assertions(assertion);
             }
-            None => panic!(
-                "Assertion error. Could not find migration with name matching `{}`",
-                name_matcher
-            ),
+            None => panic!("Assertion error. Could not find migration with name matching `{name_matcher}`"),
         }
 
         self
@@ -168,7 +163,7 @@ impl<'a> CreateMigrationAssertion<'a> {
         };
 
         let mut file = std::fs::File::create(&migration_script_path).unwrap();
-        write!(file, "{}", new_contents).unwrap();
+        write!(file, "{new_contents}").unwrap();
 
         self
     }
@@ -187,7 +182,7 @@ impl MigrationAssertion<'_> {
     pub fn expect_contents(self, expected_contents: expect_test::Expect) -> Self {
         let migration_file_path = self.path.join("migration.sql");
         let contents: String = std::fs::read_to_string(&migration_file_path)
-            .map_err(|_| format!("Trying to read migration file at {:?}", migration_file_path))
+            .map_err(|_| format!("Trying to read migration file at {migration_file_path:?}"))
             .unwrap();
 
         expected_contents.assert_eq(&contents);
@@ -198,7 +193,7 @@ impl MigrationAssertion<'_> {
     pub fn assert_contents(self, expected_contents: &str) -> Self {
         let migration_file_path = self.path.join("migration.sql");
         let contents: String = std::fs::read_to_string(&migration_file_path)
-            .map_err(|_| format!("Trying to read migration file at {:?}", migration_file_path))
+            .map_err(|_| format!("Trying to read migration file at {migration_file_path:?}"))
             .unwrap();
 
         assert_eq!(expected_contents, contents);

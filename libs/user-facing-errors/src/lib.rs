@@ -135,12 +135,12 @@ impl Error {
         let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
         let location = panic_info
             .location()
-            .map(|loc| format!("{}", loc))
+            .map(|loc| format!("{loc}"))
             .unwrap_or_else(|| "<unknown location>".to_owned());
 
         Error {
             inner: ErrorType::Unknown(UnknownError {
-                message: format!("[{}] {}", location, message),
+                message: format!("[{location}] {message}"),
                 backtrace,
             }),
             is_panic: true,
@@ -181,7 +181,7 @@ impl Error {
     pub fn unwrap_known(self) -> KnownError {
         match self.inner {
             ErrorType::Known(err) => err,
-            err @ ErrorType::Unknown(_) => panic!("Expected known error, got {:?}", err),
+            err @ ErrorType::Unknown(_) => panic!("Expected known error, got {err:?}"),
         }
     }
 

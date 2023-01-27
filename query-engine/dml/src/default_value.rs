@@ -204,7 +204,7 @@ impl ValueGenerator {
     pub fn new_nanoid(length: Option<u8>) -> Self {
         if let Some(length) = length {
             ValueGenerator::new(
-                format!("nanoid({})", length),
+                format!("nanoid({length})"),
                 vec![(None, PrismaValue::Int(length.into()))],
             )
             .unwrap()
@@ -243,8 +243,8 @@ impl ValueGenerator {
             Ok(())
         } else {
             Err(format!(
-                "The function `{}()` cannot be used on fields of type `{}`.",
-                &self.name, scalar_type
+                "The function `{}()` cannot be used on fields of type `{scalar_type}`.",
+                &self.name
             ))
         }
     }
@@ -280,7 +280,7 @@ impl ValueGeneratorFn {
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
             name if name.starts_with("nanoid(") => Ok(Self::Nanoid(name[7..name.len() - 1].parse::<u8>().ok())),
-            _ => Err(format!("The function {} is not a known function.", name)),
+            _ => Err(format!("The function {name} is not a known function.")),
         }
     }
 
@@ -347,7 +347,7 @@ impl PartialEq for ValueGenerator {
 impl fmt::Debug for DefaultValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            DefaultKind::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
+            DefaultKind::Single(ref v) => write!(f, "DefaultValue::Single({v:?})"),
             DefaultKind::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
         }
     }

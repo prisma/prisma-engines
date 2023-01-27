@@ -52,7 +52,7 @@ impl<'a> IndexFieldPair<'a> {
             return None;
         }
 
-        let ext: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
+        let ext: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
 
         let next = match self.next {
             Some(next) => next,

@@ -187,8 +187,7 @@ impl<'a> ScalarFilterParser<'a> {
 
             _ => {
                 return Err(QueryGraphBuilderError::InputError(format!(
-                    "{} is not a valid scalar filter operation",
-                    filter_name
+                    "{filter_name} is not a valid scalar filter operation"
                 )))
             }
         }
@@ -399,8 +398,7 @@ impl<'a> ScalarFilterParser<'a> {
 
             _ => {
                 return Err(QueryGraphBuilderError::InputError(format!(
-                    "{} is not a valid scalar filter operation",
-                    filter_name
+                    "{filter_name} is not a valid scalar filter operation"
                 )))
             }
         }
@@ -450,12 +448,10 @@ impl<'a> ScalarFilterParser<'a> {
                         if field_ref.is_list() { "[]" } else { "" },
                     ))),
                     Some(Field::Relation(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field {} but found a relation field.",
-                        field_ref
+                        "Expected a referenced scalar field {field_ref} but found a relation field."
                     ))),
                     Some(Field::Composite(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field {} but found a composite field.",
-                        field_ref
+                        "Expected a referenced scalar field {field_ref} but found a composite field."
                     ))),
                     None => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar field {}.{} does not exist.",
@@ -492,12 +488,10 @@ impl<'a> ScalarFilterParser<'a> {
                         if field_ref.is_list() { "[]" } else { "" },
                     ))),
                     Some(Field::Relation(rf)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar list field {} but found a relation field.",
-                        rf
+                        "Expected a referenced scalar list field {rf} but found a relation field."
                     ))),
                     Some(Field::Composite(cf)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar list field {} but found a composite field.",
-                        cf
+                        "Expected a referenced scalar list field {cf} but found a composite field."
                     ))),
                     _ => Err(QueryGraphBuilderError::InputError(format!(
                         "The referenced scalar list field {}.{} does not exist.",

@@ -193,3 +193,87 @@ async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn ignore_docs_only_added_once(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "A" (
+            id INT NULL
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model A {
+          id Int?
+
+          @@ignore
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model A {
+          id Int?
+
+          @@ignore
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expectation = expect!["[]"];
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn reserved_name_docs_are_only_added_once(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "if" (
+            id INT PRIMARY KEY
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+        /// This model has been renamed to Renamedif during introspection, because the original name if is reserved.
+        model Renamedif {
+          id Int @id
+
+          @@map("if")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model has been renamed to Renamedif during introspection, because the original name if is reserved.
+        model Renamedif {
+          id Int @id
+
+          @@map("if")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 7,
+            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "model": "Renamedif"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
+
+    Ok(())
+}

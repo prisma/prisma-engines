@@ -44,7 +44,7 @@ mod disconnect_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -91,7 +91,7 @@ mod disconnect_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -139,7 +139,7 @@ mod disconnect_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -192,7 +192,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -287,7 +287,7 @@ mod disconnect_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -330,13 +330,13 @@ mod disconnect_inside_update {
             updateOneParent(
             where: {parent}
             data:{{
-              childrenOpt: {{disconnect: [{child}]}}
+              childrenOpt: {{disconnect: [{second_child}]}}
             }}){{
               childrenOpt {{
                 c
               }}
             }}
-          }}"#, parent = parent, child = second_child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
         Ok(())
@@ -382,7 +382,7 @@ mod disconnect_inside_update {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -398,7 +398,7 @@ mod disconnect_inside_update {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -447,7 +447,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -531,7 +531,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -548,10 +548,7 @@ mod disconnect_inside_update {
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                first_child = first_child,
-                other_child = other_child
+                }}"#
             )
         );
 
@@ -636,16 +633,13 @@ mod disconnect_inside_update {
                   updateOneParent(
                     where: {parent}
                     data:{{
-                      childrenOpt: {{disconnect: [{child_1}, {child_2}]}}
+                      childrenOpt: {{disconnect: [{child_1}, {other_child}]}}
                   }}){{
                     childrenOpt{{
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                child_1 = child_1,
-                child_2 = other_child
+                }}"#
             )
         );
 
@@ -707,13 +701,13 @@ mod disconnect_inside_update {
             updateOneParent(
               where: {parent}
               data:{{
-                childrenOpt: {{disconnect: [{child}]}}
+                childrenOpt: {{disconnect: [{child_1}]}}
             }}){{
               childrenOpt{{
                 c
               }}
             }}
-          }}"#, parent = parent, child = child_1)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 

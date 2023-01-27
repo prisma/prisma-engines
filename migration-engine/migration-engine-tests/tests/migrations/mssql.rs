@@ -8,13 +8,10 @@ mod multi_schema;
 fn reset_clears_udts(api: TestApi) {
     let schema = api.schema_name();
 
-    api.raw_cmd(&format!("CREATE TYPE {}.[testType] AS TABLE (FooBar INT)", schema));
+    api.raw_cmd(&format!("CREATE TYPE {schema}.[testType] AS TABLE (FooBar INT)"));
 
     let schemas = api.query_raw(
-        &format!(
-            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
-            schema
-        ),
+        &format!("SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{schema}' and NAME = 'testType'"),
         &[],
     );
     assert_eq!(1, schemas.len());
@@ -22,10 +19,7 @@ fn reset_clears_udts(api: TestApi) {
     api.reset().send_sync(None);
 
     let schemas = api.query_raw(
-        &format!(
-            "SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{}' and NAME = 'testType'",
-            schema
-        ),
+        &format!("SELECT * FROM sys.types WHERE SCHEMA_NAME(schema_id) = '{schema}' and NAME = 'testType'"),
         &[],
     );
     assert_eq!(0, schemas.len());
@@ -35,20 +29,19 @@ fn reset_clears_udts(api: TestApi) {
 fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
     let schema = api.schema_name();
 
-    api.raw_cmd(&format!("CREATE DEFAULT [{}].catcat AS 'musti'", schema));
+    api.raw_cmd(&format!("CREATE DEFAULT [{schema}].catcat AS 'musti'"));
 
     api.raw_cmd(&format!(
         r#"
-            CREATE TABLE [{0}].cats (
+            CREATE TABLE [{schema}].cats (
                 id INT IDENTITY,
                 name NVARCHAR(255) NOT NULL,
                 CONSTRAINT [cats_pkey] PRIMARY KEY CLUSTERED ([id] ASC)
             )
-        "#,
-        schema
+        "#
     ));
 
-    api.raw_cmd(&format!("sp_bindefault '{0}.catcat', '{0}.cats.name'", schema));
+    api.raw_cmd(&format!("sp_bindefault '{schema}.catcat', '{schema}.cats.name'"));
 
     let dm = r#"
         model cats {

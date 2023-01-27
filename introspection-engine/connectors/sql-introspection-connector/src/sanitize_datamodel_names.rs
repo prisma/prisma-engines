@@ -5,7 +5,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
-use crate::datamodel_calculator::InputContext;
+use crate::datamodel_calculator::DatamodelCalculatorContext;
 
 /// Regex to determine if an identifier starts with a character that
 /// is not supported.
@@ -57,7 +57,11 @@ pub(crate) enum ModelName<'a> {
 
 impl<'a> ModelName<'a> {
     /// Create a name from an SQL identifier.
-    pub(crate) fn new_from_sql(name: &'a str, namespace: Option<&'a str>, context: InputContext<'a>) -> Self {
+    pub(crate) fn new_from_sql(
+        name: &'a str,
+        namespace: Option<&'a str>,
+        context: &DatamodelCalculatorContext<'a>,
+    ) -> Self {
         match (name, namespace) {
             (mapped_name, Some(namespace)) if !context.name_is_unique(mapped_name) => {
                 ModelName::RenamedDuplicate { mapped_name, namespace }

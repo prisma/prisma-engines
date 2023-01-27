@@ -90,8 +90,7 @@ pub fn connect_records_node(
 
                 if len != expected_connects {
                     return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "Expected {} records to be connected, found only {}.",
-                        expected_connects, len,
+                        "Expected {expected_connects} records to be connected, found only {len}.",
                     )));
                 }
 

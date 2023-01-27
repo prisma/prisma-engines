@@ -1333,7 +1333,7 @@ mod ported {
         datetime: &str,
     ) -> TestResult<()> {
         let string = match string {
-            Some(string) => format!(r#""{}""#, string),
+            Some(string) => format!(r#""{string}""#),
             None => String::from("null"),
         };
 
@@ -1342,18 +1342,17 @@ mod ported {
             r#"
                 mutation {{
                     createOneModelA(data: {{
-                        idTest: "{}",
-                        optString: {},
-                        optInt: {},
-                        optFloat: {},
-                        optBoolean: {},
-                        optEnum: {},
-                        optDateTime: "{}"
+                        idTest: "{id}",
+                        optString: {string},
+                        optInt: {int},
+                        optFloat: {float},
+                        optBoolean: {boolean},
+                        optEnum: {enum_},
+                        optDateTime: "{datetime}"
                         b: {{ connect: {{ int: 1 }} }}
                     }}) {{ id }}
                 }}
-            "#,
-            id, string, int, float, boolean, enum_, datetime
+            "#
         );
 
         runner.query(query).await?.assert_success();

@@ -174,8 +174,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
     let err = api.mark_migration_rolled_back(&second_migration_name).send_unwrap_err();
 
     assert!(err.to_string().starts_with(&format!(
-        "Migration `{}` cannot be rolled back because it is not in a failed state.\n",
-        second_migration_name
+        "Migration `{second_migration_name}` cannot be rolled back because it is not in a failed state.\n"
     )));
 
     let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();

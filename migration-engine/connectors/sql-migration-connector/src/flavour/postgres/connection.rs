@@ -137,8 +137,7 @@ impl Connection {
                                     .join("\n");
 
                                 error_position = format!(
-                                    "\n\nPosition:\n{}\n\x1b[1m{:>3}\x1b[1;31m {}\x1b[0m",
-                                    numbered_lines, line_number, line
+                                    "\n\nPosition:\n{numbered_lines}\n\x1b[1m{line_number:>3}\x1b[1;31m {line}\x1b[0m"
                                 );
                                 break;
                             } else {
@@ -157,7 +156,7 @@ impl Connection {
                         String::new()
                     };
 
-                    let database_error = format!("{}{}\n\n{:?}", db_error, position, db_error);
+                    let database_error = format!("{db_error}{position}\n\n{db_error:?}");
 
                     (Some(db_error.code().code()), database_error)
                 } else {

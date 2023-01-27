@@ -131,8 +131,8 @@ fn serialize_aggregations(
 
                 for field in order {
                     let item = flattened
-                        .remove(&format!("{}_{}", query, field))
-                        .or_else(|| flattened.remove(&format!("_{}_{}", query, field)))
+                        .remove(&format!("{query}_{field}"))
+                        .or_else(|| flattened.remove(&format!("_{query}_{field}")))
                         .unwrap();
 
                     nested_map.insert(field.clone(), item);
@@ -142,7 +142,7 @@ fn serialize_aggregations(
             } else {
                 let item = flattened
                     .remove(&query.clone())
-                    .or_else(|| flattened.remove(&format!("_{}", query)))
+                    .or_else(|| flattened.remove(&format!("_{query}")))
                     .unwrap();
 
                 inner_map.insert(query.clone(), item);
@@ -563,8 +563,8 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (st, pv) => {
             return Err(crate::FieldConversionError::create(
                 field.name.clone(),
-                format!("{:?}", st),
-                format!("{}", pv),
+                format!("{st:?}"),
+                format!("{pv}"),
             ))
         }
     };

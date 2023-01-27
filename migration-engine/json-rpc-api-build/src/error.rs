@@ -38,7 +38,7 @@ impl Debug for Error {
                 f.write_str("  ")?;
             }
 
-            f.write_fmt(format_args!("Caused by: {}\n", source))?;
+            f.write_fmt(format_args!("Caused by: {source}\n"))?;
 
             indentation_levels += 1;
             src = source.source();

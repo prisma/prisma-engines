@@ -29,7 +29,7 @@ impl IndexBuilder {
                 let field = fields
                     .iter()
                     .find(|sf| sf.name == name)
-                    .unwrap_or_else(|| panic!("Unable to resolve field '{}'", name));
+                    .unwrap_or_else(|| panic!("Unable to resolve field '{name}'"));
 
                 Arc::downgrade(field)
             })

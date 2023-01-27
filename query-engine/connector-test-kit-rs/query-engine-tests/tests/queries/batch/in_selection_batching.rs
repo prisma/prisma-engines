@@ -146,7 +146,7 @@ mod isb {
 
     async fn create_a(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneA(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneA(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

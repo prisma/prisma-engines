@@ -86,11 +86,7 @@ pub(super) fn validate_default_value(
                 Err(details) => details,
             };
 
-            let message = format!(
-                "Parse error: \"{bad_value}\" is not a valid rfc3339 datetime string. ({details})",
-                details = details,
-                bad_value = value,
-            );
+            let message = format!("Parse error: \"{value}\" is not a valid rfc3339 datetime string. ({details})");
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &message, "@default", *span,

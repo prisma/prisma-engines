@@ -198,7 +198,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_ids: &IndexMap<String, TableId>,
         schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table_name);
+        let sql = format!(r#"PRAGMA foreign_key_list("{table_name}");"#);
         let result_set = self.conn.query_raw(&sql, &[]).await?;
         let mut current_foreign_key: Option<(i64, ForeignKeyId)> = None;
         let mut current_foreign_key_columns: Vec<(i64, TableColumnId, Option<TableColumnId>)> = Vec::new();
@@ -226,7 +226,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 "set null" => ForeignKeyAction::SetNull,
                 "set default" => ForeignKeyAction::SetDefault,
                 "cascade" => ForeignKeyAction::Cascade,
-                s => panic!("Unrecognized on delete action '{}'", s),
+                s => panic!("Unrecognized on delete action '{s}'"),
             };
             let on_update_action = match row.get_expect_string("on_update").to_lowercase().as_str() {
                 "no action" => ForeignKeyAction::NoAction,
@@ -234,7 +234,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 "set null" => ForeignKeyAction::SetNull,
                 "set default" => ForeignKeyAction::SetDefault,
                 "cascade" => ForeignKeyAction::Cascade,
-                s => panic!("Unrecognized on update action '{}'", s),
+                s => panic!("Unrecognized on update action '{s}'"),
             };
             [on_delete_action, on_update_action]
         }
@@ -322,11 +322,11 @@ async fn push_columns(
     schema: &mut SqlSchema,
     conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
-    let sql = format!(r#"PRAGMA table_info ("{}")"#, table_name);
+    let sql = format!(r#"PRAGMA table_info ("{table_name}")"#);
     let result_set = conn.query_raw(&sql, &[]).await?;
     let mut pk_cols: BTreeMap<i64, TableColumnId> = BTreeMap::new();
     for row in result_set {
-        trace!("Got column row {:?}", row);
+        trace!("Got column row {row:?}");
         let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
 
         let arity = if is_required {
@@ -446,7 +446,7 @@ async fn push_indexes(
     schema: &mut SqlSchema,
     conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
-    let sql = format!(r#"PRAGMA index_list("{}");"#, table);
+    let sql = format!(r#"PRAGMA index_list("{table}");"#);
     let result_set = conn.query_raw(&sql, &[]).await?;
     let mut indexes = Vec::new(); // (index_name, is_unique, columns)
 
@@ -464,9 +464,9 @@ async fn push_indexes(
         let index_name = row.get_expect_string("name");
         let mut columns = Vec::new();
 
-        let sql = format!(r#"PRAGMA index_info("{}");"#, index_name);
+        let sql = format!(r#"PRAGMA index_info("{index_name}");"#);
         let result_set = conn.query_raw(&sql, &[]).await?;
-        trace!("Got index description results: {:?}", result_set);
+        trace!("Got index description results: {result_set:?}");
 
         for row in result_set.into_iter() {
             // if the index is on a rowid or expression, the name of the column will be null,
@@ -482,9 +482,9 @@ async fn push_indexes(
             }
         }
 
-        let sql = format!(r#"PRAGMA index_xinfo("{}");"#, index_name);
+        let sql = format!(r#"PRAGMA index_xinfo("{index_name}");"#);
         let result_set = conn.query_raw(&sql, &[]).await?;
-        trace!("Got index description results: {:?}", result_set);
+        trace!("Got index description results: {result_set:?}");
 
         for row in result_set.into_iter() {
             //if the index is on a rowid or expression, the name of the column will be null, we ignore these for now

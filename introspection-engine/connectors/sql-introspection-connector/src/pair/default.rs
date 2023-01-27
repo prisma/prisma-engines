@@ -40,7 +40,7 @@ impl<'a> DefaultValuePair<'a> {
 
         match (sql_kind, family) {
             (Some(sql::DefaultKind::Sequence(name)), _) if self.context.is_cockroach() => {
-                let connector_data: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
+                let connector_data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
 
                 let sequence_idx = connector_data
                     .sequences
@@ -70,7 +70,7 @@ impl<'a> DefaultValuePair<'a> {
             (Some(sql::DefaultKind::Value(PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
                 let variant = self
                     .context
-                    .schema
+                    .sql_schema
                     .walk(*enum_id)
                     .variants()
                     .find(|v| v.name() == variant)

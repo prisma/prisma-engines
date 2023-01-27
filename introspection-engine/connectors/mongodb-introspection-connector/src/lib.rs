@@ -41,7 +41,7 @@ impl MongoDbIntrospectionConnector {
 
             ConnectorError {
                 user_facing_error: Some(known),
-                kind: introspection_connector::ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
+                kind: introspection_connector::ErrorKind::InvalidDatabaseUrl(format!("{err} in database URL")),
             }
         };
 

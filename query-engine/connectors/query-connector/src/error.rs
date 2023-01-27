@@ -45,7 +45,7 @@ impl ConnectorError {
             ErrorKind::ForeignKeyConstraintViolation { constraint } => {
                 let field_name = match constraint {
                     DatabaseConstraint::Fields(fields) => fields.join(","),
-                    DatabaseConstraint::Index(index) => format!("{} (index)", index),
+                    DatabaseConstraint::Index(index) => format!("{index} (index)"),
                     DatabaseConstraint::ForeignKey => "foreign key".to_string(),
                     DatabaseConstraint::CannotParse => "(not available)".to_string(),
                 };
@@ -56,7 +56,7 @@ impl ConnectorError {
             }
             ErrorKind::ConversionError(message) => Some(KnownError::new(
                 user_facing_errors::query_engine::InconsistentColumnData {
-                    message: format!("{}", message),
+                    message: format!("{message}"),
                 },
             )),
             ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
@@ -70,7 +70,7 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::MultiError(merror) => Some(KnownError::new(user_facing_errors::query_engine::MultiError {
-                errors: format!("{}", merror),
+                errors: format!("{merror}"),
             })),
             ErrorKind::UniqueConstraintViolation { constraint } => {
                 Some(KnownError::new(user_facing_errors::query_engine::UniqueKeyViolation {

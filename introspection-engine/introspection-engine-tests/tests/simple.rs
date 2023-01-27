@@ -14,8 +14,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
         let expected_tags_prefix = "-- tags=";
         assert!(
             first_line.starts_with(expected_tags_prefix),
-            "The first line of a simple test must start with \"{}\"",
-            expected_tags_prefix
+            "The first line of a simple test must start with \"{expected_tags_prefix}\""
         );
         let tags = first_line.trim_start_matches(expected_tags_prefix);
         test_setup::tags_from_comma_separated_list(tags)

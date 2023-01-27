@@ -50,5 +50,5 @@ static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
 pub(crate) fn default_for(scalar_type: &ScalarType) -> &MongoDbType {
     DEFAULT_MAPPING
         .get(scalar_type)
-        .unwrap_or_else(|| panic!("MongoDB native type mapping missing for '{:?}'", scalar_type))
+        .unwrap_or_else(|| panic!("MongoDB native type mapping missing for '{scalar_type:?}'"))
 }

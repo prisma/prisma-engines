@@ -291,8 +291,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
             Ok(filters)
         }
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid scalar filter input: {:?}",
-            x
+            "Invalid scalar filter input: {x:?}"
         ))),
     }
 }
@@ -316,8 +315,7 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid relation filter input: {:?}",
-            x
+            "Invalid relation filter input: {x:?}"
         ))),
     }
 }
@@ -348,8 +346,7 @@ fn extract_composite_filters(
         ParsedInputValue::List(_) => Ok(vec![field.equals(PrismaValue::List(value.try_into()?))]),
         ParsedInputValue::Map(filter_map) => Ok(vec![composite::parse(filter_map, field, false)?]),
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid composite filter input: {:?}",
-            x
+            "Invalid composite filter input: {x:?}"
         ))),
     }
 }

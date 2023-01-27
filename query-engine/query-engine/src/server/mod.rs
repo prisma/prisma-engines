@@ -30,7 +30,7 @@ pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
     info!("Started query engine http server on http://{}", addr);
 
     if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
+        eprintln!("server error: {e}");
     }
 
     Ok(())

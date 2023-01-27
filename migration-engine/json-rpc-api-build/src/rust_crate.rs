@@ -28,7 +28,7 @@ pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
 
         if let Some(description) = &method.description {
             for line in description.lines() {
-                writeln!(librs, "//! {}", line)?;
+                writeln!(librs, "//! {line}")?;
             }
         }
     }
@@ -38,7 +38,7 @@ pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
     )?;
 
     for method_name in &method_names {
-        writeln!(librs, "    \"{}\",", method_name)?;
+        writeln!(librs, "    \"{method_name}\",")?;
     }
 
     writeln!(librs, "];")?;
@@ -68,7 +68,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
     for (type_name, record_type) in &api.record_shapes {
         if let Some(description) = &record_type.description {
             for line in description.lines() {
-                writeln!(file, "/// {}", line)?;
+                writeln!(file, "/// {line}")?;
             }
         }
 
@@ -89,23 +89,23 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
         for (field_name, field) in &record_type.fields {
             if let Some(description) = &field.description {
                 for line in description.lines() {
-                    writeln!(file, "    /// {}", line)?;
+                    writeln!(file, "    /// {line}")?;
                 }
             }
             let type_name = rustify_type_name(&field.shape);
             let type_name: Cow<'static, str> = match (field.is_list, field.is_nullable) {
-                (true, true) => format!("Option<Vec<{}>>", type_name).into(),
-                (false, true) => format!("Option<{}>", type_name).into(),
-                (true, false) => format!("Vec<{}>", type_name).into(),
+                (true, true) => format!("Option<Vec<{type_name}>>").into(),
+                (false, true) => format!("Option<{type_name}>").into(),
+                (true, false) => format!("Vec<{type_name}>").into(),
                 (false, false) => type_name,
             };
             let field_name_sc = field_name.to_snake_case();
             if &field_name_sc != field_name {
-                writeln!(file, "    ///\n    /// JSON name: {}", field_name)?;
-                writeln!(file, "    #[serde(rename = \"{}\")]", field_name)?;
+                writeln!(file, "    ///\n    /// JSON name: {field_name}")?;
+                writeln!(file, "    #[serde(rename = \"{field_name}\")]")?;
             }
 
-            writeln!(file, "    pub {}: {},", field_name_sc, type_name)?;
+            writeln!(file, "    pub {field_name_sc}: {type_name},")?;
         }
         writeln!(file, "}}\n")?;
     }
@@ -113,7 +113,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
     for (type_name, variants) in &api.enum_shapes {
         if let Some(description) = &variants.description {
             for line in description.lines() {
-                writeln!(file, "/// {}", line)?;
+                writeln!(file, "/// {line}")?;
             }
         }
 
@@ -126,21 +126,21 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
         for (variant_name, variant) in &variants.variants {
             if let Some(description) = &variant.description {
                 for line in description.lines() {
-                    writeln!(file, "/// {}", line)?;
+                    writeln!(file, "/// {line}")?;
                 }
             }
 
             let cc_variant_name = variant_name.to_camel_case();
 
             if cc_variant_name.as_str() != variant_name {
-                writeln!(file, "///\n/// JSON name: {}", variant_name)?;
-                writeln!(file, "#[serde(rename = \"{}\")]", variant_name)?;
+                writeln!(file, "///\n/// JSON name: {variant_name}")?;
+                writeln!(file, "#[serde(rename = \"{variant_name}\")]")?;
             }
 
             if let Some(shape) = &variant.shape {
-                writeln!(file, "    {}({}),", cc_variant_name, rustify_type_name(shape))?;
+                writeln!(file, "    {cc_variant_name}({}),", rustify_type_name(shape))?;
             } else {
-                writeln!(file, "    {},", cc_variant_name)?;
+                writeln!(file, "    {cc_variant_name},")?;
             }
         }
 

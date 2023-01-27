@@ -226,7 +226,7 @@ impl SqlFlavour for PostgresFlavour {
 
             let (mut conn, admin_url) = create_postgres_admin_conn(url.clone()).await?;
 
-            let query = format!("CREATE DATABASE \"{}\"", db_name);
+            let query = format!("CREATE DATABASE \"{db_name}\"");
 
             let mut database_already_exists_error = None;
 
@@ -244,7 +244,7 @@ impl SqlFlavour for PostgresFlavour {
             // Now create the schema
             let mut conn = Connection::new(connection_string.parse().unwrap()).await?;
 
-            let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", schema_name);
+            let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";");
 
             conn.raw_cmd(&schema_sql, &params.url).await?;
 
@@ -285,7 +285,7 @@ impl SqlFlavour for PostgresFlavour {
             let (mut admin_conn, admin_url) = create_postgres_admin_conn(url.clone()).await?;
 
             admin_conn
-                .raw_cmd(&format!("DROP DATABASE \"{}\"", db_name), &admin_url)
+                .raw_cmd(&format!("DROP DATABASE \"{db_name}\""), &admin_url)
                 .await?;
 
             Ok(())
@@ -322,9 +322,9 @@ impl SqlFlavour for PostgresFlavour {
             tracing::info!(?schemas_to_reset, "Resetting schema(s)");
 
             for schema_name in schemas_to_reset {
-                conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name), &params.url)
+                conn.raw_cmd(&format!("DROP SCHEMA \"{schema_name}\" CASCADE"), &params.url)
                     .await?;
-                conn.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url)
+                conn.raw_cmd(&format!("CREATE SCHEMA \"{schema_name}\""), &params.url)
                     .await?;
             }
 
@@ -414,7 +414,7 @@ impl SqlFlavour for PostgresFlavour {
                     let shadow_database_name = crate::new_shadow_database_name();
 
                     {
-                        let create_database = format!("CREATE DATABASE \"{}\"", shadow_database_name);
+                        let create_database = format!("CREATE DATABASE \"{shadow_database_name}\"");
                         main_connection
                             .raw_cmd(&create_database, &params.url)
                             .await
@@ -426,7 +426,7 @@ impl SqlFlavour for PostgresFlavour {
                         .connection_string
                         .parse()
                         .map_err(ConnectorError::url_parse_error)?;
-                    shadow_database_url.set_path(&format!("/{}", shadow_database_name));
+                    shadow_database_url.set_path(&format!("/{shadow_database_name}"));
                     let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
@@ -442,7 +442,7 @@ impl SqlFlavour for PostgresFlavour {
                     let ret =
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
+                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
                     main_connection.raw_cmd(&drop_database, &params.url).await?;
 
                     ret
@@ -461,7 +461,7 @@ impl SqlFlavour for PostgresFlavour {
 fn strip_schema_param_from_url(url: &mut Url) {
     let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
     params.remove("schema");
-    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{k}={v}")).collect();
     let params: String = params.join("&");
     url.set_query(Some(&params));
 }
@@ -477,7 +477,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection
     let mut conn = None;
 
     for database_name in CANDIDATE_DEFAULT_DATABASES {
-        url.set_path(&format!("/{}", database_name));
+        url.set_path(&format!("/{database_name}"));
         let postgres_url = PostgresUrl::new(url.clone()).unwrap();
         match Connection::new(url.clone()).await {
             // If the database does not exist, try the next one.
@@ -605,7 +605,7 @@ where
                         schema_name = schema_name,
                     );
 
-                    connection.raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name), &params.url).await?;
+                    connection.raw_cmd(&format!("CREATE SCHEMA \"{schema_name}\""), &params.url).await?;
 
                     Ok((circumstances, connection))
                 })).await?;
@@ -628,7 +628,7 @@ mod tests {
             shadow_database_connection_string: None,
         };
         flavour.set_params(params).unwrap();
-        let debugged = format!("{:?}", flavour);
+        let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

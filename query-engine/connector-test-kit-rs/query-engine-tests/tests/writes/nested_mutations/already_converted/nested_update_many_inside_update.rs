@@ -72,8 +72,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -107,8 +106,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -142,8 +140,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -183,8 +180,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -220,8 +216,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -261,8 +256,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 
@@ -304,8 +298,7 @@ mod um_inside_update {
                       non_unique
                     }}
                   }}
-                }}"#,
-                parent = parent
+                }}"#
             )
         );
 

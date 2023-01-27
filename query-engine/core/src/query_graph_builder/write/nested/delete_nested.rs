@@ -125,8 +125,7 @@ pub fn nested_delete(
                         let child_id = match child_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{}' record was found for a nested delete on relation '{}'.",
-                                child_model_name, relation_name
+                                "No '{child_model_name}' record was found for a nested delete on relation '{relation_name}'."
                             ))),
                         }?;
 

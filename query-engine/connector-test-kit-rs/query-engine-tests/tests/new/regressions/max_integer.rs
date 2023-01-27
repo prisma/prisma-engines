@@ -103,19 +103,13 @@ mod max_integer {
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
-                I32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int: {I32_OVERFLOW_MAX} }}) {{ id int }} }}"),
             0
         );
 
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int: {} }}) {{ id int }} }}",
-                I32_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int: {I32_OVERFLOW_MIN} }}) {{ id int }} }}"),
             0
         );
 
@@ -140,19 +134,13 @@ mod max_integer {
         // int
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."
         );
@@ -160,19 +148,13 @@ mod max_integer {
         // smallint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."
         );
@@ -180,19 +162,13 @@ mod max_integer {
         //oid
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
-                U32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ oid: {U32_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ oid: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ oid: {OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
         );
@@ -260,19 +236,13 @@ mod max_integer {
         // tinyint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
-                I8_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {I8_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'tinyint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
-                I8_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {I8_OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'tinyint'"
         );
@@ -280,19 +250,13 @@ mod max_integer {
         // smallint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'smallint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'smallint'"
         );
@@ -300,19 +264,13 @@ mod max_integer {
         // mediumint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
-                I24_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ mediumint: {I24_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'mediumint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ mediumint: {} }}) {{ id }} }}",
-                I24_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ mediumint: {I24_OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'mediumint'"
         );
@@ -320,19 +278,13 @@ mod max_integer {
         // int
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'int'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'int'"
         );
@@ -355,19 +307,13 @@ mod max_integer {
         // unsigned tinyint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
-                U8_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {U8_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_tinyint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_tinyint: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_tinyint: {OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_tinyint'"
         );
@@ -375,19 +321,13 @@ mod max_integer {
         // unsigned smallint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
-                U16_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {U16_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_smallint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_smallint: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_smallint: {OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_smallint'"
         );
@@ -395,19 +335,13 @@ mod max_integer {
         // unsigned mediumint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
-                U24_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {U24_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_mediumint'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_mediumint: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_mediumint: {OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_mediumint'"
         );
@@ -415,19 +349,13 @@ mod max_integer {
         // unsigned int
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
-                U32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_int: {U32_OVERFLOW_MAX} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_int'"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ unsigned_int: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ unsigned_int: {OVERFLOW_MIN} }}) {{ id }} }}"),
             2020,
             "Value out of range for the type. Out of range value for column 'unsigned_int'"
         );
@@ -548,19 +476,13 @@ mod max_integer {
         // tinyint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
-                U8_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {U8_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type tinyint"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ tinyint: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ tinyint: {OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type tinyint"
         );
@@ -568,19 +490,13 @@ mod max_integer {
         // smallint
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type smallint"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ smallint: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type smallint."
         );
@@ -588,19 +504,13 @@ mod max_integer {
         // int
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type int"
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ int: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Arithmetic overflow error converting expression to data type int"
         );
@@ -661,19 +571,13 @@ mod max_integer {
         // int4
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '2147483648' into an INT4 (32-bit signed integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int4: {} }}) {{ id }} }}",
-                I32_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int4: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-2147483649' into an INT4 (32-bit signed integer)."
         );
@@ -681,19 +585,13 @@ mod max_integer {
         // int2
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '32768' into an INT2 (16-bit signed integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, int2: {} }}) {{ id }} }}",
-                I16_OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, int2: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-32769' into an INT2 (16-bit signed integer)."
         );
@@ -701,19 +599,13 @@ mod max_integer {
         //oid
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
-                U32_OVERFLOW_MAX
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {U32_OVERFLOW_MAX} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '4294967296' into an OID (32-bit unsigned integer)."
         );
         assert_error!(
             runner,
-            format!(
-                "mutation {{ createOneTest(data: {{ id: 1, oid: {} }}) {{ id }} }}",
-                OVERFLOW_MIN
-            ),
+            format!("mutation {{ createOneTest(data: {{ id: 1, oid: {OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
         );

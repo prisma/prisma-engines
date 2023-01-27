@@ -118,9 +118,7 @@ mod nested_create_many {
     // "Nested createMany" should "allow creating a large number of records (horizontal partitioning check)"
     #[connector_test(exclude(Sqlite))]
     async fn allow_create_large_number_records(runner: Runner) -> TestResult<()> {
-        let records: Vec<_> = (1..=1000)
-            .map(|i| format!(r#"{{ id: {}, str1: "{}" }}"#, i, i))
-            .collect();
+        let records: Vec<_> = (1..=1000).map(|i| format!(r#"{{ id: {i}, str1: "{i}" }}"#)).collect();
 
         run_query!(
             runner,

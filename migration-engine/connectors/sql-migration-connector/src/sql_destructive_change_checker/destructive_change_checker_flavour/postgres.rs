@@ -131,7 +131,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 Some(namespace) => format!("\"{}\".\"{}\"", namespace, table.table),
                 None => format!("\"{}\"", table.table),
             };
-            let query = format!("SELECT COUNT(*) FROM {}", from);
+            let query = format!("SELECT COUNT(*) FROM {from}");
             let result_set = self.query_raw(&query, &[]).await?;
             super::extract_table_rows_count(table, result_set)
         })

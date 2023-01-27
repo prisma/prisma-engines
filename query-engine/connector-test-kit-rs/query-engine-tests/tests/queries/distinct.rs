@@ -226,7 +226,7 @@ mod distinct {
 
     async fn test_user(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneUser(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneUser(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

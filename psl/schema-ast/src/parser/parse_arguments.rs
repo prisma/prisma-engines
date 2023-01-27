@@ -56,6 +56,6 @@ fn parse_named_arg(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ast::Argume
             value,
             span: ast::Span::from(pair_span),
         },
-        _ => panic!("Encountered impossible attribute arg during parsing: {:?}", pair_str),
+        _ => panic!("Encountered impossible attribute arg during parsing: {pair_str:?}"),
     }
 }

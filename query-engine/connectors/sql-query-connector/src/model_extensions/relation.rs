@@ -21,7 +21,7 @@ impl RelationFieldExt for RelationField {
         if references.len() > 1 {
             references
                 .iter()
-                .map(|to_field| format!("{}_{}", prefix, to_field))
+                .map(|to_field| format!("{prefix}_{to_field}"))
                 .map(|name| Column::from(name).table(self.as_table(ctx)))
                 .collect()
         } else {

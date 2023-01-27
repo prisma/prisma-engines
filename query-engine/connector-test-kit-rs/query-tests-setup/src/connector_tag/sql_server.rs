@@ -25,22 +25,22 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         isolation_level: Option<&'static str>,
     ) -> String {
         let database = if is_multi_schema {
-            format!("database={};schema=dbo", database)
+            format!("database={database};schema=dbo")
         } else {
-            format!("database=master;schema={}", database)
+            format!("database=master;schema={database}")
         };
 
         let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
 
         match self.version {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
-            Some(SqlServerVersion::V2022) if is_ci => format!("sqlserver://test-db-sqlserver-2022:1433;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
-            Some(SqlServerVersion::V2022) => format!("sqlserver://127.0.0.1:1435;{};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}", database),
+            Some(SqlServerVersion::V2022) if is_ci => format!("sqlserver://test-db-sqlserver-2022:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
+            Some(SqlServerVersion::V2022) => format!("sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
@@ -123,7 +123,7 @@ impl TryFrom<&str> for SqlServerVersion {
             "2017" => Self::V2017,
             "2019" => Self::V2019,
             "2022" => Self::V2022,
-            _ => return Err(TestError::parse_error(format!("Unknown SqlServer version `{}`", s))),
+            _ => return Err(TestError::parse_error(format!("Unknown SqlServer version `{s}`"))),
         };
 
         Ok(version)

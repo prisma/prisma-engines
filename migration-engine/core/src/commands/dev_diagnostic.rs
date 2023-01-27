@@ -50,13 +50,12 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
     let mut reset_reasons = Vec::new();
 
     for failed_migration_name in &output.failed_migration_names {
-        reset_reasons.push(format!("The migration `{}` failed.", failed_migration_name));
+        reset_reasons.push(format!("The migration `{failed_migration_name}` failed."));
     }
 
     for edited_migration_name in &output.edited_migration_names {
         reset_reasons.push(format!(
-            "The migration `{}` was modified after it was applied.",
-            edited_migration_name
+            "The migration `{edited_migration_name}` was modified after it was applied."
         ))
     }
 
@@ -77,7 +76,7 @@ fn check_for_reset_conditions(output: &DiagnoseMigrationHistoryOutput) -> Option
                 format!(" Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}", last_common_migration_name, unpersisted_migration_names.join(", "))
             }).unwrap_or_else(String::new);
 
-            reset_reasons.push(format!("The migrations recorded in the database diverge from the local migrations directory.{}", details))
+            reset_reasons.push(format!("The migrations recorded in the database diverge from the local migrations directory.{details}"))
         },
         Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names}) => reset_reasons.push(
            format!("The following migration(s) are applied to the database but missing from the local migrations directory: {}", unpersisted_migration_names.join(", ")),

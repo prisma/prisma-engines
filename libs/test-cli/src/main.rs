@@ -93,7 +93,7 @@ impl FromStr for DiffOutputType {
             "ddl" => Ok(Self::Ddl),
             _ => {
                 let kind = std::io::ErrorKind::InvalidInput;
-                Err(std::io::Error::new(kind, format!("Invalid output type: `{}`", s)))
+                Err(std::io::Error::new(kind, format!("Invalid output type: `{s}`")))
             }
         }
     }
@@ -302,11 +302,10 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
     let schema = format!(
         r#"
             datasource db {{
-              provider = "{}"
-              url = "{}"
+              provider = "{provider}"
+              url = "{url}"
             }}
-        "#,
-        provider, url
+        "#
     );
 
     Ok(schema)
@@ -413,7 +412,7 @@ struct DiffHost;
 
 impl migration_connector::ConnectorHost for DiffHost {
     fn print(&self, s: &str) -> BoxFuture<'_, migration_core::CoreResult<()>> {
-        print!("{}", s);
+        print!("{s}");
         Box::pin(std::future::ready(Ok(())))
     }
 }
@@ -463,6 +462,6 @@ fn init_logger() {
         .with(migration_core::TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
-        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .map_err(|err| eprintln!("Error initializing the global logger: {err}"))
         .ok();
 }
