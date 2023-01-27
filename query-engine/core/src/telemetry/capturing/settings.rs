@@ -5,14 +5,14 @@ static DEFAULT_TTL: time::Duration = time::Duration::from_secs(1800); // 30 minu
 
 #[derive(Debug, Clone, Default)]
 pub struct Settings {
-    // only capture log events from the specified log levels, the special level "query", which does not
-    // exist in the engine logging infrastructure, is shimed from any event describing a query, regardless
-    // of its level.
+    /// only capture log events from the specified log levels, the special level "query", which does not
+    /// exist in the engine logging infrastructure, is shimed from any event describing a query, regardless
+    /// of its level.
     pub(super) included_log_levels: HashSet<String>,
-    // whether to include trace spans when capturing
+    /// whether to include trace spans when capturing
     pub(super) include_traces: bool,
-    // how long to keep captured traces in memory, if by any chance the capturing breaks, a tokio task
-    // will clean captured traces after this duration. Defaults to [`DEFAULT_TTL`].
+    /// how long to keep captured traces in memory, if by any chance the capturing breaks, a tokio task
+    /// will clean captured traces after this duration. Defaults to [`DEFAULT_TTL`].
     pub(super) ttl: time::Duration,
 }
 
@@ -26,13 +26,13 @@ impl Settings {
     }
 }
 
-// As the test below shows, settings can be constructed froma comma separated string.
-// Examples: valid: `"error, warn, query, tracing"` invalid: "foo, bar baz". strings corresponding
-// passed in are trimmed and converted to lowercase. chunks corresponding to levels different from
-// those in VALID_LEVELS are ignored.
-//
-// The ttl is always the same (DEFAULT_TTL) but is there to allow for easier unit-testing of c
-// apturing logic
+/// As the test below shows, settings can be constructed from a comma separated string.
+/// Examples: valid: `"error, warn, query, tracing"` invalid: "foo, bar baz". strings corresponding
+/// passed in are trimmed and converted to lowercase. chunks corresponding to levels different from
+/// those in VALID_LEVELS are ignored.
+///
+/// The ttl is always the same (DEFAULT_TTL) but is there to allow for easier unit-testing of c
+/// apturing logic
 impl From<&str> for Settings {
     fn from(s: &str) -> Self {
         let chunks = s.split(',');
@@ -52,17 +52,14 @@ impl From<&str> for Settings {
 }
 
 impl Settings {
-    #[inline(always)]
     pub fn is_enabled(&self) -> bool {
         self.traces_enabled() || self.logs_enabled()
     }
 
-    #[inline(always)]
     pub fn traces_enabled(&self) -> bool {
         self.include_traces
     }
 
-    #[inline(always)]
     pub fn logs_enabled(&self) -> bool {
         !self.included_log_levels.is_empty()
     }
