@@ -58,18 +58,18 @@ impl HandlerError {
 
 impl From<url::ParseError> for HandlerError {
     fn from(e: url::ParseError) -> Self {
-        Self::configuration(format!("Error parsing connection string: {}", e))
+        Self::configuration(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<connection_string::Error> for HandlerError {
     fn from(e: connection_string::Error) -> Self {
-        Self::configuration(format!("Error parsing connection string: {}", e))
+        Self::configuration(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<ParseError> for HandlerError {
     fn from(e: ParseError) -> Self {
-        Self::configuration(format!("Error parsing GraphQL query: {}", e))
+        Self::configuration(format!("Error parsing GraphQL query: {e}"))
     }
 }

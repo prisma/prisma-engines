@@ -12,8 +12,8 @@ use crate::{
 };
 use sql_schema_describer::{
     mssql::MssqlSchemaExt,
-    walkers::{ColumnWalker, TableWalker},
-    ColumnId, DefaultValue,
+    walkers::{TableColumnWalker, TableWalker},
+    DefaultValue, TableColumnId,
 };
 use std::borrow::Cow;
 use std::collections::BTreeSet;
@@ -189,18 +189,18 @@ impl<'a> AlterTableConstructor<'a> {
         ));
     }
 
-    fn add_column(&mut self, column_id: ColumnId) {
+    fn add_column(&mut self, column_id: TableColumnId) {
         let column = self.tables.next.schema.walk(column_id);
         self.add_columns.push(self.renderer.render_column(column));
     }
 
-    fn drop_column(&mut self, column_id: ColumnId) {
+    fn drop_column(&mut self, column_id: TableColumnId) {
         let name = self.renderer.quote(self.tables.previous.walk(column_id).name());
 
-        self.drop_columns.push(format!("{}", name));
+        self.drop_columns.push(format!("{name}"));
     }
 
-    fn drop_and_recreate_column(&mut self, columns: Pair<ColumnId>) {
+    fn drop_and_recreate_column(&mut self, columns: Pair<TableColumnId>) {
         let columns = self.tables.walk(columns);
 
         self.drop_columns
@@ -209,7 +209,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.add_columns.push(self.renderer.render_column(columns.next));
     }
 
-    fn alter_column(&mut self, columns: Pair<ColumnId>, changes: &ColumnChanges) {
+    fn alter_column(&mut self, columns: Pair<TableColumnId>, changes: &ColumnChanges) {
         let columns = self.tables.walk(columns);
         let expanded = expand_alter_column(&columns, changes);
 
@@ -261,7 +261,7 @@ enum MsSqlAlterColumn {
     Modify,
 }
 
-fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<MsSqlAlterColumn> {
+fn expand_alter_column(columns: &Pair<TableColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<MsSqlAlterColumn> {
     let mut changes = Vec::new();
 
     // Default value changes require us to re-create the constraint, which we

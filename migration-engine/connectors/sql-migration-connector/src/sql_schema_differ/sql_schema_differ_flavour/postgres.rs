@@ -15,7 +15,7 @@ use psl::builtin_connectors::{CockroachType, PostgresType};
 use regex::RegexSet;
 use sql_schema_describer::{
     postgres::PostgresSchemaExt,
-    walkers::{ColumnWalker, IndexWalker},
+    walkers::{IndexWalker, TableColumnWalker},
 };
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
@@ -44,7 +44,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         true
     }
 
-    fn column_autoincrement_changed(&self, columns: Pair<ColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, columns: Pair<TableColumnWalker<'_>>) -> bool {
         if self.is_cockroachdb() {
             return false;
         }
@@ -52,7 +52,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
-    fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // Handle the enum cases first.
         match columns
             .map(|col| col.column_type_family_as_enum().map(|e| (e.name(), e.namespace())))
@@ -290,7 +290,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 }
 
-fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+fn cockroach_column_type_change(columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
     let previous_type: Option<&CockroachType> = columns.previous.column_native_type();
@@ -320,7 +320,7 @@ fn cockroach_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<Colum
 fn cockroach_native_type_change_riskyness(
     previous: CockroachType,
     next: CockroachType,
-    columns: Pair<ColumnWalker<'_>>,
+    columns: Pair<TableColumnWalker<'_>>,
 ) -> Option<ColumnTypeChange> {
     let covered_by_index = columns
         .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
@@ -344,7 +344,7 @@ fn cockroach_native_type_change_riskyness(
     }
 }
 
-fn postgres_column_type_change(columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+fn postgres_column_type_change(columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
     let previous_type: Option<&PostgresType> = columns.previous.column_native_type();
     let next_type: Option<&PostgresType> = columns.next.column_native_type();

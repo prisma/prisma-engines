@@ -269,7 +269,7 @@ impl OrderByBuilder {
                                     &data,
                                 ));
 
-                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", field_name), []] } } } });
+                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${field_name}"), []] } } } });
                             }
                         }
                         _ => unimplemented!("Order by aggregate only supports COUNT"),
@@ -324,13 +324,12 @@ fn unwind_aggregate_joins(
                 if let Some(next_part) = data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + 1)) {
                     additional_stages.push(doc! {
                         "$unwind": {
-                            "path": format!("${}", join_name),
+                            "path": format!("${join_name}"),
                             "preserveNullAndEmptyArrays": true
                         }
                     });
 
-                    additional_stages
-                        .push(doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part) } });
+                    additional_stages.push(doc! { "$addFields": { join_name: format!("${join_name}.{next_part}") } });
                 }
 
                 Some(additional_stages)

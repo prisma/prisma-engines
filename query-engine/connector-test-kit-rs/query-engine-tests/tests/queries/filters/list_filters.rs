@@ -1257,13 +1257,12 @@ async fn list_query(runner: &Runner, field: &str, operation: &str, comparator: &
         format!(
             r#"query {{
               findManyTestModel(where: {{
-                {}: {{ {}: {} }}
+                {field}: {{ {operation}: {comparator} }}
               }}) {{
                 id
               }}
             }}
-            "#,
-            field, operation, comparator
+            "#
         )
     );
 
@@ -1277,13 +1276,12 @@ async fn not_list_query(runner: &Runner, field: &str, operation: &str, comparato
             r#"
             query {{
                 findManyTestModel(where: {{
-                NOT: {{ {}: {{ {}: {} }} }}
+                NOT: {{ {field}: {{ {operation}: {comparator} }} }}
                 }}) {{
                 id
                 }}
             }}
-            "#,
-            field, operation, comparator
+            "#
         )
     );
 

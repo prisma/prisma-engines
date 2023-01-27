@@ -60,6 +60,6 @@ mod mongo_incorrect_fields {
     fn run_command_raw(command: serde_json::Value) -> String {
         let command = command.to_string().replace('\"', "\\\"");
 
-        format!(r#"mutation {{ runCommandRaw(command: "{}") }}"#, command)
+        format!(r#"mutation {{ runCommandRaw(command: "{command}") }}"#)
     }
 }

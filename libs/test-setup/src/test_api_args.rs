@@ -206,7 +206,7 @@ impl<'a> DatasourceBlock<'a> {
     }
 }
 fn generator_block(preview_features: &'static [&'static str]) -> String {
-    let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{}""#, pf)).collect();
+    let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{pf}""#)).collect();
 
     let preview_feature_string = if preview_features.is_empty() {
         "".to_string()
@@ -216,9 +216,8 @@ fn generator_block(preview_features: &'static [&'static str]) -> String {
 
     format!(
         r#"generator generated_test_preview_flags {{
-                 provider = "prisma-client-js"{}
-               }}"#,
-        preview_feature_string
+                 provider = "prisma-client-js"{preview_feature_string}
+               }}"#
     )
 }
 

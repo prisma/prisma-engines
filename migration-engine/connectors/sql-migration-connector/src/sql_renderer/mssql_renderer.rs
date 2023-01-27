@@ -26,7 +26,7 @@ impl MssqlFlavour {
         QuotedWithPrefix(Some(Quoted::mssql_ident(ns)), Quoted::mssql_ident(name))
     }
 
-    fn render_column(&self, column: sql::ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: sql::TableColumnWalker<'_>) -> String {
         let column_name = Quoted::mssql_ident(column.name());
 
         let r#type = render_column_type(column);
@@ -55,7 +55,7 @@ impl MssqlFlavour {
                 .unwrap_or_default()
         };
 
-        format!("{} {}{}{}", column_name, r#type, nullability, default)
+        format!("{column_name} {type}{nullability}{default}")
     }
 
     fn render_references(&self, foreign_key: sql::ForeignKeyWalker<'_>) -> String {
@@ -215,7 +215,7 @@ impl SqlRenderer for MssqlFlavour {
                 })
                 .join(",\n    ");
 
-            format!(",\n    {}", constraints)
+            format!(",\n    {constraints}")
         } else {
             String::new()
         };
@@ -358,7 +358,7 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String {
         let ns = namespace.unwrap_or_else(|| self.schema_name());
-        let with_schema = format!("{}.{}", ns, name);
+        let with_schema = format!("{ns}.{name}");
 
         format!(
             "EXEC SP_RENAME N{}, N{}",
@@ -462,17 +462,17 @@ impl SqlRenderer for MssqlFlavour {
     }
 }
 
-fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: sql::TableColumnWalker<'_>) -> Cow<'static, str> {
     fn format_u32_arg(arg: Option<u32>) -> String {
         match arg {
             None => "".to_string(),
-            Some(x) => format!("({})", x),
+            Some(x) => format!("({x})"),
         }
     }
     fn format_type_param(arg: Option<MsSqlTypeParameter>) -> String {
         match arg {
             None => "".to_string(),
-            Some(MsSqlTypeParameter::Number(x)) => format!("({})", x),
+            Some(MsSqlTypeParameter::Number(x)) => format!("({x})"),
             Some(MsSqlTypeParameter::Max) => "(max)".to_string(),
         }
     }
@@ -490,7 +490,7 @@ fn render_column_type(column: sql::ColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::SmallInt => "SMALLINT".into(),
         MsSqlType::Int => "INT".into(),
         MsSqlType::BigInt => "BIGINT".into(),
-        MsSqlType::Decimal(Some((p, s))) => format!("DECIMAL({p},{s})", p = p, s = s).into(),
+        MsSqlType::Decimal(Some((p, s))) => format!("DECIMAL({p},{s})").into(),
         MsSqlType::Decimal(None) => "DECIMAL".into(),
         MsSqlType::Money => "MONEY".into(),
         MsSqlType::SmallMoney => "SMALLMONEY".into(),

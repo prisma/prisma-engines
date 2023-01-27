@@ -10,7 +10,7 @@ use prisma_value::PrismaValue;
 use psl::datamodel_connector::Connector;
 use sql::{
     postgres::{ExtensionWalker, PostgresSchemaExt},
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ViewWalker,
 };
 use sql_schema_describer::{
@@ -248,8 +248,8 @@ impl SchemaAssertion {
             self.print_context();
             println!(
                 "The schema was expected to have {} tables, but {} were found.",
-                format!("{}", expected_count).green(),
-                format!("{}", actual_count).red()
+                format!("{expected_count}").green(),
+                format!("{actual_count}").red()
             );
 
             print_tables(&self.schema);
@@ -268,8 +268,8 @@ impl SchemaAssertion {
             self.print_context();
             println!(
                 "The schema was expected to have {} views, but {} were found.",
-                format!("{}", expected_count).green(),
-                format!("{}", actual_count).red()
+                format!("{expected_count}").green(),
+                format!("{actual_count}").red()
             );
 
             println!("\n  {}", "Views in database:".italic());
@@ -363,15 +363,13 @@ impl<'a> TableAssertion<'a> {
         assert!(
             columns_count == n,
             "Assertion failed. Expected {n} columns, found {columns_count}.",
-            n = n,
-            columns_count = columns_count,
         );
         self
     }
 
     pub fn assert_foreign_keys_count(self, n: usize) -> Self {
         let fk_count = self.table.foreign_key_count();
-        assert!(fk_count == n, "Expected {} foreign keys, found {}.", n, fk_count);
+        assert!(fk_count == n, "Expected {n} foreign keys, found {fk_count}.");
         self
     }
 
@@ -453,9 +451,7 @@ impl<'a> TableAssertion<'a> {
 
         assert!(
             actual_count == count,
-            "Assertion failed: expected {} columns, found {}",
-            count,
-            actual_count,
+            "Assertion failed: expected {count} columns, found {actual_count}",
         );
 
         self
@@ -487,7 +483,7 @@ impl<'a> TableAssertion<'a> {
     #[track_caller]
     pub fn assert_indexes_count(self, n: usize) -> Self {
         let idx_count = self.table.indexes().filter(|idx| !idx.is_primary_key()).count();
-        assert!(idx_count == n, "Expected {} indexes, found {}.", n, idx_count);
+        assert!(idx_count == n, "Expected {n} indexes, found {idx_count}.");
         self
     }
 
@@ -520,13 +516,13 @@ impl<'a> TableAssertion<'a> {
         {
             self
         } else {
-            panic!("Could not find index with name {} and correct type", name);
+            panic!("Could not find index with name {name} and correct type");
         }
     }
 }
 
 pub struct ColumnAssertion<'a> {
-    column: ColumnWalker<'a>,
+    column: TableColumnWalker<'a>,
 }
 
 impl<'a> ColumnAssertion<'a> {
@@ -556,9 +552,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             self.column.default().map(|d| d.kind()) == expected.as_ref(),
-            "Assertion failed. Expected default: {:?}, but found {:?}",
-            expected,
-            found
+            "Assertion failed. Expected default: {expected:?}, but found {found:?}"
         );
 
         self
@@ -572,9 +566,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == expected,
-            "Assertion failed. Expected default constraint name: {:?}, but found {:?}",
-            expected,
-            found
+            "Assertion failed. Expected default constraint name: {expected:?}, but found {found:?}"
         );
 
         this
@@ -613,10 +605,7 @@ impl<'a> ColumnAssertion<'a> {
                 expected,
                 val
             ),
-            other => panic!(
-                "Assertion failed. Expected default: {:?}, but found {:?}",
-                expected, other
-            ),
+            other => panic!("Assertion failed. Expected default: {expected:?}, but found {other:?}"),
         }
 
         self
@@ -633,10 +622,7 @@ impl<'a> ColumnAssertion<'a> {
                 expected,
                 val
             ),
-            other => panic!(
-                "Assertion failed. Expected default: {:?}, but found {:?}",
-                expected, other
-            ),
+            other => panic!("Assertion failed. Expected default: {expected:?}, but found {other:?}"),
         }
 
         self
@@ -682,8 +668,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == &sql_schema_describer::ColumnTypeFamily::BigInt,
-            "Assertion failed. Expected a BigInt column, got {:?}.",
-            found
+            "Assertion failed. Expected a BigInt column, got {found:?}."
         );
 
         self
@@ -694,8 +679,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == &sql_schema_describer::ColumnTypeFamily::Binary,
-            "Assertion failed. Expected a bytes column, got {:?}.",
-            found
+            "Assertion failed. Expected a bytes column, got {found:?}."
         );
 
         self
@@ -706,8 +690,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == &sql_schema_describer::ColumnTypeFamily::Decimal,
-            "Assertion failed. Expected a decimal column, got {:?}.",
-            found
+            "Assertion failed. Expected a decimal column, got {found:?}."
         );
 
         self
@@ -719,8 +702,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             matches!(found, sql_schema_describer::ColumnTypeFamily::Enum(_)),
-            "Assertion failed. Expected an enum column, got {:?}.",
-            found
+            "Assertion failed. Expected an enum column, got {found:?}."
         );
 
         self
@@ -731,8 +713,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == &sql_schema_describer::ColumnTypeFamily::String,
-            "Assertion failed. Expected a string column, got {:?}.",
-            found
+            "Assertion failed. Expected a string column, got {found:?}."
         );
 
         self
@@ -743,8 +724,7 @@ impl<'a> ColumnAssertion<'a> {
 
         assert!(
             found == &sql_schema_describer::ColumnTypeFamily::Int,
-            "Assertion failed. Expected an integer column, got {:?}.",
-            found
+            "Assertion failed. Expected an integer column, got {found:?}."
         );
 
         self
@@ -838,7 +818,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
             .pk
             .columns()
             .find(|c| c.name() == column_name)
-            .unwrap_or_else(|| panic!("Could not find column {}", column_name));
+            .unwrap_or_else(|| panic!("Could not find column {column_name}"));
 
         f(IndexColumnAssertion {
             length: col.length(),
@@ -909,9 +889,7 @@ impl<'a> ForeignKeyAssertion<'a> {
         assert!(
             self.is_same_table_name(self.fk.referenced_table().name(), table)
                 && self.fk.referenced_columns().map(|c| c.name()).collect::<Vec<_>>() == columns,
-            r#"Assertion failed. Expected reference to "{}" ({:?})."#,
-            table,
-            columns,
+            r#"Assertion failed. Expected reference to "{table}" ({columns:?})."#,
         );
 
         self

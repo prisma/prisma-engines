@@ -173,8 +173,7 @@ pub(super) fn field<'db>(
                 Some("Asc") => Some(SortOrder::Asc),
                 Some(other) => {
                     ctx.push_attribute_validation_error(&format!(
-                        "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
-                        other
+                        "The `sort` argument can only be `Asc` or `Desc` you provided: {other}."
                     ));
                     None
                 }

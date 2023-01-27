@@ -1,5 +1,5 @@
 use crate::{
-    datamodel_calculator::InputContext,
+    datamodel_calculator::DatamodelCalculatorContext,
     pair::{ModelPair, Pair},
 };
 use psl::{
@@ -45,21 +45,21 @@ impl<'a> InlineRelationField<'a> {
         self.next.constrained_columns().any(|col| !col.arity().is_required())
     }
 
-    fn model(self, context: InputContext<'a>) -> ModelPair<'a> {
+    fn model(self, context: &'a DatamodelCalculatorContext<'a>) -> ModelPair<'a> {
         let previous = self.previous.map(|prev| prev.model());
         let next = self.next.table();
 
         Pair::new(context, previous, next)
     }
 
-    fn referenced_model(self, context: InputContext<'a>) -> ModelPair<'a> {
+    fn referenced_model(self, context: &'a DatamodelCalculatorContext<'a>) -> ModelPair<'a> {
         let previous = self.previous.map(|prev| prev.related_model());
         let next = self.next.referenced_table();
 
         Pair::new(context, previous, next)
     }
 
-    fn default_constraint_name(self, context: InputContext<'a>) -> String {
+    fn default_constraint_name(self, context: &DatamodelCalculatorContext<'a>) -> String {
         let connector = context.active_connector();
         let cols: Vec<_> = self.next.constrained_columns().map(|c| c.name()).collect();
         ConstraintNames::foreign_key_constraint_name(self.next.table().name(), &cols, connector)
@@ -86,21 +86,27 @@ struct EmulatedRelationField<'a> {
 
 #[derive(Clone, Copy)]
 enum RelationType<'a> {
+    /// At least one of the sides is not array.
     Inline(InlineRelationField<'a>),
+    /// Both sides are arrays.
     Many2Many(Many2ManyRelationField<'a>),
+    /// Copied from the PSL. Used either
+    /// when handling the referential integrity
+    /// in the query engine, or when using a relation
+    /// attribute to or from a view.
     Emulated(EmulatedRelationField<'a>),
 }
 
 #[derive(Clone, Copy)]
 pub(crate) struct RelationFieldPair<'a> {
     relation_type: RelationType<'a>,
-    context: InputContext<'a>,
+    context: &'a DatamodelCalculatorContext<'a>,
 }
 
 impl<'a> RelationFieldPair<'a> {
     /// Create a new inline relation field to the wanted direction.
     pub(crate) fn inline(
-        context: InputContext<'a>,
+        context: &'a DatamodelCalculatorContext<'a>,
         previous: Option<walkers::RelationFieldWalker<'a>>,
         next: sql::ForeignKeyWalker<'a>,
         direction: RelationFieldDirection,
@@ -120,7 +126,7 @@ impl<'a> RelationFieldPair<'a> {
     /// Create a new many to many relation field to the wanted
     /// direction.
     pub(crate) fn m2m(
-        context: InputContext<'a>,
+        context: &'a DatamodelCalculatorContext<'a>,
         next: sql::ForeignKeyWalker<'a>,
         direction: RelationFieldDirection,
     ) -> Self {
@@ -133,8 +139,11 @@ impl<'a> RelationFieldPair<'a> {
     }
 
     /// Create a new emulated relation field, if using `relationMode`
-    /// `prisma`.
-    pub(crate) fn emulated(context: InputContext<'a>, previous: walkers::RelationFieldWalker<'a>) -> Self {
+    /// `prisma` (or, for now, if having a relation in a view).
+    pub(crate) fn emulated(
+        context: &'a DatamodelCalculatorContext<'a>,
+        previous: walkers::RelationFieldWalker<'a>,
+    ) -> Self {
         let relation_type = EmulatedRelationField { previous };
 
         Self {
@@ -226,7 +235,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .constrained_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)
@@ -246,7 +255,7 @@ impl<'a> RelationFieldPair<'a> {
                 let iter = field
                     .next
                     .referenced_columns()
-                    .map(move |c| self.context.column_prisma_name(c.id).prisma_name());
+                    .map(move |c| self.context.table_column_prisma_name(c.id).prisma_name());
 
                 let iter: Box<dyn Iterator<Item = Cow<'a, str>>> = Box::new(iter);
                 Some(iter)

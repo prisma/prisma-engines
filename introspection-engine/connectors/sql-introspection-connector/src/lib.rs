@@ -11,6 +11,7 @@
 //! - By using the `Pair` apis, create a rendering structure together
 //!   with possible warnings utilizing the `datamodel-renderer`
 //!   crate in the [`rendering`] module.
+//! - Analyze the PSL and SQL schemas, trigger warnings if needed.
 //! - Check the Prisma version to warn and guide people upgrading
 //!   from older versions of Prisma.
 //! - Convert the rendering structure into a string. Reformat the
@@ -24,17 +25,18 @@
 #![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 pub mod datamodel_calculator; // only exported to be able to unit test it
-mod pair;
 
 mod error;
 mod introspection_helpers;
 mod introspection_map;
+mod pair;
 mod rendering;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
+use datamodel_calculator::DatamodelCalculatorContext;
 pub use error::*;
 
 use self::sanitize_datamodel_names::*;
@@ -76,7 +78,7 @@ impl SqlIntrospectionConnector {
 
                     ConnectorError {
                         user_facing_error: Some(known),
-                        kind: ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
+                        kind: ErrorKind::InvalidDatabaseUrl(format!("{err} in database URL")),
                     }
                 })
         })?;
@@ -209,7 +211,7 @@ impl SqlFamilyTrait for IntrospectionContext {
     }
 }
 
-impl SqlFamilyTrait for datamodel_calculator::InputContext<'_> {
+impl SqlFamilyTrait for DatamodelCalculatorContext<'_> {
     fn sql_family(&self) -> SqlFamily {
         self.sql_family
     }

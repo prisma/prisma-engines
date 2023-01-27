@@ -180,7 +180,7 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
-    let error = parse_unwrap_err(&format!("{}\n{}", SQLITE_SOURCE, dml));
+    let error = parse_unwrap_err(&format!("{SQLITE_SOURCE}\n{dml}"));
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `json` in model `User`: Field `json` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
@@ -195,13 +195,13 @@ fn json_type_must_work_for_some_connectors() {
     expectation.assert_eq(&error);
 
     // Postgres does support it
-    parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
+    parse(&format!("{POSTGRES_SOURCE}\n{dml}"))
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
     // MySQL does support it
-    parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
+    parse(&format!("{MYSQL_SOURCE}\n{dml}"))
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);

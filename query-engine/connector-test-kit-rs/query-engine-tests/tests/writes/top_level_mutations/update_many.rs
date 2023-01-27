@@ -286,12 +286,11 @@ mod update_many {
                 r#"mutation {{
                   updateManyTestModel(
                     where: {{}}
-                    data: {{ {}: {{ {}: {} }} }}
+                    data: {{ {field}: {{ {op}: {value} }} }}
                   ){{
                     count
                   }}
-                }}"#,
-                field, op, value
+                }}"#
             )
         );
 
@@ -302,13 +301,13 @@ mod update_many {
             assert_eq!(count, 3);
         }
 
-        let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
+        let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {field} }} }}"#));
         Ok(res)
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

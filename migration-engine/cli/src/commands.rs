@@ -34,7 +34,7 @@ impl Cli {
                         }),
                     })
                     .await?;
-                Ok(format!("Database '{}' was successfully created.", database_name))
+                Ok(format!("Database '{database_name}' was successfully created."))
             }
             CliCommand::CanConnectToDatabase => {
                 api.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {

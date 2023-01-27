@@ -217,7 +217,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
+        format!(r#"ALTER TABLE "{name}" RENAME TO "{new_name}""#)
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
@@ -310,7 +310,7 @@ fn copy_current_table_into_new_table(
     steps.push(query)
 }
 
-fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
+fn render_column<'a>(column: &TableColumnWalker<'a>) -> ddl::Column<'a> {
     sql_ddl::sqlite::Column {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column

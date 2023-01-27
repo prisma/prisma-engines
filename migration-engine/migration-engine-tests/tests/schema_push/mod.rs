@@ -200,7 +200,7 @@ fn alter_constraint_name_push(api: TestApi) {
     let custom_dm = format!(
         r#"
          model A {{
-           id   Int    @id{}
+           id   Int    @id{singular_id}
            name String @unique(map: "CustomUnique")
            a    String
            b    String
@@ -212,12 +212,11 @@ fn alter_constraint_name_push(api: TestApi) {
            a   String
            b   String
            aId Int
-           A   A      @relation("AtoB", fields: [aId], references: [id]{})
+           A   A      @relation("AtoB", fields: [aId], references: [id]{no_named_fk})
            @@index([a,b], map: "AnotherCustomIndex")
-           @@id([a, b]{})
+           @@id([a, b]{compound_id})
          }}
-     "#,
-        singular_id, no_named_fk, compound_id
+     "#
     );
 
     api.schema_push_w_datasource(custom_dm).send().assert_green();

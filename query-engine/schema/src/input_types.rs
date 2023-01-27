@@ -204,9 +204,9 @@ impl Debug for InputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().identifier.name()),
-            InputType::Scalar(s) => write!(f, "{:?}", s),
-            InputType::Enum(e) => write!(f, "{:?}", e),
-            InputType::List(l) => write!(f, "{:?}", l),
+            InputType::Scalar(s) => write!(f, "{s:?}"),
+            InputType::Enum(e) => write!(f, "{e:?}"),
+            InputType::List(l) => write!(f, "{l:?}"),
         }
     }
 }

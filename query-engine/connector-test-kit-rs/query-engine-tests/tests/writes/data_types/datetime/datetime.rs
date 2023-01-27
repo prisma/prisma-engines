@@ -72,7 +72,7 @@ mod datetime {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOnePerson(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOnePerson(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

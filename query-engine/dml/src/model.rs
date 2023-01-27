@@ -435,7 +435,7 @@ impl Model {
         let model_name = &self.name.clone();
         self.scalar_fields_mut()
             .find(|rf| rf.name == *name)
-            .unwrap_or_else(|| panic!("Could not find scalar field {} on model {}.", name, model_name))
+            .unwrap_or_else(|| panic!("Could not find scalar field {name} on model {model_name}."))
     }
 
     /// Finds a relation field by name and returns a mutable reference.
@@ -444,7 +444,7 @@ impl Model {
         let model_name = &self.name.clone();
         self.relation_fields_mut()
             .find(|rf| rf.name == *name)
-            .unwrap_or_else(|| panic!("Could not find relation field {} on model {}.", name, model_name))
+            .unwrap_or_else(|| panic!("Could not find relation field {name} on model {model_name}."))
     }
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.

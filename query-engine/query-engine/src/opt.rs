@@ -223,11 +223,11 @@ fn parse_base64_string(s: &str) -> PrismaResult<String> {
 }
 
 fn load_datamodel_file(path: &OsStr) -> String {
-    let mut f = File::open(path).unwrap_or_else(|_| panic!("Could not open datamodel file {:?}", path));
+    let mut f = File::open(path).unwrap_or_else(|_| panic!("Could not open datamodel file {path:?}"));
     let mut datamodel = String::new();
 
     f.read_to_string(&mut datamodel)
-        .unwrap_or_else(|_| panic!("Could not read datamodel file: {:?}", path));
+        .unwrap_or_else(|_| panic!("Could not read datamodel file: {path:?}"));
 
     datamodel
 }

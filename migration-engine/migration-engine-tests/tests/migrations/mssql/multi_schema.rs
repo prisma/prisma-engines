@@ -424,7 +424,7 @@ fn multi_schema_tests(_api: TestApi) {
           @@schema("two")
         } "#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushCustomAnd(CustomPushStep {
                                warnings: &[] ,
@@ -781,7 +781,7 @@ fn multi_schema_tests(_api: TestApi) {
           @@schema("two")
         } "#}.into()),
             },
-            namespaces: &namespaces,
+            namespaces,
             schema_push: SchemaPush::PushAnd(WithSchema::First,
                            &SchemaPush::PushAnd(WithSchema::Second,
                               &SchemaPush::Done)),
@@ -1126,7 +1126,7 @@ fn multi_schema_migration(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("init", &dm, &dir).send_sync();
+    api.create_migration("init", dm, &dir).send_sync();
 
     api.apply_migrations(&dir)
         .send_sync()

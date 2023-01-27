@@ -40,6 +40,11 @@ impl<'db> RelationFieldWalker<'db> {
         self.field_id
     }
 
+    /// The relation starts or ends to a view.
+    pub fn one_side_is_view(self) -> bool {
+        self.model().ast_model().is_view() || self.related_model().ast_model().is_view()
+    }
+
     /// The foreign key name of the relation (`@relation(map: ...)`).
     pub fn mapped_name(self) -> Option<&'db str> {
         self.attributes().mapped_name.map(|string_id| &self.db[string_id])
@@ -245,9 +250,9 @@ impl<'db> std::hash::Hash for RelationName<'db> {
 impl<'db> RelationName<'db> {
     pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
-            Self::Generated(format!("{}To{}", model_a, model_b))
+            Self::Generated(format!("{model_a}To{model_b}"))
         } else {
-            Self::Generated(format!("{}To{}", model_b, model_a))
+            Self::Generated(format!("{model_b}To{model_a}"))
         }
     }
 }

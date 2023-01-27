@@ -45,7 +45,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
 
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
-                .create_migration(&format!("migration{}", count), schema, &directory)
+                .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
                 .generated_migration_name
@@ -113,8 +113,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
                 last_common_migration_name: None,
             }) if unapplied_migration_names == &["0000_initial"]
         ),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -140,8 +139,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 3),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -167,8 +165,7 @@ fn squashing_whole_migration_history_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 3),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -242,7 +239,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
 
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
-                .create_migration(&format!("migration{}", count), schema, &directory)
+                .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
                 .generated_migration_name
@@ -314,8 +311,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 2),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -342,8 +338,7 @@ fn squashing_migrations_history_at_the_start_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 2),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -394,7 +389,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
 
         for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
-                .create_migration(&format!("migration{}", count), schema, &directory)
+                .create_migration(&format!("migration{count}"), schema, &directory)
                 .send_sync()
                 .into_output()
                 .generated_migration_name
@@ -466,8 +461,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 2),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -494,8 +488,7 @@ fn squashing_migrations_history_at_the_end_works(api: TestApi) {
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 2),
-        "got: {:#?}",
-        history
+        "got: {history:#?}"
     );
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());

@@ -8,7 +8,11 @@ use std::borrow::Cow;
 
 use super::{IdPair, IndexPair, Pair, RelationFieldDirection, RelationFieldPair, ScalarFieldPair};
 
-pub(crate) type ModelPair<'a> = Pair<'a, walkers::ModelWalker<'a>, sql::TableWalker<'a>>;
+/// Comparing a possible PSL model definition
+/// to a table in a database. For re-introspection
+/// some values will be copied from the previons
+/// data model.
+pub(crate) type ModelPair<'a> = Pair<'a, Option<walkers::ModelWalker<'a>>, sql::TableWalker<'a>>;
 
 impl<'a> ModelPair<'a> {
     /// The position of the model from the PSL, if existing. Used for
@@ -25,11 +29,7 @@ impl<'a> ModelPair<'a> {
 
     /// The namespace of the model, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        if self.context.uses_namespaces() {
-            self.next.namespace()
-        } else {
-            None
-        }
+        self.context.uses_namespaces().then(|| self.next.namespace()).flatten()
     }
 
     /// Name of the model in the PSL. The value can be sanitized if it
@@ -46,8 +46,10 @@ impl<'a> ModelPair<'a> {
     }
 
     /// True, if the name of the model is using a reserved identifier.
+    /// If we already have a model in the PSL, the validation will not
+    /// allow reserved names and we don't need to warn the user.
     pub(crate) fn uses_reserved_name(self) -> bool {
-        psl::is_reserved_type_name(self.next.name())
+        psl::is_reserved_type_name(self.next.name()) && self.previous.is_none()
     }
 
     /// The documentation on top of the enum.
@@ -58,8 +60,8 @@ impl<'a> ModelPair<'a> {
     /// Iterating over the scalar fields.
     pub(crate) fn scalar_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldPair<'a>> {
         self.next.columns().map(move |next| {
-            let previous = self.context.existing_scalar_field(next.id);
-            Pair::new(self.context, previous, next)
+            let previous = self.context.existing_table_scalar_field(next.id);
+            Pair::new(self.context, previous, next.coarsen())
         })
     }
 
@@ -86,10 +88,29 @@ impl<'a> ModelPair<'a> {
                 .m2m_relations_for_table(self.table_id())
                 .map(move |(direction, next)| RelationFieldPair::m2m(self.context, next, direction));
 
-            Box::new(inline.chain(m2m))
+            match self.previous {
+                Some(prev) => {
+                    // View relations are currently a bit special.
+                    // We do not have foreign keys that point to or start
+                    // from a view. The client needs the relations to do
+                    // joins, so now we just copy them from the PSL
+                    // in re-introspection.
+                    let view_relations = prev
+                        .relation_fields()
+                        .filter(|rf| rf.one_side_is_view())
+                        .filter(move |rf| !self.context.table_missing_for_model(&rf.related_model().id))
+                        .filter(move |rf| !self.context.view_missing_for_model(&rf.related_model().id))
+                        .map(move |previous| RelationFieldPair::emulated(self.context, previous));
+
+                    Box::new(inline.chain(m2m).chain(view_relations))
+                }
+                None => Box::new(inline.chain(m2m)),
+            }
         } else {
             match self.previous {
                 Some(prev) => {
+                    // If not using foreign keys, the relation fields
+                    // are copied from the previous PSL.
                     let fields = prev
                         .relation_fields()
                         .filter(move |rf| !self.context.table_missing_for_model(&rf.related_model().id))
@@ -135,10 +156,15 @@ impl<'a> ModelPair<'a> {
     /// explicitly sets the model attribute, or if the model has no
     /// usable identifiers.
     pub(crate) fn ignored(self) -> bool {
-        let explicit_ignore = self.previous.map(|model| model.is_ignored()).unwrap_or(false);
+        let explicit_ignore = self.ignored_in_psl();
         let implicit_ignore = !self.has_usable_identifier() && self.scalar_fields().len() > 0;
 
         explicit_ignore || implicit_ignore
+    }
+
+    /// If the model is already marked as ignored in the PSL.
+    pub(crate) fn ignored_in_psl(self) -> bool {
+        self.previous.map(|model| model.is_ignored()).unwrap_or(false)
     }
 
     /// Returns an iterator over all indexes of the model,
@@ -168,7 +194,7 @@ impl<'a> ModelPair<'a> {
                     })
                 });
 
-                Pair::new(self.context, previous, next)
+                Pair::new(self.context, previous, Some(next))
             })
     }
 
@@ -181,7 +207,7 @@ impl<'a> ModelPair<'a> {
             .filter(|pk| pk.columns().len() > 1)
             .and_then(move |pk| {
                 let id = self.previous.and_then(|model| model.primary_key());
-                let pair = Pair::new(self.context, id, pk);
+                let pair = Pair::new(self.context, id, Some(pk));
 
                 (!pair.defined_in_a_field()).then_some(pair)
             })

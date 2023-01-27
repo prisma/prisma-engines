@@ -270,7 +270,7 @@ mod non_embedded_upsert {
     }
 
     async fn count_items(runner: &Runner, name: &str) -> TestResult<usize> {
-        let res = run_query_json!(runner, format!("query {{ {} {{ id }} }}", name));
+        let res = run_query_json!(runner, format!("query {{ {name} {{ id }} }}"));
         let count = &res["data"][name];
 
         match count {

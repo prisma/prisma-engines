@@ -214,7 +214,7 @@ impl std::fmt::Display for TypeIdentifier {
             TypeIdentifier::Float => write!(f, "Float"),
             TypeIdentifier::Decimal => write!(f, "Decimal"),
             TypeIdentifier::Boolean => write!(f, "Bool"),
-            TypeIdentifier::Enum(e) => write!(f, "Enum{}", e),
+            TypeIdentifier::Enum(e) => write!(f, "Enum{e}"),
             TypeIdentifier::UUID => write!(f, "UUID"),
             TypeIdentifier::Json => write!(f, "Json"),
             TypeIdentifier::Xml => write!(f, "Xml"),

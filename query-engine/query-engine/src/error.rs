@@ -107,13 +107,13 @@ impl From<Diagnostics> for PrismaError {
 
 impl From<url::ParseError> for PrismaError {
     fn from(e: url::ParseError) -> PrismaError {
-        PrismaError::ConfigurationError(format!("Error parsing connection string: {}", e))
+        PrismaError::ConfigurationError(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<connection_string::Error> for PrismaError {
     fn from(e: connection_string::Error) -> PrismaError {
-        PrismaError::ConfigurationError(format!("Error parsing connection string: {}", e))
+        PrismaError::ConfigurationError(format!("Error parsing connection string: {e}"))
     }
 }
 
@@ -137,13 +137,13 @@ impl From<std::string::FromUtf8Error> for PrismaError {
 
 impl From<base64::DecodeError> for PrismaError {
     fn from(e: base64::DecodeError) -> PrismaError {
-        PrismaError::ConfigurationError(format!("Invalid base64: {}", e))
+        PrismaError::ConfigurationError(format!("Invalid base64: {e}"))
     }
 }
 
 impl From<GqlParseError> for PrismaError {
     fn from(e: GqlParseError) -> PrismaError {
-        PrismaError::QueryConversionError(format!("Error parsing GraphQL query: {}", e))
+        PrismaError::QueryConversionError(format!("Error parsing GraphQL query: {e}"))
     }
 }
 

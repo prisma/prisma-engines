@@ -114,7 +114,7 @@ impl SqlError {
                 ConnectorError {
                     user_facing_error,
                     kind: ErrorKind::TlsError {
-                        message: format!("{}", cause),
+                        message: format!("{cause}"),
                     },
                 }
             }
@@ -169,25 +169,25 @@ impl From<QuaintKind> for SqlError {
     fn from(kind: QuaintKind) -> Self {
         match kind {
             QuaintKind::DatabaseDoesNotExist { ref db_name } => Self::DatabaseDoesNotExist {
-                db_name: format!("{}", db_name),
+                db_name: format!("{db_name}"),
                 cause: kind,
             },
             QuaintKind::DatabaseAlreadyExists { ref db_name } => Self::DatabaseAlreadyExists {
-                db_name: format!("{}", db_name),
+                db_name: format!("{db_name}"),
                 cause: kind,
             },
             QuaintKind::DatabaseAccessDenied { ref db_name } => Self::DatabaseAccessDenied {
-                db_name: format!("{}", db_name),
+                db_name: format!("{db_name}"),
                 cause: kind,
             },
             QuaintKind::AuthenticationFailed { ref user } => Self::AuthenticationFailed {
-                user: format!("{}", user),
+                user: format!("{user}"),
                 cause: kind,
             },
             QuaintKind::DatabaseUrlIsInvalid(reason) => Self::DatabaseUrlIsInvalid(reason),
             e @ QuaintKind::ConnectTimeout => Self::ConnectTimeout(e),
-            e @ QuaintKind::SocketTimeout => Self::Timeout(format!("{}", e)),
-            e @ QuaintKind::PoolTimeout { .. } => Self::Timeout(format!("{}", e)),
+            e @ QuaintKind::SocketTimeout => Self::Timeout(format!("{e}")),
+            e @ QuaintKind::PoolTimeout { .. } => Self::Timeout(format!("{e}")),
             QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
             QuaintKind::TlsError { .. } => Self::TlsError { cause: kind },
             QuaintKind::UniqueConstraintViolation { ref constraint } => Self::UniqueConstraintViolation {
@@ -212,7 +212,7 @@ impl From<sql_schema_describer::DescriberError> for SqlError {
                 SqlError::QueryError(anyhow::anyhow!("{}", error))
             }
             sql_schema_describer::DescriberErrorKind::CrossSchemaReference { .. } => {
-                SqlError::CrossSchemaReference(format!("{}", error))
+                SqlError::CrossSchemaReference(format!("{error}"))
             }
         }
     }

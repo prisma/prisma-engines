@@ -32,7 +32,7 @@ impl<'a> GqlTypeRenderer<'a> {
 
             InputType::List(ref l) => {
                 let substring = self.render_input_type(l, ctx);
-                format!("[{}]", substring)
+                format!("[{substring}]")
             }
 
             InputType::Scalar(ref scalar) => {
@@ -72,7 +72,7 @@ impl<'a> GqlTypeRenderer<'a> {
 
             OutputType::List(l) => {
                 let substring = self.render_output_type(l, ctx);
-                format!("[{}]", substring)
+                format!("[{substring}]")
             }
 
             OutputType::Scalar(ref scalar) => {

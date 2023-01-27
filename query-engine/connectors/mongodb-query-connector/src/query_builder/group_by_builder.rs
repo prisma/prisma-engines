@@ -210,7 +210,7 @@ impl GroupByBuilder {
 fn aggregation_pair(op: &str, field: &ScalarFieldRef) -> (String, Bson) {
     (
         format!("{}_{}", op, field.db_name()),
-        doc! { format!("${}", op): format!("${}", field.db_name()) }.into(),
+        doc! { format!("${op}"): format!("${}", field.db_name()) }.into(),
     )
 }
 

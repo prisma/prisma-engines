@@ -257,27 +257,27 @@ impl RelationFieldAsserts for dml::RelationField {
 
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
-        self.find_model(t).unwrap_or_else(|| panic!("Model {} not found", t))
+        self.find_model(t).unwrap_or_else(|| panic!("Model {t} not found"))
     }
     fn assert_has_enum(&self, t: &str) -> &dml::Enum {
-        self.find_enum(t).unwrap_or_else(|| panic!("Enum {} not found", t))
+        self.find_enum(t).unwrap_or_else(|| panic!("Enum {t} not found"))
     }
 
     fn assert_has_composite_type(&self, t: &str) -> &dml::CompositeType {
         self.find_composite_type(t)
-            .unwrap_or_else(|| panic!("Composite type {} not found", t))
+            .unwrap_or_else(|| panic!("Composite type {t} not found"))
     }
 }
 
 impl ModelAsserts for dml::Model {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
         self.find_scalar_field(t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
         self.find_relation_field(t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
@@ -346,25 +346,25 @@ impl CompositeTypeAsserts for dml::CompositeType {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.scalar_fields()
             .find(|field| field.name == t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
     fn assert_has_enum_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.enum_fields()
             .find(|field| field.name == t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
     fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.composite_type_fields()
             .find(|field| field.name == t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
     fn assert_has_unsupported_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.unsupported_fields()
             .find(|field| field.name == t)
-            .unwrap_or_else(|| panic!("Field {} not found", t))
+            .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 }
 
@@ -372,7 +372,7 @@ impl EnumAsserts for dml::Enum {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
         self.values()
             .find(|x| x.name == t)
-            .unwrap_or_else(|| panic!("Enum Value {} not found", t))
+            .unwrap_or_else(|| panic!("Enum Value {t} not found"))
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {

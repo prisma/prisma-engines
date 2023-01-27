@@ -29,10 +29,9 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
         r#"
             datasource db {{
               provider = "postgres"
-              url      = "{}"
+              url      = "{db_url}"
             }}
-        "#,
-        db_url
+        "#
     );
 
     let error = tok(connection_error(dm));
@@ -43,7 +42,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host),
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
         "meta": {
             "database_user": user,
             "database_host": host,
@@ -64,10 +63,9 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
         r#"
             datasource db {{
               provider = "mysql"
-              url      = "{}"
+              url      = "{url}"
             }}
-        "#,
-        url
+        "#
     );
 
     let error = tok(connection_error(dm));
@@ -78,7 +76,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host, user = user),
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
         "meta": {
             "database_user": user,
             "database_host": host,
@@ -99,10 +97,9 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
         r#"
             datasource db {{
               provider = "mysql"
-              url      = "{}"
+              url      = "{url}"
             }}
-        "#,
-        url
+        "#
     );
 
     let error = tok(connection_error(dm));
@@ -113,7 +110,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
+        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
@@ -134,10 +131,9 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
         r#"
             datasource db {{
               provider = "postgres"
-              url      = "{}"
+              url      = "{url}"
             }}
-        "#,
-        url
+        "#
     );
 
     let error = tok(connection_error(dm));
@@ -148,7 +144,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
+        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
@@ -164,16 +160,15 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
     let database_name = "notmydatabase";
 
-    url.set_path(&format!("/{}", database_name));
+    url.set_path(&format!("/{database_name}"));
 
     let dm = format!(
         r#"
             datasource db {{
               provider = "mysql"
-              url      = "{}"
+              url      = "{url}"
             }}
-        "#,
-        url
+        "#
     );
 
     let error = tok(connection_error(dm));
@@ -240,10 +235,9 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
             r#"
                 datasource db {{
                     provider = "mysql"
-                    url = "{}"
+                    url = "{url}"
                 }}
-            "#,
-            url
+            "#
         );
 
         // "mysql" is the default in Quaint.
@@ -254,7 +248,7 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
 
         let expected = json!({
             "is_panic": false,
-            "message": format!("The `{}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.", name),
+            "message": format!("The `{name}` database is a system database, it should not be altered with prisma migrate. Please connect to another database."),
             "meta": {
                 "database_name": name,
             },

@@ -16,7 +16,7 @@ impl DatamodelRenderer for SqlDatamodelRenderer {
 
     fn render_m2m(&self, m2m: M2mFragment) -> String {
         let relation_directive = match m2m.relation_name {
-            Some(name) => format!(r#"@relation(name: "{}")"#, name),
+            Some(name) => format!(r#"@relation(name: "{name}")"#),
             None => "".to_owned(),
         };
 

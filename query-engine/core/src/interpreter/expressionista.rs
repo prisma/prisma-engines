@@ -348,8 +348,7 @@ impl Expressionista {
                                     let binding = match env.get(&parent_binding_name) {
                                         Some(binding) => Ok(binding),
                                         None => Err(InterpreterError::EnvVarNotFound(format!(
-                                            "Expected parent binding '{}' to be present.",
-                                            parent_binding_name
+                                            "Expected parent binding '{parent_binding_name}' to be present."
                                         ))),
                                     }?;
 
@@ -365,7 +364,7 @@ impl Expressionista {
 
                                     res.map_err(|err| {
                                         InterpreterError::InterpretationError(
-                                            format!("Error for binding '{}'", parent_binding_name),
+                                            format!("Error for binding '{parent_binding_name}'"),
                                             Some(Box::new(err)),
                                         )
                                     })

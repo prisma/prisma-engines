@@ -48,10 +48,9 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             r#"
                 datasource db {{
                     provider = "postgresql"
-                    url = "{}"
+                    url = "{url}"
                 }}
-                "#,
-            url
+                "#
         );
 
         let me = migration_api(Some(schema.clone()), None).unwrap();

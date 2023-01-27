@@ -1,17 +1,14 @@
 //! The `@default` attribute rendering.
 
-use crate::{
-    pair::{DefaultKind, ScalarFieldPair},
-    warnings::Warnings,
-};
+use crate::pair::{DefaultKind, DefaultValuePair};
 use datamodel_renderer::{
     datamodel as renderer,
     value::{Constant, Function, Text, Value},
 };
 
 /// Render a default value for the given scalar field.
-pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> Option<renderer::DefaultValue<'a>> {
-    let mut rendered = match field.default().kind() {
+pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultValue<'_>> {
+    let mut rendered = match default.kind() {
         Some(kind) => match kind {
             DefaultKind::Sequence(sequence) => {
                 let mut fun = Function::new("sequence");
@@ -73,30 +70,14 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
                 let vals = vals.into_iter().map(Value::from).collect();
                 Some(renderer::DefaultValue::array(vals))
             }
-            DefaultKind::Prisma1Uuid => {
-                let warn = crate::warnings::ModelAndField {
-                    model: field.model().name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.prisma_1_uuid_defaults.push(warn);
-                Some(renderer::DefaultValue::function(Function::new("uuid")))
-            }
-            DefaultKind::Prisma1Cuid => {
-                let warn = crate::warnings::ModelAndField {
-                    model: field.model().name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.prisma_1_cuid_defaults.push(warn);
-                Some(renderer::DefaultValue::function(Function::new("cuid")))
-            }
+            DefaultKind::Prisma1Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
+            DefaultKind::Prisma1Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
         },
         None => None,
     };
 
     if let Some(res) = rendered.as_mut() {
-        if let Some(mapped_name) = field.default().mapped_name() {
+        if let Some(mapped_name) = default.mapped_name() {
             res.map(mapped_name);
         }
     }

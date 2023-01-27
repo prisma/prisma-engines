@@ -515,7 +515,7 @@ mod multi_field_uniq_mut {
 
     async fn create_user(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneUser(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneUser(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -523,7 +523,7 @@ mod multi_field_uniq_mut {
 
     async fn create_blog(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneBlog(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneBlog(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

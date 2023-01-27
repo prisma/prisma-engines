@@ -91,7 +91,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent_3 = parent_3, child_3 = child_3)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c3"}}}}"###
         );
 
@@ -102,7 +102,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, other_parent_with_child = other_parent_with_child)),
+          }}"#)),
           @r###"{"data":{"findUniqueParent":{"childOpt":{"c":"otherChild"}}}}"###
         );
 
@@ -111,7 +111,7 @@ mod connect_inside_update {
               findUniqueChild(where: {loose_child}){{
                 c
               }}
-            }}"#, loose_child = loose_child)),
+            }}"#)),
           @r###"{"data":{"findUniqueChild":{"c":"looseChild"}}}"###
         );
 
@@ -158,7 +158,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent_1 = parent_1, child_1 = child_1)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -210,7 +210,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -264,7 +264,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child_id = child_id)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -318,7 +318,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -329,7 +329,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -414,7 +414,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"},{"c":"c3"}]}}}"###
         );
 
@@ -428,8 +428,7 @@ mod connect_inside_update {
                             c
                         }}
                     }}
-                }}"#,
-                other_parent_with_child = other_parent_with_child
+                }}"#
             ),
             &["data", "findUniqueParent", "childrenOpt", "[0]", "c"]
         )
@@ -496,7 +495,7 @@ mod connect_inside_update {
                     c
                   }}
                 }}
-              }}"#, parent = parent, child = child),
+              }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -538,7 +537,7 @@ mod connect_inside_update {
                   c
                 }}
               }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c2"}}}}"###
         );
 
@@ -579,7 +578,7 @@ mod connect_inside_update {
                   c
                 }}
               }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c2"}}}}"###
         );
 
@@ -638,7 +637,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -690,7 +689,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -745,7 +744,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -807,7 +806,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childReq":{"c":"c1"}}}}"###
         );
 
@@ -867,7 +866,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childReq":{"c":"c1"}}}}"###
         );
 
@@ -929,7 +928,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -984,7 +983,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -1051,7 +1050,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, children = children)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c3"},{"c":"c4"}]}}}"###
         );
 
@@ -1106,7 +1105,7 @@ mod connect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 

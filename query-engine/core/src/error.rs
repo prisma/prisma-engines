@@ -78,8 +78,7 @@ pub enum CoreError {
 impl CoreError {
     pub fn null_serialization_error(field_name: &str) -> Self {
         CoreError::SerializationError(format!(
-            "Inconsistent query result: Field {} is required to return data, got `null` instead.",
-            field_name
+            "Inconsistent query result: Field {field_name} is required to return data, got `null` instead."
         ))
     }
 
@@ -138,13 +137,13 @@ impl From<InterpreterError> for CoreError {
 
 impl From<url::ParseError> for CoreError {
     fn from(e: url::ParseError) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
+        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<connection_string::Error> for CoreError {
     fn from(e: connection_string::Error) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
+        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
     }
 }
 
@@ -256,7 +255,7 @@ impl From<CoreError> for user_facing_errors::Error {
                     })
                     .into(),
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
-                        details: format!("{}: {}", msg, cause),
+                        details: format!("{msg}: {cause}"),
                     })
                     .into(),
                 }

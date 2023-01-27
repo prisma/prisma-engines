@@ -10,6 +10,7 @@ mod field;
 mod field_type;
 mod index;
 mod model;
+mod view;
 
 pub use composite_type::CompositeType;
 pub use default::DefaultValue;
@@ -18,6 +19,7 @@ pub use field::Field;
 pub use field_type::FieldType;
 pub use index::{IdDefinition, IdFieldDefinition, IndexDefinition, IndexFieldInput, IndexOps, UniqueFieldAttribute};
 pub use model::{Model, Relation};
+pub use view::View;
 
 use std::fmt;
 
@@ -25,6 +27,7 @@ use std::fmt;
 #[derive(Default, Debug)]
 pub struct Datamodel<'a> {
     models: Vec<Model<'a>>,
+    views: Vec<View<'a>>,
     enums: Vec<Enum<'a>>,
     composite_types: Vec<CompositeType<'a>>,
 }
@@ -57,6 +60,17 @@ impl<'a> Datamodel<'a> {
         self.enums.push(r#enum);
     }
 
+    /// Add a view block to the data model.
+    ///
+    /// ```ignore
+    /// view Foo {   // <
+    ///   id Int @id // < this
+    /// }            // <
+    /// ```
+    pub fn push_view(&mut self, view: View<'a>) {
+        self.views.push(view);
+    }
+
     /// Add a composite type block to the data model.
     ///
     /// ```ignore
@@ -82,6 +96,10 @@ impl<'a> fmt::Display for Datamodel<'a> {
 
         for model in self.models.iter() {
             writeln!(f, "{model}")?;
+        }
+
+        for view in self.views.iter() {
+            writeln!(f, "{view}")?;
         }
 
         for r#enum in self.enums.iter() {
@@ -126,12 +144,21 @@ mod tests {
         traffic_light.push_variant("Yellow");
         traffic_light.push_variant("Green");
 
+        data_model.push_enum(traffic_light);
+
         let mut cat = Enum::new("Cat");
         cat.push_variant("Asleep");
         cat.push_variant("Hungry");
 
-        data_model.push_enum(traffic_light);
         data_model.push_enum(cat);
+
+        let mut view = View::new("Meow");
+        let mut field = Field::new("id", "Int");
+        field.id(IdFieldDefinition::default());
+
+        view.push_field(field);
+
+        data_model.push_view(view);
 
         let expected = expect![[r#"
             type Address {
@@ -140,6 +167,10 @@ mod tests {
 
             model User {
               id Int @id @default(autoincrement())
+            }
+
+            view Meow {
+              id Int @id
             }
 
             enum TrafficLight {

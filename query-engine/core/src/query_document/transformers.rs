@@ -31,8 +31,7 @@ impl TryFrom<ParsedInputValue> for PrismaValue {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of ParsedInputValue ({:?}) into PrismaValue failed.",
-                    v
+                    "Attempted conversion of ParsedInputValue ({v:?}) into PrismaValue failed."
                 )),
             }),
         }
@@ -48,8 +47,7 @@ impl TryFrom<ParsedInputValue> for ParsedInputMap {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-map ParsedInputValue ({:?}) into map failed.",
-                    v
+                    "Attempted conversion of non-map ParsedInputValue ({v:?}) into map failed."
                 )),
             }),
         }
@@ -66,8 +64,7 @@ impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-map ParsedInputValue ({:?}) into Option map failed.",
-                    v
+                    "Attempted conversion of non-map ParsedInputValue ({v:?}) into Option map failed."
                 )),
             }),
         }
@@ -83,8 +80,7 @@ impl TryFrom<ParsedInputValue> for ParsedInputList {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-list ParsedInputValue ({:?}) into list failed.",
-                    v
+                    "Attempted conversion of non-list ParsedInputValue ({v:?}) into list failed."
                 )),
             }),
         }
@@ -103,8 +99,7 @@ impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-list ParsedInputValue ({:?}) into prisma value list failed.",
-                    v
+                    "Attempted conversion of non-list ParsedInputValue ({v:?}) into prisma value list failed."
                 )),
             }),
         }
@@ -124,8 +119,7 @@ impl TryFrom<ParsedInputValue> for Option<String> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-String Prisma value type ({:?}) into String failed.",
-                    v
+                    "Attempted conversion of non-String Prisma value type ({v:?}) into String failed."
                 )),
             }),
         }
@@ -141,8 +135,7 @@ impl TryFrom<ParsedInputValue> for OrderBy {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-order-by enum ({:?}) into order by enum value failed.",
-                    v
+                    "Attempted conversion of non-order-by enum ({v:?}) into order by enum value failed."
                 )),
             }),
         }
@@ -158,8 +151,7 @@ impl TryFrom<ParsedInputValue> for ScalarFieldRef {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-field-ref enum ({:?}) into scalar field reference value failed.",
-                    v
+                    "Attempted conversion of non-field-ref enum ({v:?}) into scalar field reference value failed."
                 )),
             }),
         }
@@ -178,8 +170,7 @@ impl TryFrom<ParsedInputValue> for Option<f64> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-float Prisma value type ({:?}) into float failed.",
-                    v
+                    "Attempted conversion of non-float Prisma value type ({v:?}) into float failed."
                 )),
             }),
         }
@@ -198,8 +189,7 @@ impl TryFrom<ParsedInputValue> for Option<bool> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-bool Prisma value type ({:?}) into bool failed.",
-                    v
+                    "Attempted conversion of non-bool Prisma value type ({v:?}) into bool failed."
                 )),
             }),
         }
@@ -218,8 +208,7 @@ impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-DateTime Prisma value type ({:?}) into DateTime failed.",
-                    v
+                    "Attempted conversion of non-DateTime Prisma value type ({v:?}) into DateTime failed."
                 )),
             }),
         }
@@ -238,8 +227,7 @@ impl TryFrom<ParsedInputValue> for Option<i64> {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-int Prisma value type ({:?}) into int failed.",
-                    v
+                    "Attempted conversion of non-int Prisma value type ({v:?}) into int failed."
                 )),
             }),
         }
@@ -257,8 +245,7 @@ impl TryFrom<ParsedInputValue> for bool {
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
-                    "Attempted conversion of non-boolean Prisma value type ({:?}) into bool failed.",
-                    v
+                    "Attempted conversion of non-boolean Prisma value type ({v:?}) into bool failed."
                 )),
             }),
         }

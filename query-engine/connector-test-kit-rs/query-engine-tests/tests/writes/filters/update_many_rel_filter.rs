@@ -150,7 +150,7 @@ mod update_many_rel_filter {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTop(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTop(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

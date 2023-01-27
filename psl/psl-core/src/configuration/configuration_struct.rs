@@ -72,9 +72,8 @@ impl Configuration {
                         super::UrlValidationError::EmptyEnvValue(env_var) => {
                             Err(DatamodelError::new_source_validation_error(
                                 &format!(
-                        "You must provide a nonempty direct URL. The environment variable `{}` resolved to an empty string.",
-                        env_var
-                    ),
+                                    "You must provide a nonempty direct URL. The environment variable `{env_var}` resolved to an empty string."
+                                ),
                                 &datasource.name,
                                 *span,
                             ))

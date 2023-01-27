@@ -245,7 +245,7 @@ impl From<ListMigrationsError> for ConnectorError {
 fn invalid_connection_string_description(error_details: impl Display) -> String {
     let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
 
-    format! {r#"{} in database URL. Please refer to the documentation in {} for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."#, error_details, docs}
+    format! {r#"{error_details} in database URL. Please refer to the documentation in {docs} for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."#}
 }
 
 #[cfg(test)]

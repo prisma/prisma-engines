@@ -322,8 +322,7 @@ pub fn insert_existing_1to1_related_model_checks(
             let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No parent record (needed to update the previous parent) was found for a nested connect on relation '{}' .",
-                    relation_name
+                    "No parent record (needed to update the previous parent) was found for a nested connect on relation '{relation_name}' ."
                 ))),
             }?;
 
@@ -408,7 +407,7 @@ pub fn insert_emulated_on_delete(
             ReferentialAction::Cascade => {
                 emulate_on_delete_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
             }
-            x => panic!("Unsupported referential action emulation: {}", x),
+            x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
 
@@ -690,7 +689,7 @@ pub fn emulate_on_delete_set_null(
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
-            x => panic!("Unsupported referential action emulation: {}", x),
+            x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
 
@@ -835,7 +834,7 @@ pub fn emulate_on_update_set_null(
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
-            x => panic!("Unsupported referential action emulation: {}", x),
+            x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
 
@@ -972,7 +971,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
                 emulate_on_update_set_null(graph, &rf, connector_ctx, &join_node, child_node)?
             }
             ReferentialAction::Cascade => emulate_on_update_cascade(graph, &rf, connector_ctx, &join_node, child_node)?,
-            x => panic!("Unsupported referential action emulation: {}", x),
+            x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
 
@@ -1005,7 +1004,7 @@ pub fn insert_emulated_on_update(
             ReferentialAction::Cascade => {
                 emulate_on_update_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
             }
-            x => panic!("Unsupported referential action emulation: {}", x),
+            x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
 

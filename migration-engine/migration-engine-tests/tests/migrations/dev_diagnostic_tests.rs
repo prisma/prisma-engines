@@ -151,8 +151,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
     let expected_message = format!(
-        "- The migration `{}` failed.\n- The migration `{}` was modified after it was applied.\n- Drift detected: Your database schema is not in sync with your migration history.\n",
-        migration_two_name, migration_two_name,
+        "- The migration `{migration_two_name}` failed.\n- The migration `{migration_two_name}` was modified after it was applied.\n- Drift detected: Your database schema is not in sync with your migration history.\n",
     );
 
     assert!(action.as_reset().unwrap().starts_with(&expected_message));
@@ -231,15 +230,14 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
         .assert_applied_migrations(&["initial", "second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&name);
-    std::fs::remove_dir_all(&second_migration_folder_path).unwrap();
+    std::fs::remove_dir_all(second_migration_folder_path).unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
     let message = action.as_reset().unwrap();
     assert!(message.contains("- Drift detected: Your database schema is not in sync with your migration history"));
     assert!(message.contains(&format!(
-        "The following migration(s) are applied to the database but missing from the local migrations directory: {}",
-        name
+        "The following migration(s) are applied to the database but missing from the local migrations directory: {name}"
     )));
 }
 
@@ -285,7 +283,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
         .assert_applied_migrations(&["1-initial", "2-second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&deleted_migration_name);
-    std::fs::remove_dir_all(&second_migration_folder_path).unwrap();
+    std::fs::remove_dir_all(second_migration_folder_path).unwrap();
 
     let dm3 = api.datamodel_with_provider(
         r#"
@@ -307,7 +305,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
     let message = action.as_reset().unwrap();
 
     assert!(message.contains("Drift detected: Your database schema is not in sync with your migration history"));
-    assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}", first_migration_name, deleted_migration_name)));
+    assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{first_migration_name}`. Migrations applied to the database but absent from the migrations directory are: {deleted_migration_name}")));
 }
 
 #[test_connector]
@@ -354,10 +352,7 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
-    let expected_message = format!(
-        "The migration `{}` was modified after it was applied.",
-        initial_migration_name
-    );
+    let expected_message = format!("The migration `{initial_migration_name}` was modified after it was applied.");
 
     assert_eq!(action.as_reset(), Some(expected_message.as_str()));
 }
@@ -643,7 +638,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
     .to_user_facing()
     .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"), "{:?}", err);
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"), "{err:?}");
 }
 
 #[test_connector(tags(Postgres12))]

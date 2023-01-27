@@ -8,7 +8,7 @@ impl TryFrom<Node> for Query {
         match n {
             Node::Query(q) => Ok(q),
             x => Err(QueryGraphError::InvalidNodeTransformation {
-                from: format!("{}", x),
+                from: format!("{x}"),
                 to: "Query".to_owned(),
             }),
         }
@@ -22,7 +22,7 @@ impl TryFrom<Node> for Flow {
         match n {
             Node::Flow(f) => Ok(f),
             x => Err(QueryGraphError::InvalidNodeTransformation {
-                from: format!("{}", x),
+                from: format!("{x}"),
                 to: "Flow".to_owned(),
             }),
         }

@@ -105,7 +105,7 @@ pub(crate) fn order_by_relevance_enum(
     container: &str,
     values: Vec<String>,
 ) -> EnumTypeWeakRef {
-    let name = format!("{}OrderByRelevanceFieldEnum", container);
+    let name = format!("{container}OrderByRelevanceFieldEnum");
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_enum!(ctx, &ident);
 

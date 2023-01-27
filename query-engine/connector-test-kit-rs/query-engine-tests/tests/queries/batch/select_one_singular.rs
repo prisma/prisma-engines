@@ -276,7 +276,7 @@ mod singular_batch {
             res.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":1}}},{"data":{"findUniqueTestModelOrThrow":{"id":2}}}]}"###
         );
-        assert_eq!(compact_doc.is_compact(), false);
+        assert!(!compact_doc.is_compact());
 
         // Failing case
         let (res, compact_doc) = compact_batch(
@@ -291,7 +291,7 @@ mod singular_batch {
           res.to_string(),
           @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist, transient: false })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
         );
-        assert_eq!(compact_doc.is_compact(), false);
+        assert!(!compact_doc.is_compact());
 
         // Mix of findUnique & findUniqueOrThrow
         let (res, compact_doc) = compact_batch(
@@ -306,7 +306,7 @@ mod singular_batch {
           res.to_string(),
           @r###"{"batchResult":[{"data":{"findUniqueTestModel":null}},{"data":{"findUniqueTestModelOrThrow":{"id":2}}}]}"###
         );
-        assert_eq!(compact_doc.is_compact(), false);
+        assert!(!compact_doc.is_compact());
 
         // Mix of findUnique & findUniqueOrThrow
         let (res, compact_doc) = compact_batch(
@@ -321,7 +321,7 @@ mod singular_batch {
           res.to_string(),
           @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":2}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist, transient: false })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
         );
-        assert_eq!(compact_doc.is_compact(), false);
+        assert!(!compact_doc.is_compact());
 
         // Mix of findUnique & findUniqueOrThrow
         let (res, compact_doc) = compact_batch(
@@ -336,7 +336,7 @@ mod singular_batch {
           res.to_string(),
           @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"data":{"findUniqueTestModel":null}}]}"###
         );
-        assert_eq!(compact_doc.is_compact(), false);
+        assert!(!compact_doc.is_compact());
 
         Ok(())
     }

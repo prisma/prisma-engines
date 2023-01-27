@@ -112,8 +112,7 @@ fn handle_many_to_many(
              let parent_id = match parent_ids.pop() {
                  Some(pid) => Ok(pid),
                  None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{}' records (needed to disconnect existing child records) were found for a nested set on many-to-many relation '{}'.",
-                    parent_model_name, relation_name
+                    "No '{parent_model_name}' records (needed to disconnect existing child records) were found for a nested set on many-to-many relation '{relation_name}'."
                 ))),
              }?;
 
@@ -292,8 +291,7 @@ fn handle_one_to_many(
                 let parent_link = match parent_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' records were found for a nested set on many-to-many relation '{}'.",
-                        parent_model_name, relation_name
+                        "No '{parent_model_name}' records were found for a nested set on many-to-many relation '{relation_name}'."
                     ))),
                 }?;
 

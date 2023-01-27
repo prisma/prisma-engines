@@ -235,7 +235,7 @@ mod json {
         runner
             .query(jNull!(
                 caps,
-                format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data)
+                format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}")
             ))
             .await?
             .assert_success();

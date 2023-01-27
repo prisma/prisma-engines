@@ -217,11 +217,10 @@ fn using_unsupported_and_ignore_should_work(api: TestApi) {
     let dm = &format!(
         r#"
         model UnsupportedModel {{
-            field Unsupported("{}")
+            field Unsupported("{unsupported_type}")
             @@ignore
         }}
-     "#,
-        unsupported_type
+     "#
     );
 
     api.schema_push_w_datasource(dm).send().assert_green();

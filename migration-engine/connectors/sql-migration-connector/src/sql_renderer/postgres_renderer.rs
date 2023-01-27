@@ -21,7 +21,7 @@ use sql_schema_describer::{
 use std::borrow::Cow;
 
 impl PostgresFlavour {
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: TableColumnWalker<'_>) -> String {
         let column_name = Quoted::postgres_ident(column.name());
         let tpe_str = render_column_type(column, self);
         let nullability_str = render_nullability(column);
@@ -29,7 +29,7 @@ impl PostgresFlavour {
             .default()
             .map(|d| render_default(d.inner(), &render_column_type(column, self)))
             .filter(|default| !default.is_empty())
-            .map(|default| format!(" DEFAULT {}", default))
+            .map(|default| format!(" DEFAULT {default}"))
             .unwrap_or_else(String::new);
 
         let identity_str = render_column_identity_str(column, self);
@@ -270,11 +270,11 @@ impl SqlRenderer for PostgresFlavour {
                     let column = schemas.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
                 TableChange::DropColumn { column_id } => {
                     let name = self.quote(schemas.previous.walk(*column_id).name());
-                    lines.push(format!("DROP COLUMN {}", name));
+                    lines.push(format!("DROP COLUMN {name}"));
                 }
                 TableChange::AlterColumn(AlterColumn {
                     column_id,
@@ -296,10 +296,10 @@ impl SqlRenderer for PostgresFlavour {
                     let columns = schemas.walk(*column_id);
                     let name = self.quote(columns.previous.name());
 
-                    lines.push(format!("DROP COLUMN {}", name));
+                    lines.push(format!("DROP COLUMN {name}"));
 
                     let col_sql = self.render_column(columns.next);
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
             };
         }
@@ -530,7 +530,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
+fn render_column_type(col: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
     if let Some(enm) = col.column_type_family_as_enum() {
         let name = QuotedWithPrefix::pg_new(enm.namespace(), enm.name());
@@ -549,7 +549,7 @@ fn render_column_type(col: ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'
     }
 }
 
-fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
@@ -596,7 +596,7 @@ fn render_column_type_postgres(col: ColumnWalker<'_>) -> Cow<'static, str> {
     }
 }
 
-fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type_cockroachdb(col: TableColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let native_type = col
         .column_native_type()
@@ -640,14 +640,14 @@ fn render_column_type_cockroachdb(col: ColumnWalker<'_>) -> Cow<'static, str> {
 fn render_optional_args(input: Option<u32>) -> String {
     match input {
         None => "".to_string(),
-        Some(arg) => format!("({})", arg),
+        Some(arg) => format!("({arg})"),
     }
 }
 
 fn render_decimal_args(input: Option<(u32, u32)>) -> String {
     match input {
         None => "".to_string(),
-        Some((precision, scale)) => format!("({},{})", precision, scale),
+        Some((precision, scale)) => format!("({precision},{scale})"),
     }
 }
 
@@ -679,7 +679,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 }
 
 fn render_alter_column(
-    columns: Pair<ColumnWalker<'_>>,
+    columns: Pair<TableColumnWalker<'_>>,
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
@@ -690,7 +690,7 @@ fn render_alter_column(
     let table_name = QuotedWithPrefix::pg_from_table_walker(columns.previous.table());
     let column_name = Quoted::postgres_ident(columns.previous.name());
 
-    let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
+    let alter_column_prefix = format!("ALTER COLUMN {column_name}");
 
     for step in steps {
         match step {
@@ -699,7 +699,7 @@ fn render_alter_column(
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
                 if let Some(DefaultKind::Sequence(sequence_name)) = columns.previous.default().map(|d| d.kind()) {
-                    let sequence_is_still_used = columns.next.schema.walk_columns().any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next));
+                    let sequence_is_still_used = columns.next.schema.walk_table_columns().any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::Sequence(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -734,7 +734,7 @@ fn render_alter_column(
                 )
                 .to_lowercase();
 
-                before_statements.push(format!("CREATE SEQUENCE {}", sequence_name));
+                before_statements.push(format!("CREATE SEQUENCE {sequence_name}"));
 
                 clauses.push(format!(
                     "{prefix} SET DEFAULT {default}",
@@ -744,15 +744,16 @@ fn render_alter_column(
 
                 after_statements.push(format!(
                     "ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}",
-                    table_name = table_name,
-                    column_name = column_name,
                 ));
             }
         }
     }
 }
 
-fn expand_alter_column(columns: Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<PostgresAlterColumn> {
+fn expand_alter_column(
+    columns: Pair<TableColumnWalker<'_>>,
+    column_changes: &ColumnChanges,
+) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
     let mut set_type = false;
 
@@ -945,7 +946,7 @@ fn render_postgres_alter_enum(
 
     // Alter type of the current columns to new, with a cast
     {
-        let affected_columns = schemas.next.walk_columns().filter(
+        let affected_columns = schemas.next.walk_table_columns().filter(
             |column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(id) if *id == enums.next.id),
         );
 
@@ -1077,7 +1078,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>
     }
 }
 
-fn render_column_identity_str(column: ColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
+fn render_column_identity_str(column: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
     if !flavour.is_cockroachdb() {
         return String::new();
     }

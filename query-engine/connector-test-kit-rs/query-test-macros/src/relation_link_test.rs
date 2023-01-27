@@ -79,7 +79,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
     let test_fn_ident = test_function.sig.ident.clone();
 
     // Rename original test function to run_<orig_name>.
-    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident), Span::call_site());
+    let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     // The test database name is the name used as the database for data source rendering.
@@ -110,12 +110,12 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     let test_shells = datamodels.into_iter().enumerate().map(|(i, dm)| {
         // The shell function retains the name of the original test definition.
-        let test_fn_ident = Ident::new(&format!("{}_{}", test_fn_ident, i), Span::call_site());
+        let test_fn_ident = Ident::new(&format!("{test_fn_ident}_{i}"), Span::call_site());
         let datamodel: proc_macro2::TokenStream = format!(r#""{}""#, dm.datamodel())
             .parse()
             .expect("Could not parse the datamodel");
         let dm_with_params: String = dm.try_into().expect("Could not serialize json");
-        let test_database = format!("{}_{}_{}", suite_name, test_name, i);
+        let test_database = format!("{suite_name}_{test_name}_{i}");
         let required_capabilities = required_capabilities
             .get(i)
             .expect("Could not find some required capabilities")

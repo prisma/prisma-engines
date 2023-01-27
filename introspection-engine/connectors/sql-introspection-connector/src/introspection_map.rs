@@ -2,8 +2,13 @@
 
 mod relation_names;
 
-use crate::{datamodel_calculator::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
-use psl::parser_database::{self, ast};
+use crate::{
+    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers as helpers, pair::RelationFieldDirection,
+};
+use psl::{
+    parser_database::{self, ast},
+    PreviewFeature,
+};
 use relation_names::RelationNames;
 use sql_schema_describer as sql;
 use std::{
@@ -20,8 +25,11 @@ pub(crate) use relation_names::RelationName;
 pub(crate) struct IntrospectionMap<'a> {
     pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
     pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
+    pub(crate) existing_views: HashMap<sql::ViewId, ast::ModelId>,
     pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
-    pub(crate) existing_scalar_fields: HashMap<sql::ColumnId, (ast::ModelId, ast::FieldId)>,
+    pub(crate) missing_views_for_previous_models: HashSet<ast::ModelId>,
+    pub(crate) existing_model_scalar_fields: HashMap<sql::TableColumnId, (ast::ModelId, ast::FieldId)>,
+    pub(crate) existing_view_scalar_fields: HashMap<sql::ViewColumnId, (ast::ModelId, ast::FieldId)>,
     pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
     pub(crate) existing_m2m_relations: HashMap<sql::TableId, parser_database::ManyToManyRelationId>,
     pub(crate) relation_names: RelationNames<'a>,
@@ -31,17 +39,18 @@ pub(crate) struct IntrospectionMap<'a> {
 }
 
 impl<'a> IntrospectionMap<'a> {
-    pub(crate) fn new(input: InputContext<'a>) -> Self {
-        let sql_schema = input.schema;
-        let prisma_schema = input.previous_schema;
+    pub(crate) fn new(ctx: &DatamodelCalculatorContext<'a>) -> Self {
+        let sql_schema = ctx.sql_schema;
+        let prisma_schema = ctx.previous_schema;
         let mut map = Default::default();
 
         match_existing_models(sql_schema, prisma_schema, &mut map);
+        match_existing_views(sql_schema, prisma_schema, &mut map);
         match_enums(sql_schema, prisma_schema, &mut map);
         match_existing_scalar_fields(sql_schema, prisma_schema, &mut map);
         match_existing_inline_relations(sql_schema, prisma_schema, &mut map);
         match_existing_m2m_relations(sql_schema, prisma_schema, &mut map);
-        relation_names::introspect(input, &mut map);
+        relation_names::introspect(ctx, &mut map);
         position_inline_relation_fields(sql_schema, &mut map);
         position_m2m_relation_fields(sql_schema, &mut map);
         populate_top_level_names(sql_schema, prisma_schema, &mut map);
@@ -80,6 +89,26 @@ fn populate_top_level_names<'a>(
 
         let count = map.top_level_names.entry(name).or_default();
         *count += 1;
+    }
+
+    // we do not want dupe warnings for models clashing with views,
+    // if not using the preview.
+    if prisma_schema
+        .configuration
+        .preview_features()
+        .contains(PreviewFeature::Views)
+    {
+        for view in sql_schema.view_walkers() {
+            let name = map
+                .existing_views
+                .get(&view.id)
+                .map(|id| prisma_schema.db.walk(*id))
+                .map(|m| Cow::Borrowed(m.name()))
+                .unwrap_or_else(|| crate::sanitize_datamodel_names::sanitize_string(view.name()));
+
+            let count = map.top_level_names.entry(name).or_default();
+            *count += 1;
+        }
     }
 }
 
@@ -133,7 +162,7 @@ fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut Introspec
 fn match_enums(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
     map.existing_enums = if prisma_schema.connector.is_provider("mysql") {
         sql_schema
-            .walk_columns()
+            .walk_table_columns()
             .filter_map(|col| col.column_type_family_as_enum().map(|enm| (col, enm)))
             .filter_map(|(col, sql_enum)| {
                 prisma_schema
@@ -182,6 +211,22 @@ fn match_existing_models(schema: &sql::SqlSchema, prisma_schema: &psl::Validated
     }
 }
 
+/// Finding views from the existing PSL definition, matching the
+/// ones found in the database.
+fn match_existing_views(sql_schema: &sql::SqlSchema, prisma_schema: &psl::ValidatedSchema, map: &mut IntrospectionMap) {
+    for view in prisma_schema.db.walk_views() {
+        match sql_schema.find_view(view.database_name(), view.schema_name()) {
+            Some(sql_id) => {
+                map.existing_views.insert(sql_id, view.id);
+            }
+
+            None => {
+                map.missing_views_for_previous_models.insert(view.id);
+            }
+        }
+    }
+}
+
 /// Finding scalar fields from the existing PSL definition, matching
 /// the ones found in the database.
 fn match_existing_scalar_fields(
@@ -189,7 +234,7 @@ fn match_existing_scalar_fields(
     prisma_schema: &psl::ValidatedSchema,
     map: &mut IntrospectionMap,
 ) {
-    for col in sql_schema.walk_columns() {
+    for col in sql_schema.walk_table_columns() {
         let ids = map.existing_models.get(&col.table().id).and_then(|model_id| {
             let model = prisma_schema.db.walk(*model_id);
 
@@ -201,7 +246,25 @@ fn match_existing_scalar_fields(
         });
 
         if let Some((model, field)) = ids {
-            map.existing_scalar_fields.insert(col.id, (model.id, field.field_id()));
+            map.existing_model_scalar_fields
+                .insert(col.id, (model.id, field.field_id()));
+        }
+    }
+
+    for col in sql_schema.walk_view_columns() {
+        let ids = map.existing_views.get(&col.view().id).and_then(|view_id| {
+            let model = prisma_schema.db.walk(*view_id);
+
+            let field = model
+                .scalar_fields()
+                .find(|field| field.database_name() == col.name())?;
+
+            Some((model, field))
+        });
+
+        if let Some((model, field)) = ids {
+            map.existing_view_scalar_fields
+                .insert(col.id, (model.id, field.field_id()));
         }
     }
 }

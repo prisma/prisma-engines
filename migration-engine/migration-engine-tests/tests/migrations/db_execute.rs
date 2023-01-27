@@ -61,7 +61,7 @@ fn db_execute_happy_path_with_prisma_schema() {
         url.replace('\\', "\\\\")
     );
     let schema_path = tmpdir.path().join("schema.prisma");
-    std::fs::write(&schema_path, &prisma_schema).unwrap();
+    std::fs::write(&schema_path, prisma_schema).unwrap();
     let script = r#"
         CREATE TABLE "dogs" ( id INTEGER PRIMARY KEY, name TEXT );
         INSERT INTO "dogs" ("name") VALUES ('snoopy'), ('marmaduke');

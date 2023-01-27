@@ -101,7 +101,7 @@ fn get_expected_from_error(positives: &[Rule]) -> String {
     let mut out = String::with_capacity(positives.len() * 6);
 
     for positive in positives {
-        write!(out, "{:?}", positive).unwrap();
+        write!(out, "{positive:?}").unwrap();
     }
 
     out

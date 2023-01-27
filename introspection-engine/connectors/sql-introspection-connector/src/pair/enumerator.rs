@@ -8,8 +8,11 @@ use std::borrow::Cow;
 
 use super::Pair;
 
-pub(crate) type EnumPair<'a> = Pair<'a, walkers::EnumWalker<'a>, sql::EnumWalker<'a>>;
-pub(crate) type EnumVariantPair<'a> = Pair<'a, walkers::EnumValueWalker<'a>, sql::EnumVariantWalker<'a>>;
+/// Pairing the PSL enums (previous) to database enums (next).
+pub(crate) type EnumPair<'a> = Pair<'a, Option<walkers::EnumWalker<'a>>, sql::EnumWalker<'a>>;
+
+/// Pairing the PSL enum values (previous) to database enums (next).
+pub(crate) type EnumVariantPair<'a> = Pair<'a, Option<walkers::EnumValueWalker<'a>>, sql::EnumVariantWalker<'a>>;
 
 impl<'a> EnumPair<'a> {
     /// The documentation on top of the enum.
@@ -43,11 +46,7 @@ impl<'a> EnumPair<'a> {
 
     /// The namespace of the enumerator, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        if self.context.uses_namespaces() {
-            self.next.namespace()
-        } else {
-            None
-        }
+        self.context.uses_namespaces().then(|| self.next.namespace()).flatten()
     }
 
     /// The position of the enum from the PSL, if existing. Used for

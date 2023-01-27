@@ -44,7 +44,7 @@ fn create_migration_with_new_provider_errors(api: TestApi) {
 
     assert_eq!(err.error_code, ProviderSwitchedError::ERROR_CODE);
     assert!(err.message.contains("postgresql"));
-    assert!(err.message.contains("sqlite"), "{:?}", err);
+    assert!(err.message.contains("sqlite"), "{err:?}");
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -102,6 +102,6 @@ fn migration_lock_with_different_comment_shapes_work(api: TestApi) {
 
         assert_eq!(err.error_code, ProviderSwitchedError::ERROR_CODE);
         assert!(err.message.contains("postgresql"));
-        assert!(err.message.contains("sqlite"), "{:?}", err);
+        assert!(err.message.contains("sqlite"), "{err:?}");
     }
 }

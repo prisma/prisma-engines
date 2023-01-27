@@ -350,7 +350,7 @@ impl TestApi {
             .args
             .datasource_block(self.root.args.database_url(), &used_params, preview_features);
 
-        write!(out, "{}", ds_block).unwrap()
+        write!(out, "{ds_block}").unwrap()
     }
 
     pub fn generator_block(&self) -> String {
@@ -361,17 +361,16 @@ impl TestApi {
                 .root
                 .preview_features()
                 .iter()
-                .map(|f| format!(r#""{}""#, f))
+                .map(|f| format!(r#""{f}""#))
                 .join(", ");
 
-            format!("\npreviewFeatures = [{}]", features)
+            format!("\npreviewFeatures = [{features}]")
         };
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{}
-               }}"#,
-            preview_feature_string
+                 provider = "prisma-client-js"{preview_feature_string}
+               }}"#
         );
         generator_block
     }
@@ -437,12 +436,12 @@ where
         let mut out = String::with_capacity(sep.len() * lower_bound);
 
         if let Some(first_item) = self.next() {
-            write!(out, "{}", first_item).unwrap();
+            write!(out, "{first_item}").unwrap();
         }
 
         for item in self {
             out.push_str(sep);
-            write!(out, "{}", item).unwrap();
+            write!(out, "{item}").unwrap();
         }
 
         out

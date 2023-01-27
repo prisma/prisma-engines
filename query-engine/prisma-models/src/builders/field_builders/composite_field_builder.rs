@@ -20,7 +20,7 @@ impl CompositeFieldBuilder {
             typ: composite_types
                 .iter()
                 .find(|typ| &typ.name == type_name)
-                .unwrap_or_else(|| panic!("Invalid composite type reference: {}", type_name))
+                .unwrap_or_else(|| panic!("Invalid composite type reference: {type_name}"))
                 .clone(),
             arity: self.arity,
             container,

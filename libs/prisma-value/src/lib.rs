@@ -307,18 +307,18 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Xml(x) => x.fmt(f),
             PrismaValue::BigInt(x) => x.fmt(f),
             PrismaValue::List(x) => {
-                let as_string = format!("{:?}", x);
+                let as_string = format!("{x:?}");
                 as_string.fmt(f)
             }
             PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
             PrismaValue::Object(pairs) => {
                 let joined = pairs
                     .iter()
-                    .map(|(key, value)| format!(r#""{}": {}"#, key, value))
+                    .map(|(key, value)| format!(r#""{key}": {value}"#))
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                write!(f, "{{ {} }}", joined)
+                write!(f, "{{ {joined} }}")
             }
         }
     }

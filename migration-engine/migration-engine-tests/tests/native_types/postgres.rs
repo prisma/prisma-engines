@@ -784,9 +784,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
         let mut next_assertions = vec![];
 
         for (idx, to) in casts.iter().enumerate() {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
-            let column_name = format!("column_{}", idx);
+            let column_name = format!("column_{idx}");
 
             writeln!(
                 previous_columns,
@@ -816,10 +816,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             r#"
                model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {previous_columns}
                 }}
                 "#,
-            columns = previous_columns,
         );
 
         tracing::info!(dm = dm1.as_str());
@@ -843,10 +842,9 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {next_columns}
                 }}
-                "#,
-            columns = next_columns
+                "#
         );
 
         api.schema_push_w_datasource(&dm2).send().assert_green();
@@ -876,9 +874,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
         let mut warnings = vec![];
 
         for (idx, to) in casts.iter().enumerate() {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
-            let column_name = format!("column_{}", idx);
+            let column_name = format!("column_{idx}");
 
             writeln!(
                 previous_columns,
@@ -902,9 +900,6 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 
             warnings.push( format!(
                 "You are about to alter the column `{column_name}` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{from}` to `{to}`.",
-               column_name = column_name,
-                from = from,
-                to = to,
             ).into());
 
             previous_assertions.push((column_name.clone(), *from));
@@ -915,10 +910,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {previous_columns}
                 }}
                 "#,
-            columns = previous_columns,
         );
 
         api.schema_push_w_datasource(&dm1).send().assert_green();
@@ -941,10 +935,9 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {next_columns}
                 }}
                 "#,
-            columns = next_columns,
         );
 
         api.schema_push_w_datasource(&dm2)
@@ -979,9 +972,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
         warnings.clear();
 
         for (idx, to) in casts.iter().enumerate() {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
-            let column_name = format!("column_{}", idx);
+            let column_name = format!("column_{idx}");
 
             writeln!(
                 previous_columns,
@@ -1007,7 +1000,6 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             warnings.push(
                 format!(
                     "The `{column_name}` column on the `A` table would be dropped and recreated. This will lead to data loss.",
-                    column_name = column_name,
                     // from = from,
                     // to = to,
                 )
@@ -1021,10 +1013,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {previous_columns}
                 }}
                 "#,
-            columns = previous_columns,
         );
 
         api.schema_push_w_datasource(&dm1).send().assert_green();
@@ -1046,10 +1037,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {next_columns}
                 }}
                 "#,
-            columns = next_columns,
         );
 
         // todo we could force here and then check that the db really returns not castable
@@ -1168,9 +1158,9 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
         let mut next_assertions = vec![];
 
         for (idx, (from, seed)) in from.iter().enumerate() {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
-            let column_name = format!("column_{}", idx);
+            let column_name = format!("column_{idx}");
 
             writeln!(
                 previous_columns,
@@ -1200,10 +1190,9 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {previous_columns}
                 }}
                 "#,
-            columns = previous_columns,
         );
 
         api.schema_push_w_datasource(&dm1).send().assert_green();
@@ -1225,10 +1214,9 @@ fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @db.Integer
-                    {columns}
+                    {next_columns}
                 }}
                 "#,
-            columns = next_columns,
         );
 
         api.schema_push_w_datasource(&dm2).send().assert_green();

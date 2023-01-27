@@ -294,8 +294,7 @@ impl QueryDocumentParser {
         prisma_value::parse_datetime(s).map_err(|err| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!(
-                "Invalid DateTime: '{}' (must be ISO 8601 compatible). Underlying error: {}",
-                s, err
+                "Invalid DateTime: '{s}' (must be ISO 8601 compatible). Underlying error: {err}"
             )),
         })
     }
@@ -306,8 +305,7 @@ impl QueryDocumentParser {
             .map_err(|_| QueryParserError {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "'{}' is not a valid base64 encoded string.",
-                    s
+                    "'{s}' is not a valid base64 encoded string."
                 )),
             })
     }
@@ -317,14 +315,14 @@ impl QueryDocumentParser {
             .map(PrismaValue::Float)
             .map_err(|_| QueryParserError {
                 path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string", s)),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid decimal string")),
             })
     }
 
     fn parse_bigint(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         s.parse::<i64>().map(PrismaValue::BigInt).map_err(|_| QueryParserError {
             path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid big integer string", s)),
+            error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid big integer string")),
         })
     }
 
@@ -354,14 +352,14 @@ impl QueryDocumentParser {
     fn parse_json(&self, path: &QueryPath, s: &str) -> QueryParserResult<serde_json::Value> {
         serde_json::from_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {}", err)),
+            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
         })
     }
 
     fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
         Uuid::parse_str(s).map_err(|err| QueryParserError {
             path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid UUID: {}", err)),
+            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid UUID: {err}")),
         })
     }
 
@@ -398,8 +396,7 @@ impl QueryDocumentParser {
             Err(QueryParserError {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "Enum value '{}' is invalid for enum type {}",
-                    raw, name
+                    "Enum value '{raw}' is invalid for enum type {name}"
                 )),
             })
         };

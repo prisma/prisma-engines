@@ -3,6 +3,7 @@
 mod default;
 mod extensions;
 
+use either::Either;
 pub use extensions::{DatabaseExtension, ExtensionId, ExtensionWalker};
 
 use self::default::get_default_value;
@@ -466,12 +467,13 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
         let table_names = self.get_table_names(&mut sql_schema).await?;
 
+        // order matters
+        self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
-        self.get_views(&mut sql_schema).await?;
         self.get_procedures(&mut sql_schema).await?;
         self.get_extensions(&mut pg_ext).await?;
 
@@ -684,11 +686,14 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         sql_schema.views = views;
+
         Ok(())
     }
 
     async fn get_columns(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
+        let mut table_defaults = Vec::new();
+        let mut view_defaults = Vec::new();
 
         let is_visible_clause = if self.is_cockroach() {
             " AND info.is_hidden = 'NO'"
@@ -725,10 +730,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
-            WHERE table_schema = ANY ( $1 ) {}
+            WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
-        "#,
-            is_visible_clause,
+        "#
         );
 
         let rows = self
@@ -743,9 +747,13 @@ impl<'a> SqlSchemaDescriber<'a> {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
 
-            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
-                Some(t_walker) => t_walker.id,
-                None => continue, // we only care about columns in tables we have access to
+            let table_id = sql_schema.table_walker_ns(&namespace, &table_name);
+            let view_id = sql_schema.view_walker_ns(&namespace, &table_name);
+
+            let container_id = match (table_id, view_id) {
+                (Some(t_walker), _) => Either::Left(t_walker.id),
+                (_, Some(v_walker)) => Either::Right(v_walker.id),
+                (None, None) => continue, // we only care about columns in tables we have access to
             };
 
             let name = col.get_expect_string("column_name");
@@ -753,7 +761,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_identity = match col.get_string("is_identity") {
                 Some(is_id) if is_id.eq_ignore_ascii_case("yes") => true,
                 Some(is_id) if is_id.eq_ignore_ascii_case("no") => false,
-                Some(is_identity_str) => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+                Some(is_identity_str) => panic!("unrecognized is_identity variant '{is_identity_str}'"),
                 None => false,
             };
 
@@ -780,23 +788,51 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(DefaultKind::DbGenerated(Some(s))) if s == "unique_rowid()"
                     ));
 
-            let column_id = ColumnId(sql_schema.columns.len() as u32);
-            let default_value_id = default.map(|default| sql_schema.push_default_value(column_id, default));
+            match container_id {
+                Either::Left(table_id) => {
+                    table_defaults.push((table_id, default));
+                }
+                Either::Right(view_id) => {
+                    view_defaults.push((view_id, default));
+                }
+            }
 
             let col = Column {
                 name,
                 tpe,
-                default_value_id,
                 auto_increment,
             };
 
-            sql_schema.columns.push((table_id, col));
+            match container_id {
+                Either::Left(table_id) => {
+                    sql_schema.push_table_column(table_id, col);
+                }
+                Either::Right(view_id) => {
+                    sql_schema.push_view_column(view_id, col);
+                }
+            }
         }
 
         // We need to sort because the collation in the system tables (pg_class) is different from
         // that of the information schema, so tables come out of different order in the tables
         // query and the columns query.
-        sql_schema.columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.view_columns.sort_by_key(|(table_id, _)| *table_id);
+
+        table_defaults.sort_by_key(|(table_id, _)| *table_id);
+        view_defaults.sort_by_key(|(view_id, _)| *view_id);
+
+        for (i, (_, default)) in table_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(TableColumnId(i as u32), default);
+            }
+        }
+
+        for (i, (_, default)) in view_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_view_default_value(ViewColumnId(i as u32), default);
+            }
+        }
 
         Ok(())
     }
@@ -925,7 +961,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             referenced_column_name: &str,
             table_ids: &IndexMap<(String, String), TableId>,
             sql_schema: &SqlSchema,
-        ) -> Option<(TableId, ColumnId, TableId, ColumnId)> {
+        ) -> Option<(TableId, TableColumnId, TableId, TableColumnId)> {
             let table_id = *table_ids.get(&(namespace, table_name))?;
             let referenced_table_id = *table_ids.get(&(referenced_schema_name, referenced_table_name))?;
             let column_id = sql_schema.walk(table_id).column(column_name)?.id;
@@ -957,8 +993,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             if !sql_schema.namespaces.contains(&referenced_schema_name) {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", sql_schema.namespaces[0], table_name),
-                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    from: format!("{}.{table_name}", sql_schema.namespaces[0]),
+                    to: format!("{referenced_schema_name}.{referenced_table}"),
                     constraint: constraint_name,
                     missing_namespace: referenced_schema_name,
                 }));
@@ -992,7 +1028,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action (on delete) '{}'", confdeltype),
+                _ => panic!("unrecognized foreign key action (on delete) '{confdeltype}'"),
             };
             let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
@@ -1000,7 +1036,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action (on update) '{}'", confupdtype),
+                _ => panic!("unrecognized foreign key action (on update) '{confupdtype}'"),
             };
 
             match current_fk {
@@ -1064,10 +1100,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
                 "ASC" => SQLSortOrder::Asc,
                 "DESC" => SQLSortOrder::Desc,
-                misc => panic!(
-                    "Unexpected sort order `{}`, collation should be ASC, DESC or Null",
-                    misc
-                ),
+                misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
             });
 
             let algorithm = if self.is_cockroach() {
@@ -1240,7 +1273,7 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!("unrecognized is_nullable variant '{}'", x),
+        x => panic!("unrecognized is_nullable variant '{x}'"),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {
@@ -1334,7 +1367,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!("unrecognized is_nullable variant '{}'", x),
+        x => panic!("unrecognized is_nullable variant '{x}'"),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {

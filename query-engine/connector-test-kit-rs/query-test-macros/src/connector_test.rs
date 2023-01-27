@@ -47,14 +47,14 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_fn_ident = test_function.sig.ident.clone();
 
     // Rename original test function to run_<orig_name>.
-    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident), Span::call_site());
+    let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     // The test database name is the name used as the database for data source rendering.
     // Combination of test name and test mod name.
     let test_name = test_fn_ident.to_string();
     let suite_name = args.suite.expect("A test must have a test suite.");
-    let test_database_name = format!("{}_{}", suite_name, test_name);
+    let test_database_name = format!("{suite_name}_{test_name}");
     let capabilities = args.capabilities.idents;
 
     let referential_override = match args.relation_mode.or(args.referential_integrity) {

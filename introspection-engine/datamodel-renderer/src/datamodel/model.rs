@@ -7,7 +7,7 @@ use crate::value::{Constant, Documentation, Function};
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone, Copy)]
-enum Commented {
+pub(super) enum Commented {
     On,
     Off,
 }

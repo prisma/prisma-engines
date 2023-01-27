@@ -120,7 +120,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     variant_name: "b",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -135,7 +135,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -153,7 +152,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -171,7 +169,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -189,7 +186,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -207,7 +203,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -225,7 +220,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -243,7 +237,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -261,7 +254,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -279,7 +271,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -297,7 +288,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -315,7 +305,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -333,7 +322,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -351,7 +339,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -369,7 +356,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -387,11 +373,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -409,7 +390,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -427,7 +407,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -445,7 +424,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -463,7 +441,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -481,7 +458,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -499,7 +475,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -517,7 +492,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -537,7 +511,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -553,7 +526,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -571,7 +543,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -589,7 +560,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -607,7 +577,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -625,7 +594,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -643,7 +611,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -661,7 +628,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -679,7 +645,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -697,7 +662,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -715,7 +679,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -733,7 +696,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -751,7 +713,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -769,7 +730,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -787,7 +747,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -805,7 +764,6 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -823,15 +781,14 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         14,
                     ),
                     DefaultValue {
@@ -840,6 +797,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -855,7 +813,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -865,6 +823,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -952,7 +911,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     variant_name: "b",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -967,7 +926,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -985,7 +943,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1003,7 +960,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1021,7 +977,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1039,7 +994,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1057,7 +1011,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1075,7 +1028,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1093,7 +1045,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1111,7 +1062,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1129,7 +1079,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1147,7 +1096,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1165,7 +1113,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1183,7 +1130,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1201,7 +1147,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1219,7 +1164,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1237,7 +1181,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1255,7 +1198,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1273,7 +1215,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1291,7 +1232,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1309,7 +1249,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1327,7 +1266,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1345,7 +1283,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1365,7 +1302,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1381,7 +1317,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1399,7 +1334,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1417,7 +1351,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1435,7 +1368,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1453,7 +1385,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1471,7 +1402,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1489,7 +1419,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1507,7 +1436,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1525,7 +1453,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1543,7 +1470,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1561,7 +1487,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1579,7 +1504,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1597,7 +1521,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1615,7 +1538,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1633,7 +1555,6 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1651,13 +1572,13 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -1673,7 +1594,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -1683,6 +1604,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -1773,7 +1695,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     variant_name: "b",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -1788,7 +1710,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
                     },
                 ),
@@ -1806,7 +1727,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1824,7 +1744,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1842,7 +1761,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1860,7 +1778,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1878,7 +1795,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1896,7 +1812,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1914,7 +1829,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1932,7 +1846,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1950,7 +1863,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1968,7 +1880,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -1986,7 +1897,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2004,7 +1914,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2022,7 +1931,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2040,7 +1948,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2058,7 +1965,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2076,7 +1982,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2094,7 +1999,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2112,7 +2016,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2130,7 +2033,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2148,7 +2050,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2166,7 +2067,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2186,7 +2086,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2202,7 +2101,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2220,7 +2118,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2238,7 +2135,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2256,7 +2152,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2274,7 +2169,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2292,7 +2186,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2310,7 +2203,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2328,7 +2220,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2346,7 +2237,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2364,7 +2254,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2382,7 +2271,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2400,7 +2288,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2418,7 +2305,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2436,7 +2322,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2454,7 +2339,6 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             arity: Required,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2472,13 +2356,13 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -2494,7 +2378,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -2504,6 +2388,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2644,7 +2529,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2659,7 +2544,6 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2677,7 +2561,6 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2695,7 +2578,6 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
                     },
                 ),
@@ -2715,16 +2597,17 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     on_update_action: Restrict,
                 },
             ],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [
                 ForeignKeyColumn {
                     foreign_key_id: ForeignKeyId(
                         0,
                     ),
-                    constrained_column: ColumnId(
+                    constrained_column: TableColumnId(
                         1,
                     ),
-                    referenced_column: ColumnId(
+                    referenced_column: TableColumnId(
                         2,
                     ),
                 },
@@ -2757,7 +2640,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -2769,7 +2652,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     index_id: IndexId(
                         1,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         1,
                     ),
                     sort_order: Some(
@@ -2781,7 +2664,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     index_id: IndexId(
                         2,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         2,
                     ),
                     sort_order: Some(
@@ -2791,6 +2674,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                 },
             ],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2821,7 +2705,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2836,19 +2720,14 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -2861,10 +2740,12 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -2896,7 +2777,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2911,11 +2792,6 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -2933,19 +2809,14 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                1,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -2958,7 +2829,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         1,
                     ),
                     DefaultValue {
@@ -2971,10 +2842,12 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -3006,7 +2879,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
             ],
             enums: [],
             enum_variants: [],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -3021,19 +2894,14 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -3046,10 +2914,12 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,
@@ -3106,7 +2976,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     variant_name: "x-small",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -3121,11 +2991,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                0,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3143,11 +3008,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                1,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3165,11 +3025,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                2,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3187,11 +3042,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                3,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3209,11 +3059,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                4,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3231,11 +3076,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                5,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3253,11 +3093,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                6,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3275,11 +3110,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                7,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3297,11 +3127,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                8,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3319,11 +3144,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                9,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3343,11 +3163,6 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                10,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
@@ -3363,19 +3178,14 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: Some(
-                            DefaultValueId(
-                                11,
-                            ),
-                        ),
                         auto_increment: false,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [
+            table_default_values: [
                 (
-                    ColumnId(
+                    TableColumnId(
                         0,
                     ),
                     DefaultValue {
@@ -3388,7 +3198,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         1,
                     ),
                     DefaultValue {
@@ -3401,7 +3211,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         2,
                     ),
                     DefaultValue {
@@ -3414,7 +3224,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         3,
                     ),
                     DefaultValue {
@@ -3427,7 +3237,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         4,
                     ),
                     DefaultValue {
@@ -3440,7 +3250,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         5,
                     ),
                     DefaultValue {
@@ -3453,7 +3263,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         6,
                     ),
                     DefaultValue {
@@ -3462,7 +3272,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         7,
                     ),
                     DefaultValue {
@@ -3475,7 +3285,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         8,
                     ),
                     DefaultValue {
@@ -3488,7 +3298,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         9,
                     ),
                     DefaultValue {
@@ -3501,7 +3311,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         10,
                     ),
                     DefaultValue {
@@ -3514,7 +3324,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
                 (
-                    ColumnId(
+                    TableColumnId(
                         11,
                     ),
                     DefaultValue {
@@ -3527,10 +3337,12 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     },
                 ),
             ],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,

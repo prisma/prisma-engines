@@ -7,7 +7,7 @@ pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Ca
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
     postgres::Circumstances,
-    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
 use std::future::Future;
@@ -187,7 +187,7 @@ impl TableAssertion<'_> {
             column: self
                 .table
                 .column(column_name)
-                .ok_or_else(|| format!("Could not find the {} column", column_name))
+                .ok_or_else(|| format!("Could not find the {column_name} column"))
                 .unwrap(),
         };
 
@@ -256,7 +256,7 @@ impl TableAssertion<'_> {
 }
 
 pub struct ColumnAssertion<'a> {
-    column: ColumnWalker<'a>,
+    column: TableColumnWalker<'a>,
 }
 
 impl ColumnAssertion<'_> {
@@ -282,7 +282,7 @@ impl ColumnAssertion<'_> {
 
     pub fn assert_type_is_int_or_bigint(&self) -> &Self {
         let fam = self.column.column_type_family();
-        assert!(fam.is_int() || fam.is_bigint(), "Expected int or bigint, got {:?}", fam);
+        assert!(fam.is_int() || fam.is_bigint(), "Expected int or bigint, got {fam:?}");
         self
     }
 

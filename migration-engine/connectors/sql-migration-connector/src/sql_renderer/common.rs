@@ -1,4 +1,4 @@
-use sql_schema_describer::{walkers::ColumnWalker, *};
+use sql_schema_describer::{walkers::TableColumnWalker, *};
 use std::fmt::{Display, Write as _};
 
 pub(super) const SQL_INDENTATION: &str = "    ";
@@ -81,15 +81,15 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Quoted::Double(inner) => write!(f, "\"{}\"", inner),
-            Quoted::Single(inner) => write!(f, "'{}'", inner),
-            Quoted::Backticks(inner) => write!(f, "`{}`", inner),
-            Quoted::SquareBrackets(inner) => write!(f, "[{}]", inner),
+            Quoted::Double(inner) => write!(f, "\"{inner}\""),
+            Quoted::Single(inner) => write!(f, "'{inner}'"),
+            Quoted::Backticks(inner) => write!(f, "`{inner}`"),
+            Quoted::SquareBrackets(inner) => write!(f, "[{inner}]"),
         }
     }
 }
 
-pub(crate) fn render_nullability(column: ColumnWalker<'_>) -> &'static str {
+pub(crate) fn render_nullability(column: TableColumnWalker<'_>) -> &'static str {
     if column.arity().is_required() {
         " NOT NULL"
     } else {
@@ -113,7 +113,7 @@ pub(crate) fn format_hex(bytes: &[u8], out: &mut String) {
     out.reserve(bytes.len() * 2);
 
     for byte in bytes {
-        write!(out, "{:02x}", byte).expect("failed to hex format a byte");
+        write!(out, "{byte:02x}").expect("failed to hex format a byte");
     }
 }
 
@@ -131,12 +131,12 @@ where
         let mut out = String::with_capacity(sep.len() * lower_bound);
 
         if let Some(first_item) = self.next() {
-            write!(out, "{}", first_item).unwrap();
+            write!(out, "{first_item}").unwrap();
         }
 
         for item in self {
             out.push_str(sep);
-            write!(out, "{}", item).unwrap();
+            write!(out, "{item}").unwrap();
         }
 
         out
@@ -181,7 +181,7 @@ impl StatementRenderer {
     }
 
     pub(super) fn push_display(&mut self, d: &dyn std::fmt::Display) {
-        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{}", d)).unwrap();
+        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{d}")).unwrap();
     }
 }
 

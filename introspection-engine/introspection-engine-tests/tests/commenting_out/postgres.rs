@@ -155,7 +155,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     let expected = json!([
         {
             "code": 1,
-            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "message": "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [{
                 "model": "Test"
             }]

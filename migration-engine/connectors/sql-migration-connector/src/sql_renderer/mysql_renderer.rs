@@ -11,14 +11,14 @@ use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
-        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
+        EnumWalker, ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write as _};
 
 impl MysqlFlavour {
-    fn render_column<'a>(&self, col: ColumnWalker<'a>) -> ddl::Column<'a> {
+    fn render_column<'a>(&self, col: TableColumnWalker<'a>) -> ddl::Column<'a> {
         let default = col
             .default()
             .filter(|default| {
@@ -123,7 +123,7 @@ impl SqlRenderer for MysqlFlavour {
                             let mut rendered = format!("{}", self.quote(c.as_column().name()));
 
                             if let Some(length) = c.length() {
-                                write!(rendered, "({})", length).unwrap();
+                                write!(rendered, "({length})").unwrap();
                             }
 
                             if let Some(sort_order) = c.sort_order() {
@@ -142,7 +142,7 @@ impl SqlRenderer for MysqlFlavour {
                     let column = tables.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
                 TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
@@ -348,7 +348,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: ColumnWalker<'_>,
+    next_column: TableColumnWalker<'_>,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
@@ -365,7 +365,7 @@ fn render_mysql_modify(
         .filter(|default| !default.is_empty_dbgenerated())
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
-        .map(|expression| format!(" DEFAULT {}", expression))
+        .map(|expression| format!(" DEFAULT {expression}"))
         .unwrap_or_else(String::new);
 
     format!(
@@ -386,11 +386,11 @@ fn render_mysql_modify(
     )
 }
 
-fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
         let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
 
-        return format!("ENUM({})", variants).into();
+        return format!("ENUM({variants})").into();
     }
 
     if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
@@ -404,14 +404,14 @@ fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
     fn render(input: Option<u32>) -> String {
         match input {
             None => "".to_string(),
-            Some(arg) => format!("({})", arg),
+            Some(arg) => format!("({arg})"),
         }
     }
 
     fn render_decimal(input: Option<(u32, u32)>) -> String {
         match input {
             None => "".to_string(),
-            Some((precision, scale)) => format!("({}, {})", precision, scale),
+            Some((precision, scale)) => format!("({precision}, {scale})"),
         }
     }
 
@@ -425,11 +425,11 @@ fn render_column_type(column: ColumnWalker<'_>) -> Cow<'static, str> {
         MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(*precision)).into(),
         MySqlType::Float => "FLOAT".into(),
         MySqlType::Double => "DOUBLE".into(),
-        MySqlType::Bit(size) => format!("BIT({size})", size = size).into(),
-        MySqlType::Char(size) => format!("CHAR({size})", size = size).into(),
-        MySqlType::VarChar(size) => format!("VARCHAR({size})", size = size).into(),
-        MySqlType::Binary(size) => format!("BINARY({size})", size = size).into(),
-        MySqlType::VarBinary(size) => format!("VARBINARY({size})", size = size).into(),
+        MySqlType::Bit(size) => format!("BIT({size})").into(),
+        MySqlType::Char(size) => format!("CHAR({size})").into(),
+        MySqlType::VarChar(size) => format!("VARCHAR({size})").into(),
+        MySqlType::Binary(size) => format!("BINARY({size})").into(),
+        MySqlType::VarBinary(size) => format!("VARBINARY({size})").into(),
         MySqlType::TinyBlob => "TINYBLOB".into(),
         MySqlType::Blob => "BLOB".into(),
         MySqlType::MediumBlob => "MEDIUMBLOB".into(),
@@ -472,7 +472,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
+    fn new(columns: Pair<TableColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next.default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
@@ -497,7 +497,7 @@ impl MysqlAlterColumn {
     }
 }
 
-fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
+fn render_default<'a>(column: TableColumnWalker<'a>, default: &'a DefaultValue) -> Cow<'a, str> {
     match default.kind() {
         DefaultKind::DbGenerated(Some(val)) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
@@ -509,7 +509,7 @@ fn render_default<'a>(column: ColumnWalker<'a>, default: &'a DefaultValue) -> Co
                 .and_then(MySqlType::timestamp_precision)
                 .unwrap_or(3);
 
-            format!("CURRENT_TIMESTAMP({})", precision).into()
+            format!("CURRENT_TIMESTAMP({precision})").into()
         }
         DefaultKind::Value(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()

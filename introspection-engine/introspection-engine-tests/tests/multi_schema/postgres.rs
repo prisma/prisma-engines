@@ -830,7 +830,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResu
         CREATE TABLE "second_schema"."tbl" ( id SERIAL PRIMARY KEY, fst INT REFERENCES "first"."tbl"("id") );
     "#;
 
-    api.raw_cmd(&sql).await;
+    api.raw_cmd(sql).await;
 
     let expected = expect![[r#"
         generator client {

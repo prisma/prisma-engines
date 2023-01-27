@@ -63,8 +63,7 @@ pub fn disconnect_records_node(
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No parent record was found for a nested disconnect on relation '{}'.",
-                        relation_name
+                        "No parent record was found for a nested disconnect on relation '{relation_name}'."
                     ))),
                 }?;
 

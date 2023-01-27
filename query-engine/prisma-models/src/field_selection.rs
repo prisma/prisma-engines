@@ -286,7 +286,7 @@ impl Display for FieldSelection {
             "FieldSelection {{ fields: [{}] }}",
             self.selections
                 .iter()
-                .map(|selection| format!("{}", selection))
+                .map(|selection| format!("{selection}"))
                 .join(", ")
         )
     }
@@ -300,10 +300,7 @@ impl Display for SelectedField {
                 f,
                 "{} {{ {} }}",
                 cs.field,
-                cs.selections
-                    .iter()
-                    .map(|selection| format!("{}", selection))
-                    .join(", ")
+                cs.selections.iter().map(|selection| format!("{selection}")).join(", ")
             ),
         }
     }

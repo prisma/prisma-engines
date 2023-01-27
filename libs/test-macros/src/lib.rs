@@ -208,7 +208,7 @@ fn extract_api_arg(sig: &Signature) -> Result<(&syn::Ident, &syn::Ident), syn::E
         }
         (_, n) => Err(syn::Error::new_spanned(
             &sig.inputs,
-            format!("Test functions should take one argument, not {}", n),
+            format!("Test functions should take one argument, not {n}"),
         )),
     }
 }

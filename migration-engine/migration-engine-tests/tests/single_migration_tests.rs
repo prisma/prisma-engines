@@ -50,8 +50,7 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         let expected_tags_prefix = "// tags=";
         assert!(
             first_line.starts_with(expected_tags_prefix),
-            "The first line of a single migration test test must start with \"{}\"",
-            expected_tags_prefix
+            "The first line of a single migration test test must start with \"{expected_tags_prefix}\""
         );
         let tags = first_line.trim_start_matches(expected_tags_prefix);
         test_setup::tags_from_comma_separated_list(tags)

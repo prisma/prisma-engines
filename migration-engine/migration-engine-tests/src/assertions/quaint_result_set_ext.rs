@@ -42,10 +42,7 @@ impl<'a> RowAssertion<'a> {
         assert_eq!(
             actual_value.map(|v| v.as_ref()),
             Some(expected_value),
-            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name,
-            expected_value,
-            actual_value,
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
         );
 
         self
@@ -57,10 +54,7 @@ impl<'a> RowAssertion<'a> {
         assert_eq!(
             actual_value,
             Some(expected_value),
-            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name,
-            expected_value,
-            actual_value,
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
         );
 
         self
@@ -76,10 +70,7 @@ impl<'a> RowAssertion<'a> {
 
         assert!(
             actual_value == expected_value,
-            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name,
-            expected_value,
-            actual_value,
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
         );
 
         self
@@ -87,7 +78,7 @@ impl<'a> RowAssertion<'a> {
 
     pub fn assert_null_value(self, column_name: &str) -> Self {
         if !self.0.get(column_name).expect("not in result set").is_null() {
-            panic!("Expected a null value for {}, but got something else.", column_name)
+            panic!("Expected a null value for {column_name}, but got something else.")
         }
 
         self
@@ -104,8 +95,7 @@ impl<'a> RowAssertion<'a> {
 
         assert_eq!(
             value_text, expected_value,
-            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name, expected_value, value_text,
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {value_text:?}",
         );
 
         self
@@ -116,10 +106,7 @@ impl<'a> RowAssertion<'a> {
 
         assert!(
             actual_value == Some(expected_value),
-            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
-            column_name,
-            expected_value,
-            actual_value,
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
         );
 
         self

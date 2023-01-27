@@ -292,15 +292,14 @@ async fn remapping_enum_values(api: &TestApi) -> TestResult {
         r#"
         model Book {{
             id      Int  @id @default(autoincrement())
-            color   {0}?
+            color   {enum_name}?
         }}
 
-        enum {0} {{
+        enum {enum_name} {{
             b_lack   @map("b lack")
             w_hite   @map("w hite")
         }}
-    "#,
-        enum_name
+    "#
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -340,15 +339,14 @@ async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
         r#"
         model Book {{
             id      Int @id @default(autoincrement())
-            color   {0} @default(b_lack)
+            color   {enum_name} @default(b_lack)
         }}
 
-        enum {0} {{
+        enum {enum_name} {{
             b_lack @map("b lack")
             white
         }}
-    "#,
-        enum_name
+    "#
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
@@ -440,9 +438,9 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
              first  Int
              last   Int
 
-             @@id([first, last]{})
+             @@id([first, last]{pk_name})
          }}
-     "#, pk_name};
+     "#};
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);
     Ok(())

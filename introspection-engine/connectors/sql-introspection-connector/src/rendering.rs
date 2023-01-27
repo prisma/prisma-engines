@@ -3,33 +3,38 @@
 mod configuration;
 mod defaults;
 mod enums;
+mod id;
 mod indexes;
 mod models;
 mod postgres;
 mod relation_field;
 mod scalar_field;
+mod views;
 
-use crate::datamodel_calculator::{InputContext, OutputContext};
+use psl::PreviewFeature;
+
+use crate::datamodel_calculator::DatamodelCalculatorContext;
 pub(crate) use crate::SqlError;
+use datamodel_renderer as renderer;
 
 /// Combines the SQL database schema and an existing PSL schema to a
 /// PSL schema definition string.
-pub(crate) fn to_psl_string<'a>(
-    input: InputContext<'a>,
-    output: &mut OutputContext<'a>,
-) -> Result<(String, bool), SqlError> {
-    enums::render(input, output);
-    models::render(input, output);
+pub(crate) fn to_psl_string(ctx: &DatamodelCalculatorContext<'_>) -> Result<(String, bool), SqlError> {
+    let mut rendered = renderer::Datamodel::new();
 
-    let psl_string = if input.render_config {
-        let config = configuration::render(input.config, input.schema, input.force_namespaces);
-        format!("{}\n{}", config, output.rendered_schema)
+    enums::render(ctx, &mut rendered);
+    models::render(ctx, &mut rendered);
+
+    if ctx.config.preview_features().contains(PreviewFeature::Views) {
+        views::render(ctx, &mut rendered);
+    }
+
+    let psl_string = if ctx.render_config {
+        let config = configuration::render(ctx.config, ctx.sql_schema, ctx.force_namespaces);
+        format!("{config}\n{rendered}")
     } else {
-        output.rendered_schema.to_string()
+        rendered.to_string()
     };
 
-    Ok((
-        psl::reformat(&psl_string, 2).unwrap(),
-        output.rendered_schema.is_empty(),
-    ))
+    Ok((psl::reformat(&psl_string, 2).unwrap(), rendered.is_empty()))
 }

@@ -156,8 +156,7 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn migration_connec
             shadow_database_connection_string: None,
         }))),
         provider => Err(CoreError::from_msg(format!(
-            "`{}` is not a supported connector.",
-            provider
+            "`{provider}` is not a supported connector."
         ))),
     }
 }

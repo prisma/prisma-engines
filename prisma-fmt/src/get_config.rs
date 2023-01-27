@@ -25,7 +25,7 @@ pub(crate) fn get_config(params: &str) -> Result<String, String> {
     let params: GetConfigParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
-            panic!("Failed to deserialize GetConfigParams: {}", serde_err,);
+            panic!("Failed to deserialize GetConfigParams: {serde_err}",);
         }
     };
 
