@@ -1,17 +1,22 @@
-{ craneLib, pkgs, flakeInputs, ... }:
+{ pkgs, flakeInputs, lib, ... }:
 
 let
-  srcPath = builtins.path { path = ../.; name = "prisma-engines-workspace-root-path"; };
-  src = pkgs.lib.cleanSourceWith { filter = enginesSourceFilter; src = srcPath; };
+  srcPath = ../.;
+  srcFilter = flakeInputs.gitignore.lib.gitignoreFilterWith {
+    basePath = srcPath;
+    extraRules = ''
+      /nix
+      /flake.*
+    '';
+  };
+  src = lib.cleanSourceWith {
+    filter = srcFilter;
+    src = srcPath;
+    name = "prisma-engines-source";
+  };
   craneLib = flakeInputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
   libSuffix = if pkgs.stdenv.isDarwin then "dylib" else "so";
-
-  enginesSourceFilter = path: type: (builtins.match "\\.pest$" path != null) ||
-    (builtins.match "\\.README.md$" path != null) ||
-    (builtins.match "^\\.git/HEAD" path != null) ||
-    (builtins.match "^\\.git/refs" path != null) ||
-    (craneLib.filterCargoSources path type != null);
 in
 {
   packages.prisma-engines-deps = deps;
