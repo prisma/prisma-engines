@@ -39,7 +39,8 @@ user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 
 [workspace.dependencies.quaint]
-git = "https://github.com/prisma/quaint"
+git = "https://github.com/miguelff/quaint"
+branch = "fix-traces"
 features = [
   "bigdecimal",
   "chrono",
