@@ -5,9 +5,10 @@ edition = "2021"
 
 [dependencies]
 psl.workspace = true
-mongodb-client = { path = "../../libs/mongodb-client" }
-migration-core = { path = "../core" }
-test-setup = { path = "../../libs/test-setup" }
+quaint.workspace = true
+mongodb-client = { path = "../../../libs/mongodb-client" }
+migration-core = { path = "../../../migration-engine/core" }
+test-setup = { path = "../../../libs/test-setup" }
 
 parking_lot = { version = "0.12", features = ["send_guard"] }
 connection-string = "*"
@@ -15,4 +16,3 @@ enumflags2 = "*"
 mongodb = "2.3.0"
 tempfile = "3.3.0"
 url = "2"
-quaint.workspace = true
