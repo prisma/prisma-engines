@@ -137,7 +137,7 @@ impl Connector for CockroachDatamodelConnector {
             .iter()
             .find(|(st, _)| st == scalar_type)
             .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
         NativeTypeInstance::new::<CockroachType>(*native_type)

@@ -125,7 +125,7 @@ impl SqlFlavour for SqliteFlavour {
         let params = self.state.get_unwrapped_params();
         let file_path = &params.file_path;
         let ret = std::fs::remove_file(file_path).map_err(|err| {
-            ConnectorError::from_msg(format!("Failed to delete SQLite database at `{}`.\n{}", file_path, err))
+            ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}"))
         });
         ready(ret)
     }

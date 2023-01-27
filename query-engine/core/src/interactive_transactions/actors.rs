@@ -236,7 +236,7 @@ impl ITXClient {
             }
             other => {
                 error!("Unexpected iTx response, {}", other);
-                let reason = format!("response '{}'", other);
+                let reason = format!("response '{other}'");
                 TransactionError::Closed { reason }
             }
         }

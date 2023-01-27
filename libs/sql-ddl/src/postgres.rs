@@ -195,11 +195,7 @@ pub struct ForeignKey<'a> {
 impl Display for ForeignKey<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(constraint_name) = &self.constraint_name {
-            write!(
-                f,
-                "CONSTRAINT \"{constraint_name}\" ",
-                constraint_name = constraint_name,
-            )?;
+            write!(f, "CONSTRAINT \"{constraint_name}\" ",)?;
         }
 
         f.write_str("FOREIGN KEY (")?;

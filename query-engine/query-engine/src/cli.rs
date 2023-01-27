@@ -87,7 +87,7 @@ impl CliCommand {
         let dmmf = dmmf::render_dmmf(query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
-        println!("{}", serialized);
+        println!("{serialized}");
 
         Ok(())
     }
@@ -102,7 +102,7 @@ impl CliCommand {
         let json = psl::get_config::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
-        println!("{}", serialized);
+        println!("{serialized}");
 
         Ok(())
     }
@@ -130,7 +130,7 @@ impl CliCommand {
         let res = serde_json::to_string(&res).unwrap();
 
         let encoded_response = base64::encode(res);
-        println!("Response: {}", encoded_response); // reason for prefix is explained in TestServer.scala
+        println!("Response: {encoded_response}"); // reason for prefix is explained in TestServer.scala
 
         Ok(())
     }

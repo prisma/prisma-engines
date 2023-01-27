@@ -48,7 +48,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent_id = parent_id)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"SomeC"}}}}"###
         );
 
@@ -85,7 +85,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"SomeC"}}}}"###
         );
 
@@ -129,7 +129,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -174,7 +174,7 @@ mod create_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -218,7 +218,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -262,7 +262,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c3"}]}}}"###
         );
 
@@ -314,7 +314,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childReq":{"c":"c2"}}}}"###
         );
 
@@ -366,7 +366,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c2"}}}}"###
         );
 
@@ -415,7 +415,7 @@ mod create_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c3"}]}}}"###
         );
 

@@ -47,7 +47,7 @@ mod inline_rel {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneModelA(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneModelA(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

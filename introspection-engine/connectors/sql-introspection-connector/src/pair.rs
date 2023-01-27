@@ -13,7 +13,7 @@ mod relation_field;
 mod scalar_field;
 mod view;
 
-use crate::datamodel_calculator::InputContext;
+use crate::datamodel_calculator::DatamodelCalculatorContext;
 pub(crate) use default::{DefaultKind, DefaultValuePair};
 pub(crate) use enumerator::EnumPair;
 pub(crate) use id::IdPair;
@@ -40,7 +40,7 @@ where
     /// The next state, taken from the database.
     next: U,
     /// The configuration object of the introspection.
-    context: InputContext<'a>,
+    context: &'a DatamodelCalculatorContext<'a>,
 }
 
 impl<'a, T, U> Pair<'a, T, U>
@@ -48,7 +48,7 @@ where
     T: Copy,
     U: Copy,
 {
-    pub(crate) fn new(context: InputContext<'a>, previous: T, next: U) -> Self {
+    pub(crate) fn new(context: &'a DatamodelCalculatorContext<'a>, previous: T, next: U) -> Self {
         Self {
             context,
             previous,

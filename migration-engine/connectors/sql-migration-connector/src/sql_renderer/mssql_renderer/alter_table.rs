@@ -197,7 +197,7 @@ impl<'a> AlterTableConstructor<'a> {
     fn drop_column(&mut self, column_id: TableColumnId) {
         let name = self.renderer.quote(self.tables.previous.walk(column_id).name());
 
-        self.drop_columns.push(format!("{}", name));
+        self.drop_columns.push(format!("{name}"));
     }
 
     fn drop_and_recreate_column(&mut self, columns: Pair<TableColumnId>) {

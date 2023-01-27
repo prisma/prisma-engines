@@ -25,9 +25,9 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
         // can't handle 1 schema per test in a database well at this point in time.
         if is_ci {
-            format!("postgresql://prisma@test-db-cockroachdb:26257/{0}?schema={0}", database)
+            format!("postgresql://prisma@test-db-cockroachdb:26257/{database}?schema={database}")
         } else {
-            format!("postgresql://prisma@127.0.0.1:26257/{0}?schema={0}", database)
+            format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
         }
     }
 

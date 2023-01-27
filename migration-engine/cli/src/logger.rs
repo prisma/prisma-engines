@@ -15,7 +15,7 @@ pub(crate) fn init_logger() {
         .with(TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
-        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .map_err(|err| eprintln!("Error initializing the global logger: {err}"))
         .ok();
 }
 

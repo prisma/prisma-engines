@@ -123,7 +123,7 @@ impl SqlRenderer for MysqlFlavour {
                             let mut rendered = format!("{}", self.quote(c.as_column().name()));
 
                             if let Some(length) = c.length() {
-                                write!(rendered, "({})", length).unwrap();
+                                write!(rendered, "({length})").unwrap();
                             }
 
                             if let Some(sort_order) = c.sort_order() {
@@ -142,7 +142,7 @@ impl SqlRenderer for MysqlFlavour {
                     let column = tables.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
                 TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
@@ -365,7 +365,7 @@ fn render_mysql_modify(
         .filter(|default| !default.is_empty_dbgenerated())
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
-        .map(|expression| format!(" DEFAULT {}", expression))
+        .map(|expression| format!(" DEFAULT {expression}"))
         .unwrap_or_else(String::new);
 
     format!(
@@ -390,7 +390,7 @@ fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
         let variants: String = column.walk(*enum_id).values().map(Quoted::mysql_string).join(", ");
 
-        return format!("ENUM({})", variants).into();
+        return format!("ENUM({variants})").into();
     }
 
     if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
@@ -404,14 +404,14 @@ fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
     fn render(input: Option<u32>) -> String {
         match input {
             None => "".to_string(),
-            Some(arg) => format!("({})", arg),
+            Some(arg) => format!("({arg})"),
         }
     }
 
     fn render_decimal(input: Option<(u32, u32)>) -> String {
         match input {
             None => "".to_string(),
-            Some((precision, scale)) => format!("({}, {})", precision, scale),
+            Some((precision, scale)) => format!("({precision}, {scale})"),
         }
     }
 
@@ -425,11 +425,11 @@ fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
         MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(*precision)).into(),
         MySqlType::Float => "FLOAT".into(),
         MySqlType::Double => "DOUBLE".into(),
-        MySqlType::Bit(size) => format!("BIT({size})", size = size).into(),
-        MySqlType::Char(size) => format!("CHAR({size})", size = size).into(),
-        MySqlType::VarChar(size) => format!("VARCHAR({size})", size = size).into(),
-        MySqlType::Binary(size) => format!("BINARY({size})", size = size).into(),
-        MySqlType::VarBinary(size) => format!("VARBINARY({size})", size = size).into(),
+        MySqlType::Bit(size) => format!("BIT({size})").into(),
+        MySqlType::Char(size) => format!("CHAR({size})").into(),
+        MySqlType::VarChar(size) => format!("VARCHAR({size})").into(),
+        MySqlType::Binary(size) => format!("BINARY({size})").into(),
+        MySqlType::VarBinary(size) => format!("VARBINARY({size})").into(),
         MySqlType::TinyBlob => "TINYBLOB".into(),
         MySqlType::Blob => "BLOB".into(),
         MySqlType::MediumBlob => "MEDIUMBLOB".into(),
@@ -509,7 +509,7 @@ fn render_default<'a>(column: TableColumnWalker<'a>, default: &'a DefaultValue) 
                 .and_then(MySqlType::timestamp_precision)
                 .unwrap_or(3);
 
-            format!("CURRENT_TIMESTAMP({})", precision).into()
+            format!("CURRENT_TIMESTAMP({precision})").into()
         }
         DefaultKind::Value(PrismaValue::DateTime(dt)) if column.column_type_family().is_datetime() => {
             Quoted::mysql_string(dt.to_rfc3339()).to_string().into()

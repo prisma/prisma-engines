@@ -158,7 +158,7 @@ pub fn collect_relation_aggr_selections(
                     selections.push(RelAggregationSelection::Count(rf, filter));
                 }
             }
-            field_name => panic!("Unknown field name \"{}\" for a relation aggregation", field_name),
+            field_name => panic!("Unknown field name \"{field_name}\" for a relation aggregation"),
         }
     }
 

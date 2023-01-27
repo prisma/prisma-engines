@@ -21,8 +21,7 @@ pub fn parse(filter_key: &str, field: &RelationFieldRef, input: ParsedInputValue
         (filters::IS_NOT, None) => Ok(Filter::not(vec![field.one_relation_is_null()])),
 
         _ => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid filter key `{}` input combination for relation filter",
-            filter_key
+            "Invalid filter key `{filter_key}` input combination for relation filter"
         ))),
     }
 }

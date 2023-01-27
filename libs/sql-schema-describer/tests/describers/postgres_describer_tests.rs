@@ -1046,15 +1046,14 @@ fn cross_schema_references_are_not_allowed(api: TestApi) {
     let schema2 = format!("{}_2", api.schema_name());
 
     let sql = format!(
-        "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
-         CREATE SCHEMA \"{0}\";
-         CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
+        "DROP SCHEMA IF EXISTS \"{schema2}\" CASCADE;
+         CREATE SCHEMA \"{schema2}\";
+         CREATE TABLE \"{schema2}\".\"City\" (id INT PRIMARY KEY);
          CREATE TABLE \"User\" (
             id INT PRIMARY KEY,
-            city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
+            city INT REFERENCES \"{schema2}\".\"City\" (id) ON DELETE NO ACTION
         );
         ",
-        schema2,
     );
 
     api.raw_cmd(&sql);

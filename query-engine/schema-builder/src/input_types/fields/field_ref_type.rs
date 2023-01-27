@@ -44,5 +44,5 @@ fn field_ref_input_type_name(allow_type: &InputType) -> String {
         _ => unreachable!("input ref type only support scalar or enums"),
     };
 
-    format!("{}FieldRefInput", typ_str)
+    format!("{typ_str}FieldRefInput")
 }

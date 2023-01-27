@@ -314,15 +314,15 @@ mod tests {
         ];
 
         for test_case in test_cases {
-            println!("TESTING: {}", test_case);
+            println!("TESTING: {test_case}");
 
-            let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
+            let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
             let dml = parse(&datamodel_string);
             let dmmf_string = render_to_dmmf(&dml);
 
             assert_eq_json(
                 &dmmf_string,
-                &load_from_file(format!("{}.json", test_case).as_str()),
+                &load_from_file(format!("{test_case}.json").as_str()),
                 test_case,
             );
         }
@@ -338,6 +338,6 @@ mod tests {
 
     fn load_from_file(file: &str) -> String {
         let samples_folder_path = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
-        fs::read_to_string(format!("{}/{}", samples_folder_path, file)).unwrap()
+        fs::read_to_string(format!("{samples_folder_path}/{file}")).unwrap()
     }
 }

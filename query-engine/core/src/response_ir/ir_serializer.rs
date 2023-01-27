@@ -53,7 +53,7 @@ impl IrSerializer {
 
             ExpressionResult::Empty => panic!("Internal error: Attempted to serialize empty result."),
 
-            _ => panic!("Internal error: Attempted to serialize non-query result {:?}.", result),
+            _ => panic!("Internal error: Attempted to serialize non-query result {result:?}."),
         }
     }
 }

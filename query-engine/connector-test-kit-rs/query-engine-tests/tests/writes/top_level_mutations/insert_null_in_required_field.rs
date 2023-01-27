@@ -150,7 +150,7 @@ mod insert_null {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneA(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneA(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -87,15 +87,13 @@ mod rel_graphql {
         match model_name {
             "Cat" => runner
                 .query(format!(
-                    "mutation {{ createOneCat(data: {{ catName: \"{}\" }}) {{ id }} }}",
-                    name
+                    "mutation {{ createOneCat(data: {{ catName: \"{name}\" }}) {{ id }} }}"
                 ))
                 .await?
                 .assert_success(),
             "Owner" => runner
                 .query(format!(
-                    "mutation {{ createOneOwner(data: {{ ownerName: \"{}\" }}) {{ id }} }}",
-                    name
+                    "mutation {{ createOneOwner(data: {{ ownerName: \"{name}\" }}) {{ id }} }}"
                 ))
                 .await?
                 .assert_success(),

@@ -20,7 +20,7 @@ pub(crate) fn build(aggr_selections: &[RelAggregationSelection], ctx: &Context<'
     for (index, selection) in aggr_selections.iter().enumerate() {
         match selection {
             RelAggregationSelection::Count(rf, filter) => {
-                let join_alias = format!("aggr_selection_{}", index);
+                let join_alias = format!("aggr_selection_{index}");
                 let aggregator_alias = selection.db_alias();
                 let join = compute_aggr_join(
                     rf,

@@ -38,7 +38,7 @@ mod connect_inside_upsert {
           run_query!(&runner, format!(r#"mutation{{upsertOneParent(where: {{id: "5beea4aa6183dd734b2dbd9b"}}, create: {{p: "p1", childOpt:{{connect:{{id:{child_id}}}}}}}, update: {{p: {{ set: "p-new" }}}}) {{
             childOpt{{ c }}
           }}
-        }}"#, child_id = child_id)),
+        }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -60,10 +60,10 @@ mod connect_inside_upsert {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"mutation{{upsertOneParent(where: {{id: {parent}}}, create: {{p: "p new"}}, update: {{p: {{ set: "p updated" }},childOpt:{{connect:{{id: {child}}}}}}}) {{
+          run_query!(&runner, format!(r#"mutation{{upsertOneParent(where: {{id: {parent_id}}}, create: {{p: "p new"}}, update: {{p: {{ set: "p updated" }},childOpt:{{connect:{{id: {child_id}}}}}}}) {{
             childOpt{{c}}
           }}
-        }}"#, parent = parent_id, child = child_id)),
+        }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 

@@ -48,7 +48,7 @@ impl MssqlFlavour {
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
     fn master_url(input: &str) -> ConnectorResult<(String, String)> {
-        let mut conn = JdbcString::from_str(&format!("jdbc:{}", input))
+        let mut conn = JdbcString::from_str(&format!("jdbc:{input}"))
             .map_err(|e| ConnectorError::from_source(e, "JDBC string parse error"))?;
         let params = conn.properties_mut();
 
@@ -109,7 +109,7 @@ impl SqlFlavour for MssqlFlavour {
             let (db_name, master_uri) = Self::master_url(connection_string)?;
             let mut master_conn = Connection::new(&master_uri).await?;
 
-            let query = format!("CREATE DATABASE [{}]", db_name);
+            let query = format!("CREATE DATABASE [{db_name}]");
             master_conn
                 .raw_cmd(
                     &query,
@@ -158,7 +158,7 @@ impl SqlFlavour for MssqlFlavour {
             let params = self.state.get_unwrapped_params();
             let connection_string = &params.connector_params.connection_string;
             {
-                let conn_str: JdbcString = format!("jdbc:{}", connection_string)
+                let conn_str: JdbcString = format!("jdbc:{connection_string}")
                     .parse()
                     .map_err(ConnectorError::url_parse_error)?;
 
@@ -174,7 +174,7 @@ impl SqlFlavour for MssqlFlavour {
             let (db_name, master_uri) = Self::master_url(&params.connector_params.connection_string)?;
             let mut conn = Connection::new(&master_uri.to_string()).await?;
 
-            let query = format!("DROP DATABASE IF EXISTS [{}]", db_name);
+            let query = format!("DROP DATABASE IF EXISTS [{db_name}]");
             conn.raw_cmd(
                 &query,
                 &Params {
@@ -265,11 +265,10 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'DROP PROCEDURE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
                     FROM sys.objects
-                    WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'P'
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}' AND type = 'P'
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 let drop_shared_defaults = format!(
@@ -282,11 +281,10 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'DROP DEFAULT [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(object_id) + ']'
                     FROM sys.objects
-                    WHERE SCHEMA_NAME(schema_id) = '{0}' AND type = 'D' AND parent_object_id = 0
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}' AND type = 'D' AND parent_object_id = 0
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 let drop_views = format!(
@@ -299,11 +297,10 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'DROP VIEW [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
                     FROM sys.views
-                    WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}'
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 let drop_fks = format!(
@@ -316,11 +313,10 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
                     FROM sys.foreign_keys
-                    WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}'
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 let drop_tables = format!(
@@ -333,11 +329,10 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
                     FROM sys.tables
-                    WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}'
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 let drop_types = format!(
@@ -350,12 +345,11 @@ impl SqlFlavour for MssqlFlavour {
                     SELECT @stmt = ISNULL(@stmt + @n, '') +
                         'DROP TYPE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
                     FROM sys.types
-                    WHERE SCHEMA_NAME(schema_id) = '{0}'
+                    WHERE SCHEMA_NAME(schema_id) = '{schema_name}'
                     AND is_user_defined = 1
 
                     EXEC SP_EXECUTESQL @stmt
-                    "#,
-                    schema_name
+                    "#
                 );
 
                 connection.raw_cmd(&drop_procedures, params).await?;
@@ -368,7 +362,7 @@ impl SqlFlavour for MssqlFlavour {
 
             // We need to drop namespaces after we've dropped everything else.
             for schema_name in ns_vec {
-                let drop_namespace = format!("DROP SCHEMA IF EXISTS [{0}]", schema_name);
+                let drop_namespace = format!("DROP SCHEMA IF EXISTS [{schema_name}]");
                 connection.raw_cmd(&drop_namespace, params).await?;
             }
 
@@ -461,7 +455,7 @@ impl SqlFlavour for MssqlFlavour {
                     ));
                 }
 
-                let create_database = format!("CREATE DATABASE [{}]", shadow_database_name);
+                let create_database = format!("CREATE DATABASE [{shadow_database_name}]");
 
                 main_connection
                     .raw_cmd(&create_database, params)
@@ -549,7 +543,7 @@ mod tests {
 
         let mut flavour = MssqlFlavour::default();
         flavour.set_params(params).unwrap();
-        let debugged = format!("{:?}", flavour);
+        let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

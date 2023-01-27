@@ -12,7 +12,7 @@ pub fn generate_rust_modules(out_dir: &Path) -> CrateResult {
     let api_defs_root = concat!(env!("CARGO_MANIFEST_DIR"), "/methods");
 
     // https://doc.rust-lang.org/cargo/reference/build-scripts.html
-    println!("cargo:rerun-if-changed={}", api_defs_root);
+    println!("cargo:rerun-if-changed={api_defs_root}");
 
     let entries = std::fs::read_dir(api_defs_root)?;
     let mut api = Api::default();
@@ -44,21 +44,18 @@ fn validate(api: &Api) {
 
     for (method_name, method) in &api.methods {
         if !shape_exists(&method.request_shape, api) {
-            errs.push(format!("Request shape for {} does not exist", method_name))
+            errs.push(format!("Request shape for {method_name} does not exist"))
         }
 
         if !shape_exists(&method.response_shape, api) {
-            errs.push(format!("Response shape for {} does not exist", method_name))
+            errs.push(format!("Response shape for {method_name} does not exist"))
         }
     }
 
     for (record_name, record_shape) in &api.record_shapes {
         for (field_name, field) in &record_shape.fields {
             if !shape_exists(&field.shape, api) {
-                errs.push(format!(
-                    "Field shape for {}.{} does not exist.",
-                    record_name, field_name
-                ))
+                errs.push(format!("Field shape for {record_name}.{field_name} does not exist."))
             }
         }
     }
@@ -68,8 +65,7 @@ fn validate(api: &Api) {
             if let Some(shape) = variant.shape.as_ref() {
                 if !shape_exists(shape, api) {
                     errs.push(format!(
-                        "Enum variant shape for {}.{} does not exist.",
-                        enum_name, variant_name
+                        "Enum variant shape for {enum_name}.{variant_name} does not exist."
                     ))
                 }
             }
@@ -78,7 +74,7 @@ fn validate(api: &Api) {
 
     if !errs.is_empty() {
         for err in errs {
-            eprintln!("{}", err);
+            eprintln!("{err}");
         }
         std::process::exit(1);
     }

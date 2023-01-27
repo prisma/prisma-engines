@@ -58,15 +58,15 @@ pub enum AlterTableClause<'a> {
 impl Display for AlterTableClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AlterTableClause::RenameTo { next_name } => write!(f, "RENAME TO {}", next_name),
+            AlterTableClause::RenameTo { next_name } => write!(f, "RENAME TO {next_name}"),
             AlterTableClause::RenameIndex {
                 previous_name,
                 next_name,
-            } => write!(f, "RENAME INDEX `{}` TO `{}`", previous_name, next_name),
-            AlterTableClause::DropColumn { column_name } => write!(f, "DROP COLUMN `{}`", column_name),
-            AlterTableClause::DropForeignKey { constraint_name } => write!(f, "DROP FOREIGN KEY `{}`", constraint_name),
+            } => write!(f, "RENAME INDEX `{previous_name}` TO `{next_name}`"),
+            AlterTableClause::DropColumn { column_name } => write!(f, "DROP COLUMN `{column_name}`"),
+            AlterTableClause::DropForeignKey { constraint_name } => write!(f, "DROP FOREIGN KEY `{constraint_name}`"),
             AlterTableClause::DropPrimaryKey => f.write_str("DROP PRIMARY KEY"),
-            AlterTableClause::AddForeignKey(fk) => write!(f, "ADD {}", fk),
+            AlterTableClause::AddForeignKey(fk) => write!(f, "ADD {fk}"),
         }
     }
 }
@@ -84,7 +84,7 @@ pub struct ForeignKey<'a> {
 impl<'a> Display for ForeignKey<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(constraint_name) = &self.constraint_name {
-            write!(f, "CONSTRAINT `{constraint_name}` ", constraint_name = constraint_name,)?;
+            write!(f, "CONSTRAINT `{constraint_name}` ")?;
         }
 
         f.write_str("FOREIGN KEY (")?;
@@ -209,7 +209,7 @@ impl Display for CreateIndex<'_> {
                 let mut rendered = Ident(&s.name).to_string();
 
                 if let Some(length) = s.length {
-                    write!(rendered, "({})", length).unwrap();
+                    write!(rendered, "({length})").unwrap();
                 }
 
                 if let Some(sort_order) = s.sort_order {
@@ -261,7 +261,7 @@ impl Display for CreateTable<'_> {
                     let mut rendered = Ident(&col.name).to_string();
 
                     if let Some(length) = col.length {
-                        write!(rendered, "({})", length).unwrap();
+                        write!(rendered, "({length})").unwrap();
                     }
 
                     if let Some(sort_order) = col.sort_order {
@@ -356,7 +356,7 @@ impl Display for IndexClause<'_> {
                 let mut rendered = format!("{}", Ident(col.name.as_ref()));
 
                 if let Some(length) = col.length {
-                    write!(rendered, "({})", length).unwrap();
+                    write!(rendered, "({length})").unwrap();
                 };
 
                 if let Some(sort_order) = col.sort_order {

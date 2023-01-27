@@ -8,7 +8,7 @@ use sql::ColumnArity;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
-use super::{DefaultValuePair, IdPair, IndexPair, ModelPair, Pair, ViewPair};
+use super::{DefaultValuePair, IdPair, IndexPair, Pair};
 
 /// Comparing a possible previous PSL scalar field
 /// to a column from the database. Re-introspection
@@ -42,22 +42,6 @@ impl<'a> ScalarFieldPair<'a> {
     /// If the field is ignored in the client.
     pub fn is_ignored(self) -> bool {
         self.previous.map(|f| f.is_ignored()).unwrap_or(false)
-    }
-
-    /// The container where the field is defined, view or model.
-    pub fn container(self) -> Either<ModelPair<'a>, ViewPair<'a>> {
-        let previous = self.previous.map(|f| f.model());
-
-        match self.next.refine() {
-            Either::Left(f) => {
-                let pair = Pair::new(self.context, previous, f.table());
-                Either::Left(pair)
-            }
-            Either::Right(v) => {
-                let pair = Pair::new(self.context, previous, v.view());
-                Either::Right(pair)
-            }
-        }
     }
 
     /// True if we took the name from the PSL.

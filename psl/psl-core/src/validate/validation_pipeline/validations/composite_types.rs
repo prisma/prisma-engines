@@ -46,8 +46,7 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
             }
             ScalarFieldType::CompositeType(ctid) if visited.first() == Some(ctid) => {
                 let msg = format!(
-                    "The types cause an endless cycle in the path {}. Please change one of the fields to be either optional or a list to break the cycle.",
-                    path,
+                    "The types cause an endless cycle in the path {path}. Please change one of the fields to be either optional or a list to break the cycle."
                 );
 
                 errors.push((
@@ -156,7 +155,7 @@ impl<'db> fmt::Display for CompositeTypePath<'db> {
         let path = traversed
             .into_iter()
             .map(|w| w.name())
-            .map(|n| format!("`{}`", n))
+            .map(|n| format!("`{n}`"))
             .collect::<Vec<_>>()
             .join(" → ");
 

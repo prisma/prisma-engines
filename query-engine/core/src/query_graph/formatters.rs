@@ -71,9 +71,9 @@ impl Display for Computation {
 impl Display for Node {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Query(q) => write!(f, "{}", q),
-            Self::Flow(flow) => write!(f, "{}", flow),
-            Self::Computation(c) => write!(f, "{}", c),
+            Self::Query(q) => write!(f, "{q}"),
+            Self::Flow(flow) => write!(f, "{flow}"),
+            Self::Computation(c) => write!(f, "{c}"),
             Self::Empty => write!(f, "Empty"),
         }
     }
@@ -83,8 +83,8 @@ impl ToGraphviz for Node {
     fn to_graphviz(&self) -> String {
         match self {
             Node::Query(q) => q.to_graphviz(),
-            Node::Flow(f) => format!("{}", f),
-            Node::Computation(c) => format!("{}", c),
+            Node::Flow(f) => format!("{f}"),
+            Node::Computation(c) => format!("{c}"),
             Node::Empty => "Empty".to_string(),
         }
     }
@@ -130,7 +130,7 @@ fn fmt_raw_indices(i: &[NodeIndex]) -> String {
 }
 
 fn fmt_node_list(v: &[NodeRef]) -> String {
-    let inner_string = v.iter().map(|x| format!("{}", x)).collect::<Vec<String>>().join(", ");
+    let inner_string = v.iter().map(|x| format!("{x}")).collect::<Vec<String>>().join(", ");
 
     format!("[{}]", inner_string.as_str())
 }

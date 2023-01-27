@@ -18,8 +18,7 @@ impl FromStr for FilterGrouping {
             filters::OR_LOWERCASE => Ok(Self::Or),
             filters::NOT_LOWERCASE => Ok(Self::Not),
             _ => Err(QueryGraphBuilderError::InputError(format!(
-                "{} is not a valid grouping filter operation",
-                s
+                "{s} is not a valid grouping filter operation"
             ))),
         }
     }

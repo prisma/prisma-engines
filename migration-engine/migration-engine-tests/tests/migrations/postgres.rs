@@ -116,7 +116,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     .to_string();
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {field_name} {prisma_type} @db.{native_type}").unwrap();
     }
 
     dm.push_str("}\n");

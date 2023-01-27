@@ -208,10 +208,7 @@ impl SqlFlavour for MysqlFlavour {
             let mut conn = Connection::new(url).await?;
             let db_name = params.url.dbname();
 
-            let query = format!(
-                "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-                db_name
-            );
+            let query = format!("CREATE DATABASE `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
             conn.raw_cmd(&query, &mysql_url).await?;
 
@@ -243,7 +240,7 @@ impl SqlFlavour for MysqlFlavour {
             let db_name = params.url.dbname();
 
             connection
-                .raw_cmd(&format!("DROP DATABASE `{}`", db_name), &params.url)
+                .raw_cmd(&format!("DROP DATABASE `{db_name}`"), &params.url)
                 .await?;
 
             Ok(())
@@ -293,12 +290,12 @@ impl SqlFlavour for MysqlFlavour {
 
             let db_name = params.url.dbname();
             connection
-                .raw_cmd(&format!("DROP DATABASE `{}`", db_name), &params.url)
+                .raw_cmd(&format!("DROP DATABASE `{db_name}`"), &params.url)
                 .await?;
             connection
-                .raw_cmd(&format!("CREATE DATABASE `{}`", db_name), &params.url)
+                .raw_cmd(&format!("CREATE DATABASE `{db_name}`"), &params.url)
                 .await?;
-            connection.raw_cmd(&format!("USE `{}`", db_name), &params.url).await?;
+            connection.raw_cmd(&format!("USE `{db_name}`"), &params.url).await?;
 
             Ok(())
         })
@@ -369,13 +366,13 @@ impl SqlFlavour for MysqlFlavour {
                 with_connection(&mut self.state, move |params, _circumstances, conn| async move {
                     let shadow_database_name = crate::new_shadow_database_name();
 
-                    let create_database = format!("CREATE DATABASE `{}`", shadow_database_name);
+                    let create_database = format!("CREATE DATABASE `{shadow_database_name}`");
                     conn.raw_cmd(&create_database, &params.url)
                         .await
                         .map_err(|err| err.into_shadow_db_creation_error())?;
 
                     let mut shadow_database_url = params.url.url().clone();
-                    shadow_database_url.set_path(&format!("/{}", shadow_database_name));
+                    shadow_database_url.set_path(&format!("/{shadow_database_name}"));
                     let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
@@ -391,7 +388,7 @@ impl SqlFlavour for MysqlFlavour {
                     // leaving shadow databases behind in case of e.g. faulty migrations.
                     let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS `{}`", shadow_database_name);
+                    let drop_database = format!("DROP DATABASE IF EXISTS `{shadow_database_name}`");
                     conn.raw_cmd(&drop_database, &params.url).await?;
 
                     ret
@@ -465,7 +462,7 @@ mod tests {
             shadow_database_connection_string: None,
         };
         flavour.set_params(params).unwrap();
-        let debugged = format!("{:?}", flavour);
+        let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
 

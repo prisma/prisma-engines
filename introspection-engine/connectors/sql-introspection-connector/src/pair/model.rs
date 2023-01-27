@@ -29,11 +29,7 @@ impl<'a> ModelPair<'a> {
 
     /// The namespace of the model, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        if self.context.uses_namespaces() {
-            self.next.namespace()
-        } else {
-            None
-        }
+        self.context.uses_namespaces().then(|| self.next.namespace()).flatten()
     }
 
     /// Name of the model in the PSL. The value can be sanitized if it
@@ -50,8 +46,10 @@ impl<'a> ModelPair<'a> {
     }
 
     /// True, if the name of the model is using a reserved identifier.
+    /// If we already have a model in the PSL, the validation will not
+    /// allow reserved names and we don't need to warn the user.
     pub(crate) fn uses_reserved_name(self) -> bool {
-        psl::is_reserved_type_name(self.next.name())
+        psl::is_reserved_type_name(self.next.name()) && self.previous.is_none()
     }
 
     /// The documentation on top of the enum.
@@ -158,10 +156,15 @@ impl<'a> ModelPair<'a> {
     /// explicitly sets the model attribute, or if the model has no
     /// usable identifiers.
     pub(crate) fn ignored(self) -> bool {
-        let explicit_ignore = self.previous.map(|model| model.is_ignored()).unwrap_or(false);
+        let explicit_ignore = self.ignored_in_psl();
         let implicit_ignore = !self.has_usable_identifier() && self.scalar_fields().len() > 0;
 
         explicit_ignore || implicit_ignore
+    }
+
+    /// If the model is already marked as ignored in the PSL.
+    pub(crate) fn ignored_in_psl(self) -> bool {
+        self.previous.map(|model| model.is_ignored()).unwrap_or(false)
     }
 
     /// Returns an iterator over all indexes of the model,

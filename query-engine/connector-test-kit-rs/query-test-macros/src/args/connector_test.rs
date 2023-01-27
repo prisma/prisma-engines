@@ -70,7 +70,7 @@ impl darling::FromMeta for RelationMode {
         match value.to_lowercase().as_str() {
             "prisma" => Ok(Self::Prisma),
             "foreignkeys" => Ok(Self::ForeignKeys),
-            _ => Err(darling::Error::custom(format!("Invalid value: {}", value))),
+            _ => Err(darling::Error::custom(format!("Invalid value: {value}"))),
         }
     }
 }
@@ -181,7 +181,7 @@ impl darling::FromMeta for ExcludeFeatures {
 }
 
 fn strings_to_list(name: &str, items: &[syn::NestedMeta]) -> Result<Vec<String>, darling::Error> {
-    let error = format!("{} can only be string literals.", name);
+    let error = format!("{name} can only be string literals.");
     items
         .iter()
         .map(|i| match i {

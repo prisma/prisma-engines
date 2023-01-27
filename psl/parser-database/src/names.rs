@@ -191,17 +191,17 @@ fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Con
 fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
     if ident.name.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The name of a {} must not be empty.", schema_item),
+            &format!("The name of a {schema_item} must not be empty."),
             ident.span,
         ))
     } else if ident.name.chars().next().unwrap().is_numeric() {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The name of a {} must not start with a number.", schema_item),
+            &format!("The name of a {schema_item} must not start with a number."),
             ident.span,
         ))
     } else if ident.name.contains('-') {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The character `-` is not allowed in {} names.", schema_item),
+            &format!("The character `-` is not allowed in {schema_item} names."),
             ident.span,
         ))
     }

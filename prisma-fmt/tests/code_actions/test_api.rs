@@ -47,7 +47,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);
 
     let schema = {
-        write!(path, "{}/{}/schema.prisma", SCENARIOS_PATH, scenario_name).unwrap();
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}/schema.prisma").unwrap();
         std::fs::read_to_string(&path).unwrap()
     };
 
@@ -59,7 +59,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     };
 
     path.clear();
-    write!(path, "{}/{}/result.json", SCENARIOS_PATH, scenario_name).unwrap();
+    write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();
     let expected_result = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
 
     let params = lsp_types::CodeActionParams {
@@ -111,8 +111,8 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk>) -> String {
     for chunk in chunks {
         let formatted = match chunk {
             dissimilar::Chunk::Equal(text) => text.into(),
-            dissimilar::Chunk::Delete(text) => format!("\x1b[41m{}\x1b[0m", text),
-            dissimilar::Chunk::Insert(text) => format!("\x1b[42m{}\x1b[0m", text),
+            dissimilar::Chunk::Delete(text) => format!("\x1b[41m{text}\x1b[0m"),
+            dissimilar::Chunk::Insert(text) => format!("\x1b[42m{text}\x1b[0m"),
         };
         buf.push_str(&formatted);
     }

@@ -485,12 +485,14 @@ impl ReferentialAction {
             "SetNull" => Some(ReferentialAction::SetNull),
             "SetDefault" => Some(ReferentialAction::SetDefault),
             s => {
-                let message = format!("Invalid referential action: `{}`", s);
+                let message = format!("Invalid referential action: `{s}`");
+
                 diagnostics.push_error(DatamodelError::new_attribute_validation_error(
                     &message,
                     "@relation",
                     expr.span(),
                 ));
+
                 None
             }
         }

@@ -90,7 +90,7 @@ where
 
     let features = preview_features
         .iter()
-        .map(|f| format!("\"{}\"", f))
+        .map(|f| format!("\"{f}\""))
         .collect::<Vec<_>>()
         .join(", ");
 

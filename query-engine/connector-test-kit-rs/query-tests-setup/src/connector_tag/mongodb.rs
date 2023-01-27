@@ -26,34 +26,22 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
     ) -> String {
         match self.version {
             Some(MongoDbVersion::V4_2) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{}?authSource=admin&retryWrites=true",
-                database
+                "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{database}?authSource=admin&retryWrites=true"
             ),
             Some(MongoDbVersion::V4_2) => {
-                format!(
-                    "mongodb://prisma:prisma@127.0.0.1:27016/{}?authSource=admin&retryWrites=true",
-                    database
-                )
+                format!("mongodb://prisma:prisma@127.0.0.1:27016/{database}?authSource=admin&retryWrites=true")
             }
             Some(MongoDbVersion::V4_4) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-4-4:27017/{}?authSource=admin&retryWrites=true",
-                database
+                "mongodb://prisma:prisma@test-db-mongodb-4-4:27017/{database}?authSource=admin&retryWrites=true"
             ),
             Some(MongoDbVersion::V4_4) => {
-                format!(
-                    "mongodb://prisma:prisma@127.0.0.1:27017/{}?authSource=admin&retryWrites=true",
-                    database
-                )
+                format!("mongodb://prisma:prisma@127.0.0.1:27017/{database}?authSource=admin&retryWrites=true")
             }
-            Some(MongoDbVersion::V5) if is_ci => format!(
-                "mongodb://prisma:prisma@test-db-mongodb-5:27018/{}?authSource=admin&retryWrites=true",
-                database
-            ),
+            Some(MongoDbVersion::V5) if is_ci => {
+                format!("mongodb://prisma:prisma@test-db-mongodb-5:27018/{database}?authSource=admin&retryWrites=true")
+            }
             Some(MongoDbVersion::V5) => {
-                format!(
-                    "mongodb://prisma:prisma@127.0.0.1:27018/{}?authSource=admin&retryWrites=true",
-                    database
-                )
+                format!("mongodb://prisma:prisma@127.0.0.1:27018/{database}?authSource=admin&retryWrites=true")
             }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
@@ -138,7 +126,7 @@ impl TryFrom<&str> for MongoDbVersion {
             "4.4" => Self::V4_4,
             "4.2" => Self::V4_2,
             "5" => Self::V5,
-            _ => return Err(TestError::parse_error(format!("Unknown MongoDB version `{}`", s))),
+            _ => return Err(TestError::parse_error(format!("Unknown MongoDB version `{s}`"))),
         };
 
         Ok(version)

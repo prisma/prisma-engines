@@ -212,7 +212,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
 fn write_migrations(migrations: &[&str]) -> tempfile::TempDir {
     let dir = tempfile::tempdir().unwrap();
     for (idx, migration) in migrations.iter().enumerate() {
-        let migration_dir = dir.path().join(format!("{:3}", idx));
+        let migration_dir = dir.path().join(format!("{idx:3}"));
         std::fs::create_dir(&migration_dir).unwrap();
         let migration_path = migration_dir.join("migration.sql");
         std::fs::write(&migration_path, migration).unwrap();

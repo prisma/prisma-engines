@@ -148,7 +148,7 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let uri = format!("/transaction/{}/commit", tx_id);
+        let uri = format!("/transaction/{tx_id}/commit");
 
         let req = Request::builder()
             .uri(uri.as_str())
@@ -170,7 +170,7 @@ impl RunnerInterface for BinaryRunner {
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let uri = format!("/transaction/{}/rollback", tx_id);
+        let uri = format!("/transaction/{tx_id}/rollback");
 
         let req = Request::builder()
             .uri(uri.as_str())

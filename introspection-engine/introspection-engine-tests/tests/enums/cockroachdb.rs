@@ -244,16 +244,15 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
         r#"
         model News {{
             id          BigInt @id @default(autoincrement())
-            confirmed   {0} @default(true)
+            confirmed   {enum_name} @default(true)
         }}
 
-        enum {0} {{
+        enum {enum_name} {{
             true
             false
             rumor
         }}
     "#,
-        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

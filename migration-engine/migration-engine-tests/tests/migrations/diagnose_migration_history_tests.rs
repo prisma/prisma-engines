@@ -319,7 +319,7 @@ fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: TestApi
         .assert_applied_migrations(&["initial", "second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&name);
-    std::fs::remove_dir_all(&second_migration_folder_path).unwrap();
+    std::fs::remove_dir_all(second_migration_folder_path).unwrap();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -389,7 +389,7 @@ fn diagnose_migrations_history_can_detect_when_history_diverges(api: TestApi) {
         .assert_applied_migrations(&["1-initial", "2-second-migration"]);
 
     let second_migration_folder_path = directory.path().join(&deleted_migration_name);
-    std::fs::remove_dir_all(&second_migration_folder_path).unwrap();
+    std::fs::remove_dir_all(second_migration_folder_path).unwrap();
 
     let dm3 = api.datamodel_with_provider(
         r#"
@@ -930,7 +930,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
         match result {
             Ok(api) => break api,
             Err(err) => {
-                eprintln!("got err, sleeping\nerr:{:?}", err);
+                eprintln!("got err, sleeping\nerr:{err:?}");
                 tries += 1;
                 std::thread::sleep(std::time::Duration::from_millis(200));
             }

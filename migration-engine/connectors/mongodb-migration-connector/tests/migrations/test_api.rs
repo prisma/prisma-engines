@@ -50,7 +50,7 @@ fn fresh_db_name() -> String {
     let id = DATABASE_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let mut out = String::with_capacity(PREFIX.len() + 4);
     out.push_str(PREFIX);
-    out.write_fmt(format_args!("{:04}", id)).unwrap();
+    out.write_fmt(format_args!("{id:04}")).unwrap();
     out
 }
 
@@ -149,13 +149,13 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);
 
     let schema = {
-        write!(path, "{}/{}/schema.prisma", SCENARIOS_PATH, scenario_name).unwrap();
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}/schema.prisma").unwrap();
         std::fs::read_to_string(&path).unwrap()
     };
 
     let state: State = {
         path.clear();
-        write!(path, "{}/{}/state.json", SCENARIOS_PATH, scenario_name).unwrap();
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}/state.json").unwrap();
         let file = std::fs::File::open(&path).unwrap();
         let collections: BTreeMap<String, _> = serde_json::from_reader(&file).unwrap();
         State { collections }
@@ -163,7 +163,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let mut expected_result = {
         path.clear();
-        write!(path, "{}/{}/result", SCENARIOS_PATH, scenario_name).unwrap();
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}/result").unwrap();
         std::fs::read_to_string(&path).unwrap()
     };
 
@@ -201,7 +201,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
         if *UPDATE_EXPECT {
             let mut file = std::fs::File::create(&path).unwrap(); // truncate
-            write!(file, "{}", rendered_migration).unwrap();
+            write!(file, "{rendered_migration}").unwrap();
         } else if expected_result != rendered_migration {
             let chunks = dissimilar::diff(&expected_result, &rendered_migration);
             panic!(
@@ -245,8 +245,8 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk>) -> String {
     for chunk in chunks {
         let formatted = match chunk {
             dissimilar::Chunk::Equal(text) => text.into(),
-            dissimilar::Chunk::Delete(text) => format!("\x1b[41m{}\x1b[0m", text),
-            dissimilar::Chunk::Insert(text) => format!("\x1b[42m{}\x1b[0m", text),
+            dissimilar::Chunk::Delete(text) => format!("\x1b[41m{text}\x1b[0m"),
+            dissimilar::Chunk::Insert(text) => format!("\x1b[42m{text}\x1b[0m"),
         };
         buf.push_str(&formatted);
     }

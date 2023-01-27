@@ -188,7 +188,7 @@ mod basic_order_by {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneOrderTest(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneOrderTest(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

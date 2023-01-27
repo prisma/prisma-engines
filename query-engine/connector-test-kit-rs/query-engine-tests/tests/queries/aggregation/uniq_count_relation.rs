@@ -216,7 +216,7 @@ mod uniq_count_rel {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOnePost(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOnePost(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

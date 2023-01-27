@@ -41,8 +41,7 @@ impl<T: Debug> TypeRefCache<T> {
     pub fn insert(&mut self, ident: Identifier, value: Arc<T>) {
         if let Some(old) = self.cache.insert(ident.clone(), value) {
             panic!(
-                "Invariant violation: Inserted identifier {:?} twice, this is a bug and invalidates weak arc references. {:?}",
-                ident, old
+                "Invariant violation: Inserted identifier {ident:?} twice, this is a bug and invalidates weak arc references. {old:?}"
             )
         }
     }

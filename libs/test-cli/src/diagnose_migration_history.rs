@@ -14,7 +14,7 @@ impl DiagnoseMigrationHistory {
 
         let output = engine.diagnose_migration_history(input).await?;
 
-        eprintln!("{:#?}", output);
+        eprintln!("{output:#?}");
 
         Ok(())
     }

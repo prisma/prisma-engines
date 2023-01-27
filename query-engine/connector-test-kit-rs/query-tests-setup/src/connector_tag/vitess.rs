@@ -106,7 +106,7 @@ impl FromStr for VitessVersion {
         let version = match s {
             "5.7" => Self::V5_7,
             "8.0" => Self::V8_0,
-            _ => return Err(TestError::parse_error(format!("Unknown Vitess version `{}`", s))),
+            _ => return Err(TestError::parse_error(format!("Unknown Vitess version `{s}`"))),
         };
 
         Ok(version)

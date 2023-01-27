@@ -89,7 +89,7 @@ impl Runner {
             "direct" => Self::direct(datamodel, connector_tag, metrics).await,
             "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
             "binary" => Self::binary(datamodel, connector_tag, metrics).await,
-            unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
+            unknown => Err(TestError::parse_error(format!("Unknown test runner '{unknown}'"))),
         }?;
 
         Ok(Self { log_capture, inner })

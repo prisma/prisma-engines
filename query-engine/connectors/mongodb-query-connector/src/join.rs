@@ -100,7 +100,7 @@ impl JoinStage {
             .enumerate()
             .map(|(idx, right_field)| {
                 let right_ref = format!("${}", right_field.db_name());
-                let left_var = format!("$$left_{}", idx);
+                let left_var = format!("$$left_{idx}");
 
                 match relation.is_many_to_many() {
                     true if right_field.is_list() => doc! { "$in": [left_var, right_ref] },
@@ -118,7 +118,7 @@ impl JoinStage {
             // Go through every right field to place in the $addFields operator
             for right_field in right_scalars.iter() {
                 let right_name = right_field.db_name();
-                let right_ref = format!("${}", right_name);
+                let right_ref = format!("${right_name}");
 
                 add_fields.insert(
                     right_name,
@@ -153,7 +153,7 @@ impl JoinStage {
         // If the field is a to-one, add an unwind stage.
         let unwind_stage = if !from_field.is_list() {
             Some(doc! {
-                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+                "$unwind": { "path": format!("${as_name}"), "preserveNullAndEmptyArrays": true }
             })
         } else {
             None
@@ -166,7 +166,7 @@ impl JoinStage {
 
         // With the left side, we need to introduce the variable `left_x` pointing to the correct field
         for (idx, left_field) in left_scalars.iter().enumerate() {
-            let left_var = format!("left_{}", idx);
+            let left_var = format!("left_{idx}");
 
             let_vars.insert(left_var, format!("${}", left_field.db_name()));
         }

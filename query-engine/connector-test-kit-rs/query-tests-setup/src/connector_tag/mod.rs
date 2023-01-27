@@ -108,7 +108,7 @@ impl fmt::Display for ConnectorTag {
             Self::Cockroach(_) => "CockroachDB",
         };
 
-        write!(f, "{}", printable)
+        write!(f, "{printable}")
     }
 }
 
@@ -133,13 +133,13 @@ impl fmt::Display for ConnectorVersion {
             },
             Self::Sqlite => "SQLite".to_string(),
             Self::Vitess(v) => match v {
-                Some(v) => format!("Vitess ({})", v),
+                Some(v) => format!("Vitess ({v})"),
                 None => "Vitess (unknown)".to_string(),
             },
             Self::CockroachDb => "CockroachDB".to_string(),
         };
 
-        write!(f, "{}", printable)
+        write!(f, "{printable}")
     }
 }
 
@@ -167,7 +167,7 @@ impl ConnectorTag {
     ) -> bool {
         let current_connector = config.test_connector_tag().unwrap();
         if !enabled.contains(&current_connector) {
-            println!("Skipping test '{}', current test connector is not enabled.", test_name);
+            println!("Skipping test '{test_name}', current test connector is not enabled.");
             return false;
         }
 
@@ -176,8 +176,7 @@ impl ConnectorTag {
             .any(|cap| !current_connector.capabilities().contains(cap))
         {
             println!(
-                "Skipping test '{}', current test connector doesn't offer one or more capabilities that are required.",
-                test_name
+                "Skipping test '{test_name}', current test connector doesn't offer one or more capabilities that are required."
             );
             return false;
         }
@@ -208,7 +207,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
             "vitess" => Self::Vitess(VitessConnectorTag::new(version)?),
-            _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
+            _ => return Err(TestError::parse_error(format!("Unknown connector tag `{connector}`"))),
         };
 
         Ok(tag)

@@ -79,9 +79,9 @@ fn test_connecting_with_a_working_mysql_connection_string(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
 
-    assert!(output.status.success(), "{:?}", output);
+    assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Connection successful"), "{:?}", stderr);
+    assert!(stderr.contains("Connection successful"), "{stderr:?}");
 }
 
 #[test_connector(tags(Mysql))]
@@ -106,9 +106,9 @@ fn test_connecting_with_a_working_postgres_connection_string(api: TestApi) {
 
     let output = api.run(&["--datasource", &conn_string, "can-connect-to-database"]);
 
-    assert!(output.status.success(), "{:?}", output);
+    assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Connection successful"), "{:?}", stderr);
+    assert!(stderr.contains("Connection successful"), "{stderr:?}");
 }
 
 // Note: not redundant with previous test because of the different URL scheme.
@@ -122,9 +122,9 @@ fn test_connecting_with_a_working_postgresql_connection_string(api: TestApi) {
 
     let output = api.run(&["--datasource", &conn_string, "can-connect-to-database"]);
 
-    assert!(output.status.success(), "{:?}", output);
+    assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Connection successful"), "{:?}", stderr);
+    assert!(stderr.contains("Connection successful"), "{stderr:?}");
 }
 
 #[test_connector(tags(Postgres))]
@@ -144,16 +144,16 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
 
     let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
 
-    assert!(output.status.success(), "{:?}", output);
+    assert!(output.status.success(), "{output:?}");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Connection successful"), "{:?}", stderr);
+    assert!(stderr.contains("Connection successful"), "{stderr:?}");
 }
 
 #[test_connector(tags(Postgres, Mysql))]
 fn test_create_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
 
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
     assert!(output.status.success());
@@ -197,7 +197,7 @@ fn test_create_sqlite_database(api: TestApi) {
     let url = format!("file:{}", sqlite_path.to_string_lossy());
     let output = api.run(&["--datasource", &url, "create-database"]);
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(output.status.success(), "{:?}", stderr);
+    assert!(output.status.success(), "{stderr:?}");
     assert!(stderr.contains("success"));
     assert!(stderr.contains("test_create_sqlite_database.db"));
 
@@ -223,7 +223,7 @@ fn test_drop_sqlite_database(api: TestApi) {
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = run(&["--datasource", &connection_string, "drop-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
 
     let output = run(&["--datasource", &connection_string, "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
@@ -280,13 +280,13 @@ fn database_already_exists_must_return_a_proper_error(api: TestApi) {
 
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains(r#""error_code":"P1009""#));
-    assert!(stderr.contains(&format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port)));
+    assert!(stderr.contains(&format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`")));
 }
 
 #[test_connector(tags(Postgres))]
 fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
     let connection_string = api.connection_string();
-    let url = format!("{}&sslmode=require&sslaccept=strict", connection_string);
+    let url = format!("{connection_string}&sslmode=require&sslaccept=strict");
     let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
 
     assert_eq!(output.status.code(), Some(1));
@@ -434,9 +434,9 @@ fn execute_postgres(api: TestApi) {
 
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
 
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = r#"
@@ -491,10 +491,10 @@ fn introspect_postgres(api: TestApi) {
     let connection_string = api.connection_string();
 
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
 
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
-    assert!(output.status.success(), "{:#?}", output);
+    assert!(output.status.success(), "{output:#?}");
 
     let tmpdir = tempfile::tempdir().unwrap();
     let schema = indoc! {r#"

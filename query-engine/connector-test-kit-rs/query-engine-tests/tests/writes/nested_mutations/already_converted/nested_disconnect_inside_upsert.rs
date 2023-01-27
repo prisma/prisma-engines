@@ -50,7 +50,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -103,7 +103,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -157,7 +157,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -212,7 +212,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
         Ok(())
@@ -258,7 +258,7 @@ mod disconnect_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -305,7 +305,7 @@ mod disconnect_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -351,7 +351,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -401,7 +401,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -452,7 +452,7 @@ mod disconnect_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 

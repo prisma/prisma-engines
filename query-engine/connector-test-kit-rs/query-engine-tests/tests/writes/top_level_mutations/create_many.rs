@@ -198,7 +198,7 @@ mod create_many {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=1000 {
-            records.push(format!("{{ id: {} }}", i));
+            records.push(format!("{{ id: {i} }}"));
         }
 
         insta::assert_snapshot!(
@@ -236,7 +236,7 @@ mod create_many {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=2000 {
-            records.push(format!("{{ id: {}, a: {}, b: {}, c: {} }}", i, i, i, i));
+            records.push(format!("{{ id: {i}, a: {i}, b: {i}, c: {i} }}"));
         }
 
         insta::assert_snapshot!(

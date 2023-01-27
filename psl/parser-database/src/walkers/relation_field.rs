@@ -250,9 +250,9 @@ impl<'db> std::hash::Hash for RelationName<'db> {
 impl<'db> RelationName<'db> {
     pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
-            Self::Generated(format!("{}To{}", model_a, model_b))
+            Self::Generated(format!("{model_a}To{model_b}"))
         } else {
-            Self::Generated(format!("{}To{}", model_b, model_a))
+            Self::Generated(format!("{model_b}To{model_a}"))
         }
     }
 }

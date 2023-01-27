@@ -42,7 +42,7 @@ impl<'a> IdPair<'a> {
 
         let clustered = match self.next {
             Some(next) => {
-                let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
+                let ext: &MssqlSchemaExt = self.context.sql_schema.downcast_connector_data();
                 ext.index_is_clustered(next.id)
             }
             None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(true),
@@ -59,11 +59,6 @@ impl<'a> IdPair<'a> {
     /// `@@id`.
     pub(crate) fn defined_in_a_field(self) -> bool {
         self.fields().len() == 1
-    }
-
-    /// The existing model in the PSL.
-    pub(crate) fn model(self) -> Option<walkers::ModelWalker<'a>> {
-        self.previous.map(|prev| prev.model())
     }
 
     /// If defined in a single field, returns the given field.

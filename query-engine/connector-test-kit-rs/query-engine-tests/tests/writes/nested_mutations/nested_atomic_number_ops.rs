@@ -479,18 +479,15 @@ mod atomic_number_ops {
                       rel: {{
                         create: {{
                           id: {id}
-                          optInt: {int}
-                          optFloat: {float}
+                          optInt: {i}
+                          optFloat: {f}
                         }}
                       }}
                     }}
                   ) {{
                     id
                   }}
-                }}"#,
-                id = id,
-                int = i,
-                float = f
+                }}"#
             )
         );
 
@@ -516,11 +513,7 @@ mod atomic_number_ops {
                       {field}
                     }}
                   }}
-                }}"#,
-                id = id,
-                field = field,
-                op = op,
-                value = value
+                }}"#
             ),
             &["data", "updateOneTestModel", "rel"]
         );

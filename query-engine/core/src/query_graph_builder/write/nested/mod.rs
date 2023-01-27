@@ -47,7 +47,7 @@ pub fn connect_nested_query(
             operations::UPDATE_MANY => nested_update_many(graph, connector_ctx, &parent, &parent_relation_field, value, &child_model)?,
             operations::DELETE_MANY => nested_delete_many(graph, connector_ctx, &parent, &parent_relation_field, value, &child_model)?,
             operations::CONNECT_OR_CREATE => nested_connect_or_create(graph, connector_ctx, parent, &parent_relation_field, value, &child_model)?,
-            _ => panic!("Unhandled nested operation: {}", field_name),
+            _ => panic!("Unhandled nested operation: {field_name}"),
         };
     }
 

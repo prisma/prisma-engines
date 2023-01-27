@@ -77,19 +77,19 @@ impl From<ConnectorError> for ApiError {
 
 impl From<url::ParseError> for ApiError {
     fn from(e: url::ParseError) -> Self {
-        Self::configuration(format!("Error parsing connection string: {}", e))
+        Self::configuration(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<connection_string::Error> for ApiError {
     fn from(e: connection_string::Error) -> Self {
-        Self::configuration(format!("Error parsing connection string: {}", e))
+        Self::configuration(format!("Error parsing connection string: {e}"))
     }
 }
 
 impl From<serde_json::Error> for ApiError {
     fn from(e: serde_json::Error) -> Self {
-        Self::JsonDecode(format!("{}", e))
+        Self::JsonDecode(format!("{e}"))
     }
 }
 

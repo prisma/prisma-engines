@@ -55,8 +55,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
             .local_custom_name_scope_violations(model.model_id(), name.as_ref())
         {
             let message = format!(
-                "The given custom name `{}` has to be unique on the model. Please provide a different name for the `name` argument.",
-                name,
+                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
             );
 
             let from_arg = index.ast_attribute().span_for_argument("name");

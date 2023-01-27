@@ -300,8 +300,7 @@ fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttrib
         Some("Asc") => Some(SortOrder::Asc),
         Some(other) => {
             ctx.push_attribute_validation_error(&format!(
-                "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
-                other
+                "The `sort` argument can only be `Asc` or `Desc` you provided: {other}."
             ));
             None
         }
@@ -522,7 +521,7 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
         Some("SpGist") => Some(IndexAlgorithm::SpGist),
         Some("Brin") => Some(IndexAlgorithm::Brin),
         Some(other) => {
-            ctx.push_attribute_validation_error(&format!("Unknown index type: {}.", other));
+            ctx.push_attribute_validation_error(&format!("Unknown index type: {other}."));
             None
         }
         None => None,
@@ -1083,8 +1082,7 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 
     ctx.push_error(DatamodelError::new_model_validation_error(
         &format!(
-            "The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.",
-            attribute
+            "The `name` property within the `{attribute}` attribute only allows for the following characters: `_a-zA-Z0-9`."
         ),
         "model",
         object_name,

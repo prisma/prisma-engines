@@ -51,7 +51,7 @@ impl FromStr for ScalarType {
             "Json" => Ok(ScalarType::Json),
             "Bytes" => Ok(ScalarType::Bytes),
             "Decimal" => Ok(ScalarType::Decimal),
-            _ => Err(format!("type {} is not a known scalar type.", s)),
+            _ => Err(format!("type {s} is not a known scalar type.")),
         }
     }
 }

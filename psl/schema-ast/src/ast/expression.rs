@@ -25,11 +25,11 @@ impl fmt::Display for Expression {
             Expression::ConstantValue(val, _) => fmt::Display::fmt(val, f),
             Expression::Function(fun, args, _) => {
                 let args = args.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
-                write!(f, "{}({})", fun, args)
+                write!(f, "{fun}({args})")
             }
             Expression::Array(vals, _) => {
                 let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
-                write!(f, "[{}]", vals)
+                write!(f, "[{vals}]")
             }
         }
     }

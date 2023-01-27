@@ -1898,7 +1898,7 @@ fn with_params(r#type: &str) -> &str {
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
     for (from, seed, casts) in SAFE_CASTS.iter() {
         for to in *casts {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
             let kind = from.split('(').next().unwrap();
 
@@ -1956,7 +1956,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     for (from, seed, casts) in RISKY_CASTS.iter() {
         for to in *casts {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
             let kind = from.split('(').next().unwrap();
 
@@ -2022,7 +2022,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
     for (from, seed, casts) in NOT_CASTABLE.iter() {
         for to in *casts {
-            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+            println!("From `{from}` to `{to}` with seed `{seed:?}`");
 
             let kind = match from.split('(').next() {
                 Some(a) => a,

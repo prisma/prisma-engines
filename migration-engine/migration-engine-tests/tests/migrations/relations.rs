@@ -553,10 +553,9 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             model B {{
                 id   Int @id
                 aId  Int?
-                a    A?    @relation(fields: [aId], references: [id], onDelete: {})
+                a    A?    @relation(fields: [aId], references: [id], onDelete: {ra})
             }}
-        "#,
-            ra
+        "#
         );
 
         api.schema_push_w_datasource(&dm).send().assert_green();
@@ -644,10 +643,9 @@ fn on_update_referential_actions_should_work(api: TestApi) {
             model B {{
                 id   BigInt @id
                 aId  BigInt?
-                a    A?    @relation(fields: [aId], references: [id], onUpdate: {})
+                a    A?    @relation(fields: [aId], references: [id], onUpdate: {ra})
             }}
-        "#,
-            ra
+        "#
         );
 
         api.schema_push_w_datasource(&dm).send().assert_green();

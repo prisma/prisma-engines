@@ -137,11 +137,11 @@ impl<'a> fmt::Display for Generator<'a> {
         writeln!(f, "provider = {}", self.provider)?;
 
         if let Some(output) = self.output {
-            writeln!(f, "output = {}", output)?;
+            writeln!(f, "output = {output}")?;
         }
 
         if let Some(ref features) = self.preview_features {
-            writeln!(f, "previewFeatures = {}", features)?;
+            writeln!(f, "previewFeatures = {features}")?;
         }
 
         if !self.binary_targets.is_empty() {

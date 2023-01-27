@@ -790,7 +790,7 @@ impl DefaultValue {
     }
 
     #[cfg(test)]
-    pub(crate) fn as_sequence<'a>(&'a self) -> Option<&'a str> {
+    pub(crate) fn as_sequence(&self) -> Option<&str> {
         match self.kind {
             DefaultKind::Sequence(ref name) => Some(name),
             _ => None,

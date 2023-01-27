@@ -163,7 +163,7 @@ impl SchemaPushAssertion {
 
             println!("\nWarnings that were {}:", "found and expected".bold());
             good.iter().for_each(|good| {
-                println!("\t - {}", good);
+                println!("\t - {good}");
             });
 
             panic!();
@@ -258,7 +258,7 @@ impl SchemaPushAssertion {
 
             println!("\nErrors that were {}:", "found and expected".bold());
             good.iter().for_each(|good| {
-                println!("\t - {}", good);
+                println!("\t - {good}");
             });
 
             panic!();
