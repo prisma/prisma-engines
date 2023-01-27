@@ -91,13 +91,13 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     let first_migration_file_path = first_migration_directory_path.join("migration.sql");
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
     std::fs::write(
-        &migrations_lock_path,
-        &format!("provider = \"{}\"", api.args().provider()),
+        migrations_lock_path,
+        format!("provider = \"{}\"", api.args().provider()),
     )
     .unwrap();
     std::fs::create_dir_all(&first_migration_directory_path).unwrap();
     std::fs::write(
-        &first_migration_file_path,
+        first_migration_file_path,
         "CREATE TABLE cats ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT false );",
     )
     .unwrap();
@@ -132,13 +132,13 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     let first_migration_file_path = first_migration_directory_path.join("migration.sql");
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
     std::fs::write(
-        &migrations_lock_path,
-        &format!("provider = \"{}\"", api.args().provider()),
+        migrations_lock_path,
+        format!("provider = \"{}\"", api.args().provider()),
     )
     .unwrap();
     std::fs::create_dir_all(&first_migration_directory_path).unwrap();
     std::fs::write(
-        &first_migration_file_path,
+        first_migration_file_path,
         "CREATE TABLE cats ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT false );",
     )
     .unwrap();
@@ -181,7 +181,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
         }
     "#;
     let schema_path = write_file_to_tmp(first_schema, &tempdir, "schema.prisma");
-    let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
 
     tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
@@ -266,8 +266,8 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
 
     let base_dir = tempfile::TempDir::new().unwrap();
     let base_dir_str = base_dir.path().to_string_lossy();
-    let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
-    let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
+    let first_url = format!("file:{base_dir_str}/first_db.sqlite");
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
 
     tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
@@ -321,8 +321,8 @@ fn from_url_to_url(mut api: TestApi) {
 
     let base_dir = tempfile::TempDir::new().unwrap();
     let base_dir_str = base_dir.path().to_string_lossy();
-    let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
-    let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
+    let first_url = format!("file:{base_dir_str}/first_db.sqlite");
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
 
     tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
@@ -420,9 +420,9 @@ fn diff_sqlite_migration_directories() {
     let base_dir_str_2 = base_dir_2.path().to_str().unwrap();
 
     let migrations_lock_path = base_dir.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
+    std::fs::write(migrations_lock_path, "provider = \"sqlite\"").unwrap();
     let migrations_lock_path = base_dir_2.path().join("migration_lock.toml");
-    std::fs::write(&migrations_lock_path, "provider = \"sqlite\"").unwrap();
+    std::fs::write(migrations_lock_path, "provider = \"sqlite\"").unwrap();
 
     let params = DiffParams {
         exit_code: None,
@@ -730,7 +730,7 @@ pub(crate) fn diff_result(params: DiffParams) -> (DiffResult, String) {
     let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
     let result = test_setup::runtime::run_with_thread_local_runtime(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
-    assert!(printed_messages.len() == 1, "{:?}", printed_messages);
+    assert!(printed_messages.len() == 1, "{printed_messages:?}");
     (result, printed_messages[0].clone())
 }
 

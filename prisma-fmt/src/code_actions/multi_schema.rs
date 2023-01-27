@@ -5,12 +5,12 @@ use psl::{
     Configuration,
 };
 
-pub(super) fn add_schema_block_attribute_model<'a>(
+pub(super) fn add_schema_block_attribute_model(
     actions: &mut Vec<CodeActionOrCommand>,
     params: &CodeActionParams,
     schema: &str,
     config: &Configuration,
-    model: ModelWalker<'a>,
+    model: ModelWalker<'_>,
 ) {
     let datasource = match config.datasources.first() {
         Some(ds) => ds,
@@ -57,12 +57,12 @@ pub(super) fn add_schema_block_attribute_model<'a>(
     actions.push(CodeActionOrCommand::CodeAction(action))
 }
 
-pub(super) fn add_schema_block_attribute_enum<'a>(
+pub(super) fn add_schema_block_attribute_enum(
     actions: &mut Vec<CodeActionOrCommand>,
     params: &CodeActionParams,
     schema: &str,
     config: &Configuration,
-    enumerator: EnumWalker<'a>,
+    enumerator: EnumWalker<'_>,
 ) {
     let datasource = match config.datasources.first() {
         Some(ds) => ds,

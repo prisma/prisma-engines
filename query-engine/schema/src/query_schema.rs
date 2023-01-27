@@ -189,7 +189,7 @@ impl fmt::Display for QueryTag {
             Self::AggregateRaw => "aggregateRaw",
         };
 
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
@@ -261,6 +261,6 @@ impl std::fmt::Display for ScalarType {
             ScalarType::Bytes => "Bytes",
         };
 
-        write!(f, "{}", typ)
+        write!(f, "{typ}")
     }
 }

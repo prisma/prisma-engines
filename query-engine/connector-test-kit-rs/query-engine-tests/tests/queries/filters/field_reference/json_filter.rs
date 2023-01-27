@@ -457,7 +457,7 @@ mod json_filter {
     }
 
     fn jsonq(filter: String) -> String {
-        format!(r#"query {{ findManyTestModel(where: {{ {} }} ) {{ id }} }}"#, filter)
+        format!(r#"query {{ findManyTestModel(where: {{ {filter} }} ) {{ id }} }}"#)
     }
 
     fn json_path(runner: &Runner) -> &'static str {

@@ -248,7 +248,7 @@ mod delete_many {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTodo(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTodo(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -56,15 +56,12 @@ impl<'a> Statistics<'a> {
     /// - if model is foo and field is bar, the type is FooBar
     /// - if a model already exists with the name, we'll use FooBar_
     fn composite_type_name(&self, model: &str, field: &str) -> Name {
-        let combined: String = format!("{}_{}", model, field)
-            .chars()
-            .filter(|c| c.is_ascii())
-            .collect();
+        let combined: String = format!("{model}_{field}").chars().filter(|c| c.is_ascii()).collect();
 
         let name = Name::Model(combined.to_case(Case::Pascal));
 
         let name = if self.models.contains_key(&name) {
-            format!("{}_", name)
+            format!("{name}_")
         } else {
             name.take()
         };
@@ -568,7 +565,7 @@ impl fmt::Display for FieldPercentages {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (i, (k, v)) in self.data.iter().enumerate() {
             let p = (*v * 1000.0).round() / 10.0;
-            write!(f, "{}: {}%", k, p)?;
+            write!(f, "{k}: {p}%")?;
 
             if i < self.data.keys().count() - 1 {
                 write!(f, ", ")?;

@@ -144,7 +144,6 @@ impl TestApi {
         &self.namespaces
     }
 
-    #[track_caller]
     async fn test_introspect_internal(
         &self,
         previous_schema: psl::ValidatedSchema,
@@ -160,7 +159,6 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    #[track_caller]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let schema = format!("{}{}", self.pure_config(), data_model_string);
         let schema = parse_datamodel(&schema);
@@ -170,7 +168,6 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    #[track_caller]
     pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
@@ -179,7 +176,6 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    #[track_caller]
     pub async fn re_introspect_config(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model, true).await?;
@@ -261,7 +257,7 @@ impl TestApi {
             ""
         };
 
-        let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{}""#, ns)).collect();
+        let namespaces: Vec<String> = self.namespaces().iter().map(|ns| format!(r#""{ns}""#)).collect();
 
         let namespaces = if namespaces.is_empty() {
             "".to_string()
@@ -300,13 +296,11 @@ impl TestApi {
         psl::parse_configuration(&self.pure_config()).unwrap()
     }
 
-    #[track_caller]
     pub async fn expect_datamodel(&self, expectation: &expect_test::Expect) {
         let found = self.introspect().await.unwrap();
         expectation.assert_eq(&found);
     }
 
-    #[track_caller]
     pub async fn expect_warnings(&self, expectation: &expect_test::Expect) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
@@ -314,7 +308,6 @@ impl TestApi {
         expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
     }
 
-    #[track_caller]
     pub async fn expect_no_warnings(&self) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
@@ -323,7 +316,6 @@ impl TestApi {
         assert!(introspection_result.warnings.is_empty())
     }
 
-    #[track_caller]
     pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();
@@ -331,7 +323,6 @@ impl TestApi {
         expectation.assert_eq(&reintrospected.data_model);
     }
 
-    #[track_caller]
     pub async fn expect_re_introspect_warnings(&self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
@@ -339,7 +330,6 @@ impl TestApi {
         expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
     }
 
-    #[track_caller]
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {
         let expected_with_source = self.dm_with_sources(expected_without_header);
         let expected_with_generator = self.dm_with_generator_and_preview_flags(&expected_with_source);
@@ -365,11 +355,7 @@ impl TestApi {
     }
 
     fn generator_block(&self) -> String {
-        let preview_features: Vec<String> = self
-            .preview_features()
-            .iter()
-            .map(|pf| format!(r#""{}""#, pf))
-            .collect();
+        let preview_features: Vec<String> = self.preview_features().iter().map(|pf| format!(r#""{pf}""#)).collect();
 
         let preview_feature_string = if preview_features.is_empty() {
             "".to_string()
@@ -379,14 +365,12 @@ impl TestApi {
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{}
-               }}"#,
-            preview_feature_string
+                 provider = "prisma-client-js"{preview_feature_string}
+               }}"#
         );
         generator_block
     }
 
-    #[track_caller]
     pub async fn raw_cmd(&self, query: &str) {
         self.database.raw_cmd(query).await.unwrap()
     }

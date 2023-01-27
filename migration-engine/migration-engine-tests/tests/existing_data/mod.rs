@@ -178,7 +178,7 @@ fn column_defaults_can_safely_be_changed(api: TestApi) {
                 model_name,
                 first_default
                     .as_ref()
-                    .map(|default| format!("@default(\"{}\")", default))
+                    .map(|default| format!("@default(\"{default}\")"))
                     .unwrap_or_else(String::new)
             );
 
@@ -240,7 +240,7 @@ fn column_defaults_can_safely_be_changed(api: TestApi) {
                 model_name,
                 second_default
                     .as_ref()
-                    .map(|default| format!(r#"@default("{}")"#, default))
+                    .map(|default| format!(r#"@default("{default}")"#))
                     .unwrap_or_else(String::new)
             );
 

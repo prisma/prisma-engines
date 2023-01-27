@@ -3,14 +3,12 @@
 use crate::{
     pair::{IdPair, IndexPair, ScalarFieldPair},
     rendering::defaults,
-    warnings::{self, Warnings},
 };
 use datamodel_renderer::datamodel as renderer;
-use either::Either;
 use sql_schema_describer::ColumnArity;
 
 /// Render a scalar field to be added in a model.
-pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) -> renderer::Field<'a> {
+pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
     let mut rendered = renderer::Field::new(field.name(), field.prisma_type());
 
     match field.arity() {
@@ -35,7 +33,7 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
         rendered.documentation(docs);
     }
 
-    if let Some(default) = defaults::render(field, warnings) {
+    if let Some(default) = defaults::render(field.default()) {
         rendered.default(default);
     }
 
@@ -55,73 +53,11 @@ pub(crate) fn render<'a>(field: ScalarFieldPair<'a>, warnings: &mut Warnings) ->
         rendered.unique(render_unique(unique));
     }
 
-    if field.remapped_name_from_psl() {
-        match field.container() {
-            Either::Left(model) => {
-                let mf = crate::warnings::ModelAndField {
-                    model: model.name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.remapped_fields_in_model.push(mf);
-            }
-            Either::Right(view) => {
-                let mf = crate::warnings::ViewAndField {
-                    view: view.name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.remapped_fields_in_view.push(mf);
-            }
-        }
-    }
-
-    if field.is_unsupported() {
-        match field.container() {
-            Either::Left(model) => {
-                let mf = warnings::ModelAndFieldAndType {
-                    model: model.name().to_string(),
-                    field: field.name().to_string(),
-                    tpe: field.prisma_type().to_string(),
-                };
-
-                warnings.unsupported_types_in_model.push(mf)
-            }
-            Either::Right(view) => {
-                let mf = warnings::ViewAndFieldAndType {
-                    view: view.name().to_string(),
-                    field: field.name().to_string(),
-                    tpe: field.prisma_type().to_string(),
-                };
-
-                warnings.unsupported_types_in_view.push(mf)
-            }
-        }
-    }
-
     if field.remapped_name_empty() {
         let docs = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+
         rendered.documentation(docs);
         rendered.commented_out();
-
-        match field.container() {
-            Either::Left(model) => {
-                let mf = crate::warnings::ModelAndField {
-                    model: model.name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.fields_with_empty_names_in_model.push(mf);
-            }
-            Either::Right(view) => {
-                let mf = crate::warnings::ViewAndField {
-                    view: view.name().to_string(),
-                    field: field.name().to_string(),
-                };
-
-                warnings.fields_with_empty_names_in_view.push(mf);
-            }
-        }
     }
 
     rendered

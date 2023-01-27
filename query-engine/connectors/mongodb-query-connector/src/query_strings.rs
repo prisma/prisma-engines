@@ -292,7 +292,7 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
     match val {
         Bson::Array(ary) => fmt_list(buffer, ary, depth + 1),
         Bson::Document(doc) => fmt_doc(buffer, doc, depth + 1),
-        val => write!(buffer, "{}", val),
+        val => write!(buffer, "{val}"),
     }
 }
 

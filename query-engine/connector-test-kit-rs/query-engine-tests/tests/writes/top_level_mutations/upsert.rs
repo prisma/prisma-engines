@@ -717,14 +717,13 @@ mod upsert {
             format!(
                 r#"mutation {{
             upsertOneTestModel(
-              where: {{ id: {} }}
-              create: {{ id: {} }}
-              update: {{ {}: {{ {}: {} }} }}
+              where: {{ id: {id} }}
+              create: {{ id: {id} }}
+              update: {{ {field}: {{ {op}: {value} }} }}
             ){{
-              {}
+              {field}
             }}
-          }}"#,
-                id, id, field, op, value, field
+          }}"#
             )
         );
 
@@ -733,7 +732,7 @@ mod upsert {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

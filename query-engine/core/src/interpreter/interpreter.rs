@@ -228,7 +228,7 @@ impl<'conn> QueryInterpreter<'conn> {
             Expression::Query { query } => Box::pin(async move {
                 match *query {
                     Query::Read(read) => {
-                        self.log_line(level, || format!("READ {}", read));
+                        self.log_line(level, || format!("READ {read}"));
                         let span = info_span!("prisma:engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
                             .instrument(span)
@@ -237,7 +237,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     }
 
                     Query::Write(write) => {
-                        self.log_line(level, || format!("WRITE {}", write));
+                        self.log_line(level, || format!("WRITE {write}"));
                         let span = info_span!("prisma:engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
                             .instrument(span)
@@ -248,12 +248,12 @@ impl<'conn> QueryInterpreter<'conn> {
             }),
 
             Expression::Get { binding_name } => Box::pin(async move {
-                self.log_line(level, || format!("GET {}", binding_name));
+                self.log_line(level, || format!("GET {binding_name}"));
                 env.clone().remove(&binding_name)
             }),
 
             Expression::GetFirstNonEmpty { binding_names } => Box::pin(async move {
-                self.log_line(level, || format!("GET FIRST NON EMPTY {:?}", binding_names));
+                self.log_line(level, || format!("GET FIRST NON EMPTY {binding_names:?}"));
 
                 Ok(binding_names
                     .into_iter()

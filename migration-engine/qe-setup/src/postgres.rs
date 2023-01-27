@@ -12,27 +12,25 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
         strip_schema_param_from_url(&mut url);
         let conn = create_postgres_admin_conn(url.clone()).await?;
 
-        let query = format!("DROP DATABASE \"{}\"", db_name);
+        let query = format!("DROP DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
 
-        let query = format!("CREATE DATABASE \"{}\"", db_name);
+        let query = format!("CREATE DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
     } else {
         strip_schema_param_from_url(&mut url);
         let conn = create_postgres_admin_conn(url.clone()).await?;
 
-        let query = format!("CREATE DATABASE \"{}\"", db_name);
+        let query = format!("CREATE DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
 
         // Now create the schema
-        url.set_path(&format!("/{}", db_name));
+        url.set_path(&format!("/{db_name}"));
 
         let conn = Quaint::new(url.as_ref()).await.unwrap();
 
-        let drop_and_recreate_schema = format!(
-            "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
-            schema = schema
-        );
+        let drop_and_recreate_schema =
+            format!("DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";");
         conn.raw_cmd(&drop_and_recreate_schema)
             .await
             .map_err(|e| ConnectorError::from_source(e, ""))?;
@@ -51,7 +49,7 @@ pub(crate) async fn postgres_teardown(url: &str, db_schemas: &[&str]) -> Connect
         let conn = create_postgres_admin_conn(url.clone()).await?;
         let db_name = url.path().strip_prefix('/').unwrap();
 
-        let query = format!("DROP DATABASE \"{}\" CASCADE", db_name);
+        let query = format!("DROP DATABASE \"{db_name}\" CASCADE");
         conn.raw_cmd(&query).await.ok();
     }
 
@@ -66,7 +64,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Quaint> {
 fn strip_schema_param_from_url(url: &mut Url) {
     let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
     params.remove("schema");
-    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{k}={v}")).collect();
     let params: String = params.join("&");
     url.set_query(Some(&params));
 }

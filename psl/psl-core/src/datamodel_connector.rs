@@ -383,15 +383,13 @@ impl ConstraintScope {
                 Cow::from("global for primary keys, foreign keys and default constraints")
             }
             ConstraintScope::ModelKeyIndex => {
-                Cow::from(format!("on model `{}` for indexes and unique constraints", model_name))
+                Cow::from(format!("on model `{model_name}` for indexes and unique constraints"))
             }
             ConstraintScope::ModelPrimaryKeyKeyIndex => Cow::from(format!(
-                "on model `{}` for primary key, indexes and unique constraints",
-                model_name
+                "on model `{model_name}` for primary key, indexes and unique constraints"
             )),
             ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => Cow::from(format!(
-                "on model `{}` for primary key, indexes, unique constraints and foreign keys",
-                model_name
+                "on model `{model_name}` for primary key, indexes, unique constraints and foreign keys"
             )),
         }
     }

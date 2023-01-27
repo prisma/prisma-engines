@@ -2,7 +2,9 @@
 
 mod relation_names;
 
-use crate::{datamodel_calculator::InputContext, introspection_helpers as helpers, pair::RelationFieldDirection};
+use crate::{
+    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers as helpers, pair::RelationFieldDirection,
+};
 use psl::{
     parser_database::{self, ast},
     PreviewFeature,
@@ -37,9 +39,9 @@ pub(crate) struct IntrospectionMap<'a> {
 }
 
 impl<'a> IntrospectionMap<'a> {
-    pub(crate) fn new(input: InputContext<'a>) -> Self {
-        let sql_schema = input.schema;
-        let prisma_schema = input.previous_schema;
+    pub(crate) fn new(ctx: &DatamodelCalculatorContext<'a>) -> Self {
+        let sql_schema = ctx.sql_schema;
+        let prisma_schema = ctx.previous_schema;
         let mut map = Default::default();
 
         match_existing_models(sql_schema, prisma_schema, &mut map);
@@ -48,7 +50,7 @@ impl<'a> IntrospectionMap<'a> {
         match_existing_scalar_fields(sql_schema, prisma_schema, &mut map);
         match_existing_inline_relations(sql_schema, prisma_schema, &mut map);
         match_existing_m2m_relations(sql_schema, prisma_schema, &mut map);
-        relation_names::introspect(input, &mut map);
+        relation_names::introspect(ctx, &mut map);
         position_inline_relation_fields(sql_schema, &mut map);
         position_m2m_relation_fields(sql_schema, &mut map);
         populate_top_level_names(sql_schema, prisma_schema, &mut map);

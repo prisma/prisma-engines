@@ -730,10 +730,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
-            WHERE table_schema = ANY ( $1 ) {}
+            WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
-        "#,
-            is_visible_clause,
+        "#
         );
 
         let rows = self
@@ -762,7 +761,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_identity = match col.get_string("is_identity") {
                 Some(is_id) if is_id.eq_ignore_ascii_case("yes") => true,
                 Some(is_id) if is_id.eq_ignore_ascii_case("no") => false,
-                Some(is_identity_str) => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+                Some(is_identity_str) => panic!("unrecognized is_identity variant '{is_identity_str}'"),
                 None => false,
             };
 
@@ -994,8 +993,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             if !sql_schema.namespaces.contains(&referenced_schema_name) {
                 return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
-                    from: format!("{}.{}", sql_schema.namespaces[0], table_name),
-                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    from: format!("{}.{table_name}", sql_schema.namespaces[0]),
+                    to: format!("{referenced_schema_name}.{referenced_table}"),
                     constraint: constraint_name,
                     missing_namespace: referenced_schema_name,
                 }));
@@ -1029,7 +1028,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action (on delete) '{}'", confdeltype),
+                _ => panic!("unrecognized foreign key action (on delete) '{confdeltype}'"),
             };
             let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
@@ -1037,7 +1036,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 'c' => ForeignKeyAction::Cascade,
                 'n' => ForeignKeyAction::SetNull,
                 'd' => ForeignKeyAction::SetDefault,
-                _ => panic!("unrecognized foreign key action (on update) '{}'", confupdtype),
+                _ => panic!("unrecognized foreign key action (on update) '{confupdtype}'"),
             };
 
             match current_fk {
@@ -1101,10 +1100,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
                 "ASC" => SQLSortOrder::Asc,
                 "DESC" => SQLSortOrder::Desc,
-                misc => panic!(
-                    "Unexpected sort order `{}`, collation should be ASC, DESC or Null",
-                    misc
-                ),
+                misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
             });
 
             let algorithm = if self.is_cockroach() {
@@ -1277,7 +1273,7 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!("unrecognized is_nullable variant '{}'", x),
+        x => panic!("unrecognized is_nullable variant '{x}'"),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {
@@ -1371,7 +1367,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
-        x => panic!("unrecognized is_nullable variant '{}'", x),
+        x => panic!("unrecognized is_nullable variant '{x}'"),
     };
 
     let arity = match matches!(data_type.as_str(), "ARRAY") {

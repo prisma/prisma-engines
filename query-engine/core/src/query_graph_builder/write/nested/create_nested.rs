@@ -156,8 +156,7 @@ fn handle_one_to_many(
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation on '{}' record) was found for a nested create on one-to-many relation '{}'.",
-                        child_model_name, parent_model_name, relation_name
+                        "No '{child_model_name}' record (needed to inline the relation on '{parent_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -184,8 +183,7 @@ fn handle_one_to_many(
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to inline the relation on '{}' record) was found for a nested create on one-to-many relation '{}'.",
-                            parent_model_name, child_model_name, relation_name
+                            "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -348,8 +346,7 @@ fn handle_one_to_one(
             let link = match links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{}' record (needed to inline the relation with create on '{}' record) was found for a nested create on one-to-one relation '{}'.",
-                    parent_model_name, child_model_name, relation_name
+                    "No '{parent_model_name}' record (needed to inline the relation with create on '{child_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
                 ))),
             }?;
 
@@ -380,8 +377,7 @@ fn handle_one_to_one(
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation with an update on '{}' record) was found for a nested create on one-to-one relation '{}'.",
-                        child_model_name, parent_model_name, relation_name
+                        "No '{child_model_name}' record (needed to inline the relation with an update on '{parent_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -474,8 +470,7 @@ pub fn nested_create_many(
                 let parent_link = match parent_links.pop() {
                     Some(p) => Ok(p),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation on '{}' record) was found for a nested createMany on relation '{}'.",
-                        parent_model_name, child_model_name, relation_name
+                        "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested createMany on relation '{relation_name}'."
                     ))),
                 }?;
 

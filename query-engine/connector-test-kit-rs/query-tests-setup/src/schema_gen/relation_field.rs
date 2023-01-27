@@ -86,8 +86,7 @@ impl TryFrom<(&str, bool)> for RelationField {
             "ToMany" => RelationField::ToMany { child },
             _ => {
                 return Err(TestError::parse_error(format!(
-                    "Unknown relation field `{}`. Valid names are: ToOneOpt, ToOneReq and ToMany",
-                    name
+                    "Unknown relation field `{name}`. Valid names are: ToOneOpt, ToOneReq and ToMany"
                 )))
             }
         };

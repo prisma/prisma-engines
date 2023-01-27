@@ -44,7 +44,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_>, ctx: &mut Con
             loose_criterias.collect::<Vec<_>>().join("\n"),
         );
 
-        Cow::from(format!("{} {}", msg, suffix))
+        Cow::from(format!("{msg} {suffix}"))
     } else {
         Cow::from(msg)
     };
@@ -118,8 +118,7 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
             .local_custom_name_scope_violations(model.model_id(), name.as_ref())
         {
             let message = format!(
-                "The given custom name `{}` has to be unique on the model. Please provide a different name for the `name` argument.",
-                name,
+                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
             );
 
             let span = pk

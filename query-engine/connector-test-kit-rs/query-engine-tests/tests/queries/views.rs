@@ -114,7 +114,7 @@ mod views {
     }
 
     async fn create_test_data(runner: &Runner, schema_name: &str) -> TestResult<()> {
-        migrate_view(&runner, schema_name).await?;
+        migrate_view(runner, schema_name).await?;
 
         create_test_model(runner, r#"{ id: 1, firstName: "John", lastName: "Doe" }"#).await?;
         create_test_model(runner, r#"{ id: 2, firstName: "Jane", lastName: "Doe" }"#).await?;
@@ -158,7 +158,7 @@ mod views {
 
     async fn create_test_model(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -166,7 +166,7 @@ mod views {
 
     async fn create_child(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneChild(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneChild(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -81,7 +81,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
 
         (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseAlreadyExists {
-                database_name: format!("{}", db_name),
+                database_name: format!("{db_name}"),
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
             }))
@@ -89,7 +89,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
 
         (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseAlreadyExists {
-                database_name: format!("{}", db_name),
+                database_name: format!("{db_name}"),
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
             }))
@@ -97,14 +97,14 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
 
         (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::IncorrectDatabaseCredentials {
-                database_user: format!("{}", user),
+                database_user: format!("{user}"),
                 database_host: url.host().to_owned(),
             }))
         }
 
         (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::IncorrectDatabaseCredentials {
-                database_user: format!("{}", user),
+                database_user: format!("{user}"),
                 database_host: url.host().to_owned(),
             }))
         }
@@ -206,7 +206,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
 
         (ErrorKind::LengthMismatch { column }, _connection_info) => {
             Some(KnownError::new(query_engine::InputValueTooLong {
-                column_name: format!("{}", column),
+                column_name: format!("{column}"),
             }))
         }
 
@@ -218,28 +218,28 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
 
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mysql(_)) => {
             Some(KnownError::new(common::InvalidModel {
-                model: format!("{}", model),
+                model: format!("{model}"),
                 kind: ModelKind::Table,
             }))
         }
 
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Postgres(_)) => {
             Some(KnownError::new(common::InvalidModel {
-                model: format!("{}", model),
+                model: format!("{model}"),
                 kind: ModelKind::Table,
             }))
         }
 
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Sqlite { .. }) => {
             Some(KnownError::new(common::InvalidModel {
-                model: format!("{}", model),
+                model: format!("{model}"),
                 kind: ModelKind::Table,
             }))
         }
 
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mssql(_)) => {
             Some(KnownError::new(common::InvalidModel {
-                model: format!("{}", model),
+                model: format!("{model}"),
                 kind: ModelKind::Table,
             }))
         }

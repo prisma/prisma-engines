@@ -95,12 +95,11 @@ impl MongoError {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
             MongoError::MissingRequiredArgumentError { argument } => ConnectorError::from_kind(ErrorKind::RawApiError(
-                format!("Missing required argument: '{}'.", argument),
+                format!("Missing required argument: '{argument}'."),
             )),
             MongoError::ArgumentTypeMismatchError { argument, have, want } => {
                 ConnectorError::from_kind(ErrorKind::RawApiError(format!(
-                    "Argument type mismatch for '{}'. Have: {}, want: {}.",
-                    argument, have, want
+                    "Argument type mismatch for '{argument}'. Have: {have}, want: {want}."
                 )))
             }
 
@@ -209,17 +208,17 @@ fn driver_error_to_connector_error(err: DriverError) -> ConnectorError {
             }
         }
 
-        mongodb::error::ErrorKind::BsonDeserialization(err) => ConnectorError::from_kind(
-            ErrorKind::InternalConversionError(format!("BSON decode error: {}", err)),
-        ),
+        mongodb::error::ErrorKind::BsonDeserialization(err) => {
+            ConnectorError::from_kind(ErrorKind::InternalConversionError(format!("BSON decode error: {err}")))
+        }
 
-        mongodb::error::ErrorKind::BsonSerialization(err) => ConnectorError::from_kind(
-            ErrorKind::InternalConversionError(format!("BSON encode error: {}", err)),
-        ),
+        mongodb::error::ErrorKind::BsonSerialization(err) => {
+            ConnectorError::from_kind(ErrorKind::InternalConversionError(format!("BSON encode error: {err}")))
+        }
 
         _ => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
             code: "unknown".to_owned(),
-            message: format!("{}", err),
+            message: format!("{err}"),
         }),
     }
 }
@@ -244,7 +243,7 @@ fn parse_unique_index_violation(message: &str) -> Option<String> {
 
 impl From<mongodb::bson::oid::Error> for MongoError {
     fn from(err: mongodb::bson::oid::Error) -> Self {
-        MongoError::MalformedObjectId(format!("{}", err))
+        MongoError::MalformedObjectId(format!("{err}"))
     }
 }
 

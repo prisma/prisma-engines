@@ -131,7 +131,7 @@ async fn push_indexes(
         let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
             "A" => SQLSortOrder::Asc,
             "D" => SQLSortOrder::Desc,
-            misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
+            misc => panic!("Unexpected sort order `{misc}`, collation should be A, D or Null"),
         });
         let column_name = if let Some(name) = row.get_string("column_name") {
             name
@@ -205,7 +205,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             .map(|row| row.get_expect_string("schema_name"))
             .collect();
 
-        trace!("Found schema names: {:?}", names);
+        trace!("Found schema names: {names:?}");
 
         Ok(names)
     }
@@ -285,7 +285,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             map.insert(cloned_name, id);
         }
 
-        trace!("Found table names: {:?}", map);
+        trace!("Found table names: {map:?}");
 
         Ok(map)
     }
@@ -309,7 +309,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             })
             .unwrap_or(0);
 
-        trace!("Found db size: {:?}", size);
+        trace!("Found db size: {size:?}");
 
         Ok(size)
     }
@@ -346,7 +346,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for col in rows {
-            trace!("Got column: {:?}", col);
+            trace!("Got column: {col:?}");
             let table_name = col.get_expect_string("table_name");
             let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
                 *id
@@ -361,7 +361,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let is_required = match is_nullable.as_ref() {
                 "no" => true,
                 "yes" => false,
-                x => panic!("unrecognized is_nullable variant '{}'", x),
+                x => panic!("unrecognized is_nullable variant '{x}'"),
             };
 
             let arity = if is_required {
@@ -589,7 +589,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             "mediumtext" => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
             "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
             "enum" => {
-                let enum_name = format!("{}_{}", table, column_name);
+                let enum_name = format!("{table}_{column_name}");
                 let enum_id = sql_schema.push_enum(Default::default(), enum_name);
                 push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), None)
@@ -747,7 +747,7 @@ async fn push_foreign_keys(
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
     for row in result_set.into_iter() {
-        trace!("Got description FK row {:#?}", row);
+        trace!("Got description FK row {row:#?}");
         let (table_id, column_id, referenced_table_id, referenced_column_id) =
             if let Some(ids) = get_ids(&row, table_ids, sql_schema) {
                 ids
@@ -761,7 +761,7 @@ async fn push_foreign_keys(
             "set default" => ForeignKeyAction::SetDefault,
             "restrict" => ForeignKeyAction::Restrict,
             "no action" => ForeignKeyAction::NoAction,
-            s => panic!("Unrecognized on delete action '{}'", s),
+            s => panic!("Unrecognized on delete action '{s}'"),
         };
         let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
             "cascade" => ForeignKeyAction::Cascade,
@@ -769,7 +769,7 @@ async fn push_foreign_keys(
             "set default" => ForeignKeyAction::SetDefault,
             "restrict" => ForeignKeyAction::Restrict,
             "no action" => ForeignKeyAction::NoAction,
-            s => panic!("Unrecognized on update action '{}'", s),
+            s => panic!("Unrecognized on update action '{s}'"),
         };
 
         match &current_fk {

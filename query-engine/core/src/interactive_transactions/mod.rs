@@ -100,7 +100,7 @@ impl CachedTx {
         if let Self::Open(ref mut otx) = self {
             Ok(otx)
         } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{}'", self);
+            let reason = format!("Transaction is no longer valid. Last state: '{self}'");
             Err(CoreError::from(TransactionError::Closed { reason }))
         }
     }

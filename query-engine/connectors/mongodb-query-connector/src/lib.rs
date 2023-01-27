@@ -38,7 +38,7 @@ impl BsonTransform for Bson {
             Ok(doc)
         } else {
             Err(MongoError::ConversionError {
-                from: format!("{:?}", self),
+                from: format!("{self:?}"),
                 to: "Bson::Document".to_string(),
             })
         }

@@ -101,7 +101,7 @@ fn namespaces_and_preview_features_from_diff_targets(
                 let schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
                     ConnectorError::from_source_with_context(
                         err,
-                        format!("Error trying to read Prisma schema file at `{}`.", schema).into_boxed_str(),
+                        format!("Error trying to read Prisma schema file at `{schema}`.").into_boxed_str(),
                     )
                 })?;
 
@@ -136,7 +136,7 @@ async fn json_rpc_diff_target_to_connector(
         std::fs::read_to_string(schema_path).map_err(|err| {
             ConnectorError::from_source_with_context(
                 err,
-                format!("Error trying to read Prisma schema file at `{}`.", schema_path).into_boxed_str(),
+                format!("Error trying to read Prisma schema file at `{schema_path}`.").into_boxed_str(),
             )
         })
     };

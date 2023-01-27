@@ -18,10 +18,9 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
         r#"
             datasource db {{
               provider = "mysql"
-              url      = "{}"
+              url      = "{url}"
             }}
         "#,
-        url,
     );
 
     let error = tok(connection_error(dm));

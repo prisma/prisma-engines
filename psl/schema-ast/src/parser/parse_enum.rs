@@ -88,9 +88,6 @@ fn parse_enum_value(
             documentation: comment,
             span: Span::from(pair_span),
         }),
-        _ => panic!(
-            "Encountered impossible enum value declaration during parsing, name is missing: {:?}",
-            pair_str
-        ),
+        _ => panic!("Encountered impossible enum value declaration during parsing, name is missing: {pair_str:?}",),
     }
 }

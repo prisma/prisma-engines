@@ -356,7 +356,7 @@ mod filter_spec {
     }
 
     fn user_uniques_query(filter: &str) -> String {
-        format!(r#"query {{ findManyUser{} {{ unique }} }}"#, filter)
+        format!(r#"query {{ findManyUser{filter} {{ unique }} }}"#)
     }
 
     async fn user_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
@@ -368,7 +368,7 @@ mod filter_spec {
 
     async fn vehicle_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
         let result = runner
-            .query(format!(r#"query {{ findManyVehicle{} {{ unique }} }}"#, filter))
+            .query(format!(r#"query {{ findManyVehicle{filter} {{ unique }} }}"#))
             .await?;
 
         result.assert_success();
@@ -377,7 +377,7 @@ mod filter_spec {
 
     async fn lot_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
         let result = runner
-            .query(format!(r#"query {{ findManyParkingLot{} {{ unique }} }}"#, filter))
+            .query(format!(r#"query {{ findManyParkingLot{filter} {{ unique }} }}"#))
             .await?;
 
         result.assert_success();

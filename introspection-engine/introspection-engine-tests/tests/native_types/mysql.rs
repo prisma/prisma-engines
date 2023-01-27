@@ -50,7 +50,7 @@ const TYPES: &[(&str, &str)] = &[
 async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
-        .map(|(name, db_type)| format!("`{}` {} Not Null", name, db_type))
+        .map(|(name, db_type)| format!("`{name}` {db_type} Not Null"))
         .collect();
 
     api.barrel()
@@ -115,8 +115,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
 
     let result = api.introspect().await?;
 
-    println!("EXPECTATION: \n {:#}", types);
-    println!("RESULT: \n {:#}", result);
+    println!("EXPECTATION: \n {types:#}");
+    println!("RESULT: \n {result:#}");
 
     api.assert_eq_datamodels(&types, &result);
 

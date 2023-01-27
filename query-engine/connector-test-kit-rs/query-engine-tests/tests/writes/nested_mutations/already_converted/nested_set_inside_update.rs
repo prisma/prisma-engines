@@ -54,7 +54,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -110,7 +110,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -165,7 +165,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[]}}}"###
         );
 
@@ -215,7 +215,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -285,7 +285,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -342,7 +342,7 @@ mod set_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent, child = child)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -413,7 +413,7 @@ mod set_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[]}}}"###
         );
 

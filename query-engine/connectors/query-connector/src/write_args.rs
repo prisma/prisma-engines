@@ -240,7 +240,7 @@ impl FieldPath {
             if self.path.is_empty() {
                 alias.to_owned()
             } else {
-                format!("${}.{}", alias, rendered_path)
+                format!("${alias}.{rendered_path}")
             }
         } else {
             rendered_path
@@ -258,7 +258,7 @@ impl FieldPath {
             if self.path.is_empty() {
                 alias.to_owned()
             } else {
-                format!("{}_{}", alias, rendered_path)
+                format!("{alias}_{rendered_path}")
             }
         } else {
             rendered_path
@@ -345,8 +345,7 @@ impl TryInto<PrismaValue> for WriteOperation {
             WriteOperation::Scalar(ScalarWriteOperation::Set(pv)) => Ok(pv),
             WriteOperation::Composite(CompositeWriteOperation::Set(pv)) => Ok(pv),
             x => Err(ConnectorError::from_kind(ErrorKind::InternalConversionError(format!(
-                "Unable to convert write expression {:?} into prisma value.",
-                x
+                "Unable to convert write expression {x:?} into prisma value."
             )))),
         }
     }

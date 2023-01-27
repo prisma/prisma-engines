@@ -310,7 +310,7 @@ impl DriftDiagnostic {
     pub fn unwrap_drift_detected(self) -> String {
         match self {
             DriftDiagnostic::DriftDetected { summary } => summary,
-            other => panic!("unwrap_drift_detected on {:?}", other),
+            other => panic!("unwrap_drift_detected on {other:?}"),
         }
     }
 }

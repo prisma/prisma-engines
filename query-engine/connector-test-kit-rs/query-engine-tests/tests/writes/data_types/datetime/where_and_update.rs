@@ -37,7 +37,7 @@ mod where_and_update {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTest(data: {}) {{ unique }} }}", data))
+            .query(format!("mutation {{ createOneTest(data: {data}) {{ unique }} }}"))
             .await?
             .assert_success();
         Ok(())

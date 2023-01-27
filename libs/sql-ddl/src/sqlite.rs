@@ -31,12 +31,7 @@ impl Display for CreateTable<'_> {
         }
 
         for foreign_key in &self.foreign_keys {
-            write!(
-                f,
-                ",\n{indentation}{fk}",
-                indentation = SQL_INDENTATION,
-                fk = foreign_key
-            )?;
+            write!(f, ",\n{SQL_INDENTATION}{foreign_key}")?;
         }
 
         write!(f, "\n)")
@@ -90,7 +85,7 @@ impl Display for ForeignKeyAction {
 impl Display for ForeignKey<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(constraint_name) = &self.constraint_name {
-            write!(f, "CONSTRAINT \"{}\" ", constraint_name)?;
+            write!(f, "CONSTRAINT \"{constraint_name}\" ")?;
         }
 
         f.write_str("FOREIGN KEY (")?;

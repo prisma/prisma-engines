@@ -488,7 +488,7 @@ where
     match AssertUnwindSafe(fut).catch_unwind().await {
         Ok(result) => result,
         Err(err) => match Error::extract_panic_message(err) {
-            Some(message) => Err(napi::Error::from_reason(format!("PANIC: {}", message))),
+            Some(message) => Err(napi::Error::from_reason(format!("PANIC: {message}"))),
             None => Err(napi::Error::from_reason("PANIC: unknown panic".to_string())),
         },
     }

@@ -84,7 +84,7 @@ pub(crate) trait SqlRenderer {
             Some(namespace) => format!("{}.{}", self.quote(namespace), self.quote(table_name)),
             None => format!("{}", self.quote(table_name)),
         };
-        vec![format!("DROP TABLE {}", name)]
+        vec![format!("DROP TABLE {name}")]
     }
 
     /// Render a `RedefineTables` step.

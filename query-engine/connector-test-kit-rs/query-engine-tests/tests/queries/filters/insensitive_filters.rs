@@ -185,8 +185,7 @@ mod insensitive {
     async fn create_row(runner: &Runner, s: &str) -> TestResult<()> {
         runner
             .query(format!(
-                r#"mutation {{ createOneTestModel(data: {{ str: "{}" }}) {{ id }} }}"#,
-                s
+                r#"mutation {{ createOneTestModel(data: {{ str: "{s}" }}) {{ id }} }}"#
             ))
             .await?
             .assert_success();

@@ -26,8 +26,7 @@ pub async fn load(
         p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
 
         x => Err(CoreError::ConfigurationError(format!(
-            "Unsupported connector type: {}",
-            x
+            "Unsupported connector type: {x}"
         ))),
     }
 }

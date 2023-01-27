@@ -82,7 +82,7 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
             let mut object = Map::new();
 
             for (idx, p_value) in row.into_iter().enumerate() {
-                let column_name = columns.get(idx).unwrap_or(&format!("f{}", idx)).clone();
+                let column_name = columns.get(idx).unwrap_or(&format!("f{idx}")).clone();
 
                 object.insert(column_name, p_value.as_typed_json());
             }

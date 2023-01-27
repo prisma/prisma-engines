@@ -39,7 +39,7 @@ impl QueryResult {
             return;
         }
 
-        let err_code = err_code.map(|code| format!("P{}", code));
+        let err_code = err_code.map(|code| format!("P{code}"));
         let err_exists = self.errors().into_iter().any(|err| {
             let code_matches = err.code() == err_code.as_deref();
             let msg_matches = match msg_contains.as_ref() {

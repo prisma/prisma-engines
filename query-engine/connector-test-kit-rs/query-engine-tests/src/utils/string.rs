@@ -1,5 +1,5 @@
 pub fn enclose(input: &str, with: &str) -> String {
-    format!("{}{}{}", with, input, with)
+    format!("{with}{input}{with}")
 }
 
 pub fn enclose_all<T>(input: Vec<T>, with: &str) -> Vec<String>

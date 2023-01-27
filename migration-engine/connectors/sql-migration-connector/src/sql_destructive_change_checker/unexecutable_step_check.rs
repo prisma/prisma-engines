@@ -48,8 +48,7 @@ impl Check for UnexecutableStepCheck {
                 let message = match database_checks.get_row_count(&Table::from_column(column)) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
-                        "There are {row_count} rows in this table, it is not possible to execute this step.",
-                        row_count = row_count
+                        "There are {row_count} rows in this table, it is not possible to execute this step."
                     )),
                     None => message(format_args!("This is not possible if the table is not empty.")),
                 };
@@ -69,8 +68,7 @@ impl Check for UnexecutableStepCheck {
                 let message = match database_checks.get_row_count(&Table::from_column(column)) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
                     Some(row_count) => message(format_args!(
-                        "There are {row_count} rows in this table, it is not possible to execute this step.",
-                        row_count = row_count
+                        "There are {row_count} rows in this table, it is not possible to execute this step."
                     )),
                     None => message(format_args!("This is not possible if the table is not empty.")),
                 };
@@ -113,8 +111,7 @@ impl Check for UnexecutableStepCheck {
                     (Some(0), _) => None,
                     (_, Some(0)) => None,
                     (_, Some(value_count)) => Some(message(format_args!(
-                        "There are {} existing non-null values in that column, this step cannot be executed.",
-                        value_count
+                        "There are {value_count} existing non-null values in that column, this step cannot be executed."
                     ))),
                     (_, _) => Some(message(format_args!(
                         "If there are non-null values in that column, this step will fail."

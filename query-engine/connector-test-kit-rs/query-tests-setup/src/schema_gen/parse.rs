@@ -19,8 +19,7 @@ pub fn walk_json<'a>(json: &'a serde_json::Value, path: &[&str]) -> Result<&'a s
         match key {
             Some(val) => Ok(val),
             None => Err(TestError::parse_error(format!(
-                "Could not walk the JSON value `{}`. The key `{}` does not exist",
-                json, p
+                "Could not walk the JSON value `{json}`. The key `{p}` does not exist"
             ))),
         }
     })
@@ -61,7 +60,7 @@ pub fn parse_compound_id(
     let arguments = fields
         .iter()
         .zip(field_values.iter())
-        .map(|(name, value)| format!("{}: {}", name, value))
+        .map(|(name, value)| format!("{name}: {value}"))
         .join(",");
 
     Ok(format!(
@@ -70,9 +69,7 @@ pub fn parse_compound_id(
               {arguments}
             }},
             {meta}
-        }}",
-        arg_name = arg_name,
-        arguments = arguments
+        }}"
     ))
 }
 
@@ -93,8 +90,7 @@ pub fn parse_many_compound_ids(
             Ok(compound_ids)
         }
         x => Err(TestError::parse_error(format!(
-            "An array was expected but we found: `{}` instead",
-            x
+            "An array was expected but we found: `{x}` instead"
         ))),
     }
 }
@@ -111,8 +107,7 @@ pub fn parse_many_ids(field: &str, json: &serde_json::Value, path: &[&str]) -> R
             Ok(ids)
         }
         x => Err(TestError::parse_error(format!(
-            "An array was expected but we found: `{}` instead",
-            x
+            "An array was expected but we found: `{x}` instead"
         ))),
     }
 }

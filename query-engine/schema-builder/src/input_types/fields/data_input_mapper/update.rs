@@ -26,7 +26,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             TypeIdentifier::String => InputType::object(update_operations_object_type(ctx, "String", sf, false)),
             TypeIdentifier::Boolean => InputType::object(update_operations_object_type(ctx, "Bool", sf, false)),
             TypeIdentifier::Enum(e) => {
-                InputType::object(update_operations_object_type(ctx, &format!("Enum{}", e), sf, false))
+                InputType::object(update_operations_object_type(ctx, &format!("Enum{e}"), sf, false))
             }
             TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, sf),
             TypeIdentifier::DateTime => InputType::object(update_operations_object_type(ctx, "DateTime", sf, false)),
@@ -169,7 +169,7 @@ fn update_operations_object_type(
     // - "Nullable" affects the `set` operation (`set` is nullable)
     let nullable = if !sf.is_required() { "Nullable" } else { "" };
     let ident = Identifier::new(
-        format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
+        format!("{nullable}{prefix}FieldUpdateOperationsInput"),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);

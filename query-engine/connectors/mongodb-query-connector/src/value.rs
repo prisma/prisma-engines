@@ -189,8 +189,8 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
             // Unhandled conversions
             (mdb_type, p_val) => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{:?}", p_val),
-                    to: format!("{:?}", mdb_type),
+                    from: format!("{p_val:?}"),
+                    to: format!("{mdb_type:?}"),
                 })
             }
         })
@@ -275,8 +275,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
             (ident, val) => {
                 return Err(MongoError::Unsupported(format!(
-                    "Unhandled and unsupported value mapping for MongoDB: {} as {:?}.",
-                    val, ident,
+                    "Unhandled and unsupported value mapping for MongoDB: {val} as {ident:?}.",
                 )))
             }
         })
@@ -305,8 +304,8 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
             _ => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{}", bson),
-                    to: format!("List of {:?}", type_identifier),
+                    from: format!("{bson}"),
+                    to: format!("List of {type_identifier:?}"),
                 });
             }
         },
@@ -378,7 +377,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (ident, bson) => {
             return Err(MongoError::ConversionError {
                 from: bson.to_string(),
-                to: format!("{:?}", ident),
+                to: format!("{ident:?}"),
             })
         }
     };
@@ -400,7 +399,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
 
             _ => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{}", bson),
+                    from: format!("{bson}"),
                     to: "List".to_owned(),
                 });
             }
@@ -437,7 +436,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
             }
             bson => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{:?}", bson),
+                    from: format!("{bson:?}"),
                     to: "Document".to_owned(),
                 })
             }
@@ -468,7 +467,7 @@ where
 
 fn format_opt<T: Display>(opt: Option<T>) -> String {
     match opt {
-        Some(t) => format!("{}", t),
+        Some(t) => format!("{t}"),
         None => "None".to_owned(),
     }
 }

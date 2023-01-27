@@ -15,10 +15,10 @@ impl fmt::Display for DatabaseConstraint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Fields(fields) => {
-                let quoted_fields: Vec<String> = fields.iter().map(|f| format!("`{}`", f)).collect();
+                let quoted_fields: Vec<String> = fields.iter().map(|f| format!("`{f}`")).collect();
                 write!(f, "fields: ({})", quoted_fields.join(","))
             }
-            Self::Index(index) => write!(f, "constraint: `{}`", index),
+            Self::Index(index) => write!(f, "constraint: `{index}`"),
             Self::ForeignKey => write!(f, "foreign key"),
             Self::CannotParse => write!(f, "(not available)"),
         }

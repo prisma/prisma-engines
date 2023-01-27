@@ -174,8 +174,7 @@ pub fn nested_upsert(
                         let child_id = match child_ids.pop() {
                             Some(id) => Ok(id),
                             None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{}' record (needed for nested update `where` on exists) was found for a nested upsert on relation '{}'.",
-                                child_model_name, relation_name
+                                "No '{child_model_name}' record (needed for nested update `where` on exists) was found for a nested upsert on relation '{relation_name}'."
                             ))),
                         }?;
 
@@ -254,8 +253,7 @@ pub fn nested_upsert(
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
-                            child_model_name, parent_model_name, relation_name
+                            "No '{child_model_name}' record (needed to update inlined relation on '{parent_model_name}') was found for a nested upsert on relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -280,8 +278,7 @@ pub fn nested_upsert(
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
-                            parent_model_name, child_model_name, relation_name
+                            "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested upsert on relation '{relation_name}'."
                         ))),
                     }?;
 

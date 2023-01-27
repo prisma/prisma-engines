@@ -85,8 +85,8 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 23,
-            "message": "The following views were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "code": 24,
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [
               {
                 "view": "Schwuser"
@@ -707,8 +707,8 @@ async fn unsupported_types_trigger_a_warning(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 23,
-            "message": "The following views were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "code": 24,
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [
               {
                 "view": "A"
@@ -716,7 +716,7 @@ async fn unsupported_types_trigger_a_warning(api: &TestApi) -> TestResult {
             ]
           },
           {
-            "code": 20,
+            "code": 21,
             "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
             "affected": [
               {
@@ -762,7 +762,7 @@ async fn re_intro_keeps_the_map(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 22,
+            "code": 23,
             "message": "These views were enriched with `@@map` information taken from the previous Prisma schema.",
             "affected": [
               {
@@ -802,7 +802,7 @@ async fn re_intro_keeps_the_field_map(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 21,
+            "code": 22,
             "message": "These fields were enriched with `@map` information taken from the previous Prisma schema.",
             "affected": [
               {
@@ -921,7 +921,7 @@ async fn id_names_are_reintrospected(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 24,
+            "code": 25,
             "message": "These views were enriched with custom compound id names taken from the previous Prisma schema.",
             "affected": [
               {
@@ -970,8 +970,8 @@ async fn invalid_field_names_trigger_warnings(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 23,
-            "message": "The following views were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "code": 24,
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [
               {
                 "view": "A"
@@ -979,7 +979,7 @@ async fn invalid_field_names_trigger_warnings(api: &TestApi) -> TestResult {
             ]
           },
           {
-            "code": 25,
+            "code": 26,
             "message": "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
             "affected": [
               {
@@ -1044,8 +1044,8 @@ async fn dupes_are_renamed(api: &TestApi) -> TestResult {
     let expected = expect![[r#"
         [
           {
-            "code": 23,
-            "message": "The following views were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "code": 24,
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [
               {
                 "view": "public_A"
@@ -1111,6 +1111,88 @@ async fn dupe_views_are_not_considered_without_preview_feature(api: &TestApi) ->
 
     let expected = expect![[r#"[]"#]];
     api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn ignore_docs_only_added_once(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE VIEW "A" AS SELECT 1 AS id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view A {
+          id Int?
+
+          @@ignore
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view A {
+          id Int?
+
+          @@ignore
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expectation = expect!["[]"];
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn reserved_name_docs_are_only_added_once(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE VIEW "if" AS SELECT 1 AS id;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input_dm = indoc! {r#"
+        /// This view has been renamed to Renamedif during introspection, because the original name if is reserved.
+        view Renamedif {
+          id Int?
+
+          @@map("if")
+          @@ignore
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This view has been renamed to Renamedif during introspection, because the original name if is reserved.
+        view Renamedif {
+          id Int?
+
+          @@map("if")
+          @@ignore
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input_dm, expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 23,
+            "message": "These views were enriched with `@@map` information taken from the previous Prisma schema.",
+            "affected": [
+              {
+                "view": "Renamedif"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
 
     Ok(())
 }

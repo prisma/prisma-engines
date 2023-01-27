@@ -31,7 +31,7 @@ impl<'db> fmt::Display for Fields<'db> {
             .fields
             .iter()
             .map(|field_id| self.model.relation_field(*field_id).name())
-            .map(|name| format!("`{}`", name));
+            .map(|name| format!("`{name}`"));
 
         match fields.len() {
             x if x < 2 => f.write_str(&fields.join(", ")),
@@ -309,15 +309,15 @@ mod tests {
     fn test_is_left_wise_included() {
         let item = vec![1, 2];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), true);
+        assert!(is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![1, 2, 3, 4];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), true);
+        assert!(is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![1, 2, 3, 4];
         let group = vec![1, 2];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
+        assert!(!is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![2, 3];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
+        assert!(!is_leftwise_included_it(item.iter(), group.iter()));
     }
 }

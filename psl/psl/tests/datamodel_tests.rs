@@ -39,7 +39,7 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
             "previewFeatures = [{}]",
             preview_features
                 .iter()
-                .map(|f| format!("\"{}\"", f))
+                .map(|f| format!("\"{f}\""))
                 .collect::<Vec<_>>()
                 .join(", ")
         )
@@ -62,5 +62,5 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         preview_features
     );
 
-    format!("{}\n{}", header, dm)
+    format!("{header}\n{dm}")
 }

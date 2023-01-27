@@ -43,21 +43,20 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
         r#"
         model Book {{
             id      Int     @id @default(autoincrement())
-            color   {0}
-            color2  {1}
+            color   {color}
+            color2  {color2}
         }}
 
-        enum {0} {{
+        enum {color} {{
             black
             white
         }}
 
-        enum {1} {{
+        enum {color2} {{
             black2
             white2
         }}
     "#,
-        color, color2,
     );
 
     for _ in 0..4 {
@@ -105,21 +104,20 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
         r#"
         model Book {{
             id      Int     @id @default(autoincrement())
-            color   {1}
-            color2  {0}
+            color   {color}
+            color2  {color2}
         }}
 
-        enum {1} {{
+        enum {color} {{
             black
             white
         }}
 
-        enum {0} {{
+        enum {color2} {{
             black2
             white2
         }}
     "#,
-        color2, color,
     );
 
     for _ in 0..4 {
@@ -161,15 +159,14 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
         r#"
         model Book {{
             id      Int @id @default(autoincrement())
-            color   {0} @default(black)
+            color   {enum_name} @default(black)
         }}
 
-        enum {0} {{
+        enum {enum_name} {{
             black
             white
         }}
     "#,
-        enum_name,
     );
 
     api.assert_eq_datamodels(&dm, &api.introspect().await?);

@@ -71,25 +71,25 @@ pub enum QueryParserErrorKind {
 impl Display for QueryParserErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::AssertionError(reason) => write!(f, "Assertion error: {}.", reason),
+            Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
             Self::RequiredValueNotSetError => write!(f, "A value is required but not set."),
             Self::FieldNotFoundError => write!(f, "Field does not exist on enclosing type."),
             Self::ArgumentNotFoundError => write!(f, "Argument does not exist on enclosing type."),
-            Self::FieldCountError(err) => write!(f, "{}", err),
-            Self::ValueParseError(reason) => write!(f, "Error parsing value: {}.", reason),
+            Self::FieldCountError(err) => write!(f, "{err}"),
+            Self::ValueParseError(reason) => write!(f, "Error parsing value: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(
                 f,
                 "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
                 parsing_errors
                     .iter()
-                    .map(|err| format!("{}", err))
+                    .map(|err| format!("{err}"))
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
             Self::ValueTypeMismatchError { have, want } => {
-                write!(f, "Value types mismatch. Have: {:?}, want: {:?}", have, want)
+                write!(f, "Value types mismatch. Have: {have:?}, want: {want:?}")
             }
-            Self::ValueFitError(s) => write!(f, "{}", s),
+            Self::ValueFitError(s) => write!(f, "{s}"),
         }
     }
 }
@@ -169,7 +169,7 @@ impl From<prisma_models::DomainError> for QueryParserError {
     fn from(err: prisma_models::DomainError) -> Self {
         QueryParserError {
             path: QueryPath::default(),
-            error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {}", err)),
+            error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
         }
     }
 }

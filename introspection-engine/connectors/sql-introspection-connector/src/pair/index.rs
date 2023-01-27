@@ -83,7 +83,7 @@ impl<'a> IndexPair<'a> {
 
         let clustered = match self.next {
             Some(next) => {
-                let ext: &MssqlSchemaExt = self.context.schema.downcast_connector_data();
+                let ext: &MssqlSchemaExt = self.context.sql_schema.downcast_connector_data();
                 ext.index_is_clustered(next.id)
             }
             None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(false),
@@ -106,7 +106,7 @@ impl<'a> IndexPair<'a> {
         match (self.next, self.previous.and_then(|i| i.algorithm())) {
             // Index is defined in a table to the database.
             (Some(next), _) => {
-                let data: &PostgresSchemaExt = self.context.schema.downcast_connector_data();
+                let data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
 
                 match data.index_algorithm(next.id) {
                     sql::postgres::SqlIndexAlgorithm::BTree => None,

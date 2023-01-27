@@ -110,7 +110,7 @@ pub(crate) async fn apply_script(
 ) -> ConnectorResult<()> {
     connector
         .host
-        .print(&format!("Applying migration `{}`\n", migration_name))
+        .print(&format!("Applying migration `{migration_name}`\n"))
         .await?;
     connector.flavour.scan_migration_script(script);
     connector.flavour.apply_migration_script(migration_name, script).await

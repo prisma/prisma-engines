@@ -7,7 +7,7 @@ const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/reformatter
 #[inline(never)] // we want to compile fast
 fn run_reformat_test(test_file_path: &str) {
     let file_path = path::Path::new(TESTS_ROOT).join(test_file_path);
-    let text = fs::read_to_string(&file_path).unwrap();
+    let text = fs::read_to_string(file_path).unwrap();
     let reformatted_text: String = reformat(&text);
 
     let snapshot_file_name = path::Path::new(TESTS_ROOT).join(format!(

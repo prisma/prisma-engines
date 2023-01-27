@@ -1,6 +1,6 @@
 //! Prisma version information lookup.
 
-use crate::datamodel_calculator::InputContext;
+use crate::datamodel_calculator::DatamodelCalculatorContext;
 use crate::introspection_helpers::{
     has_created_at_and_updated_at, is_new_migration_table, is_old_migration_table, is_prisma_1_or_11_list_table,
     is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table, is_relay_table,
@@ -61,14 +61,17 @@ const MYSQL_TYPES: &[MySqlType] = &[
 
 /// Find out if the database is created with a specific version of
 /// Prisma.
-pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
+pub(crate) fn check_prisma_version(input: &DatamodelCalculatorContext<'_>) -> Version {
     let mut version_checker = VersionChecker {
         sql_family: input.sql_family(),
         is_cockroachdb: input.is_cockroach(),
-        has_migration_table: input.schema.table_walkers().any(is_old_migration_table),
-        has_relay_table: input.schema.table_walkers().any(is_relay_table),
-        has_prisma_1_join_table: input.schema.table_walkers().any(is_prisma_1_point_0_join_table),
-        has_prisma_1_1_or_2_join_table: input.schema.table_walkers().any(is_prisma_1_point_1_or_2_join_table),
+        has_migration_table: input.sql_schema.table_walkers().any(is_old_migration_table),
+        has_relay_table: input.sql_schema.table_walkers().any(is_relay_table),
+        has_prisma_1_join_table: input.sql_schema.table_walkers().any(is_prisma_1_point_0_join_table),
+        has_prisma_1_1_or_2_join_table: input
+            .sql_schema
+            .table_walkers()
+            .any(is_prisma_1_point_1_or_2_join_table),
         uses_on_delete: false,
         uses_default_values: false,
         always_has_created_at_updated_at: true,
@@ -78,7 +81,7 @@ pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
     };
 
     for table in input
-        .schema
+        .sql_schema
         .table_walkers()
         .filter(|table| !is_old_migration_table(*table))
         .filter(|table| !is_new_migration_table(*table))
@@ -105,7 +108,7 @@ pub(crate) fn check_prisma_version(input: &InputContext<'_>) -> Version {
     }
 
     match version_checker.sql_family {
-        _ if input.schema.is_empty() => Version::NonPrisma,
+        _ if input.sql_schema.is_empty() => Version::NonPrisma,
         SqlFamily::Sqlite if version_checker.is_prisma_2() => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
         SqlFamily::Mysql if version_checker.is_prisma_2() => Version::Prisma2,

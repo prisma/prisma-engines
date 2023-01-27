@@ -620,7 +620,7 @@ fn native_type_name_to_prisma_scalar_type_name(scalar_type: &str) -> &'static st
 
     let idx = TYPES_MAP
         .binary_search_by_key(&scalar_type, |(native, _prisma)| native)
-        .map_err(|_err| format!("Could not find {} in TYPES_MAP", scalar_type))
+        .map_err(|_err| format!("Could not find {scalar_type} in TYPES_MAP"))
         .unwrap();
 
     TYPES_MAP[idx].1
@@ -632,7 +632,7 @@ fn colnames_for_cases(cases: Cases) -> Vec<String> {
     std::iter::repeat(())
         .enumerate()
         .take(max_colname)
-        .map(|(idx, _)| format!("col{}", idx))
+        .map(|(idx, _)| format!("col{idx}"))
         .collect()
 }
 

@@ -246,7 +246,7 @@ impl TestApi {
             .args
             .preview_features()
             .iter()
-            .map(|pf| format!(r#""{}""#, pf))
+            .map(|pf| format!(r#""{pf}""#))
             .collect();
 
         let preview_feature_string = if preview_features.is_empty() {
@@ -257,9 +257,8 @@ impl TestApi {
 
         let generator_block = format!(
             r#"generator client {{
-                 provider = "prisma-client-js"{}
-               }}"#,
-            preview_feature_string
+                 provider = "prisma-client-js"{preview_feature_string}
+               }}"#
         );
         generator_block
     }

@@ -227,8 +227,8 @@ fn bad_migrations_should_make_the_command_fail_with_a_good_error(api: TestApi) {
     std::fs::create_dir(&migration_directory).unwrap();
     let migration_file_path = migration_directory.join("migration.sql");
     let script = "this is not valid SQL";
-    let mut file = std::fs::File::create(&migration_file_path).unwrap();
-    write!(file, "{}", script).unwrap();
+    let mut file = std::fs::File::create(migration_file_path).unwrap();
+    write!(file, "{script}").unwrap();
 
     let error = api.create_migration("create-cats", &dm, &dir).send_unwrap_err();
 

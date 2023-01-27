@@ -29,7 +29,7 @@ impl PostgresFlavour {
             .default()
             .map(|d| render_default(d.inner(), &render_column_type(column, self)))
             .filter(|default| !default.is_empty())
-            .map(|default| format!(" DEFAULT {}", default))
+            .map(|default| format!(" DEFAULT {default}"))
             .unwrap_or_else(String::new);
 
         let identity_str = render_column_identity_str(column, self);
@@ -270,11 +270,11 @@ impl SqlRenderer for PostgresFlavour {
                     let column = schemas.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
                 TableChange::DropColumn { column_id } => {
                     let name = self.quote(schemas.previous.walk(*column_id).name());
-                    lines.push(format!("DROP COLUMN {}", name));
+                    lines.push(format!("DROP COLUMN {name}"));
                 }
                 TableChange::AlterColumn(AlterColumn {
                     column_id,
@@ -296,10 +296,10 @@ impl SqlRenderer for PostgresFlavour {
                     let columns = schemas.walk(*column_id);
                     let name = self.quote(columns.previous.name());
 
-                    lines.push(format!("DROP COLUMN {}", name));
+                    lines.push(format!("DROP COLUMN {name}"));
 
                     let col_sql = self.render_column(columns.next);
-                    lines.push(format!("ADD COLUMN {}", col_sql));
+                    lines.push(format!("ADD COLUMN {col_sql}"));
                 }
             };
         }
@@ -640,14 +640,14 @@ fn render_column_type_cockroachdb(col: TableColumnWalker<'_>) -> Cow<'static, st
 fn render_optional_args(input: Option<u32>) -> String {
     match input {
         None => "".to_string(),
-        Some(arg) => format!("({})", arg),
+        Some(arg) => format!("({arg})"),
     }
 }
 
 fn render_decimal_args(input: Option<(u32, u32)>) -> String {
     match input {
         None => "".to_string(),
-        Some((precision, scale)) => format!("({},{})", precision, scale),
+        Some((precision, scale)) => format!("({precision},{scale})"),
     }
 }
 
@@ -690,7 +690,7 @@ fn render_alter_column(
     let table_name = QuotedWithPrefix::pg_from_table_walker(columns.previous.table());
     let column_name = Quoted::postgres_ident(columns.previous.name());
 
-    let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
+    let alter_column_prefix = format!("ALTER COLUMN {column_name}");
 
     for step in steps {
         match step {
@@ -734,7 +734,7 @@ fn render_alter_column(
                 )
                 .to_lowercase();
 
-                before_statements.push(format!("CREATE SEQUENCE {}", sequence_name));
+                before_statements.push(format!("CREATE SEQUENCE {sequence_name}"));
 
                 clauses.push(format!(
                     "{prefix} SET DEFAULT {default}",
@@ -744,8 +744,6 @@ fn render_alter_column(
 
                 after_statements.push(format!(
                     "ALTER SEQUENCE {sequence_name} OWNED BY {table_name}.{column_name}",
-                    table_name = table_name,
-                    column_name = column_name,
                 ));
             }
         }

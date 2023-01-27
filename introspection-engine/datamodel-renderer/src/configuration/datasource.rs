@@ -147,15 +147,15 @@ impl<'a> fmt::Display for Datasource<'a> {
         writeln!(f, "provider = {}", self.provider)?;
         writeln!(f, "url = {}", self.url)?;
         if let Some(direct_url) = self.direct_url {
-            writeln!(f, "directUrl = {}", direct_url)?;
+            writeln!(f, "directUrl = {direct_url}")?;
         }
 
         if let Some(url) = self.shadow_database_url {
-            writeln!(f, "shadowDatabaseUrl = {}", url)?;
+            writeln!(f, "shadowDatabaseUrl = {url}")?;
         }
 
         if let Some(relation_mode) = self.relation_mode {
-            writeln!(f, "relationMode = \"{}\"", relation_mode)?;
+            writeln!(f, "relationMode = \"{relation_mode}\"")?;
         }
 
         for (key, value) in self.custom_properties.iter() {

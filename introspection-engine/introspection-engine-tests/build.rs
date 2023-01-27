@@ -30,7 +30,7 @@ fn find_all_sql_files(prefix: &str, all_sql_files: &mut Vec<String>) {
         let entry = entry.unwrap();
         let file_name = entry.file_name();
         let file_name = file_name.to_str().unwrap();
-        let entry_path = format!("{}/{}", prefix, file_name);
+        let entry_path = format!("{prefix}/{file_name}");
         let file_type = entry.file_type().unwrap();
 
         if file_name == "." || file_name == ".." {

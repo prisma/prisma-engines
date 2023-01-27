@@ -98,8 +98,7 @@ pub fn nested_update(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record was found for a nested update on relation '{}'.",
-                            child_model_name, relation_name
+                            "No '{child_model_name}' record was found for a nested update on relation '{relation_name}'."
                         ))),
                     }?;
 

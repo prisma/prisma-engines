@@ -34,8 +34,7 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
             (filters::IS_NOT, input) => Ok(field.is_not(extract_filter(input.try_into()?, &field.typ)?)),
 
             _ => Err(QueryGraphBuilderError::InputError(format!(
-                "Invalid filter key `{}` input combination for composite filter",
-                filter_key
+                "Invalid filter key `{filter_key}` input combination for composite filter"
             ))),
         }
     } else {

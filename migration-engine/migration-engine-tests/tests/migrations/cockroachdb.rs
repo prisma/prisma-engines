@@ -149,7 +149,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
     .to_string();
 
     for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
+        writeln!(&mut dm, "    {field_name} {prisma_type} @db.{native_type}").unwrap();
     }
 
     dm.push_str("}\n");
@@ -618,7 +618,7 @@ fn column_defaults_can_safely_be_changed(api: TestApi) {
                 model_name,
                 first_default
                     .as_ref()
-                    .map(|default| format!("@default(\"{}\")", default))
+                    .map(|default| format!("@default(\"{default}\")"))
                     .unwrap_or_else(String::new)
             );
 
@@ -680,7 +680,7 @@ fn column_defaults_can_safely_be_changed(api: TestApi) {
                 model_name,
                 second_default
                     .as_ref()
-                    .map(|default| format!(r#"@default("{}")"#, default))
+                    .map(|default| format!(r#"@default("{default}")"#))
                     .unwrap_or_else(String::new)
             );
 
@@ -797,10 +797,9 @@ fn on_delete_referential_actions_should_work(api: TestApi) {
             model B {{
                 id   BigInt @id
                 aId  BigInt?
-                a    A?    @relation(fields: [aId], references: [id], onDelete: {})
+                a    A?    @relation(fields: [aId], references: [id], onDelete: {ra})
             }}
-        "#,
-            ra
+        "#
         );
 
         api.schema_push_w_datasource(&dm).send().assert_green();

@@ -38,18 +38,17 @@ mod where_and_datetime {
                     createOneNote(
                       data: {{
                         outerString: "Outer String"
-                        outerDateTime: "{}"
+                        outerDateTime: "{outer_where}"
                         todos: {{
                           create: [
-                            {{ innerString: "Inner String", innerDateTime: "{}" }}
+                            {{ innerString: "Inner String", innerDateTime: "{inner_where}" }}
                           ]
                         }}
                       }}
                     ){{
                       id
                     }}
-            }}"#,
-                outer_where, inner_where
+            }}"#
             )
         );
 
@@ -58,12 +57,12 @@ mod where_and_datetime {
             format!(
                 r#"mutation {{
                     updateOneNote(
-                      where: {{ outerDateTime: "{}" }}
+                      where: {{ outerDateTime: "{outer_where}" }}
                       data: {{
                         outerString: {{ set: "Changed Outer String" }}
                         todos: {{
                           update: [{{
-                            where: {{ innerDateTime: "{}" }},
+                            where: {{ innerDateTime: "{inner_where}" }},
                             data:{{ innerString: {{ set: "Changed Inner String" }} }}
                           }}]
                         }}
@@ -71,18 +70,17 @@ mod where_and_datetime {
                     ){{
                       id
                     }}
-            }}"#,
-                outer_where, inner_where
+            }}"#
             )
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{outer_where}" }}){{outerString, outerDateTime}} }}"#)),
           @r###"{"data":{"findUniqueNote":{"outerString":"Changed Outer String","outerDateTime":"2018-12-05T12:34:23.000Z"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{inner_where}" }}){{innerString, innerDateTime}} }}"#)),
           @r###"{"data":{"findUniqueTodo":{"innerString":"Changed Inner String","innerDateTime":"2019-12-05T12:34:23.000Z"}}}"###
         );
 
@@ -102,18 +100,17 @@ mod where_and_datetime {
                   createOneNote(
                     data: {{
                       outerString: "Outer String"
-                      outerDateTime: "{}"
+                      outerDateTime: "{outer_where}"
                       todos: {{
                         create: [
-                          {{ innerString: "Inner String", innerDateTime: "{}" }}
+                          {{ innerString: "Inner String", innerDateTime: "{inner_where}" }}
                         ]
                       }}
                     }}
                   ){{
                     id
                   }}
-          }}"#,
-                outer_where, inner_where
+          }}"#
             )
         );
 
@@ -122,12 +119,12 @@ mod where_and_datetime {
             format!(
                 r#"mutation {{
                   updateOneNote(
-                    where: {{ outerDateTime: "{}" }}
+                    where: {{ outerDateTime: "{outer_where}" }}
                     data: {{
                       outerString: {{ set: "Changed Outer String" }}
                       todos: {{
                         update: [{{
-                          where: {{ innerDateTime: "{}" }},
+                          where: {{ innerDateTime: "{inner_where}" }},
                           data:{{ innerString: {{ set: "Changed Inner String" }} }}
                         }}]
                       }}
@@ -135,18 +132,17 @@ mod where_and_datetime {
                   ){{
                     id
                   }}
-          }}"#,
-                outer_where, inner_where
+          }}"#
             )
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{}" }}){{outerString, outerDateTime}} }}"#, outer_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{outerDateTime: "{outer_where}" }}){{outerString, outerDateTime}} }}"#)),
           @r###"{"data":{"findUniqueNote":{"outerString":"Changed Outer String","outerDateTime":"2018-01-03T11:27:38.000Z"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{}" }}){{innerString, innerDateTime}} }}"#, inner_where)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{innerDateTime: "{inner_where}" }}){{innerString, innerDateTime}} }}"#)),
           @r###"{"data":{"findUniqueTodo":{"innerString":"Changed Inner String","innerDateTime":"2018-01-03T11:27:38.000Z"}}}"###
         );
 

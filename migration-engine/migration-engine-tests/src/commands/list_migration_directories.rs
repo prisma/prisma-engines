@@ -51,9 +51,7 @@ impl<'a> ListMigrationDirectoriesAssertion<'a> {
 
         assert!(
             found_names == names,
-            "Assertion failed. The listed migrations do not match the expectations. ({:?} vs {:?})",
-            found_names,
-            names
+            "Assertion failed. The listed migrations do not match the expectations. ({found_names:?} vs {names:?})"
         );
 
         self

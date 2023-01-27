@@ -45,7 +45,7 @@ pub fn render_test_datamodel(
     let is_multi_schema = !db_schemas.is_empty();
 
     let schema_def = if is_multi_schema {
-        format!("schemas = {:?}", db_schemas)
+        format!("schemas = {db_schemas:?}")
     } else {
         String::default()
     };
@@ -74,7 +74,7 @@ pub fn render_test_datamodel(
     let renderer = tag.datamodel_renderer();
     let models = process_template(template, renderer);
 
-    format!("{}\n\n{}", datasource_with_generator, models)
+    format!("{datasource_with_generator}\n\n{models}")
 }
 
 fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> String {
@@ -93,13 +93,13 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
 }
 
 fn render_preview_features(excluded_features: &[&str]) -> String {
-    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{}""#, f)).collect();
+    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
 
     ALL_PREVIEW_FEATURES
         .active_features()
         .iter()
         .chain(ALL_PREVIEW_FEATURES.hidden_features())
-        .map(|f| format!(r#""{}""#, f))
+        .map(|f| format!(r#""{f}""#))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")
 }

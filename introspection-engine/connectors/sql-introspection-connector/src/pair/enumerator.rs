@@ -46,11 +46,7 @@ impl<'a> EnumPair<'a> {
 
     /// The namespace of the enumerator, if using the multi-schema feature.
     pub(crate) fn namespace(self) -> Option<&'a str> {
-        if self.context.uses_namespaces() {
-            self.next.namespace()
-        } else {
-            None
-        }
+        self.context.uses_namespaces().then(|| self.next.namespace()).flatten()
     }
 
     /// The position of the enum from the PSL, if existing. Used for

@@ -46,7 +46,7 @@ mod upsert_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"updated C"}]}}}"###
         );
 
@@ -94,7 +94,7 @@ mod upsert_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"new C"}]}}}"###
         );
 
@@ -142,7 +142,7 @@ mod upsert_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"},{"c":"updated C"}]}}}"###
         );
 
@@ -192,7 +192,7 @@ mod upsert_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"updated C"}]}}}"###
         );
 
@@ -245,7 +245,7 @@ mod upsert_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"updated C"}]}}}"###
         );
 

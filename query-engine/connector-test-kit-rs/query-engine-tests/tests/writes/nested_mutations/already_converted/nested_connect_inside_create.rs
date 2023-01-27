@@ -35,13 +35,13 @@ mod connect_inside_create {
           run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p2", p_1:"p", p_2: "2",
-              childOpt: {{ connect: {child} }}
+              childOpt: {{ connect: {child_1} }}
             }}){{
               childOpt {{
                 c
               }}
             }}
-          }}"#, child = child_1)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -71,13 +71,13 @@ mod connect_inside_create {
           run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p1", p_1:"p", p_2: "1",
-              childOpt: {{ connect: {connect} }}
+              childOpt: {{ connect: {child_1} }}
             }}){{
               childOpt {{
                 c
               }}
             }}
-          }}"#, connect = child_1)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -108,13 +108,13 @@ mod connect_inside_create {
           run_query!(runner, format!(r#"mutation {{
             createOneParent(data:{{
               p: "p1", p_1:"p", p_2: "1",
-              childOpt: {{ connect: {connect} }}
+              childOpt: {{ connect: {child_1} }}
             }}){{
               childOpt {{
                 c
               }}
             }}
-          }}"#, connect = child_1)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -154,8 +154,7 @@ mod connect_inside_create {
                     c
                   }}
                 }}
-              }}"#,
-                child = child
+              }}"#
             ),
             2025,
             "An operation failed because it depends on one or more records that were required but not found."
@@ -199,7 +198,7 @@ mod connect_inside_create {
                 c
               }}
             }}
-          }}"#, child = child)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -241,7 +240,7 @@ mod connect_inside_create {
                 c
               }}
             }}
-          }}"#, child = child)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -284,7 +283,7 @@ mod connect_inside_create {
                 c
               }}
             }}
-          }}"#, child = child)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -402,7 +401,7 @@ mod connect_inside_create {
                 c
               }}
             }}
-          }}"#, child_id = child_id)),
+          }}"#)),
           @r###"{"data":{"createOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -443,8 +442,7 @@ mod connect_inside_create {
                       c
                     }}
                   }}
-                }}"#,
-                child = child
+                }}"#
             ),
             2018,
             "The required connected records were not found. Expected 2 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 1."
@@ -486,8 +484,7 @@ mod connect_inside_create {
                     c
                   }}
                 }}
-              }}"#,
-              child = child
+              }}"#
           ),
           2018,
           "The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'ChildToParent', found 0."
@@ -791,8 +788,7 @@ mod connect_inside_create {
                     c
                   }}
                 }}
-              }}"#,
-              child = child
+              }}"#
           ),
           2025,
           "An operation failed because it depends on one or more records that were required but not found. Expected 1 records to be connected, found only 0."

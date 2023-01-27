@@ -234,7 +234,7 @@ fn get_relation_mode(
                 let supported_values = connector
                     .allowed_relation_mode_settings()
                     .iter()
-                    .map(|v| format!(r#""{}""#, v))
+                    .map(|v| format!(r#""{v}""#))
                     .collect::<Vec<_>>()
                     .join(", ");
 

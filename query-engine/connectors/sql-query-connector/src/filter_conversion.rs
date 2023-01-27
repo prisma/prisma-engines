@@ -617,7 +617,7 @@ fn with_json_type_filter(
                         comparable.or(expr_json.json_type_not_equals(JsonType::Number)).into()
                     }
                     serde_json::Value::Number(_) => comparable.and(expr_json.json_type_equals(JsonType::Number)).into(),
-                    v => panic!("JSON target types only accept strings or numbers, found: {}", v),
+                    v => panic!("JSON target types only accept strings or numbers, found: {v}"),
                 }
             }
             _ => unreachable!(),
@@ -644,7 +644,7 @@ fn default_scalar_filter(
         ScalarCondition::Equals(value) => comparable.equals(convert_first_value(fields, value, alias, ctx)),
         ScalarCondition::NotEquals(value) => comparable.not_equals(convert_first_value(fields, value, alias, ctx)),
         ScalarCondition::Contains(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("%{}%", value)),
+            ConditionValue::Value(value) => comparable.like(format!("%{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
                 field_ref.aliased_col(alias, ctx).into(),
@@ -652,7 +652,7 @@ fn default_scalar_filter(
             ])),
         },
         ScalarCondition::NotContains(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("%{}%", value)),
+            ConditionValue::Value(value) => comparable.not_like(format!("%{value}%")),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     Value::text("%").raw().into(),
@@ -662,14 +662,14 @@ fn default_scalar_filter(
             }
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("{}%", value)),
+            ConditionValue::Value(value) => comparable.like(format!("{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 field_ref.aliased_col(alias, ctx).into(),
                 Value::text("%").raw().into(),
             ])),
         },
         ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("{}%", value)),
+            ConditionValue::Value(value) => comparable.not_like(format!("{value}%")),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     field_ref.aliased_col(alias, ctx).into(),
@@ -678,14 +678,14 @@ fn default_scalar_filter(
             }
         },
         ScalarCondition::EndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.like(format!("%{}", value)),
+            ConditionValue::Value(value) => comparable.like(format!("%{value}")),
             ConditionValue::FieldRef(field_ref) => comparable.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                 Value::text("%").raw().into(),
                 field_ref.aliased_col(alias, ctx).into(),
             ])),
         },
         ScalarCondition::NotEndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.not_like(format!("%{}", value)),
+            ConditionValue::Value(value) => comparable.not_like(format!("%{value}")),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.not_like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                     Value::text("%").raw().into(),
@@ -773,18 +773,18 @@ fn insensitive_scalar_filter(
     let condition = match cond {
         ScalarCondition::Equals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_null(),
         ScalarCondition::Equals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{}", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{value}")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw("ILIKE", field_ref.aliased_col(alias, ctx)),
         },
         ScalarCondition::NotEquals(ConditionValue::Value(PrismaValue::Null)) => comparable.is_not_null(),
         ScalarCondition::NotEquals(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{}", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{value}")),
             ConditionValue::FieldRef(field_ref) => {
                 comparable.compare_raw("NOT ILIKE", field_ref.aliased_col(alias, ctx))
             }
         },
         ScalarCondition::Contains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{}%", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![
@@ -795,7 +795,7 @@ fn insensitive_scalar_filter(
             ),
         },
         ScalarCondition::NotContains(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{}%", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![
@@ -806,28 +806,28 @@ fn insensitive_scalar_filter(
             ),
         },
         ScalarCondition::StartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{}%", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::NotStartsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{}%", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("{value}%")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").into()]),
             ),
         },
         ScalarCondition::EndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{}", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("ILIKE", format!("%{value}")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "ILIKE",
                 concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
             ),
         },
         ScalarCondition::NotEndsWith(value) => match value {
-            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{}", value)),
+            ConditionValue::Value(value) => comparable.compare_raw("NOT ILIKE", format!("%{value}")),
             ConditionValue::FieldRef(field_ref) => comparable.compare_raw(
                 "NOT ILIKE",
                 concat::<'_, Expression<'_>>(vec![Value::text("%").into(), field_ref.aliased_col(alias, ctx).into()]),
@@ -1040,7 +1040,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_contains (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let contains = expr_string.like(format!("%{}%", value));
+                let contains = expr_string.like(format!("%{value}%"));
 
                 if reverse {
                     contains.or(expr_json.json_type_not_equals(JsonType::String)).into()
@@ -1098,7 +1098,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_starts_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let starts_with = expr_string.like(format!("{}%", value));
+                let starts_with = expr_string.like(format!("{value}%"));
 
                 if reverse {
                     starts_with.or(expr_json.json_type_not_equals(JsonType::String)).into()
@@ -1158,7 +1158,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_ends_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let ends_with = expr_string.like(format!("%{}", value));
+                let ends_with = expr_string.like(format!("%{value}"));
 
                 if reverse {
                     ends_with.or(expr_json.json_type_not_equals(JsonType::String)).into()

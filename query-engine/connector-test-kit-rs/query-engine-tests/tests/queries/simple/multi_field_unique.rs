@@ -267,7 +267,7 @@ mod multi_field_unique {
 
     async fn create_user(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneUser(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneUser(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

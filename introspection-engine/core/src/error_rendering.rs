@@ -43,6 +43,6 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
     JsonRpcError {
         code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
         message: "The migration engine encountered an error and failed to render it.".to_string(),
-        data: Some(serde_json::json!({ "backtrace": null, "message": format!("{}", err) })),
+        data: Some(serde_json::json!({ "backtrace": null, "message": format!("{err}") })),
     }
 }
