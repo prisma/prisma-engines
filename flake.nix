@@ -34,6 +34,7 @@
           ./nix/cli-shell.nix
           ./nix/dev-vm.nix
           ./nix/prisma-fmt-wasm.nix
+          ./nix/qe-data-proxy-logging-checks
           ./nix/shell.nix
         ];
       };

@@ -1,0 +1,5 @@
+query {
+  findManyAlbum(where: { name: "a very muppets christmas" }) {
+    id
+  }
+}

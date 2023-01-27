@@ -3,6 +3,7 @@ use crate::{
     execute_many_operations, execute_single_operation, telemetry::helpers::set_span_link_from_traceparent, ClosedTx,
     OpenTx, Operation, ResponseData, TxId,
 };
+use opentelemetry::trace::{TraceContextExt, Tracer as _};
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -16,6 +17,7 @@ use tokio::{
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 #[derive(PartialEq)]
 enum RunState {
@@ -220,7 +222,11 @@ impl ITXClient {
 
     fn create_receive_and_req(&self, msg: TxOpRequestMsg) -> (oneshot::Receiver<TxOpResponse>, TxOpRequest) {
         let (send, rx) = oneshot::channel::<TxOpResponse>();
-        let request = TxOpRequest { msg, respond_to: send };
+        let request = TxOpRequest {
+            msg,
+            respond_to: send,
+            trace_id: opentelemetry::Context::current().span().span_context().trace_id(),
+        };
         (rx, request)
     }
 
@@ -286,6 +292,14 @@ pub fn spawn_itx_actor(
                     }
                     msg = server.receive.recv() => {
                         if let Some(op) = msg {
+                            // Make sure the transaction operation will be included in the request trace.
+                            {
+                                let tracer = opentelemetry::global::tracer("opentelemetry");
+                                let otel_span = tracer.span_builder("in transaction").with_trace_id(op.trace_id).start(&tracer);
+                                let tracing_span = info_span!("in transaction");
+                                tracing_span.set_parent(opentelemetry::Context::current_with_span(otel_span));
+                            }
+
                             let run_state = server.process_msg(op).await;
 
                             if run_state == RunState::Finished {

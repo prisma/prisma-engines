@@ -1,9 +1,11 @@
 use crate::state::State;
+use crate::tracer::fetch_captures_for_trace;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::global;
 use opentelemetry::propagation::Extractor;
+use opentelemetry::trace::{TraceContextExt as _, Tracer as _};
 use query_core::{schema::QuerySchemaRenderer, TransactionOptions, TxId};
 use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
@@ -12,7 +14,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::{field, Instrument, Span};
+use tracing::{field, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
@@ -115,14 +117,14 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let headers = req.headers();
     let traceparent = traceparent(headers);
     let tx_id = transaction_id(headers);
-    let cx = get_parent_span_context(headers);
 
-    let span = if tx_id.is_none() {
-        let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
-        span
-    } else {
-        Span::none()
+    // Opentelemetry + tracing
+    let tracing_span = {
+        let cx = get_parent_span_context(headers);
+        let opentelemetry_span = crate::tracer::tracer().start_with_context("prisma:engine", &cx);
+        let tracing_span = info_span!("prisma:engine", user_facing = true);
+        tracing_span.set_parent(cx.with_span(opentelemetry_span));
+        tracing_span
     };
 
     let work = async move {
@@ -133,7 +135,13 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+                let mut result = handler.handle(body, tx_id, traceparent).await;
+
+                {
+                    let trace_id = tracing::Span::current().context().span().span_context().trace_id();
+                    let traces = fetch_captures_for_trace(trace_id).await.unwrap();
+                    result.set_extension("logs".to_owned(), traces.into());
+                }
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
@@ -156,7 +164,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         }
     };
 
-    work.await
+    work.instrument(tracing_span).await
 }
 
 /// Expose the GraphQL playground if enabled.

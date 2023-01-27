@@ -44,7 +44,7 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     logger.setup_telemetry(opts.enable_open_telemetry, &opts.open_telemetry_endpoint);
 
     if install_logger {
-        logger.install().unwrap();
+        logger.install().await.unwrap();
     }
 
     if opts.enable_metrics || opts.dataproxy_metric_override {

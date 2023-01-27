@@ -1,4 +1,5 @@
 use crate::{Operation, ResponseData};
+use opentelemetry::trace::TraceId;
 use std::fmt::Display;
 use tokio::sync::oneshot;
 
@@ -11,6 +12,7 @@ pub enum TxOpRequestMsg {
 }
 
 pub struct TxOpRequest {
+    pub(crate) trace_id: TraceId,
     pub msg: TxOpRequestMsg,
     pub respond_to: oneshot::Sender<TxOpResponse>,
 }

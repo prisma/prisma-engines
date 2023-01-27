@@ -80,7 +80,7 @@ impl Logger {
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.
-    pub fn install(&self) -> LoggerResult<()> {
+    pub async fn install(&self) -> LoggerResult<()> {
         let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
 
@@ -117,10 +117,10 @@ impl Logger {
             TracingConfig::Stdout => {
                 // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
                 // export traces too. We export it to stdout
-                let exporter = crate::tracer::ClientSpanExporter::default();
-                let tracer = crate::tracer::install(Some(exporter), None);
+                // let exporter = crate::tracer::ClientSpanExporter::default();
+                crate::tracer::install(Some(crate::tracer::CapturingExporter), None);
                 let telemetry_layer = tracing_opentelemetry::layer()
-                    .with_tracer(tracer)
+                    .with_tracer(crate::tracer::tracer().clone())
                     .with_filter(is_user_trace);
                 let subscriber = subscriber.with(telemetry_layer);
                 subscriber::set_global_default(subscriber)?;

@@ -1,0 +1,52 @@
+{
+  "errors": [
+    {
+      "error": "Error in query graph construction: QueryParserError(QueryParserError { path: QueryPath { segments: [\"Query\", \"findManyAlbum\", \"where\", \"AlbumWhereInput\", \"name\"] }, error_kind: FieldNotFoundError })",
+      "user_facing_error": {
+        "is_panic": false,
+        "message": "Failed to validate the query: `Field does not exist on enclosing type.` at `Query.findManyAlbum.where.AlbumWhereInput.name`",
+        "meta": {
+          "query_validation_error": "Field does not exist on enclosing type.",
+          "query_position": "Query.findManyAlbum.where.AlbumWhereInput.name"
+        },
+        "error_code": "P2009"
+      }
+    }
+  ],
+  "extensions": {
+    "traces": [
+      {
+        "trace_id": "0af89ba61fc3d56ef7d7d0c673e626db",
+        "span_id": "d5d79085752a4577",
+        "parent_span_id": "b5fe277321510873",
+        "name": "prisma:engine:connection",
+        "start_time": [
+          1674737796,
+          880933580
+        ],
+        "end_time": [
+          1674737796,
+          880970950
+        ],
+        "attributes": {
+          "db.type": "sqlite"
+        }
+      },
+      {
+        "trace_id": "0af89ba61fc3d56ef7d7d0c673e626db",
+        "span_id": "b5fe277321510873",
+        "parent_span_id": "0000000000000000",
+        "name": "prisma:engine",
+        "start_time": [
+          1674737796,
+          880811602
+        ],
+        "end_time": [
+          1674737796,
+          881036011
+        ]
+      }
+    ],
+    "logs": []
+  }
+}

@@ -39,17 +39,17 @@ in
     buildPhase = ''
       mkdir .cargo
       ln -s ${deps}/config.toml .cargo/config.toml
-      cargo build --release --bins
-      cargo build --release -p query-engine-node-api
+      cargo build --bin=query-engine
+      # cargo build --release -p query-engine-node-api
     '';
 
     installPhase = ''
       mkdir -p $out/bin $out/lib
-      cp target/release/query-engine $out/bin/
-      cp target/release/migration-engine $out/bin/
-      cp target/release/introspection-engine $out/bin/
-      cp target/release/prisma-fmt $out/bin/
-      cp target/release/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
+      cp target/debug/query-engine $out/bin/
+      # cp target/release/migration-engine $out/bin/
+      # cp target/release/introspection-engine $out/bin/
+      # cp target/release/prisma-fmt $out/bin/
+      # cp target/release/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
     '';
   };
 }
