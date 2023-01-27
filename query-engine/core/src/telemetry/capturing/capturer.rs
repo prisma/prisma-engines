@@ -65,7 +65,7 @@ impl Processor {
         }
     }
 
-    pub(self) async fn start_capturing(&self, trace_id: TraceId, settings: Settings) {
+    async fn start_capturing(&self, trace_id: TraceId, settings: Settings) {
         let mut locked_storage = self.storage.lock().unwrap();
         locked_storage.insert(trace_id, settings.clone().into());
         drop(locked_storage);
@@ -81,7 +81,7 @@ impl Processor {
         });
     }
 
-    pub(self) async fn fetch_captures(&self, trace_id: TraceId) -> Option<Storage> {
+    async fn fetch_captures(&self, trace_id: TraceId) -> Option<Storage> {
         let mut traces = self.storage.lock().unwrap();
 
         traces.remove(&trace_id)
