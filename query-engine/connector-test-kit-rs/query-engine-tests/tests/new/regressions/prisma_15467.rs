@@ -80,7 +80,7 @@ db.Standing.updateMany({{
         let expected_query = query.trim();
         assert!(
             last_log_line.contains(expected_query),
-            "{}", 
+            "{}",
             r#"{last_log_line} should have contained {expected_query}"#,
         );
 
@@ -88,7 +88,7 @@ db.Standing.updateMany({{
         let expected_duration_field = "duration_ms";
         assert!(
             last_log_line.contains(expected_duration_field),
-            "{}", 
+            "{}",
             r#"{last_log_line} should have contained {expected_duration_field}"#
         );
 
