@@ -9,7 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{IntrospectionContext, IntrospectionResult, Version};
+use schema_connector::{IntrospectionContext, IntrospectionResult};
 pub(crate) use statistics::Name;
 use statistics::*;
 
@@ -64,6 +64,5 @@ pub(super) async fn sample(
         is_empty: data_model.is_empty(),
         warnings,
         views: None,
-        version: Version::NonPrisma,
     })
 }

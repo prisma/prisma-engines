@@ -370,7 +370,6 @@ impl GenericApi for EngineState {
 
                         Ok(IntrospectResult {
                             datamodel: result.data_model,
-                            version: format!("{:?}", result.version),
                             views,
                             warnings: result
                                 .warnings

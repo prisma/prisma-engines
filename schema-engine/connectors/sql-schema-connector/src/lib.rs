@@ -20,7 +20,6 @@ mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-mod version_checker;
 mod warnings;
 
 use database_schema::SqlDatabaseSchema;

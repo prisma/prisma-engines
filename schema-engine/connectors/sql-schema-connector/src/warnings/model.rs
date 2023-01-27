@@ -1,4 +1,4 @@
-use crate::introspection_pair::{DefaultKind, ModelPair};
+use crate::introspection_pair::ModelPair;
 
 use super::generators::{self, Warnings};
 
@@ -46,24 +46,6 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
     }
 
     for field in model.scalar_fields() {
-        if let Some(DefaultKind::Prisma1Uuid) = field.default().kind() {
-            let warn = generators::ModelAndField {
-                model: model.name().to_string(),
-                field: field.name().to_string(),
-            };
-
-            warnings.prisma_1_uuid_defaults.push(warn);
-        }
-
-        if let Some(DefaultKind::Prisma1Cuid) = field.default().kind() {
-            let warn = generators::ModelAndField {
-                model: model.name().to_string(),
-                field: field.name().to_string(),
-            };
-
-            warnings.prisma_1_cuid_defaults.push(warn);
-        }
-
         if field.remapped_name_from_psl() {
             let mf = generators::ModelAndField {
                 model: model.name().to_string(),

@@ -29,7 +29,7 @@ pub use destructive_change_checker::{
 pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
 pub use introspection_context::{CompositeTypeDepth, IntrospectionContext};
-pub use introspection_result::{IntrospectionResult, IntrospectionResultOutput, Version, ViewDefinition, Warning};
+pub use introspection_result::{IntrospectionResult, IntrospectionResultOutput, ViewDefinition, Warning};
 pub use migration::Migration;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 

@@ -80,14 +80,18 @@ db.Standing.updateMany({{
         let expected_query = query.trim();
         assert!(
             last_log_line.contains(expected_query),
-            r#"{last_log_line} should have contained {expected_query}"#,
+            "{} should have contained {}",
+            last_log_line,
+            expected_query
         );
 
         // Piggybacking assertion reproducing https://github.com/prisma/prisma/issues/14378
         let expected_duration_field = "duration_ms";
         assert!(
             last_log_line.contains(expected_duration_field),
-            r#"{last_log_line} should have contained {expected_duration_field}"#
+            "{} should have contained {}",
+            last_log_line,
+            expected_duration_field
         );
 
         Ok(())

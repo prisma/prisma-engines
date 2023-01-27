@@ -1,7 +1,7 @@
 //! Small utility functions.
 
 use sql::walkers::TableWalker;
-use sql_schema_describer::{self as sql, ColumnTypeFamily, IndexType};
+use sql_schema_describer::{self as sql, IndexType};
 use std::cmp;
 
 /// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
@@ -55,30 +55,9 @@ pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
             .any(|col| col.name().eq_ignore_ascii_case("stablemodelidentifier"))
 }
 
-/// If the table has `createdAt` and `updatedAt` fields.
-pub(crate) fn has_created_at_and_updated_at(table: TableWalker<'_>) -> bool {
-    let has_created_at = table.columns().any(|col| {
-        col.name().eq_ignore_ascii_case("createdat") && col.column_type().family == ColumnTypeFamily::DateTime
-    });
-
-    let has_updated_at = table.columns().any(|col| {
-        col.name().eq_ignore_ascii_case("updatedat") && col.column_type().family == ColumnTypeFamily::DateTime
-    });
-
-    has_created_at && has_updated_at
-}
-
 /// A special table to handle many to many relations in Prisma.
 pub(crate) fn is_prisma_join_table(t: TableWalker<'_>) -> bool {
     is_prisma_1_point_0_join_table(t) || is_prisma_1_point_1_or_2_join_table(t)
-}
-
-/// A legacy Prisma 1 list table.
-pub(crate) fn is_prisma_1_or_11_list_table(table: TableWalker<'_>) -> bool {
-    table.columns().len() == 3
-        && table.columns().any(|col| col.name().eq_ignore_ascii_case("nodeid"))
-        && table.column("position").is_some()
-        && table.column("value").is_some()
 }
 
 /// A special legacy join table, seen in Prisma 1.1 and 1.2.
