@@ -47,7 +47,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     pub(crate) fn lift(&self) -> Datamodel {
-        let mut schema = Datamodel::new();
+        let mut schema = Datamodel::default();
 
         // We iterate over scalar fields, then relations, but we want the
         // order of fields in the Model to match the order of the fields in
@@ -70,7 +70,7 @@ impl<'a> LiftAstToDml<'a> {
 
         self.lift_relations(&mut schema, &mut field_ids_for_sorting);
 
-        for model in schema.models_mut() {
+        for model in &mut schema.models {
             let model_name = model.name.as_str();
             model
                 .fields
@@ -317,7 +317,7 @@ impl<'a> LiftAstToDml<'a> {
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) -> Model {
         let ast_model = walker.ast_model();
-        let mut model = Model::new(ast_model.name().to_owned(), None);
+        let mut model = Model::new(walker.id, ast_model.name().to_owned(), None);
 
         model.documentation = ast_model.documentation().map(String::from);
         model.database_name = walker.mapped_name().map(String::from);
@@ -435,7 +435,7 @@ impl<'a> LiftAstToDml<'a> {
 
     /// Internal: Validates an enum AST node.
     fn lift_enum(&self, r#enum: EnumWalker<'_>) -> Enum {
-        let mut en = Enum::new(r#enum.name(), vec![], None);
+        let mut en = Enum::new(r#enum.id, r#enum.name());
 
         for value in r#enum.values() {
             en.add_value(self.lift_enum_value(value));

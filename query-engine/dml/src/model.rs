@@ -3,12 +3,13 @@ use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
-use psl_core::parser_database::IndexType;
+use psl_core::parser_database::{ast, IndexType};
 use std::{borrow::Cow, fmt};
 
 /// Represents a model in a prisma schema.
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Model {
+    pub id: ast::ModelId,
     /// Name of the model.
     pub name: String,
     /// Fields of the model.
@@ -341,8 +342,9 @@ impl<'a> UniqueCriterion<'a> {
 
 impl Model {
     /// Creates a new model with the given name.
-    pub fn new(name: String, database_name: Option<String>) -> Model {
+    pub fn new(id: ast::ModelId, name: String, database_name: Option<String>) -> Model {
         Model {
+            id,
             name,
             fields: vec![],
             indices: vec![],

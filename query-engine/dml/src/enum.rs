@@ -1,8 +1,10 @@
 use crate::traits::{WithDatabaseName, WithName};
+use psl_core::schema_ast::ast;
 
 /// Represents an enum in the datamodel.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Enum {
+    pub id: ast::EnumId,
     /// Name of the enum.
     pub name: String,
     /// Values of the enum.
@@ -17,13 +19,14 @@ pub struct Enum {
 
 impl Enum {
     /// Creates a new enum with the given schema, name and values.
-    pub fn new(name: &str, values: Vec<EnumValue>, schema: Option<String>) -> Enum {
+    pub fn new(id: ast::EnumId, name: &str) -> Enum {
         Enum {
+            id,
             name: String::from(name),
-            values,
+            values: Vec::new(),
             documentation: None,
             database_name: None,
-            schema,
+            schema: None,
         }
     }
 
