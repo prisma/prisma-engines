@@ -1,4 +1,5 @@
 mod multi_schema;
+mod relation_mode;
 mod relations;
 
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
@@ -25,37 +26,35 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let validated_schema = psl::validate(file);
 
+    let config = &validated_schema.configuration;
+
+    for source in validated_schema.db.ast().sources() {
+        relation_mode::edit_referential_integrity(&mut actions, &params, validated_schema.db.source(), source)
+    }
+
     for model in validated_schema
         .db
         .walk_models()
         .chain(validated_schema.db.walk_views())
     {
-        if validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(
                 &mut actions,
                 &params,
                 validated_schema.db.source(),
-                &validated_schema.configuration,
+                config,
                 model,
             )
         }
     }
 
     for enumerator in validated_schema.db.walk_enums() {
-        if validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_enum(
                 &mut actions,
                 &params,
                 validated_schema.db.source(),
-                &validated_schema.configuration,
+                config,
                 enumerator,
             )
         }
@@ -162,15 +161,22 @@ fn create_missing_attribute<'a>(
             &model.ast_model().attributes,
         );
 
-        let range = span_to_range(schema, model.ast_model().span());
+        let range = range_after_span(schema, model.ast_model().span());
         (formatted_attribute, range)
     };
 
     TextEdit { range, new_text }
 }
 
-fn span_to_range(schema: &str, span: Span) -> Range {
+fn range_after_span(schema: &str, span: Span) -> Range {
     let start = crate::offset_to_position(span.end - 1, schema);
+    let end = crate::offset_to_position(span.end, schema);
+
+    Range { start, end }
+}
+
+fn span_to_range(schema: &str, span: Span) -> Range {
+    let start = crate::offset_to_position(span.start, schema);
     let end = crate::offset_to_position(span.end, schema);
 
     Range { start, end }
@@ -189,17 +195,18 @@ fn format_attribute(
     formatted_attribute
 }
 
-fn create_schema_attribute_edit(
+fn create_text_edit(
     schema: &str,
-    indentation: IndentationType,
-    newline: NewlineType,
-    attributes: &Vec<Attribute>,
+    formatted_attribute: String,
+    append: bool,
     span: Span,
     params: &CodeActionParams,
 ) -> WorkspaceEdit {
-    let formatted_attribute = format_attribute("schema()", indentation, newline, attributes);
+    let range = match append {
+        true => range_after_span(schema, span),
+        false => span_to_range(schema, span),
+    };
 
-    let range = span_to_range(schema, span);
     let text = TextEdit {
         range,
         new_text: formatted_attribute,
