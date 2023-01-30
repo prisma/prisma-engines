@@ -28,8 +28,19 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
+      # We explicitly exclude dependencies whose docs are excessively large.
+      # 61MB for typenum alone alone as of this writing.
       - name: Generate docs
-        run: cargo doc --workspace
+        run: |
+          cargo doc \
+            --workspace \
+            --exclude typenum \
+            --exclude futures \
+            --exclude openssl_sys \
+            --exclude libc \
+            --exclude object \
+            --exclude digest \
+            --exclude tiberius
 
       - name: Move docs to gh-pages branch
         run: |
