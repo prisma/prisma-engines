@@ -258,7 +258,7 @@ impl From<String> for QueryTag {
             "findRaw" => Self::FindRaw,
             "aggregateRaw" => Self::AggregateRaw,
             "runCommandRaw" => Self::RunCommandRaw,
-            v => panic!("Unknown query tag: {}", v),
+            v => panic!("Unknown query tag: {v}"),
         }
     }
 }
