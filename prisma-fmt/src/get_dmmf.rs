@@ -14,11 +14,6 @@ pub(crate) fn get_dmmf(params: &str) -> String {
         }
     };
 
-    get_dmmf_impl(params)
-}
-
-fn get_dmmf_impl(params: GetDmmfParams) -> String {
-    // Note:
-    // - if the Prisma schema is not valid, this panics
+    // if the Prisma schema is not valid, this panics
     dmmf::dmmf_json_from_schema(&params.prisma_schema)
 }
