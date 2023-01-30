@@ -89,10 +89,7 @@ impl OutputType {
     }
 
     pub fn is_scalar(&self) -> bool {
-        match self {
-            OutputType::Scalar(_) => true,
-            _ => false,
-        }
+        matches!(self, OutputType::Scalar(_))
     }
 
     pub fn is_scalar_list(&self) -> bool {

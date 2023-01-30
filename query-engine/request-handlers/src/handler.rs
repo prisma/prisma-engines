@@ -4,6 +4,7 @@ use futures::FutureExt;
 use indexmap::IndexMap;
 use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
+    constants::custom_types,
     protocol::EngineProtocol,
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
@@ -271,7 +272,7 @@ impl<'a> RequestHandler<'a> {
         let (key1, _) = iter.next().unwrap();
         let (key2, unwrapped_value) = iter.next().unwrap();
 
-        if key1 == "$type" && key2 == "$value" {
+        if key1 == custom_types::TYPE && key2 == custom_types::VALUE {
             Some(unwrapped_value)
         } else {
             None
