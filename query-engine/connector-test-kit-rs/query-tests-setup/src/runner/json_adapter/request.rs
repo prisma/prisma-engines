@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
-use query_core::{schema::QuerySchemaRef, Selection};
+use query_core::{constants::custom_types, schema::QuerySchemaRef, Selection};
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 use serde_json::{json, Value as JsonValue};
 
@@ -58,7 +58,7 @@ fn prisma_value_to_json(pv: PrismaValue) -> JsonValue {
                 obj.into_iter().map(|(k, v)| (k, prisma_value_to_json(v))).collect();
 
             if is_field_ref_obj {
-                json!({ "$type": "FieldRef", "value": JsonValue::Object(map) })
+                json!({ custom_types::TYPE: custom_types::FIELD_REF, custom_types::VALUE: JsonValue::Object(map) })
             } else {
                 JsonValue::Object(map)
             }

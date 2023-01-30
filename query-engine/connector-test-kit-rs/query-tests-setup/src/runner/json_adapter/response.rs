@@ -1,5 +1,8 @@
 use prisma_models::PrismaValue;
-use query_core::response_ir::{Item, ItemRef, Map};
+use query_core::{
+    constants::custom_types,
+    response_ir::{Item, ItemRef, Map},
+};
 use request_handlers::{GQLBatchResponse, GQLResponse, PrismaResponse};
 
 pub struct JsonResponse;
@@ -94,5 +97,5 @@ fn is_tagged_value(obj: &[(String, PrismaValue)]) -> bool {
     let (key1, _) = iter.next().unwrap();
     let (key2, _) = iter.next().unwrap();
 
-    key1 == "$type" && key2 == "$value"
+    key1 == custom_types::TYPE && key2 == custom_types::VALUE
 }
