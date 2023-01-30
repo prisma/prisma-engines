@@ -14,7 +14,7 @@ mod int {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"int":"10000000000"}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"int":-42}}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -55,7 +55,7 @@ mod int {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"int":"10000000000"},{"int":"-10000000000"},{"int":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"int":-42},{"int":1337},{"int":null}]}}"###
                 );
             }
             EngineProtocol::Json => {

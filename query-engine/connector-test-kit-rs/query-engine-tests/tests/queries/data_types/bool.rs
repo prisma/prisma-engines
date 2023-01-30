@@ -14,7 +14,7 @@ mod bool {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"bool":"10000000000"}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"bool":true}}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -55,7 +55,7 @@ mod bool {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"bool":"10000000000"},{"bool":"-10000000000"},{"bool":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"bool":true},{"bool":false},{"bool":null}]}}"###
                 );
             }
             EngineProtocol::Json => {

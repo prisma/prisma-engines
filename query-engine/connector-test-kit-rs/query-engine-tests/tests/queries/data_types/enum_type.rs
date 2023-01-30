@@ -32,7 +32,7 @@ mod enum_type {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"my_enum":"10000000000"}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"my_enum":"A"}}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -73,7 +73,7 @@ mod enum_type {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"my_enum":"10000000000"},{"my_enum":"-10000000000"},{"my_enum":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"my_enum":"A"},{"my_enum":"B"},{"my_enum":null}]}}"###
                 );
             }
             EngineProtocol::Json => {
