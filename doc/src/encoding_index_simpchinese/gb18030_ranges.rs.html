@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/5scl1fxyxf84i9ih2wdys1s2axkbyamf-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/encoding-index-simpchinese-1.20141219.5/gb18030_ranges.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gb18030_ranges.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../encoding_index_simpchinese/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+</pre><pre class="rust"><code><span class="comment">// AUTOGENERATED FROM index-gb18030-ranges.txt, ORIGINAL COMMENT FOLLOWS:
+//
+// Any copyright is dedicated to the Public Domain.
+// https://creativecommons.org/publicdomain/zero/1.0/
+//
+// For details on index index-gb18030-ranges.txt see the Encoding Standard
+// https://encoding.spec.whatwg.org/
+//
+// Identifier: f963aaa1653f630c523e7b04729fb4e4458f35806c45eb5c179445623138f0c0
+// Date: 2014-12-19
+
+</span><span class="kw">static </span>FORWARD_TABLE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u32] = <span class="kw-2">&amp;</span>[
+    <span class="number">0</span>, <span class="number">128</span>, <span class="number">165</span>, <span class="number">169</span>, <span class="number">178</span>, <span class="number">184</span>, <span class="number">216</span>, <span class="number">226</span>, <span class="number">235</span>, <span class="number">238</span>, <span class="number">244</span>, <span class="number">248</span>, <span class="number">251</span>, <span class="number">253</span>, <span class="number">258</span>,
+    <span class="number">276</span>, <span class="number">284</span>, <span class="number">300</span>, <span class="number">325</span>, <span class="number">329</span>, <span class="number">334</span>, <span class="number">364</span>, <span class="number">463</span>, <span class="number">465</span>, <span class="number">467</span>, <span class="number">469</span>, <span class="number">471</span>, <span class="number">473</span>, <span class="number">475</span>, <span class="number">477</span>,
+    <span class="number">506</span>, <span class="number">594</span>, <span class="number">610</span>, <span class="number">712</span>, <span class="number">716</span>, <span class="number">730</span>, <span class="number">930</span>, <span class="number">938</span>, <span class="number">962</span>, <span class="number">970</span>, <span class="number">1026</span>, <span class="number">1104</span>, <span class="number">1106</span>, <span class="number">8209</span>,
+    <span class="number">8215</span>, <span class="number">8218</span>, <span class="number">8222</span>, <span class="number">8231</span>, <span class="number">8241</span>, <span class="number">8244</span>, <span class="number">8246</span>, <span class="number">8252</span>, <span class="number">8365</span>, <span class="number">8452</span>, <span class="number">8454</span>, <span class="number">8458</span>,
+    <span class="number">8471</span>, <span class="number">8482</span>, <span class="number">8556</span>, <span class="number">8570</span>, <span class="number">8596</span>, <span class="number">8602</span>, <span class="number">8713</span>, <span class="number">8720</span>, <span class="number">8722</span>, <span class="number">8726</span>, <span class="number">8731</span>, <span class="number">8737</span>,
+    <span class="number">8740</span>, <span class="number">8742</span>, <span class="number">8748</span>, <span class="number">8751</span>, <span class="number">8760</span>, <span class="number">8766</span>, <span class="number">8777</span>, <span class="number">8781</span>, <span class="number">8787</span>, <span class="number">8802</span>, <span class="number">8808</span>, <span class="number">8816</span>,
+    <span class="number">8854</span>, <span class="number">8858</span>, <span class="number">8870</span>, <span class="number">8896</span>, <span class="number">8979</span>, <span class="number">9322</span>, <span class="number">9372</span>, <span class="number">9548</span>, <span class="number">9588</span>, <span class="number">9616</span>, <span class="number">9622</span>, <span class="number">9634</span>,
+    <span class="number">9652</span>, <span class="number">9662</span>, <span class="number">9672</span>, <span class="number">9676</span>, <span class="number">9680</span>, <span class="number">9702</span>, <span class="number">9735</span>, <span class="number">9738</span>, <span class="number">9793</span>, <span class="number">9795</span>, <span class="number">11906</span>, <span class="number">11909</span>,
+    <span class="number">11913</span>, <span class="number">11917</span>, <span class="number">11928</span>, <span class="number">11944</span>, <span class="number">11947</span>, <span class="number">11951</span>, <span class="number">11956</span>, <span class="number">11960</span>, <span class="number">11964</span>, <span class="number">11979</span>,
+    <span class="number">12284</span>, <span class="number">12292</span>, <span class="number">12312</span>, <span class="number">12319</span>, <span class="number">12330</span>, <span class="number">12351</span>, <span class="number">12436</span>, <span class="number">12447</span>, <span class="number">12535</span>, <span class="number">12543</span>,
+    <span class="number">12586</span>, <span class="number">12842</span>, <span class="number">12850</span>, <span class="number">12964</span>, <span class="number">13200</span>, <span class="number">13215</span>, <span class="number">13218</span>, <span class="number">13253</span>, <span class="number">13263</span>, <span class="number">13267</span>,
+    <span class="number">13270</span>, <span class="number">13384</span>, <span class="number">13428</span>, <span class="number">13727</span>, <span class="number">13839</span>, <span class="number">13851</span>, <span class="number">14617</span>, <span class="number">14703</span>, <span class="number">14801</span>, <span class="number">14816</span>,
+    <span class="number">14964</span>, <span class="number">15183</span>, <span class="number">15471</span>, <span class="number">15585</span>, <span class="number">16471</span>, <span class="number">16736</span>, <span class="number">17208</span>, <span class="number">17325</span>, <span class="number">17330</span>, <span class="number">17374</span>,
+    <span class="number">17623</span>, <span class="number">17997</span>, <span class="number">18018</span>, <span class="number">18212</span>, <span class="number">18218</span>, <span class="number">18301</span>, <span class="number">18318</span>, <span class="number">18760</span>, <span class="number">18811</span>, <span class="number">18814</span>,
+    <span class="number">18820</span>, <span class="number">18823</span>, <span class="number">18844</span>, <span class="number">18848</span>, <span class="number">18872</span>, <span class="number">19576</span>, <span class="number">19620</span>, <span class="number">19738</span>, <span class="number">19887</span>, <span class="number">40870</span>,
+    <span class="number">59244</span>, <span class="number">59336</span>, <span class="number">59367</span>, <span class="number">59413</span>, <span class="number">59417</span>, <span class="number">59423</span>, <span class="number">59431</span>, <span class="number">59437</span>, <span class="number">59443</span>, <span class="number">59452</span>,
+    <span class="number">59460</span>, <span class="number">59478</span>, <span class="number">59493</span>, <span class="number">63789</span>, <span class="number">63866</span>, <span class="number">63894</span>, <span class="number">63976</span>, <span class="number">63986</span>, <span class="number">64016</span>, <span class="number">64018</span>,
+    <span class="number">64021</span>, <span class="number">64025</span>, <span class="number">64034</span>, <span class="number">64037</span>, <span class="number">64042</span>, <span class="number">65074</span>, <span class="number">65093</span>, <span class="number">65107</span>, <span class="number">65112</span>, <span class="number">65127</span>,
+    <span class="number">65132</span>, <span class="number">65375</span>, <span class="number">65510</span>, <span class="number">65536</span>,
+];
+
+<span class="kw">static </span>BACKWARD_TABLE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u32] = <span class="kw-2">&amp;</span>[
+    <span class="number">0</span>, <span class="number">0</span>, <span class="number">36</span>, <span class="number">38</span>, <span class="number">45</span>, <span class="number">50</span>, <span class="number">81</span>, <span class="number">89</span>, <span class="number">95</span>, <span class="number">96</span>, <span class="number">100</span>, <span class="number">103</span>, <span class="number">104</span>, <span class="number">105</span>, <span class="number">109</span>, <span class="number">126</span>, <span class="number">133</span>,
+    <span class="number">148</span>, <span class="number">172</span>, <span class="number">175</span>, <span class="number">179</span>, <span class="number">208</span>, <span class="number">306</span>, <span class="number">307</span>, <span class="number">308</span>, <span class="number">309</span>, <span class="number">310</span>, <span class="number">311</span>, <span class="number">312</span>, <span class="number">313</span>, <span class="number">341</span>, <span class="number">428</span>,
+    <span class="number">443</span>, <span class="number">544</span>, <span class="number">545</span>, <span class="number">558</span>, <span class="number">741</span>, <span class="number">742</span>, <span class="number">749</span>, <span class="number">750</span>, <span class="number">805</span>, <span class="number">819</span>, <span class="number">820</span>, <span class="number">7922</span>, <span class="number">7924</span>, <span class="number">7925</span>,
+    <span class="number">7927</span>, <span class="number">7934</span>, <span class="number">7943</span>, <span class="number">7944</span>, <span class="number">7945</span>, <span class="number">7950</span>, <span class="number">8062</span>, <span class="number">8148</span>, <span class="number">8149</span>, <span class="number">8152</span>, <span class="number">8164</span>, <span class="number">8174</span>,
+    <span class="number">8236</span>, <span class="number">8240</span>, <span class="number">8262</span>, <span class="number">8264</span>, <span class="number">8374</span>, <span class="number">8380</span>, <span class="number">8381</span>, <span class="number">8384</span>, <span class="number">8388</span>, <span class="number">8390</span>, <span class="number">8392</span>, <span class="number">8393</span>,
+    <span class="number">8394</span>, <span class="number">8396</span>, <span class="number">8401</span>, <span class="number">8406</span>, <span class="number">8416</span>, <span class="number">8419</span>, <span class="number">8424</span>, <span class="number">8437</span>, <span class="number">8439</span>, <span class="number">8445</span>, <span class="number">8482</span>, <span class="number">8485</span>,
+    <span class="number">8496</span>, <span class="number">8521</span>, <span class="number">8603</span>, <span class="number">8936</span>, <span class="number">8946</span>, <span class="number">9046</span>, <span class="number">9050</span>, <span class="number">9063</span>, <span class="number">9066</span>, <span class="number">9076</span>, <span class="number">9092</span>, <span class="number">9100</span>,
+    <span class="number">9108</span>, <span class="number">9111</span>, <span class="number">9113</span>, <span class="number">9131</span>, <span class="number">9162</span>, <span class="number">9164</span>, <span class="number">9218</span>, <span class="number">9219</span>, <span class="number">11329</span>, <span class="number">11331</span>, <span class="number">11334</span>, <span class="number">11336</span>,
+    <span class="number">11346</span>, <span class="number">11361</span>, <span class="number">11363</span>, <span class="number">11366</span>, <span class="number">11370</span>, <span class="number">11372</span>, <span class="number">11375</span>, <span class="number">11389</span>, <span class="number">11682</span>, <span class="number">11686</span>,
+    <span class="number">11687</span>, <span class="number">11692</span>, <span class="number">11694</span>, <span class="number">11714</span>, <span class="number">11716</span>, <span class="number">11723</span>, <span class="number">11725</span>, <span class="number">11730</span>, <span class="number">11736</span>, <span class="number">11982</span>,
+    <span class="number">11989</span>, <span class="number">12102</span>, <span class="number">12336</span>, <span class="number">12348</span>, <span class="number">12350</span>, <span class="number">12384</span>, <span class="number">12393</span>, <span class="number">12395</span>, <span class="number">12397</span>, <span class="number">12510</span>,
+    <span class="number">12553</span>, <span class="number">12851</span>, <span class="number">12962</span>, <span class="number">12973</span>, <span class="number">13738</span>, <span class="number">13823</span>, <span class="number">13919</span>, <span class="number">13933</span>, <span class="number">14080</span>, <span class="number">14298</span>,
+    <span class="number">14585</span>, <span class="number">14698</span>, <span class="number">15583</span>, <span class="number">15847</span>, <span class="number">16318</span>, <span class="number">16434</span>, <span class="number">16438</span>, <span class="number">16481</span>, <span class="number">16729</span>, <span class="number">17102</span>,
+    <span class="number">17122</span>, <span class="number">17315</span>, <span class="number">17320</span>, <span class="number">17402</span>, <span class="number">17418</span>, <span class="number">17859</span>, <span class="number">17909</span>, <span class="number">17911</span>, <span class="number">17915</span>, <span class="number">17916</span>,
+    <span class="number">17936</span>, <span class="number">17939</span>, <span class="number">17961</span>, <span class="number">18664</span>, <span class="number">18703</span>, <span class="number">18814</span>, <span class="number">18962</span>, <span class="number">19043</span>, <span class="number">33469</span>, <span class="number">33470</span>,
+    <span class="number">33471</span>, <span class="number">33484</span>, <span class="number">33485</span>, <span class="number">33490</span>, <span class="number">33497</span>, <span class="number">33501</span>, <span class="number">33505</span>, <span class="number">33513</span>, <span class="number">33520</span>, <span class="number">33536</span>,
+    <span class="number">33550</span>, <span class="number">37845</span>, <span class="number">37921</span>, <span class="number">37948</span>, <span class="number">38029</span>, <span class="number">38038</span>, <span class="number">38064</span>, <span class="number">38065</span>, <span class="number">38066</span>, <span class="number">38069</span>,
+    <span class="number">38075</span>, <span class="number">38076</span>, <span class="number">38078</span>, <span class="number">39108</span>, <span class="number">39109</span>, <span class="number">39113</span>, <span class="number">39114</span>, <span class="number">39115</span>, <span class="number">39116</span>, <span class="number">39265</span>,
+    <span class="number">39394</span>, <span class="number">189000</span>,
+];
+
+<span class="doccomment">/// Returns the index code point for pointer `code` in this index.
+</span><span class="attr">#[inline]
+</span><span class="kw">pub fn </span>forward(code: u32) -&gt; u32 {
+    <span class="kw">if </span>(code &gt; <span class="number">39419 </span>&amp;&amp; code &lt; <span class="number">189000</span>) || code &gt; <span class="number">1237575 </span>{ <span class="kw">return </span><span class="number">0xffffffff</span>; }
+    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="kw">if </span>code &gt;= BACKWARD_TABLE[<span class="number">127</span>] {<span class="number">81</span>} <span class="kw">else </span>{<span class="number">0</span>};
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">63</span>] { i += <span class="number">64</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">31</span>] { i += <span class="number">32</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">15</span>] { i += <span class="number">16</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">7</span>] { i += <span class="number">8</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">3</span>] { i += <span class="number">4</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i+<span class="number">1</span>] { i += <span class="number">2</span>; }
+    <span class="kw">if </span>code &gt;= BACKWARD_TABLE[i] { i += <span class="number">1</span>; }
+    (code - BACKWARD_TABLE[i-<span class="number">1</span>]) + FORWARD_TABLE[i-<span class="number">1</span>]
+}
+
+<span class="doccomment">/// Returns the index pointer for code point `code` in this index.
+</span><span class="attr">#[inline]
+</span><span class="kw">pub fn </span>backward(code: u32) -&gt; u32 {
+    <span class="kw">if </span>code &lt; <span class="number">128 </span>{ <span class="kw">return </span><span class="number">0xffffffff</span>; }
+    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="kw">if </span>code &gt;= FORWARD_TABLE[<span class="number">127</span>] {<span class="number">81</span>} <span class="kw">else </span>{<span class="number">0</span>};
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">63</span>] { i += <span class="number">64</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">31</span>] { i += <span class="number">32</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">15</span>] { i += <span class="number">16</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">7</span>] { i += <span class="number">8</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">3</span>] { i += <span class="number">4</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i+<span class="number">1</span>] { i += <span class="number">2</span>; }
+    <span class="kw">if </span>code &gt;= FORWARD_TABLE[i] { i += <span class="number">1</span>; }
+    (code - FORWARD_TABLE[i-<span class="number">1</span>]) + BACKWARD_TABLE[i-<span class="number">1</span>]
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="macro">multi_byte_range_tests!</span>(
+    <span class="kw">mod </span>= gb18030_ranges,
+    key = [<span class="number">0</span>, <span class="number">189000</span>], key &lt; <span class="number">1114112</span>,
+    value = [<span class="number">128</span>, <span class="number">65536</span>], value &lt; <span class="number">1587600
+</span>);
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="encoding_index_simpchinese" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["ExtendedFloat","Extended precision floating-point type."]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["execute_many_operations",""],["execute_many_self_contained",""],["execute_single_operation",""],["execute_single_self_contained",""],["get_current_dispatcher",""],["load","Loads a query executor based on the parsed Prisma schema (datasource)."]],"struct":[["TransactionOptions",""]],"trait":[["QueryExecutor",""],["TransactionManager",""]]};

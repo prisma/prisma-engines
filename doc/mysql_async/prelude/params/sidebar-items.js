@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Params","Representations of parameters of a prepared statement."]],"struct":[["MissingNamedParameterError","`FromValue` conversion error."]]};

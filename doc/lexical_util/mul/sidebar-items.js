@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["mul","Multiply two unsigned, integral values, and return the hi and lo product."],["mulhi","Multiply two unsigned, integral values, and return the hi product."]]};

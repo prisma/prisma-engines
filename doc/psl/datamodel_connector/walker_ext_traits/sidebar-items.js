@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["CompleteInlineRelationWalkerExt",""],["DefaultValueExt",""],["IndexWalkerExt",""],["InlineRelationWalkerExt",""],["PrimaryKeyWalkerExt",""],["RelationFieldWalkerExt",""],["ScalarFieldWalkerExt",""]]};

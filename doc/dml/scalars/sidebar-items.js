@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["ScalarType","Prisma’s builtin scalar types."]]};

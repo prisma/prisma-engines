@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["DNSClass","The DNS Record class"]]};

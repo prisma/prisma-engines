@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Params",""],["ParamsIter","Immutable subparameter iterator."],["Parser","Parser for raw VTE protocol which delegates actions to a `Perform`"]],"trait":[["Perform","Performs actions requested by the Parser"]]};

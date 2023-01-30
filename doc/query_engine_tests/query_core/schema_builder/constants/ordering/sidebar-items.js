@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["ASC",""],["DESC",""],["FIELDS",""],["FIRST",""],["LAST",""],["NULLS",""],["NULLS_ORDER",""],["SEARCH",""],["SORT",""],["SORT_ORDER",""],["UNDERSCORE_RELEVANCE",""]]};

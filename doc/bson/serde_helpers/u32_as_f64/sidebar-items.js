@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserializes a u32 from an f64 (BSON double). Errors if an exact conversion is not possible."],["serialize","Serializes a u32 as an f64 (BSON double)."]]};

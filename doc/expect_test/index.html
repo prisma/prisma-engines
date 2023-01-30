@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Minimalistic snapshot testing for Rust."><meta name="keywords" content="rust, rustlang, rust-lang, expect_test"><title>expect_test - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../expect_test/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate expect_test</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 1.4.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">expect_test</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/expect_test/lib.rs.html#1-877">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Minimalistic snapshot testing for Rust.</p>
+<h2 id="introduction"><a href="#introduction">Introduction</a></h2>
+<p><code>expect_test</code> is a small addition over plain <code>assert_eq!</code> testing approach,
+which allows to automatically update tests results.</p>
+<p>The core of the library is the <code>expect!</code> macro. It can be though of as a
+super-charged string literal, which can update itself.</p>
+<p>Let’s see an example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>expect_test::expect;
+
+<span class="kw">let </span>actual = <span class="number">2 </span>+ <span class="number">2</span>;
+<span class="kw">let </span>expected = <span class="macro">expect!</span>[<span class="string">&quot;5&quot;</span>]; <span class="comment">// or expect![[&quot;5&quot;]]
+</span>expected.assert_eq(<span class="kw-2">&amp;</span>actual.to_string())</code></pre></div>
+<p>Running this code will produce a test failure, as <code>&quot;5&quot;</code> is indeed not equal
+to <code>&quot;4&quot;</code>. Running the test with <code>UPDATE_EXPECT=1</code> env variable however would
+“magically” update the code to:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>actual = <span class="number">2 </span>+ <span class="number">2</span>;
+<span class="kw">let </span>expected = <span class="macro">expect!</span>[<span class="string">&quot;4&quot;</span>];
+expected.assert_eq(<span class="kw-2">&amp;</span>actual.to_string())</code></pre></div>
+<p>This becomes very useful when you have a lot of tests with verbose and
+potentially changing expected output.</p>
+<p>Under the hood, the <code>expect!</code> macro uses <code>file!</code>, <code>line!</code> and <code>column!</code> to
+record source position at compile time. At runtime, this position is used
+to patch the file in-place, if <code>UPDATE_EXPECT</code> is set.</p>
+<h2 id="guide"><a href="#guide">Guide</a></h2>
+<p><code>expect!</code> returns an instance of <code>Expect</code> struct, which holds position
+information and a string literal. Use <code>Expect::assert_eq</code> for string
+comparison. Use <code>Expect::assert_debug_eq</code> for verbose debug comparison. Note
+that leading indentation is automatically removed.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>expect_test::expect;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>Foo {
+    value: i32,
+}
+
+<span class="kw">let </span>actual = Foo { value: <span class="number">92 </span>};
+<span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">&quot;
+    Foo {
+        value: 92,
+    }
+&quot;</span>]];
+expected.assert_debug_eq(<span class="kw-2">&amp;</span>actual);</code></pre></div>
+<p>Be careful with <code>assert_debug_eq</code> - in general, stability of the debug
+representation is not guaranteed. However, even if it changes, you can
+quickly update all the tests by running the test suite with <code>UPDATE_EXPECT</code>
+environmental variable set.</p>
+<p>If the expected data is too verbose to include inline, you can store it in
+an external file using the <code>expect_file!</code> macro:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>expect_test::expect_file;
+
+<span class="kw">let </span>actual = <span class="number">42</span>;
+<span class="kw">let </span>expected = <span class="macro">expect_file!</span>[<span class="string">&quot;./the-answer.txt&quot;</span>];
+expected.assert_eq(<span class="kw-2">&amp;</span>actual.to_string());</code></pre></div>
+<p>File path is relative to the current file.</p>
+<h2 id="suggested-workflows"><a href="#suggested-workflows">Suggested Workflows</a></h2>
+<p>I like to use data-driven tests with <code>expect_test</code>. I usually define a
+single driver function <code>check</code> and then call it from individual tests:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>expect_test::{expect, Expect};
+
+<span class="kw">fn </span>check(actual: i32, expect: Expect) {
+    <span class="kw">let </span>actual = actual.to_string();
+    expect.assert_eq(<span class="kw-2">&amp;</span>actual);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_addition() {
+    check(<span class="number">90 </span>+ <span class="number">2</span>, <span class="macro">expect!</span>[[<span class="string">&quot;92&quot;</span>]]);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_multiplication() {
+    check(<span class="number">46 </span>* <span class="number">2</span>, <span class="macro">expect!</span>[[<span class="string">&quot;92&quot;</span>]]);
+}</code></pre></div>
+<p>Each test’s body is a single call to <code>check</code>. All the variation in tests
+comes from the input data.</p>
+<p>When writing a new test, I usually copy-paste an old one, leave the <code>expect</code>
+blank and use <code>UPDATE_EXPECT</code> to fill the value for me:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[test]
+</span><span class="kw">fn </span>test_division() {
+    check(<span class="number">92 </span>/ <span class="number">2</span>, <span class="macro">expect!</span>[[]])
+}</code></pre></div>
+<p>See
+https://blog.janestreet.com/using-ascii-waveforms-to-test-hardware-designs/
+for a cool example of snapshot testing in the wild!</p>
+<h2 id="alternatives"><a href="#alternatives">Alternatives</a></h2>
+<ul>
+<li><a href="https://crates.io/crates/insta">insta</a> - a more feature full snapshot
+testing library.</li>
+<li><a href="https://crates.io/crates/k9">k9</a> - a testing library which includes
+support for snapshot testing among other things.</li>
+</ul>
+<h2 id="maintenance-status"><a href="#maintenance-status">Maintenance status</a></h2>
+<p>The main customer of this library is rust-analyzer. The library is  stable,
+it is planned to not release any major versions past 1.0.</p>
+<h3 id="minimal-supported-rust-version"><a href="#minimal-supported-rust-version">Minimal Supported Rust Version</a></h3>
+<p>This crate’s minimum supported <code>rustc</code> version is <code>1.45.0</code>. MSRV is updated
+conservatively, supporting roughly 10 minor versions of <code>rustc</code>. MSRV bump
+is not considered semver breaking, but will require at least minor version
+bump.</p>
+</div></details><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.expect.html" title="expect_test::expect macro">expect</a></div><div class="item-right docblock-short">Creates an instance of <code>Expect</code> from string literal:</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.expect_file.html" title="expect_test::expect_file macro">expect_file</a></div><div class="item-right docblock-short">Creates an instance of <code>ExpectFile</code> from relative or absolute path:</div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Expect.html" title="expect_test::Expect struct">Expect</a></div><div class="item-right docblock-short">Self-updating string literal.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ExpectFile.html" title="expect_test::ExpectFile struct">ExpectFile</a></div><div class="item-right docblock-short">Self-updating file.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Position.html" title="expect_test::Position struct">Position</a></div><div class="item-right docblock-short">Position of original <code>expect!</code> in the source file.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="expect_test" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

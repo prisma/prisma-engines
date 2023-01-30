@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["DnsMultiplexer","A DNS Client implemented over futures-rs."],["DnsMultiplexerConnect","A wrapper for a future DnsExchange connection"]]};

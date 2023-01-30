@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["NativeTypeInstance","Represents an instance of a native type declared in the Prisma schema."]]};

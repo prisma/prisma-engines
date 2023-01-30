@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["CompositeTypeDepth","Control type for composite type traversal."],["ErrorKind",""],["Version",""]],"struct":[["ConnectorError",""],["DatabaseMetadata",""],["IntrospectionContext",""],["IntrospectionResult",""],["IntrospectionResultOutput",""],["Warning",""]],"trait":[["IntrospectionConnector",""]],"type":[["ConnectorResult",""]]};

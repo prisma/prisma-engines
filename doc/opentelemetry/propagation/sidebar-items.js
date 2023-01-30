@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["text_map_propagator","Text Propagator"]],"trait":[["Extractor","Extractor provides an interface for removing fields from an underlying struct like `HashMap`"],["Injector","Injector provides an interface for adding fields from an underlying struct like `HashMap`"]]};

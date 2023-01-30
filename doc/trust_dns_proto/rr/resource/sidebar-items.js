@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Record","Resource records are storage value in DNS, into which all key/value pair data is stored."],["RecordParts","Consumes `Record` giving public access to fields of `Record` so they can be destructured and taken by value"]]};

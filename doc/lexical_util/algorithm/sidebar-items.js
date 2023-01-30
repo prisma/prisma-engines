@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["copy_to_dst","Copy bytes from source to destination."],["ltrim_char_count","Count the number of leading characters equal to a given value."],["rtrim_char_count","Count the number of trailing characters equal to a given value."],["rtrim_char_slice","Trim character from the end (right-side) of a slice."]]};

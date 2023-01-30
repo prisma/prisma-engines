@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Deserialization and serialization of MongoDB Extended JSON v2"><meta name="keywords" content="rust, rustlang, rust-lang, extjson"><title>bson::extjson - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Module extjson</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#modules">Modules</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Module <a href="../index.html">bson</a>::<wbr><a class="mod" href="#">extjson</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../../src/bson/extjson/mod.rs.html#1-93">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Deserialization and serialization of <a href="https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/">MongoDB Extended JSON v2</a></p>
+<h3 id="overview-of-extended-json"><a href="#overview-of-extended-json">Overview of Extended JSON</a></h3>
+<p>MongoDB Extended JSON (abbreviated extJSON) is format of JSON that allows for the encoding of
+BSON type information. Normal JSON cannot unambiguously represent all BSON types losslessly, so
+an extension was designed to include conventions for representing those types.</p>
+<p>For example, a BSON binary is represented by the following format:</p>
+<div class="example-wrap"><pre class="language-text"><code>{
+   &quot;$binary&quot;: {
+       &quot;base64&quot;: &lt;base64 encoded payload as a string&gt;,
+       &quot;subType&quot;: &lt;subtype as a one or two character hex string&gt;,
+   }
+}
+</code></pre></div>
+<p>For more information on extJSON and the complete list of translations, see the <a href="https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/">official MongoDB documentation</a>.</p>
+<p>All MongoDB drivers and BSON libraries interpret and produce extJSON, so it can serve as a
+useful tool for communicating between applications where raw BSON bytes cannot be used (e.g. via
+JSON REST APIs). It’s also useful for representing BSON data as a string.</p>
+<h4 id="canonical-and-relaxed-modes"><a href="#canonical-and-relaxed-modes">Canonical and Relaxed Modes</a></h4>
+<p>There are two modes of extJSON: “Canonical” and “Relaxed”. They are the same except for the
+following differences:</p>
+<ul>
+<li>In relaxed mode, all BSON numbers are represented by the JSON number type, rather than the
+object
+notation.</li>
+<li>In relaxed mode, the string in the datetime object notation is RFC 3339 (ISO-8601) formatted
+(if the date is after 1970).</li>
+</ul>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>doc = <span class="macro">bson!</span>({ <span class="string">&quot;x&quot;</span>: <span class="number">5</span>, <span class="string">&quot;d&quot;</span>: bson::DateTime::now() });
+
+<span class="macro">println!</span>(<span class="string">&quot;relaxed: {}&quot;</span>, doc.clone().into_relaxed_extjson());
+<span class="comment">// relaxed: &quot;{&quot;x&quot;:5,&quot;d&quot;:{&quot;$date&quot;:&quot;2020-06-01T22:19:13.075Z&quot;}}&quot;
+
+</span><span class="macro">println!</span>(<span class="string">&quot;canonical: {}&quot;</span>, doc.into_canonical_extjson());
+<span class="comment">// canonical: {&quot;x&quot;:{&quot;$numberInt&quot;:&quot;5&quot;},&quot;d&quot;:{&quot;$date&quot;:{&quot;$numberLong&quot;:&quot;1591050020711&quot;}}}</span></code></pre></div>
+<p>Canonical mode is useful when BSON values need to be round tripped without losing any type
+information. Relaxed mode is more useful when debugging or logging BSON data.</p>
+<h3 id="deserializing-extended-json"><a href="#deserializing-extended-json">Deserializing Extended JSON</a></h3>
+<p>Extended JSON can be deserialized using <a href="../enum.Bson.html"><code>Bson</code></a>’s
+<code>TryFrom&lt;serde_json::Value&gt;</code> implementation. This implementation accepts both canonical and
+relaxed extJSON, and the two modes can even be mixed within a single representation.</p>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>json_doc = <span class="macro">json!</span>({ <span class="string">&quot;x&quot;</span>: <span class="number">5i32</span>, <span class="string">&quot;y&quot;</span>: { <span class="string">&quot;$numberInt&quot;</span>: <span class="string">&quot;5&quot; </span>}, <span class="string">&quot;z&quot;</span>: { <span class="string">&quot;subdoc&quot;</span>: <span class="string">&quot;hello&quot; </span>} });
+<span class="kw">let </span>bson: Bson = json_doc.try_into().unwrap(); <span class="comment">// Bson::Document(...)
+
+</span><span class="kw">let </span>json_date = <span class="macro">json!</span>({ <span class="string">&quot;$date&quot;</span>: { <span class="string">&quot;$numberLong&quot;</span>: <span class="string">&quot;1590972160292&quot; </span>} });
+<span class="kw">let </span>bson_date: Bson = json_date.try_into().unwrap(); <span class="comment">// Bson::DateTime(...)
+
+</span><span class="kw">let </span>invalid_ext_json = <span class="macro">json!</span>({ <span class="string">&quot;$numberLong&quot;</span>: <span class="number">5 </span>});
+Bson::try_from(invalid_ext_json).expect_err(<span class="string">&quot;5 should be a string&quot;</span>);</code></pre></div>
+<h3 id="serializing-to-extended-json"><a href="#serializing-to-extended-json">Serializing to Extended JSON</a></h3>
+<p>Extended JSON can be created via <a href="../enum.Bson.html"><code>Bson</code></a>’s <code>Into&lt;serde_json::Value&gt;</code>
+implementation (which will create relaxed extJSON),
+<a href="../enum.Bson.html#method.into_relaxed_extjson"><code>Bson::into_relaxed_extjson</code></a>, and
+<a href="../enum.Bson.html#method.into_canonical_extjson"><code>Bson::into_canonical_extjson</code></a>.</p>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>doc = <span class="macro">bson!</span>({ <span class="string">&quot;x&quot;</span>: <span class="number">5i32</span>, <span class="string">&quot;_id&quot;</span>: oid::ObjectId::new() });
+
+<span class="kw">let </span>relaxed_extjson: serde_json::Value = doc.clone().into();
+<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, relaxed_extjson); <span class="comment">// { &quot;x&quot;: 5, &quot;_id&quot;: { &quot;$oid&quot;: &lt;hexstring&gt; } }
+
+</span><span class="kw">let </span>relaxed_extjson = doc.clone().into_relaxed_extjson();
+<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, relaxed_extjson); <span class="comment">// { &quot;x&quot;: 5, &quot;_id&quot;: { &quot;$oid&quot;: &lt;hexstring&gt; } }
+
+</span><span class="kw">let </span>canonical_extjson = doc.into_canonical_extjson();
+<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, canonical_extjson); <span class="comment">// { &quot;x&quot;: { &quot;$numberInt&quot;: &quot;5&quot; }, &quot;_id&quot;: { &quot;$oid&quot;: &lt;hexstring&gt; } }</span></code></pre></div>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="de/index.html" title="bson::extjson::de mod">de</a></div><div class="item-right docblock-short">Deserializing <a href="https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/">MongoDB Extended JSON v2</a></div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bson" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

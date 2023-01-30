@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["new_row","Creates `Row` from values and columns."]],"mod":[["convert",""]],"struct":[["Row","Client side representation of a MySql row."],["RowDeserializer","Row deserializer."]],"trait":[["ColumnIndex","Things that may be used as an index of a row column."]]};

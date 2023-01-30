@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["SharedFuture","Response future from [`Shared`] services."]]};

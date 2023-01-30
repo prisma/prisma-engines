@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BitEnd","One-Bit-After Tail Index"],["BitIdx","Semantic Bit Index"],["BitIdxError","Bit Index Error"],["BitMask","Multi-Bit Selection Mask"],["BitPos","Bit Position"],["BitSel","One-Hot Bit Selection Mask"]]};

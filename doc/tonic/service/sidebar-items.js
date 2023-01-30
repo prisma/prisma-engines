@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["interceptor","Create a new interceptor layer."],["interceptor_fn","Create a new interceptor layer."]],"mod":[["interceptor","gRPC interceptors which are a kind of middleware."]],"trait":[["Interceptor","A gRPC interceptor."]]};

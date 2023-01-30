@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["IntrospectionInput",""],["RpcImpl",""]],"trait":[["Rpc",""]]};

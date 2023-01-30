@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["SessionChangeStream","A [`SessionChangeStream`] is a change stream that was created with a ClientSession that must be iterated using one. To iterate, use [`SessionChangeStream::next`]:"]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["gen_server","The generated server module."]]};

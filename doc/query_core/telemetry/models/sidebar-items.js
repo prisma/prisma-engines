@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Event",""],["Link",""],["TraceSpan",""]],"type":[["HrTime",""],["LogEvent","logs are modeled as span events"],["MetricEvent","metrics are modeled as span events"]]};

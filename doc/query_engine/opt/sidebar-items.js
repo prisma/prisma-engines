@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["CliOpt",""],["Subcommand",""]],"struct":[["DebugPanicInput",""],["ExecuteRequestInput",""],["GetConfigInput",""],["PrismaOpt",""]]};

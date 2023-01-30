@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["ErrorDecoder","A decoder that always returns error."],["ErrorEncoder","An encoder that always returns error."],["ErrorEncoding","An encoding that returns encoder/decoder error for every case."]]};

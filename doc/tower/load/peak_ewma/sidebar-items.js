@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Cost","Represents the relative cost of communicating with a service."],["Handle","Tracks an in-flight request and updates the RTT-estimate on Drop."],["PeakEwma","Measures the load of the underlying service using Peak-EWMA load measurement."],["PeakEwmaDiscover","Wraps a `D`-typed stream of discovered services with `PeakEwma`."]]};

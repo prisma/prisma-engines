@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BitArray","Bit-Precision Array Immediate"],["IntoIter","Bit-Array Iteration"]]};

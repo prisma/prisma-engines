@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["configuration","Types related to the configuration section in the PSL."],["datamodel","Types related to the datamodel section in the PSL."],["value","Common types needed in the configuration and datamodel."]]};

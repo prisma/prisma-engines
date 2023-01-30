@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Convenience macro to use the `serde_as` system."><meta name="keywords" content="rust, rustlang, rust-lang, serde_as"><title>serde_as in serde_with - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><div class="sidebar-elems"><h2><a href="index.html">In serde_with</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Attribute Macro <a href="index.html">serde_with</a>::<wbr><a class="attr" href="#">serde_as</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/serde_with_macros/lib.rs.html#484">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><div class="item-decl"><pre class="rust attr"><code>#[serde_as]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Convenience macro to use the <a href="https://docs.rs/serde_with/1.12.1/serde_with/guide/index.html"><code>serde_as</code></a> system.</p>
+<p>The <a href="https://docs.rs/serde_with/1.12.1/serde_with/guide/index.html"><code>serde_as</code></a> system is designed as a more flexible alternative to serde’s with-annotation.</p>
+<h2 id="example"><a href="#example">Example</a></h2>
+<div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serde_with::{serde_as, DisplayFromStr};
+<span class="kw">use </span>std::collections::HashMap;
+
+<span class="attr">#[serde_as]
+#[derive(Serialize, Deserialize)]
+</span><span class="kw">struct </span>Data {
+    <span class="doccomment">/// Serialize into number
+    </span><span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;_&quot;</span>)]
+    </span>a: u32,
+
+    <span class="doccomment">/// Serialize into String
+    </span><span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;DisplayFromStr&quot;</span>)]
+    </span>b: u32,
+
+    <span class="doccomment">/// Serialize into a map from String to String
+    </span><span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;HashMap&lt;DisplayFromStr, _&gt;&quot;</span>)]
+    </span>c: Vec&lt;(u32, String)&gt;,
+}</code></pre></div>
+<h2 id="alternative-path-to-serde_with-crate"><a href="#alternative-path-to-serde_with-crate">Alternative path to <code>serde_with</code> crate</a></h2>
+<p>If <code>serde_with</code> is not available at the default path, its path should be specified with the
+<code>crate</code> argument. See <a href="https://docs.rs/serde_with/1.12.1/serde_with/guide/serde_as/index.html#re-exporting-serde_as">re-exporting <code>serde_as</code></a> for more use case information.</p>
+
+<div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code><span class="attr">#[serde_as(<span class="kw">crate </span>= <span class="string">&quot;::some_other_lib::serde_with&quot;</span>)]
+#[derive(Deserialize)]
+</span><span class="kw">struct </span>Data {
+    <span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;_&quot;</span>)]
+    </span>a: u32,
+}</code></pre></div>
+<h2 id="what-this-macro-does"><a href="#what-this-macro-does">What this macro does</a></h2>
+<p>The <code>serde_as</code> macro only serves a convenience function.
+All the steps it performs, can easily be done manually, in case the cost of an attribute macro is deemed to high.
+The functionality can best be described with an example.</p>
+
+<div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code><span class="attr">#[serde_as]
+#[derive(serde::Serialize)]
+</span><span class="kw">struct </span>Foo {
+    <span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;Vec&lt;_&gt;&quot;</span>)]
+    </span>bar: Vec&lt;u32&gt;,
+}</code></pre></div>
+<ol>
+<li>
+<p>All the placeholder type <code>_</code> will be replaced with <code>::serde_with::Same</code>.
+The placeholder type <code>_</code> marks all the places where the types <code>Serialize</code> implementation should be used.
+In the example, it means that the <code>u32</code> values will serialize with the <code>Serialize</code> implementation of <code>u32</code>.
+The <code>Same</code> type implements <code>SerializeAs</code> whenever the underlying type implements <code>Serialize</code> and is used to make the two traits compatible.</p>
+<p>If you specify a custom path for <code>serde_with</code> via the <code>crate</code> attribute, the path to the <code>Same</code> type will be altered accordingly.</p>
+</li>
+<li>
+<p>Wrap the type from the annotation inside a <code>::serde_with::As</code>.
+In the above example we know have something like <code>::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;</code>.
+The <code>As</code> type acts as the opposite of the <code>Same</code> type.
+It allows using a <code>SerializeAs</code> type whenever a <code>Serialize</code> is required.</p>
+</li>
+<li>
+<p>Translate the <code>*as</code> attributes into the serde equivalent ones.
+<code>#[serde_as(as = ...)]</code> will become <code>#[serde(with = ...)]</code>.
+Similarly, <code>serialize_as</code> is translated to <code>serialize_with</code>.</p>
+<p>The field attributes will be kept on the struct/enum such that other macros can use them too.</p>
+</li>
+<li>
+<p>It searches <code>#[serde_as(as = ...)]</code> if there is a type named <code>BorrowCow</code> under any path.
+If <code>BorrowCow</code> is found, the attribute <code>#[serde(borrow)]</code> is added to the field.
+If <code>#[serde(borrow)]</code> or <code>#[serde(borrow = &quot;...&quot;)]</code> is already present, this step will be skipped.</p>
+</li>
+</ol>
+<p>After all these steps, the code snippet will have transformed into roughly this.</p>
+
+<div class="example-wrap ignore"><div class='tooltip'>ⓘ</div><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(serde::Serialize)]
+</span><span class="kw">struct </span>Foo {
+    <span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;Vec&lt;_&gt;&quot;</span>)]
+    #[serde(with = <span class="string">&quot;::serde_with::As::&lt;Vec&lt;::serde_with::Same&gt;&gt;&quot;</span>)]
+    </span>bar: Vec&lt;u32&gt;,
+}</code></pre></div>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="serde_with" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

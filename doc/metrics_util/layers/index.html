@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Layers are composable helpers that can be “layered” on top of an existing `Recorder` to enhance or alter its behavior as desired, without having to change the recorder implementation itself."><meta name="keywords" content="rust, rustlang, rust-lang, layers"><title>metrics_util::layers - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Module layers</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Module <a href="../index.html">metrics_util</a>::<wbr><a class="mod" href="#">layers</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../../src/metrics_util/layers/mod.rs.html#1-193">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Layers are composable helpers that can be “layered” on top of an existing <code>Recorder</code> to enhance
+or alter its behavior as desired, without having to change the recorder implementation itself.</p>
+<p>As well, <a href="struct.Stack.html" title="Stack"><code>Stack</code></a> can be used to easily compose multiple layers together and provides a
+convenience method for installing it as the global recorder, providing a smooth transition from
+working directly with installing exporters to installing stacks.</p>
+<p>Here’s an example of a layer that filters out all metrics that start with a specific string:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// A simple layer that denies any metrics that have &quot;stairway&quot; or &quot;heaven&quot; in their name.
+</span><span class="attr">#[derive(Default)]
+</span><span class="kw">pub struct </span>StairwayDeny&lt;R&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) R);
+
+<span class="kw">impl</span>&lt;R&gt; StairwayDeny&lt;R&gt; {
+    <span class="kw">fn </span>is_invalid_key(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        key.contains(<span class="string">&quot;stairway&quot;</span>) || key.contains(<span class="string">&quot;heaven&quot;</span>)
+    }
+}
+
+<span class="kw">impl</span>&lt;R: Recorder&gt; Recorder <span class="kw">for </span>StairwayDeny&lt;R&gt; {
+    <span class="kw">fn </span>describe_counter(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        key_name: KeyName,
+        unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;,
+        description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key_name.as_str()) {
+            <span class="kw">return</span>;
+        }
+        <span class="self">self</span>.<span class="number">0</span>.describe_counter(key_name, unit, description)
+    }
+
+    <span class="kw">fn </span>describe_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key_name.as_str()) {
+            <span class="kw">return</span>;
+        }
+        <span class="self">self</span>.<span class="number">0</span>.describe_gauge(key_name, unit, description)
+    }
+
+    <span class="kw">fn </span>describe_histogram(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        key_name: KeyName,
+        unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;,
+        description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    ) {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key_name.as_str()) {
+            <span class="kw">return</span>;
+        }
+        <span class="self">self</span>.<span class="number">0</span>.describe_histogram(key_name, unit, description)
+    }
+
+    <span class="kw">fn </span>register_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Counter {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key.name()) {
+            <span class="kw">return </span>Counter::noop();
+        }
+        <span class="self">self</span>.<span class="number">0</span>.register_counter(key)
+    }
+
+    <span class="kw">fn </span>register_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Gauge {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key.name()) {
+            <span class="kw">return </span>Gauge::noop();
+        }
+        <span class="self">self</span>.<span class="number">0</span>.register_gauge(key)
+    }
+
+    <span class="kw">fn </span>register_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Histogram {
+        <span class="kw">if </span><span class="self">self</span>.is_invalid_key(key.name()) {
+            <span class="kw">return </span>Histogram::noop();
+        }
+        <span class="self">self</span>.<span class="number">0</span>.register_histogram(key)
+    }
+}
+
+<span class="attr">#[derive(Default)]
+</span><span class="kw">pub struct </span>StairwayDenyLayer;
+
+<span class="kw">impl</span>&lt;R&gt; Layer&lt;R&gt; <span class="kw">for </span>StairwayDenyLayer {
+    <span class="kw">type </span>Output = StairwayDeny&lt;R&gt;;
+
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, inner: R) -&gt; <span class="self">Self</span>::Output {
+        StairwayDeny(inner)
+    }
+}
+
+<span class="comment">// Now you can construct an instance of it to use it.  The layer will be wrapped around
+// our base recorder, which is a debugging recorder also supplied by `metrics_util`.
+</span><span class="kw">let </span>recorder = BasicRecorder;
+<span class="kw">let </span>layer = StairwayDenyLayer::default();
+<span class="kw">let </span>layered = layer.layer(recorder);
+metrics::set_boxed_recorder(Box::new(layered)).expect(<span class="string">&quot;failed to install recorder&quot;</span>);
+
+
+<span class="comment">// Working with layers directly is a bit cumbersome, though, so let&#39;s use a `Stack`.
+</span><span class="kw">let </span>stack = Stack::new(BasicRecorder);
+stack.push(StairwayDenyLayer::default()).install().expect(<span class="string">&quot;failed to install stack&quot;</span>);
+
+
+<span class="comment">// `Stack` makes it easy to chain layers together, as well.
+</span><span class="kw">let </span>stack = Stack::new(BasicRecorder);
+stack
+    .push(PrefixLayer::new(<span class="string">&quot;app_name&quot;</span>))
+    .push(StairwayDenyLayer::default())
+    .install()
+    .expect(<span class="string">&quot;failed to install stack&quot;</span>);</code></pre></div>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Fanout.html" title="metrics_util::layers::Fanout struct">Fanout</a></div><div class="item-right docblock-short">Fans out metrics to multiple recorders.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FanoutBuilder.html" title="metrics_util::layers::FanoutBuilder struct">FanoutBuilder</a></div><div class="item-right docblock-short">A layer for fanning out metrics to multiple recorders.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Prefix.html" title="metrics_util::layers::Prefix struct">Prefix</a></div><div class="item-right docblock-short">Applies a prefix to every metric key.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.PrefixLayer.html" title="metrics_util::layers::PrefixLayer struct">PrefixLayer</a></div><div class="item-right docblock-short">A layer for applying a prefix to every metric key.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stack.html" title="metrics_util::layers::Stack struct">Stack</a></div><div class="item-right docblock-short">Builder for composing layers together in a top-down/inside-out order.</div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="metrics_util::layers::Layer trait">Layer</a></div><div class="item-right docblock-short">Decorates an object by wrapping it within another type.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="metrics_util" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

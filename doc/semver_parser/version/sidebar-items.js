@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Identifier",""]],"fn":[["parse",""]],"struct":[["Version",""]]};

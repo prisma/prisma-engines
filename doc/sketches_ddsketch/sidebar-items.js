@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["DDSketchError","General error type for DDSketch, represents either an invalid quantile or an incompatible merge operation."]],"struct":[["Config","The configuration struct for constructing a `DDSketch`"],["DDSketch","This struct represents a DDSketch"]]};

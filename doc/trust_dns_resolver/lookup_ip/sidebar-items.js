@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["LookupIp","Result of a DNS query when querying for A or AAAA records."],["LookupIpFuture","The Future returned from [crate::AsyncResolver] when performing an A or AAAA lookup."],["LookupIpIntoIter","Borrowed view of set of RDatas returned from a Lookup"],["LookupIpIter","Borrowed view of set of IPs returned from a LookupIp"]]};

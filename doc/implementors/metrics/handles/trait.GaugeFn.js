@@ -1,0 +1,4 @@
+(function() {var implementors = {
+"metrics":[],
+"metrics_util":[["impl&lt;T&gt; <a class=\"trait\" href=\"metrics/handles/trait.GaugeFn.html\" title=\"trait metrics::handles::GaugeFn\">GaugeFn</a> for <a class=\"struct\" href=\"metrics_util/registry/struct.Generational.html\" title=\"struct metrics_util::registry::Generational\">Generational</a>&lt;T&gt;<span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class=\"trait\" href=\"metrics/handles/trait.GaugeFn.html\" title=\"trait metrics::handles::GaugeFn\">GaugeFn</a>,</span>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":[["BitArr","Bit-Array Type Definition"],["bitarr","Bit-Array Value Constructor"],["bitbox","Boxed Bit-Slice Constructor"],["bits","Bit-Slice Region Constructor"],["bitvec","Bit-Vector Constructor"]],"struct":[["BitPtr","Single-Bit Pointer"],["BitPtrRange","Bit-Pointer Range"],["BitRef","Proxy Bit-Reference"]]};

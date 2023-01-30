@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate implements the PBKDF2 key derivation function as specified in RFC 2898."><meta name="keywords" content="rust, rustlang, rust-lang, pbkdf2"><title>pbkdf2 - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../pbkdf2/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../pbkdf2/index.html"><div class="logo-container">
+                    <img src="https://raw.githubusercontent.com/RustCrypto/media/8f1a9894/logo.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate pbkdf2</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.10.1</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">pbkdf2</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/pbkdf2/lib.rs.html#1-148">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate implements the PBKDF2 key derivation function as specified
+in <a href="https://tools.ietf.org/html/rfc2898">RFC 2898</a>.</p>
+<p>If you are only using the low-level <a href="fn.pbkdf2.html" title="pbkdf2"><code>pbkdf2</code></a> function instead of the
+higher-level [<code>Pbkdf2</code>] struct to produce/verify hash strings,
+it’s recommended to disable default features in your <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+pbkdf2 = { version = &quot;0.7&quot;, default-features = false }
+</code></pre></div><h2 id="usage-simple-with-default-params"><a href="#usage-simple-with-default-params">Usage (simple with default params)</a></h2>
+<p>Note: this example requires the <code>rand_core</code> crate with the <code>std</code> feature
+enabled for <code>rand_core::OsRng</code> (embedded platforms can substitute their
+own RNG)</p>
+<p>Add the following to your crate’s <code>Cargo.toml</code> to import it:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+pbkdf2 = &quot;0.7&quot;
+rand_core = { version = &quot;0.6&quot;, features = [&quot;std&quot;] }
+</code></pre></div>
+<p>The following example demonstrates the high-level password hashing API:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pbkdf2::{
+    password_hash::{
+        rand_core::OsRng,
+        PasswordHash, PasswordHasher, PasswordVerifier, SaltString
+    },
+    Pbkdf2
+};
+
+<span class="kw">let </span>password = <span class="string">b&quot;hunter42&quot;</span>; <span class="comment">// Bad password; don&#39;t actually use!
+</span><span class="kw">let </span>salt = SaltString::generate(<span class="kw-2">&amp;mut </span>OsRng);
+
+<span class="comment">// Hash password to PHC string ($pbkdf2-sha256$...)
+</span><span class="kw">let </span>password_hash = Pbkdf2.hash_password(password, <span class="kw-2">&amp;</span>salt)<span class="question-mark">?</span>.to_string();
+
+<span class="comment">// Verify password against PHC string
+</span><span class="kw">let </span>parsed_hash = PasswordHash::new(<span class="kw-2">&amp;</span>password_hash)<span class="question-mark">?</span>;
+<span class="macro">assert!</span>(Pbkdf2.verify_password(password, <span class="kw-2">&amp;</span>parsed_hash).is_ok());</code></pre></div>
+</div></details><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.pbkdf2.html" title="pbkdf2::pbkdf2 fn">pbkdf2</a></div><div class="item-right docblock-short">Generic implementation of PBKDF2 algorithm.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="pbkdf2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

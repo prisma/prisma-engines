@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["crate_name","Find the crate name for the given `orig_name` in the current `Cargo.toml`."]]};

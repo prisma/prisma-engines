@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Asynchronous stream of elements."><meta name="keywords" content="rust, rustlang, rust-lang, async_stream"><title>async_stream - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../async_stream/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate async_stream</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.3.3</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#macros">Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">async_stream</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/async_stream/lib.rs.html#1-245">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Asynchronous stream of elements.</p>
+<p>Provides two macros, <code>stream!</code> and <code>try_stream!</code>, allowing the caller to
+define asynchronous streams of elements. These are implemented using <code>async</code>
+&amp; <code>await</code> notation. This crate works without unstable features.</p>
+<p>The <code>stream!</code> macro returns an anonymous type implementing the <a href="https://docs.rs/futures-core/*/futures_core/stream/trait.Stream.html"><code>Stream</code></a>
+trait. The <code>Item</code> associated type is the type of the values yielded from the
+stream. The <code>try_stream!</code> also returns an anonymous type implementing the
+<a href="https://docs.rs/futures-core/*/futures_core/stream/trait.Stream.html"><code>Stream</code></a> trait, but the <code>Item</code> associated type is <code>Result&lt;T, Error&gt;</code>. The
+<code>try_stream!</code> macro supports using <code>?</code> notiation as part of the
+implementation.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<p>A basic stream yielding numbers. Values are yielded using the <code>yield</code>
+keyword. The stream block must return <code>()</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>async_stream::stream;
+
+<span class="kw">use </span>futures_util::pin_mut;
+<span class="kw">use </span>futures_util::stream::StreamExt;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+    <span class="kw">let </span>s = <span class="macro">stream! </span>{
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+            <span class="kw">yield </span>i;
+        }
+    };
+
+    <span class="macro">pin_mut!</span>(s); <span class="comment">// needed for iteration
+
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(value) = s.next().<span class="kw">await </span>{
+        <span class="macro">println!</span>(<span class="string">&quot;got {}&quot;</span>, value);
+    }
+}</code></pre></div>
+<p>Streams may be returned by using <code>impl Stream&lt;Item = T&gt;</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>async_stream::stream;
+
+<span class="kw">use </span>futures_core::stream::Stream;
+<span class="kw">use </span>futures_util::pin_mut;
+<span class="kw">use </span>futures_util::stream::StreamExt;
+
+<span class="kw">fn </span>zero_to_three() -&gt; <span class="kw">impl </span>Stream&lt;Item = u32&gt; {
+    <span class="macro">stream! </span>{
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+            <span class="kw">yield </span>i;
+        }
+    }
+}
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+    <span class="kw">let </span>s = zero_to_three();
+    <span class="macro">pin_mut!</span>(s); <span class="comment">// needed for iteration
+
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(value) = s.next().<span class="kw">await </span>{
+        <span class="macro">println!</span>(<span class="string">&quot;got {}&quot;</span>, value);
+    }
+}</code></pre></div>
+<p>Streams may be implemented in terms of other streams - <code>async-stream</code> provides <code>for await</code>
+syntax to assist with this:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>async_stream::stream;
+
+<span class="kw">use </span>futures_core::stream::Stream;
+<span class="kw">use </span>futures_util::pin_mut;
+<span class="kw">use </span>futures_util::stream::StreamExt;
+
+<span class="kw">fn </span>zero_to_three() -&gt; <span class="kw">impl </span>Stream&lt;Item = u32&gt; {
+    <span class="macro">stream! </span>{
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+            <span class="kw">yield </span>i;
+        }
+    }
+}
+
+<span class="kw">fn </span>double&lt;S: Stream&lt;Item = u32&gt;&gt;(input: S)
+    -&gt; <span class="kw">impl </span>Stream&lt;Item = u32&gt;
+{
+    <span class="macro">stream! </span>{
+        <span class="kw">for await </span>value <span class="kw">in </span>input {
+            <span class="kw">yield </span>value * <span class="number">2</span>;
+        }
+    }
+}
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+    <span class="kw">let </span>s = double(zero_to_three());
+    <span class="macro">pin_mut!</span>(s); <span class="comment">// needed for iteration
+
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(value) = s.next().<span class="kw">await </span>{
+        <span class="macro">println!</span>(<span class="string">&quot;got {}&quot;</span>, value);
+    }
+}</code></pre></div>
+<p>Rust try notation (<code>?</code>) can be used with the <code>try_stream!</code> macro. The <code>Item</code>
+of the returned stream is <code>Result</code> with <code>Ok</code> being the value yielded and
+<code>Err</code> the error type returned by <code>?</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::net::{TcpListener, TcpStream};
+
+<span class="kw">use </span>async_stream::try_stream;
+<span class="kw">use </span>futures_core::stream::Stream;
+
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::net::SocketAddr;
+
+<span class="kw">fn </span>bind_and_accept(addr: SocketAddr)
+    -&gt; <span class="kw">impl </span>Stream&lt;Item = io::Result&lt;TcpStream&gt;&gt;
+{
+    <span class="macro">try_stream! </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>listener = TcpListener::bind(addr).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>(stream, addr) = listener.accept().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="macro">println!</span>(<span class="string">&quot;received on {:?}&quot;</span>, addr);
+            <span class="kw">yield </span>stream;
+        }
+    }
+}</code></pre></div>
+<h2 id="implementation"><a href="#implementation">Implementation</a></h2>
+<p>The <code>stream!</code> and <code>try_stream!</code> macros are implemented using proc macros.
+The macro searches the syntax tree for instances of <code>sender.send($expr)</code> and
+transforms them into <code>sender.send($expr).await</code>.</p>
+<p>The stream uses a lightweight sender to send values from the stream
+implementation to the caller. When entering the stream, an <code>Option&lt;T&gt;</code> is
+stored on the stack. A pointer to the cell is stored in a thread local and
+<code>poll</code> is called on the async block. When <code>poll</code> returns.
+<code>sender.send(value)</code> stores the value that cell and yields back to the
+caller.</p>
+</div></details><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.stream.html" title="async_stream::stream macro">stream</a></div><div class="item-right docblock-short">Asynchronous stream</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.try_stream.html" title="async_stream::try_stream macro">try_stream</a></div><div class="item-right docblock-short">Asynchronous fallible stream</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="async_stream" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

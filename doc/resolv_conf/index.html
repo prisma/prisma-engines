@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The crate simply parses `/etc/resolv.conf` file and creates a config object"><meta name="keywords" content="rust, rustlang, rust-lang, resolv_conf"><title>resolv_conf - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate resolv_conf</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.7.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">resolv_conf</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/resolv_conf/lib.rs.html#1-105">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The crate simply parses <code>/etc/resolv.conf</code> file and creates a config object</p>
+<h2 id="examples"><a href="#examples">Examples</a></h2><h3 id="parsing-a-config-from-a-string"><a href="#parsing-a-config-from-a-string">Parsing a config from a string</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern crate </span>resolv_conf;
+
+<span class="kw">use </span>std::net::{Ipv4Addr, Ipv6Addr};
+<span class="kw">use </span>resolv_conf::{ScopedIp, Config, Network};
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span>config_str = <span class="string">&quot;
+options ndots:8 timeout:8 attempts:8
+
+domain example.com
+search example.com sub.example.com
+
+nameserver 2001:4860:4860::8888
+nameserver 2001:4860:4860::8844
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+options rotate
+options inet6 no-tld-query
+
+sortlist 130.155.160.0/255.255.240.0 130.155.0.0&quot;</span>;
+
+    <span class="comment">// Parse the config.
+    </span><span class="kw">let </span>parsed_config = Config::parse(<span class="kw-2">&amp;</span>config_str).expect(<span class="string">&quot;Failed to parse config&quot;</span>);
+
+    <span class="comment">// We can build configs manually as well, either directly or with Config::new()
+    </span><span class="kw">let </span><span class="kw-2">mut </span>expected_config = Config::new();
+    expected_config.nameservers = <span class="macro">vec!</span>[
+        ScopedIp::V6(Ipv6Addr::new(<span class="number">0x2001</span>, <span class="number">0x4860</span>, <span class="number">0x4860</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0x8888</span>), <span class="prelude-val">None</span>),
+        ScopedIp::V6(Ipv6Addr::new(<span class="number">0x2001</span>, <span class="number">0x4860</span>, <span class="number">0x4860</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0x8844</span>), <span class="prelude-val">None</span>),
+        ScopedIp::V4(Ipv4Addr::new(<span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>)),
+        ScopedIp::V4(Ipv4Addr::new(<span class="number">8</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">4</span>)),
+    ];
+    expected_config.sortlist = <span class="macro">vec!</span>[
+        Network::V4(Ipv4Addr::new(<span class="number">130</span>, <span class="number">155</span>, <span class="number">160</span>, <span class="number">0</span>), Ipv4Addr::new(<span class="number">255</span>, <span class="number">255</span>, <span class="number">240</span>, <span class="number">0</span>)),
+        Network::V4(Ipv4Addr::new(<span class="number">130</span>, <span class="number">155</span>, <span class="number">0</span>, <span class="number">0</span>), Ipv4Addr::new(<span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)),
+    ];
+    expected_config.debug = <span class="bool-val">false</span>;
+    expected_config.ndots = <span class="number">8</span>;
+    expected_config.timeout = <span class="number">8</span>;
+    expected_config.attempts = <span class="number">8</span>;
+    expected_config.rotate = <span class="bool-val">true</span>;
+    expected_config.no_check_names = <span class="bool-val">false</span>;
+    expected_config.inet6 = <span class="bool-val">true</span>;
+    expected_config.ip6_bytestring = <span class="bool-val">false</span>;
+    expected_config.ip6_dotint = <span class="bool-val">false</span>;
+    expected_config.edns0 = <span class="bool-val">false</span>;
+    expected_config.single_request = <span class="bool-val">false</span>;
+    expected_config.single_request_reopen = <span class="bool-val">false</span>;
+    expected_config.no_tld_query = <span class="bool-val">true</span>;
+    expected_config.use_vc = <span class="bool-val">false</span>;
+    expected_config.set_domain(String::from(<span class="string">&quot;example.com&quot;</span>));
+    expected_config.set_search(<span class="macro">vec!</span>[
+        String::from(<span class="string">&quot;example.com&quot;</span>),
+        String::from(<span class="string">&quot;sub.example.com&quot;</span>)
+    ]);
+
+    <span class="comment">// We can compare configurations, since resolv_conf::Config implements Eq
+    </span><span class="macro">assert_eq!</span>(parsed_config, expected_config);
+}</code></pre></div>
+<h3 id="parsing-a-file"><a href="#parsing-a-file">Parsing a file</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io::Read;
+<span class="kw">use </span>std::fs::File;
+
+<span class="kw">extern crate </span>resolv_conf;
+
+<span class="kw">fn </span>main() {
+    <span class="comment">// Read the file
+    </span><span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::with_capacity(<span class="number">4096</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>f = File::open(<span class="string">&quot;/etc/resolv.conf&quot;</span>).unwrap();
+    f.read_to_end(<span class="kw-2">&amp;mut </span>buf).unwrap();
+
+    <span class="comment">// Parse the buffer
+    </span><span class="kw">let </span>cfg = resolv_conf::Config::parse(<span class="kw-2">&amp;</span>buf).unwrap();
+
+    <span class="comment">// Print the config
+    </span><span class="macro">println!</span>(<span class="string">&quot;---- Parsed /etc/resolv.conf -----\n{:#?}\n&quot;</span>, cfg);
+}</code></pre></div>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AddrParseError.html" title="resolv_conf::AddrParseError struct">AddrParseError</a></div><div class="item-right docblock-short">An error which can be returned when parsing an IP address.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Config.html" title="resolv_conf::Config struct">Config</a></div><div class="item-right docblock-short">Represent a resolver configuration, as described in <code>man 5 resolv.conf</code>.
+The options and defaults match those in the linux <code>man</code> page.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DomainIter.html" title="resolv_conf::DomainIter struct">DomainIter</a></div><div class="item-right docblock-short">An iterator returned by <a href="struct.Config.html#method.get_last_search_or_domain"><code>Config.get_last_search_or_domain</code></a></div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Family.html" title="resolv_conf::Family enum">Family</a></div><div class="item-right docblock-short">The internet protocol family that is prefered.
+This option is commonly found on openbsd.</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Lookup.html" title="resolv_conf::Lookup enum">Lookup</a></div><div class="item-right docblock-short">The databases that should be searched during a lookup.
+This option is commonly found on openbsd.</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Network.html" title="resolv_conf::Network enum">Network</a></div><div class="item-right docblock-short">A network, that is an IP address and a mask</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ParseError.html" title="resolv_conf::ParseError enum">ParseError</a></div><div class="item-right docblock-short">Error while parsing resolv.conf file</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ScopedIp.html" title="resolv_conf::ScopedIp enum">ScopedIp</a></div><div class="item-right docblock-short">Represent an IP address. This type is similar to <code>std::net::IpAddr</code> but it supports IPv6 scope
+identifiers.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="resolv_conf" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

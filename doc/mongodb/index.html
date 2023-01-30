@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate contains the officially supported MongoDB Rust driver, a client side library that can be used to interact with MongoDB deployments in Rust applications. It uses the [`bson`] crate for BSON support. The driver contains a fully async API that supports either [`tokio`] (default) or `async-std`, depending on the feature flags set. The driver also has a sync API that may be enabled via the `&quot;sync&quot;` feature flag."><meta name="keywords" content="rust, rustlang, rust-lang, mongodb"><title>mongodb - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate mongodb</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 2.3.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">mongodb</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/mongodb/lib.rs.html#1-367">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate contains the officially supported MongoDB Rust driver, a
+client side library that can be used to interact with MongoDB deployments
+in Rust applications. It uses the <a href="../bson/index.html" title="bson"><code>bson</code></a> crate for BSON support.
+The driver contains a fully async API that supports either <a href="../tokio/index.html" title="tokio"><code>tokio</code></a> (default)
+or <a href="https://docs.rs/async_std"><code>async-std</code></a>, depending on the feature flags set. The driver also has
+a sync API that may be enabled via the <code>&quot;sync&quot;</code> feature flag.</p>
+<h2 id="installation"><a href="#installation">Installation</a></h2><h3 id="requirements"><a href="#requirements">Requirements</a></h3>
+<ul>
+<li>Rust 1.53+</li>
+<li>MongoDB 3.6+</li>
+</ul>
+<h3 id="importing"><a href="#importing">Importing</a></h3>
+<p>The driver is available on <a href="https://crates.io/crates/mongodb">crates.io</a>. To use the driver in
+your application, simply add it to your project’s <code>Cargo.toml</code>.</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+mongodb = &quot;2.3.0&quot;
+</code></pre></div><h4 id="configuring-the-async-runtime"><a href="#configuring-the-async-runtime">Configuring the async runtime</a></h4>
+<p>The driver supports both of the most popular async runtime crates, namely
+<a href="https://crates.io/crates/tokio"><code>tokio</code></a> and <a href="https://crates.io/crates/async-std"><code>async-std</code></a>. By
+default, the driver will use <a href="https://crates.io/crates/tokio"><code>tokio</code></a>, but you can explicitly choose
+a runtime by specifying one of <code>&quot;tokio-runtime&quot;</code> or <code>&quot;async-std-runtime&quot;</code> feature flags in your
+<code>Cargo.toml</code>.</p>
+<p>For example, to instruct the driver to work with <a href="https://crates.io/crates/async-std"><code>async-std</code></a>,
+add the following to your <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies.mongodb]
+version = &quot;2.3.0&quot;
+default-features = false
+features = [&quot;async-std-runtime&quot;]
+</code></pre></div><h4 id="enabling-the-sync-api"><a href="#enabling-the-sync-api">Enabling the sync API</a></h4>
+<p>The driver also provides a blocking sync API. To enable this, add the <code>&quot;sync&quot;</code> or <code>&quot;tokio-sync&quot;</code>
+feature to your <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies.mongodb]
+version = &quot;2.3.0&quot;
+features = [&quot;tokio-sync&quot;]
+</code></pre></div>
+<p>Using the <code>&quot;sync&quot;</code> feature also requires using <code>default-features = false</code>.
+<strong>Note:</strong> The sync-specific types can be imported from <code>mongodb::sync</code> (e.g.
+<code>mongodb::sync::Client</code>).</p>
+<h4 id="all-feature-flags"><a href="#all-feature-flags">All Feature flags</a></h4><div><table><thead><tr><th style="text-align: left">Feature</th><th style="text-align: left">Description</th><th style="text-align: left">Extra dependencies</th><th style="text-align: left">Default</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>tokio-runtime</code></td><td style="text-align: left">Enable support for the <code>tokio</code> async runtime</td><td style="text-align: left"><code>tokio</code> 1.0 with the <code>full</code> feature</td><td style="text-align: left">yes</td></tr>
+<tr><td style="text-align: left"><code>async-std-runtime</code></td><td style="text-align: left">Enable support for the <code>async-std</code> runtime</td><td style="text-align: left"><code>async-std</code> 1.0</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>sync</code></td><td style="text-align: left">Expose the synchronous API (<code>mongodb::sync</code>), using an async-std backend. Cannot be used with the <code>tokio-runtime</code> feature flag.</td><td style="text-align: left"><code>async-std</code> 1.0</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>tokio-sync</code></td><td style="text-align: left">Expose the synchronous API (<code>mongodb::sync</code>), using a tokio backend. Cannot be used with the <code>async-std-runtime</code> feature flag.</td><td style="text-align: left"><code>tokio</code> 1.0 with the <code>full</code> feature</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>aws-auth</code></td><td style="text-align: left">Enable support for the MONGODB-AWS authentication mechanism.</td><td style="text-align: left"><code>reqwest</code> 0.11</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>bson-uuid-0_8</code></td><td style="text-align: left">Enable support for v0.8 of the <a href="docs.rs/uuid/0.8"><code>uuid</code></a> crate in the public API of the re-exported <code>bson</code> crate.</td><td style="text-align: left">n/a</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>bson-chrono-0_4</code></td><td style="text-align: left">Enable support for v0.4 of the <a href="docs.rs/chrono/0.4"><code>chrono</code></a> crate in the public API of the re-exported <code>bson</code> crate.</td><td style="text-align: left">n/a</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>bson-serde_with</code></td><td style="text-align: left">Enable support for the <a href="docs.rs/serde_with/latest"><code>serde_with</code></a> crate in the public API of the re-exported <code>bson</code> crate.</td><td style="text-align: left"><code>serde_with</code> 1.0</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>zlib-compression</code></td><td style="text-align: left">Enable support for compressing messages with <a href="https://zlib.net/"><code>zlib</code></a></td><td style="text-align: left"><code>flate2</code> 1.0</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>zstd-compression</code></td><td style="text-align: left">Enable support for compressing messages with <a href="http://facebook.github.io/zstd/"><code>zstd</code></a>.  This flag requires Rust version 1.54.</td><td style="text-align: left"><code>zstd</code> 0.9.0</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>snappy-compression</code></td><td style="text-align: left">Enable support for compressing messages with <a href="http://google.github.io/snappy/"><code>snappy</code></a></td><td style="text-align: left"><code>snap</code> 1.0.5</td><td style="text-align: left">no</td></tr>
+<tr><td style="text-align: left"><code>openssl-tls</code></td><td style="text-align: left">Switch TLS connection handling to use <a href="https://docs.rs/openssl/0.10.38/">‘openssl’</a>.</td><td style="text-align: left"><code>openssl</code> 0.10.38</td><td style="text-align: left">no</td></tr>
+</tbody></table>
+</div><h2 id="example-usage"><a href="#example-usage">Example Usage</a></h2><h3 id="using-the-async-api"><a href="#using-the-async-api">Using the async API</a></h3><h4 id="connecting-to-a-mongodb-deployment"><a href="#connecting-to-a-mongodb-deployment">Connecting to a MongoDB deployment</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>mongodb::{Client, options::ClientOptions};
+
+<span class="comment">// Parse a connection string into an options struct.
+</span><span class="kw">let </span><span class="kw-2">mut </span>client_options = ClientOptions::parse(<span class="string">&quot;mongodb://localhost:27017&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+<span class="comment">// Manually set an option.
+</span>client_options.app_name = <span class="prelude-val">Some</span>(<span class="string">&quot;My App&quot;</span>.to_string());
+
+<span class="comment">// Get a handle to the deployment.
+</span><span class="kw">let </span>client = Client::with_options(client_options)<span class="question-mark">?</span>;
+
+<span class="comment">// List the names of the databases in that deployment.
+</span><span class="kw">for </span>db_name <span class="kw">in </span>client.list_database_names(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">? </span>{
+    <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, db_name);
+}</code></pre></div>
+<h4 id="getting-a-handle-to-a-database"><a href="#getting-a-handle-to-a-database">Getting a handle to a database</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Get a handle to a database.
+</span><span class="kw">let </span>db = client.database(<span class="string">&quot;mydb&quot;</span>);
+
+<span class="comment">// List the names of the collections in that database.
+</span><span class="kw">for </span>collection_name <span class="kw">in </span>db.list_collection_names(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">? </span>{
+    <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, collection_name);
+}</code></pre></div>
+<h4 id="inserting-documents-into-a-collection"><a href="#inserting-documents-into-a-collection">Inserting documents into a collection</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>mongodb::bson::{doc, Document};
+
+<span class="comment">// Get a handle to a collection in the database.
+</span><span class="kw">let </span>collection = db.collection::&lt;Document&gt;(<span class="string">&quot;books&quot;</span>);
+
+<span class="kw">let </span>docs = <span class="macro">vec!</span>[
+    <span class="macro">doc! </span>{ <span class="string">&quot;title&quot;</span>: <span class="string">&quot;1984&quot;</span>, <span class="string">&quot;author&quot;</span>: <span class="string">&quot;George Orwell&quot; </span>},
+    <span class="macro">doc! </span>{ <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Animal Farm&quot;</span>, <span class="string">&quot;author&quot;</span>: <span class="string">&quot;George Orwell&quot; </span>},
+    <span class="macro">doc! </span>{ <span class="string">&quot;title&quot;</span>: <span class="string">&quot;The Great Gatsby&quot;</span>, <span class="string">&quot;author&quot;</span>: <span class="string">&quot;F. Scott Fitzgerald&quot; </span>},
+];
+
+<span class="comment">// Insert some documents into the &quot;mydb.books&quot; collection.
+</span>collection.insert_many(docs, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
+<p>A <a href="struct.Collection.html"><code>Collection</code></a> can be parameterized with any type that implements the
+<code>Serialize</code> and <code>Deserialize</code> traits from the <a href="https://serde.rs/"><code>serde</code></a> crate,
+not just <code>Document</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code># In Cargo.toml, add the following dependency.
+serde = { version = &quot;1.0&quot;, features = [&quot;derive&quot;] }
+</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
+
+<span class="attr">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">struct </span>Book {
+    title: String,
+    author: String,
+}
+
+<span class="comment">// Get a handle to a collection of `Book`.
+</span><span class="kw">let </span>typed_collection = db.collection::&lt;Book&gt;(<span class="string">&quot;books&quot;</span>);
+
+<span class="kw">let </span>books = <span class="macro">vec!</span>[
+    Book {
+        title: <span class="string">&quot;The Grapes of Wrath&quot;</span>.to_string(),
+        author: <span class="string">&quot;John Steinbeck&quot;</span>.to_string(),
+    },
+    Book {
+        title: <span class="string">&quot;To Kill a Mockingbird&quot;</span>.to_string(),
+        author: <span class="string">&quot;Harper Lee&quot;</span>.to_string(),
+    },
+];
+
+<span class="comment">// Insert the books into &quot;mydb.books&quot; collection, no manual conversion to BSON necessary.
+</span>typed_collection.insert_many(books, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
+<h4 id="finding-documents-in-a-collection"><a href="#finding-documents-in-a-collection">Finding documents in a collection</a></h4>
+<p>Results from queries are generally returned via <a href="struct.Cursor.html"><code>Cursor</code></a>, a struct which streams
+the results back from the server as requested. The <a href="struct.Cursor.html"><code>Cursor</code></a> type implements the
+<a href="https://docs.rs/futures/latest/futures/stream/trait.Stream.html"><code>Stream</code></a> trait from
+the <a href="https://crates.io/crates/futures"><code>futures</code></a> crate, and in order to access its streaming
+functionality you need to import at least one of the
+<a href="https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html"><code>StreamExt</code></a> or
+<a href="https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html"><code>TryStreamExt</code></a> traits.</p>
+<div class="example-wrap"><pre class="language-toml"><code># In Cargo.toml, add the following dependency.
+futures = &quot;0.3&quot;
+</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// This trait is required to use `try_next()` on the cursor
+</span><span class="kw">use </span>futures::stream::TryStreamExt;
+<span class="kw">use </span>mongodb::{bson::doc, options::FindOptions};
+
+<span class="comment">// Query the books in the collection with a filter and an option.
+</span><span class="kw">let </span>filter = <span class="macro">doc! </span>{ <span class="string">&quot;author&quot;</span>: <span class="string">&quot;George Orwell&quot; </span>};
+<span class="kw">let </span>find_options = FindOptions::builder().sort(<span class="macro">doc! </span>{ <span class="string">&quot;title&quot;</span>: <span class="number">1 </span>}).build();
+<span class="kw">let </span><span class="kw-2">mut </span>cursor = typed_collection.find(filter, find_options).<span class="kw">await</span><span class="question-mark">?</span>;
+
+<span class="comment">// Iterate over the results of the cursor.
+</span><span class="kw">while let </span><span class="prelude-val">Some</span>(book) = cursor.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+    <span class="macro">println!</span>(<span class="string">&quot;title: {}&quot;</span>, book.title);
+}</code></pre></div>
+<h4 id="using-the-sync-api"><a href="#using-the-sync-api">Using the sync API</a></h4>
+<p>The driver also provides a blocking sync API. See the <a href="#enabling-the-sync-api">Installation</a>
+section for instructions on how to enable it.</p>
+<p>The various sync-specific types are found in the <code>mongodb::sync</code> submodule rather than in the
+crate’s top level like in the async API. The sync API calls through to the async API internally
+though, so it looks and behaves similarly to it.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>mongodb::{
+    bson::doc,
+    sync::Client,
+};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+
+<span class="attr">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="kw">struct </span>Book {
+    title: String,
+    author: String,
+}
+
+<span class="kw">let </span>client = Client::with_uri_str(<span class="string">&quot;mongodb://localhost:27017&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>database = client.database(<span class="string">&quot;mydb&quot;</span>);
+<span class="kw">let </span>collection = database.collection::&lt;Book&gt;(<span class="string">&quot;books&quot;</span>);
+
+<span class="kw">let </span>docs = <span class="macro">vec!</span>[
+    Book {
+        title: <span class="string">&quot;1984&quot;</span>.to_string(),
+        author: <span class="string">&quot;George Orwell&quot;</span>.to_string(),
+    },
+    Book {
+        title: <span class="string">&quot;Animal Farm&quot;</span>.to_string(),
+        author: <span class="string">&quot;George Orwell&quot;</span>.to_string(),
+    },
+    Book {
+        title: <span class="string">&quot;The Great Gatsby&quot;</span>.to_string(),
+        author: <span class="string">&quot;F. Scott Fitzgerald&quot;</span>.to_string(),
+    },
+];
+
+<span class="comment">// Insert some books into the &quot;mydb.books&quot; collection.
+</span>collection.insert_many(docs, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+
+<span class="kw">let </span>cursor = collection.find(<span class="macro">doc! </span>{ <span class="string">&quot;author&quot;</span>: <span class="string">&quot;George Orwell&quot; </span>}, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+<span class="kw">for </span>result <span class="kw">in </span>cursor {
+    <span class="macro">println!</span>(<span class="string">&quot;title: {}&quot;</span>, result<span class="question-mark">?</span>.title);
+}</code></pre></div>
+<h3 id="warning-about-timeouts--cancellation"><a href="#warning-about-timeouts--cancellation">Warning about timeouts / cancellation</a></h3>
+<p>In async Rust, it is common to implement cancellation and timeouts by dropping a future after a
+certain period of time instead of polling it to completion. This is how
+<a href="https://docs.rs/tokio/1.10.1/tokio/time/fn.timeout.html"><code>tokio::time::timeout</code></a> works, for
+example. However, doing this with futures returned by the driver can leave the driver’s internals in
+an inconsistent state, which may lead to unpredictable or incorrect behavior (see RUST-937 for more
+details). As such, it is <strong><em>highly</em></strong> recommended to poll all futures returned from the driver to
+completion. In order to still use timeout mechanisms like <code>tokio::time::timeout</code> with the driver,
+one option is to spawn tasks and time out on their
+<a href="https://docs.rs/tokio/1.10.1/tokio/task/struct.JoinHandle.html"><code>JoinHandle</code></a> futures instead of on
+the driver’s futures directly. This will ensure the driver’s futures will always be completely polled
+while also allowing the application to continue in the event of a timeout.</p>
+<p>e.g.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>collection = client.database(<span class="string">&quot;foo&quot;</span>).collection(<span class="string">&quot;bar&quot;</span>);
+<span class="kw">let </span>handle = tokio::task::spawn(<span class="kw">async move </span>{
+    collection.insert_one(<span class="macro">doc! </span>{ <span class="string">&quot;x&quot;</span>: <span class="number">1 </span>}, <span class="prelude-val">None</span>).<span class="kw">await
+</span>});
+
+tokio::time::timeout(Duration::from_secs(<span class="number">5</span>), handle).<span class="kw">await</span><span class="question-mark">???</span>;</code></pre></div>
+<h3 id="minimum-supported-rust-version-msrv"><a href="#minimum-supported-rust-version-msrv">Minimum supported Rust version (MSRV)</a></h3>
+<p>The MSRV for this crate is currently 1.53.0. This will be rarely be increased, and if it ever is,
+it will only happen in a minor or major version release.</p>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><div class="item-table"><div class="item-row"><div class="item-left import-item" id="reexport.bson"><code>pub use ::<a class="mod" href="../bson/index.html" title="mod bson">bson</a>;</code></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="change_stream/index.html" title="mongodb::change_stream mod">change_stream</a></div><div class="item-right docblock-short">Contains the functionality for change streams.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="mongodb::error mod">error</a></div><div class="item-right docblock-short">Contains the <code>Error</code> and <code>Result</code> types that <code>mongodb</code> uses.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="event/index.html" title="mongodb::event mod">event</a></div><div class="item-right docblock-short">Contains the events and functionality for monitoring internal <code>Client</code> behavior.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="options/index.html" title="mongodb::options mod">options</a></div><div class="item-right docblock-short">Contains all of the types needed to specify options to MongoDB operations.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="results/index.html" title="mongodb::results mod">results</a></div><div class="item-right docblock-short">Contains the types of results returned by CRUD operations.</div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Client.html" title="mongodb::Client struct">Client</a></div><div class="item-right docblock-short">This is the main entry point for the API. A <code>Client</code> is used to connect to a MongoDB cluster.
+By default, it will monitor the topology of the cluster, keeping track of any changes, such
+as servers being added or removed.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientSession.html" title="mongodb::ClientSession struct">ClientSession</a></div><div class="item-right docblock-short">A MongoDB client session. This struct represents a logical session used for ordering sequential
+operations. To create a <code>ClientSession</code>, call <code>start_session</code> on a <code>Client</code>.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClusterTime.html" title="mongodb::ClusterTime struct">ClusterTime</a></div><div class="item-right docblock-short">Struct modeling a cluster time reported by the server.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Collection.html" title="mongodb::Collection struct">Collection</a></div><div class="item-right docblock-short"><code>Collection</code> is the client-side abstraction of a MongoDB Collection. It can be used to
+perform collection-level operations such as CRUD operations. A <code>Collection</code> can be obtained
+through a <a href="struct.Database.html"><code>Database</code></a> by calling either
+<a href="struct.Database.html#method.collection"><code>Database::collection</code></a> or
+<a href="struct.Database.html#method.collection_with_options"><code>Database::collection_with_options</code></a>.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Cursor.html" title="mongodb::Cursor struct">Cursor</a></div><div class="item-right docblock-short">A <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> streams the result of a query. When a query is made, the returned <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> will
+contain the first batch of results from the server; the individual results will then be returned
+as the <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> is iterated. When the batch is exhausted and if there are more results, the
+<a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> will fetch the next batch of documents, and so forth until the results are exhausted.
+Note that because of this batching, additional network I/O may occur on any given call to
+<code>next</code>. Because of this, a <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> iterates over <code>Result&lt;T&gt;</code> items rather than
+simply <code>T</code> items.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Database.html" title="mongodb::Database struct">Database</a></div><div class="item-right docblock-short"><code>Database</code> is the client-side abstraction of a MongoDB database. It can be used to perform
+database-level operations or to obtain handles to specific collections within the database. A
+<code>Database</code> can only be obtained through a <a href="struct.Client.html"><code>Client</code></a> by calling either
+<a href="struct.Client.html#method.database"><code>Client::database</code></a> or
+<a href="struct.Client.html#method.database_with_options"><code>Client::database_with_options</code></a>.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IndexModel.html" title="mongodb::IndexModel struct">IndexModel</a></div><div class="item-right docblock-short">Specifies the fields and options for an index. For more information, see the <a href="https://www.mongodb.com/docs/manual/indexes/">documentation</a>.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Namespace.html" title="mongodb::Namespace struct">Namespace</a></div><div class="item-right docblock-short">A struct modeling the canonical name for a collection in MongoDB.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerInfo.html" title="mongodb::ServerInfo struct">ServerInfo</a></div><div class="item-right docblock-short">A description of the most up-to-date information known about a server. Further details can be
+found in the <a href="https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst">Server Discovery and Monitoring specification</a>.</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SessionCursor.html" title="mongodb::SessionCursor struct">SessionCursor</a></div><div class="item-right docblock-short">A <a href="struct.SessionCursor.html" title="SessionCursor"><code>SessionCursor</code></a> is a cursor that was created with a <a href="struct.ClientSession.html" title="ClientSession"><code>ClientSession</code></a> that must be iterated
+using one. To iterate, use <a href="struct.SessionCursor.html#method.next" title="SessionCursor::next"><code>SessionCursor::next</code></a> or retrieve a <a href="struct.SessionCursorStream.html" title="SessionCursorStream"><code>SessionCursorStream</code></a> using
+<a href="struct.SessionCursor.html#method.stream" title="SessionCursor::stream"><code>SessionCursor::stream</code></a>:</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SessionCursorStream.html" title="mongodb::SessionCursorStream struct">SessionCursorStream</a></div><div class="item-right docblock-short">A type that implements <a href="https://docs.rs/futures/latest/futures/stream/index.html"><code>Stream</code></a> which can be used to
+stream the results of a <a href="struct.SessionCursor.html" title="SessionCursor"><code>SessionCursor</code></a>. Returned from <a href="struct.SessionCursor.html#method.stream" title="SessionCursor::stream"><code>SessionCursor::stream</code></a>.</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ServerType.html" title="mongodb::ServerType enum">ServerType</a></div><div class="item-right docblock-short">Enum representing the possible types of servers that the driver can connect to.</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TopologyType.html" title="mongodb::TopologyType enum">TopologyType</a></div><div class="item-right docblock-short">The possible types for a topology.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Build `App`, `Arg`s, `SubCommand`s and `Group`s with Usage-string like input but without the associated parsing runtime cost."><meta name="keywords" content="rust, rustlang, rust-lang, clap_app"><title>clap_app in clap - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><div class="sidebar-elems"><h2><a href="index.html">In clap</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Macro <a href="index.html">clap</a>::<wbr><a class="macro" href="#">clap_app</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/clap/macros.rs.html#666-816">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><div class="item-decl"><div class="example-wrap"><pre class="rust macro"><code><span class="macro">macro_rules! </span>clap_app {
+    (@app (<span class="macro-nonterminal">$builder</span>:expr)) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@arg (<span class="macro-nonterminal">$name</span>:expr): $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@arg <span class="macro-nonterminal">$name</span>:ident: $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@setting <span class="macro-nonterminal">$setting</span>:ident) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@attributes $(<span class="macro-nonterminal">$attr</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@group <span class="macro-nonterminal">$name</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@group <span class="macro-nonterminal">$name</span>:ident !<span class="macro-nonterminal">$ident</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@group <span class="macro-nonterminal">$name</span>:ident +<span class="macro-nonterminal">$ident</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (@subcommand <span class="macro-nonterminal">$name</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@app (<span class="macro-nonterminal">$builder</span>:expr) (<span class="macro-nonterminal">$ident</span>:ident: $(<span class="macro-nonterminal">$v</span>:expr),<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@group (<span class="macro-nonterminal">$builder</span>:expr, <span class="macro-nonterminal">$group</span>:expr)) =&gt; { ... };
+    (@group (<span class="macro-nonterminal">$builder</span>:expr, <span class="macro-nonterminal">$group</span>:expr) (@attributes $(<span class="macro-nonterminal">$attr</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@group (<span class="macro-nonterminal">$builder</span>:expr, <span class="macro-nonterminal">$group</span>:expr) (@arg <span class="macro-nonterminal">$name</span>:ident: $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt --(<span class="macro-nonterminal">$long</span>:expr) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt --<span class="macro-nonterminal">$long</span>:ident $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt -<span class="macro-nonterminal">$short</span>:ident $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) (-) &lt;<span class="macro-nonterminal">$var</span>:ident&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) (+) &lt;<span class="macro-nonterminal">$var</span>:ident&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) (-) [<span class="macro-nonterminal">$var</span>:ident] $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) (+) [<span class="macro-nonterminal">$var</span>:ident] $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt ... $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt #{<span class="macro-nonterminal">$n</span>:expr, <span class="macro-nonterminal">$m</span>:expr} $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt * $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt !<span class="macro-nonterminal">$ident</span>:ident $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt +<span class="macro-nonterminal">$ident</span>:ident $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt {<span class="macro-nonterminal">$fn_</span>:expr} $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@as_expr <span class="macro-nonterminal">$expr</span>:expr) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt <span class="macro-nonterminal">$desc</span>:tt) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt <span class="macro-nonterminal">$ident</span>:ident[$(<span class="macro-nonterminal">$target</span>:ident)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt <span class="macro-nonterminal">$ident</span>:ident($(<span class="macro-nonterminal">$expr</span>:expr),<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@arg (<span class="macro-nonterminal">$arg</span>:expr) <span class="macro-nonterminal">$modes</span>:tt <span class="macro-nonterminal">$ident</span>:ident($(<span class="macro-nonterminal">$expr</span>:expr,)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (@subcommand <span class="macro-nonterminal">$name</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    ((<span class="macro-nonterminal">$name</span>:expr) =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+    (<span class="macro-nonterminal">$name</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; { ... };
+}</code></pre></div>
+</div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Build <code>App</code>, <code>Arg</code>s, <code>SubCommand</code>s and <code>Group</code>s with Usage-string like input
+but without the associated parsing runtime cost.</p>
+<p><code>clap_app!</code> also supports several shorthand syntaxes.</p>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>matches = <span class="macro">clap_app!</span>(myapp =&gt;
+    (version: <span class="string">&quot;1.0&quot;</span>)
+    (author: <span class="string">&quot;Kevin K. &lt;kbknapp@gmail.com&gt;&quot;</span>)
+    (about: <span class="string">&quot;Does awesome things&quot;</span>)
+    (@arg CONFIG: -c --config +takes_value <span class="string">&quot;Sets a custom config file&quot;</span>)
+    (@arg INPUT: +required <span class="string">&quot;Sets the input file to use&quot;</span>)
+    (@arg debug: -d ... <span class="string">&quot;Sets the level of debugging information&quot;</span>)
+    (@group difficulty =&gt;
+        (@arg hard: -h --hard <span class="string">&quot;Sets hard mode&quot;</span>)
+        (@arg normal: -n --normal <span class="string">&quot;Sets normal mode&quot;</span>)
+        (@arg easy: -e --easy <span class="string">&quot;Sets easy mode&quot;</span>)
+    )
+    (@subcommand test =&gt;
+        (about: <span class="string">&quot;controls testing features&quot;</span>)
+        (version: <span class="string">&quot;1.3&quot;</span>)
+        (author: <span class="string">&quot;Someone E. &lt;someone_else@other.com&gt;&quot;</span>)
+        (@arg verbose: -v --verbose <span class="string">&quot;Print test information verbosely&quot;</span>)
+    )
+)
+.get_matches();</code></pre></div>
+<h2 id="shorthand-syntax-for-args"><a href="#shorthand-syntax-for-args">Shorthand Syntax for Args</a></h2>
+<ul>
+<li>A single hyphen followed by a character (such as <code>-c</code>) sets the <a href="./struct.Arg.html#method.short"><code>Arg::short</code></a></li>
+<li>A double hyphen followed by a character or word (such as <code>--config</code>) sets <a href="./struct.Arg.html#method.long"><code>Arg::long</code></a>
+<ul>
+<li>If one wishes to use a <a href="./struct.Arg.html#method.long"><code>Arg::long</code></a> with a hyphen inside (i.e. <code>--config-file</code>), you
+must use <code>--(&quot;config-file&quot;)</code> due to limitations of the Rust macro system.</li>
+</ul>
+</li>
+<li>Three dots (<code>...</code>) sets <a href="./struct.Arg.html#method.multiple"><code>Arg::multiple(true)</code></a></li>
+<li>Angled brackets after either a short or long will set <a href="./struct.Arg.html#method.value_name"><code>Arg::value_name</code></a> and
+<code>Arg::required(true)</code> such as <code>--config &lt;FILE&gt;</code> = <code>Arg::value_name(&quot;FILE&quot;)</code> and
+<code>Arg::required(true)</code></li>
+<li>Square brackets after either a short or long will set <a href="./struct.Arg.html#method.value_name"><code>Arg::value_name</code></a> and
+<code>Arg::required(false)</code> such as <code>--config [FILE]</code> = <code>Arg::value_name(&quot;FILE&quot;)</code> and
+<code>Arg::required(false)</code></li>
+<li>There are short hand syntaxes for Arg methods that accept booleans
+<ul>
+<li>A plus sign will set that method to <code>true</code> such as <code>+required</code> = <code>Arg::required(true)</code></li>
+<li>An exclamation will set that method to <code>false</code> such as <code>!required</code> = <code>Arg::required(false)</code></li>
+</ul>
+</li>
+<li>A <code>#{min, max}</code> will set <a href="./struct.Arg.html#method.min_values"><code>Arg::min_values(min)</code></a> and <a href="./struct.Arg.html#method.max_values"><code>Arg::max_values(max)</code></a></li>
+<li>An asterisk (<code>*</code>) will set <code>Arg::required(true)</code></li>
+<li>Curly brackets around a <code>fn</code> will set <a href="./struct.Arg.html#method.validator"><code>Arg::validator</code></a> as in <code>{fn}</code> = <code>Arg::validator(fn)</code></li>
+<li>An Arg method that accepts a string followed by square brackets will set that method such as
+<code>conflicts_with[FOO]</code> will set <code>Arg::conflicts_with(&quot;FOO&quot;)</code> (note the lack of quotes around
+<code>FOO</code> in the macro)</li>
+<li>An Arg method that takes a string and can be set multiple times (such as
+<a href="./struct.Arg.html#method.conflicts_with"><code>Arg::conflicts_with</code></a>) followed by square brackets and a list of values separated by spaces
+will set that method such as <code>conflicts_with[FOO BAR BAZ]</code> will set
+<code>Arg::conflicts_with(&quot;FOO&quot;)</code>, <code>Arg::conflicts_with(&quot;BAR&quot;)</code>, and <code>Arg::conflicts_with(&quot;BAZ&quot;)</code>
+(note the lack of quotes around the values in the macro)</li>
+</ul>
+<h2 id="shorthand-syntax-for-groups"><a href="#shorthand-syntax-for-groups">Shorthand Syntax for Groups</a></h2>
+<ul>
+<li>There are short hand syntaxes for <code>ArgGroup</code> methods that accept booleans
+<ul>
+<li>A plus sign will set that method to <code>true</code> such as <code>+required</code> = <code>ArgGroup::required(true)</code></li>
+<li>An exclamation will set that method to <code>false</code> such as <code>!required</code> = <code>ArgGroup::required(false)</code></li>
+</ul>
+</li>
+</ul>
+</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="clap" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

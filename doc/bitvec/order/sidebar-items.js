@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["verify","Complete `BitOrder` Verification"],["verify_for_type","Single-Type `BitOrder` Verification"]],"struct":[["Lsb0","Least-Significant-First Bit Traversal"],["Msb0","Most-Significant-First Bit Traversal"]],"trait":[["BitOrder","In-Element Bit Ordering"]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["error","Error types"],["future","Future types"]],"struct":[["Timeout","Applies a timeout to requests."],["TimeoutLayer","Applies a timeout to requests via the supplied inner service."]]};

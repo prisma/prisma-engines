@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The JSON-RPC API definition."><meta name="keywords" content="rust, rustlang, rust-lang, json_rpc"><title>migration_core::json_rpc - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Module json_rpc</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#modules">Modules</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Module <a href="../index.html">migration_core</a>::<wbr><a class="mod" href="#">json_rpc</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../../src/migration_core/build/prisma-engines-source/target/debug/build/migration-core-8e36b27d01c51c7a/out/methods.rs.html#1">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The JSON-RPC API definition.</p>
+<h3 id="methods"><a href="#methods">Methods</a></h3><h4 id="-applymigrations"><a href="#-applymigrations">🔌 applyMigrations</a></h4>
+<p>➡️  <a href="./types/struct.ApplyMigrationsInput.html">ApplyMigrationsInput</a></p>
+<p>↩️  <a href="./types/struct.ApplyMigrationsOutput.html">ApplyMigrationsOutput</a></p>
+<p>Apply the migrations from the migrations directory to the database.</p>
+<p>This is the command behind <code>prisma migrate deploy</code>.</p>
+<h4 id="-createdatabase"><a href="#-createdatabase">🔌 createDatabase</a></h4>
+<p>➡️  <a href="./types/struct.CreateDatabaseParams.html">CreateDatabaseParams</a></p>
+<p>↩️  <a href="./types/struct.CreateDatabaseResult.html">CreateDatabaseResult</a></p>
+<p>Create the logical database from the Prisma schema.</p>
+<h4 id="-createmigration"><a href="#-createmigration">🔌 createMigration</a></h4>
+<p>➡️  <a href="./types/struct.CreateMigrationInput.html">CreateMigrationInput</a></p>
+<p>↩️  <a href="./types/struct.CreateMigrationOutput.html">CreateMigrationOutput</a></p>
+<p>Create the next migration in the migrations history. If <code>draft</code> is false and
+there are no unexecutable steps, it will also apply the newly created
+migration.</p>
+<p><strong>Note</strong>: This will use the shadow database on the connectors where we need
+one.</p>
+<h4 id="-dbexecute"><a href="#-dbexecute">🔌 dbExecute</a></h4>
+<p>➡️  <a href="./types/struct.DbExecuteParams.html">DbExecuteParams</a></p>
+<p>↩️  <a href="./types/struct.DbExecuteResult.html">DbExecuteResult</a></p>
+<p>Execute a database script directly on the specified live database.</p>
+<p>Note that this may not be
+defined on all connectors.</p>
+<h4 id="-debugpanic"><a href="#-debugpanic">🔌 debugPanic</a></h4>
+<p>➡️  <a href="./types/struct.DebugPanicInput.html">DebugPanicInput</a></p>
+<p>↩️  <a href="./types/struct.DebugPanicOutput.html">DebugPanicOutput</a></p>
+<p>Make the migration engine panic. Only useful to test client error handling.</p>
+<h4 id="-devdiagnostic"><a href="#-devdiagnostic">🔌 devDiagnostic</a></h4>
+<p>➡️  <a href="./types/struct.DevDiagnosticInput.html">DevDiagnosticInput</a></p>
+<p>↩️  <a href="./types/struct.DevDiagnosticOutput.html">DevDiagnosticOutput</a></p>
+<p>The method called at the beginning of <code>migrate dev</code> to decide the course of
+action based on the current state of the workspace.</p>
+<p>It acts as a wrapper around diagnoseMigrationHistory. Its role is to interpret
+the diagnostic output, and translate it to a concrete action to be performed by
+the CLI.</p>
+<h4 id="-diagnosemigrationhistory"><a href="#-diagnosemigrationhistory">🔌 diagnoseMigrationHistory</a></h4>
+<p>➡️  <a href="./types/struct.DiagnoseMigrationHistoryInput.html">DiagnoseMigrationHistoryInput</a></p>
+<p>↩️  <a href="./types/struct.DiagnoseMigrationHistoryOutput.html">DiagnoseMigrationHistoryOutput</a></p>
+<p>Read the contents of the migrations directory and the migrations table,
+and returns their relative statuses. At this stage, the migration
+engine only reads, it does not write to the database nor the migrations
+directory, nor does it use a shadow database.</p>
+<h4 id="-diff"><a href="#-diff">🔌 diff</a></h4>
+<p>➡️  <a href="./types/struct.DiffParams.html">DiffParams</a></p>
+<p>↩️  <a href="./types/struct.DiffResult.html">DiffResult</a></p>
+<p>Compares two databases schemas from two arbitrary sources, and display the
+difference as either a human-readable summary, or an executable script that can
+be passed to dbExecute.</p>
+<p>Connection to a shadow database is only necessary when either the <code>from</code> or the
+<code>to</code> params is a migrations directory.</p>
+<p>Diffs have a <em>direction</em>. Which source is <code>from</code> and which is <code>to</code> matters. The
+resulting diff should be thought as a migration from the schema in <code>from</code> to
+the schema in <code>to</code>.</p>
+<p>By default, we output a human-readable diff. If you want an executable script,
+pass the <code>&quot;script&quot;: true</code> param.</p>
+<h4 id="-ensureconnectionvalidity"><a href="#-ensureconnectionvalidity">🔌 ensureConnectionValidity</a></h4>
+<p>➡️  <a href="./types/struct.EnsureConnectionValidityParams.html">EnsureConnectionValidityParams</a></p>
+<p>↩️  <a href="./types/struct.EnsureConnectionValidityResult.html">EnsureConnectionValidityResult</a></p>
+<p>Make sure the migration engine can connect to the database from the Prisma schema.</p>
+<h4 id="-evaluatedataloss"><a href="#-evaluatedataloss">🔌 evaluateDataLoss</a></h4>
+<p>➡️  <a href="./types/struct.EvaluateDataLossInput.html">EvaluateDataLossInput</a></p>
+<p>↩️  <a href="./types/struct.EvaluateDataLossOutput.html">EvaluateDataLossOutput</a></p>
+<p>Development command for migrations. Evaluate the data loss induced by the next
+migration the engine would generate on the main database.</p>
+<p>At this stage, the engine does not create or mutate anything in the database
+nor in the migrations directory.</p>
+<p>This is part of the <code>migrate dev</code> flow.</p>
+<p><strong>Note</strong>: the engine currently assumes the main database schema is up-to-date
+with the migration history.</p>
+<h4 id="-getdatabaseversion"><a href="#-getdatabaseversion">🔌 getDatabaseVersion</a></h4>
+<p>➡️  <a href="./types/struct.GetDatabaseVersionInput.html">GetDatabaseVersionInput</a></p>
+<p>↩️  <a href="./types/struct.GetDatabaseVersionOutput.html">GetDatabaseVersionOutput</a></p>
+<p>Get the database version for error reporting.</p>
+<h4 id="-introspect"><a href="#-introspect">🔌 introspect</a></h4>
+<p>➡️  <a href="./types/struct.IntrospectParams.html">IntrospectParams</a></p>
+<p>↩️  <a href="./types/struct.IntrospectResult.html">IntrospectResult</a></p>
+<p>Introspect the database (db pull)</p>
+<h4 id="-listmigrationdirectories"><a href="#-listmigrationdirectories">🔌 listMigrationDirectories</a></h4>
+<p>➡️  <a href="./types/struct.ListMigrationDirectoriesInput.html">ListMigrationDirectoriesInput</a></p>
+<p>↩️  <a href="./types/struct.ListMigrationDirectoriesOutput.html">ListMigrationDirectoriesOutput</a></p>
+<p>List the names of the migrations in the migrations directory.</p>
+<h4 id="-markmigrationapplied"><a href="#-markmigrationapplied">🔌 markMigrationApplied</a></h4>
+<p>➡️  <a href="./types/struct.MarkMigrationAppliedInput.html">MarkMigrationAppliedInput</a></p>
+<p>↩️  <a href="./types/struct.MarkMigrationAppliedOutput.html">MarkMigrationAppliedOutput</a></p>
+<p>Mark a migration as applied in the migrations table.</p>
+<p>There are two possible outcomes:</p>
+<ul>
+<li>The migration is already in the table, but in a failed state. In this case, we will mark it
+as rolled back, then create a new entry.</li>
+<li>The migration is not in the table. We will create a new entry in the migrations table. The
+<code>started_at</code> and <code>finished_at</code> will be the same.</li>
+<li>If it is already applied, we return a user-facing error.</li>
+</ul>
+<h4 id="-markmigrationrolledback"><a href="#-markmigrationrolledback">🔌 markMigrationRolledBack</a></h4>
+<p>➡️  <a href="./types/struct.MarkMigrationRolledBackInput.html">MarkMigrationRolledBackInput</a></p>
+<p>↩️  <a href="./types/struct.MarkMigrationRolledBackOutput.html">MarkMigrationRolledBackOutput</a></p>
+<p>Mark an existing failed migration as rolled back in the migrations table. It
+will still be there, but ignored for all purposes except as audit trail.</p>
+<h4 id="-reset"><a href="#-reset">🔌 reset</a></h4>
+<p>➡️  <a href="./types/struct.ResetInput.html">ResetInput</a></p>
+<p>↩️  <a href="./types/struct.ResetOutput.html">ResetOutput</a></p>
+<p>Try to make the database empty: no data and no schema. On most connectors, this
+is implemented by dropping and recreating the database. If that fails (most
+likely because of insufficient permissions), the engine attemps a “best effort
+reset” by inspecting the contents of the database and dropping them
+individually.</p>
+<p>Drop and recreate the database. The migrations will not be applied, as it would
+overlap with <code>applyMigrations</code>.</p>
+<h4 id="-schemapush"><a href="#-schemapush">🔌 schemaPush</a></h4>
+<p>➡️  <a href="./types/struct.SchemaPushInput.html">SchemaPushInput</a></p>
+<p>↩️  <a href="./types/struct.SchemaPushOutput.html">SchemaPushOutput</a></p>
+<p>The command behind <code>db push</code>.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="method_names/index.html" title="migration_core::json_rpc::method_names mod">method_names</a></div><div class="item-right docblock-short">String constants for method names.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="types/index.html" title="migration_core::json_rpc::types mod">types</a></div><div class="item-right docblock-short">API type definitions used by the methods.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="migration_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

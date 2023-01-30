@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Path",""]],"trait":[["PathTraverser","Trait for traversing based on Path"]]};

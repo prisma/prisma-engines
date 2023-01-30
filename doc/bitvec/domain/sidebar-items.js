@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["BitDomain","Bit-Slice Partitioning"],["Domain","Bit-Slice Element Partitioning"]],"struct":[["PartialElement","Partially-Owned Memory Element"]]};

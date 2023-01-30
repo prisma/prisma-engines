@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Identity","A no-op middleware."],["Stack","Two middlewares chained together."]]};

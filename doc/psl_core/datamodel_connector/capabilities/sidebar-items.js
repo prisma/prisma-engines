@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["ConnectorCapability",""]],"struct":[["ConnectorCapabilities","Contains all capabilities that the connector is able to serve."]]};

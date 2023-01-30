@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["RawFlags","Wrapper for raw flags value."]]};
