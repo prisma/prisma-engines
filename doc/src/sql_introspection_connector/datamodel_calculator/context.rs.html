@@ -486,7 +486,7 @@
         // Removing the filter when all connectors are done.
         </span><span class="self">self</span>.sql_schema
             .view_walkers()
-            .filter(|v| !v.columns().len() &gt; <span class="number">0</span>)
+            .filter(|v| v.columns().len() &gt; <span class="number">0</span>)
             .map(|next| {
                 <span class="kw">let </span>previous = <span class="self">self</span>.existing_view(next.id);
                 Pair::new(<span class="self">self</span>, previous, next)
