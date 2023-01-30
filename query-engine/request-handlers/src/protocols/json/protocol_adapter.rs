@@ -226,7 +226,11 @@ impl JsonProtocolAdapter {
     }
 
     fn default_scalar_selection(object_type: &ObjectTypeStrongRef, selection: &mut Selection) {
-        for scalar in object_type.get_fields().iter().filter(|f| f.field_type.is_scalar()) {
+        for scalar in object_type
+            .get_fields()
+            .iter()
+            .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list())
+        {
             selection.push_nested_selection(Selection::with_name(scalar.name.to_owned()));
         }
     }
@@ -305,6 +309,7 @@ mod tests {
             id String @id @map("_id")
             name String?
             email String @unique
+            tags  String[]
             posts Post[]
             address Address
           }
@@ -366,6 +371,12 @@ mod tests {
                     },
                     Selection {
                         name: "email",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: "tags",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
@@ -525,6 +536,12 @@ mod tests {
                         arguments: [],
                         nested_selections: [],
                     },
+                    Selection {
+                        name: "tags",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
                 ],
             },
         )
@@ -575,6 +592,12 @@ mod tests {
                     },
                     Selection {
                         name: "email",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: "tags",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
