@@ -136,7 +136,7 @@ impl From<user_facing_errors::Error> for GQLError {
 impl From<CoreError> for GQLError {
     fn from(err: CoreError) -> GQLError {
         GQLError {
-            error: format!("{}", err),
+            error: format!("{err}"),
             user_facing_error: err.into(),
         }
     }
