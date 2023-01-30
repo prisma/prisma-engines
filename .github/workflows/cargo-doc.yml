@@ -15,42 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Generate docs
-        run: cargo doc --workspace
-
-      - name: Move docs to gh-pages branch
-        run: |
-          mkdir -p /tmp/cargo-doc-output
-          mv target/doc /tmp/cargo-doc-output/doc
-
-      - uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-
-      - name: Replace old docs with new docs
-        run: |
-          rm -rf ./doc
-          mv /tmp/cargo-doc-output/doc doc
-
-      - name: Commit and push new docs
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: cargo docs for ${{ env.GITHUB_SHA }}
-          branch: gh-pages
-          commit_user_name: prisma-bot
-          commit_user_email: prismabots@gmail.com
-          commit_author: prisma-bot <prismabots@gmail.com>
-
+      - uses: cachix/install-nix-action@v18
+      - run: |
+          git config user.email "prismabots@gmail.com"
+          git config user.name "prisma-bot"
+      - run: nix run .#publish-cargo-docs
