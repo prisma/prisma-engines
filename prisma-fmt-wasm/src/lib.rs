@@ -12,7 +12,7 @@ pub fn get_config(params: String) -> Result<String, JsError> {
 }
 
 #[wasm_bindgen]
-pub fn get_dmmf(params: String) -> String {
+pub fn get_dmmf(params: String) -> Result<String, String> {
     prisma_fmt::get_dmmf(params)
 }
 
