@@ -1,4 +1,7 @@
+mod asserts;
+
 pub use ::indoc::{formatdoc, indoc};
+pub(crate) use asserts::*;
 pub use dml::*;
 pub use expect_test::expect;
 
