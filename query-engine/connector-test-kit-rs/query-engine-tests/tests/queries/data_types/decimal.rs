@@ -48,7 +48,7 @@ mod decimal {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"decimal":{"$type":"Decimal","$value":"12.3456"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"decimal":{"$type":"Decimal","value":"12.3456"}}}}"###
                 );
             }
         }
@@ -86,7 +86,7 @@ mod decimal {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"decimal":{"$type":"Decimal","$value":"12.3456"}},{"decimal":{"$type":"Decimal","$value":"-1.2345678"}},{"decimal":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"decimal":{"$type":"Decimal","value":"12.3456"}},{"decimal":{"$type":"Decimal","value":"-1.2345678"}},{"decimal":null}]}}"###
                 );
             }
         }

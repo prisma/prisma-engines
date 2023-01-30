@@ -37,7 +37,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","$value":"{}"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"{}"}}}}"###
                 );
             }
         }
@@ -75,7 +75,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","$value":"{}"}},{"json":{"$type":"Json","$value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","$value":"1"}},{"json":{"$type":"Json","$value":"\"hello\""}},{"json":{"$type":"Json","$value":"[1,\"a\",{\"b\":true}]"}}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}}]}}"###
                 );
             }
         }
@@ -114,7 +114,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"json":null},{"json":{"$type":"Json","$value":"null"}}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"json":null},{"json":{"$type":"Json","value":"null"}}]}}"###
                 );
             }
         }

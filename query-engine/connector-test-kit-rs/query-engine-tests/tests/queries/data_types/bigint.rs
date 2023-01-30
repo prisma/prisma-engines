@@ -37,7 +37,7 @@ mod bigint {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"bInt":{"$type":"BigInt","$value":"10000000000"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"bInt":{"$type":"BigInt","value":"10000000000"}}}}"###
                 );
             }
         }
@@ -75,7 +75,7 @@ mod bigint {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"bInt":{"$type":"BigInt","$value":"10000000000"}},{"bInt":{"$type":"BigInt","$value":"-10000000000"}},{"bInt":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"bInt":{"$type":"BigInt","value":"10000000000"}},{"bInt":{"$type":"BigInt","value":"-10000000000"}},{"bInt":null}]}}"###
                 );
             }
         }
