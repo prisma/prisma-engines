@@ -55,7 +55,7 @@ impl TxTraceExt for crate::TxId {
 
     fn as_traceparent(&self) -> String {
         let trace_id = self.clone().into_trace_id();
-        format!("00-{}-0000000000000001-01", trace_id)
+        format!("00-{trace_id}-0000000000000001-01")
     }
 }
 
