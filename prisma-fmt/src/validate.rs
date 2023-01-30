@@ -7,14 +7,14 @@ pub(crate) fn run(input_schema: &str) -> Result<(), String> {
     }
 
     use std::fmt::Write as _;
-    let mut formatted_error = diagnostics.to_pretty_string("schema.prisma", &input_schema);
+    let mut formatted_error = diagnostics.to_pretty_string("schema.prisma", input_schema);
     write!(
         formatted_error,
         "\nValidation Error Count: {}",
         diagnostics.errors().len(),
     )
     .unwrap();
-    return Err(formatted_error);
+    Err(formatted_error)
 }
 
 #[cfg(test)]
@@ -57,7 +57,7 @@ mod tests {
 
             Validation Error Count: 3"#]];
 
-        let response = run(&schema).unwrap_err();
+        let response = run(schema).unwrap_err();
         expected.assert_eq(&response);
     }
 
@@ -70,7 +70,7 @@ mod tests {
             }
         "#;
 
-        run(&schema).unwrap();
+        run(schema).unwrap();
     }
 
     #[test]
@@ -83,7 +83,7 @@ mod tests {
             }
         "#;
 
-        run(&schema).unwrap();
+        run(schema).unwrap();
     }
 
     #[test]
@@ -107,7 +107,7 @@ mod tests {
             [1;94m   | [0m
 
             Validation Error Count: 1"#]];
-        let response = run(&schema).unwrap_err();
+        let response = run(schema).unwrap_err();
         expected.assert_eq(&response);
     }
 }
