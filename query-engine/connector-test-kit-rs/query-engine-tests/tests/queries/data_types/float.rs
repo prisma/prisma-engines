@@ -14,7 +14,7 @@ mod float {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"float":"10000000000"}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"float":1.2}}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -55,7 +55,7 @@ mod float {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"float":"10000000000"},{"float":"-10000000000"},{"float":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":null}]}}"###
                 );
             }
             EngineProtocol::Json => {

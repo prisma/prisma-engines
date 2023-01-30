@@ -25,7 +25,7 @@ mod decimal {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"decimal":"10000000000"}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"decimal":"12.3456"}}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -66,7 +66,7 @@ mod decimal {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"decimal":"10000000000"},{"decimal":"-10000000000"},{"decimal":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"decimal":"12.3456"},{"decimal":"-1.2345678"},{"decimal":null}]}}"###
                 );
             }
             query_engine_tests::EngineProtocol::Json => {
