@@ -231,6 +231,10 @@
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{error::PrismaError, PrismaResult};
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::{env, ffi::OsStr, fs::File, io::Read};
@@ -335,6 +339,10 @@
     <span class="doccomment">/// Enable OpenTelemetry streaming from requests.
     </span><span class="attr">#[structopt(long)]
     </span><span class="kw">pub </span>enable_open_telemetry: bool,
+
+    <span class="attr">#[structopt(long)]
+    </span><span class="doccomment">/// Enable tracer to capture logs and traces and return in the response
+    </span><span class="kw">pub </span>enable_telemetry_in_response: bool,
 
     <span class="doccomment">/// The url to the OpenTelemetry collector.
     /// Enabling this will send the OpenTelemtry tracing to a collector

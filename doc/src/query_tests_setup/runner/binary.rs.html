@@ -244,6 +244,12 @@
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
 <span class="kw">use </span>query_core::{schema::QuerySchemaRef, TxId};
 <span class="kw">use </span>query_engine::opt::PrismaOpt;
@@ -266,7 +272,13 @@
 <span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>RunnerInterface <span class="kw">for </span>BinaryRunner {
     <span class="kw">async fn </span>load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>opts = PrismaOpt::from_list(<span class="kw-2">&amp;</span>[<span class="string">&quot;binary&quot;</span>, <span class="string">&quot;--enable-raw-queries&quot;</span>, <span class="string">&quot;--datamodel&quot;</span>, <span class="kw-2">&amp;</span>datamodel]);
+        <span class="kw">let </span>opts = PrismaOpt::from_list(<span class="kw-2">&amp;</span>[
+            <span class="string">&quot;binary&quot;</span>,
+            <span class="string">&quot;--enable-raw-queries&quot;</span>,
+            <span class="string">&quot;--enable-telemetry-in-response&quot;</span>,
+            <span class="string">&quot;--datamodel&quot;</span>,
+            <span class="kw-2">&amp;</span>datamodel,
+        ]);
         <span class="kw">let </span>state = setup(<span class="kw-2">&amp;</span>opts, <span class="bool-val">false</span>, <span class="prelude-val">Some</span>(metrics)).<span class="kw">await</span>.unwrap();
 
         <span class="kw">let </span>configuration = opts.configuration(<span class="bool-val">true</span>).unwrap();

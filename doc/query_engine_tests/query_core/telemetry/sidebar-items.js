@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["helpers",""],["models",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["capturing","Telemetry Capturing is the process of recording the logs and traces happening during a request to the binary engine, and rendering them in the response."],["helpers",""],["models",""]]};

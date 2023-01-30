@@ -68,6 +68,10 @@
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{context::PrismaContext, logger::Logger, opt::PrismaOpt, PrismaResult};
 <span class="kw">use </span>psl::PreviewFeature;
 <span class="kw">use </span>query_core::schema::QuerySchemaRef;
@@ -111,7 +115,11 @@
     logger.log_format(opts.log_format());
     logger.log_queries(opts.log_queries());
     logger.enable_metrics(metrics.clone());
-    logger.setup_telemetry(opts.enable_open_telemetry, <span class="kw-2">&amp;</span>opts.open_telemetry_endpoint);
+    logger.setup_telemetry(
+        opts.enable_open_telemetry,
+        opts.enable_telemetry_in_response,
+        <span class="kw-2">&amp;</span>opts.open_telemetry_endpoint,
+    );
 
     <span class="kw">if </span>install_logger {
         logger.install().unwrap();

@@ -207,6 +207,7 @@
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
 <a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre><pre class="rust"><code><span class="kw">use </span>opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>serde_json::json;
@@ -321,7 +322,8 @@
 <span class="attr">#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Event {
     <span class="kw">pub</span>(<span class="kw">super</span>) span_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) name: String,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;String::is_empty&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">super</span>) level: String,
     <span class="kw">pub</span>(<span class="kw">super</span>) timestamp: HrTime,
     <span class="kw">pub</span>(<span class="kw">super</span>) attributes: HashMap&lt;String, serde_json::Value&gt;,

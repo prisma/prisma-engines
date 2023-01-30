@@ -106,6 +106,26 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::models::TraceSpan;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>opentelemetry::sdk::export::trace::SpanData;
@@ -149,9 +169,31 @@
     }
 }
 
+<span class="kw">pub fn </span>get_trace_parent_from_span(span: <span class="kw-2">&amp;</span>Span) -&gt; String {
+    <span class="kw">let </span>cx = span.context();
+    <span class="kw">let </span>binding = cx.span();
+    <span class="kw">let </span>span_context = binding.span_context();
+
+    <span class="macro">format!</span>(<span class="string">&quot;00-{}-{}-01&quot;</span>, span_context.trace_id(), span_context.span_id())
+}
+
+<span class="kw">pub fn </span>get_trace_id_from_span(span: <span class="kw-2">&amp;</span>Span) -&gt; TraceId {
+    <span class="kw">let </span>cx = span.context();
+    get_trace_id_from_context(<span class="kw-2">&amp;</span>cx)
+}
+
 <span class="kw">pub fn </span>get_trace_id_from_context(context: <span class="kw-2">&amp;</span>Context) -&gt; TraceId {
     <span class="kw">let </span>context_span = context.span();
     context_span.span_context().trace_id()
+}
+
+<span class="kw">pub fn </span>get_trace_id_from_traceparent(traceparent: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; TraceId {
+    traceparent
+        .unwrap_or(<span class="string">&quot;0-0-0-0&quot;</span>)
+        .split(<span class="string">&#39;-&#39;</span>)
+        .nth(<span class="number">1</span>)
+        .map(|id| TraceId::from_hex(id).unwrap_or(TraceId::INVALID))
+        .unwrap()
 }
 
 <span class="kw">pub enum </span>QueryEngineLogLevel {
@@ -200,10 +242,6 @@
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    user_facing_filter(meta)
-}
-
-<span class="kw">pub fn </span>user_facing_filter(meta: <span class="kw-2">&amp;</span>Metadata) -&gt; bool {
     <span class="kw">if </span><span class="kw-2">*</span>SHOW_ALL_TRACES {
         <span class="kw">return </span><span class="bool-val">true</span>;
     }
@@ -212,7 +250,9 @@
         <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    meta.target() == <span class="string">&quot;quaint::connector::metrics&quot; </span>&amp;&amp; meta.name() == <span class="string">&quot;quaint:query&quot;
+    <span class="comment">// spans describing a quaint query.
+    // TODO: should this span be made user_facing in quaint?
+    </span>meta.target() == <span class="string">&quot;quaint::connector::metrics&quot; </span>&amp;&amp; meta.name() == <span class="string">&quot;quaint:query&quot;
 </span>}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

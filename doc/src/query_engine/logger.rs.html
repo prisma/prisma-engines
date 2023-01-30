@@ -133,6 +133,14 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre><pre class="rust"><code><span class="kw">use </span>opentelemetry::{
     sdk::{trace::Config, Resource},
     KeyValue,
@@ -162,6 +170,9 @@
 </span><span class="kw">enum </span>TracingConfig {
     <span class="comment">// exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
     </span>Http(String),
+    <span class="comment">// captured means that traces will be captured in memory and exposed in the graphql response
+    // logs will be also exposed in the response when capturing is enabled
+    </span>Captured,
     <span class="comment">// stdout means that traces will be printed to standard output
     </span>Stdout,
     <span class="comment">// disabled means that tracing will be disabled
@@ -194,16 +205,17 @@
         <span class="self">self</span>.metrics = <span class="prelude-val">Some</span>(metrics);
     }
 
-    <span class="kw">pub fn </span>setup_telemetry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enable_telemetry: bool, endpoint: <span class="kw-2">&amp;</span>str) {
+    <span class="kw">pub fn </span>setup_telemetry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enable_telemetry: bool, enable_capturing: bool, endpoint: <span class="kw-2">&amp;</span>str) {
         <span class="kw">let </span>endpoint = <span class="kw">if </span>endpoint.is_empty() {
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(endpoint.to_owned())
         };
 
-        <span class="self">self</span>.tracing_config = <span class="kw">match </span>(enable_telemetry, endpoint) {
-            (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(endpoint)) =&gt; TracingConfig::Http(endpoint),
-            (<span class="bool-val">true</span>, <span class="prelude-val">None</span>) =&gt; TracingConfig::Stdout,
+        <span class="self">self</span>.tracing_config = <span class="kw">match </span>(enable_telemetry, enable_capturing, endpoint) {
+            (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; TracingConfig::Captured,
+            (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(endpoint)) =&gt; TracingConfig::Http(endpoint),
+            (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; TracingConfig::Stdout,
             <span class="kw">_ </span>=&gt; TracingConfig::Disabled,
         };
     }
@@ -235,6 +247,10 @@
             .with(<span class="self">self</span>.metrics.clone());
 
         <span class="kw">match </span><span class="self">self</span>.tracing_config {
+            TracingConfig::Captured =&gt; {
+                <span class="kw">let </span>log_queries = <span class="self">self</span>.log_queries;
+                telemetry::capturing::install_capturing_layer(subscriber, log_queries)
+            }
             TracingConfig::Http(<span class="kw-2">ref </span>endpoint) =&gt; {
                 <span class="comment">// Opentelemetry is enabled, but capturing is disabled, there&#39;s an endpoint to export
                 // the traces to.
