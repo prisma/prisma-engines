@@ -37,7 +37,7 @@ mod datetime {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"dt":{"$type":"DateTime","$value":"1900-10-10T01:10:10.001Z"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"dt":{"$type":"DateTime","value":"1900-10-10T01:10:10.001Z"}}}}"###
                 );
             }
         }
@@ -75,7 +75,7 @@ mod datetime {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"dt":{"$type":"DateTime","$value":"1900-10-10T01:10:10.001Z"}},{"dt":{"$type":"DateTime","$value":"1969-01-01T10:33:59.000Z"}},{"dt":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"dt":{"$type":"DateTime","value":"1900-10-10T01:10:10.001Z"}},{"dt":{"$type":"DateTime","value":"1969-01-01T10:33:59.000Z"}},{"dt":null}]}}"###
                 );
             }
         }

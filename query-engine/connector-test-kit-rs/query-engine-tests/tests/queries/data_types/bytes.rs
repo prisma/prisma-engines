@@ -37,7 +37,7 @@ mod bytes {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"bytes":{"$type":"Bytes","$value":"AQID"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"bytes":{"$type":"Bytes","value":"AQID"}}}}"###
                 );
             }
         }
@@ -75,7 +75,7 @@ mod bytes {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"bytes":{"$type":"Bytes","$value":"AQID"}},{"bytes":{"$type":"Bytes","$value":"dGVzdA=="}},{"bytes":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"bytes":{"$type":"Bytes","value":"AQID"}},{"bytes":{"$type":"Bytes","value":"dGVzdA=="}},{"bytes":null}]}}"###
                 );
             }
         }
