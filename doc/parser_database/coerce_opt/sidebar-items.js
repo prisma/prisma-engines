@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["boolean",""],["constant",""],["constant_with_span",""],["float",""],["function",""],["function_or_constant_with_span",""],["function_with_span",""],["integer",""],["string",""],["string_with_span",""]]};

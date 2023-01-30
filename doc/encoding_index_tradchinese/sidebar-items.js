@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["big5","Big5 and HKSCS."]]};

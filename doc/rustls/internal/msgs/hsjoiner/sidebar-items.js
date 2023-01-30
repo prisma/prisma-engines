@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["HandshakeJoiner","This works to reconstruct TLS handshake messages from individual TLS messages.  It’s guaranteed that TLS messages output from this layer contain precisely one handshake payload."]]};

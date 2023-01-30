@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["Error","A unified error enum that contains several errors that might occurr during the lifecycle of this driver"],["IoErrorKind","A list specifying general categories of I/O error."]],"struct":[["TokenError","An error token returned from the server."]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":[["BitOps","Types supporting maybe-atomic bitwise operations."],["NumericOps","Types supporting maybe-atomic arithmetic operations."]]};

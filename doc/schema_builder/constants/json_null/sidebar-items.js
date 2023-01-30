@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":[["ANY_NULL",""],["DB_NULL",""],["FILTER_ENUM_NAME","Name of the enum used for filter inputs."],["INPUT_ENUM_NAME","Name of the enum used for write inputs."],["JSON_NULL",""],["NULLABLE_INPUT_ENUM_NAME","Name of the enum used for write inputs, nullable field."]]};

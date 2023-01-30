@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["RawSeq","Same as `RawCons` but for a sequence of values."],["Seq","Sequence of serialized values (length serialized as `U`)."]],"trait":[["SeqRepr","Representation of a serialized bytes."]]};

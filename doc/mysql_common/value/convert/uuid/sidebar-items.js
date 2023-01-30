@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["UuidIr","Intermediate result of a Value-to-Uuid conversion."]]};

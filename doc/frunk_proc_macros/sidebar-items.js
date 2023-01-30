@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"macro":[["Path","Build a generic path that can be used for traversals"],["path","Add one to an expression."]]};

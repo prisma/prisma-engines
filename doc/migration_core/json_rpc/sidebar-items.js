@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["method_names","String constants for method names."],["types","API type definitions used by the methods."]]};

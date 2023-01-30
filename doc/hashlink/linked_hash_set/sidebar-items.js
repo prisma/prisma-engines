@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Difference",""],["Drain",""],["Intersection",""],["IntoIter",""],["Iter",""],["LinkedHashSet",""],["SymmetricDifference",""],["Union",""]]};

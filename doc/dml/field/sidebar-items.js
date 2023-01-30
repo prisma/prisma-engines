@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["Field","Represents a Field in a Model."],["FieldArity","Arity of a Field in a Model."],["FieldType","Datamodel field type."]],"struct":[["CompositeField","Represents a composite field."],["RelationField","Represents a relation field in a model."],["ScalarField","Represents a scalar field in a model."]]};

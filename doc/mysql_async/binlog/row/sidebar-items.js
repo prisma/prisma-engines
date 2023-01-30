@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["BinlogRowValueOptions","Bonlog rows event row value options."]],"struct":[["BinlogRow","Representation of a binlog row."],["BinlogRowToRowError",""],["UnknownBinlogRowValueOptions",""]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Saturating","Provides intentionally-saturating arithmetic on `T`."]]};

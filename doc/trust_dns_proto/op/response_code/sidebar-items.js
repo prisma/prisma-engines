@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["ResponseCode","The status code of the response to a query."]]};

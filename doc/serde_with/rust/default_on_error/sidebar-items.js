@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize T and return the [`Default`] value on error"],["serialize","Serialize value with the default serializer"]]};

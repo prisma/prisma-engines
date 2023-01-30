@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["iso_8859_1","Algorithmic mapping for ISO 8859-1."]],"struct":[["SingleByteDecoder","A decoder for single-byte encodings based on ASCII."],["SingleByteEncoder","An encoder for single-byte encodings based on ASCII."],["SingleByteEncoding","A common framework for single-byte encodings based on ASCII."]]};

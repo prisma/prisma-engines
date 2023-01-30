@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"type":[["Result","A specialized Result type for lexical operations."]]};

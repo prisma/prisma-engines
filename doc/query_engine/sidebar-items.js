@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["LogFormat",""]],"mod":[["cli",""],["context",""],["error",""],["logger",""],["opt",""],["server",""],["tracer",""]],"type":[["PrismaResult",""]]};

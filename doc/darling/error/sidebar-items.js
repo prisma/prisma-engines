@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Accumulator","Accumulator for errors, for helping call [`Error::multiple`]."],["Error","An error encountered during attribute parsing."],["IntoIter","An iterator that moves out of an `Error`."]],"type":[["Result","An alias of `Result` specific to attribute parsing."]]};

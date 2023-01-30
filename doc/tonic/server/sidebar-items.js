@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Grpc","A gRPC Server handler."]],"trait":[["ClientStreamingService","A specialization of tower_service::Service."],["ServerStreamingService","A specialization of tower_service::Service."],["StreamingService","A specialization of tower_service::Service."],["UnaryService","A specialization of tower_service::Service."]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Grpc","A gRPC client dispatcher."]],"trait":[["GrpcService","Definition of the gRPC trait alias for `tower_service`."]]};

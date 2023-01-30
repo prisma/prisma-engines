@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["SortOrder",""]],"mod":[["mssql",""],["mysql",""],["postgres",""],["sqlite",""]],"struct":[["IndexColumn",""]]};

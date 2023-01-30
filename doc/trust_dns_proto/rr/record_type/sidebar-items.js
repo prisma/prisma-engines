@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["RecordType","The type of the resource record."]]};
