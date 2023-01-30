@@ -15,8 +15,8 @@ fn strings_with_quotes_are_unescaped() {
         }"#
     );
 
-    let mut dml = parse(input);
-    let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
+    let dml = parse(input);
+    let cat = dml.models().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
 
     assert_eq!(
@@ -41,8 +41,8 @@ fn strings_with_newlines_are_unescaped() {
         }"#
     );
 
-    let mut dml = parse(input);
-    let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
+    let dml = parse(input);
+    let cat = dml.models().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
 
     assert_eq!(
@@ -69,8 +69,8 @@ fn strings_with_escaped_unicode_codepoints_are_unescaped() {
         }"#
     );
 
-    let mut dml = parse(input);
-    let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
+    let dml = parse(input);
+    let cat = dml.models().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
 
     assert_eq!(

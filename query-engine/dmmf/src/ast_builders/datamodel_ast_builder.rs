@@ -5,35 +5,37 @@ use bigdecimal::ToPrimitive;
 use prisma_models::dml::{
     self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName,
 };
+use psl::{parser_database::walkers, schema_ast::ast::WithDocumentation};
 
-pub fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
+pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+    let dml = dml::lift(schema);
     let mut datamodel = Datamodel {
         models: vec![],
         enums: vec![],
-        types: Vec::with_capacity(schema.composite_types.len()),
+        types: Vec::with_capacity(dml.composite_types.len()),
     };
 
-    for enum_model in schema.enums() {
+    for enum_model in schema.db.walk_enums() {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
-    for model in schema.models().filter(|model| !model.is_ignored) {
+    for model in dml.models().filter(|model| !model.is_ignored) {
         datamodel.models.push(model_to_dmmf(model));
     }
 
-    for ct in schema.composite_types() {
+    for ct in dml.composite_types() {
         datamodel.types.push(composite_type_to_dmmf(ct))
     }
 
     datamodel
 }
 
-fn enum_to_dmmf(en: &dml::Enum) -> Enum {
+fn enum_to_dmmf(en: walkers::EnumWalker<'_>) -> Enum {
     let mut enm = Enum {
-        name: en.name.clone(),
+        name: en.name().to_owned(),
         values: vec![],
-        db_name: en.database_name.clone(),
-        documentation: en.documentation.clone(),
+        db_name: en.mapped_name().map(ToOwned::to_owned),
+        documentation: en.ast_enum().documentation().map(ToOwned::to_owned),
     };
 
     for enum_value in en.values() {
@@ -43,10 +45,10 @@ fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     enm
 }
 
-fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
+fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     EnumValue {
-        name: en.name.clone(),
-        db_name: en.database_name.clone(),
+        name: en.name().to_owned(),
+        db_name: en.mapped_name().map(ToOwned::to_owned),
     }
 }
 
@@ -286,18 +288,11 @@ fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
 mod tests {
     use super::schema_to_dmmf;
     use pretty_assertions::assert_eq;
-    use prisma_models::dml::Datamodel;
     use std::fs;
 
-    pub(crate) fn parse(datamodel_string: &str) -> Datamodel {
-        match psl::parse_schema(datamodel_string) {
-            Ok(s) => prisma_models::dml::lift(&s),
-            Err(err) => panic!("Datamodel parsing failed\n\n{err}",),
-        }
-    }
-
-    fn render_to_dmmf(schema: &prisma_models::dml::Datamodel) -> String {
-        let dmmf = schema_to_dmmf(schema);
+    fn render_to_dmmf(schema: &str) -> String {
+        let schema = psl::parse_schema(schema).unwrap();
+        let dmmf = schema_to_dmmf(&schema);
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 
@@ -317,8 +312,7 @@ mod tests {
             println!("TESTING: {test_case}");
 
             let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
-            let dml = parse(&datamodel_string);
-            let dmmf_string = render_to_dmmf(&dml);
+            let dmmf_string = render_to_dmmf(&datamodel_string);
 
             assert_eq_json(
                 &dmmf_string,

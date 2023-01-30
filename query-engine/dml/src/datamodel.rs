@@ -1,5 +1,5 @@
 use crate::composite_type::CompositeType;
-use crate::field::{Field, RelationField, ScalarField};
+use crate::field::RelationField;
 use crate::model::Model;
 use crate::r#enum::Enum;
 use crate::relation_info::RelationInfo;
@@ -10,7 +10,7 @@ use crate::relation_info::RelationInfo;
 /// string, only introspection and the lowering of the datamodel to the ast care about these flags.
 /// The FieldType: Unsupported behaves in the same way.
 /// Both of these are never converted into the internal datamodel.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
@@ -18,15 +18,6 @@ pub struct Datamodel {
 }
 
 impl Datamodel {
-    pub fn new() -> Datamodel {
-        Datamodel { ..Default::default() }
-    }
-
-    /// Checks if a datamodel contains neither enums nor models.
-    pub fn is_empty(&self) -> bool {
-        self.enums.is_empty() && self.models.is_empty()
-    }
-
     /// Gets an iterator over all models.
     pub fn models(&self) -> std::slice::Iter<Model> {
         self.models.iter()
@@ -40,16 +31,6 @@ impl Datamodel {
     /// Gets an iterator over all enums.
     pub fn enums(&self) -> std::slice::Iter<Enum> {
         self.enums.iter()
-    }
-
-    /// Gets a mutable iterator over all models.
-    pub fn models_mut(&mut self) -> std::slice::IterMut<Model> {
-        self.models.iter_mut()
-    }
-
-    /// Gets a mutable iterator over all enums.
-    pub fn enums_mut(&mut self) -> std::slice::IterMut<Enum> {
-        self.enums.iter_mut()
     }
 
     /// Finds a model by name.
@@ -74,23 +55,6 @@ impl Datamodel {
         self.find_model(&self.find_related_field_bang(field).1.relation_info.referenced_model)
     }
 
-    /// Finds a mutable field reference by a model and field name.
-    pub fn find_field_mut(&mut self, model: &str, field: &str) -> &mut Field {
-        self.find_model_mut(model).find_field_mut(field)
-    }
-
-    /// Finds a mutable scalar field reference by a model and field name.
-    pub fn find_scalar_field_mut(&mut self, model: &str, field: &str) -> &mut ScalarField {
-        // This uses the memory location of field for equality.
-        self.find_model_mut(model).find_scalar_field_mut(field)
-    }
-
-    /// Finds a mutable relation field reference by a model and field name.
-    #[track_caller]
-    pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
-        self.find_model_mut(model).find_relation_field_mut(field)
-    }
-
     /// Finds an enum by name.
     pub fn find_enum(&self, name: &str) -> Option<&Enum> {
         self.enums().find(|m| m.name == *name)
@@ -103,29 +67,10 @@ impl Datamodel {
 
     /// Finds a model by name and returns a mutable reference.
     pub fn find_model_mut(&mut self, name: &str) -> &mut Model {
-        self.models_mut()
+        self.models
+            .iter_mut()
             .find(|m| m.name == *name)
             .expect("We assume an internally valid datamodel before mutating.")
-    }
-
-    /// Finds an enum by name and returns a mutable reference.
-    pub fn find_enum_mut(&mut self, name: &str) -> &mut Enum {
-        self.enums_mut()
-            .find(|m| m.name == *name)
-            .expect("We assume an internally valid datamodel before mutating.")
-    }
-
-    /// Returns (model_name, field_name) for all fields using a specific enum.
-    pub fn find_enum_fields(&self, enum_name: &str) -> Vec<(String, String)> {
-        let mut fields = vec![];
-        for model in self.models() {
-            for field in model.scalar_fields() {
-                if field.field_type.is_enum(enum_name) {
-                    fields.push((model.name.clone(), field.name.clone()))
-                }
-            }
-        }
-        fields
     }
 
     /// Returns (model_name, field_name) for all relation fields pointing to a specific model.

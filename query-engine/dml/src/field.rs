@@ -67,10 +67,6 @@ impl FieldType {
         matches!(self, Self::CompositeType(_))
     }
 
-    pub fn is_enum(&self, name: &str) -> bool {
-        matches!(self, Self::Enum(this) if this == name)
-    }
-
     pub fn is_unsupported(&self) -> bool {
         matches!(self, Self::Unsupported(_))
     }

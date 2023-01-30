@@ -4,7 +4,6 @@ mod serialization_ast;
 pub use serialization_ast::DataModelMetaFormat;
 
 use ast_builders::{schema_to_dmmf, DmmfQuerySchemaRenderer};
-use prisma_models::dml;
 use schema::{QuerySchemaRef, QuerySchemaRenderer};
 use std::sync::Arc;
 
@@ -21,7 +20,7 @@ pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
 }
 
 pub fn from_precomputed_parts(query_schema: QuerySchemaRef) -> DataModelMetaFormat {
-    let data_model = schema_to_dmmf(&dml::lift(&query_schema.internal_data_model.schema));
+    let data_model = schema_to_dmmf(&query_schema.internal_data_model.schema);
     let (schema, mappings) = DmmfQuerySchemaRenderer::render(query_schema);
 
     DataModelMetaFormat {
