@@ -10,7 +10,6 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
-      - 'query-engine/**'
 
 jobs:
   build:
