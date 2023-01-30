@@ -2,10 +2,11 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use prisma_models::dml::{
-    self, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName,
+use prisma_models::dml::{self, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName};
+use psl::{
+    parser_database::{walkers, ScalarFieldType},
+    schema_ast::ast::WithDocumentation,
 };
-use psl::{parser_database::walkers, schema_ast::ast::WithDocumentation};
 
 pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let dml = dml::lift(schema);
@@ -23,7 +24,7 @@ pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         datamodel.models.push(model_to_dmmf(model));
     }
 
-    for ct in dml.composite_types() {
+    for ct in schema.db.walk_composite_types() {
         datamodel.types.push(composite_type_to_dmmf(ct))
     }
 
@@ -52,14 +53,13 @@ fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     }
 }
 
-fn composite_type_to_dmmf(ct: &dml::CompositeType) -> Model {
+fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
     Model {
-        name: ct.name.clone(),
+        name: ct.name().to_owned(),
         db_name: None,
         fields: ct
-            .fields
-            .iter()
-            .filter(|field| !matches!(&field.r#type, CompositeTypeFieldType::Unsupported(_)))
+            .fields()
+            .filter(|field| !matches!(field.r#type(), ScalarFieldType::Unsupported(_)))
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: None,
@@ -70,34 +70,35 @@ fn composite_type_to_dmmf(ct: &dml::CompositeType) -> Model {
     }
 }
 
-fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
+fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) -> Field {
     Field {
-        name: field.name.clone(),
-        kind: match field.r#type {
-            CompositeTypeFieldType::CompositeType(_) => String::from("object"),
-            CompositeTypeFieldType::Enum(_) => String::from("enum"),
-            CompositeTypeFieldType::Scalar(_, _) => String::from("scalar"),
-            CompositeTypeFieldType::Unsupported(_) => String::from("unsupported"),
+        name: field.name().to_owned(),
+        kind: match field.r#type() {
+            ScalarFieldType::CompositeType(_) => "object".into(),
+            ScalarFieldType::Enum(_) => "enum".into(),
+            ScalarFieldType::BuiltInScalar(_) => "scalar".into(),
+            ScalarFieldType::Unsupported(_) => unreachable!(),
         },
-        db_name: field.database_name.clone(),
-        is_required: field.arity == dml::FieldArity::Required || field.arity == dml::FieldArity::List,
-        is_list: field.arity == dml::FieldArity::List,
+        db_name: field.mapped_name().map(ToOwned::to_owned),
+        is_required: field.arity() == dml::FieldArity::Required || field.arity() == dml::FieldArity::List,
+        is_list: field.arity() == dml::FieldArity::List,
         is_id: false,
         is_read_only: false,
-        has_default_value: field.default_value.is_some(),
-        default: default_value_to_serde(&field.default_value),
+        has_default_value: field.default_value().is_some(),
+        default: field
+            .default_value()
+            .map(|dv| default_value_to_serde(&dml::dml_default_kind(dv, field.scalar_type()))),
         is_unique: false,
         relation_name: None,
         relation_from_fields: None,
         relation_to_fields: None,
         relation_on_delete: None,
-        field_type: match &field.r#type {
-            CompositeTypeFieldType::CompositeType(t) => t.clone(),
-            CompositeTypeFieldType::Enum(t) => t.clone(),
-            CompositeTypeFieldType::Unsupported(t) => t.clone(),
-            CompositeTypeFieldType::Scalar(t, _) => type_to_string(t),
+        field_type: match field.r#type() {
+            ScalarFieldType::CompositeType(ct) => field.walk(*ct).name().to_owned(),
+            ScalarFieldType::Enum(enm) => field.walk(*enm).name().to_owned(),
+            ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
+            ScalarFieldType::Unsupported(_) => unreachable!(),
         },
-
         is_generated: None,
         is_updated_at: None,
         documentation: None,
@@ -172,7 +173,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_id: model.field_is_primary(field.name()),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
-        default: default_value_to_serde(&field.default_value().cloned()),
+        default: field.default_value().map(|dv| default_value_to_serde(dv.kind())),
         is_unique: model.field_is_unique(field.name()),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
@@ -195,14 +196,14 @@ fn get_field_kind(field: &dml::Field) -> String {
     }
 }
 
-fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
-    dv_opt.as_ref().map(|dv| match dv.kind() {
+fn default_value_to_serde(dv: &dml::DefaultKind) -> serde_json::Value {
+    match dv {
         dml::DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
         dml::DefaultKind::Expression(vg) => {
             let args: Vec<_> = vg.args().iter().map(|(_, v)| v.clone()).collect();
             function_to_serde(vg.name(), &args)
         }
-    })
+    }
 }
 
 fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
