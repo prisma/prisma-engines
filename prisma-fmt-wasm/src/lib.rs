@@ -22,6 +22,11 @@ pub fn lint(input: String) -> String {
 }
 
 #[wasm_bindgen]
+pub fn validate(schema: String) -> Result<(), String> {
+    prisma_fmt::validate(schema)
+}
+
+#[wasm_bindgen]
 pub fn native_types(input: String) -> String {
     prisma_fmt::native_types(input)
 }

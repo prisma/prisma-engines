@@ -6,6 +6,7 @@ mod lint;
 mod native;
 mod preview;
 mod text_document_completion;
+mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
@@ -63,6 +64,28 @@ pub fn format(schema: &str, params: &str) -> String {
 
 pub fn lint(schema: String) -> String {
     lint::run(&schema)
+}
+
+/// Function that emulates what happened when improperly calling the `getDmmf` query engine RPC on invalid schemas.
+/// When the schema is valid, nothing happens.
+/// When the schema is invalid, the function displays a human-friendly error message indicating the schema lines
+/// where the errors lie and the total error count, e.g.:
+///
+/// ```sh
+/// The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.
+///   -->  schema.prisma:5
+///   |
+/// 4 |   relationMode         = "prisma"
+/// 5 |   referentialIntegrity = "foreignKeys"
+/// 6 | }
+///   |
+///
+/// Validation Error Count: 1
+/// ```
+///
+/// This function doesn't panic.
+pub fn validate(schema: String) -> Result<(), String> {
+    validate::run(&schema)
 }
 
 pub fn native_types(schema: String) -> String {
