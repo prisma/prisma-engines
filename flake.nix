@@ -31,6 +31,7 @@
         imports = [
           ./nix/all-engines.nix
           ./nix/args.nix
+          ./nix/cargo-doc.nix
           ./nix/cli-shell.nix
           ./nix/dev-vm.nix
           ./nix/prisma-fmt-wasm.nix
