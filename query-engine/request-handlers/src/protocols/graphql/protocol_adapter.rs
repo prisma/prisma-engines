@@ -44,7 +44,7 @@ impl GraphQLProtocolAdapter {
                 .definitions
                 .into_iter()
                 .find(|def| Self::matches_operation(def, op))
-                .ok_or_else(|| HandlerError::query_conversion(format!("Operation '{}' does not match any query.", op)))
+                .ok_or_else(|| HandlerError::query_conversion(format!("Operation '{op}' does not match any query.")))
                 .and_then(Self::convert_definition),
 
             None => gql_doc
@@ -138,18 +138,17 @@ impl GraphQLProtocolAdapter {
         match value {
             Value::Variable(name) => Err(HandlerError::unsupported_feature(
                 "Variable usage",
-                format!("Variable '{}'.", name),
+                format!("Variable '{name}'."),
             )),
             Value::Int(i) => match i.as_i64() {
                 Some(i) => Ok(PrismaValue::Int(i)),
-                None => Err(HandlerError::query_conversion(format!(
-                    "Invalid 64 bit integer: {:?}",
-                    i
-                ))),
+                None => Err(HandlerError::query_conversion(
+                    format!("Invalid 64 bit integer: {i:?}",),
+                )),
             },
             Value::Float(f) => match BigDecimal::from_f64(f) {
                 Some(dec) => Ok(PrismaValue::Float(dec)),
-                None => Err(HandlerError::query_conversion(format!("invalid 64-bit float: {:?}", f))),
+                None => Err(HandlerError::query_conversion(format!("invalid 64-bit float: {f:?}"))),
             },
             Value::String(s) => Ok(PrismaValue::String(s)),
             Value::Boolean(b) => Ok(PrismaValue::Boolean(b)),
