@@ -35,6 +35,7 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
+        engine_protocol: [graphql, json]
 
     env:
       LOG_LEVEL: "info"
@@ -48,6 +49,7 @@ jobs:
       TEST_RUNNER: "direct"
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
+      PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -60,7 +62,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }}"
+      - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 
       - uses: actions-rs/toolchain@v1
