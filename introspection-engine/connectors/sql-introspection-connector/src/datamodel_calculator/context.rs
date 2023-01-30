@@ -101,7 +101,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
         // Removing the filter when all connectors are done.
         self.sql_schema
             .view_walkers()
-            .filter(|v| !v.columns().len() > 0)
+            .filter(|v| v.columns().len() > 0)
             .map(|next| {
                 let previous = self.existing_view(next.id);
                 Pair::new(self, previous, next)
