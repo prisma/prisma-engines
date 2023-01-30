@@ -147,14 +147,14 @@
             <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-    <span class="kw">let </span>edit = <span class="kw">super</span>::create_schema_attribute_edit(
-        schema,
+    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_attribute(
+        <span class="string">&quot;schema()&quot;</span>,
         model.indentation(),
         model.newline(),
         <span class="kw-2">&amp;</span>model.ast_model().attributes,
-        model.ast_model().span(),
-        params,
     );
+
+    <span class="kw">let </span>edit = <span class="kw">super</span>::create_text_edit(schema, formatted_attribute, <span class="bool-val">true</span>, model.ast_model().span(), params);
 
     <span class="kw">let </span>action = CodeAction {
         title: String::from(<span class="string">&quot;Add `@@schema` attribute&quot;</span>),
@@ -199,14 +199,14 @@
         <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">let </span>edit = <span class="kw">super</span>::create_schema_attribute_edit(
-        schema,
+    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_attribute(
+        <span class="string">&quot;schema()&quot;</span>,
         enumerator.indentation(),
         enumerator.newline(),
         <span class="kw-2">&amp;</span>enumerator.ast_enum().attributes,
-        enumerator.ast_enum().span(),
-        params,
     );
+
+    <span class="kw">let </span>edit = <span class="kw">super</span>::create_text_edit(schema, formatted_attribute, <span class="bool-val">true</span>, enumerator.ast_enum().span(), params);
 
     <span class="kw">let </span>action = CodeAction {
         title: String::from(<span class="string">&quot;Add `@@schema` attribute&quot;</span>),

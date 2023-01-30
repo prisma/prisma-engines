@@ -213,7 +213,15 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>multi_schema;
+<span class="kw">mod </span>relation_mode;
 <span class="kw">mod </span>relations;
 
 <span class="kw">use </span>lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
@@ -240,37 +248,35 @@
 
     <span class="kw">let </span>validated_schema = psl::validate(file);
 
+    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>validated_schema.configuration;
+
+    <span class="kw">for </span>source <span class="kw">in </span>validated_schema.db.ast().sources() {
+        relation_mode::edit_referential_integrity(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), source)
+    }
+
     <span class="kw">for </span>model <span class="kw">in </span>validated_schema
         .db
         .walk_models()
         .chain(validated_schema.db.walk_views())
     {
-        <span class="kw">if </span>validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        <span class="kw">if </span>config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(
                 <span class="kw-2">&amp;mut </span>actions,
                 <span class="kw-2">&amp;</span>params,
                 validated_schema.db.source(),
-                <span class="kw-2">&amp;</span>validated_schema.configuration,
+                config,
                 model,
             )
         }
     }
 
     <span class="kw">for </span>enumerator <span class="kw">in </span>validated_schema.db.walk_enums() {
-        <span class="kw">if </span>validated_schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::MultiSchema)
-        {
+        <span class="kw">if </span>config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_enum(
                 <span class="kw-2">&amp;mut </span>actions,
                 <span class="kw-2">&amp;</span>params,
                 validated_schema.db.source(),
-                <span class="kw-2">&amp;</span>validated_schema.configuration,
+                config,
                 enumerator,
             )
         }
@@ -377,15 +383,22 @@
             <span class="kw-2">&amp;</span>model.ast_model().attributes,
         );
 
-        <span class="kw">let </span>range = span_to_range(schema, model.ast_model().span());
+        <span class="kw">let </span>range = range_after_span(schema, model.ast_model().span());
         (formatted_attribute, range)
     };
 
     TextEdit { range, new_text }
 }
 
-<span class="kw">fn </span>span_to_range(schema: <span class="kw-2">&amp;</span>str, span: Span) -&gt; Range {
+<span class="kw">fn </span>range_after_span(schema: <span class="kw-2">&amp;</span>str, span: Span) -&gt; Range {
     <span class="kw">let </span>start = <span class="kw">crate</span>::offset_to_position(span.end - <span class="number">1</span>, schema);
+    <span class="kw">let </span>end = <span class="kw">crate</span>::offset_to_position(span.end, schema);
+
+    Range { start, end }
+}
+
+<span class="kw">fn </span>span_to_range(schema: <span class="kw-2">&amp;</span>str, span: Span) -&gt; Range {
+    <span class="kw">let </span>start = <span class="kw">crate</span>::offset_to_position(span.start, schema);
     <span class="kw">let </span>end = <span class="kw">crate</span>::offset_to_position(span.end, schema);
 
     Range { start, end }
@@ -404,17 +417,18 @@
     formatted_attribute
 }
 
-<span class="kw">fn </span>create_schema_attribute_edit(
+<span class="kw">fn </span>create_text_edit(
     schema: <span class="kw-2">&amp;</span>str,
-    indentation: IndentationType,
-    newline: NewlineType,
-    attributes: <span class="kw-2">&amp;</span>Vec&lt;Attribute&gt;,
+    formatted_attribute: String,
+    append: bool,
     span: Span,
     params: <span class="kw-2">&amp;</span>CodeActionParams,
 ) -&gt; WorkspaceEdit {
-    <span class="kw">let </span>formatted_attribute = format_attribute(<span class="string">&quot;schema()&quot;</span>, indentation, newline, attributes);
+    <span class="kw">let </span>range = <span class="kw">match </span>append {
+        <span class="bool-val">true </span>=&gt; range_after_span(schema, span),
+        <span class="bool-val">false </span>=&gt; span_to_range(schema, span),
+    };
 
-    <span class="kw">let </span>range = span_to_range(schema, span);
     <span class="kw">let </span>text = TextEdit {
         range,
         new_text: formatted_attribute,

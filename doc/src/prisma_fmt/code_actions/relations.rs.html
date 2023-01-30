@@ -578,7 +578,7 @@
         <span class="kw-2">&amp;</span>relation.model().ast_model().attributes,
     );
 
-    <span class="kw">let </span>range = <span class="kw">super</span>::span_to_range(schema, relation.model().ast_model().span());
+    <span class="kw">let </span>range = <span class="kw">super</span>::range_after_span(schema, relation.model().ast_model().span());
     <span class="kw">let </span>text = TextEdit {
         range,
         new_text: formatted_attribute,
