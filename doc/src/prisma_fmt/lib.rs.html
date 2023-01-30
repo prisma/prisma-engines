@@ -210,9 +210,15 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>actions;
 <span class="kw">mod </span>code_actions;
 <span class="kw">mod </span>get_config;
+<span class="kw">mod </span>get_dmmf;
 <span class="kw">mod </span>lint;
 <span class="kw">mod </span>native;
 <span class="kw">mod </span>preview;
@@ -328,6 +334,10 @@
 /// ```
 </span><span class="kw">pub fn </span>get_config(get_config_params: String) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
     get_config::get_config(<span class="kw-2">&amp;</span>get_config_params)
+}
+
+<span class="kw">pub fn </span>get_dmmf(get_dmmf_params: String) -&gt; String {
+    get_dmmf::get_dmmf(<span class="kw-2">&amp;</span>get_dmmf_params)
 }
 
 <span class="doccomment">/// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
