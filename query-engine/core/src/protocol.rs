@@ -7,12 +7,6 @@ pub enum EngineProtocol {
     Json,
 }
 
-impl Default for EngineProtocol {
-    fn default() -> Self {
-        Self::Graphql
-    }
-}
-
 impl From<&String> for EngineProtocol {
     fn from(s: &String) -> Self {
         match s.as_str() {

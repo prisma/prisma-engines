@@ -54,12 +54,17 @@ impl CliCommand {
                     config: opts.configuration(input.ignore_env_var_errors)?,
                     ignore_env_var_errors: input.ignore_env_var_errors,
                 }))),
-                CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
-                    query: input.query.clone(),
-                    enable_raw_queries: opts.enable_raw_queries,
-                    schema: opts.schema(false)?,
-                    engine_protocol: opts.engine_protocol(),
-                }))),
+                CliOpt::ExecuteRequest(input) => {
+                    let schema = opts.schema(false)?;
+                    let features = schema.configuration.preview_features();
+
+                    Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
+                        query: input.query.clone(),
+                        enable_raw_queries: opts.enable_raw_queries,
+                        schema,
+                        engine_protocol: opts.engine_protocol(features),
+                    })))
+                }
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
                 }))),

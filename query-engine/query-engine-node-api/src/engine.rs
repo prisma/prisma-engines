@@ -116,7 +116,7 @@ struct ConstructorOptions {
     #[serde(default)]
     ignore_env_var_errors: bool,
     #[serde(default)]
-    engine_protocol: EngineProtocol,
+    engine_protocol: Option<EngineProtocol>,
 }
 
 impl Inner {
@@ -180,6 +180,13 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
+        let engine_protocol =
+            engine_protocol.unwrap_or_else(
+                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
+                    true => EngineProtocol::Json,
+                    false => EngineProtocol::Graphql,
+                },
+            );
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),

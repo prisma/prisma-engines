@@ -1,4 +1,5 @@
 use crate::{error::PrismaError, PrismaResult};
+use psl::{PreviewFeature, PreviewFeatures};
 use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
@@ -219,11 +220,14 @@ impl PrismaOpt {
         PrismaOpt::from_iter_safe(list).unwrap()
     }
 
-    pub fn engine_protocol(&self) -> EngineProtocol {
+    pub fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
         self.engine_protocol
             .as_ref()
             .map(EngineProtocol::from)
-            .unwrap_or_else(|| EngineProtocol::Graphql)
+            .unwrap_or_else(|| match preview_features.contains(PreviewFeature::JsonProtocol) {
+                true => EngineProtocol::Json,
+                false => EngineProtocol::Graphql,
+            })
     }
 }
 
