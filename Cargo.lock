@@ -3243,6 +3243,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "connection-string",
+ "crossbeam-channel",
  "crossbeam-queue",
  "cuid",
  "enumflags2",
