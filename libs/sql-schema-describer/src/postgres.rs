@@ -615,7 +615,15 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
-        let sql = include_str!("postgres/tables_query.sql");
+        let version_sql = "select current_setting('server_version_num')::integer as version;";
+        let version_rows = self.conn.query_raw(version_sql, &[]).await?;
+        let version_result = version_rows.into_iter().map(|r| r.get_expect_i64("version")).next();
+
+        let sql = match version_result {
+            Some(version) if version >= 100000 => include_str!("postgres/tables_query.sql"),
+            _ => include_str!("postgres/tables_query_simple.sql"),
+        };
+
         let namespaces = &sql_schema.namespaces;
 
         let rows = self
@@ -626,13 +634,17 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let names = rows
-            .into_iter()
-            .map(|row| (row.get_expect_string("table_name"), row.get_expect_string("namespace")));
+        let names = rows.into_iter().map(|row| {
+            (
+                row.get_expect_string("table_name"),
+                row.get_expect_string("namespace"),
+                row.get_expect_bool("relhassubclass"),
+            )
+        });
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace) in names {
+        for (table_name, namespace, _has_subclass) in names {
             let cloned_name = table_name.clone();
             let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
             map.insert((namespace, cloned_name), id);
