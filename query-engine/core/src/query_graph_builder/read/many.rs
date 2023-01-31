@@ -18,7 +18,6 @@ fn find_many_with_options(
 ) -> QueryGraphBuilderResult<ReadQuery> {
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let name = field.name;
-    let alias = field.alias;
     let nested_fields = field.nested_fields.unwrap().fields;
     let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
     let aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, &model)?;
@@ -32,7 +31,6 @@ fn find_many_with_options(
 
     Ok(ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
         name,
-        alias,
         model,
         args,
         selected_fields,

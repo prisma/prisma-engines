@@ -76,7 +76,6 @@ impl QueryDocumentParser {
                 let schema_field = Arc::clone(schema_field);
                 let parsed_field = ParsedField {
                     name: selection.name().to_string(),
-                    alias: selection.alias().clone(),
                     arguments,
                     nested_fields,
                 };

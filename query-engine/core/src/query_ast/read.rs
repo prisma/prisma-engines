@@ -143,7 +143,6 @@ impl QueryOptions {
 #[derive(Debug, Clone)]
 pub struct RecordQuery {
     pub name: String,
-    pub alias: Option<String>,
     pub model: ModelRef,
     pub filter: Option<Filter>,
     pub selected_fields: FieldSelection,
@@ -156,7 +155,6 @@ pub struct RecordQuery {
 #[derive(Debug, Clone)]
 pub struct ManyRecordsQuery {
     pub name: String,
-    pub alias: Option<String>,
     pub model: ModelRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
@@ -169,7 +167,6 @@ pub struct ManyRecordsQuery {
 #[derive(Debug, Clone)]
 pub struct RelatedRecordsQuery {
     pub name: String,
-    pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
@@ -185,7 +182,6 @@ pub struct RelatedRecordsQuery {
 #[derive(Debug, Clone)]
 pub struct AggregateRecordsQuery {
     pub name: String,
-    pub alias: Option<String>,
     pub model: ModelRef,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,

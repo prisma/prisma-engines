@@ -8,7 +8,6 @@ use schema_builder::constants::args;
 
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
-    let alias = field.alias;
     let model = model;
 
     let by_arg = field.arguments.lookup(args::BY).unwrap().value;
@@ -33,7 +32,6 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
-        alias,
         model,
         selection_order,
         args,

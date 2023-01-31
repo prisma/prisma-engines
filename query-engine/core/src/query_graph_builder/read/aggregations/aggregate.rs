@@ -4,7 +4,6 @@ use prisma_models::ModelRef;
 
 pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
-    let alias = field.alias;
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
     let selection_order = collect_selection_tree(&nested_fields);
@@ -27,7 +26,6 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
-        alias,
         model,
         selection_order,
         args,

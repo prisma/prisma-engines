@@ -796,7 +796,6 @@ impl QueryGraph {
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
                 name: "reload".into(),
-                alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
                 selected_fields: FieldSelection::union(identifiers),

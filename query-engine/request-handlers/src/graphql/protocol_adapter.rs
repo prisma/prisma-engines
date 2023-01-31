@@ -103,7 +103,7 @@ impl GraphQLProtocolAdapter {
 
                     let nested_selections = Self::convert_selection_set(f.selection_set)?;
 
-                    Ok(Selection::new(f.name, f.alias, arguments, nested_selections))
+                    Ok(Selection::new(f.name, arguments, nested_selections))
                 }
 
                 GqlSelection::FragmentSpread(fs) => Err(HandlerError::unsupported_feature(
@@ -204,9 +204,9 @@ mod tests {
         assert_eq!(read.arguments(), [("where".to_string(), where_args)]);
 
         let selections = Vec::from([
-            Selection::new("id", None, [], Vec::new()),
-            Selection::new("large_number", None, [], Vec::new()),
-            Selection::new("other", None, [], Vec::from([Selection::new("name", None, [], [])])),
+            Selection::new("id", [], Vec::new()),
+            Selection::new("large_number", [], Vec::new()),
+            Selection::new("other", [], Vec::from([Selection::new("name", [], [])])),
         ]);
 
         assert_eq!(read.nested_selections(), selections);

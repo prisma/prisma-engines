@@ -37,7 +37,6 @@ where
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
         name: "read_ids_infallible".into(), // this name only eases debugging
-        alias: None,
         model: model.clone(),
         args: (model, filter).into(),
         selected_fields,
@@ -108,7 +107,6 @@ where
 
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
-        alias: None,
         parent_field: Arc::clone(parent_relation_field),
         parent_results: None,
         args: (child_model, filter).into(),

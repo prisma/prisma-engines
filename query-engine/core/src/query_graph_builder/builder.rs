@@ -108,10 +108,7 @@ impl QueryGraphBuilder {
 
     fn derive_serializer(selection: &Selection, field: &OutputFieldRef) -> IrSerializer {
         IrSerializer {
-            key: selection
-                .alias()
-                .clone()
-                .unwrap_or_else(|| selection.name().to_string()),
+            key: selection.name().to_owned(),
             output_field: field.clone(),
         }
     }

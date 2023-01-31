@@ -9,7 +9,6 @@ pub fn find_related(
 ) -> QueryGraphBuilderResult<ReadQuery> {
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let name = field.name;
-    let alias = field.alias;
     let sub_selections = field.nested_fields.unwrap().fields;
     let (aggr_fields_pairs, sub_selections) = extractors::extract_nested_rel_aggr_selections(sub_selections);
     let aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, &model)?;
@@ -23,7 +22,6 @@ pub fn find_related(
 
     Ok(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name,
-        alias,
         parent_field,
         args,
         selected_fields,

@@ -6,14 +6,7 @@ use schema_builder::constants::{aggregations::*, args};
 use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
-    from.iter()
-        .map(|pair| {
-            pair.parsed_field
-                .alias
-                .clone()
-                .unwrap_or_else(|| pair.parsed_field.name.clone())
-        })
-        .collect()
+    from.iter().map(|pair| pair.parsed_field.name.clone()).collect()
 }
 
 /// Creates a `FieldSelection` from a query selection.

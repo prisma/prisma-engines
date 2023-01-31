@@ -9,7 +9,6 @@ pub type SelectionArgument = (String, PrismaValue);
 #[derive(Debug, Clone)]
 pub struct Selection {
     name: String,
-    alias: Option<String>,
     arguments: Vec<(String, PrismaValue)>,
     nested_selections: Vec<Selection>,
 }
@@ -17,7 +16,6 @@ pub struct Selection {
 impl PartialEq for Selection {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
-            && self.alias == other.alias
             && self.arguments.len() == other.arguments.len()
             && self.nested_selections.len() == other.nested_selections.len()
             && self.arguments.iter().all(|arg| other.arguments.contains(arg))
@@ -30,10 +28,10 @@ impl PartialEq for Selection {
 
 impl Selection {
     pub fn with_name(name: impl Into<String>) -> Selection {
-        Selection::new(name.into(), None, Vec::new(), Vec::new())
+        Selection::new(name.into(), Vec::new(), Vec::new())
     }
 
-    pub fn new<T, A, N>(name: T, alias: Option<String>, arguments: A, nested_selections: N) -> Self
+    pub fn new<T, A, N>(name: T, arguments: A, nested_selections: N) -> Self
     where
         T: Into<String>,
         A: Into<Vec<SelectionArgument>>,
@@ -41,7 +39,6 @@ impl Selection {
     {
         Self {
             name: name.into(),
-            alias,
             arguments: arguments.into(),
             nested_selections: nested_selections.into(),
         }
@@ -91,14 +88,6 @@ impl Selection {
 
     pub fn name(&self) -> &str {
         &self.name
-    }
-
-    pub fn alias(&self) -> &Option<String> {
-        &self.alias
-    }
-
-    pub fn set_alias(&mut self, alias: Option<String>) {
-        self.alias = alias
     }
 }
 

@@ -92,7 +92,6 @@ pub struct FieldPair {
 #[derive(Debug, Clone)]
 pub struct ParsedField {
     pub name: String,
-    pub alias: Option<String>,
     pub arguments: Vec<ParsedArgument>,
     pub nested_fields: Option<ParsedObject>,
 }

@@ -28,7 +28,6 @@ pub fn find_unique_with_options(
     };
 
     let name = field.name;
-    let alias = field.alias;
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
     let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
@@ -40,7 +39,6 @@ pub fn find_unique_with_options(
 
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,
-        alias,
         model,
         filter,
         selected_fields,

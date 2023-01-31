@@ -224,8 +224,6 @@ impl CompactedDocument {
             // expression and with a compound id a combination of `AND` and `OR`.
             builder.push_argument(args::WHERE, In::new(selection_set));
 
-            builder.set_alias(selections[0].alias().clone());
-
             builder
         };
 
