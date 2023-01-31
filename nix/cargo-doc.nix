@@ -3,13 +3,9 @@
 {
   packages.cargo-docs = pkgs.clangStdenv.mkDerivation {
     name = "prisma-engines-cargo-docs";
-    inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs src;
+    inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs src configurePhase;
 
-    buildPhase = ''
-      mkdir .cargo
-      ln -s ${self'.packages.prisma-engines-deps}/config.toml .cargo/config.toml
-      cargo doc --workspace
-    '';
+    buildPhase = "cargo doc --workspace";
 
     installPhase = ''
       mkdir -p $out/share
