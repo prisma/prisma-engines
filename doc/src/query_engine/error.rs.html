@@ -131,70 +131,34 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
 </pre><pre class="rust"><code><span class="kw">use </span>connector::error::ConnectorError;
-<span class="kw">use </span>graphql_parser::query::ParseError <span class="kw">as </span>GqlParseError;
 <span class="kw">use </span>psl::diagnostics::Diagnostics;
 <span class="kw">use </span>query_core::CoreError;
-
 <span class="kw">use </span>thiserror::Error;
 
 <span class="attr">#[derive(Debug, Error)]
 #[allow(clippy::enum_variant_names)]
 </span><span class="kw">pub enum </span>PrismaError {
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
-    </span>SerializationError(String),
-
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    <span class="attr">#[error(transparent)]
     </span>CoreError(Box&lt;CoreError&gt;),
 
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    <span class="attr">#[error(transparent)]
     </span>JsonDecodeError(anyhow::Error),
 
     <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
     </span>ConfigurationError(String),
 
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    <span class="attr">#[error(transparent)]
     </span>ConnectorError(Box&lt;ConnectorError&gt;),
 
     <span class="attr">#[error(<span class="string">&quot;{:?}&quot;</span>, _0)]
     </span>ConversionError(Diagnostics, String),
 
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    <span class="attr">#[error(transparent)]
     </span>IOError(anyhow::Error),
-
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
-    </span>InvocationError(String),
-
-    <span class="doccomment">/// (Feature name, additional error text)
-    </span><span class="attr">#[error(<span class="string">&quot;Unsupported feature: {}. {}&quot;</span>, _0, _1)]
-    </span>UnsupportedFeatureError(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String),
 
     <span class="attr">#[error(<span class="string">&quot;Error in data model: {:?}&quot;</span>, _0)]
     </span>DatamodelError(Diagnostics),
-
-    <span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
-    </span>QueryConversionError(String),
 }
 
 <span class="kw">impl </span>From&lt;PrismaError&gt; <span class="kw">for </span>user_facing_errors::Error {
@@ -292,12 +256,6 @@
 <span class="kw">impl </span>From&lt;base64::DecodeError&gt; <span class="kw">for </span>PrismaError {
     <span class="kw">fn </span>from(e: base64::DecodeError) -&gt; PrismaError {
         PrismaError::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Invalid base64: {e}&quot;</span>))
-    }
-}
-
-<span class="kw">impl </span>From&lt;GqlParseError&gt; <span class="kw">for </span>PrismaError {
-    <span class="kw">fn </span>from(e: GqlParseError) -&gt; PrismaError {
-        PrismaError::QueryConversionError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing GraphQL query: {e}&quot;</span>))
     }
 }
 
