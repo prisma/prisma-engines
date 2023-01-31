@@ -335,14 +335,16 @@
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 <span class="kw">use </span>bigdecimal::ToPrimitive;
-<span class="kw">use </span>prisma_models::dml::{
-    <span class="self">self</span>, CompositeTypeFieldType, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName,
+<span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName};
+<span class="kw">use </span>psl::{
+    parser_database::{walkers, ScalarFieldType},
+    schema_ast::ast::WithDocumentation,
 };
-<span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast::WithDocumentation};
 
 <span class="kw">pub fn </span>schema_to_dmmf(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Datamodel {
     <span class="kw">let </span>dml = dml::lift(schema);
@@ -360,7 +362,7 @@
         datamodel.models.push(model_to_dmmf(model));
     }
 
-    <span class="kw">for </span>ct <span class="kw">in </span>dml.composite_types() {
+    <span class="kw">for </span>ct <span class="kw">in </span>schema.db.walk_composite_types() {
         datamodel.types.push(composite_type_to_dmmf(ct))
     }
 
@@ -389,14 +391,13 @@
     }
 }
 
-<span class="kw">fn </span>composite_type_to_dmmf(ct: <span class="kw-2">&amp;</span>dml::CompositeType) -&gt; Model {
+<span class="kw">fn </span>composite_type_to_dmmf(ct: walkers::CompositeTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Model {
     Model {
-        name: ct.name.clone(),
+        name: ct.name().to_owned(),
         db_name: <span class="prelude-val">None</span>,
         fields: ct
-            .fields
-            .iter()
-            .filter(|field| !<span class="macro">matches!</span>(<span class="kw-2">&amp;</span>field.r#type, CompositeTypeFieldType::Unsupported(<span class="kw">_</span>)))
+            .fields()
+            .filter(|field| !<span class="macro">matches!</span>(field.r#type(), ScalarFieldType::Unsupported(<span class="kw">_</span>)))
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: <span class="prelude-val">None</span>,
@@ -407,34 +408,35 @@
     }
 }
 
-<span class="kw">fn </span>composite_type_field_to_dmmf(field: <span class="kw-2">&amp;</span>dml::CompositeTypeField) -&gt; Field {
+<span class="kw">fn </span>composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Field {
     Field {
-        name: field.name.clone(),
-        kind: <span class="kw">match </span>field.r#type {
-            CompositeTypeFieldType::CompositeType(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;object&quot;</span>),
-            CompositeTypeFieldType::Enum(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;enum&quot;</span>),
-            CompositeTypeFieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;scalar&quot;</span>),
-            CompositeTypeFieldType::Unsupported(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;unsupported&quot;</span>),
+        name: field.name().to_owned(),
+        kind: <span class="kw">match </span>field.r#type() {
+            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;object&quot;</span>.into(),
+            ScalarFieldType::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>.into(),
+            ScalarFieldType::BuiltInScalar(<span class="kw">_</span>) =&gt; <span class="string">&quot;scalar&quot;</span>.into(),
+            ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         },
-        db_name: field.database_name.clone(),
-        is_required: field.arity == dml::FieldArity::Required || field.arity == dml::FieldArity::List,
-        is_list: field.arity == dml::FieldArity::List,
+        db_name: field.mapped_name().map(ToOwned::to_owned),
+        is_required: field.arity() == dml::FieldArity::Required || field.arity() == dml::FieldArity::List,
+        is_list: field.arity() == dml::FieldArity::List,
         is_id: <span class="bool-val">false</span>,
         is_read_only: <span class="bool-val">false</span>,
-        has_default_value: field.default_value.is_some(),
-        default: default_value_to_serde(<span class="kw-2">&amp;</span>field.default_value),
+        has_default_value: field.default_value().is_some(),
+        default: field
+            .default_value()
+            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml::dml_default_kind(dv, field.scalar_type()))),
         is_unique: <span class="bool-val">false</span>,
         relation_name: <span class="prelude-val">None</span>,
         relation_from_fields: <span class="prelude-val">None</span>,
         relation_to_fields: <span class="prelude-val">None</span>,
         relation_on_delete: <span class="prelude-val">None</span>,
-        field_type: <span class="kw">match </span><span class="kw-2">&amp;</span>field.r#type {
-            CompositeTypeFieldType::CompositeType(t) =&gt; t.clone(),
-            CompositeTypeFieldType::Enum(t) =&gt; t.clone(),
-            CompositeTypeFieldType::Unsupported(t) =&gt; t.clone(),
-            CompositeTypeFieldType::Scalar(t, <span class="kw">_</span>) =&gt; type_to_string(t),
+        field_type: <span class="kw">match </span>field.r#type() {
+            ScalarFieldType::CompositeType(ct) =&gt; field.walk(<span class="kw-2">*</span>ct).name().to_owned(),
+            ScalarFieldType::Enum(enm) =&gt; field.walk(<span class="kw-2">*</span>enm).name().to_owned(),
+            ScalarFieldType::BuiltInScalar(st) =&gt; st.as_str().to_owned(),
+            ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         },
-
         is_generated: <span class="prelude-val">None</span>,
         is_updated_at: <span class="prelude-val">None</span>,
         documentation: <span class="prelude-val">None</span>,
@@ -509,7 +511,7 @@
         is_id: model.field_is_primary(field.name()),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
-        default: default_value_to_serde(<span class="kw-2">&amp;</span>field.default_value().cloned()),
+        default: field.default_value().map(|dv| default_value_to_serde(dv.kind())),
         is_unique: model.field_is_unique(field.name()),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
@@ -532,14 +534,14 @@
     }
 }
 
-<span class="kw">fn </span>default_value_to_serde(dv_opt: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt; {
-    dv_opt.as_ref().map(|dv| <span class="kw">match </span>dv.kind() {
+<span class="kw">fn </span>default_value_to_serde(dv: <span class="kw-2">&amp;</span>dml::DefaultKind) -&gt; serde_json::Value {
+    <span class="kw">match </span>dv {
         dml::DefaultKind::Single(value) =&gt; prisma_value_to_serde(<span class="kw-2">&amp;</span>value.clone()),
         dml::DefaultKind::Expression(vg) =&gt; {
             <span class="kw">let </span>args: Vec&lt;<span class="kw">_</span>&gt; = vg.args().iter().map(|(<span class="kw">_</span>, v)| v.clone()).collect();
             function_to_serde(vg.name(), <span class="kw-2">&amp;</span>args)
         }
-    })
+    }
 }
 
 <span class="kw">fn </span>prisma_value_to_serde(value: <span class="kw-2">&amp;</span>PrismaValue) -&gt; serde_json::Value {

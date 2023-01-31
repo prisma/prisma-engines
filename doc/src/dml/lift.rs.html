@@ -1239,7 +1239,7 @@
     st.as_str().parse().unwrap()
 }
 
-<span class="kw">fn </span>dml_default_kind(default_value: <span class="kw-2">&amp;</span>ast::Expression, scalar_type: <span class="prelude-ty">Option</span>&lt;ScalarType&gt;) -&gt; DefaultKind {
+<span class="kw">pub fn </span>dml_default_kind(default_value: <span class="kw-2">&amp;</span>ast::Expression, scalar_type: <span class="prelude-ty">Option</span>&lt;ScalarType&gt;) -&gt; DefaultKind {
     <span class="comment">// This has all been validated in parser-database, so unwrapping is always safe.
     </span><span class="kw">match </span>default_value {
         ast::Expression::Function(funcname, args, <span class="kw">_</span>) <span class="kw">if </span>funcname == <span class="string">&quot;dbgenerated&quot; </span>=&gt; {
