@@ -549,7 +549,7 @@ fn parser_database_scalar_type_to_dml_scalar_type(st: db::ScalarType) -> dml::Sc
     st.as_str().parse().unwrap()
 }
 
-fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {
+pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {
     // This has all been validated in parser-database, so unwrapping is always safe.
     match default_value {
         ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {

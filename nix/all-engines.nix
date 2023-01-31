@@ -1,6 +1,7 @@
-{ pkgs, flakeInputs, lib, ... }:
+{ pkgs, flakeInputs, lib, self', ... }:
 
 let
+  stdenv = pkgs.clangStdenv;
   srcPath = ../.;
   srcFilter = flakeInputs.gitignore.lib.gitignoreFilterWith {
     basePath = srcPath;
@@ -16,11 +17,10 @@ let
   };
   craneLib = flakeInputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
-  libSuffix = if pkgs.stdenv.isDarwin then "dylib" else "so";
+  libSuffix = if stdenv.isDarwin then "dylib" else "so";
 in
 {
-  packages.prisma-engines-deps = deps;
-  packages.prisma-engines = pkgs.stdenv.mkDerivation {
+  packages.prisma-engines = stdenv.mkDerivation {
     name = "prisma-engines";
     inherit src;
 
@@ -36,9 +36,12 @@ in
       darwin.apple_sdk.frameworks.Security
     ];
 
-    buildPhase = ''
+    configurePhase = ''
       mkdir .cargo
       ln -s ${deps}/config.toml .cargo/config.toml
+    '';
+
+    buildPhase = ''
       cargo build --release --bins
       cargo build --release -p query-engine-node-api
     '';
@@ -52,4 +55,38 @@ in
       cp target/release/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
     '';
   };
+
+  packages.test-cli = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "test-cli";
+      inherit src;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+
+      buildPhase = "cargo build --profile=${profile} --bin=test-cli";
+
+      installPhase = ''
+        set -eu
+        mkdir -p $out/bin
+        QE_PATH=$(find target -name 'test-cli')
+        cp $QE_PATH $out/bin
+      '';
+    })
+    { profile = "release"; };
+
+  packages.query-engine-bin = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "query-engine-bin";
+      inherit src;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+
+      buildPhase = "cargo build --profile=${profile} --bin=query-engine";
+
+      installPhase = ''
+        set -eu
+        mkdir -p $out/bin
+        QE_PATH=$(find target -name 'query-engine')
+        cp $QE_PATH $out/bin
+      '';
+    })
+    { profile = "release"; };
 }
