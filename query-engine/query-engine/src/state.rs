@@ -61,12 +61,14 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
 
     let datamodel = opts.schema(false)?;
     let config = &datamodel.configuration;
+    let protocol = opts.engine_protocol(config.preview_features());
     config.validate_that_one_datasource_is_provided()?;
 
     let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
+
     let span = tracing::info_span!("prisma:engine:connect");
 
-    let cx = PrismaContext::builder(datamodel, opts.engine_protocol())
+    let cx = PrismaContext::builder(datamodel, protocol)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
         .build()
