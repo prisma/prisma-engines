@@ -22,8 +22,6 @@ pub struct Model {
     pub indices: Vec<IndexDefinition>,
     /// Describes the Primary Keys
     pub primary_key: Option<PrimaryKeyDefinition>,
-    /// Indicates if this model is generated.
-    pub is_generated: bool,
     /// Indicates if this model has to be commented out.
     pub is_commented_out: bool,
     /// Indicates if this model has to be ignored by the Client.
@@ -351,7 +349,6 @@ impl Model {
             primary_key: None,
             documentation: None,
             database_name,
-            is_generated: false,
             is_commented_out: false,
             is_ignored: false,
             is_view: false,

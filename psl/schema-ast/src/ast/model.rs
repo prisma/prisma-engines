@@ -79,7 +79,7 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn iter_fields(&self) -> impl ExactSizeIterator<Item = (FieldId, &Field)> {
+    pub fn iter_fields(&self) -> impl ExactSizeIterator<Item = (FieldId, &Field)> + Clone {
         self.fields
             .iter()
             .enumerate()
