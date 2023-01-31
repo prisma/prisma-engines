@@ -1,0 +1,11 @@
+datasource db {
+  provider = "postgres"
+  url = "postgres://"
+}
+
+model A {
+  id     Int  @id @default(autoincrement())
+  child  A?   @relation(name: "a_self_relation")
+  parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+  aId    Int? @unique
+}
