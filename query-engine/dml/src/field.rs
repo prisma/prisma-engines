@@ -6,13 +6,13 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{CompositeTypeFieldType, FieldArity};
-use psl_core::parser_database::ReferentialAction;
+use psl_core::{parser_database::ReferentialAction, schema_ast::ast};
 
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
     /// This is an enum field, with an enum of the given name.
-    Enum(String),
+    Enum(ast::EnumId),
     /// This is a relation field.
     Relation(RelationInfo),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
@@ -34,6 +34,13 @@ impl From<CompositeTypeFieldType> for FieldType {
 }
 
 impl FieldType {
+    pub fn as_enum(&self) -> Option<ast::EnumId> {
+        match self {
+            FieldType::Enum(id) => Some(*id),
+            _ => None,
+        }
+    }
+
     pub fn as_scalar(&self) -> Option<&ScalarType> {
         match self {
             FieldType::Scalar(scalar_type, _) => Some(scalar_type),

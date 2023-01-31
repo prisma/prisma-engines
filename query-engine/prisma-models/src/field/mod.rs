@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::ModelRef;
+use crate::{ast, ModelRef};
 use dml::ScalarType;
 use std::{hash::Hash, sync::Arc};
 
@@ -187,7 +187,7 @@ pub enum TypeIdentifier {
     Float,
     Decimal,
     Boolean,
-    Enum(String),
+    Enum(ast::EnumId),
     UUID,
     Json,
     Xml,
@@ -214,7 +214,7 @@ impl std::fmt::Display for TypeIdentifier {
             TypeIdentifier::Float => write!(f, "Float"),
             TypeIdentifier::Decimal => write!(f, "Decimal"),
             TypeIdentifier::Boolean => write!(f, "Bool"),
-            TypeIdentifier::Enum(e) => write!(f, "Enum{e}"),
+            TypeIdentifier::Enum(e) => write!(f, "Enum{e:?}"),
             TypeIdentifier::UUID => write!(f, "UUID"),
             TypeIdentifier::Json => write!(f, "Json"),
             TypeIdentifier::Xml => write!(f, "Xml"),

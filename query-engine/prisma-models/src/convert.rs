@@ -13,14 +13,12 @@ pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
     // for another action.
     let relations = builders::relation_builders(&relation_placeholders, relation_mode);
 
-    let enums = builders::convert_enums(&datamodel);
     let composite_types = builders::composite_type_builders(&datamodel);
     let internal_data_model = Arc::new(InternalDataModel {
         models: OnceCell::new(),
         composite_types: OnceCell::new(),
         relations: OnceCell::new(),
         relation_fields: OnceCell::new(),
-        enums: enums.into_iter().map(Arc::new).collect(),
         schema,
     });
 

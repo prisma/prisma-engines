@@ -75,12 +75,10 @@ fn should_set_default_an_enum_type() {
 
     let datamodel = parse(dml);
     let user_composite = datamodel.assert_has_composite_type("Composite");
-    user_composite
-        .assert_has_enum_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
-            "A_VARIANT_WITH_UNDERSCORES",
-        ))));
+    let field = user_composite.assert_has_enum_field("role");
+    field.assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
+        "A_VARIANT_WITH_UNDERSCORES",
+    ))));
 }
 
 // TODO: Remove ignore when enums are supported
@@ -108,7 +106,6 @@ fn should_set_default_on_remapped_enum_type() {
     let user_composite = datamodel.assert_has_composite_type("Composite");
     user_composite
         .assert_has_enum_field("role")
-        .assert_enum_type("Role")
         .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
         ))));

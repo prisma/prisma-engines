@@ -465,10 +465,7 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::CompositeType(_) => {
                 unreachable!();
             }
-            db::ScalarFieldType::Enum(enum_id) => {
-                let enum_name = &self.db.ast()[*enum_id].name.name;
-                FieldType::Enum(enum_name.to_owned())
-            }
+            db::ScalarFieldType::Enum(enum_id) => FieldType::Enum(*enum_id),
             db::ScalarFieldType::Unsupported(_) => {
                 FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
@@ -518,11 +515,7 @@ impl<'a> LiftAstToDml<'a> {
                     }),
                 )
             }
-            db::ScalarFieldType::Enum(enum_id) => {
-                let enum_name = &self.db.ast()[*enum_id].name.name;
-
-                CompositeTypeFieldType::Enum(enum_name.to_owned())
-            }
+            db::ScalarFieldType::Enum(enum_id) => CompositeTypeFieldType::Enum(*enum_id),
             db::ScalarFieldType::Unsupported(_) => {
                 let field = composite_type_field
                     .ast_field()

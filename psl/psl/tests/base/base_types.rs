@@ -65,11 +65,6 @@ fn parse_field_arity() {
         .assert_has_scalar_field("comments")
         .assert_base_type(&ScalarType::String)
         .assert_arity(&dml::FieldArity::List);
-
-    post_model
-        .assert_has_scalar_field("enums")
-        .assert_enum_type("Enum")
-        .assert_arity(&dml::FieldArity::List);
 }
 
 #[test]
@@ -228,7 +223,6 @@ fn resolve_enum_field() {
     user_model
         .assert_has_scalar_field("email")
         .assert_base_type(&ScalarType::String);
-    user_model.assert_has_scalar_field("role").assert_enum_type("Role");
 
     let role_enum = schema.assert_has_enum("Role");
     role_enum.assert_has_value("ADMIN");

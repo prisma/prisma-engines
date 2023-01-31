@@ -28,15 +28,11 @@ pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
     Arc::downgrade(&typ)
 }
 
-pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumTypeWeakRef {
-    let ident = Identifier::new(enum_name, MODEL_NAMESPACE);
+pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_id: ast::EnumId) -> EnumTypeWeakRef {
+    let ident = Identifier::new(ctx.internal_data_model.walk(enum_id).name(), MODEL_NAMESPACE);
     return_cached_enum!(ctx, &ident);
 
-    let schema_enum = ctx
-        .internal_data_model
-        .find_enum(enum_name)
-        .expect("Enum references must always be valid.");
-
+    let schema_enum = ctx.internal_data_model.clone().zip(enum_id);
     let typ = Arc::new(EnumType::database(ident.clone(), schema_enum));
 
     ctx.cache_enum_type(ident, typ.clone());

@@ -21,7 +21,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(e) => InputType::enum_type(map_schema_enum_type(ctx, e)),
+        TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, *id)),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),

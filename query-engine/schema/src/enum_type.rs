@@ -78,31 +78,28 @@ impl DatabaseEnumType {
     pub fn map_input_value(&self, val: &str) -> Option<PrismaValue> {
         Some(PrismaValue::Enum(
             self.internal_enum
-                .values
-                .iter()
-                .find(|ev| ev.name == val)?
-                .db_name()
-                .clone(),
+                .walker()
+                .values()
+                .find(|ev| ev.name() == val)?
+                .database_name()
+                .to_owned(),
         ))
     }
 
     pub fn map_output_value(&self, val: &str) -> Option<PrismaValue> {
-        Some(PrismaValue::Enum(
-            self.internal_enum
-                .values
-                .iter()
-                .find(|ev| ev.db_name() == val)?
-                .name
-                .clone(),
-        ))
+        self.internal_enum
+            .walker()
+            .values()
+            .find(|ev| ev.database_name() == val)
+            .map(|ev| PrismaValue::Enum(ev.name().to_owned()))
     }
 
     pub fn external_values(&self) -> Vec<String> {
         self.internal_enum
-            .values
-            .iter()
-            .map(|v| v.name.to_string())
-            .collect::<Vec<String>>()
+            .walker()
+            .values()
+            .map(|v| v.name().to_owned())
+            .collect()
     }
 }
 

@@ -24,7 +24,6 @@ pub(crate) trait FieldAsserts {
 pub(crate) trait ScalarFieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
     fn assert_unsupported_type(&self, t: &str) -> &Self;
-    fn assert_enum_type(&self, en: &str) -> &Self;
     fn assert_native_type(&self) -> &NativeTypeInstance;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
@@ -36,7 +35,6 @@ pub(crate) trait ScalarFieldAsserts {
 pub(crate) trait CompositeTypeFieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
-    fn assert_enum_type(&self, en: &str) -> &Self;
 }
 
 pub(crate) trait RelationFieldAsserts {
@@ -134,15 +132,6 @@ impl ScalarFieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_enum_type(&self, en: &str) -> &Self {
-        if let dml::FieldType::Enum(enum_type) = &self.field_type {
-            assert_eq!(enum_type, en);
-        } else {
-            panic!("Enum expected, but found {:?}", self.field_type);
-        }
-        self
-    }
-
     fn assert_native_type(&self) -> &NativeTypeInstance {
         if let dml::FieldType::Scalar(_, Some(t)) = &self.field_type {
             t
@@ -191,15 +180,6 @@ impl CompositeTypeFieldAsserts for dml::CompositeTypeField {
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self {
         assert_eq!(self.default_value, Some(t));
 
-        self
-    }
-
-    fn assert_enum_type(&self, en: &str) -> &Self {
-        if let dml::CompositeTypeFieldType::Enum(enum_type) = &self.r#type {
-            assert_eq!(enum_type, en);
-        } else {
-            panic!("Enum expected, but found {:?}", self.r#type);
-        }
         self
     }
 }

@@ -31,7 +31,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
         TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
-        TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, e)),
+        TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, *e)),
         TypeIdentifier::Json => OutputType::json(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),

@@ -4,6 +4,7 @@ use crate::{
     default_value::DefaultValue, native_type_instance::NativeTypeInstance, scalars::ScalarType, Field, FieldArity,
     FieldType, ScalarField,
 };
+use psl_core::parser_database::ast;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeType {
@@ -89,12 +90,19 @@ pub enum CompositeTypeFieldType {
     CompositeType(String),
     Scalar(ScalarType, Option<NativeTypeInstance>),
     /// This is an enum field, with an enum of the given name.
-    Enum(String),
+    Enum(ast::EnumId),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
 }
 
 impl CompositeTypeFieldType {
+    pub fn as_enum(&self) -> Option<ast::EnumId> {
+        match self {
+            CompositeTypeFieldType::Enum(id) => Some(*id),
+            _ => None,
+        }
+    }
+
     pub fn as_composite_type(&self) -> Option<&String> {
         if let Self::CompositeType(v) = self {
             Some(v)

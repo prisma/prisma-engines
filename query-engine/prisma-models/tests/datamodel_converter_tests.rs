@@ -75,7 +75,7 @@ fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
 #[test]
 fn an_empty_datamodel_must_work() {
     let datamodel = convert("");
-    assert!(datamodel.enums.is_empty());
+    assert_eq!(datamodel.schema.db.enums_count(), 0);
     assert!(datamodel.models().is_empty());
     assert!(datamodel.relations().is_empty());
 }
@@ -96,32 +96,15 @@ fn converting_enums() {
             }
         "#,
     );
-    let expected_values = vec![
-        InternalEnumValue {
-            name: "A".to_string(),
-            database_name: None,
-        },
-        InternalEnumValue {
-            name: "B".to_string(),
-            database_name: None,
-        },
-        InternalEnumValue {
-            name: "C".to_string(),
-            database_name: None,
-        },
-    ];
-    let enm = datamodel.enums.iter().find(|e| e.name == "MyEnum").unwrap();
-    assert_eq!(enm.values, expected_values);
-
-    let field = datamodel.assert_model("MyModel").assert_scalar_field("field");
-    assert_eq!(field.type_identifier(), TypeIdentifier::Enum("MyEnum".to_string()));
-    assert_eq!(
-        field.internal_enum(),
-        Some(&InternalEnum {
-            name: "MyEnum".to_string(),
-            values: expected_values
-        })
-    );
+    let enm = datamodel.find_enum("MyEnum").unwrap();
+    assert_eq!(enm.walker().values().len(), 3);
+    let model = datamodel.find_model("MyModel").unwrap();
+    let field = model.assert_scalar_field("field");
+    if let TypeIdentifier::Enum(id) = field.type_identifier() {
+        assert_eq!(enm.id, id)
+    } else {
+        panic!()
+    }
 }
 
 #[test]

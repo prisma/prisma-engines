@@ -12,7 +12,6 @@ pub struct InternalDataModel {
     pub(crate) relations: OnceCell<Vec<RelationRef>>,
     pub(crate) relation_fields: OnceCell<Vec<RelationFieldRef>>,
 
-    pub enums: Vec<InternalEnumRef>,
     pub schema: Arc<psl::ValidatedSchema>,
 }
 
@@ -37,11 +36,11 @@ impl InternalDataModel {
         self.relations.get().unwrap().as_slice()
     }
 
-    pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnumRef> {
-        self.enums
-            .iter()
-            .find(|e| e.name == name)
-            .cloned()
+    pub fn find_enum(self: &Arc<Self>, name: &str) -> crate::Result<InternalEnumRef> {
+        self.schema
+            .db
+            .find_enum(name)
+            .map(|enum_walker| self.clone().zip(enum_walker.id))
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
@@ -109,6 +108,14 @@ impl InternalDataModel {
                     .collect()
             })
             .as_slice()
+    }
+
+    pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {
+        self.schema.db.walk(id)
+    }
+
+    pub fn zip<I>(self: Arc<InternalDataModel>, id: I) -> crate::Zipper<I> {
+        crate::Zipper { id, dm: self }
     }
 }
 
