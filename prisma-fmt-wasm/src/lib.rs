@@ -11,6 +11,7 @@ pub fn get_config(params: String) -> Result<String, JsError> {
     prisma_fmt::get_config(params).map_err(|e| JsError::new(&e))
 }
 
+/// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
 #[wasm_bindgen]
 pub fn get_dmmf(params: String) -> Result<String, JsError> {
     prisma_fmt::get_dmmf(params).map_err(|e| JsError::new(&e))
