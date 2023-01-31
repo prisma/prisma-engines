@@ -2,7 +2,6 @@
 
 let
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ../prisma-fmt-wasm/rust-toolchain.toml;
-  deps = self'.packages.prisma-engines-deps;
   scriptsDir = ../prisma-fmt-wasm/scripts;
   inherit (pkgs) jq nodejs coreutils wasm-bindgen-cli stdenv;
   inherit (builtins) readFile replaceStrings;
@@ -10,10 +9,9 @@ in
 {
   packages.prisma-fmt-wasm = stdenv.mkDerivation {
     name = "prisma-fmt-wasm";
-    src = ../.;
     nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
+    inherit (self'.packages.prisma-engines) configurePhase src;
 
-    configurePhase = "mkdir .cargo && ln -s ${deps}/config.toml .cargo/config.toml";
     buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-fmt-build";
     installPhase = readFile "${scriptsDir}/install.sh";
   };

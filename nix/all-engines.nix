@@ -20,7 +20,6 @@ let
   libSuffix = if stdenv.isDarwin then "dylib" else "so";
 in
 {
-  packages.prisma-engines-deps = deps;
   packages.prisma-engines = stdenv.mkDerivation {
     name = "prisma-engines";
     inherit src;
@@ -37,9 +36,12 @@ in
       darwin.apple_sdk.frameworks.Security
     ];
 
-    buildPhase = ''
+    configurePhase = ''
       mkdir .cargo
       ln -s ${deps}/config.toml .cargo/config.toml
+    '';
+
+    buildPhase = ''
       cargo build --release --bins
       cargo build --release -p query-engine-node-api
     '';
@@ -58,13 +60,9 @@ in
     ({ profile }: stdenv.mkDerivation {
       name = "test-cli";
       inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
 
-      buildPhase = ''
-        mkdir .cargo
-        ln -s ${deps}/config.toml .cargo/config.toml
-        cargo build --profile=${profile} --bin=test-cli
-      '';
+      buildPhase = "cargo build --profile=${profile} --bin=test-cli";
 
       installPhase = ''
         set -eu
@@ -79,13 +77,9 @@ in
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-bin";
       inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
 
-      buildPhase = ''
-        mkdir .cargo
-        ln -s ${deps}/config.toml .cargo/config.toml
-        cargo build --profile=${profile} --bin=query-engine
-      '';
+      buildPhase = "cargo build --profile=${profile} --bin=query-engine";
 
       installPhase = ''
         set -eu
