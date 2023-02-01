@@ -3,6 +3,8 @@ use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 
+use crate::validate::SCHEMA_PARSER_ERROR_CODE;
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GetConfigParams {
@@ -17,7 +19,7 @@ struct GetConfigParams {
 
 #[derive(Debug)]
 struct GetConfigError {
-    error_code: Option<String>,
+    error_code: Option<&'static str>,
     message: String,
 }
 
@@ -49,7 +51,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
 
         GetConfigError {
             // this mirrors user_facing_errors::common::SchemaParserError
-            error_code: Some(String::from("P1012")),
+            error_code: Some(SCHEMA_PARSER_ERROR_CODE),
             message: full_error,
         }
     };
