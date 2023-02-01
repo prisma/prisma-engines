@@ -139,6 +139,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
+                    is_partition: false,
                 },
             ],
             enums: [],
@@ -1248,6 +1249,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                         0,
                     ),
                     name: "string_defaults_test",
+                    is_partition: false,
                 },
             ],
             enums: [],
@@ -1420,6 +1422,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                         0,
                     ),
                     name: "test",
+                    is_partition: false,
                 },
             ],
             enums: [],
@@ -1771,12 +1774,14 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Table_0",
+                    is_partition: false,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_0",
+                    is_partition: false,
                 },
             ],
             enums: [],
@@ -1989,30 +1994,35 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Table_0",
+                    is_partition: false,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         0,
                     ),
                     name: "Table_1",
+                    is_partition: false,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_0",
+                    is_partition: false,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_1",
+                    is_partition: false,
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_2",
+                    is_partition: false,
                 },
             ],
             enums: [],

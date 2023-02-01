@@ -48,9 +48,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
 
     // TODO(partition): fix this message.
     if model.is_partition() {
-        let docs = format!(
-            "This table is a partition table and requires additional setup for migrations to function correctly. Visit ..."
-        );
+        let docs = "This table is a partition table and requires additional setup for migrations to function correctly. Visit ...";
 
         rendered.documentation(docs);
     }
