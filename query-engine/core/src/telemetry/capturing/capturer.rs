@@ -99,7 +99,7 @@ impl SpanProcessor for Processor {
     /// In the case of mongo, an event represents the query, but it needs to be transformed before
     /// capturing it. `Event::query_event` does that.    
     fn on_end(&self, span_data: SpanData) {
-        _ = task::span_data_processed(span_data);
+        task::span_data_processed(span_data).unwrap();
     }
 
     fn force_flush(&self) -> TraceResult<()> {
@@ -131,7 +131,6 @@ mod task {
     }
 
     impl Candidate<'_> {
-        #[inline(always)]
         fn is_loggable_query_event(&self) -> bool {
             if self.settings.included_log_levels.contains("query") {
                 if let Some(target) = self.value.attributes.get("target") {
@@ -155,7 +154,6 @@ mod task {
             }
         }
 
-        #[inline(always)]
         fn is_loggable_event(&self) -> bool {
             self.settings.included_log_levels.contains(&self.value.level)
         }
@@ -169,21 +167,13 @@ mod task {
         StartCapturing(TraceId, Settings, oneshot::Sender<()>),
         /// Tells the task to fetch the captures for the given trace_id, and sendthem to the given sender
         FetchCaptures(TraceId, oneshot::Sender<Storage>),
-        /// Tells the task to cleaup traces that could have potentially expired
-        GC(TraceId),
     }
 
-    static TASK: Lazy<Sender<CaptureOp>> = Lazy::new(|| {
+    static SENDER: Lazy<Sender<CaptureOp>> = Lazy::new(|| {
         let (sender, receiver) = unbounded();
-        let cleanup_sender = sender.clone();
 
         std::thread::spawn(move || {
             let mut store: HashMap<TraceId, Storage> = Default::default();
-
-            let tokio = tokio::runtime::Builder::new_multi_thread()
-                .enable_all()
-                .build()
-                .unwrap();
 
             loop {
                 match receiver.recv() {
@@ -191,15 +181,8 @@ mod task {
                         tracing::trace!("capture task: start capturing for {:?}", trace_id);
 
                         let storage = Storage::from(settings);
-                        let ttl = storage.settings.ttl;
                         store.insert(trace_id, storage);
                         _ = op_sender.send(());
-
-                        let cleanup_sender = cleanup_sender.clone();
-                        tokio.spawn(async move {
-                            tokio::time::sleep(ttl).await;
-                            cleanup_sender.send(CaptureOp::GC(trace_id)).unwrap();
-                        });
                     }
                     Ok(CaptureOp::SpanDataProcessed(span_data)) => {
                         tracing::trace!("capture task: sending span data {:?}", span_data);
@@ -245,14 +228,6 @@ mod task {
                             _ = sender.send(Storage::default());
                         }
                     }
-                    Ok(CaptureOp::GC(trace_id)) => {
-                        if store.remove(&trace_id).is_some() {
-                            tracing::trace!(
-                                "Gargabe collected after trace capturing started for trace_id={:?}.",
-                                trace_id
-                            );
-                        }
-                    }
                     Err(_) => {
                         tracing::error!("recv error in capture task");
                         unreachable!("CAPTURE_TASK channel closed")
@@ -265,25 +240,24 @@ mod task {
     });
 
     pub(super) fn span_data_processed(span_data: SpanData) -> Result<(), SendError<CaptureOp>> {
-        TASK.send(CaptureOp::SpanDataProcessed(span_data))
+        SENDER.send(CaptureOp::SpanDataProcessed(span_data))
     }
 
     pub(crate) async fn start_capturing(trace_id: TraceId, settings: Settings) -> Result<(), ()> {
         let (sender, mut receiver) = tokio::sync::oneshot::channel::<()>();
-        TASK.send(CaptureOp::StartCapturing(trace_id, settings, sender))
+        SENDER
+            .send(CaptureOp::StartCapturing(trace_id, settings, sender))
             .unwrap();
 
         let mut interval = interval(Duration::from_millis(1));
-        let mut i = 0;
+        let start = std::time::Instant::now();
         loop {
             tokio::select! {
-                _ = interval.tick() => {
-                    i+=1;
-                },
                 _msg = &mut receiver => {
-                    tracing::trace!("waited {}ms to receive signal from start capturing", i);
+                    tracing::trace!("waited {}ms to receive signal from start capturing", start.elapsed().as_millis());
                     return Ok(());
                 }
+                _ = interval.tick() => {},
             }
         }
     }
@@ -292,18 +266,16 @@ mod task {
         trace_id: TraceId,
     ) -> Result<Storage, tokio::sync::oneshot::error::RecvError> {
         let (sender, mut receiver) = oneshot::channel::<Storage>();
-        TASK.send(CaptureOp::FetchCaptures(trace_id, sender)).unwrap();
+        SENDER.send(CaptureOp::FetchCaptures(trace_id, sender)).unwrap();
         let mut interval = interval(Duration::from_millis(1));
-        let mut i = 0;
+        let start = std::time::Instant::now();
         loop {
             tokio::select! {
-                _ = interval.tick() => {
-                    i+=1;
-                },
                 msg = &mut receiver => {
-                    tracing::trace!("waited {}ms to receive signal from fetch captures", i);
+                    tracing::trace!("waited {}ms to receive signal from fetch captures", start.elapsed().as_millis());
                     return msg;
                 }
+                _ = interval.tick() => {},
             }
         }
     }

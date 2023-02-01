@@ -1,7 +1,6 @@
-use std::{collections::HashSet, time};
+use std::collections::HashSet;
 
 static VALID_VALUES: &[&str] = &["error", "warn", "info", "debug", "trace", "query", "tracing"];
-static DEFAULT_TTL: time::Duration = time::Duration::from_secs(1800); // 30 minutes
 
 #[derive(Debug, Clone, Default)]
 pub struct Settings {
@@ -11,17 +10,13 @@ pub struct Settings {
     pub(super) included_log_levels: HashSet<String>,
     /// whether to include trace spans when capturing
     pub(super) include_traces: bool,
-    /// how long to keep captured traces in memory, if by any chance the capturing breaks, a tokio task
-    /// will clean captured traces after this duration. Defaults to [`DEFAULT_TTL`].
-    pub(super) ttl: time::Duration,
 }
 
 impl Settings {
-    pub(super) fn new(included_log_levels: HashSet<String>, include_traces: bool, ttl: time::Duration) -> Self {
+    pub(super) fn new(included_log_levels: HashSet<String>, include_traces: bool) -> Self {
         Self {
             include_traces,
             included_log_levels,
-            ttl,
         }
     }
 }
@@ -47,7 +42,7 @@ impl From<&str> for Settings {
         let include_traces = set.remove("tracing");
         let included_log_levels = set;
 
-        Self::new(included_log_levels, include_traces, DEFAULT_TTL)
+        Self::new(included_log_levels, include_traces)
     }
 }
 
