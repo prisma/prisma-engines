@@ -59,7 +59,7 @@ impl SelectDefinition for QueryArguments {
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
-        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions, ctx);
+        let cursor_condition = cursor_condition::build(&self, &model, &order_by_definitions, ctx);
         let aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
@@ -93,12 +93,6 @@ impl SelectDefinition for QueryArguments {
             .offset(skip as usize)
             .append_trace(&Span::current())
             .add_trace_id(ctx.trace_id);
-
-        let select_ast = if let Some(table) = table_opt {
-            select_ast.and_from(table)
-        } else {
-            select_ast
-        };
 
         let select_ast = order_by_definitions
             .iter()
