@@ -644,9 +644,13 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, _has_subclass) in names {
+        for (table_name, namespace, is_partition) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap());
+            let id = sql_schema.push_table(
+                table_name,
+                sql_schema.get_namespace_id(&namespace).unwrap(),
+                is_partition,
+            );
             map.insert((namespace, cloned_name), id);
         }
 

@@ -60,7 +60,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
         let table_id = ctx
             .schema
             .describer_schema
-            .push_table(model.database_name().to_owned(), namespace_id);
+            .push_table(model.database_name().to_owned(), namespace_id, false);
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         for field in model.scalar_fields() {
@@ -219,7 +219,10 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         };
 
         let namespace_id = ctx.walk(model_a_table_id).namespace_id(); // we put the join table in the schema of table A.
-        let table_id = ctx.schema.describer_schema.push_table(table_name.clone(), namespace_id);
+        let table_id = ctx
+            .schema
+            .describer_schema
+            .push_table(table_name.clone(), namespace_id, false);
         let column_a_type = ctx
             .walk(model_a_table_id)
             .primary_key_columns()

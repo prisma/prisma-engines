@@ -101,6 +101,11 @@ impl<'a> TableWalker<'a> {
         self.primary_key_columns().map(|cols| cols.len()).unwrap_or(0)
     }
 
+    /// Is the table a partition table?
+    pub fn is_partition(self) -> bool {
+        self.table().is_partition
+    }
+
     /// Reference to the underlying `Table` struct.
     fn table(self) -> &'a Table {
         &self.schema.tables[self.id.0 as usize]

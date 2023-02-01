@@ -32,6 +32,11 @@ impl<'a> ModelPair<'a> {
         self.context.uses_namespaces().then(|| self.next.namespace()).flatten()
     }
 
+    /// Whether the model is a partition table or not.
+    pub(crate) fn is_partition(self) -> bool {
+        self.next.is_partition()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.

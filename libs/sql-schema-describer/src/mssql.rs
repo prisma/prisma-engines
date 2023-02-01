@@ -225,7 +225,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
 
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(table_name, namespace_id);
+            let id = sql_schema.push_table(table_name, namespace_id, false);
             map.insert((namespace, cloned_name), id);
         }
 
