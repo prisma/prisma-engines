@@ -14,6 +14,7 @@
 //!    - it can be aliased,
 //!    - it can have a number of nested selections (selection set in GQL).
 //! - Arguments contain concrete values and complex subtypes that are parsed and validated by the query builders, and then used for querying data (input types in GQL).
+mod argument_value;
 mod error;
 mod operation;
 mod parse_ast;
@@ -21,6 +22,7 @@ mod parser;
 mod selection;
 mod transformers;
 
+pub use argument_value::*;
 pub use error::*;
 pub use operation::*;
 pub use parse_ast::*;
@@ -29,7 +31,7 @@ pub use selection::*;
 pub use transformers::*;
 
 use crate::query_graph_builder::resolve_compound_field;
-use prisma_models::{ModelRef, PrismaValue};
+use prisma_models::ModelRef;
 use schema::QuerySchemaRef;
 use schema_builder::constants::*;
 use std::collections::HashMap;
@@ -79,12 +81,12 @@ impl BatchDocument {
 
         where_obj.iter().any(|(key, val)| match val {
             // If it's a compound, then it's still considered as scalar
-            PrismaValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
+            ArgumentValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(&key) {
                 Ok(_) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
-                    PrismaValue::Object(obj) => !obj.iter().any(|(k, _)| k.as_str() == filters::EQUALS),
+                    ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
                     _ => false,
                 },
                 Err(_) => true,
@@ -155,7 +157,7 @@ impl BatchDocumentTransaction {
 
 #[derive(Debug, Clone)]
 pub struct CompactedDocument {
-    pub arguments: Vec<HashMap<String, PrismaValue>>,
+    pub arguments: Vec<HashMap<String, ArgumentValue>>,
     pub nested_selection: Vec<String>,
     pub operation: Operation,
     pub keys: Vec<String>,
@@ -243,11 +245,11 @@ impl CompactedDocument {
 
         // Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
-        let arguments: Vec<HashMap<String, PrismaValue>> = selections
+        let arguments: Vec<HashMap<String, ArgumentValue>> = selections
             .into_iter()
             .map(|mut sel| {
                 let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
-                let filter_map: HashMap<String, PrismaValue> = extract_filter(where_obj, model).into_iter().collect();
+                let filter_map: HashMap<String, ArgumentValue> = extract_filter(where_obj, model).into_iter().collect();
 
                 filter_map
             })
@@ -257,7 +259,7 @@ impl CompactedDocument {
         let keys: Vec<_> = arguments[0]
             .iter()
             .flat_map(|pair| match pair {
-                (_, PrismaValue::Object(obj)) => obj.iter().map(|(key, _)| key.to_owned()).collect(),
+                (_, ArgumentValue::Object(obj)) => obj.keys().map(ToOwned::to_owned).collect(),
                 (key, _) => vec![key.to_owned()],
             })
             .collect();
@@ -281,19 +283,16 @@ impl CompactedDocument {
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
 /// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that's not worth it for now.
-fn extract_filter(where_obj: Vec<SelectionArgument>, model: &ModelRef) -> Vec<SelectionArgument> {
+fn extract_filter(where_obj: ArgumentValueObject, model: &ModelRef) -> Vec<SelectionArgument> {
     where_obj
         .into_iter()
         .flat_map(|(key, val)| match val {
             // This means our query has a compound field in the form of: {co1_col2: { col1_col2: { col1: <val>, col2: <val> } }}
-            PrismaValue::Object(obj) if resolve_compound_field(&key, model).is_some() => obj.into_iter().collect(),
+            ArgumentValue::Object(obj) if resolve_compound_field(&key, model).is_some() => obj.into_iter().collect(),
             // This means our query has a scalar filter in the form of {col1: { equals: <val> }}
-            PrismaValue::Object(obj) => {
+            ArgumentValue::Object(obj) => {
                 // This is safe because it's been validated before in the `.can_compact` method.
-                let (_, equal_val) = obj
-                    .iter()
-                    .find(|(k, _)| k == filters::EQUALS)
-                    .expect("we only support scalar equals filters");
+                let equal_val = obj.get(filters::EQUALS).expect("we only support scalar equals filters");
 
                 vec![(key, equal_val.clone())]
             }

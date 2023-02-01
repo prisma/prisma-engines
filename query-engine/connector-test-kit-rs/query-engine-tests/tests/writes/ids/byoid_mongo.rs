@@ -97,7 +97,7 @@ mod byoi_mongo {
               createOneParent(data: {p: "Parent", id: 12}){p, id}
             }"#,
             2009,
-            "`Mutation.createOneParent.data.ParentUncheckedCreateInput.id`: Value types mismatch. Have: Int(12), want: String"
+            "`Mutation.createOneParent.data.ParentUncheckedCreateInput.id`: Value types mismatch. Have: Scalar(Int(12)), want: String"
         );
 
         Ok(())
@@ -112,7 +112,7 @@ mod byoi_mongo {
                   createOneParent(data: {p: "Parent", id: 12}){p, id}
                 }"#,
             2009,
-            "`Mutation.createOneParent.data.ParentUncheckedCreateInput.id`: Value types mismatch. Have: Int(12), want: String"
+            "`Mutation.createOneParent.data.ParentUncheckedCreateInput.id`: Value types mismatch. Have: Scalar(Int(12)), want: String"
         );
 
         Ok(())

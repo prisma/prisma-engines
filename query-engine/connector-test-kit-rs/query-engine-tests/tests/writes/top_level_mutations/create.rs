@@ -195,7 +195,7 @@ mod create {
             }
           ){ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#,
           2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch. Have: Enum(\"B\"), want: Int"
+          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch. Have: Scalar(Enum(\"B\")), want: Int"
         );
 
         Ok(())
@@ -372,7 +372,7 @@ mod json_create {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "Value types mismatch. Have: Scalar(Enum(\"AnyNull\"))"
         );
 
         Ok(())
