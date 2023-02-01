@@ -11,6 +11,9 @@ pub(crate) fn run(input_schema: &str) -> Result<(), String> {
         return Ok(());
     }
 
+    // always colorise output regardless of the environment
+    colored::control::set_override(true);
+
     use std::fmt::Write as _;
     let mut formatted_error = diagnostics.to_pretty_string("schema.prisma", input_schema);
     write!(

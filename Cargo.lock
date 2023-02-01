@@ -2954,6 +2954,7 @@ dependencies = [
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
+ "colored",
  "dissimilar",
  "dmmf",
  "enumflags2",
