@@ -6,6 +6,7 @@ mod lint;
 mod native;
 mod preview;
 mod text_document_completion;
+mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
@@ -65,6 +66,28 @@ pub fn lint(schema: String) -> String {
     lint::run(&schema)
 }
 
+/// Function that emulates what happened when improperly calling the `getDmmf` query engine RPC on invalid schemas.
+/// When the schema is valid, nothing happens.
+/// When the schema is invalid, the function displays a human-friendly error message indicating the schema lines
+/// where the errors lie and the total error count, e.g.:
+///
+/// ```sh
+/// The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.
+///   -->  schema.prisma:5
+///   |
+/// 4 |   relationMode         = "prisma"
+/// 5 |   referentialIntegrity = "foreignKeys"
+/// 6 | }
+///   |
+///
+/// Validation Error Count: 1
+/// ```
+///
+/// This function doesn't panic.
+pub fn validate(schema: String) -> Result<(), String> {
+    validate::run(&schema)
+}
+
 pub fn native_types(schema: String) -> String {
     native::run(&schema)
 }
@@ -119,7 +142,39 @@ pub fn get_config(get_config_params: String) -> Result<String, String> {
     get_config::get_config(&get_config_params)
 }
 
-pub fn get_dmmf(get_dmmf_params: String) -> String {
+/// This is the same command as get_config()
+///
+/// Params is a JSON string with the following shape:
+///
+/// ```ignore
+/// interface GetDmmfParams {
+///   prismaSchema: string
+/// }
+/// ```
+/// Params example:
+///
+/// ```ignore
+/// {
+///   "prismaSchema": <the prisma schema>,
+/// }
+/// ```
+///
+/// The response is a JSON string with the following shape:
+///
+/// ```ignore
+/// type GetDmmfSuccessResponse = any // same as QE getDmmf
+///
+/// interface GetDmmfErrorResponse {
+///   error: {
+///     error_code?: string
+///     message: string
+///   }
+/// }
+///
+/// type GetDmmfResponse = GetDmmfErrorResponse | GetDmmfSuccessResponse
+///
+/// ```
+pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
     get_dmmf::get_dmmf(&get_dmmf_params)
 }
 
