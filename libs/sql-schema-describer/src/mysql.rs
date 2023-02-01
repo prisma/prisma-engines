@@ -285,7 +285,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (name, is_partition) in names {
             let cloned_name = name.clone();
-            let id = sql_schema.push_table(name, Default::default(), is_partition);
+            let id = if is_partition {
+                sql_schema.push_table_partitioned(name, Default::default())
+            } else {
+                sql_schema.push_table(name, Default::default())
+            };
             map.insert(cloned_name, id);
         }
 

@@ -327,12 +327,22 @@ impl SqlSchema {
         id
     }
 
-    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId, is_partition: bool) -> TableId {
+    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
         let id = TableId(self.tables.len() as u32);
         self.tables.push(Table {
             namespace_id,
             name,
-            is_partition,
+            is_partition: false,
+        });
+        id
+    }
+
+    pub fn push_table_partitioned(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
+        let id = TableId(self.tables.len() as u32);
+        self.tables.push(Table {
+            namespace_id,
+            name,
+            is_partition: true,
         });
         id
     }

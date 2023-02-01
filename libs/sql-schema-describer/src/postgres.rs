@@ -103,6 +103,7 @@ impl fmt::Display for SqlIndexAlgorithm {
 pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
+    CanPartitionTables,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -615,13 +616,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
-        let version_sql = "select current_setting('server_version_num')::integer as version;";
-        let version_rows = self.conn.query_raw(version_sql, &[]).await?;
-        let version_result = version_rows.into_iter().map(|r| r.get_expect_i64("version")).next();
-
-        let sql = match version_result {
-            Some(version) if version >= 100000 => include_str!("postgres/tables_query.sql"),
-            _ => include_str!("postgres/tables_query_simple.sql"),
+        let sql = if self.circumstances.contains(Circumstances::CanPartitionTables) {
+            include_str!("postgres/tables_query.sql")
+        } else {
+            include_str!("postgres/tables_query_simple.sql")
         };
 
         let namespaces = &sql_schema.namespaces;
@@ -646,11 +644,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for (table_name, namespace, is_partition) in names {
             let cloned_name = table_name.clone();
-            let id = sql_schema.push_table(
-                table_name,
-                sql_schema.get_namespace_id(&namespace).unwrap(),
-                is_partition,
-            );
+            let id = if is_partition {
+                sql_schema.push_table_partitioned(table_name, sql_schema.get_namespace_id(&namespace).unwrap())
+            } else {
+                sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap())
+            };
             map.insert((namespace, cloned_name), id);
         }
 
