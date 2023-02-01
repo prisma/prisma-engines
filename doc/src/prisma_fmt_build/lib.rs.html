@@ -67,6 +67,12 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
 </pre><pre class="rust"><code><span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[wasm_bindgen]
@@ -80,14 +86,20 @@
     prisma_fmt::get_config(params).map_err(|e| JsError::new(<span class="kw-2">&amp;</span>e))
 }
 
-<span class="attr">#[wasm_bindgen]
-</span><span class="kw">pub fn </span>get_dmmf(params: String) -&gt; String {
-    prisma_fmt::get_dmmf(params)
+<span class="doccomment">/// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
+</span><span class="attr">#[wasm_bindgen]
+</span><span class="kw">pub fn </span>get_dmmf(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;String, JsError&gt; {
+    prisma_fmt::get_dmmf(params).map_err(|e| JsError::new(<span class="kw-2">&amp;</span>e))
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>lint(input: String) -&gt; String {
     prisma_fmt::lint(input)
+}
+
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">pub fn </span>validate(schema: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    prisma_fmt::validate(schema)
 }
 
 <span class="attr">#[wasm_bindgen]

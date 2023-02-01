@@ -271,10 +271,14 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::Diagnostics;
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>serde_json::json;
 <span class="kw">use </span>std::collections::HashMap;
+
+<span class="kw">use </span><span class="kw">crate</span>::validate::SCHEMA_PARSER_ERROR_CODE;
 
 <span class="attr">#[derive(Deserialize, Debug)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
@@ -290,7 +294,7 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">struct </span>GetConfigError {
-    error_code: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    error_code: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
     message: String,
 }
 
@@ -322,7 +326,7 @@
 
         GetConfigError {
             <span class="comment">// this mirrors user_facing_errors::common::SchemaParserError
-            </span>error_code: <span class="prelude-val">Some</span>(String::from(<span class="string">&quot;P1012&quot;</span>)),
+            </span>error_code: <span class="prelude-val">Some</span>(SCHEMA_PARSER_ERROR_CODE),
             message: full_error,
         }
     };
