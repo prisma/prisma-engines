@@ -1,7 +1,8 @@
 use serde_json::json;
+use std::fmt::Write as _;
 
 // this mirrors user_facing_errors::common::SchemaParserError
-pub static SCHEMA_PARSER_ERROR_CODE: &str = "P1012";
+pub(crate) static SCHEMA_PARSER_ERROR_CODE: &str = "P1012";
 
 pub(crate) fn run(input_schema: &str) -> Result<(), String> {
     let validate_schema = psl::validate(input_schema.into());
@@ -11,10 +12,9 @@ pub(crate) fn run(input_schema: &str) -> Result<(), String> {
         return Ok(());
     }
 
-    // always colorise output regardless of the environment
+    // always colorise output regardless of the environment, which is important for Wasm
     colored::control::set_override(true);
 
-    use std::fmt::Write as _;
     let mut formatted_error = diagnostics.to_pretty_string("schema.prisma", input_schema);
     write!(
         formatted_error,

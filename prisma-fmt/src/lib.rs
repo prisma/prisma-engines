@@ -66,7 +66,8 @@ pub fn lint(schema: String) -> String {
     lint::run(&schema)
 }
 
-/// Function that emulates what happened when improperly calling the `getDmmf` query engine RPC on invalid schemas.
+/// Function that throws a human-friendly error message when the schema is invalid, following the JSON formatting
+/// historically used by the Query Engine's `user_facing_errors::common::SchemaParserError`.
 /// When the schema is valid, nothing happens.
 /// When the schema is invalid, the function displays a human-friendly error message indicating the schema lines
 /// where the errors lie and the total error count, e.g.:
@@ -83,7 +84,7 @@ pub fn lint(schema: String) -> String {
 /// Validation Error Count: 1
 /// ```
 ///
-/// This function doesn't panic.
+/// This function isn't supposed to panic.
 pub fn validate(schema: String) -> Result<(), String> {
     validate::run(&schema)
 }
@@ -142,7 +143,7 @@ pub fn get_config(get_config_params: String) -> Result<String, String> {
     get_config::get_config(&get_config_params)
 }
 
-/// This is the same command as get_config()
+/// This is the same command as get_dmmf()
 ///
 /// Params is a JSON string with the following shape:
 ///
