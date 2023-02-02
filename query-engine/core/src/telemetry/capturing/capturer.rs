@@ -115,11 +115,10 @@ impl SpanProcessor for Processor {
 
 mod task {
     use super::*;
-    use core::panic;
     use crossbeam_channel::*;
     use once_cell::sync::Lazy;
-    use std::{collections::HashMap, time::Duration};
-    use tokio::{sync::oneshot, time::interval};
+    use std::collections::HashMap;
+    use tokio::sync::oneshot;
 
     const VALID_QUERY_ATTRS: [&str; 4] = ["query", "params", "target", "duration_ms"];
     /// A Candidate represents either a span or an event that is being considered for capturing.
@@ -243,40 +242,22 @@ mod task {
         SENDER.send(CaptureOp::SpanDataProcessed(span_data))
     }
 
-    pub(crate) async fn start_capturing(trace_id: TraceId, settings: Settings) -> Result<(), ()> {
-        let (sender, mut receiver) = tokio::sync::oneshot::channel::<()>();
+    pub(crate) async fn start_capturing(
+        trace_id: TraceId,
+        settings: Settings,
+    ) -> Result<(), tokio::sync::oneshot::error::RecvError> {
+        let (sender, receiver) = tokio::sync::oneshot::channel::<()>();
         SENDER
             .send(CaptureOp::StartCapturing(trace_id, settings, sender))
             .unwrap();
-
-        let mut interval = interval(Duration::from_millis(1));
-        let start = std::time::Instant::now();
-        loop {
-            tokio::select! {
-                _msg = &mut receiver => {
-                    tracing::trace!("waited {}ms to receive signal from start capturing", start.elapsed().as_millis());
-                    return Ok(());
-                }
-                _ = interval.tick() => {},
-            }
-        }
+        receiver.await
     }
 
     pub(crate) async fn fetch_captures_for_trace(
         trace_id: TraceId,
     ) -> Result<Storage, tokio::sync::oneshot::error::RecvError> {
-        let (sender, mut receiver) = oneshot::channel::<Storage>();
+        let (sender, receiver) = oneshot::channel::<Storage>();
         SENDER.send(CaptureOp::FetchCaptures(trace_id, sender)).unwrap();
-        let mut interval = interval(Duration::from_millis(1));
-        let start = std::time::Instant::now();
-        loop {
-            tokio::select! {
-                msg = &mut receiver => {
-                    tracing::trace!("waited {}ms to receive signal from fetch captures", start.elapsed().as_millis());
-                    return msg;
-                }
-                _ = interval.tick() => {},
-            }
-        }
+        receiver.await
     }
 }
