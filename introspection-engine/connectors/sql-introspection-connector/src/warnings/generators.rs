@@ -447,7 +447,6 @@ pub(super) fn warning_enriched_with_custom_primary_key_names_in_views(affected: 
     }
 }
 
-// TODO(partition): fix this message.
 pub(super) fn warning_fields_with_empty_names_in_views(affected: &[ViewAndField]) -> Warning {
     Warning {
         code: 26,
@@ -458,7 +457,7 @@ pub(super) fn warning_fields_with_empty_names_in_views(affected: &[ViewAndField]
 }
 
 pub(super) fn partition_tables_found(affected: &[Model]) -> Warning {
-    let message = "Partition table owie";
+    let message = "These tables are partition tables, which are not yet fully supported.";
 
     Warning {
         code: 27,
