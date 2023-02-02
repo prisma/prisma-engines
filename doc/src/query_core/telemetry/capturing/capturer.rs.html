@@ -261,25 +261,6 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{settings::Settings, storage::Storage};
 <span class="kw">use </span><span class="kw">crate</span>::models;
 <span class="kw">use </span>opentelemetry::{
@@ -397,11 +378,10 @@
 
 <span class="kw">mod </span>task {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>core::panic;
     <span class="kw">use </span>crossbeam_channel::<span class="kw-2">*</span>;
     <span class="kw">use </span>once_cell::sync::Lazy;
-    <span class="kw">use </span>std::{collections::HashMap, time::Duration};
-    <span class="kw">use </span>tokio::{sync::oneshot, time::interval};
+    <span class="kw">use </span>std::collections::HashMap;
+    <span class="kw">use </span>tokio::sync::oneshot;
 
     <span class="kw">const </span>VALID_QUERY_ATTRS: [<span class="kw-2">&amp;</span>str; <span class="number">4</span>] = [<span class="string">&quot;query&quot;</span>, <span class="string">&quot;params&quot;</span>, <span class="string">&quot;target&quot;</span>, <span class="string">&quot;duration_ms&quot;</span>];
     <span class="doccomment">/// A Candidate represents either a span or an event that is being considered for capturing.
@@ -525,42 +505,24 @@
         SENDER.send(CaptureOp::SpanDataProcessed(span_data))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>start_capturing(trace_id: TraceId, settings: Settings) -&gt; <span class="prelude-ty">Result</span>&lt;(), ()&gt; {
-        <span class="kw">let </span>(sender, <span class="kw-2">mut </span>receiver) = tokio::sync::oneshot::channel::&lt;()&gt;();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>start_capturing(
+        trace_id: TraceId,
+        settings: Settings,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), tokio::sync::oneshot::error::RecvError&gt; {
+        <span class="kw">let </span>(sender, receiver) = tokio::sync::oneshot::channel::&lt;()&gt;();
         SENDER
             .send(CaptureOp::StartCapturing(trace_id, settings, sender))
             .unwrap();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>interval = interval(Duration::from_millis(<span class="number">1</span>));
-        <span class="kw">let </span>start = std::time::Instant::now();
-        <span class="kw">loop </span>{
-            <span class="macro">tokio::select! </span>{
-                _msg = <span class="kw-2">&amp;mut </span>receiver =&gt; {
-                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;waited {}ms to receive signal from start capturing&quot;</span>, start.elapsed().as_millis());
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
-                }
-                <span class="kw">_ </span>= interval.tick() =&gt; {},
-            }
-        }
-    }
+        receiver.<span class="kw">await
+    </span>}
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>fetch_captures_for_trace(
         trace_id: TraceId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Storage, tokio::sync::oneshot::error::RecvError&gt; {
-        <span class="kw">let </span>(sender, <span class="kw-2">mut </span>receiver) = oneshot::channel::&lt;Storage&gt;();
+        <span class="kw">let </span>(sender, receiver) = oneshot::channel::&lt;Storage&gt;();
         SENDER.send(CaptureOp::FetchCaptures(trace_id, sender)).unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>interval = interval(Duration::from_millis(<span class="number">1</span>));
-        <span class="kw">let </span>start = std::time::Instant::now();
-        <span class="kw">loop </span>{
-            <span class="macro">tokio::select! </span>{
-                msg = <span class="kw-2">&amp;mut </span>receiver =&gt; {
-                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;waited {}ms to receive signal from fetch captures&quot;</span>, start.elapsed().as_millis());
-                    <span class="kw">return </span>msg;
-                }
-                <span class="kw">_ </span>= interval.tick() =&gt; {},
-            }
-        }
-    }
+        receiver.<span class="kw">await
+    </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
