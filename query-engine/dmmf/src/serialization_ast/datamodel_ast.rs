@@ -13,7 +13,7 @@ pub struct Field {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub db_name: Option<String>,
-    pub kind: String,
+    pub kind: &'static str,
     pub is_list: bool,
     pub is_required: bool,
     pub is_unique: bool,

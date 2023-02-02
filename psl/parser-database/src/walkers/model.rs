@@ -6,7 +6,7 @@ pub use primary_key::*;
 pub(crate) use unique_criteria::*;
 
 use super::{
-    CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
     ScalarFieldWalker,
 };
 use crate::{
@@ -22,6 +22,13 @@ impl<'db> ModelWalker<'db> {
     /// The name of the model.
     pub fn name(self) -> &'db str {
         self.ast_model().name()
+    }
+
+    /// Traverse the fields of the models in the order they were defined.
+    pub fn fields(self) -> impl ExactSizeIterator<Item = FieldWalker<'db>> + Clone {
+        self.ast_model()
+            .iter_fields()
+            .map(move |(field_id, _)| self.walk((self.id, field_id)))
     }
 
     /// Whether MySQL would consider the field indexed for autoincrement purposes.
