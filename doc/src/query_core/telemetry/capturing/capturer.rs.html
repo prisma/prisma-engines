@@ -223,6 +223,63 @@
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{settings::Settings, storage::Storage};
 <span class="kw">use </span><span class="kw">crate</span>::models;
 <span class="kw">use </span>opentelemetry::{
@@ -232,7 +289,6 @@
     },
     trace::{TraceId, TraceResult},
 };
-<span class="kw">use </span>std::{collections::HashMap, sync::Arc, sync::Mutex};
 
 <span class="doccomment">/// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
 /// Generally, both the trace id and the settings will be derived from request headers. Thus, a new
@@ -279,37 +335,19 @@
 <span class="doccomment">/// A [`SpanProcessor`] that captures and stores spans in memory in a synchronized dictionary for
 /// later retrieval
 </span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>Processor {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) storage: Arc&lt;Mutex&lt;HashMap&lt;TraceId, Storage&gt;&gt;&gt;,
-}
+</span><span class="kw">pub struct </span>Processor {}
 
 <span class="kw">impl </span>Processor {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            storage: Default::default(),
-        }
+        <span class="self">Self </span>{}
     }
 
     <span class="kw">async fn </span>start_capturing(<span class="kw-2">&amp;</span><span class="self">self</span>, trace_id: TraceId, settings: Settings) {
-        <span class="kw">let </span><span class="kw-2">mut </span>locked_storage = <span class="self">self</span>.storage.lock().unwrap();
-        locked_storage.insert(trace_id, settings.clone().into());
-        drop(locked_storage);
-
-        <span class="kw">let </span>ttl = settings.ttl;
-        <span class="kw">let </span>storage = <span class="self">self</span>.storage.clone();
-        tokio::spawn(<span class="kw">async move </span>{
-            tokio::time::sleep(ttl).<span class="kw">await</span>;
-            <span class="kw">let </span><span class="kw-2">mut </span>locked_traces = storage.lock().unwrap();
-            <span class="kw">if </span>locked_traces.remove(<span class="kw-2">&amp;</span>trace_id).is_some() {
-                <span class="macro">warn!</span>(<span class="string">&quot;Timeout waiting for telemetry to be captured. trace_id={}&quot;</span>, trace_id)
-            }
-        });
+        task::start_capturing(trace_id, settings).<span class="kw">await</span>.unwrap();
     }
 
     <span class="kw">async fn </span>fetch_captures(<span class="kw-2">&amp;</span><span class="self">self</span>, trace_id: TraceId) -&gt; <span class="prelude-ty">Option</span>&lt;Storage&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>traces = <span class="self">self</span>.storage.lock().unwrap();
-
-        traces.remove(<span class="kw-2">&amp;</span>trace_id)
+        task::fetch_captures_for_trace(trace_id).<span class="kw">await</span>.ok()
     }
 }
 
@@ -343,32 +381,7 @@
     /// In the case of mongo, an event represents the query, but it needs to be transformed before
     /// capturing it. `Event::query_event` does that.    
     </span><span class="kw">fn </span>on_end(<span class="kw-2">&amp;</span><span class="self">self</span>, span_data: SpanData) {
-        <span class="kw">let </span>trace_id = span_data.span_context.trace_id();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>locked_storage = <span class="self">self</span>.storage.lock().unwrap();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(storage) = locked_storage.get_mut(<span class="kw-2">&amp;</span>trace_id) {
-            <span class="kw">let </span>settings = storage.settings.clone();
-
-            <span class="kw">let </span>(events, span) = models::TraceSpan::from(span_data).split_events();
-
-            <span class="kw">if </span>settings.traces_enabled() {
-                storage.traces.push(span);
-            }
-
-            <span class="kw">if </span>storage.settings.logs_enabled() {
-                events.into_iter().for_each(|log| {
-                    <span class="kw">let </span>candidate = Candidate {
-                        value: log,
-                        settings: <span class="kw-2">&amp;</span>settings,
-                    };
-                    <span class="kw">if </span>candidate.is_loggable_query_event() {
-                        storage.logs.push(candidate.query_event())
-                    } <span class="kw">else if </span>candidate.is_loggable_event() {
-                        storage.logs.push(candidate.value)
-                    }
-                });
-            }
-        }
+        task::span_data_processed(span_data).unwrap();
     }
 
     <span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceResult&lt;()&gt; {
@@ -381,71 +394,172 @@
         </span><span class="prelude-val">Ok</span>(())
     }
 }
-<span class="kw">const </span>VALID_QUERY_ATTRS: [<span class="kw-2">&amp;</span>str; <span class="number">4</span>] = [<span class="string">&quot;query&quot;</span>, <span class="string">&quot;params&quot;</span>, <span class="string">&quot;target&quot;</span>, <span class="string">&quot;duration_ms&quot;</span>];
-<span class="doccomment">/// A Candidate represents either a span or an event that is being considered for capturing.
-/// A Candidate can be converted into a [`Capture`].
-</span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">struct </span>Candidate&lt;<span class="lifetime">&#39;batch_iter</span>&gt; {
-    value: models::LogEvent,
-    settings: <span class="kw-2">&amp;</span><span class="lifetime">&#39;batch_iter </span>Settings,
-}
 
-<span class="kw">impl </span>Candidate&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>is_loggable_query_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">if </span><span class="self">self</span>.settings.included_log_levels.contains(<span class="string">&quot;query&quot;</span>) {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = <span class="self">self</span>.value.attributes.get(<span class="string">&quot;target&quot;</span>) {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = target.as_str() {
-                    <span class="kw">return </span>(val == <span class="string">&quot;quaint::connector::metrics&quot; </span>&amp;&amp; <span class="self">self</span>.value.attributes.get(<span class="string">&quot;query&quot;</span>).is_some())
-                        || val == <span class="string">&quot;mongodb_query_connector::query&quot;</span>;
+<span class="kw">mod </span>task {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>core::panic;
+    <span class="kw">use </span>crossbeam_channel::<span class="kw-2">*</span>;
+    <span class="kw">use </span>once_cell::sync::Lazy;
+    <span class="kw">use </span>std::{collections::HashMap, time::Duration};
+    <span class="kw">use </span>tokio::{sync::oneshot, time::interval};
+
+    <span class="kw">const </span>VALID_QUERY_ATTRS: [<span class="kw-2">&amp;</span>str; <span class="number">4</span>] = [<span class="string">&quot;query&quot;</span>, <span class="string">&quot;params&quot;</span>, <span class="string">&quot;target&quot;</span>, <span class="string">&quot;duration_ms&quot;</span>];
+    <span class="doccomment">/// A Candidate represents either a span or an event that is being considered for capturing.
+    /// A Candidate can be converted into a [`Capture`].
+    </span><span class="attr">#[derive(Debug, Clone)]
+    </span><span class="kw">struct </span>Candidate&lt;<span class="lifetime">&#39;batch_iter</span>&gt; {
+        value: models::LogEvent,
+        settings: <span class="kw-2">&amp;</span><span class="lifetime">&#39;batch_iter </span>Settings,
+    }
+
+    <span class="kw">impl </span>Candidate&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">fn </span>is_loggable_query_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="kw">if </span><span class="self">self</span>.settings.included_log_levels.contains(<span class="string">&quot;query&quot;</span>) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = <span class="self">self</span>.value.attributes.get(<span class="string">&quot;target&quot;</span>) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = target.as_str() {
+                        <span class="kw">return </span>(val == <span class="string">&quot;quaint::connector::metrics&quot; </span>&amp;&amp; <span class="self">self</span>.value.attributes.get(<span class="string">&quot;query&quot;</span>).is_some())
+                            || val == <span class="string">&quot;mongodb_query_connector::query&quot;</span>;
+                    }
                 }
             }
+            <span class="bool-val">false
+        </span>}
+
+        <span class="kw">fn </span>query_event(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; models::LogEvent {
+            <span class="self">self</span>.value
+                .attributes
+                .retain(|key, <span class="kw">_</span>| (<span class="kw-2">&amp;</span>VALID_QUERY_ATTRS).contains(<span class="kw-2">&amp;</span>key.as_str()));
+
+            models::LogEvent {
+                level: <span class="string">&quot;query&quot;</span>.to_string(),
+                ..<span class="self">self</span>.value
+            }
         }
-        <span class="bool-val">false
-    </span>}
 
-    <span class="kw">fn </span>query_event(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; models::LogEvent {
-        <span class="self">self</span>.value
-            .attributes
-            .retain(|key, <span class="kw">_</span>| (<span class="kw-2">&amp;</span>VALID_QUERY_ATTRS).contains(<span class="kw-2">&amp;</span>key.as_str()));
-
-        models::LogEvent {
-            level: <span class="string">&quot;query&quot;</span>.to_string(),
-            ..<span class="self">self</span>.value
+        <span class="kw">fn </span>is_loggable_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="self">self</span>.settings.included_log_levels.contains(<span class="kw-2">&amp;</span><span class="self">self</span>.value.level)
         }
     }
 
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>is_loggable_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.settings.included_log_levels.contains(<span class="kw-2">&amp;</span><span class="self">self</span>.value.level)
+    <span class="attr">#[derive(Debug)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>CaptureOp {
+        <span class="doccomment">/// Tells the task that the given span data has been processed by the span processor
+        </span>SpanDataProcessed(SpanData),
+        <span class="doccomment">/// Tells the task to start capturing for the given trace id
+        </span>StartCapturing(TraceId, Settings, oneshot::Sender&lt;()&gt;),
+        <span class="doccomment">/// Tells the task to fetch the captures for the given trace_id, and sendthem to the given sender
+        </span>FetchCaptures(TraceId, oneshot::Sender&lt;Storage&gt;),
     }
-}
 
-<span class="doccomment">/// tests for capture exporter
-</span><span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>tests {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>std::time::Duration;
+    <span class="kw">static </span>SENDER: Lazy&lt;Sender&lt;CaptureOp&gt;&gt; = Lazy::new(|| {
+        <span class="kw">let </span>(sender, receiver) = unbounded();
 
-    <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>test_garbage_collection() {
-        <span class="kw">let </span>exporter = Processor::new();
+        std::thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>store: HashMap&lt;TraceId, Storage&gt; = Default::default();
 
-        <span class="kw">let </span>trace_id = TraceId::from_hex(<span class="string">&quot;1&quot;</span>).unwrap();
-        <span class="kw">let </span>one_ms = Duration::from_millis(<span class="number">1</span>);
+            <span class="kw">loop </span>{
+                <span class="kw">match </span>receiver.recv() {
+                    <span class="prelude-val">Ok</span>(CaptureOp::StartCapturing(trace_id, settings, op_sender)) =&gt; {
+                        <span class="macro">tracing::trace!</span>(<span class="string">&quot;capture task: start capturing for {:?}&quot;</span>, trace_id);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>settings = Settings::default();
-        settings.ttl = one_ms;
+                        <span class="kw">let </span>storage = Storage::from(settings);
+                        store.insert(trace_id, storage);
+                        <span class="kw">_ </span>= op_sender.send(());
+                    }
+                    <span class="prelude-val">Ok</span>(CaptureOp::SpanDataProcessed(span_data)) =&gt; {
+                        <span class="macro">tracing::trace!</span>(<span class="string">&quot;capture task: sending span data {:?}&quot;</span>, span_data);
+                        <span class="kw">let </span>trace_id = span_data.span_context.trace_id();
 
-        exporter.start_capturing(trace_id, settings).<span class="kw">await</span>;
-        <span class="kw">let </span>storage = exporter.storage.lock().unwrap();
-        <span class="macro">assert!</span>(storage.get(<span class="kw-2">&amp;</span>trace_id).is_some());
-        drop(storage);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(storage) = store.get_mut(<span class="kw-2">&amp;</span>trace_id) {
+                            <span class="kw">let </span>settings = storage.settings.clone();
+                            <span class="kw">let </span>(events, span) = models::TraceSpan::from(span_data).split_events();
 
-        tokio::time::sleep(<span class="number">10 </span>* one_ms).<span class="kw">await</span>;
+                            <span class="kw">if </span>settings.traces_enabled() {
+                                storage.traces.push(span);
+                            }
 
-        <span class="kw">let </span>storage = exporter.storage.lock().unwrap();
-        <span class="macro">assert!</span>(storage.get(<span class="kw-2">&amp;</span>trace_id).is_none());
+                            <span class="kw">if </span>storage.settings.logs_enabled() {
+                                events.into_iter().for_each(|log| {
+                                    <span class="kw">let </span>candidate = Candidate {
+                                        value: log,
+                                        settings: <span class="kw-2">&amp;</span>settings,
+                                    };
+                                    <span class="kw">if </span>candidate.is_loggable_query_event() {
+                                        storage.logs.push(candidate.query_event())
+                                    } <span class="kw">else if </span>candidate.is_loggable_event() {
+                                        storage.logs.push(candidate.value)
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    <span class="prelude-val">Ok</span>(CaptureOp::FetchCaptures(trace_id, sender)) =&gt; {
+                        <span class="macro">tracing::info!</span>(<span class="string">&quot;fetching captures for trace_id={:?}.&quot;</span>, trace_id);
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(storage) = store.remove(<span class="kw-2">&amp;</span>trace_id) {
+                            <span class="kw">match </span>sender.send(storage) {
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                                    <span class="macro">tracing::error!</span>(
+                                        <span class="string">&quot;send error in capture task, when fetching captures for trace_id={:?}.&quot;</span>,
+                                        trace_id
+                                    );
+                                }
+                            }
+                        } <span class="kw">else </span>{
+                            <span class="macro">tracing::error!</span>(<span class="string">&quot;storage should contain captures for (trace_id={:?})&quot;</span>, trace_id);
+                            <span class="kw">_ </span>= sender.send(Storage::default());
+                        }
+                    }
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                        <span class="macro">tracing::error!</span>(<span class="string">&quot;recv error in capture task&quot;</span>);
+                        <span class="macro">unreachable!</span>(<span class="string">&quot;CAPTURE_TASK channel closed&quot;</span>)
+                    }
+                }
+            }
+        });
+
+        sender
+    });
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>span_data_processed(span_data: SpanData) -&gt; <span class="prelude-ty">Result</span>&lt;(), SendError&lt;CaptureOp&gt;&gt; {
+        SENDER.send(CaptureOp::SpanDataProcessed(span_data))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>start_capturing(trace_id: TraceId, settings: Settings) -&gt; <span class="prelude-ty">Result</span>&lt;(), ()&gt; {
+        <span class="kw">let </span>(sender, <span class="kw-2">mut </span>receiver) = tokio::sync::oneshot::channel::&lt;()&gt;();
+        SENDER
+            .send(CaptureOp::StartCapturing(trace_id, settings, sender))
+            .unwrap();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>interval = interval(Duration::from_millis(<span class="number">1</span>));
+        <span class="kw">let </span>start = std::time::Instant::now();
+        <span class="kw">loop </span>{
+            <span class="macro">tokio::select! </span>{
+                _msg = <span class="kw-2">&amp;mut </span>receiver =&gt; {
+                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;waited {}ms to receive signal from start capturing&quot;</span>, start.elapsed().as_millis());
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+                }
+                <span class="kw">_ </span>= interval.tick() =&gt; {},
+            }
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>fetch_captures_for_trace(
+        trace_id: TraceId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Storage, tokio::sync::oneshot::error::RecvError&gt; {
+        <span class="kw">let </span>(sender, <span class="kw-2">mut </span>receiver) = oneshot::channel::&lt;Storage&gt;();
+        SENDER.send(CaptureOp::FetchCaptures(trace_id, sender)).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>interval = interval(Duration::from_millis(<span class="number">1</span>));
+        <span class="kw">let </span>start = std::time::Instant::now();
+        <span class="kw">loop </span>{
+            <span class="macro">tokio::select! </span>{
+                msg = <span class="kw-2">&amp;mut </span>receiver =&gt; {
+                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;waited {}ms to receive signal from fetch captures&quot;</span>, start.elapsed().as_millis());
+                    <span class="kw">return </span>msg;
+                }
+                <span class="kw">_ </span>= interval.tick() =&gt; {},
+            }
+        }
     }
 }
 </code></pre></div>

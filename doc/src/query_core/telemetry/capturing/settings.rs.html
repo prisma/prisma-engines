@@ -78,17 +78,11 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{collections::HashSet, time};
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">static </span>VALID_VALUES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;error&quot;</span>, <span class="string">&quot;warn&quot;</span>, <span class="string">&quot;info&quot;</span>, <span class="string">&quot;debug&quot;</span>, <span class="string">&quot;trace&quot;</span>, <span class="string">&quot;query&quot;</span>, <span class="string">&quot;tracing&quot;</span>];
-<span class="kw">static </span>DEFAULT_TTL: time::Duration = time::Duration::from_secs(<span class="number">1800</span>); <span class="comment">// 30 minutes
 
-</span><span class="attr">#[derive(Debug, Clone, Default)]
+<span class="attr">#[derive(Debug, Clone, Default)]
 </span><span class="kw">pub struct </span>Settings {
     <span class="doccomment">/// only capture log events from the specified log levels, the special level &quot;query&quot;, which does not
     /// exist in the engine logging infrastructure, is shimed from any event describing a query, regardless
@@ -96,17 +90,13 @@
     </span><span class="kw">pub</span>(<span class="kw">super</span>) included_log_levels: HashSet&lt;String&gt;,
     <span class="doccomment">/// whether to include trace spans when capturing
     </span><span class="kw">pub</span>(<span class="kw">super</span>) include_traces: bool,
-    <span class="doccomment">/// how long to keep captured traces in memory, if by any chance the capturing breaks, a tokio task
-    /// will clean captured traces after this duration. Defaults to [`DEFAULT_TTL`].
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) ttl: time::Duration,
 }
 
 <span class="kw">impl </span>Settings {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(included_log_levels: HashSet&lt;String&gt;, include_traces: bool, ttl: time::Duration) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(included_log_levels: HashSet&lt;String&gt;, include_traces: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             include_traces,
             included_log_levels,
-            ttl,
         }
     }
 }
@@ -132,7 +122,7 @@
         <span class="kw">let </span>include_traces = set.remove(<span class="string">&quot;tracing&quot;</span>);
         <span class="kw">let </span>included_log_levels = set;
 
-        <span class="self">Self</span>::new(included_log_levels, include_traces, DEFAULT_TTL)
+        <span class="self">Self</span>::new(included_log_levels, include_traces)
     }
 }
 
