@@ -658,9 +658,6 @@
 <a href="#658" id="658">658</a>
 <a href="#659" id="659">659</a>
 <a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::default_value::DefaultKind;
 <span class="kw">use </span><span class="kw">crate</span>::field::{Field, FieldType, RelationField, ScalarField};
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
@@ -685,8 +682,6 @@
     </span><span class="kw">pub </span>indices: Vec&lt;IndexDefinition&gt;,
     <span class="doccomment">/// Describes the Primary Keys
     </span><span class="kw">pub </span>primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKeyDefinition&gt;,
-    <span class="doccomment">/// Indicates if this model is generated.
-    </span><span class="kw">pub </span>is_generated: bool,
     <span class="doccomment">/// Indicates if this model has to be commented out.
     </span><span class="kw">pub </span>is_commented_out: bool,
     <span class="doccomment">/// Indicates if this model has to be ignored by the Client.
@@ -1014,7 +1009,6 @@
             primary_key: <span class="prelude-val">None</span>,
             documentation: <span class="prelude-val">None</span>,
             database_name,
-            is_generated: <span class="bool-val">false</span>,
             is_commented_out: <span class="bool-val">false</span>,
             is_ignored: <span class="bool-val">false</span>,
             is_view: <span class="bool-val">false</span>,

@@ -332,33 +332,28 @@
 <a href="#332" id="332">332</a>
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 <span class="kw">use </span>bigdecimal::ToPrimitive;
-<span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, FieldType, Ignorable, PrismaValue, ScalarType, WithDatabaseName};
+<span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, PrismaValue};
 <span class="kw">use </span>psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
 
 <span class="kw">pub fn </span>schema_to_dmmf(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Datamodel {
-    <span class="kw">let </span>dml = dml::lift(schema);
     <span class="kw">let </span><span class="kw-2">mut </span>datamodel = Datamodel {
-        models: <span class="macro">vec!</span>[],
-        enums: <span class="macro">vec!</span>[],
-        types: Vec::with_capacity(dml.composite_types.len()),
+        models: Vec::with_capacity(schema.db.models_count()),
+        enums: Vec::with_capacity(schema.db.enums_count()),
+        types: Vec::new(),
     };
 
     <span class="kw">for </span>enum_model <span class="kw">in </span>schema.db.walk_enums() {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
-    <span class="kw">for </span>model <span class="kw">in </span>dml.models().filter(|model| !model.is_ignored) {
+    <span class="kw">for </span>model <span class="kw">in </span>schema.db.walk_models().filter(|model| !model.is_ignored()) {
         datamodel.models.push(model_to_dmmf(model));
     }
 
@@ -412,9 +407,9 @@
     Field {
         name: field.name().to_owned(),
         kind: <span class="kw">match </span>field.r#type() {
-            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;object&quot;</span>.into(),
-            ScalarFieldType::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>.into(),
-            ScalarFieldType::BuiltInScalar(<span class="kw">_</span>) =&gt; <span class="string">&quot;scalar&quot;</span>.into(),
+            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;object&quot;</span>,
+            ScalarFieldType::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            ScalarFieldType::BuiltInScalar(<span class="kw">_</span>) =&gt; <span class="string">&quot;scalar&quot;</span>,
             ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
@@ -443,94 +438,133 @@
     }
 }
 
-<span class="kw">fn </span>model_to_dmmf(model: <span class="kw-2">&amp;</span>dml::Model) -&gt; Model {
-    <span class="kw">let </span>primary_key = <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = <span class="kw-2">&amp;</span>model.primary_key {
-        (!pk.defined_on_field).then(|| PrimaryKey {
-            name: pk.name.clone(),
-            <span class="comment">//TODO(extended indices) add field options here
-            </span>fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
+<span class="kw">fn </span>model_to_dmmf(model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Model {
+    <span class="kw">let </span>primary_key = <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+        (!pk.is_defined_on_field()).then(|| PrimaryKey {
+            name: pk.name().map(ToOwned::to_owned),
+            fields: pk.fields().map(|f| f.name().to_owned()).collect(),
         })
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>};
 
     Model {
-        name: model.name.clone(),
-        db_name: model.database_name.clone(),
+        name: model.name().to_owned(),
+        db_name: model.mapped_name().map(ToOwned::to_owned),
         fields: model
             .fields()
-            .filter(|field| !field.is_ignored() &amp;&amp; !<span class="macro">matches!</span>(field.field_type(), FieldType::Unsupported(<span class="kw">_</span>)))
-            .map(|f| field_to_dmmf(model, f))
+            .filter(|field| !should_skip_model_field(field))
+            .map(field_to_dmmf)
             .collect(),
-        is_generated: <span class="prelude-val">Some</span>(model.is_generated),
-        documentation: model.documentation.clone(),
+        is_generated: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+        documentation: model.ast_model().documentation().map(ToOwned::to_owned),
         primary_key,
         unique_fields: model
-            .indices
-            .iter()
+            .indexes()
             .filter_map(|i| {
-                (i.is_unique() &amp;&amp; !i.defined_on_field).then(|| {
-                    i.fields
-                        .clone()
-                        .into_iter()
-                        .map(|f| f.path.into_iter().map(|(field, <span class="kw">_</span>)| field).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;.&quot;</span>))
-                        .collect()
-                })
+                (i.is_unique() &amp;&amp; !i.is_defined_on_field()).then(|| i.fields().map(|f| f.name().to_owned()).collect())
             })
             .collect(),
         unique_indexes: model
-            .indices
-            .iter()
+            .indexes()
             .filter_map(|i| {
-                (i.is_unique() &amp;&amp; !i.defined_on_field).then(|| UniqueIndex {
-                    name: i.name.clone(),
-                    <span class="comment">//TODO(extended indices) add field options here
-                    </span>fields: i
-                        .fields
-                        .clone()
-                        .into_iter()
-                        .map(|f| f.path.into_iter().map(|(field, <span class="kw">_</span>)| field).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;.&quot;</span>))
-                        .collect(),
+                (i.is_unique() &amp;&amp; !i.is_defined_on_field()).then(|| UniqueIndex {
+                    name: i.name().map(ToOwned::to_owned),
+                    fields: i.fields().map(|f| f.name().to_owned()).collect(),
                 })
             })
             .collect(),
     }
 }
 
-<span class="kw">fn </span>field_to_dmmf(model: <span class="kw-2">&amp;</span>dml::Model, field: <span class="kw-2">&amp;</span>dml::Field) -&gt; Field {
-    <span class="kw">let </span>a_relation_field_is_based_on_this_field: bool = model
-        .relation_fields()
-        .any(|f| f.relation_info.fields.iter().any(|f| f == field.name()));
-
-    Field {
-        name: field.name().to_string(),
-        db_name: field.database_name().map(|f| f.to_string()),
-        kind: get_field_kind(field),
-        is_required: <span class="kw-2">*</span>field.arity() == dml::FieldArity::Required || <span class="kw-2">*</span>field.arity() == dml::FieldArity::List,
-        is_list: <span class="kw-2">*</span>field.arity() == dml::FieldArity::List,
-        is_id: model.field_is_primary(field.name()),
-        is_read_only: a_relation_field_is_based_on_this_field,
-        has_default_value: field.default_value().is_some(),
-        default: field.default_value().map(|dv| default_value_to_serde(dv.kind())),
-        is_unique: model.field_is_unique(field.name()),
-        relation_name: get_relation_name(field),
-        relation_from_fields: get_relation_from_fields(field),
-        relation_to_fields: get_relation_to_fields(field),
-        relation_on_delete: get_relation_delete_strategy(field),
-        field_type: get_field_type(field),
-        is_generated: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-        is_updated_at: <span class="prelude-val">Some</span>(field.is_updated_at()),
-        documentation: field.documentation().map(|v| v.to_owned()),
+<span class="kw">fn </span>should_skip_model_field(field: <span class="kw-2">&amp;</span>walkers::FieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    <span class="kw">match </span>field.refine() {
+        walkers::RefinedFieldWalker::Scalar(f) =&gt; f.is_ignored() || f.is_unsupported(),
+        walkers::RefinedFieldWalker::Relation(f) =&gt; f.is_ignored(),
     }
 }
 
-<span class="kw">fn </span>get_field_kind(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; String {
-    <span class="kw">match </span>field.field_type() {
-        dml::FieldType::CompositeType(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;object&quot;</span>),
-        dml::FieldType::Relation(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;object&quot;</span>),
-        dml::FieldType::Enum(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;enum&quot;</span>),
-        dml::FieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;scalar&quot;</span>),
-        dml::FieldType::Unsupported(<span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;unsupported&quot;</span>),
+<span class="kw">fn </span>field_to_dmmf(field: walkers::FieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Field {
+    <span class="kw">match </span>field.refine() {
+        walkers::RefinedFieldWalker::Scalar(sf) =&gt; scalar_field_to_dmmf(sf),
+        walkers::RefinedFieldWalker::Relation(rf) =&gt; relation_field_to_dmmf(rf),
+    }
+}
+
+<span class="kw">fn </span>scalar_field_to_dmmf(field: walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Field {
+    <span class="kw">let </span>ast_field = field.ast_field();
+    <span class="kw">let </span>field_walker = walkers::FieldWalker::from(field);
+    <span class="kw">let </span>is_id = field.is_single_pk();
+    Field {
+        name: field.name().to_owned(),
+        db_name: field.mapped_name().map(ToOwned::to_owned),
+        kind: <span class="kw">match </span>field.scalar_field_type() {
+            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;object&quot;</span>,
+            ScalarFieldType::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            ScalarFieldType::BuiltInScalar(<span class="kw">_</span>) =&gt; <span class="string">&quot;scalar&quot;</span>,
+            ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+        },
+        is_list: ast_field.arity.is_list(),
+        is_required: <span class="macro">matches!</span>(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_unique: !is_id &amp;&amp; field.is_unique(),
+        is_id,
+        is_read_only: field.model().relation_fields().any(|rf| {
+            rf.referencing_fields()
+                .into_iter()
+                .flatten()
+                .any(|f| f.field_id() == field.field_id())
+        }),
+        has_default_value: field.default_value().is_some(),
+        field_type: <span class="kw">match </span>field.scalar_field_type() {
+            ScalarFieldType::CompositeType(ct) =&gt; field_walker.walk(ct).name().to_owned(),
+            ScalarFieldType::Enum(enm) =&gt; field_walker.walk(enm).name().to_owned(),
+            ScalarFieldType::BuiltInScalar(st) =&gt; st.as_str().to_owned(),
+            ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+        },
+        default: field
+            .default_value()
+            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml::dml_default_kind(dv.value(), field.scalar_type()))),
+        relation_name: <span class="prelude-val">None</span>,
+        relation_from_fields: <span class="prelude-val">None</span>,
+        relation_to_fields: <span class="prelude-val">None</span>,
+        relation_on_delete: <span class="prelude-val">None</span>,
+        is_generated: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+        is_updated_at: <span class="prelude-val">Some</span>(field.is_updated_at()),
+        documentation: ast_field.documentation().map(ToOwned::to_owned),
+    }
+}
+
+<span class="kw">fn </span>relation_field_to_dmmf(field: walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Field {
+    <span class="kw">let </span>ast_field = field.ast_field();
+    Field {
+        name: field.name().to_owned(),
+        db_name: <span class="prelude-val">None</span>,
+        kind: <span class="string">&quot;object&quot;</span>,
+        is_list: ast_field.arity.is_list(),
+        is_required: <span class="macro">matches!</span>(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_unique: <span class="bool-val">false</span>,
+        is_id: <span class="bool-val">false</span>,
+        is_read_only: <span class="bool-val">false</span>,
+        has_default_value: <span class="bool-val">false</span>,
+        field_type: field.related_model().name().to_owned(),
+        default: <span class="prelude-val">None</span>,
+        relation_name: <span class="prelude-val">Some</span>(field.relation_name().to_string()),
+        relation_from_fields: <span class="prelude-val">Some</span>(
+            field
+                .referencing_fields()
+                .map(|fields| fields.map(|f| f.name().to_owned()).collect())
+                .unwrap_or_default(),
+        ),
+        relation_to_fields: <span class="prelude-val">Some</span>(
+            field
+                .referenced_fields()
+                .map(|fields| fields.map(|f| f.name().to_owned()).collect())
+                .unwrap_or_default(),
+        ),
+        relation_on_delete: field.explicit_on_delete().map(|od| od.to_string()),
+        is_generated: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+        is_updated_at: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+        documentation: ast_field.documentation().map(ToOwned::to_owned),
     }
 }
 
@@ -579,48 +613,6 @@
     };
 
     serde_json::to_value(<span class="kw-2">&amp;</span>func).expect(<span class="string">&quot;Failed to render function JSON&quot;</span>)
-}
-
-<span class="kw">fn </span>get_field_type(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; String {
-    <span class="kw">match </span><span class="kw-2">&amp;</span>field.field_type() {
-        dml::FieldType::CompositeType(t) =&gt; t.clone(),
-        dml::FieldType::Relation(relation_info) =&gt; relation_info.referenced_model.clone(),
-        dml::FieldType::Enum(t) =&gt; t.clone(),
-        dml::FieldType::Unsupported(t) =&gt; t.clone(),
-        dml::FieldType::Scalar(t, <span class="kw">_</span>) =&gt; type_to_string(t),
-    }
-}
-
-<span class="kw">fn </span>type_to_string(scalar: <span class="kw-2">&amp;</span>ScalarType) -&gt; String {
-    scalar.to_string()
-}
-
-<span class="kw">fn </span>get_relation_name(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-    <span class="kw">match </span><span class="kw-2">&amp;</span>field {
-        dml::Field::RelationField(rf) =&gt; <span class="prelude-val">Some</span>(rf.relation_info.name.clone()),
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-    }
-}
-
-<span class="kw">fn </span>get_relation_from_fields(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt; {
-    <span class="kw">match </span><span class="kw-2">&amp;</span>field {
-        dml::Field::RelationField(rf) =&gt; <span class="prelude-val">Some</span>(rf.relation_info.fields.clone()),
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-    }
-}
-
-<span class="kw">fn </span>get_relation_to_fields(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt; {
-    <span class="kw">match </span><span class="kw-2">&amp;</span>field {
-        dml::Field::RelationField(rf) =&gt; <span class="prelude-val">Some</span>(rf.relation_info.references.clone()),
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-    }
-}
-
-<span class="kw">fn </span>get_relation_delete_strategy(field: <span class="kw-2">&amp;</span>dml::Field) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-    <span class="kw">match </span><span class="kw-2">&amp;</span>field {
-        dml::Field::RelationField(rf) =&gt; rf.relation_info.on_delete.map(|ri| ri.to_string()),
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-    }
 }
 
 <span class="attr">#[cfg(test)]

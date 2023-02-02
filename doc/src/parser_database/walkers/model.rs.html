@@ -316,6 +316,13 @@
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>primary_key;
 <span class="kw">mod </span>unique_criteria;
 
@@ -324,7 +331,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>unique_criteria::<span class="kw-2">*</span>;
 
 <span class="kw">use super</span>::{
-    CompleteInlineRelationWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
     ScalarFieldWalker,
 };
 <span class="kw">use crate</span>::{
@@ -340,6 +347,13 @@
     <span class="doccomment">/// The name of the model.
     </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
         <span class="self">self</span>.ast_model().name()
+    }
+
+    <span class="doccomment">/// Traverse the fields of the models in the order they were defined.
+    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone {
+        <span class="self">self</span>.ast_model()
+            .iter_fields()
+            .map(<span class="kw">move </span>|(field_id, <span class="kw">_</span>)| <span class="self">self</span>.walk((<span class="self">self</span>.id, field_id)))
     }
 
     <span class="doccomment">/// Whether MySQL would consider the field indexed for autoincrement purposes.

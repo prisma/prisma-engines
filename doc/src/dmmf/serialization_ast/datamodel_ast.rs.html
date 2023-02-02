@@ -120,7 +120,7 @@
     <span class="kw">pub </span>name: String,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>kind: String,
+    <span class="kw">pub </span>kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub </span>is_list: bool,
     <span class="kw">pub </span>is_required: bool,
     <span class="kw">pub </span>is_unique: bool,

@@ -95,52 +95,104 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker};
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 <span class="kw">use </span><span class="kw">crate</span>::ScalarType;
 <span class="kw">use </span>schema_ast::ast;
 
-<span class="attr">#[derive(Copy, Clone)]
-</span><span class="kw">enum </span>InnerWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    Scalar(ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
-    Relation(RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
-}
-
 <span class="doccomment">/// A model field, scalar or relation.
-</span><span class="attr">#[derive(Clone, Copy)]
-</span><span class="kw">pub struct </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    inner: InnerWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
-}
+</span><span class="kw">pub type </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; = Walker&lt;<span class="lifetime">&#39;db</span>, (ast::ModelId, ast::FieldId)&gt;;
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="doccomment">/// The field name.
-    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
-        <span class="kw">match </span><span class="self">self</span>.inner {
-            InnerWalker::Scalar(f) =&gt; f.name(),
-            InnerWalker::Relation(f) =&gt; f.name(),
-        }
+    <span class="doccomment">/// The AST node for the field.
+    </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.id.<span class="number">0</span>][<span class="self">self</span>.id.<span class="number">1</span>]
     }
 
-    <span class="doccomment">/// The model name.
+    <span class="doccomment">/// The field name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="self">self</span>.ast_field().name()
+    }
+
+    <span class="doccomment">/// Traverse the field&#39;s parent model.
     </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="kw">match </span><span class="self">self</span>.inner {
-            InnerWalker::Scalar(f) =&gt; f.model(),
-            InnerWalker::Relation(f) =&gt; f.model(),
+        <span class="self">self</span>.walk(<span class="self">self</span>.id.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Find out which kind of field this is.
+    </span><span class="kw">pub fn </span>refine(<span class="self">self</span>) -&gt; RefinedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="kw">let </span>Walker {
+            id: (model_id, field_id),
+            db,
+        } = <span class="self">self</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_field) = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
+            RefinedFieldWalker::Relation(RelationFieldWalker {
+                model_id,
+                field_id,
+                db,
+                relation_field,
+            })
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(scalar_field) = <span class="self">self</span>.db.types.scalar_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
+            RefinedFieldWalker::Scalar(ScalarFieldWalker {
+                model_id,
+                field_id,
+                db,
+                scalar_field,
+            })
+        } <span class="kw">else </span>{
+            <span class="macro">unreachable!</span>(<span class="string">&quot;{:?} is neither a scalar field nor a relation field&quot;</span>, <span class="self">self</span>.id)
         }
     }
+}
+
+<span class="doccomment">/// A field that has been identified as scalar field or relation field.
+</span><span class="attr">#[derive(Copy, Clone)]
+</span><span class="kw">pub enum </span>RefinedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// A scalar field
+    </span>Scalar(ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+    <span class="doccomment">/// A relation field
+    </span>Relation(RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>from(w: ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: InnerWalker::Scalar(w),
+        Walker {
+            db: w.db,
+            id: (w.model_id, w.field_id),
         }
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>from(w: RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: InnerWalker::Relation(w),
+        Walker {
+            db: w.db,
+            id: (w.model_id, w.field_id),
         }
     }
 }

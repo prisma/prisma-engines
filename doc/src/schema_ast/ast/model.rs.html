@@ -195,7 +195,7 @@
 }
 
 <span class="kw">impl </span>Model {
-    <span class="kw">pub fn </span>iter_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = (FieldId, <span class="kw-2">&amp;</span>Field)&gt; {
+    <span class="kw">pub fn </span>iter_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = (FieldId, <span class="kw-2">&amp;</span>Field)&gt; + Clone {
         <span class="self">self</span>.fields
             .iter()
             .enumerate()
