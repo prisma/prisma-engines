@@ -332,6 +332,9 @@
 <a href="#332" id="332">332</a>
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
@@ -353,7 +356,12 @@
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
-    <span class="kw">for </span>model <span class="kw">in </span>schema.db.walk_models().filter(|model| !model.is_ignored()) {
+    <span class="kw">for </span>model <span class="kw">in </span>schema
+        .db
+        .walk_models()
+        .filter(|model| !model.is_ignored())
+        .chain(schema.db.walk_views())
+    {
         datamodel.models.push(model_to_dmmf(model));
     }
 
@@ -637,6 +645,7 @@
             <span class="string">&quot;source_with_generator&quot;</span>,
             <span class="string">&quot;without_relation_name&quot;</span>,
             <span class="string">&quot;ignore&quot;</span>,
+            <span class="string">&quot;views&quot;</span>,
         ];
 
         <span class="kw">for </span>test_case <span class="kw">in </span>test_cases {
@@ -644,12 +653,9 @@
 
             <span class="kw">let </span>datamodel_string = load_from_file(<span class="macro">format!</span>(<span class="string">&quot;{test_case}.prisma&quot;</span>).as_str());
             <span class="kw">let </span>dmmf_string = render_to_dmmf(<span class="kw-2">&amp;</span>datamodel_string);
-
-            assert_eq_json(
-                <span class="kw-2">&amp;</span>dmmf_string,
-                <span class="kw-2">&amp;</span>load_from_file(<span class="macro">format!</span>(<span class="string">&quot;{test_case}.json&quot;</span>).as_str()),
-                test_case,
-            );
+            <span class="kw">let </span>expected_json = load_from_file(<span class="macro">format!</span>(<span class="string">&quot;{test_case}.json&quot;</span>).as_str());
+            <span class="macro">println!</span>(<span class="string">&quot;{dmmf_string}&quot;</span>);
+            assert_eq_json(<span class="kw-2">&amp;</span>dmmf_string, <span class="kw-2">&amp;</span>expected_json, test_case);
         }
     }
 

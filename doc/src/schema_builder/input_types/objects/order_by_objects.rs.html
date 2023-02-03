@@ -319,10 +319,8 @@
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::{aggregations, ordering};
-<span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>output_types::aggregation;
 <span class="kw">use </span>prisma_models::prelude::ParentContainer;
 
@@ -625,7 +623,7 @@
     <span class="kw">let </span>fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
         <span class="kw-2">&amp;</span>container.name(),
-        scalar_fields.iter().map(|sf| sf.name().to_owned()).collect_vec(),
+        scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
