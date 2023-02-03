@@ -5,6 +5,7 @@ use std::{
 
 use clap::Parser;
 use serde::{Deserialize, Serialize};
+use color_eyre::eyre::eyre;
 
 #[derive(Parser)]
 struct Args {
@@ -37,8 +38,12 @@ fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
 
     let args = Args::parse();
-    let date_time = chrono::Utc::now().to_rfc3339();
 
+    if args.files.is_empty() {
+        return Err(eyre!("Please provide at least one engine file"));
+    }
+
+    let date_time = chrono::Utc::now().to_rfc3339();
     let write_headers = !Path::new(&args.db).exists();
 
     let csv_file = OpenOptions::new()
