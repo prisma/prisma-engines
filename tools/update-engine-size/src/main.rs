@@ -4,12 +4,14 @@ use std::{
 };
 
 use clap::Parser;
-use serde::{Deserialize, Serialize};
 use color_eyre::eyre::eyre;
+use serde::Serialize;
 
+/// This tool updates the size of the engine binaries in the CSV file
+/// on CI for tracking their changes over time.
 #[derive(Parser)]
 struct Args {
-    /// Path to the JSON database
+    /// Path to the CSV database
     #[arg(long)]
     db: String,
 
@@ -25,12 +27,12 @@ struct Args {
     files: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
-struct DbEntry {
-    date_time: String,
-    branch: String,
-    commit: String,
-    file: String,
+#[derive(Serialize)]
+struct DbEntry<'a> {
+    date_time: &'a str,
+    branch: &'a str,
+    commit: &'a str,
+    file: &'a str,
     size_bytes: u64,
 }
 
@@ -60,10 +62,10 @@ fn main() -> color_eyre::Result<()> {
         let path = Path::new(&path);
 
         let entry = DbEntry {
-            date_time: date_time.clone(),
-            branch: args.branch.clone(),
-            commit: args.commit.clone(),
-            file: path.file_name().unwrap().to_string_lossy().into_owned(),
+            date_time: &date_time,
+            branch: &args.branch,
+            commit: &args.commit,
+            file: &path.file_name().unwrap().to_string_lossy(),
             size_bytes: fs::metadata(path)?.len(),
         };
 
