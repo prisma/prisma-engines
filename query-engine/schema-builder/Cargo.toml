@@ -8,8 +8,6 @@ psl.workspace = true
 schema = { path = "../schema" }
 prisma-models = { path = "../prisma-models" }
 once_cell = "1.3"
-itertools = "0.10"
-lazy_static = "1.4"
 
 [dev-dependencies.criterion]
 version = "0.4.0"

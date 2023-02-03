@@ -1,6 +1,5 @@
 use super::*;
 use constants::{aggregations, ordering};
-use itertools::Itertools;
 use output_types::aggregation;
 use prisma_models::prelude::ParentContainer;
 
@@ -303,7 +302,7 @@ fn order_by_object_type_text_search(
     let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
         &container.name(),
-        scalar_fields.iter().map(|sf| sf.name().to_owned()).collect_vec(),
+        scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
 
     let fields = vec![
