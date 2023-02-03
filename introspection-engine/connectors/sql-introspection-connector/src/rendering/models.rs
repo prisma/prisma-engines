@@ -46,6 +46,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         }
     }
 
+    if model.is_partition() {
+        let docs = "This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.";
+
+        rendered.documentation(docs);
+    }
+
     if let Some(namespace) = model.namespace() {
         rendered.schema(namespace);
     }

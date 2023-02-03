@@ -1,5 +1,6 @@
 use barrel::types;
-use introspection_engine_tests::{test_api::*, TestResult};
+use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
+use serde_json::json;
 
 #[test_connector(tags(Mysql))]
 async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
@@ -100,5 +101,51 @@ async fn remapping_field_names_to_empty_mysql(api: &TestApi) -> TestResult {
 
     api.expect_datamodel(&dm).await;
 
+    Ok(())
+}
+
+#[test_connector(tags(Mysql), exclude(Vitess))]
+async fn partition_table_gets_comment(api: &TestApi) -> TestResult {
+    api.raw_cmd(
+        r#"
+CREATE TABLE `blocks` (
+    id INT NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE blocks
+PARTITION BY HASH (id)
+PARTITIONS 2; "#,
+    )
+    .await;
+
+    let expected = json!([{
+        "code": 27,
+        "message": "These tables are partition tables, which are not yet fully supported.",
+        "affected": [
+            {
+                "model": "blocks"
+            }
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
+        model blocks {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
+    api.expect_datamodel(&expected).await;
     Ok(())
 }

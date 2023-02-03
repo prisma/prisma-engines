@@ -47,6 +47,8 @@ pub(super) struct Warnings {
     pub(super) reintrospected_relations: Vec<Model>,
     /// The name of these models or enums was a dupe in the PSL.
     pub(super) duplicate_names: Vec<TopLevelItem>,
+    /// Warn about using partition tables, which only have introspection support.
+    pub(super) partition_tables: Vec<Model>,
 }
 
 impl Warnings {
@@ -183,6 +185,8 @@ impl Warnings {
             warning_top_level_item_name_is_a_dupe,
             &mut self.warnings,
         );
+
+        maybe_warn(&self.partition_tables, partition_tables_found, &mut self.warnings);
 
         self.warnings
     }
@@ -448,6 +452,16 @@ pub(super) fn warning_fields_with_empty_names_in_views(affected: &[ViewAndField]
         code: 26,
         message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
             .into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(super) fn partition_tables_found(affected: &[Model]) -> Warning {
+    let message = "These tables are partition tables, which are not yet fully supported.";
+
+    Warning {
+        code: 27,
+        message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }

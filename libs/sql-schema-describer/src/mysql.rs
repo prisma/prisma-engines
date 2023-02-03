@@ -264,7 +264,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<IndexMap<String, TableId>> {
         // Only consider tables for which we can read at least one column.
         let sql = r#"
-            SELECT DISTINCT BINARY table_info.table_name AS table_name
+            SELECT DISTINCT
+              BINARY table_info.table_name AS table_name,
+              (CASE WHEN table_info.create_options='partitioned' THEN TRUE ELSE FALSE END) as is_partition
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -275,13 +277,19 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND table_info.table_type = 'BASE TABLE'
             ORDER BY BINARY table_info.table_name"#;
         let rows = self.conn.query_raw(sql, &[schema.into(), schema.into()]).await?;
-        let names = rows.into_iter().map(|row| row.get_expect_string("table_name"));
+        let names = rows
+            .into_iter()
+            .map(|row| (row.get_expect_string("table_name"), row.get_expect_bool("is_partition")));
 
         let mut map = IndexMap::default();
 
-        for name in names {
+        for (name, is_partition) in names {
             let cloned_name = name.clone();
-            let id = sql_schema.push_table(name, Default::default());
+            let id = if is_partition {
+                sql_schema.push_table_partitioned(name, Default::default())
+            } else {
+                sql_schema.push_table(name, Default::default())
+            };
             map.insert(cloned_name, id);
         }
 

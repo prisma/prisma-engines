@@ -329,7 +329,21 @@ impl SqlSchema {
 
     pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
         let id = TableId(self.tables.len() as u32);
-        self.tables.push(Table { namespace_id, name });
+        self.tables.push(Table {
+            namespace_id,
+            name,
+            is_partition: false,
+        });
+        id
+    }
+
+    pub fn push_table_partitioned(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
+        let id = TableId(self.tables.len() as u32);
+        self.tables.push(Table {
+            namespace_id,
+            name,
+            is_partition: true,
+        });
         id
     }
 
@@ -431,6 +445,7 @@ impl SqlSchema {
 pub struct Table {
     namespace_id: NamespaceId,
     name: String,
+    is_partition: bool,
 }
 
 /// The type of an index.

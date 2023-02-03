@@ -22,6 +22,19 @@ pub async fn load_describer<'a>(
                 if provider == Some(POSTGRES.provider_name()) {
                     circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
                 }
+            } else {
+                let pgversion_result = connection
+                    .query_raw("select current_setting('server_version_num')::integer as version;", &[])
+                    .await?;
+                let pgversion = pgversion_result
+                    .get(0)
+                    .and_then(|r| r.get("version"))
+                    .and_then(|v| v.as_i32());
+
+                match pgversion {
+                    Some(version) if version >= 100000 => circumstances |= Circumstances::CanPartitionTables,
+                    _ => (),
+                }
             }
 
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
