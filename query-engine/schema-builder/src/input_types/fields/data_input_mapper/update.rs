@@ -25,8 +25,14 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             TypeIdentifier::BigInt => InputType::object(update_operations_object_type(ctx, "BigInt", sf, true)),
             TypeIdentifier::String => InputType::object(update_operations_object_type(ctx, "String", sf, false)),
             TypeIdentifier::Boolean => InputType::object(update_operations_object_type(ctx, "Bool", sf, false)),
-            TypeIdentifier::Enum(e) => {
-                InputType::object(update_operations_object_type(ctx, &format!("Enum{e:?}"), sf, false))
+            TypeIdentifier::Enum(enum_id) => {
+                let enum_name = ctx.internal_data_model.walk(enum_id).name();
+                InputType::object(update_operations_object_type(
+                    ctx,
+                    &format!("Enum{enum_name}"),
+                    sf,
+                    false,
+                ))
             }
             TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, sf),
             TypeIdentifier::DateTime => InputType::object(update_operations_object_type(ctx, "DateTime", sf, false)),

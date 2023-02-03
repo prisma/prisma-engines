@@ -206,7 +206,13 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        scalar_filter_name(&sf.type_identifier().to_string(), true, !sf.is_required(), false, false),
+        scalar_filter_name(
+            &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
+            true,
+            !sf.is_required(),
+            false,
+            false,
+        ),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -252,7 +258,8 @@ fn full_scalar_filter_type(
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
     let native_type_name = native_type.map(|nt| nt.name());
-    let type_name = ctx.connector.scalar_filter_name(typ.to_string(), native_type_name);
+    let scalar_type_name = typ.type_name(&ctx.internal_data_model.schema).into_owned();
+    let type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
     let ident = Identifier::new(
         scalar_filter_name(&type_name, list, nullable, nested, include_aggregates),
         PRISMA_NAMESPACE,

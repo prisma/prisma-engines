@@ -21,10 +21,6 @@ impl<I: Copy> Zipper<I> {
     pub fn walker(&self) -> Walker<'_, I> {
         self.dm.schema.db.walk(self.id)
     }
-
-    pub fn zip<J>(self, id: J) -> Zipper<J> {
-        self.dm.zip(id)
-    }
 }
 
 pub type InternalEnum = Zipper<ast::EnumId>;
