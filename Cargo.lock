@@ -3796,7 +3796,6 @@ name = "schema-builder"
 version = "0.1.0"
 dependencies = [
  "criterion",
- "itertools",
  "once_cell",
  "prisma-models",
  "psl",
