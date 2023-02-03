@@ -20,24 +20,31 @@ in
     text = ''
       set -euxo pipefail
 
-      ls ${self'.packages.query-engine-bin-and-lib}/lib
+      if ! git diff --exit-code 1> /dev/null; then
+        : "The workspace is not clean. Please commit or reset, then try again".
+        exit 1
+      fi
 
-      # if ! git diff --exit-code 1> /dev/null; then
-      #   : "The workspace is not clean. Please commit or reset, then try again".
-      #   exit 1
-      # fi
+      CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      CURRENT_COMMIT=$(git rev-parse --short HEAD)
+      REPO_ROOT=$(git rev-parse --show-toplevel)
 
-      # CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-      # CURRENT_COMMIT=$(git rev-parse --short HEAD)
-      # REPO_ROOT=$(git rev-parse --show-toplevel)
+      pushd "$REPO_ROOT"
+      git fetch --depth=1 origin gh-pages
+      git checkout origin/gh-pages
 
-      # pushd "$REPO_ROOT"
-      # git fetch --depth=1 origin gh-pages
-      # git checkout origin/gh-pages
+      ${self'.packages.update-engine-size}/bin/update-engine-size \
+          --db engine_size.csv
+          --branch "$CURRENT_BRANCH"
+          --commit "$CURRENT_COMMIT"
+          ${self'.packages.query-engine-bin-and-lib}/bin/query-engine
+          ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node
 
-      # git push origin '+HEAD:gh-pages'
-      # git checkout "$CURRENT_BRANCH"
-      # popd
+      git add engine_size.csv
+      git commit --quiet -m "update engines size for $CURRENT_COMMIT"
+      git push origin '+HEAD:gh-pages'
+      git checkout "$CURRENT_BRANCH"
+      popd
     '';
   };
 }
