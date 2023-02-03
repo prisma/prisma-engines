@@ -19,7 +19,12 @@ pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
-    for model in schema.db.walk_models().filter(|model| !model.is_ignored()) {
+    for model in schema
+        .db
+        .walk_models()
+        .filter(|model| !model.is_ignored())
+        .chain(schema.db.walk_views())
+    {
         datamodel.models.push(model_to_dmmf(model));
     }
 
@@ -303,6 +308,7 @@ mod tests {
             "source_with_generator",
             "without_relation_name",
             "ignore",
+            "views",
         ];
 
         for test_case in test_cases {
@@ -310,12 +316,9 @@ mod tests {
 
             let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
             let dmmf_string = render_to_dmmf(&datamodel_string);
-
-            assert_eq_json(
-                &dmmf_string,
-                &load_from_file(format!("{test_case}.json").as_str()),
-                test_case,
-            );
+            let expected_json = load_from_file(format!("{test_case}.json").as_str());
+            println!("{dmmf_string}");
+            assert_eq_json(&dmmf_string, &expected_json, test_case);
         }
     }
 
