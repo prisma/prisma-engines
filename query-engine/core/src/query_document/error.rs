@@ -1,6 +1,7 @@
-use crate::{query_document::PrismaValue, schema::InputType};
+use crate::schema::InputType;
 use fmt::Display;
 use itertools::Itertools;
+use prisma_models::PrismaValue;
 use std::fmt;
 
 #[derive(Debug)]

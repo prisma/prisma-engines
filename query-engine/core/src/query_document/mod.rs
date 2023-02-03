@@ -28,11 +28,11 @@ pub use parser::*;
 pub use selection::*;
 pub use transformers::*;
 
-use crate::resolve_compound_field;
 use prisma_models::{ModelRef, PrismaValue};
 use schema::QuerySchemaRef;
 use schema_builder::constants::*;
 use std::collections::HashMap;
+use crate::query_graph_builder::resolve_compound_field;
 
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 

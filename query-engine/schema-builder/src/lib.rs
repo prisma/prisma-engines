@@ -40,6 +40,8 @@ mod mutations;
 mod output_types;
 mod utils;
 
+pub use self::utils::{compound_id_field_name, compound_index_field_name};
+
 use cache::TypeRefCache;
 use prisma_models::{
     CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
@@ -50,8 +52,7 @@ use psl::{
 };
 use schema::*;
 use std::sync::Arc;
-
-pub use utils::*;
+use utils::*;
 
 pub(crate) struct BuilderContext {
     internal_data_model: InternalDataModelRef,
@@ -65,7 +66,7 @@ pub(crate) struct BuilderContext {
 }
 
 impl BuilderContext {
-    pub fn new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
+    fn new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
         let connector = internal_data_model.schema.connector;
         let preview_features = internal_data_model.schema.configuration.preview_features();
         Self {
@@ -79,16 +80,16 @@ impl BuilderContext {
         }
     }
 
-    pub fn has_feature(&self, feature: PreviewFeature) -> bool {
+    fn has_feature(&self, feature: PreviewFeature) -> bool {
         self.preview_features.contains(feature)
     }
 
-    pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
+    fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.connector.has_capability(capability)
     }
 
     /// Get an input (object) type.
-    pub fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeWeakRef> {
+    fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeWeakRef> {
         self.cache.input_types.get(ident)
     }
 
