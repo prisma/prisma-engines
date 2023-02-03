@@ -1447,6 +1447,20 @@
 <a href="#1447" id="1447">1447</a>
 <a href="#1448" id="1448">1448</a>
 <a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1552,7 +1566,8 @@
 </span><span class="kw">pub enum </span>Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, <span class="comment">// TODO: this is a temporary workaround
-</span>}
+    </span>CanPartitionTables,
+}
 
 <span class="kw">pub struct </span>SqlSchemaDescriber&lt;<span class="lifetime">&#39;a</span>&gt; {
     conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
@@ -2064,7 +2079,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     ) -&gt; DescriberResult&lt;IndexMap&lt;(String, String), TableId&gt;&gt; {
-        <span class="kw">let </span>sql = <span class="macro">include_str!</span>(<span class="string">&quot;postgres/tables_query.sql&quot;</span>);
+        <span class="kw">let </span>sql = <span class="kw">if </span><span class="self">self</span>.circumstances.contains(Circumstances::CanPartitionTables) {
+            <span class="macro">include_str!</span>(<span class="string">&quot;postgres/tables_query.sql&quot;</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">include_str!</span>(<span class="string">&quot;postgres/tables_query_simple.sql&quot;</span>)
+        };
+
         <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
 
         <span class="kw">let </span>rows = <span class="self">self
@@ -2075,15 +2095,23 @@
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>names = rows
-            .into_iter()
-            .map(|row| (row.get_expect_string(<span class="string">&quot;table_name&quot;</span>), row.get_expect_string(<span class="string">&quot;namespace&quot;</span>)));
+        <span class="kw">let </span>names = rows.into_iter().map(|row| {
+            (
+                row.get_expect_string(<span class="string">&quot;table_name&quot;</span>),
+                row.get_expect_string(<span class="string">&quot;namespace&quot;</span>),
+                row.get_expect_bool(<span class="string">&quot;relhassubclass&quot;</span>),
+            )
+        });
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>(table_name, namespace) <span class="kw">in </span>names {
+        <span class="kw">for </span>(table_name, namespace, is_partition) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = table_name.clone();
-            <span class="kw">let </span>id = sql_schema.push_table(table_name, sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap());
+            <span class="kw">let </span>id = <span class="kw">if </span>is_partition {
+                sql_schema.push_table_partitioned(table_name, sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap())
+            } <span class="kw">else </span>{
+                sql_schema.push_table(table_name, sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap())
+            };
             map.insert((namespace, cloned_name), id);
         }
 

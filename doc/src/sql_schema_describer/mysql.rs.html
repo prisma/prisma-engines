@@ -802,6 +802,14 @@
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
 <a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1068,7 +1076,9 @@
     ) -&gt; DescriberResult&lt;IndexMap&lt;String, TableId&gt;&gt; {
         <span class="comment">// Only consider tables for which we can read at least one column.
         </span><span class="kw">let </span>sql = <span class="string">r#&quot;
-            SELECT DISTINCT BINARY table_info.table_name AS table_name
+            SELECT DISTINCT
+              BINARY table_info.table_name AS table_name,
+              (CASE WHEN table_info.create_options=&#39;partitioned&#39; THEN TRUE ELSE FALSE END) as is_partition
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -1079,13 +1089,19 @@
                 AND table_info.table_type = &#39;BASE TABLE&#39;
             ORDER BY BINARY table_info.table_name&quot;#</span>;
         <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into(), schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>names = rows.into_iter().map(|row| row.get_expect_string(<span class="string">&quot;table_name&quot;</span>));
+        <span class="kw">let </span>names = rows
+            .into_iter()
+            .map(|row| (row.get_expect_string(<span class="string">&quot;table_name&quot;</span>), row.get_expect_bool(<span class="string">&quot;is_partition&quot;</span>)));
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>name <span class="kw">in </span>names {
+        <span class="kw">for </span>(name, is_partition) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = name.clone();
-            <span class="kw">let </span>id = sql_schema.push_table(name, Default::default());
+            <span class="kw">let </span>id = <span class="kw">if </span>is_partition {
+                sql_schema.push_table_partitioned(name, Default::default())
+            } <span class="kw">else </span>{
+                sql_schema.push_table(name, Default::default())
+            };
             map.insert(cloned_name, id);
         }
 

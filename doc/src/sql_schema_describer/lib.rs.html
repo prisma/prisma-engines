@@ -849,6 +849,21 @@
 <a href="#849" id="849">849</a>
 <a href="#850" id="850">850</a>
 <a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
@@ -1180,7 +1195,21 @@
 
     <span class="kw">pub fn </span>push_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, namespace_id: NamespaceId) -&gt; TableId {
         <span class="kw">let </span>id = TableId(<span class="self">self</span>.tables.len() <span class="kw">as </span>u32);
-        <span class="self">self</span>.tables.push(Table { namespace_id, name });
+        <span class="self">self</span>.tables.push(Table {
+            namespace_id,
+            name,
+            is_partition: <span class="bool-val">false</span>,
+        });
+        id
+    }
+
+    <span class="kw">pub fn </span>push_table_partitioned(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, namespace_id: NamespaceId) -&gt; TableId {
+        <span class="kw">let </span>id = TableId(<span class="self">self</span>.tables.len() <span class="kw">as </span>u32);
+        <span class="self">self</span>.tables.push(Table {
+            namespace_id,
+            name,
+            is_partition: <span class="bool-val">true</span>,
+        });
         id
     }
 
@@ -1282,6 +1311,7 @@
 </span><span class="kw">pub struct </span>Table {
     namespace_id: NamespaceId,
     name: String,
+    is_partition: bool,
 }
 
 <span class="doccomment">/// The type of an index.

@@ -95,6 +95,12 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Rendering of model blocks.
 
 </span><span class="kw">use super</span>::{id, indexes, relation_field, scalar_field};
@@ -141,6 +147,12 @@
 
             rendered.documentation(docs);
         }
+    }
+
+    <span class="kw">if </span>model.is_partition() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.&quot;</span>;
+
+        rendered.documentation(docs);
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(namespace) = model.namespace() {

@@ -213,6 +213,11 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::walkers,
@@ -245,6 +250,11 @@
     <span class="doccomment">/// The namespace of the model, if using the multi-schema feature.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>namespace(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
         <span class="self">self</span>.context.uses_namespaces().then(|| <span class="self">self</span>.next.namespace()).flatten()
+    }
+
+    <span class="doccomment">/// Whether the model is a partition table or not.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_partition(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.next.is_partition()
     }
 
     <span class="doccomment">/// Name of the model in the PSL. The value can be sanitized if it
