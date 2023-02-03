@@ -33,11 +33,11 @@ in
       git fetch --depth=1 origin gh-pages
       git checkout origin/gh-pages
 
-      ${self'.packages.update-engine-size}/bin/update-engine-size \
-          --db engine_size.csv
-          --branch "$CURRENT_BRANCH"
-          --commit "$CURRENT_COMMIT"
-          ${self'.packages.query-engine-bin-and-lib}/bin/query-engine
+      ${self'.packages.update-engine-size}/bin/update-engine-size             \
+          --db engine_size.csv                                                \
+          --branch "$CURRENT_BRANCH"                                          \
+          --commit "$CURRENT_COMMIT"                                          \
+          ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node
 
       git add engine_size.csv
