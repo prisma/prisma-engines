@@ -41,9 +41,9 @@ thread::spawn(<span class="kw">move </span>|| {
 <p>This spawns the given future onto the runtime’s executor, usually a
 thread pool. The thread pool is then responsible for polling the future
 until it completes.</p>
-<p>You do not have to <code>.await</code> the returned <code>JoinHandle</code> to make the
-provided future start execution. It will start running in the background
-immediately when <code>spawn</code> is called.</p>
+<p>The provided future will start running in the background immediately
+when <code>spawn</code> is called, even if you don’t await the returned
+<code>JoinHandle</code>.</p>
 <p>See <a href="index.html">module level</a> documentation for more details.</p>
 <h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::runtime::Runtime;
