@@ -419,6 +419,12 @@
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
 <a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -446,8 +452,14 @@
             TypeIdentifier::BigInt =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;BigInt&quot;</span>, sf, <span class="bool-val">true</span>)),
             TypeIdentifier::String =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;String&quot;</span>, sf, <span class="bool-val">false</span>)),
             TypeIdentifier::Boolean =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Bool&quot;</span>, sf, <span class="bool-val">false</span>)),
-            TypeIdentifier::Enum(e) =&gt; {
-                InputType::object(update_operations_object_type(ctx, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{e}&quot;</span>), sf, <span class="bool-val">false</span>))
+            TypeIdentifier::Enum(enum_id) =&gt; {
+                <span class="kw">let </span>enum_name = ctx.internal_data_model.walk(enum_id).name();
+                InputType::object(update_operations_object_type(
+                    ctx,
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{enum_name}&quot;</span>),
+                    sf,
+                    <span class="bool-val">false</span>,
+                ))
             }
             TypeIdentifier::Json =&gt; map_scalar_input_type_for_field(ctx, sf),
             TypeIdentifier::DateTime =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;DateTime&quot;</span>, sf, <span class="bool-val">false</span>)),

@@ -655,39 +655,6 @@
 <a href="#655" id="655">655</a>
 <a href="#656" id="656">656</a>
 <a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="self">self </span><span class="kw">as </span>dml, <span class="kw-2">*</span>};
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl_core::{
@@ -752,10 +719,6 @@
 
         <span class="kw">for </span>composite_type <span class="kw">in </span><span class="self">self</span>.db.walk_composite_types() {
             schema.composite_types.push(<span class="self">self</span>.lift_composite_type(composite_type))
-        }
-
-        <span class="kw">for </span>r#enum <span class="kw">in </span><span class="self">self</span>.db.walk_enums() {
-            schema.enums.push(<span class="self">self</span>.lift_enum(r#enum))
         }
 
         <span class="self">self</span>.lift_relations(<span class="kw-2">&amp;mut </span>schema, <span class="kw-2">&amp;mut </span>field_ids_for_sorting);
@@ -1123,28 +1086,6 @@
         model
     }
 
-    <span class="doccomment">/// Internal: Validates an enum AST node.
-    </span><span class="kw">fn </span>lift_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, r#enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Enum {
-        <span class="kw">let </span><span class="kw-2">mut </span>en = Enum::new(r#enum.id, r#enum.name());
-
-        <span class="kw">for </span>value <span class="kw">in </span>r#enum.values() {
-            en.add_value(<span class="self">self</span>.lift_enum_value(value));
-        }
-
-        en.documentation = r#enum.ast_enum().documentation().map(String::from);
-        en.database_name = r#enum.mapped_name().map(String::from);
-        en.schema = r#enum.schema().map(|(s, <span class="kw">_</span>)| s.to_owned());
-        en
-    }
-
-    <span class="doccomment">/// Internal: Lifts an enum value AST node.
-    </span><span class="kw">fn </span>lift_enum_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: EnumValueWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; EnumValue {
-        <span class="kw">let </span><span class="kw-2">mut </span>enum_value = EnumValue::new(value.name());
-        enum_value.documentation = value.documentation().map(String::from);
-        enum_value.database_name = value.mapped_name().map(String::from);
-        enum_value
-    }
-
     <span class="kw">fn </span>lift_scalar_field_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         ast_field: <span class="kw-2">&amp;</span>ast::Field,
@@ -1155,10 +1096,7 @@
             db::ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>();
             }
-            db::ScalarFieldType::Enum(enum_id) =&gt; {
-                <span class="kw">let </span>enum_name = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast()[<span class="kw-2">*</span>enum_id].name.name;
-                FieldType::Enum(enum_name.to_owned())
-            }
+            db::ScalarFieldType::Enum(enum_id) =&gt; FieldType::Enum(<span class="kw-2">*</span>enum_id),
             db::ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; {
                 FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().<span class="number">0</span>.to_owned())
             }
@@ -1208,11 +1146,7 @@
                     }),
                 )
             }
-            db::ScalarFieldType::Enum(enum_id) =&gt; {
-                <span class="kw">let </span>enum_name = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast()[<span class="kw-2">*</span>enum_id].name.name;
-
-                CompositeTypeFieldType::Enum(enum_name.to_owned())
-            }
+            db::ScalarFieldType::Enum(enum_id) =&gt; CompositeTypeFieldType::Enum(<span class="kw-2">*</span>enum_id),
             db::ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>field = composite_type_field
                     .ast_field()

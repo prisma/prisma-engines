@@ -96,27 +96,9 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::composite_type::CompositeType;
 <span class="kw">use </span><span class="kw">crate</span>::field::RelationField;
 <span class="kw">use </span><span class="kw">crate</span>::model::Model;
-<span class="kw">use crate</span>::r#enum::Enum;
 <span class="kw">use </span><span class="kw">crate</span>::relation_info::RelationInfo;
 
 <span class="doccomment">/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
@@ -127,7 +109,6 @@
 /// Both of these are never converted into the internal datamodel.
 </span><span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Datamodel {
-    <span class="kw">pub </span>enums: Vec&lt;Enum&gt;,
     <span class="kw">pub </span>models: Vec&lt;Model&gt;,
     <span class="kw">pub </span>composite_types: Vec&lt;CompositeType&gt;,
 }
@@ -141,11 +122,6 @@
     <span class="doccomment">/// Gets an iterator over all composite types.
     </span><span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;CompositeType&gt; {
         <span class="self">self</span>.composite_types.iter()
-    }
-
-    <span class="doccomment">/// Gets an iterator over all enums.
-    </span><span class="kw">pub fn </span>enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;Enum&gt; {
-        <span class="self">self</span>.enums.iter()
     }
 
     <span class="doccomment">/// Finds a model by name.
@@ -168,16 +144,6 @@
     <span class="doccomment">/// Finds parent  model for a field reference.
     </span><span class="kw">pub fn </span>find_model_by_relation_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>RelationField) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
         <span class="self">self</span>.find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.find_related_field_bang(field).<span class="number">1</span>.relation_info.referenced_model)
-    }
-
-    <span class="doccomment">/// Finds an enum by name.
-    </span><span class="kw">pub fn </span>find_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Enum&gt; {
-        <span class="self">self</span>.enums().find(|m| m.name == <span class="kw-2">*</span>name)
-    }
-
-    <span class="doccomment">/// Finds an enum by database name.
-    </span><span class="kw">pub fn </span>find_enum_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Enum&gt; {
-        <span class="self">self</span>.enums().find(|e| e.database_name == <span class="prelude-val">Some</span>(db_name.to_owned()))
     }
 
     <span class="doccomment">/// Finds a model by name and returns a mutable reference.

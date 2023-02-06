@@ -81,7 +81,7 @@
         TypeIdentifier::UUID =&gt; InputType::uuid(),
         TypeIdentifier::DateTime =&gt; InputType::date_time(),
         TypeIdentifier::Json =&gt; InputType::json(),
-        TypeIdentifier::Enum(e) =&gt; InputType::enum_type(map_schema_enum_type(ctx, e)),
+        TypeIdentifier::Enum(id) =&gt; InputType::enum_type(map_schema_enum_type(ctx, <span class="kw-2">*</span>id)),
         TypeIdentifier::Xml =&gt; InputType::xml(),
         TypeIdentifier::Bytes =&gt; InputType::bytes(),
         TypeIdentifier::BigInt =&gt; InputType::bigint(),

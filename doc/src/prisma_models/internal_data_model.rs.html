@@ -136,6 +136,13 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::{Arc, Weak};
@@ -150,7 +157,6 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) relations: OnceCell&lt;Vec&lt;RelationRef&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) relation_fields: OnceCell&lt;Vec&lt;RelationFieldRef&gt;&gt;,
 
-    <span class="kw">pub </span>enums: Vec&lt;InternalEnumRef&gt;,
     <span class="kw">pub </span>schema: Arc&lt;psl::ValidatedSchema&gt;,
 }
 
@@ -175,11 +181,11 @@
         <span class="self">self</span>.relations.get().unwrap().as_slice()
     }
 
-    <span class="kw">pub fn </span>find_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;InternalEnumRef&gt; {
-        <span class="self">self</span>.enums
-            .iter()
-            .find(|e| e.name == name)
-            .cloned()
+    <span class="kw">pub fn </span>find_enum(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;InternalEnumRef&gt; {
+        <span class="self">self</span>.schema
+            .db
+            .find_enum(name)
+            .map(|enum_walker| <span class="self">self</span>.clone().zip(enum_walker.id))
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
@@ -247,6 +253,14 @@
                     .collect()
             })
             .as_slice()
+    }
+
+    <span class="kw">pub fn </span>walk&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: I) -&gt; psl::parser_database::walkers::Walker&lt;I&gt; {
+        <span class="self">self</span>.schema.db.walk(id)
+    }
+
+    <span class="kw">pub fn </span>zip&lt;I&gt;(<span class="self">self</span>: Arc&lt;InternalDataModel&gt;, id: I) -&gt; <span class="kw">crate</span>::Zipper&lt;I&gt; {
+        <span class="kw">crate</span>::Zipper { id, dm: <span class="self">self </span>}
     }
 }
 

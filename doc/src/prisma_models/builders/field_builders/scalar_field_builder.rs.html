@@ -41,7 +41,7 @@
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, InternalEnum};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>};
 <span class="kw">use </span>dml::{DefaultValue, FieldArity, NativeTypeInstance};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::{fmt::Debug, sync::Arc};
@@ -55,7 +55,7 @@
     <span class="kw">pub </span>is_auto_generated_int_id: bool,
     <span class="kw">pub </span>is_autoincrement: bool,
     <span class="kw">pub </span>is_updated_at: bool,
-    <span class="kw">pub </span>internal_enum: <span class="prelude-ty">Option</span>&lt;InternalEnum&gt;,
+    <span class="kw">pub </span>internal_enum: <span class="prelude-ty">Option</span>&lt;ast::EnumId&gt;,
     <span class="kw">pub </span>arity: FieldArity,
     <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,

@@ -1029,7 +1029,7 @@
                         <span class="prelude-val">Ok</span>(ConditionValue::reference(field_ref))
                     }
                     <span class="prelude-val">Some</span>(Field::Scalar(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
-                        <span class="string">&quot;Expected a referenced scalar field of type {}{} but found {} of type {}{}.&quot;</span>,
+                        <span class="string">&quot;Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.&quot;</span>,
                         expected_type,
                         <span class="kw">if </span>field.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
                         field_ref,
@@ -1069,7 +1069,7 @@
                         <span class="prelude-val">Ok</span>(ConditionListValue::reference(field_ref))
                     }
                     <span class="prelude-val">Some</span>(Field::Scalar(field_ref)) =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
-                        <span class="string">&quot;Expected a referenced scalar field of type {}{} but found {} of type {}{}.&quot;</span>,
+                        <span class="string">&quot;Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.&quot;</span>,
                         field.type_identifier(),
                         <span class="kw">if </span>field.is_list() { <span class="string">&quot;[]&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
                         field_ref,

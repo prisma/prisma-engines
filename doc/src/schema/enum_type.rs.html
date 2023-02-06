@@ -123,9 +123,6 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::{InternalEnumRef, PrismaValue, ScalarFieldRef};
 
@@ -206,31 +203,28 @@
     <span class="kw">pub fn </span>map_input_value(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
         <span class="prelude-val">Some</span>(PrismaValue::Enum(
             <span class="self">self</span>.internal_enum
-                .values
-                .iter()
-                .find(|ev| ev.name == val)<span class="question-mark">?
-                </span>.db_name()
-                .clone(),
+                .walker()
+                .values()
+                .find(|ev| ev.name() == val)<span class="question-mark">?
+                </span>.database_name()
+                .to_owned(),
         ))
     }
 
     <span class="kw">pub fn </span>map_output_value(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
-        <span class="prelude-val">Some</span>(PrismaValue::Enum(
-            <span class="self">self</span>.internal_enum
-                .values
-                .iter()
-                .find(|ev| ev.db_name() == val)<span class="question-mark">?
-                </span>.name
-                .clone(),
-        ))
+        <span class="self">self</span>.internal_enum
+            .walker()
+            .values()
+            .find(|ev| ev.database_name() == val)
+            .map(|ev| PrismaValue::Enum(ev.name().to_owned()))
     }
 
     <span class="kw">pub fn </span>external_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
         <span class="self">self</span>.internal_enum
-            .values
-            .iter()
-            .map(|v| v.name.to_string())
-            .collect::&lt;Vec&lt;String&gt;&gt;()
+            .walker()
+            .values()
+            .map(|v| v.name().to_owned())
+            .collect()
     }
 }
 

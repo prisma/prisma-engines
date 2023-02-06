@@ -536,6 +536,13 @@
 <a href="#536" id="536">536</a>
 <a href="#537" id="537">537</a>
 <a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::default_value::{DefaultKind, DefaultValue, ValueGenerator};
@@ -544,13 +551,13 @@
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
 <span class="kw">use </span><span class="kw">crate</span>::traits::{Ignorable, WithDatabaseName, WithName};
 <span class="kw">use crate</span>::{CompositeTypeFieldType, FieldArity};
-<span class="kw">use </span>psl_core::parser_database::ReferentialAction;
+<span class="kw">use </span>psl_core::{parser_database::ReferentialAction, schema_ast::ast};
 
 <span class="doccomment">/// Datamodel field type.
 </span><span class="attr">#[derive(Debug, PartialEq, Clone)]
 </span><span class="kw">pub enum </span>FieldType {
     <span class="doccomment">/// This is an enum field, with an enum of the given name.
-    </span>Enum(String),
+    </span>Enum(ast::EnumId),
     <span class="doccomment">/// This is a relation field.
     </span>Relation(RelationInfo),
     <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.
@@ -572,6 +579,13 @@
 }
 
 <span class="kw">impl </span>FieldType {
+    <span class="kw">pub fn </span>as_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::EnumId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::Enum(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
     <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarType&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             FieldType::Scalar(scalar_type, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(scalar_type),

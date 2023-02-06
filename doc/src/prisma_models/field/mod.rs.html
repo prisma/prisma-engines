@@ -265,6 +265,7 @@
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -273,9 +274,9 @@
 <span class="kw">pub use </span>relation::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>scalar::<span class="kw-2">*</span>;
 
-<span class="kw">use </span><span class="kw">crate</span>::ModelRef;
+<span class="kw">use crate</span>::{ast, ModelRef};
 <span class="kw">use </span>dml::ScalarType;
-<span class="kw">use </span>std::{hash::Hash, sync::Arc};
+<span class="kw">use </span>std::{borrow::Cow, hash::Hash, sync::Arc};
 
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>Field {
@@ -454,7 +455,7 @@
     Float,
     Decimal,
     Boolean,
-    Enum(String),
+    Enum(ast::EnumId),
     UUID,
     Json,
     Xml,
@@ -470,24 +471,25 @@
             TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
         )
     }
-}
 
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>TypeIdentifier {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">pub fn </span>type_name(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            TypeIdentifier::String =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;String&quot;</span>),
-            TypeIdentifier::Int =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Int&quot;</span>),
-            TypeIdentifier::BigInt =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;BigInt&quot;</span>),
-            TypeIdentifier::Float =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Float&quot;</span>),
-            TypeIdentifier::Decimal =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Decimal&quot;</span>),
-            TypeIdentifier::Boolean =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Bool&quot;</span>),
-            TypeIdentifier::Enum(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Enum{e}&quot;</span>),
-            TypeIdentifier::UUID =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UUID&quot;</span>),
-            TypeIdentifier::Json =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Json&quot;</span>),
-            TypeIdentifier::Xml =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Xml&quot;</span>),
-            TypeIdentifier::DateTime =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DateTime&quot;</span>),
-            TypeIdentifier::Bytes =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Bytes&quot;</span>),
-            TypeIdentifier::Unsupported =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Unsupported&quot;</span>),
+            TypeIdentifier::String =&gt; <span class="string">&quot;String&quot;</span>.into(),
+            TypeIdentifier::Int =&gt; <span class="string">&quot;Int&quot;</span>.into(),
+            TypeIdentifier::BigInt =&gt; <span class="string">&quot;BigInt&quot;</span>.into(),
+            TypeIdentifier::Float =&gt; <span class="string">&quot;Float&quot;</span>.into(),
+            TypeIdentifier::Decimal =&gt; <span class="string">&quot;Decimal&quot;</span>.into(),
+            TypeIdentifier::Boolean =&gt; <span class="string">&quot;Bool&quot;</span>.into(),
+            TypeIdentifier::Enum(enum_id) =&gt; {
+                <span class="kw">let </span>enum_name = schema.db.walk(<span class="kw-2">*</span>enum_id).name();
+                <span class="macro">format!</span>(<span class="string">&quot;Enum{enum_name}&quot;</span>).into()
+            }
+            TypeIdentifier::UUID =&gt; <span class="string">&quot;UUID&quot;</span>.into(),
+            TypeIdentifier::Json =&gt; <span class="string">&quot;Json&quot;</span>.into(),
+            TypeIdentifier::Xml =&gt; <span class="string">&quot;Xml&quot;</span>.into(),
+            TypeIdentifier::DateTime =&gt; <span class="string">&quot;DateTime&quot;</span>.into(),
+            TypeIdentifier::Bytes =&gt; <span class="string">&quot;Bytes&quot;</span>.into(),
+            TypeIdentifier::Unsupported =&gt; <span class="string">&quot;Unsupported&quot;</span>.into(),
         }
     }
 }

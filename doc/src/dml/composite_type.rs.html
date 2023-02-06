@@ -123,12 +123,21 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Composite types defined with the `type` keyword.
 
 </span><span class="kw">use crate</span>::{
     default_value::DefaultValue, native_type_instance::NativeTypeInstance, scalars::ScalarType, Field, FieldArity,
     FieldType, ScalarField,
 };
+<span class="kw">use </span>psl_core::parser_database::ast;
 
 <span class="attr">#[derive(Debug, PartialEq, Clone)]
 </span><span class="kw">pub struct </span>CompositeType {
@@ -214,12 +223,19 @@
     CompositeType(String),
     Scalar(ScalarType, <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;),
     <span class="doccomment">/// This is an enum field, with an enum of the given name.
-    </span>Enum(String),
+    </span>Enum(ast::EnumId),
     <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.
     </span>Unsupported(String),
 }
 
 <span class="kw">impl </span>CompositeTypeFieldType {
+    <span class="kw">pub fn </span>as_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::EnumId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            CompositeTypeFieldType::Enum(id) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
     <span class="kw">pub fn </span>as_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::CompositeType(v) = <span class="self">self </span>{
             <span class="prelude-val">Some</span>(v)

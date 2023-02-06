@@ -161,10 +161,6 @@
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::{filters, itx, json_null, ordering};
 <span class="kw">use </span>schema::EnumType;
@@ -195,15 +191,11 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_schema_enum_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, enum_name: <span class="kw-2">&amp;</span>str) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(enum_name, MODEL_NAMESPACE);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_schema_enum_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, enum_id: ast::EnumId) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(ctx.internal_data_model.walk(enum_id).name(), MODEL_NAMESPACE);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>schema_enum = ctx
-        .internal_data_model
-        .find_enum(enum_name)
-        .expect(<span class="string">&quot;Enum references must always be valid.&quot;</span>);
-
+    <span class="kw">let </span>schema_enum = ctx.internal_data_model.clone().zip(enum_id);
     <span class="kw">let </span>typ = Arc::new(EnumType::database(ident.clone(), schema_enum));
 
     ctx.cache_enum_type(ident, typ.clone());

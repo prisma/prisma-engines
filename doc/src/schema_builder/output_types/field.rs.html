@@ -167,7 +167,7 @@
         TypeIdentifier::Float =&gt; OutputType::float(),
         TypeIdentifier::Decimal =&gt; OutputType::decimal(),
         TypeIdentifier::Boolean =&gt; OutputType::boolean(),
-        TypeIdentifier::Enum(e) =&gt; OutputType::enum_type(map_schema_enum_type(ctx, e)),
+        TypeIdentifier::Enum(e) =&gt; OutputType::enum_type(map_schema_enum_type(ctx, <span class="kw-2">*</span>e)),
         TypeIdentifier::Json =&gt; OutputType::json(),
         TypeIdentifier::DateTime =&gt; OutputType::date_time(),
         TypeIdentifier::UUID =&gt; OutputType::uuid(),

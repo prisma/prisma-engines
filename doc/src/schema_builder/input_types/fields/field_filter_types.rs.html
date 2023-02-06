@@ -628,6 +628,13 @@
 <a href="#628" id="628">628</a>
 <a href="#629" id="629">629</a>
 <a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{
@@ -836,7 +843,13 @@
 
 <span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new(
-        scalar_filter_name(<span class="kw-2">&amp;</span>sf.type_identifier().to_string(), <span class="bool-val">true</span>, !sf.is_required(), <span class="bool-val">false</span>, <span class="bool-val">false</span>),
+        scalar_filter_name(
+            <span class="kw-2">&amp;</span>sf.type_identifier().type_name(<span class="kw-2">&amp;</span>ctx.internal_data_model.schema),
+            <span class="bool-val">true</span>,
+            !sf.is_required(),
+            <span class="bool-val">false</span>,
+            <span class="bool-val">false</span>,
+        ),
         PRISMA_NAMESPACE,
     );
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -882,7 +895,8 @@
     include_aggregates: bool,
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>native_type_name = native_type.map(|nt| nt.name());
-    <span class="kw">let </span>type_name = ctx.connector.scalar_filter_name(typ.to_string(), native_type_name);
+    <span class="kw">let </span>scalar_type_name = typ.type_name(<span class="kw-2">&amp;</span>ctx.internal_data_model.schema).into_owned();
+    <span class="kw">let </span>type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
     <span class="kw">let </span>ident = Identifier::new(
         scalar_filter_name(<span class="kw-2">&amp;</span>type_name, list, nullable, nested, include_aggregates),
         PRISMA_NAMESPACE,
