@@ -128,8 +128,7 @@ impl<'db> ModelWalker<'db> {
     #[track_caller]
     pub fn scalar_field(self, field_id: ast::FieldId) -> ScalarFieldWalker<'db> {
         ScalarFieldWalker {
-            model_id: self.id,
-            field_id,
+            id: super::ScalarFieldId(self.id, field_id),
             db: self.db,
             scalar_field: &self.db.types.scalar_fields[&(self.id, field_id)],
         }
@@ -142,8 +141,7 @@ impl<'db> ModelWalker<'db> {
             .scalar_fields
             .range((self.id, ast::FieldId::MIN)..=(self.id, ast::FieldId::MAX))
             .map(move |((model_id, field_id), scalar_field)| ScalarFieldWalker {
-                model_id: *model_id,
-                field_id: *field_id,
+                id: super::ScalarFieldId(*model_id, *field_id),
                 db,
                 scalar_field,
             })
@@ -204,8 +202,7 @@ impl<'db> ModelWalker<'db> {
             .relation_fields
             .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
             .map(move |((_, field_id), relation_field)| RelationFieldWalker {
-                model_id,
-                field_id: *field_id,
+                id: super::RelationFieldId(model_id, *field_id),
                 db,
                 relation_field,
             })
@@ -218,8 +215,7 @@ impl<'db> ModelWalker<'db> {
     /// If the field does not exist.
     pub fn relation_field(self, field_id: ast::FieldId) -> RelationFieldWalker<'db> {
         RelationFieldWalker {
-            model_id: self.id,
-            field_id,
+            id: super::RelationFieldId(self.id, field_id),
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.id, field_id)],
         }

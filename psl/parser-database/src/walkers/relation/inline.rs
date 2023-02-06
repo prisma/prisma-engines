@@ -40,8 +40,8 @@ impl<'db> InlineRelationWalker<'db> {
         match (self.forward_relation_field(), self.back_relation_field()) {
             (Some(field_a), Some(field_b)) => {
                 let walker = CompleteInlineRelationWalker {
-                    side_a: (self.referencing_model().id, field_a.field_id),
-                    side_b: (self.referenced_model().id, field_b.field_id),
+                    side_a: (self.referencing_model().id, field_a.field_id()),
+                    side_b: (self.referenced_model().id, field_b.field_id()),
                     db: self.0.db,
                 };
 

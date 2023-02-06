@@ -28,8 +28,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
 
     pub fn referencing_field(self) -> RelationFieldWalker<'db> {
         RelationFieldWalker {
-            model_id: self.side_a.0,
-            field_id: self.side_a.1,
+            id: crate::walkers::RelationFieldId(self.side_a.0, self.side_a.1),
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
         }
@@ -37,8 +36,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
 
     pub fn referenced_field(self) -> RelationFieldWalker<'db> {
         RelationFieldWalker {
-            model_id: self.side_b.0,
-            field_id: self.side_b.1,
+            id: crate::walkers::RelationFieldId(self.side_b.0, self.side_b.1),
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_b.0, self.side_b.1)],
         }
@@ -50,8 +48,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             let model_id = self.referenced_model().id;
 
             ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
+                id: crate::walkers::ScalarFieldId(model_id, *field_id),
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
             }
@@ -69,8 +66,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             let model_id = self.referencing_model().id;
 
             ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
+                id: crate::walkers::ScalarFieldId(model_id, *field_id),
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
             }

@@ -8,18 +8,22 @@ use crate::{
 use diagnostics::Span;
 use either::Either;
 
+/// An opaque identifier for a model scalar field in a schema.
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct ScalarFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
+
 /// A scalar field, as part of a model.
 #[derive(Debug, Copy, Clone)]
 pub struct ScalarFieldWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
-    pub(crate) field_id: ast::FieldId,
+    /// The typed identifier for the field.
+    pub id: ScalarFieldId,
     pub(crate) db: &'db ParserDatabase,
     pub(crate) scalar_field: &'db ScalarField,
 }
 
 impl<'db> PartialEq for ScalarFieldWalker<'db> {
     fn eq(&self, other: &Self) -> bool {
-        self.model_id == other.model_id && self.field_id == other.field_id
+        self.id == other.id
     }
 }
 
@@ -28,12 +32,12 @@ impl<'db> Eq for ScalarFieldWalker<'db> {}
 impl<'db> ScalarFieldWalker<'db> {
     /// The ID of the field node in the AST.
     pub fn field_id(self) -> ast::FieldId {
-        self.field_id
+        self.id.1
     }
 
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.model_id][self.field_id]
+        &self.db.ast[self.id.0][self.id.1]
     }
 
     /// Is this field unique? This method will return true if:
@@ -45,14 +49,14 @@ impl<'db> ScalarFieldWalker<'db> {
 
         if let Some(true) = model
             .primary_key()
-            .map(|pk| pk.contains_exactly_fields_by_id(&[self.field_id]))
+            .map(|pk| pk.contains_exactly_fields_by_id(&[self.field_id()]))
         {
             return true;
         }
 
         self.model().indexes().any(|idx| {
             let mut fields = idx.fields();
-            idx.is_unique() && fields.len() == 1 && fields.next().map(|f| f.field_id()) == Some(self.field_id)
+            idx.is_unique() && fields.len() == 1 && fields.next().map(|f| f.field_id()) == Some(self.field_id())
         })
     }
 
@@ -85,12 +89,12 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// Does the field define a primary key by its own.
     pub fn is_single_pk(self) -> bool {
-        self.model().field_is_single_pk(self.field_id)
+        self.model().field_is_single_pk(self.field_id())
     }
 
     /// Is the field part of a compound primary key.
     pub fn is_part_of_a_compound_pk(self) -> bool {
-        self.model().field_is_part_of_a_compound_pk(self.field_id)
+        self.model().field_is_part_of_a_compound_pk(self.field_id())
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -135,7 +139,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The model that contains the field.
     pub fn model(self) -> ModelWalker<'db> {
-        self.db.walk(self.model_id)
+        self.db.walk(self.id.0)
     }
 
     /// (attribute scope, native type name, arguments, span)
@@ -157,8 +161,8 @@ impl<'db> ScalarFieldWalker<'db> {
     /// The `@default()` attribute of the field, if any.
     pub fn default_value(self) -> Option<DefaultValueWalker<'db>> {
         self.attributes().default.as_ref().map(|default| DefaultValueWalker {
-            model_id: self.model_id,
-            field_id: self.field_id,
+            model_id: self.id.0,
+            field_id: self.field_id(),
             db: self.db,
             default,
         })
@@ -262,8 +266,7 @@ impl<'db> DefaultValueWalker<'db> {
     /// ```
     pub fn field(self) -> ScalarFieldWalker<'db> {
         ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: self.field_id,
+            id: super::ScalarFieldId(self.model_id, self.field_id),
             db: self.db,
             scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.field_id)],
         }
