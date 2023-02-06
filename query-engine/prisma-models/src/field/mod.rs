@@ -6,9 +6,9 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::ModelRef;
+use crate::{ast, ModelRef};
 use dml::ScalarType;
-use std::{hash::Hash, sync::Arc};
+use std::{borrow::Cow, hash::Hash, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
@@ -187,7 +187,7 @@ pub enum TypeIdentifier {
     Float,
     Decimal,
     Boolean,
-    Enum(String),
+    Enum(ast::EnumId),
     UUID,
     Json,
     Xml,
@@ -203,24 +203,25 @@ impl TypeIdentifier {
             TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
         )
     }
-}
 
-impl std::fmt::Display for TypeIdentifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    pub fn type_name(&self, schema: &psl::ValidatedSchema) -> Cow<'static, str> {
         match self {
-            TypeIdentifier::String => write!(f, "String"),
-            TypeIdentifier::Int => write!(f, "Int"),
-            TypeIdentifier::BigInt => write!(f, "BigInt"),
-            TypeIdentifier::Float => write!(f, "Float"),
-            TypeIdentifier::Decimal => write!(f, "Decimal"),
-            TypeIdentifier::Boolean => write!(f, "Bool"),
-            TypeIdentifier::Enum(e) => write!(f, "Enum{e}"),
-            TypeIdentifier::UUID => write!(f, "UUID"),
-            TypeIdentifier::Json => write!(f, "Json"),
-            TypeIdentifier::Xml => write!(f, "Xml"),
-            TypeIdentifier::DateTime => write!(f, "DateTime"),
-            TypeIdentifier::Bytes => write!(f, "Bytes"),
-            TypeIdentifier::Unsupported => write!(f, "Unsupported"),
+            TypeIdentifier::String => "String".into(),
+            TypeIdentifier::Int => "Int".into(),
+            TypeIdentifier::BigInt => "BigInt".into(),
+            TypeIdentifier::Float => "Float".into(),
+            TypeIdentifier::Decimal => "Decimal".into(),
+            TypeIdentifier::Boolean => "Bool".into(),
+            TypeIdentifier::Enum(enum_id) => {
+                let enum_name = schema.db.walk(*enum_id).name();
+                format!("Enum{enum_name}").into()
+            }
+            TypeIdentifier::UUID => "UUID".into(),
+            TypeIdentifier::Json => "Json".into(),
+            TypeIdentifier::Xml => "Xml".into(),
+            TypeIdentifier::DateTime => "DateTime".into(),
+            TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
 }

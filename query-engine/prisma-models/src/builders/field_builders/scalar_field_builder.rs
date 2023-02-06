@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
+use crate::{ast, parent_container::ParentContainer, prelude::*};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
@@ -12,7 +12,7 @@ pub struct ScalarFieldBuilder {
     pub is_auto_generated_int_id: bool,
     pub is_autoincrement: bool,
     pub is_updated_at: bool,
-    pub internal_enum: Option<InternalEnum>,
+    pub internal_enum: Option<ast::EnumId>,
     pub arity: FieldArity,
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,

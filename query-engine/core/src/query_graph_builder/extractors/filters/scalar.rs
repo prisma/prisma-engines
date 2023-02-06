@@ -440,7 +440,7 @@ impl<'a> ScalarFilterParser<'a> {
                         Ok(ConditionValue::reference(field_ref))
                     }
                     Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
+                        "Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.",
                         expected_type,
                         if field.is_list() { "[]" } else { "" },
                         field_ref,
@@ -480,7 +480,7 @@ impl<'a> ScalarFilterParser<'a> {
                         Ok(ConditionListValue::reference(field_ref))
                     }
                     Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
+                        "Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.",
                         field.type_identifier(),
                         if field.is_list() { "[]" } else { "" },
                         field_ref,

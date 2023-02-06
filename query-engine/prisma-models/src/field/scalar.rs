@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
+use crate::{ast, parent_container::ParentContainer, prelude::*};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
@@ -17,7 +17,7 @@ pub struct ScalarField {
     pub(crate) is_auto_generated_int_id: bool,
     pub(crate) is_autoincrement: bool,
     pub(crate) is_updated_at: bool,
-    pub(crate) internal_enum: Option<InternalEnum>,
+    pub(crate) internal_enum: Option<ast::EnumId>,
     pub(crate) arity: FieldArity,
     pub(crate) db_name: Option<String>,
     pub(crate) default_value: Option<DefaultValue>,
@@ -80,8 +80,8 @@ impl ScalarField {
         self.arity
     }
 
-    pub fn internal_enum(&self) -> Option<&InternalEnum> {
-        self.internal_enum.as_ref()
+    pub fn internal_enum(&self) -> Option<crate::InternalEnum> {
+        self.internal_enum.map(|id| self.internal_data_model().zip(id))
     }
 
     pub fn default_value(&self) -> Option<&DefaultValue> {

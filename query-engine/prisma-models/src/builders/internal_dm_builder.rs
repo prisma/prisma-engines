@@ -5,8 +5,7 @@ use super::{
 use crate::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
     extensions::*,
-    IndexType, InlineRelation, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
-    TypeIdentifier,
+    IndexType, InlineRelation, RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use psl::datamodel_connector::RelationMode;
@@ -21,7 +20,7 @@ pub(crate) fn model_builders(
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
             name: model.name.clone(),
-            fields: model_field_builders(datamodel, model, relation_placeholders),
+            fields: model_field_builders(model, relation_placeholders),
             manifestation: model.database_name().map(|s| s.to_owned()),
             primary_key: pk_builder(model),
             indexes: index_builders(model),
@@ -31,11 +30,7 @@ pub(crate) fn model_builders(
         .collect()
 }
 
-fn model_field_builders(
-    datamodel: &Datamodel,
-    model: &dml::Model,
-    relations: &[RelationPlaceholder],
-) -> Vec<FieldBuilder> {
+fn model_field_builders(model: &dml::Model, relations: &[RelationPlaceholder]) -> Vec<FieldBuilder> {
     model
         .fields()
         .filter(|field| !field.is_ignored())
@@ -84,7 +79,7 @@ fn model_field_builders(
                         is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
                         is_autoincrement: sf.is_auto_increment(),
                         is_updated_at: sf.is_updated_at,
-                        internal_enum: sf.internal_enum(datamodel),
+                        internal_enum: sf.field_type.as_enum(),
                         arity: sf.arity,
                         db_name: sf.database_name.clone(),
                         default_value: sf.default_value.clone(),
@@ -96,7 +91,7 @@ fn model_field_builders(
         .collect()
 }
 
-fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeType) -> Vec<FieldBuilder> {
+fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder> {
     composite
         .fields
         .iter()
@@ -124,7 +119,7 @@ fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeTyp
                         is_auto_generated_int_id: false,
                         is_autoincrement: false,
                         is_updated_at: false, // Todo: This info isn't available here.
-                        internal_enum: field.internal_enum(datamodel),
+                        internal_enum: field.r#type.as_enum(),
                         arity: field.arity,
                         db_name: field.database_name.clone(),
                         default_value: field.default_value.as_ref().cloned(),
@@ -191,26 +186,7 @@ pub(crate) fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTyp
         .iter()
         .map(|ct| CompositeTypeBuilder {
             name: ct.name.clone(),
-            fields: composite_field_builders(datamodel, ct),
-        })
-        .collect()
-}
-
-pub(crate) fn convert_enums(datamodel: &Datamodel) -> Vec<InternalEnum> {
-    datamodel
-        .enums()
-        .map(|e| InternalEnum {
-            name: e.name.clone(),
-            values: convert_enum_values(e),
-        })
-        .collect()
-}
-
-fn convert_enum_values(enm: &dml::Enum) -> Vec<InternalEnumValue> {
-    enm.values()
-        .map(|enum_value| InternalEnumValue {
-            name: enum_value.name.clone(),
-            database_name: enum_value.database_name.clone(),
+            fields: composite_field_builders(ct),
         })
         .collect()
 }

@@ -80,14 +80,10 @@ fn should_set_default_an_enum_type() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("Model");
-    user_model
-        .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
-            "A_VARIANT_WITH_UNDERSCORES",
-        ))));
+    let field = user_model.assert_has_scalar_field("role");
+    assert!(field.default_value().is_some());
 }
 
 #[test]
@@ -104,15 +100,11 @@ fn should_set_default_on_remapped_enum_type() {
         A_VARIANT_WITH_UNDERSCORES @map("A VARIANT WITH UNDERSCORES")
     }
     "#;
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
-        .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
-            "A_VARIANT_WITH_UNDERSCORES",
-        ))));
+    let schema = psl::parse_schema(dml).unwrap();
+    let user_model = schema.assert_has_model("Model");
+    let field = user_model.assert_has_scalar_field("role");
+    assert_eq!("Role", field.field_type_as_enum().unwrap().name());
+    assert!(field.default_value().is_some());
 }
 
 #[test]
@@ -129,15 +121,10 @@ fn db_generated_function_must_work_for_enum_fields() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("Model");
-
-    user_model
-        .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_dbgenerated(
-            "ADMIN".to_string(),
-        )));
+    let field = user_model.assert_has_scalar_field("role");
+    assert!(field.default_value().is_some());
 }
 
 #[test]

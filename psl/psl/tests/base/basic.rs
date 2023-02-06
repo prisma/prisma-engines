@@ -33,16 +33,13 @@ fn parse_basic_enum() {
         HHorse99
     }
     "#;
-
-    let schema = parse(dml);
-    let role_enum = schema.assert_has_enum("Roles");
-    role_enum.assert_has_value("ADMIN");
-    role_enum.assert_has_value("USER");
-    role_enum.assert_has_value("User");
-    role_enum.assert_has_value("Admin");
-    role_enum.assert_has_value("ADMIN_USER");
-    role_enum.assert_has_value("Admin_User");
-    role_enum.assert_has_value("HHorse99");
+    let schema = psl::parse_schema(dml).unwrap();
+    let role_enum = schema.db.find_enum("Roles").unwrap();
+    let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
+    assert_eq!(
+        values,
+        &["Admin", "User", "USER", "ADMIN", "ADMIN_USER", "Admin_User", "HHorse99"]
+    );
 }
 
 #[test]

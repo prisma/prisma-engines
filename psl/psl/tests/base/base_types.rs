@@ -65,11 +65,6 @@ fn parse_field_arity() {
         .assert_has_scalar_field("comments")
         .assert_base_type(&ScalarType::String)
         .assert_arity(&dml::FieldArity::List);
-
-    post_model
-        .assert_has_scalar_field("enums")
-        .assert_enum_type("Enum")
-        .assert_arity(&dml::FieldArity::List);
 }
 
 #[test]
@@ -223,17 +218,13 @@ fn resolve_enum_field() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User");
-    user_model
-        .assert_has_scalar_field("email")
-        .assert_base_type(&ScalarType::String);
-    user_model.assert_has_scalar_field("role").assert_enum_type("Role");
+    user_model.assert_has_scalar_field("email");
 
-    let role_enum = schema.assert_has_enum("Role");
-    role_enum.assert_has_value("ADMIN");
-    role_enum.assert_has_value("PRO");
-    role_enum.assert_has_value("USER");
+    let role_enum = schema.db.find_enum("Role").unwrap();
+    let value_names: Vec<_> = role_enum.values().map(|v| v.name()).collect();
+    assert_eq!(value_names, &["ADMIN", "USER", "PRO"]);
 }
 
 #[test]

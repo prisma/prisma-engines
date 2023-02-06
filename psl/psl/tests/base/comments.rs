@@ -1,4 +1,5 @@
 use crate::common::*;
+use psl::schema_ast::ast::WithDocumentation;
 
 #[test]
 fn comments_must_work_in_models() {
@@ -84,16 +85,17 @@ fn comments_must_work_in_enums() {
       PIZZAIOLO /// they make the pizza
     }"#;
 
-    let schema = parse(dml);
-    let role_enum = schema
-        .assert_has_enum("Role")
-        .assert_with_documentation("Documentation Comment Enum");
-    role_enum
-        .assert_has_value("USER")
-        .assert_with_documentation("Documentation Comment Enum Value 1");
-    role_enum
-        .assert_has_value("PIZZAIOLO")
-        .assert_with_documentation("they make the pizza");
+    let schema = psl::parse_schema(dml).unwrap();
+    let role_enum = schema.db.find_enum("Role").unwrap();
+    assert_eq!(role_enum.ast_enum().documentation(), Some("Documentation Comment Enum"));
+    let vals: Vec<(_, _)> = role_enum.values().map(|v| (v.name(), v.documentation())).collect();
+    assert_eq!(
+        vals,
+        &[
+            ("USER", Some("Documentation Comment Enum Value 1")),
+            ("PIZZAIOLO", Some("they make the pizza",))
+        ]
+    );
 }
 
 #[test]
