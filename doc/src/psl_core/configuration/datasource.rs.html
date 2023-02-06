@@ -261,6 +261,11 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -361,29 +366,7 @@
     <span class="kw">where
         </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt;,
     {
-        <span class="kw">let </span>url = <span class="kw">match </span>from_url(<span class="kw-2">&amp;</span><span class="self">self</span>.url, env) {
-            <span class="prelude-val">Ok</span>(result) =&gt; result,
-            <span class="prelude-val">Err</span>(error) =&gt; <span class="kw">match </span>error {
-                UrlValidationError::EmptyUrlValue =&gt; {
-                    <span class="kw">let </span>msg = <span class="string">&quot;You must provide a nonempty URL&quot;</span>;
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.url_span).into());
-                }
-                UrlValidationError::EmptyEnvValue(env_var) =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(
-                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string.&quot;</span>),
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.name,
-                        <span class="self">self</span>.url_span,
-                    )
-                    .into())
-                }
-                UrlValidationError::NoEnvValue(env_var) =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(
-                        DatamodelError::new_environment_functional_evaluation_error(env_var, <span class="self">self</span>.url_span).into(),
-                    )
-                }
-                UrlValidationError::NoUrlOrEnv =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
-            },
-        };
+        <span class="kw">let </span>url = <span class="self">self</span>.load_url_no_validation(env)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.active_connector.validate_url(<span class="kw-2">&amp;</span>url).map_err(|err_str| {
             <span class="kw">let </span>err_str = <span class="kw">if </span>url.starts_with(<span class="string">&quot;prisma&quot;</span>) {
@@ -404,6 +387,32 @@
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(url)
+    }
+
+    <span class="doccomment">/// Load the database URL, without validating it and resolve env vars in the
+    /// process.
+    </span><span class="kw">pub fn </span>load_url_no_validation&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, env: F) -&gt; <span class="prelude-ty">Result</span>&lt;String, Diagnostics&gt;
+    <span class="kw">where
+        </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt;,
+    {
+        from_url(<span class="kw-2">&amp;</span><span class="self">self</span>.url, env).map_err(|err| <span class="kw">match </span>err {
+                UrlValidationError::EmptyUrlValue =&gt; {
+                    <span class="kw">let </span>msg = <span class="string">&quot;You must provide a nonempty URL&quot;</span>;
+                    DatamodelError::new_source_validation_error(msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.url_span).into()
+                }
+                UrlValidationError::EmptyEnvValue(env_var) =&gt; {
+                    DatamodelError::new_source_validation_error(
+                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string.&quot;</span>),
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.name,
+                        <span class="self">self</span>.url_span,
+                    )
+                    .into()
+                }
+                UrlValidationError::NoEnvValue(env_var) =&gt; {
+                    DatamodelError::new_environment_functional_evaluation_error(env_var, <span class="self">self</span>.url_span).into()
+                }
+                UrlValidationError::NoUrlOrEnv =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
+        })
     }
 
     <span class="doccomment">/// Load the direct database URL, validating it and resolving env vars in the
@@ -464,7 +473,8 @@
     <span class="kw">where
         </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt;,
     {
-        <span class="kw">let </span>url = <span class="self">self</span>.load_url(env)<span class="question-mark">?</span>;
+        <span class="comment">//CHECKUP
+        </span><span class="kw">let </span>url = <span class="self">self</span>.load_url(env)<span class="question-mark">?</span>;
         <span class="kw">let </span>url = <span class="self">self</span>.active_connector.set_config_dir(config_dir, <span class="kw-2">&amp;</span>url);
 
         <span class="prelude-val">Ok</span>(url.into_owned())
