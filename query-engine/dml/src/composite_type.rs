@@ -12,6 +12,7 @@ pub struct CompositeType {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeTypeField {
+    pub id: (ast::CompositeTypeId, ast::FieldId),
     pub name: String,
     pub r#type: CompositeTypeFieldType,
     pub arity: FieldArity,

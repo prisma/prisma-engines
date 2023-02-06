@@ -306,6 +306,7 @@ impl<'a> LiftAstToDml<'a> {
 
         for field in walker.fields() {
             let field = CompositeTypeField {
+                id: field.id,
                 name: field.name().to_owned(),
                 r#type: self.lift_composite_type_field_type(field, field.r#type()),
                 arity: field.arity(),
