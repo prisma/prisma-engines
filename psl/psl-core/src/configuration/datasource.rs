@@ -98,29 +98,7 @@ impl Datasource {
     where
         F: Fn(&str) -> Option<String>,
     {
-        let url = match from_url(&self.url, env) {
-            Ok(result) => result,
-            Err(error) => match error {
-                UrlValidationError::EmptyUrlValue => {
-                    let msg = "You must provide a nonempty URL";
-                    return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
-                }
-                UrlValidationError::EmptyEnvValue(env_var) => {
-                    return Err(DatamodelError::new_source_validation_error(
-                        &format!("You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string."),
-                        &self.name,
-                        self.url_span,
-                    )
-                    .into())
-                }
-                UrlValidationError::NoEnvValue(env_var) => {
-                    return Err(
-                        DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into(),
-                    )
-                }
-                UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
-            },
-        };
+        let url = self.load_url_no_validation(env)?;
 
         self.active_connector.validate_url(&url).map_err(|err_str| {
             let err_str = if url.starts_with("prisma") {
@@ -141,6 +119,32 @@ impl Datasource {
         })?;
 
         Ok(url)
+    }
+
+    /// Load the database URL, without validating it and resolve env vars in the
+    /// process.
+    pub fn load_url_no_validation<F>(&self, env: F) -> Result<String, Diagnostics>
+    where
+        F: Fn(&str) -> Option<String>,
+    {
+        from_url(&self.url, env).map_err(|err| match err {
+                UrlValidationError::EmptyUrlValue => {
+                    let msg = "You must provide a nonempty URL";
+                    return DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into();
+                }
+                UrlValidationError::EmptyEnvValue(env_var) => {
+                    return DatamodelError::new_source_validation_error(
+                        &format!("You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string."),
+                        &self.name,
+                        self.url_span,
+                    )
+                    .into();
+                }
+                UrlValidationError::NoEnvValue(env_var) => {
+                    return DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into();
+                }
+                UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
+        })
     }
 
     /// Load the direct database URL, validating it and resolving env vars in the
@@ -201,6 +205,7 @@ impl Datasource {
     where
         F: Fn(&str) -> Option<String>,
     {
+        //CHECKUP
         let url = self.load_url(env)?;
         let url = self.active_connector.set_config_dir(config_dir, &url);
 

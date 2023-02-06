@@ -91,10 +91,80 @@ impl Configuration {
                         },
                         Ok(res) => Ok(Some(res)),
                     }?;
+
                 datasource.direct_url = Some(crate::StringFromEnvVar {
                     from_env_var: direct_url.from_env_var.clone(),
                     value: result,
                 });
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn resolve_datasource_direct_urls_from_env<F>(
+        &mut self,
+        url_overrides: &[(String, String)],
+        env: F,
+    ) -> Result<(), Diagnostics>
+    where
+        F: Fn(&str) -> Option<String> + Copy,
+    {
+        for datasource in &mut self.datasources {
+            if let Some((_, url)) = url_overrides.iter().find(|(name, _url)| name == &datasource.name) {
+                datasource.url.value = Some(url.clone());
+                datasource.url.from_env_var = None;
+            }
+
+            let mut has_direct_url = false;
+
+            if let (Some(direct_url), Some(span)) = (&datasource.direct_url, &datasource.direct_url_span) {
+                let result = match super::from_url(direct_url, env) {
+                        Err(err) => {
+                            match err {
+                        super::UrlValidationError::EmptyUrlValue => {
+                            let msg = "You must provide a nonempty direct URL";
+                            Err(DatamodelError::new_source_validation_error(msg, &datasource.name, *span))
+                        }
+                        super::UrlValidationError::EmptyEnvValue(env_var) => {
+                            Err(DatamodelError::new_source_validation_error(
+                                &format!(
+                                    "You must provide a nonempty direct URL. The environment variable `{env_var}` resolved to an empty string."
+                                ),
+                                &datasource.name,
+                                *span,
+                            ))
+                        },
+                        super::UrlValidationError::NoEnvValue(env_var) => {
+                            Err(DatamodelError::new_environment_functional_evaluation_error(
+                                env_var,
+                                *span,
+                            ))
+                        },
+                        super::UrlValidationError::NoUrlOrEnv => {
+                          Ok(None)
+                        },
+                    }
+                        },
+                        Ok(res) => Ok(Some(res)),
+                    }?;
+
+                has_direct_url = true;
+
+                datasource.direct_url = Some(crate::StringFromEnvVar {
+                    from_env_var: direct_url.from_env_var.clone(),
+                    value: result,
+                });
+            }
+
+            // We probably just need to improve validation, especially around allowing 'prisma://'
+            // urls.
+            if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
+                if has_direct_url {
+                    datasource.url.value = Some(datasource.load_url_no_validation(env)?);
+                } else {
+                    datasource.url.value = Some(datasource.load_url(env)?);
+                }
             }
         }
 
