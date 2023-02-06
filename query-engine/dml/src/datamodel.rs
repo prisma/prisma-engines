@@ -1,7 +1,6 @@
 use crate::composite_type::CompositeType;
 use crate::field::RelationField;
 use crate::model::Model;
-use crate::r#enum::Enum;
 use crate::relation_info::RelationInfo;
 
 /// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
@@ -12,7 +11,6 @@ use crate::relation_info::RelationInfo;
 /// Both of these are never converted into the internal datamodel.
 #[derive(Debug, Default)]
 pub struct Datamodel {
-    pub enums: Vec<Enum>,
     pub models: Vec<Model>,
     pub composite_types: Vec<CompositeType>,
 }
@@ -26,11 +24,6 @@ impl Datamodel {
     /// Gets an iterator over all composite types.
     pub fn composite_types(&self) -> std::slice::Iter<CompositeType> {
         self.composite_types.iter()
-    }
-
-    /// Gets an iterator over all enums.
-    pub fn enums(&self) -> std::slice::Iter<Enum> {
-        self.enums.iter()
     }
 
     /// Finds a model by name.
@@ -53,16 +46,6 @@ impl Datamodel {
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
         self.find_model(&self.find_related_field_bang(field).1.relation_info.referenced_model)
-    }
-
-    /// Finds an enum by name.
-    pub fn find_enum(&self, name: &str) -> Option<&Enum> {
-        self.enums().find(|m| m.name == *name)
-    }
-
-    /// Finds an enum by database name.
-    pub fn find_enum_db_name(&self, db_name: &str) -> Option<&Enum> {
-        self.enums().find(|e| e.database_name == Some(db_name.to_owned()))
     }
 
     /// Finds a model by name and returns a mutable reference.

@@ -64,10 +64,6 @@ impl<'a> LiftAstToDml<'a> {
             schema.composite_types.push(self.lift_composite_type(composite_type))
         }
 
-        for r#enum in self.db.walk_enums() {
-            schema.enums.push(self.lift_enum(r#enum))
-        }
-
         self.lift_relations(&mut schema, &mut field_ids_for_sorting);
 
         for model in &mut schema.models {
@@ -431,28 +427,6 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         model
-    }
-
-    /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, r#enum: EnumWalker<'_>) -> Enum {
-        let mut en = Enum::new(r#enum.id, r#enum.name());
-
-        for value in r#enum.values() {
-            en.add_value(self.lift_enum_value(value));
-        }
-
-        en.documentation = r#enum.ast_enum().documentation().map(String::from);
-        en.database_name = r#enum.mapped_name().map(String::from);
-        en.schema = r#enum.schema().map(|(s, _)| s.to_owned());
-        en
-    }
-
-    /// Internal: Lifts an enum value AST node.
-    fn lift_enum_value(&self, value: EnumValueWalker<'_>) -> EnumValue {
-        let mut enum_value = EnumValue::new(value.name());
-        enum_value.documentation = value.documentation().map(String::from);
-        enum_value.database_name = value.mapped_name().map(String::from);
-        enum_value
     }
 
     fn lift_scalar_field_type(
