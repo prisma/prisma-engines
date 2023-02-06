@@ -5,6 +5,7 @@ use psl_core::parser_database::ast;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeType {
+    pub id: ast::CompositeTypeId,
     pub name: String,
     pub fields: Vec<CompositeTypeField>,
 }

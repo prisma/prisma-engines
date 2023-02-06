@@ -126,8 +126,13 @@ impl<'a> LiftAstToDml<'a> {
                         // Construct a relation field in the DML for an existing relation field in the source.
                         let arity = forward_field_walker.ast_field().arity;
                         let referential_arity = forward_field_walker.referential_arity();
-                        let mut relation_field =
-                            RelationField::new(forward_field_walker.name(), arity, referential_arity, relation_info);
+                        let mut relation_field = RelationField::new(
+                            forward_field_walker.id,
+                            forward_field_walker.name(),
+                            arity,
+                            referential_arity,
+                            relation_info,
+                        );
 
                         let column_names: Vec<&str> = relation
                             .referencing_fields()
@@ -183,8 +188,13 @@ impl<'a> LiftAstToDml<'a> {
                             let ast_field = relation_field.ast_field();
                             let arity = ast_field.arity;
                             let referential_arity = relation_field.referential_arity();
-                            let mut field =
-                                RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                            let mut field = RelationField::new(
+                                relation_field.id,
+                                relation_field.name(),
+                                arity,
+                                referential_arity,
+                                relation_info,
+                            );
 
                             common_dml_fields(&mut field, relation_field);
 
@@ -199,6 +209,7 @@ impl<'a> LiftAstToDml<'a> {
                             let arity = FieldArity::List;
                             let referential_arity = FieldArity::List;
                             let mut field = RelationField::new(
+                                relation.forward_relation_field().unwrap().id,
                                 relation.referencing_model().name(),
                                 arity,
                                 referential_arity,
@@ -218,8 +229,13 @@ impl<'a> LiftAstToDml<'a> {
                         let arity = ast_field.arity;
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
                         let referential_arity = relation_field.referential_arity();
-                        let mut field =
-                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                        let mut field = RelationField::new(
+                            relation_field.id,
+                            relation_field.name(),
+                            arity,
+                            referential_arity,
+                            relation_info,
+                        );
 
                         common_dml_fields(&mut field, relation_field);
 
@@ -249,8 +265,13 @@ impl<'a> LiftAstToDml<'a> {
                         let relation_info = RelationInfo::new(relation_field.related_model().name());
                         let referential_arity = relation_field.referential_arity();
 
-                        let mut field =
-                            RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+                        let mut field = RelationField::new(
+                            relation_field.id,
+                            relation_field.name(),
+                            arity,
+                            referential_arity,
+                            relation_info,
+                        );
 
                         common_dml_fields(&mut field, relation_field);
 
@@ -301,6 +322,7 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         CompositeType {
+            id: walker.id,
             name: walker.name().to_owned(),
             fields,
         }

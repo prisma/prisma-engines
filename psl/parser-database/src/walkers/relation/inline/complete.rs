@@ -28,8 +28,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
 
     pub fn referencing_field(self) -> RelationFieldWalker<'db> {
         RelationFieldWalker {
-            model_id: self.side_a.0,
-            field_id: self.side_a.1,
+            id: crate::walkers::RelationFieldId(self.side_a.0, self.side_a.1),
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
         }
@@ -37,8 +36,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
 
     pub fn referenced_field(self) -> RelationFieldWalker<'db> {
         RelationFieldWalker {
-            model_id: self.side_b.0,
-            field_id: self.side_b.1,
+            id: crate::walkers::RelationFieldId(self.side_b.0, self.side_b.1),
             db: self.db,
             relation_field: &self.db.types.relation_fields[&(self.side_b.0, self.side_b.1)],
         }

@@ -7,7 +7,10 @@ use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{CompositeTypeFieldType, FieldArity};
 use psl_core::{
-    parser_database::{walkers::ScalarFieldId, ReferentialAction},
+    parser_database::{
+        walkers::{RelationFieldId, ScalarFieldId},
+        ReferentialAction,
+    },
     schema_ast::ast,
 };
 
@@ -269,6 +272,8 @@ impl Ignorable for Field {
 /// Represents a relation field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct RelationField {
+    pub id: RelationFieldId,
+
     /// Name of the field.
     pub name: String,
 
@@ -296,8 +301,15 @@ pub struct RelationField {
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, referential_arity: FieldArity, relation_info: RelationInfo) -> Self {
+    pub fn new(
+        id: RelationFieldId,
+        name: &str,
+        arity: FieldArity,
+        referential_arity: FieldArity,
+        relation_info: RelationInfo,
+    ) -> Self {
         RelationField {
+            id,
             name: String::from(name),
             arity,
             referential_arity,
