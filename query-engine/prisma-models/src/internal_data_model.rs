@@ -1,5 +1,6 @@
 use crate::{parent_container::ParentContainer, prelude::*, CompositeTypeRef, InternalEnumRef};
 use once_cell::sync::OnceCell;
+use psl::schema_ast::ast;
 use std::sync::{Arc, Weak};
 
 pub type InternalDataModelRef = Arc<InternalDataModel>;
@@ -52,16 +53,28 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
+    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
+        self.models
+            .get()
+            .and_then(|models| models.iter().find(|model| model.id == model_id))
+            .cloned()
+            .unwrap()
+    }
+
     /// This method takes the two models at the ends of the relation as a first argument, because
     /// relation names are scoped by the pair of models in the relation. Relation names are _not_
     /// globally unique.
-    pub fn find_relation(&self, model_names: (&str, &str), relation_name: &str) -> crate::Result<RelationWeakRef> {
+    pub fn find_relation(
+        &self,
+        model_ids: (ast::ModelId, ast::ModelId),
+        relation_name: &str,
+    ) -> crate::Result<RelationWeakRef> {
         self.relations
             .get()
             .and_then(|relations| {
                 relations
                     .iter()
-                    .find(|relation| relation_matches(relation, model_names, relation_name))
+                    .find(|relation| relation_matches(relation, model_ids, relation_name))
             })
             .map(Arc::downgrade)
             .ok_or_else(|| DomainError::RelationNotFound {
@@ -85,11 +98,11 @@ impl InternalDataModel {
     pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
         match &field.container {
             ParentContainer::Model(model) => {
-                let model_name = &model.upgrade().unwrap().name;
+                let model_id = model.upgrade().unwrap().id;
 
                 self.relation_fields()
                     .iter()
-                    .filter(|rf| &rf.relation_info.referenced_model == model_name)
+                    .filter(|rf| rf.relation_info.referenced_model == model_id)
                     .filter(|rf| rf.relation_info.references.contains(&field.name))
                     .map(Arc::clone)
                     .collect()
@@ -124,20 +137,20 @@ impl InternalDataModel {
 ///
 /// In other words, the scope for a relation name is only between two models. Every pair of models
 /// has its own scope for relation names.
-fn relation_matches(relation: &Relation, model_names: (&str, &str), relation_name: &str) -> bool {
+fn relation_matches(relation: &Relation, model_ids: (ast::ModelId, ast::ModelId), relation_name: &str) -> bool {
     if relation.name != relation_name {
         return false;
     }
 
-    if relation.is_self_relation() && model_names.0 == model_names.1 && relation.model_a_name == model_names.0 {
+    if relation.is_self_relation() && model_ids.0 == model_ids.1 && relation.model_a_id == model_ids.0 {
         return true;
     }
 
-    if model_names.0 == relation.model_a_name && model_names.1 == relation.model_b_name {
+    if model_ids.0 == relation.model_a_id && model_ids.1 == relation.model_b_id {
         return true;
     }
 
-    if model_names.0 == relation.model_b_name && model_names.1 == relation.model_a_name {
+    if model_ids.0 == relation.model_b_id && model_ids.1 == relation.model_a_id {
         return true;
     }
 

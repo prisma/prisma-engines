@@ -331,24 +331,12 @@ impl RelationField {
         self.emulates_referential_actions = Some(value);
     }
 
-    pub fn points_to_model(&self, name: &str) -> bool {
-        self.relation_info.referenced_model == name
-    }
-
     pub fn is_required(&self) -> bool {
         self.arity.is_required()
     }
 
     pub fn is_list(&self) -> bool {
         self.arity.is_list()
-    }
-
-    pub fn is_singular(&self) -> bool {
-        !self.is_list()
-    }
-
-    pub fn is_optional(&self) -> bool {
-        self.arity.is_optional()
     }
 
     pub fn default_on_delete_action(&self) -> ReferentialAction {
@@ -444,14 +432,6 @@ impl ScalarField {
 
     pub fn is_required(&self) -> bool {
         self.arity.is_required()
-    }
-
-    pub fn is_list(&self) -> bool {
-        self.arity.is_list()
-    }
-
-    pub fn is_singular(&self) -> bool {
-        !self.is_list()
     }
 
     pub fn is_optional(&self) -> bool {

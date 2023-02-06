@@ -1,10 +1,12 @@
 use super::{FieldBuilder, IndexBuilder, PrimaryKeyBuilder};
 use crate::{CompositeTypeRef, Fields, InternalDataModelWeakRef, Model, ModelRef};
 use once_cell::sync::OnceCell;
+use psl::schema_ast::ast;
 use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct ModelBuilder {
+    pub id: ast::ModelId,
     pub name: String,
     pub fields: Vec<FieldBuilder>,
     pub manifestation: Option<String>,
@@ -21,6 +23,7 @@ impl ModelBuilder {
         composite_types: &[CompositeTypeRef],
     ) -> ModelRef {
         let model = Arc::new(Model {
+            id: self.id,
             name: self.name,
             manifestation: self.manifestation,
             fields: OnceCell::new(),

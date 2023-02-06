@@ -351,7 +351,7 @@ fn explicit_relation_fields() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
+    let relation = datamodel.assert_relation((blog.id, post.id), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -369,7 +369,7 @@ fn explicit_relation_fields() {
         .assert_model_a("Blog")
         .assert_model_b("Post")
         .assert_manifestation(&RelationLinkManifestation::Inline(InlineRelation {
-            in_table_of_model_name: "Post".to_string(),
+            in_table_of_model: post.id,
         }));
 }
 
@@ -392,7 +392,7 @@ fn many_to_many_relations() {
     let relation_name = "BlogToPost";
     let blog = datamodel.assert_model("Blog");
     let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation(("Blog", "Post"), relation_name);
+    let relation = datamodel.assert_relation((blog.id, post.id), relation_name);
 
     blog.assert_relation_field("posts")
         .assert_list()
@@ -549,7 +549,7 @@ fn convert(datamodel: &str) -> Arc<InternalDataModel> {
 
 trait DatamodelAssertions {
     fn assert_model(&self, name: &str) -> Arc<Model>;
-    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation>;
+    fn assert_relation(&self, models: (ast::ModelId, ast::ModelId), name: &str) -> Arc<Relation>;
 }
 
 impl DatamodelAssertions for InternalDataModel {
@@ -557,7 +557,7 @@ impl DatamodelAssertions for InternalDataModel {
         self.find_model(name).unwrap()
     }
 
-    fn assert_relation(&self, models: (&str, &str), name: &str) -> Arc<Relation> {
+    fn assert_relation(&self, models: (ast::ModelId, ast::ModelId), name: &str) -> Arc<Relation> {
         self.find_relation(models, name).unwrap().upgrade().unwrap()
     }
 }

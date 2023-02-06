@@ -116,7 +116,7 @@ impl RelationField {
                 self.model()
                     .internal_data_model()
                     .find_relation(
-                        (&self.model().name, &self.relation_info.referenced_model),
+                        (self.model().id, self.relation_info.referenced_model),
                         &self.relation_name,
                     )
                     .unwrap()
@@ -141,7 +141,7 @@ impl RelationField {
                 if is_self_rel {
                     !self.relation_info.references.is_empty()
                 } else {
-                    m.in_table_of_model_name == self.model().name
+                    m.in_table_of_model == self.model().id
                 }
             }
             _ => false,

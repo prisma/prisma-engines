@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
 use once_cell::sync::OnceCell;
-use psl::datamodel_connector::RelationMode;
+use psl::{datamodel_connector::RelationMode, schema_ast::ast};
 use std::{
     fmt::Debug,
     sync::{Arc, Weak},
@@ -15,8 +15,8 @@ pub type RelationWeakRef = Weak<Relation>;
 pub struct Relation {
     pub(crate) name: String,
 
-    pub(crate) model_a_name: String,
-    pub(crate) model_b_name: String,
+    pub(crate) model_a_id: ast::ModelId,
+    pub(crate) model_b_id: ast::ModelId,
 
     pub(crate) model_a: OnceCell<ModelWeakRef>,
     pub(crate) model_b: OnceCell<ModelWeakRef>,
@@ -52,14 +52,14 @@ impl Relation {
     /// A model that relates to itself. For example a `Person` that is a parent
     /// can relate to people that are children.
     pub fn is_self_relation(&self) -> bool {
-        self.model_a_name == self.model_b_name
+        self.model_a_id == self.model_b_id
     }
 
     /// A pointer to the first `Model` in the `Relation`.
     pub fn model_a(&self) -> ModelRef {
         self.model_a
             .get_or_init(|| {
-                let model = self.internal_data_model().find_model(&self.model_a_name).unwrap();
+                let model = self.internal_data_model().find_model_by_id(self.model_a_id);
                 Arc::downgrade(&model)
             })
             .upgrade()
@@ -70,7 +70,7 @@ impl Relation {
     pub fn model_b(&self) -> ModelRef {
         self.model_b
             .get_or_init(|| {
-                let model = self.internal_data_model().find_model(&self.model_b_name).unwrap();
+                let model = self.internal_data_model().find_model_by_id(self.model_b_id);
                 Arc::downgrade(&model)
             })
             .upgrade()
@@ -169,8 +169,8 @@ impl Debug for Relation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Relation")
             .field("name", &self.name)
-            .field("model_a_name", &self.model_a_name)
-            .field("model_b_name", &self.model_b_name)
+            .field("model_a_name", &self.model_a_id)
+            .field("model_b_name", &self.model_b_id)
             .field("model_a", &self.model_a)
             .field("model_b", &self.model_b)
             .field("field_a", &self.field_a)
@@ -189,7 +189,7 @@ pub enum RelationLinkManifestation {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InlineRelation {
-    pub in_table_of_model_name: String,
+    pub in_table_of_model: ast::ModelId,
 }
 
 #[derive(Debug, Clone, PartialEq)]

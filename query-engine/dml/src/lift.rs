@@ -120,7 +120,7 @@ impl<'a> LiftAstToDml<'a> {
 
                         let referenced_model = relation.referenced_model();
 
-                        let relation_info = RelationInfo::new(referenced_model.name());
+                        let relation_info = RelationInfo::new(referenced_model.id);
 
                         let forward_field_walker = relation.forward_relation_field().unwrap();
                         // Construct a relation field in the DML for an existing relation field in the source.
@@ -181,7 +181,7 @@ impl<'a> LiftAstToDml<'a> {
 
                     // Back field
                     {
-                        let relation_info = RelationInfo::new(relation.referencing_model().name());
+                        let relation_info = RelationInfo::new(relation.referencing_model().id);
                         let model = schema.find_model_mut(relation.referenced_model().name());
 
                         let mut field = if let Some(relation_field) = relation.back_relation_field() {
@@ -227,7 +227,7 @@ impl<'a> LiftAstToDml<'a> {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
                         let arity = ast_field.arity;
-                        let relation_info = RelationInfo::new(relation_field.related_model().name());
+                        let relation_info = RelationInfo::new(relation_field.related_model().id);
                         let referential_arity = relation_field.referential_arity();
                         let mut field = RelationField::new(
                             relation_field.id,
@@ -262,7 +262,7 @@ impl<'a> LiftAstToDml<'a> {
                     for relation_field in [relation.field_a(), relation.field_b()] {
                         let ast_field = relation_field.ast_field();
                         let arity = ast_field.arity;
-                        let relation_info = RelationInfo::new(relation_field.related_model().name());
+                        let relation_info = RelationInfo::new(relation_field.related_model().id);
                         let referential_arity = relation_field.referential_arity();
 
                         let mut field = RelationField::new(

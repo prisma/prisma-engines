@@ -1,10 +1,10 @@
-use psl_core::parser_database as db;
+use psl_core::{parser_database as db, schema_ast::ast};
 
 /// Holds information about a relation field.
 #[derive(Debug, PartialEq, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
-    pub referenced_model: String,
+    pub referenced_model: ast::ModelId,
     /// The fields forming the relation.
     pub fields: Vec<String>,
     /// The target field of the relation a.k.a. `references`
@@ -24,9 +24,9 @@ pub struct RelationInfo {
 impl RelationInfo {
     /// Creates a new relation info for the
     /// given target model.
-    pub fn new(model: &str) -> RelationInfo {
+    pub fn new(referenced_model: ast::ModelId) -> RelationInfo {
         RelationInfo {
-            referenced_model: String::from(model),
+            referenced_model,
             fields: Vec::new(),
             references: Vec::new(),
             name: String::new(),

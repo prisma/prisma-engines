@@ -8,7 +8,7 @@ use crate::{
     IndexType, InlineRelation, RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-use psl::datamodel_connector::RelationMode;
+use psl::{datamodel_connector::RelationMode, schema_ast::ast};
 
 pub(crate) fn model_builders(
     datamodel: &Datamodel,
@@ -19,6 +19,7 @@ pub(crate) fn model_builders(
         .filter(|model| !model.is_ignored())
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
+            id: model.id,
             name: model.name.clone(),
             fields: model_field_builders(model, relation_placeholders),
             manifestation: model.database_name().map(|s| s.to_owned()),
@@ -142,8 +143,8 @@ pub(crate) fn relation_builders(
         .map(|r| RelationBuilder {
             name: r.name(),
             manifestation: r.manifestation(),
-            model_a_name: r.model_a.name.clone(),
-            model_b_name: r.model_b.name.clone(),
+            model_a_id: r.model_a.id,
+            model_b_id: r.model_b.id,
             relation_mode,
         })
         .collect()
@@ -204,9 +205,7 @@ pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationP
                 ..
             } = &field.relation_info;
 
-            let related_model = datamodel
-                .find_model(to)
-                .unwrap_or_else(|| panic!("Related model {to} not found"));
+            let related_model = datamodel.find_model_by_id(*to).unwrap();
 
             let (_, related_field) = datamodel.find_related_field_bang(field);
             let related_field_info: &dml::RelationInfo = &related_field.relation_info;
@@ -247,25 +246,25 @@ pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationP
             };
 
             let inline_on_model_a = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_a.name.clone(),
+                in_table_of_model: model_a.id,
                 field: field_a.clone(),
                 referenced_fields: referenced_fields_a.clone(),
             };
 
             let inline_on_model_b = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_b.name.clone(),
+                in_table_of_model: model_b.id,
                 field: field_b.clone(),
                 referenced_fields: referenced_fields_b.clone(),
             };
 
             let inline_on_this_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: model.name.clone(),
+                in_table_of_model: model.id,
                 field: field.clone(),
                 referenced_fields: references.clone(),
             };
 
             let inline_on_related_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: related_model.name.clone(),
+                in_table_of_model: related_model.id,
                 field: related_field.clone(),
                 referenced_fields: related_field_info.references.clone(),
             };
@@ -323,7 +322,7 @@ pub struct RelationPlaceholder {
 #[derive(PartialEq, Debug, Clone)]
 pub enum ManifestationPlaceholder {
     Inline {
-        in_table_of_model: String,
+        in_table_of_model: ast::ModelId,
         /// The relation field.
         field: dml::RelationField,
         /// The name of the (dml) fields referenced by the relation.
@@ -386,7 +385,7 @@ impl RelationPlaceholder {
             }),
             ManifestationPlaceholder::Inline { in_table_of_model, .. } => {
                 RelationLinkManifestation::Inline(InlineRelation {
-                    in_table_of_model_name: in_table_of_model.to_string(),
+                    in_table_of_model: *in_table_of_model,
                 })
             }
         }
