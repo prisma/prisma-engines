@@ -130,18 +130,18 @@ impl Datasource {
         from_url(&self.url, env).map_err(|err| match err {
                 UrlValidationError::EmptyUrlValue => {
                     let msg = "You must provide a nonempty URL";
-                    return DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into();
+                    DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into()
                 }
                 UrlValidationError::EmptyEnvValue(env_var) => {
-                    return DatamodelError::new_source_validation_error(
+                    DatamodelError::new_source_validation_error(
                         &format!("You must provide a nonempty URL. The environment variable `{env_var}` resolved to an empty string."),
                         &self.name,
                         self.url_span,
                     )
-                    .into();
+                    .into()
                 }
                 UrlValidationError::NoEnvValue(env_var) => {
-                    return DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into();
+                    DatamodelError::new_environment_functional_evaluation_error(env_var, self.url_span).into()
                 }
                 UrlValidationError::NoUrlOrEnv => unreachable!("Missing url in datasource"),
         })
