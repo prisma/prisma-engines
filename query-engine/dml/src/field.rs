@@ -6,7 +6,10 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{CompositeTypeFieldType, FieldArity};
-use psl_core::{parser_database::ReferentialAction, schema_ast::ast};
+use psl_core::{
+    parser_database::{walkers::ScalarFieldId, ReferentialAction},
+    schema_ast::ast,
+};
 
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
@@ -366,6 +369,8 @@ impl WithName for RelationField {
 /// Represents a scalar field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct ScalarField {
+    pub id: ScalarFieldId,
+
     /// Name of the field.
     pub name: String,
 
@@ -400,8 +405,9 @@ pub struct ScalarField {
 
 impl ScalarField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, arity: FieldArity, field_type: FieldType) -> ScalarField {
+    pub fn new(id: ScalarFieldId, name: &str, arity: FieldArity, field_type: FieldType) -> ScalarField {
         ScalarField {
+            id,
             name: String::from(name),
             arity,
             field_type,
@@ -413,14 +419,6 @@ impl ScalarField {
             is_commented_out: false,
             is_ignored: false,
         }
-    }
-
-    /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
-        let mut field = Self::new(name, FieldArity::Optional, field_type);
-        field.is_generated = true;
-
-        field
     }
 
     pub fn set_default_value(&mut self, val: DefaultValue) {

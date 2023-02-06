@@ -411,7 +411,7 @@ impl<'a> LiftAstToDml<'a> {
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
-            let mut field = ScalarField::new(ast_field.name(), ast_field.arity, field_type);
+            let mut field = ScalarField::new(scalar_field.id, ast_field.name(), ast_field.arity, field_type);
 
             field.documentation = ast_field.documentation().map(String::from);
             field.is_ignored = scalar_field.is_ignored();

@@ -50,8 +50,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             let model_id = self.referenced_model().id;
 
             ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
+                id: crate::walkers::ScalarFieldId(model_id, *field_id),
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
             }
@@ -69,8 +68,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             let model_id = self.referencing_model().id;
 
             ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
+                id: crate::walkers::ScalarFieldId(model_id, *field_id),
                 db: self.db,
                 scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
             }
