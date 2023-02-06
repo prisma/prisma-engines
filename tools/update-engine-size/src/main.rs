@@ -1,10 +1,10 @@
 use std::{
+    error::Error,
     fs::{self, OpenOptions},
     path::Path,
 };
 
 use clap::Parser;
-use color_eyre::eyre::eyre;
 use serde::Serialize;
 
 /// This tool updates the size of the engine binaries in the CSV file
@@ -36,13 +36,11 @@ struct DbEntry<'a> {
     size_bytes: u64,
 }
 
-fn main() -> color_eyre::Result<()> {
-    color_eyre::install()?;
-
+fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
     if args.files.is_empty() {
-        return Err(eyre!("Please provide at least one engine file"));
+        panic!("Please provide at least one engine file");
     }
 
     let date_time = chrono::Utc::now().to_rfc3339();
