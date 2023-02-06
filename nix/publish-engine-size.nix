@@ -35,13 +35,13 @@ in
       git checkout origin/gh-pages
 
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
-          --db engine_size.csv                                                \
+          --db engines-size/data.csv                                                \
           --branch "$CURRENT_BRANCH"                                          \
           --commit "$CURRENT_COMMIT_FULL"                                     \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node
 
-      git add engine_size.csv
+      git add engines-size/data.csv
       git commit --quiet -m "update engines size for $CURRENT_COMMIT_SHORT"
       git push origin '+HEAD:gh-pages'
       git checkout "$CURRENT_BRANCH"
