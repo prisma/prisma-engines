@@ -119,9 +119,7 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker, Walker};
 <span class="kw">use </span><span class="kw">crate</span>::ScalarType;
 <span class="kw">use </span>schema_ast::ast;
 
@@ -152,15 +150,13 @@
         } = <span class="self">self</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_field) = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
             RefinedFieldWalker::Relation(RelationFieldWalker {
-                model_id,
-                field_id,
+                id: <span class="kw">super</span>::RelationFieldId(model_id, field_id),
                 db,
                 relation_field,
             })
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(scalar_field) = <span class="self">self</span>.db.types.scalar_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
             RefinedFieldWalker::Scalar(ScalarFieldWalker {
-                model_id,
-                field_id,
+                id: ScalarFieldId(model_id, field_id),
                 db,
                 scalar_field,
             })
@@ -183,7 +179,7 @@
     <span class="kw">fn </span>from(w: ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
         Walker {
             db: w.db,
-            id: (w.model_id, w.field_id),
+            id: (w.id.<span class="number">0</span>, w.id.<span class="number">1</span>),
         }
     }
 }
@@ -192,7 +188,7 @@
     <span class="kw">fn </span>from(w: RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
         Walker {
             db: w.db,
-            id: (w.model_id, w.field_id),
+            id: (w.id.<span class="number">0</span>, w.id.<span class="number">1</span>),
         }
     }
 }

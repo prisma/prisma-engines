@@ -319,10 +319,6 @@
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>primary_key;
 <span class="kw">mod </span>unique_criteria;
 
@@ -453,8 +449,7 @@
     </span><span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>scalar_field(<span class="self">self</span>, field_id: ast::FieldId) -&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         ScalarFieldWalker {
-            model_id: <span class="self">self</span>.id,
-            field_id,
+            id: <span class="kw">super</span>::ScalarFieldId(<span class="self">self</span>.id, field_id),
             db: <span class="self">self</span>.db,
             scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.id, field_id)],
         }
@@ -467,8 +462,7 @@
             .scalar_fields
             .range((<span class="self">self</span>.id, ast::FieldId::MIN)..=(<span class="self">self</span>.id, ast::FieldId::MAX))
             .map(<span class="kw">move </span>|((model_id, field_id), scalar_field)| ScalarFieldWalker {
-                model_id: <span class="kw-2">*</span>model_id,
-                field_id: <span class="kw-2">*</span>field_id,
+                id: <span class="kw">super</span>::ScalarFieldId(<span class="kw-2">*</span>model_id, <span class="kw-2">*</span>field_id),
                 db,
                 scalar_field,
             })
@@ -529,8 +523,7 @@
             .relation_fields
             .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
             .map(<span class="kw">move </span>|((<span class="kw">_</span>, field_id), relation_field)| RelationFieldWalker {
-                model_id,
-                field_id: <span class="kw-2">*</span>field_id,
+                id: <span class="kw">super</span>::RelationFieldId(model_id, <span class="kw-2">*</span>field_id),
                 db,
                 relation_field,
             })
@@ -543,8 +536,7 @@
     /// If the field does not exist.
     </span><span class="kw">pub fn </span>relation_field(<span class="self">self</span>, field_id: ast::FieldId) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         RelationFieldWalker {
-            model_id: <span class="self">self</span>.id,
-            field_id,
+            id: <span class="kw">super</span>::RelationFieldId(<span class="self">self</span>.id, field_id),
             db: <span class="self">self</span>.db,
             relation_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.id, field_id)],
         }

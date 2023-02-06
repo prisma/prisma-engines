@@ -283,6 +283,8 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::RelationField,
@@ -295,18 +297,22 @@
     hash::{Hash, Hasher},
 };
 
+<span class="doccomment">/// An opaque identifier for a model relation field in a schema.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash)]
+</span><span class="kw">pub struct </span>RelationFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
+
 <span class="doccomment">/// A relation field on a model in the schema.
 </span><span class="attr">#[derive(Copy, Clone, Debug)]
 </span><span class="kw">pub struct </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
+    <span class="doccomment">/// The typed identifier for the relation field.
+    </span><span class="kw">pub </span>id: RelationFieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
     <span class="kw">pub</span>(<span class="kw">crate</span>) relation_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.model_id == other.model_id &amp;&amp; <span class="self">self</span>.field_id == other.field_id
+        <span class="self">self</span>.id == other.id
     }
 }
 
@@ -314,16 +320,15 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Hash <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
-        <span class="self">self</span>.model_id.hash(state);
-        <span class="self">self</span>.field_id.hash(state);
+        <span class="self">self</span>.id.hash(state);
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="doccomment">/// The ID of the AST node of the field.
     </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
-        <span class="self">self</span>.field_id
-    }
+        <span class="self">self</span>.id.<span class="number">1
+    </span>}
 
     <span class="doccomment">/// The relation starts or ends to a view.
     </span><span class="kw">pub fn </span>one_side_is_view(<span class="self">self</span>) -&gt; bool {
@@ -342,7 +347,7 @@
 
     <span class="doccomment">/// The AST node of the field.
     </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][<span class="self">self</span>.field_id]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.id.<span class="number">0</span>][<span class="self">self</span>.id.<span class="number">1</span>]
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attributes(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField {
@@ -386,7 +391,7 @@
 
     <span class="doccomment">/// The model containing the field.
     </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// The `@relation` attribute in the field AST.
@@ -417,7 +422,7 @@
     </span><span class="kw">pub fn </span>relation(<span class="self">self</span>) -&gt; RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         <span class="kw">let </span>model = <span class="self">self</span>.model();
         <span class="kw">let </span><span class="kw-2">mut </span>relations = model.relations_from().chain(model.relations_to());
-        relations.find(|r| r.has_field(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id)).unwrap()
+        relations.find(|r| r.has_field(<span class="self">self</span>.id.<span class="number">0</span>, <span class="self">self</span>.id.<span class="number">1</span>)).unwrap()
     }
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,
@@ -466,12 +471,11 @@
 
     <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
     </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone&gt; {
-        <span class="kw">let </span>model_id = <span class="self">self</span>.model_id;
+        <span class="kw">let </span>model_id = <span class="self">self</span>.id.<span class="number">0</span>;
         <span class="kw">let </span>attributes = <span class="self">self</span>.attributes();
         attributes.fields.as_ref().map(<span class="kw">move </span>|fields| {
             fields.iter().map(<span class="kw">move </span>|field_id| ScalarFieldWalker {
-                model_id,
-                field_id: <span class="kw-2">*</span>field_id,
+                id: <span class="kw">super</span>::ScalarFieldId(model_id, <span class="kw-2">*</span>field_id),
                 db: <span class="self">self</span>.db,
                 scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)],
             })

@@ -176,8 +176,8 @@
         <span class="kw">match </span>(<span class="self">self</span>.forward_relation_field(), <span class="self">self</span>.back_relation_field()) {
             (<span class="prelude-val">Some</span>(field_a), <span class="prelude-val">Some</span>(field_b)) =&gt; {
                 <span class="kw">let </span>walker = CompleteInlineRelationWalker {
-                    side_a: (<span class="self">self</span>.referencing_model().id, field_a.field_id),
-                    side_b: (<span class="self">self</span>.referenced_model().id, field_b.field_id),
+                    side_a: (<span class="self">self</span>.referencing_model().id, field_a.field_id()),
+                    side_b: (<span class="self">self</span>.referenced_model().id, field_b.field_id()),
                     db: <span class="self">self</span>.<span class="number">0</span>.db,
                 };
 

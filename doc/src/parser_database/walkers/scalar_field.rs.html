@@ -462,6 +462,9 @@
 <a href="#462" id="462">462</a>
 <a href="#463" id="463">463</a>
 <a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::IndexFieldWalker;
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
@@ -472,18 +475,22 @@
 <span class="kw">use </span>diagnostics::Span;
 <span class="kw">use </span>either::Either;
 
+<span class="doccomment">/// An opaque identifier for a model scalar field in a schema.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug)]
+</span><span class="kw">pub struct </span>ScalarFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
+
 <span class="doccomment">/// A scalar field, as part of a model.
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
+    <span class="doccomment">/// The typed identifier for the field.
+    </span><span class="kw">pub </span>id: ScalarFieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
     <span class="kw">pub</span>(<span class="kw">crate</span>) scalar_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarField,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.model_id == other.model_id &amp;&amp; <span class="self">self</span>.field_id == other.field_id
+        <span class="self">self</span>.id == other.id
     }
 }
 
@@ -492,12 +499,12 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="doccomment">/// The ID of the field node in the AST.
     </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
-        <span class="self">self</span>.field_id
-    }
+        <span class="self">self</span>.id.<span class="number">1
+    </span>}
 
     <span class="doccomment">/// The field node in the AST.
     </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][<span class="self">self</span>.field_id]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.id.<span class="number">0</span>][<span class="self">self</span>.id.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Is this field unique? This method will return true if:
@@ -509,14 +516,14 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = model
             .primary_key()
-            .map(|pk| pk.contains_exactly_fields_by_id(<span class="kw-2">&amp;</span>[<span class="self">self</span>.field_id]))
+            .map(|pk| pk.contains_exactly_fields_by_id(<span class="kw-2">&amp;</span>[<span class="self">self</span>.field_id()]))
         {
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
         <span class="self">self</span>.model().indexes().any(|idx| {
             <span class="kw">let </span><span class="kw-2">mut </span>fields = idx.fields();
-            idx.is_unique() &amp;&amp; fields.len() == <span class="number">1 </span>&amp;&amp; fields.next().map(|f| f.field_id()) == <span class="prelude-val">Some</span>(<span class="self">self</span>.field_id)
+            idx.is_unique() &amp;&amp; fields.len() == <span class="number">1 </span>&amp;&amp; fields.next().map(|f| f.field_id()) == <span class="prelude-val">Some</span>(<span class="self">self</span>.field_id())
         })
     }
 
@@ -549,12 +556,12 @@
 
     <span class="doccomment">/// Does the field define a primary key by its own.
     </span><span class="kw">pub fn </span>is_single_pk(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.model().field_is_single_pk(<span class="self">self</span>.field_id)
+        <span class="self">self</span>.model().field_is_single_pk(<span class="self">self</span>.field_id())
     }
 
     <span class="doccomment">/// Is the field part of a compound primary key.
     </span><span class="kw">pub fn </span>is_part_of_a_compound_pk(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.model().field_is_part_of_a_compound_pk(<span class="self">self</span>.field_id)
+        <span class="self">self</span>.model().field_is_part_of_a_compound_pk(<span class="self">self</span>.field_id())
     }
 
     <span class="doccomment">/// Is there an `@ignore` attribute on the field?
@@ -599,7 +606,7 @@
 
     <span class="doccomment">/// The model that contains the field.
     </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// (attribute scope, native type name, arguments, span)
@@ -621,8 +628,8 @@
     <span class="doccomment">/// The `@default()` attribute of the field, if any.
     </span><span class="kw">pub fn </span>default_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DefaultValueWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
         <span class="self">self</span>.attributes().default.as_ref().map(|default| DefaultValueWalker {
-            model_id: <span class="self">self</span>.model_id,
-            field_id: <span class="self">self</span>.field_id,
+            model_id: <span class="self">self</span>.id.<span class="number">0</span>,
+            field_id: <span class="self">self</span>.field_id(),
             db: <span class="self">self</span>.db,
             default,
         })
@@ -726,8 +733,7 @@
     /// ```
     </span><span class="kw">pub fn </span>field(<span class="self">self</span>) -&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         ScalarFieldWalker {
-            model_id: <span class="self">self</span>.model_id,
-            field_id: <span class="self">self</span>.field_id,
+            id: <span class="kw">super</span>::ScalarFieldId(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id),
             db: <span class="self">self</span>.db,
             scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id)],
         }
