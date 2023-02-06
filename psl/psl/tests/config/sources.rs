@@ -170,6 +170,7 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
         [1;94m 3 | [0m  url = [1;91menv("DB_URL_EMPTY_0001")[0m
         [1;94m   | [0m
     "#]];
+    std::env::remove_var("DB_URL_EMPTY_0001");
 
     expectation.assert_eq(&error)
 }
@@ -279,6 +280,7 @@ fn must_not_error_for_empty_shadow_database_urls_derived_load_env_vars() {
     let config = parse_configuration(schema);
     let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
 
+    std::env::remove_var("EMPTY_SHADOW_DB URL_0129");
     assert!(shadow_database_url.is_none());
 }
 
@@ -771,4 +773,101 @@ fn must_error_for_missing_env_direct_urls() {
     "#]];
 
     expectation.assert_eq(&error)
+}
+
+#[test]
+fn directurl_should_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DATABASE_URL_0001")
+          url = "prisma://localhost:1234"
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0001", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let result = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap();
+
+    let expectation = expect!("postgres://hostfoo");
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0001");
+
+    expectation.assert_eq(&result)
+}
+
+#[test]
+fn load_url_should_not_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0002")
+          url = env("DATABASE_URL_0002")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0002", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0002", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.
+
+        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+
+        More information about Data Proxy: https://pris.ly/d/data-proxy
+        [0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  directUrl = env("DIRECT_URL_0002")
+        [1;94m 4 | [0m  url = [1;91menv("DATABASE_URL_0002")[0m
+        [1;94m   | [0m
+    "#]);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0002");
+    std::env::remove_var("DIRECT_URL_0002");
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn load_url_no_validation_should_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0003")
+          url = env("DATABASE_URL_0003")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0003", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0003", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let result = config.datasources[0]
+        .load_url_no_validation(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap();
+
+    let expectation = expect!("prisma://hostbar");
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0003");
+    std::env::remove_var("DIRECT_URL_0003");
+
+    expectation.assert_eq(&result)
 }
