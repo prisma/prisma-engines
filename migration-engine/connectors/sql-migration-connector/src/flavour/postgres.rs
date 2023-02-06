@@ -510,6 +510,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection
 pub(crate) enum Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
+    CanPartitionTables,
 }
 
 #[allow(clippy::needless_collect)] // clippy is wrong
@@ -560,16 +561,20 @@ where
                     let schema_name = params.url.schema();
 
                     let schema_exists_result = connection.query_raw(
-                            "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version()",
+                            "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version(), current_setting('server_version_num')::integer as numeric_version",
                             &[schema_name.into()],
                             &params.url,
                         )
                         .await?;
 
-                    let version = schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string());
+                    let version =
+                        schema_exists_result
+                          .get(0)
+                          .and_then(|row| row.at(1).and_then(|v| row.at(2).map(|n| (n, v))))
+                          .and_then(|(vs,vn)| vs.to_string().and_then(|v| vn.as_i32().map(|n| (v, n))));
 
                     match version {
-                        Some(version) => {
+                        Some((version, version_num)) => {
                             let db_is_cockroach = version.contains("CockroachDB");
 
                             // We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
@@ -586,6 +591,8 @@ where
                             } else if db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
                                 connection.raw_cmd(COCKROACHDB_PRELUDE, &params.url).await?;
+                            } else if version_num >= 100000 {
+                                circumstances |= Circumstances:: CanPartitionTables;
                             }
                         }
                         None => {

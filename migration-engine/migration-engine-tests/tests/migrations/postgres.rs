@@ -1,4 +1,5 @@
 mod extensions;
+mod introspection;
 mod multi_schema;
 
 use migration_core::migration_connector::DiffTarget;

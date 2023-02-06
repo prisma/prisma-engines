@@ -46,6 +46,10 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
         }
 
+        if circumstances.contains(super::Circumstances::CanPartitionTables) {
+            describer_circumstances |= describer::Circumstances::CanPartitionTables;
+        }
+
         let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
         let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
 
