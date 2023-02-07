@@ -35,7 +35,7 @@ in
       git checkout origin/gh-pages
 
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
-          --db engines-size/data.csv                                                \
+          --db engines-size/data.csv                                          \
           --branch "$CURRENT_BRANCH"                                          \
           --commit "$CURRENT_COMMIT_FULL"                                     \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
