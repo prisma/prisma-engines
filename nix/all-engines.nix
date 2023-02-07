@@ -90,6 +90,9 @@ in
     })
     { profile = "release"; };
 
+  # TODO: try to make caching and sharing the build artifacts work with crane.  There should be
+  # separate `query-engine-lib` and `query-engine-bin` derivations instead, but we use this for now
+  # to make the CI job that uses it faster.
   packages.query-engine-bin-and-lib = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-bin-and-lib";
