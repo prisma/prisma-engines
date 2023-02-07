@@ -80,7 +80,6 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
@@ -158,8 +157,7 @@
             }
             RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; <span class="self">self
                 </span>.internal_data_model()
-                .find_model(<span class="kw-2">&amp;</span>m.in_table_of_model_name)
-                .unwrap()
+                .find_model_by_id(m.in_table_of_model)
                 .as_table(ctx),
         }
     }

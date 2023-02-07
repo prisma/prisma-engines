@@ -30,21 +30,17 @@
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-<a href="#34" id="34">34</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
-
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{InternalDataModelWeakRef, Relation, RelationLinkManifestation, RelationRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::datamodel_connector::RelationMode;
-
-<span class="kw">use crate</span>::{InternalDataModelWeakRef, Relation, RelationLinkManifestation, RelationRef};
+<span class="kw">use </span>psl::{datamodel_connector::RelationMode, schema_ast::ast};
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RelationBuilder {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>manifestation: RelationLinkManifestation,
-    <span class="kw">pub </span>model_a_name: String,
-    <span class="kw">pub </span>model_b_name: String,
+    <span class="kw">pub </span>model_a_id: ast::ModelId,
+    <span class="kw">pub </span>model_b_id: ast::ModelId,
     <span class="kw">pub </span>relation_mode: RelationMode,
 }
 
@@ -53,8 +49,8 @@
         <span class="kw">let </span>relation = Relation {
             name: <span class="self">self</span>.name,
             manifestation: <span class="self">self</span>.manifestation,
-            model_a_name: <span class="self">self</span>.model_a_name,
-            model_b_name: <span class="self">self</span>.model_b_name,
+            model_a_id: <span class="self">self</span>.model_a_id,
+            model_b_id: <span class="self">self</span>.model_b_id,
             relation_mode: <span class="self">self</span>.relation_mode,
             model_a: OnceCell::new(),
             model_b: OnceCell::new(),

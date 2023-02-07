@@ -391,7 +391,6 @@
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
 <a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder, FieldBuilder,
     IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
@@ -402,7 +401,7 @@
     IndexType, InlineRelation, RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
 <span class="kw">use </span>dml::{<span class="self">self</span>, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-<span class="kw">use </span>psl::datamodel_connector::RelationMode;
+<span class="kw">use </span>psl::{datamodel_connector::RelationMode, schema_ast::ast};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_builders(
     datamodel: <span class="kw-2">&amp;</span>Datamodel,
@@ -413,6 +412,7 @@
         .filter(|model| !model.is_ignored())
         .filter(|model| model.is_supported())
         .map(|model| ModelBuilder {
+            id: model.id,
             name: model.name.clone(),
             fields: model_field_builders(model, relation_placeholders),
             manifestation: model.database_name().map(|s| s.to_owned()),
@@ -536,8 +536,8 @@
         .map(|r| RelationBuilder {
             name: r.name(),
             manifestation: r.manifestation(),
-            model_a_name: r.model_a.name.clone(),
-            model_b_name: r.model_b.name.clone(),
+            model_a_id: r.model_a.id,
+            model_b_id: r.model_b.id,
             relation_mode,
         })
         .collect()
@@ -598,9 +598,7 @@
                 ..
             } = <span class="kw-2">&amp;</span>field.relation_info;
 
-            <span class="kw">let </span>related_model = datamodel
-                .find_model(to)
-                .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Related model {to} not found&quot;</span>));
+            <span class="kw">let </span>related_model = datamodel.find_model_by_id(<span class="kw-2">*</span>to).unwrap();
 
             <span class="kw">let </span>(<span class="kw">_</span>, related_field) = datamodel.find_related_field_bang(field);
             <span class="kw">let </span>related_field_info: <span class="kw-2">&amp;</span>dml::RelationInfo = <span class="kw-2">&amp;</span>related_field.relation_info;
@@ -641,25 +639,25 @@
             };
 
             <span class="kw">let </span>inline_on_model_a = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_a.name.clone(),
+                in_table_of_model: model_a.id,
                 field: field_a.clone(),
                 referenced_fields: referenced_fields_a.clone(),
             };
 
             <span class="kw">let </span>inline_on_model_b = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_b.name.clone(),
+                in_table_of_model: model_b.id,
                 field: field_b.clone(),
                 referenced_fields: referenced_fields_b.clone(),
             };
 
             <span class="kw">let </span>inline_on_this_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: model.name.clone(),
+                in_table_of_model: model.id,
                 field: field.clone(),
                 referenced_fields: references.clone(),
             };
 
             <span class="kw">let </span>inline_on_related_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: related_model.name.clone(),
+                in_table_of_model: related_model.id,
                 field: related_field.clone(),
                 referenced_fields: related_field_info.references.clone(),
             };
@@ -717,7 +715,7 @@
 #[derive(PartialEq, Debug, Clone)]
 </span><span class="kw">pub enum </span>ManifestationPlaceholder {
     Inline {
-        in_table_of_model: String,
+        in_table_of_model: ast::ModelId,
         <span class="doccomment">/// The relation field.
         </span>field: dml::RelationField,
         <span class="doccomment">/// The name of the (dml) fields referenced by the relation.
@@ -780,7 +778,7 @@
             }),
             ManifestationPlaceholder::Inline { in_table_of_model, .. } =&gt; {
                 RelationLinkManifestation::Inline(InlineRelation {
-                    in_table_of_model_name: in_table_of_model.to_string(),
+                    in_table_of_model: <span class="kw-2">*</span>in_table_of_model,
                 })
             }
         }

@@ -36,13 +36,13 @@
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
-</pre><pre class="rust"><code><span class="kw">use </span>psl_core::parser_database <span class="kw">as </span>db;
+</pre><pre class="rust"><code><span class="kw">use </span>psl_core::{parser_database <span class="kw">as </span>db, schema_ast::ast};
 
 <span class="doccomment">/// Holds information about a relation field.
 </span><span class="attr">#[derive(Debug, PartialEq, Clone)]
 </span><span class="kw">pub struct </span>RelationInfo {
     <span class="doccomment">/// The target model of the relation.
-    </span><span class="kw">pub </span>referenced_model: String,
+    </span><span class="kw">pub </span>referenced_model: ast::ModelId,
     <span class="doccomment">/// The fields forming the relation.
     </span><span class="kw">pub </span>fields: Vec&lt;String&gt;,
     <span class="doccomment">/// The target field of the relation a.k.a. `references`
@@ -62,9 +62,9 @@
 <span class="kw">impl </span>RelationInfo {
     <span class="doccomment">/// Creates a new relation info for the
     /// given target model.
-    </span><span class="kw">pub fn </span>new(model: <span class="kw-2">&amp;</span>str) -&gt; RelationInfo {
+    </span><span class="kw">pub fn </span>new(referenced_model: ast::ModelId) -&gt; RelationInfo {
         RelationInfo {
-            referenced_model: String::from(model),
+            referenced_model,
             fields: Vec::new(),
             references: Vec::new(),
             name: String::new(),

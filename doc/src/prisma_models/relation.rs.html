@@ -201,7 +201,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::ReferentialAction;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::datamodel_connector::RelationMode;
+<span class="kw">use </span>psl::{datamodel_connector::RelationMode, schema_ast::ast};
 <span class="kw">use </span>std::{
     fmt::Debug,
     sync::{Arc, Weak},
@@ -215,8 +215,8 @@
 </span><span class="kw">pub struct </span>Relation {
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a_name: String,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b_name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b_id: ast::ModelId,
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) model_a: OnceCell&lt;ModelWeakRef&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) model_b: OnceCell&lt;ModelWeakRef&gt;,
@@ -252,14 +252,14 @@
     <span class="doccomment">/// A model that relates to itself. For example a `Person` that is a parent
     /// can relate to people that are children.
     </span><span class="kw">pub fn </span>is_self_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.model_a_name == <span class="self">self</span>.model_b_name
+        <span class="self">self</span>.model_a_id == <span class="self">self</span>.model_b_id
     }
 
     <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.
     </span><span class="kw">pub fn </span>model_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
         <span class="self">self</span>.model_a
             .get_or_init(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.model_a_name).unwrap();
+                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model_by_id(<span class="self">self</span>.model_a_id);
                 Arc::downgrade(<span class="kw-2">&amp;</span>model)
             })
             .upgrade()
@@ -270,7 +270,7 @@
     </span><span class="kw">pub fn </span>model_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
         <span class="self">self</span>.model_b
             .get_or_init(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.model_b_name).unwrap();
+                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model_by_id(<span class="self">self</span>.model_b_id);
                 Arc::downgrade(<span class="kw-2">&amp;</span>model)
             })
             .upgrade()
@@ -369,8 +369,8 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         f.debug_struct(<span class="string">&quot;Relation&quot;</span>)
             .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a_name)
-            .field(<span class="string">&quot;model_b_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b_name)
+            .field(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a_id)
+            .field(<span class="string">&quot;model_b_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b_id)
             .field(<span class="string">&quot;model_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a)
             .field(<span class="string">&quot;model_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b)
             .field(<span class="string">&quot;field_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.field_a)
@@ -389,7 +389,7 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>InlineRelation {
-    <span class="kw">pub </span>in_table_of_model_name: String,
+    <span class="kw">pub </span>in_table_of_model: ast::ModelId,
 }
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]

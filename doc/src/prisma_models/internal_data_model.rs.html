@@ -143,8 +143,22 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::sync::{Arc, Weak};
 
 <span class="kw">pub type </span>InternalDataModelRef = Arc&lt;InternalDataModel&gt;;
@@ -197,16 +211,28 @@
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
+    <span class="kw">pub fn </span>find_model_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId) -&gt; ModelRef {
+        <span class="self">self</span>.models
+            .get()
+            .and_then(|models| models.iter().find(|model| model.id == model_id))
+            .cloned()
+            .unwrap()
+    }
+
     <span class="doccomment">/// This method takes the two models at the ends of the relation as a first argument, because
     /// relation names are scoped by the pair of models in the relation. Relation names are _not_
     /// globally unique.
-    </span><span class="kw">pub fn </span>find_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, model_names: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str), relation_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;RelationWeakRef&gt; {
+    </span><span class="kw">pub fn </span>find_relation(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model_ids: (ast::ModelId, ast::ModelId),
+        relation_name: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;RelationWeakRef&gt; {
         <span class="self">self</span>.relations
             .get()
             .and_then(|relations| {
                 relations
                     .iter()
-                    .find(|relation| relation_matches(relation, model_names, relation_name))
+                    .find(|relation| relation_matches(relation, model_ids, relation_name))
             })
             .map(Arc::downgrade)
             .ok_or_else(|| DomainError::RelationNotFound {
@@ -230,11 +256,11 @@
     </span><span class="kw">pub fn </span>fields_refering_to_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; Vec&lt;RelationFieldRef&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span>field.container {
             ParentContainer::Model(model) =&gt; {
-                <span class="kw">let </span>model_name = <span class="kw-2">&amp;</span>model.upgrade().unwrap().name;
+                <span class="kw">let </span>model_id = model.upgrade().unwrap().id;
 
                 <span class="self">self</span>.relation_fields()
                     .iter()
-                    .filter(|rf| <span class="kw-2">&amp;</span>rf.relation_info.referenced_model == model_name)
+                    .filter(|rf| rf.relation_info.referenced_model == model_id)
                     .filter(|rf| rf.relation_info.references.contains(<span class="kw-2">&amp;</span>field.name))
                     .map(Arc::clone)
                     .collect()
@@ -269,20 +295,20 @@
 ///
 /// In other words, the scope for a relation name is only between two models. Every pair of models
 /// has its own scope for relation names.
-</span><span class="kw">fn </span>relation_matches(relation: <span class="kw-2">&amp;</span>Relation, model_names: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str), relation_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+</span><span class="kw">fn </span>relation_matches(relation: <span class="kw-2">&amp;</span>Relation, model_ids: (ast::ModelId, ast::ModelId), relation_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
     <span class="kw">if </span>relation.name != relation_name {
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">if </span>relation.is_self_relation() &amp;&amp; model_names.<span class="number">0 </span>== model_names.<span class="number">1 </span>&amp;&amp; relation.model_a_name == model_names.<span class="number">0 </span>{
+    <span class="kw">if </span>relation.is_self_relation() &amp;&amp; model_ids.<span class="number">0 </span>== model_ids.<span class="number">1 </span>&amp;&amp; relation.model_a_id == model_ids.<span class="number">0 </span>{
         <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if </span>model_names.<span class="number">0 </span>== relation.model_a_name &amp;&amp; model_names.<span class="number">1 </span>== relation.model_b_name {
+    <span class="kw">if </span>model_ids.<span class="number">0 </span>== relation.model_a_id &amp;&amp; model_ids.<span class="number">1 </span>== relation.model_b_id {
         <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">if </span>model_names.<span class="number">0 </span>== relation.model_b_name &amp;&amp; model_names.<span class="number">1 </span>== relation.model_a_name {
+    <span class="kw">if </span>model_ids.<span class="number">0 </span>== relation.model_b_id &amp;&amp; model_ids.<span class="number">1 </span>== relation.model_a_id {
         <span class="kw">return </span><span class="bool-val">true</span>;
     }
 

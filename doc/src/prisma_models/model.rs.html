@@ -126,8 +126,11 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::{
     fmt::Debug,
     hash::{Hash, Hasher},
@@ -138,6 +141,7 @@
 <span class="kw">pub type </span>ModelWeakRef = Weak&lt;Model&gt;;
 
 <span class="kw">pub struct </span>Model {
+    <span class="kw">pub </span>id: ast::ModelId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) manifestation: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields: OnceCell&lt;Fields&gt;,

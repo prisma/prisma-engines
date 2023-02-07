@@ -77,37 +77,13 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::composite_type::CompositeType;
 <span class="kw">use </span><span class="kw">crate</span>::field::RelationField;
 <span class="kw">use </span><span class="kw">crate</span>::model::Model;
 <span class="kw">use </span><span class="kw">crate</span>::relation_info::RelationInfo;
+<span class="kw">use </span>psl_core::schema_ast::ast;
 
-<span class="doccomment">/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
-/// know that introspection encountered unsupported names or features and these are supposed
-/// to be rendered as comments. Since the parser will not set these flags when reading a schema
-/// string, only introspection and the lowering of the datamodel to the ast care about these flags.
-/// The FieldType: Unsupported behaves in the same way.
-/// Both of these are never converted into the internal datamodel.
-</span><span class="attr">#[derive(Debug, Default)]
+<span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Datamodel {
     <span class="kw">pub </span>models: Vec&lt;Model&gt;,
     <span class="kw">pub </span>composite_types: Vec&lt;CompositeType&gt;,
@@ -129,6 +105,10 @@
         <span class="self">self</span>.models().find(|model| model.name == name)
     }
 
+    <span class="kw">pub fn </span>find_model_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ast::ModelId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
+        <span class="self">self</span>.models().find(|m| m.id == id)
+    }
+
     <span class="doccomment">/// Finds a composite type by name.
     </span><span class="kw">pub fn </span>find_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeType&gt; {
         <span class="self">self</span>.composite_types().find(|composite| composite.name == name)
@@ -141,11 +121,6 @@
             .find(|model| model.database_name.as_deref() == <span class="prelude-val">Some</span>(db_name))
     }
 
-    <span class="doccomment">/// Finds parent  model for a field reference.
-    </span><span class="kw">pub fn </span>find_model_by_relation_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>RelationField) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt; {
-        <span class="self">self</span>.find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.find_related_field_bang(field).<span class="number">1</span>.relation_info.referenced_model)
-    }
-
     <span class="doccomment">/// Finds a model by name and returns a mutable reference.
     </span><span class="kw">pub fn </span>find_model_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Model {
         <span class="self">self</span>.models
@@ -154,22 +129,9 @@
             .expect(<span class="string">&quot;We assume an internally valid datamodel before mutating.&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns (model_name, field_name) for all relation fields pointing to a specific model.
-    </span><span class="kw">pub fn </span>find_relation_fields_for_model(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;(String, String)&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
-        <span class="kw">for </span>model <span class="kw">in </span><span class="self">self</span>.models() {
-            <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
-                <span class="kw">if </span>field.relation_info.referenced_model == model_name {
-                    fields.push((model.name.clone(), field.name.clone()))
-                }
-            }
-        }
-        fields
-    }
-
     <span class="doccomment">/// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
     </span><span class="kw">pub fn </span>find_related_field_for_info(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>RelationInfo, exclude: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span>RelationField)&gt; {
-        <span class="self">self</span>.find_model(<span class="kw-2">&amp;</span>info.referenced_model)
+        <span class="self">self</span>.find_model_by_id(info.referenced_model)
             .expect(<span class="string">&quot;The model referred to by a RelationInfo should always exist.&quot;</span>)
             .fields
             .iter()

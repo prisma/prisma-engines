@@ -800,7 +800,7 @@
 
                         <span class="kw">let </span>referenced_model = relation.referenced_model();
 
-                        <span class="kw">let </span>relation_info = RelationInfo::new(referenced_model.name());
+                        <span class="kw">let </span>relation_info = RelationInfo::new(referenced_model.id);
 
                         <span class="kw">let </span>forward_field_walker = relation.forward_relation_field().unwrap();
                         <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.
@@ -861,7 +861,7 @@
 
                     <span class="comment">// Back field
                     </span>{
-                        <span class="kw">let </span>relation_info = RelationInfo::new(relation.referencing_model().name());
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation.referencing_model().id);
                         <span class="kw">let </span>model = schema.find_model_mut(relation.referenced_model().name());
 
                         <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_field) = relation.back_relation_field() {
@@ -907,7 +907,7 @@
                     <span class="kw">for </span>relation_field <span class="kw">in </span>[relation.field_a(), relation.field_b()] {
                         <span class="kw">let </span>ast_field = relation_field.ast_field();
                         <span class="kw">let </span>arity = ast_field.arity;
-                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().name());
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().id);
                         <span class="kw">let </span>referential_arity = relation_field.referential_arity();
                         <span class="kw">let </span><span class="kw-2">mut </span>field = RelationField::new(
                             relation_field.id,
@@ -942,7 +942,7 @@
                     <span class="kw">for </span>relation_field <span class="kw">in </span>[relation.field_a(), relation.field_b()] {
                         <span class="kw">let </span>ast_field = relation_field.ast_field();
                         <span class="kw">let </span>arity = ast_field.arity;
-                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().name());
+                        <span class="kw">let </span>relation_info = RelationInfo::new(relation_field.related_model().id);
                         <span class="kw">let </span>referential_arity = relation_field.referential_arity();
 
                         <span class="kw">let </span><span class="kw-2">mut </span>field = RelationField::new(

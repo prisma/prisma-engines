@@ -427,7 +427,7 @@
                 <span class="self">self</span>.model()
                     .internal_data_model()
                     .find_relation(
-                        (<span class="kw-2">&amp;</span><span class="self">self</span>.model().name, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_info.referenced_model),
+                        (<span class="self">self</span>.model().id, <span class="self">self</span>.relation_info.referenced_model),
                         <span class="kw-2">&amp;</span><span class="self">self</span>.relation_name,
                     )
                     .unwrap()
@@ -452,7 +452,7 @@
                 <span class="kw">if </span>is_self_rel {
                     !<span class="self">self</span>.relation_info.references.is_empty()
                 } <span class="kw">else </span>{
-                    m.in_table_of_model_name == <span class="self">self</span>.model().name
+                    m.in_table_of_model == <span class="self">self</span>.model().id
                 }
             }
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
