@@ -363,7 +363,7 @@ async fn update_records_from_filter(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let update = build_update_and_set_query(model, args, ctx);
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
+    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
 
     let update = update.so_that(filter_condition);
     let count = conn.execute(update.into()).await?;

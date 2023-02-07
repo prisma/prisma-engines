@@ -2259,7 +2259,7 @@ checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 [[package]]
 name = "mysql_async"
 version = "0.30.0"
-source = "git+https://github.com/prisma/mysql_async?branch=vendored-openssl#e3f8bdb41d57e769412f53d0f479bf67fdcc0ee3"
+source = "git+https://github.com/prisma/mysql_async?branch=vendored-openssl#b5d16fb211fc6a0d5c892269536a95da803eabae"
 dependencies = [
  "bytes",
  "crossbeam",

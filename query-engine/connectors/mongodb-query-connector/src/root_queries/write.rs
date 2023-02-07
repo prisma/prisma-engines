@@ -210,7 +210,10 @@ pub async fn update_records<'conn>(
         .instrument(span)
         .await?;
 
-        if update_type == UpdateType::Many && res.modified_count == 0 {
+        // It's important we check the `matched_count` and not the `modified_count` here.
+        // MongoDB returns `modified_count: 0` when performing a noop update, which breaks
+        // nested connect mutations as it rely on the returned count to know whether the update happened.
+        if update_type == UpdateType::Many && res.matched_count == 0 {
             return Ok(Vec::new());
         }
     }
