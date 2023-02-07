@@ -29,19 +29,20 @@ in
       CURRENT_COMMIT_SHORT=$(git rev-parse --short HEAD)
       CURRENT_COMMIT_FULL=$(git rev-parse HEAD)
       REPO_ROOT=$(git rev-parse --show-toplevel)
+      CSV_PATH="engines-size/data.csv"
 
       pushd "$REPO_ROOT"
       git fetch --depth=1 origin gh-pages
       git checkout origin/gh-pages
 
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
-          --db engines-size/data.csv                                          \
+          --db "$CSV_PATH"                                                    \
           --branch "$CURRENT_BRANCH"                                          \
           --commit "$CURRENT_COMMIT_FULL"                                     \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node
 
-      git add engines-size/data.csv
+      git add "$CSV_PATH"
       git commit --quiet -m "update engines size for $CURRENT_COMMIT_SHORT"
       git push origin '+HEAD:gh-pages'
       git checkout "$CURRENT_BRANCH"
