@@ -29,7 +29,7 @@ pub async fn load_describer<'a>(
                 let pgversion = pgversion_result
                     .get(0)
                     .and_then(|r| r.get("version"))
-                    .and_then(|v| v.as_i32());
+                    .and_then(|v| v.as_integer());
 
                 match pgversion {
                     Some(version) if version >= 100000 => circumstances |= Circumstances::CanPartitionTables,
