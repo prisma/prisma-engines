@@ -21,6 +21,14 @@
         font-size: 28px;
       }
 
+      h2 {
+        text-align: center;
+      }
+
+      .plot {
+        min-height: 400px;
+      }
+
       svg {
         font-size: 10px;
       }
@@ -33,7 +41,14 @@
       <h1>Query Engine size (Linux, glibc)</h1>
     </header>
 
-    <div id="plot"></div>
+    <h2>Comparative</h2>
+    <div class="plot" id="plot"></div>
+
+    <h2>libquery_engine.node</h2>
+    <div class="plot" id="plot-lib"></div>
+
+    <h2>query-engine</h2>
+    <div class="plot" id="plot-bin"></div>
 
     <script src="https://d3js.org/d3.v6.js"></script>
     <script type="module" src="plot.js"></script>
