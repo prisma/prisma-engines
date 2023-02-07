@@ -35,9 +35,11 @@ function createPlot({ data, yDomainFromZero = false }) {
     d3.max(data, (d) => d.size_bytes),
   ];
 
+  const digitsAfterComma = yDomainFromZero ? 2 : 3;
+
   return Plot.plot({
     width: document.body.clientWidth,
-    marginLeft: 70,
+    marginLeft: 80,
     marginRight: 170,
     x: {
       grid: true,
@@ -45,7 +47,7 @@ function createPlot({ data, yDomainFromZero = false }) {
     y: {
       domain: yDomain,
       grid: true,
-      tickFormat: formatMB,
+      tickFormat: (tick) => formatMB(tick, digitsAfterComma),
     },
     marks: [
       Plot.line(data, {
@@ -69,8 +71,7 @@ function createPlot({ data, yDomainFromZero = false }) {
   });
 }
 
-function formatMB(bytes) {
+function formatMB(bytes, digitsAfterComma = 2) {
   const megabytes = bytes / 1024 / 1024;
-  const rounded = Math.round(megabytes * 100) / 100;
-  return `${rounded} MB`;
+  return `${megabytes.toFixed(digitsAfterComma)} MB`;
 }
