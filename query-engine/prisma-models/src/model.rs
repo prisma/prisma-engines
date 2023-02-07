@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
+use psl::schema_ast::ast;
 use std::{
     fmt::Debug,
     hash::{Hash, Hasher},
@@ -10,6 +11,7 @@ pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
 pub struct Model {
+    pub id: ast::ModelId,
     pub(crate) name: String,
     pub(crate) manifestation: Option<String>,
     pub(crate) fields: OnceCell<Fields>,

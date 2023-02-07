@@ -2,13 +2,8 @@ use crate::composite_type::CompositeType;
 use crate::field::RelationField;
 use crate::model::Model;
 use crate::relation_info::RelationInfo;
+use psl_core::schema_ast::ast;
 
-/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
-/// know that introspection encountered unsupported names or features and these are supposed
-/// to be rendered as comments. Since the parser will not set these flags when reading a schema
-/// string, only introspection and the lowering of the datamodel to the ast care about these flags.
-/// The FieldType: Unsupported behaves in the same way.
-/// Both of these are never converted into the internal datamodel.
 #[derive(Debug, Default)]
 pub struct Datamodel {
     pub models: Vec<Model>,
@@ -31,6 +26,10 @@ impl Datamodel {
         self.models().find(|model| model.name == name)
     }
 
+    pub fn find_model_by_id(&self, id: ast::ModelId) -> Option<&Model> {
+        self.models().find(|m| m.id == id)
+    }
+
     /// Finds a composite type by name.
     pub fn find_composite_type(&self, name: &str) -> Option<&CompositeType> {
         self.composite_types().find(|composite| composite.name == name)
@@ -43,11 +42,6 @@ impl Datamodel {
             .find(|model| model.database_name.as_deref() == Some(db_name))
     }
 
-    /// Finds parent  model for a field reference.
-    pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        self.find_model(&self.find_related_field_bang(field).1.relation_info.referenced_model)
-    }
-
     /// Finds a model by name and returns a mutable reference.
     pub fn find_model_mut(&mut self, name: &str) -> &mut Model {
         self.models
@@ -56,22 +50,9 @@ impl Datamodel {
             .expect("We assume an internally valid datamodel before mutating.")
     }
 
-    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
-    pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
-        let mut fields = vec![];
-        for model in self.models() {
-            for field in model.relation_fields() {
-                if field.relation_info.referenced_model == model_name {
-                    fields.push((model.name.clone(), field.name.clone()))
-                }
-            }
-        }
-        fields
-    }
-
     /// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
     pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<(usize, &RelationField)> {
-        self.find_model(&info.referenced_model)
+        self.find_model_by_id(info.referenced_model)
             .expect("The model referred to by a RelationInfo should always exist.")
             .fields
             .iter()

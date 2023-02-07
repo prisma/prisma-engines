@@ -5,7 +5,7 @@ pub(crate) use asserts::*;
 pub use dml::*;
 pub use expect_test::expect;
 
-use psl::{diagnostics::*, Configuration, StringFromEnvVar};
+use psl::{diagnostics::*, schema_ast::ast, Configuration, StringFromEnvVar};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
@@ -39,7 +39,7 @@ pub(crate) trait CompositeTypeFieldAsserts {
 
 pub(crate) trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
-    fn assert_relation_to(&self, t: &str) -> &Self;
+    fn assert_relation_to(&self, t: ast::ModelId) -> &Self;
     fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self;
     fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self;
     fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
@@ -191,7 +191,7 @@ impl RelationFieldAsserts for dml::RelationField {
         self
     }
 
-    fn assert_relation_to(&self, t: &str) -> &Self {
+    fn assert_relation_to(&self, t: ast::ModelId) -> &Self {
         assert_eq!(self.relation_info.referenced_model, t);
         self
     }

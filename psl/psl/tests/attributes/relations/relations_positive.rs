@@ -40,10 +40,10 @@ fn settings_must_be_deteced() {
 
     let schema = parse(dml);
 
-    schema
-        .assert_has_model("Todo")
+    let todo_model = schema.assert_has_model("Todo");
+    todo_model
         .assert_has_relation_field("parent_todo")
-        .assert_relation_to("Todo")
+        .assert_relation_to(todo_model.id)
         .assert_relation_referenced_fields(&["id"])
         .assert_arity(&dml::FieldArity::Optional);
 }
@@ -68,19 +68,21 @@ fn resolve_relation() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
+    let post_model = schema.assert_has_model("Post");
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String);
     user_model
         .assert_has_relation_field("posts")
-        .assert_relation_to("Post")
+        .assert_relation_to(post_model.id)
         .assert_arity(&dml::FieldArity::List);
 
-    let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_scalar_field("text")
         .assert_base_type(&ScalarType::String);
-    post_model.assert_has_relation_field("user").assert_relation_to("User");
+    post_model
+        .assert_has_relation_field("user")
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -102,10 +104,11 @@ fn resolve_related_field() {
 
     let schema = parse(dml);
 
+    let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to("User")
+        .assert_relation_to(user_model.id)
         .assert_relation_referenced_fields(&["firstName"]);
 }
 
@@ -132,10 +135,11 @@ fn resolve_related_fields() {
 
     let schema = parse(dml);
 
+    let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to("User")
+        .assert_relation_to(user_model.id)
         .assert_relation_base_fields(&["authorFirstName", "authorLastName"])
         .assert_relation_referenced_fields(&["firstName", "lastName"]);
 }
@@ -162,31 +166,31 @@ fn allow_multiple_relations() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
+    let post_model = schema.assert_has_model("Post");
     user_model
         .assert_field_count(3)
         .assert_has_relation_field("posts")
-        .assert_relation_to("Post")
+        .assert_relation_to(post_model.id)
         .assert_arity(&dml::FieldArity::List)
         .assert_relation_name("PostToUser");
     user_model
         .assert_has_relation_field("more_posts")
-        .assert_relation_to("Post")
+        .assert_relation_to(post_model.id)
         .assert_arity(&dml::FieldArity::List)
         .assert_relation_name("more_posts");
 
-    let post_model = schema.assert_has_model("Post");
     post_model
         .assert_field_count(6)
         .assert_has_scalar_field("text")
         .assert_base_type(&ScalarType::String);
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to("User")
+        .assert_relation_to(user_model.id)
         .assert_arity(&dml::FieldArity::Required)
         .assert_relation_name("PostToUser");
     post_model
         .assert_has_relation_field("posting_user")
-        .assert_relation_to("User")
+        .assert_relation_to(user_model.id)
         .assert_arity(&dml::FieldArity::Required)
         .assert_relation_name("more_posts");
 }
@@ -209,14 +213,18 @@ fn allow_complicated_self_relations() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_has_relation_field("son").assert_relation_to("User");
+    user_model
+        .assert_has_relation_field("son")
+        .assert_relation_to(user_model.id);
     user_model
         .assert_has_relation_field("father")
-        .assert_relation_to("User");
+        .assert_relation_to(user_model.id);
     user_model
         .assert_has_relation_field("husband")
-        .assert_relation_to("User");
-    user_model.assert_has_relation_field("wife").assert_relation_to("User");
+        .assert_relation_to(user_model.id);
+    user_model
+        .assert_has_relation_field("wife")
+        .assert_relation_to(user_model.id);
 }
 
 #[test]

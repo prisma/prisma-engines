@@ -75,8 +75,7 @@ impl AsTable for Relation {
             }
             RelationLinkManifestation::Inline(ref m) => self
                 .internal_data_model()
-                .find_model(&m.in_table_of_model_name)
-                .unwrap()
+                .find_model_by_id(m.in_table_of_model)
                 .as_table(ctx),
         }
     }
