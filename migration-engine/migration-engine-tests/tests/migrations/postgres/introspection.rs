@@ -57,15 +57,20 @@ ALTER TABLE blocks
     .unwrap();
 
     let expected = format!(
-        r#"
-datasource db {{
+        r#"datasource db {{
   provider = "postgres"
   url      = "{}"
 }}
 
 /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
 model blocks {{
-  id Int @id @default(autoincrement())
+  id              Int
+  account         String
+  block_source_id Int?
+  blocks          blocks?  @relation("blocksToblocks", fields: [block_source_id, account], references: [id, account], onDelete: Cascade, onUpdate: NoAction, map: "block_source_block_fk")
+  other_blocks    blocks[] @relation("blocksToblocks")
+
+  @@id([account, id])
 }}
 "#,
         url_str

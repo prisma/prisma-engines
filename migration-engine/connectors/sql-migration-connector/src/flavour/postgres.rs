@@ -570,8 +570,8 @@ where
                     let version =
                         schema_exists_result
                           .get(0)
-                          .and_then(|row| row.at(1).and_then(|v| row.at(2).map(|n| (n, v))))
-                          .and_then(|(vs,vn)| vs.to_string().and_then(|v| vn.as_i32().map(|n| (v, n))));
+                          .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
+                          .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_i32().map(|version_number| (version, version_number))));
 
                     match version {
                         Some((version, version_num)) => {
