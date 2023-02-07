@@ -114,7 +114,7 @@ pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx:
                 ScalarWriteOperation::Field(_) => unimplemented!(),
                 ScalarWriteOperation::Set(rhs) => field.value(rhs).into(),
                 ScalarWriteOperation::Add(rhs) if field.is_list() => {
-                    let e: Expression = Column::from(name.clone()).into();
+                    let e: Expression = Column::from((table.clone(), name.clone())).into();
                     let vals: Vec<_> = match rhs {
                         PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
                         _ => vec![field.value(rhs)],
