@@ -561,7 +561,7 @@ where
                     let schema_name = params.url.schema();
 
                     let schema_exists_result = connection.query_raw(
-                            "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version(), current_setting('server_version_num')::integer as numeric_version",
+                            "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version(), current_setting('server_version_num')::integer as numeric_version;",
                             &[schema_name.into()],
                             &params.url,
                         )
@@ -571,7 +571,7 @@ where
                         schema_exists_result
                           .get(0)
                           .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
-                          .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_i32().map(|version_number| (version, version_number))));
+                          .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
                     match version {
                         Some((version, version_num)) => {
