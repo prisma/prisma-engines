@@ -78,7 +78,7 @@
                 <span class="kw">let </span>pgversion = pgversion_result
                     .get(<span class="number">0</span>)
                     .and_then(|r| r.get(<span class="string">&quot;version&quot;</span>))
-                    .and_then(|v| v.as_i32());
+                    .and_then(|v| v.as_integer());
 
                 <span class="kw">match </span>pgversion {
                     <span class="prelude-val">Some</span>(version) <span class="kw">if </span>version &gt;= <span class="number">100000 </span>=&gt; circumstances |= Circumstances::CanPartitionTables,

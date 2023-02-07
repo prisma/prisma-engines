@@ -183,6 +183,10 @@
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.
 
 </span><span class="kw">use </span>enumflags2::BitFlags;
@@ -229,6 +233,10 @@
 
         <span class="kw">if </span>circumstances.contains(<span class="kw">super</span>::Circumstances::CockroachWithPostgresNativeTypes) {
             describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
+        }
+
+        <span class="kw">if </span>circumstances.contains(<span class="kw">super</span>::Circumstances::CanPartitionTables) {
+            describer_circumstances |= describer::Circumstances::CanPartitionTables;
         }
 
         <span class="kw">let </span>namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));

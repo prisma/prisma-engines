@@ -637,6 +637,13 @@
 <a href="#637" id="637">637</a>
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -1149,7 +1156,8 @@ SET enable_experimental_alter_column_type_general = true;
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, <span class="comment">// FIXME: we should really break and remove this
-</span>}
+    </span>CanPartitionTables,
+}
 
 <span class="attr">#[allow(clippy::needless_collect)] </span><span class="comment">// clippy is wrong
 </span><span class="kw">fn </span>disable_postgres_statement_cache(url: <span class="kw-2">&amp;mut </span>Url) -&gt; ConnectorResult&lt;()&gt; {
@@ -1199,16 +1207,20 @@ SET enable_experimental_alter_column_type_general = true;
                     <span class="kw">let </span>schema_name = params.url.schema();
 
                     <span class="kw">let </span>schema_exists_result = connection.query_raw(
-                            <span class="string">&quot;SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version()&quot;</span>,
+                            <span class="string">&quot;SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version(), current_setting(&#39;server_version_num&#39;)::integer as numeric_version;&quot;</span>,
                             <span class="kw-2">&amp;</span>[schema_name.into()],
                             <span class="kw-2">&amp;</span>params.url,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="kw">let </span>version = schema_exists_result.get(<span class="number">0</span>).and_then(|row| row.at(<span class="number">1</span>)).and_then(|v| v.to_string());
+                    <span class="kw">let </span>version =
+                        schema_exists_result
+                          .get(<span class="number">0</span>)
+                          .and_then(|row| row.at(<span class="number">1</span>).and_then(|ver_str| row.at(<span class="number">2</span>).map(|ver_num| (ver_str, ver_num))))
+                          .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
                     <span class="kw">match </span>version {
-                        <span class="prelude-val">Some</span>(version) =&gt; {
+                        <span class="prelude-val">Some</span>((version, version_num)) =&gt; {
                             <span class="kw">let </span>db_is_cockroach = version.contains(<span class="string">&quot;CockroachDB&quot;</span>);
 
                             <span class="comment">// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
@@ -1225,6 +1237,8 @@ SET enable_experimental_alter_column_type_general = true;
                             } <span class="kw">else if </span>db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
                                 connection.raw_cmd(COCKROACHDB_PRELUDE, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
+                            } <span class="kw">else if </span>version_num &gt;= <span class="number">100000 </span>{
+                                circumstances |= Circumstances:: CanPartitionTables;
                             }
                         }
                         <span class="prelude-val">None </span>=&gt; {
