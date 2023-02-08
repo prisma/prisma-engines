@@ -174,7 +174,13 @@ impl Relation {
                     model_b_column: "B".into(),
                 })
             }
-            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => todo!(),
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => {
+                RelationLinkManifestation::RelationTable(RelationTable {
+                    table: String::new(),
+                    model_a_column: "A".into(),
+                    model_b_column: "B".into(),
+                })
+            }
         }
     }
 }
