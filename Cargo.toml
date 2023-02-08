@@ -28,7 +28,6 @@ members = [
   "prisma-fmt",
   "prisma-fmt-wasm",
   "psl/*",
-  "tools/*"
 ]
 
 [workspace.dependencies]

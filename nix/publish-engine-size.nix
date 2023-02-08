@@ -3,18 +3,6 @@
 let stdenv = pkgs.clangStdenv;
 in
 {
-  packages.update-engine-size = stdenv.mkDerivation {
-    name = "update-engine-size";
-    inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs src configurePhase;
-
-    buildPhase = "cargo build --release --bin update-engine-size";
-
-    installPhase = ''
-      mkdir -p $out/bin
-      cp target/release/update-engine-size $out/bin/update-engine-size
-    '';
-  };
-
   packages.publish-engine-size = pkgs.writeShellApplication {
     name = "publish-engine-size";
     text = ''
@@ -25,20 +13,18 @@ in
         exit 1
       fi
 
-      CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      export CSV_PATH="engines-size/data.csv"
+      export CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      export CURRENT_COMMIT=$(git rev-parse HEAD)
+
       CURRENT_COMMIT_SHORT=$(git rev-parse --short HEAD)
-      CURRENT_COMMIT_FULL=$(git rev-parse HEAD)
       REPO_ROOT=$(git rev-parse --show-toplevel)
-      CSV_PATH="engines-size/data.csv"
 
       pushd "$REPO_ROOT"
       git fetch --depth=1 origin gh-pages
       git checkout origin/gh-pages
 
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
-          --db "$CSV_PATH"                                                    \
-          --branch "$CURRENT_BRANCH"                                          \
-          --commit "$CURRENT_COMMIT_FULL"                                     \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node
 
@@ -47,6 +33,25 @@ in
       git push origin '+HEAD:gh-pages'
       git checkout "$CURRENT_BRANCH"
       popd
+    '';
+  };
+
+  packages.update-engine-size = pkgs.writeShellApplication {
+    name = "update-engine-size";
+    text = ''
+      set -euxo pipefail
+
+      DATE_TIME="$(date -u --iso-8601=seconds)"
+
+      if [[ ! -f $CSV_PATH ]]; then
+        echo "date_time,branch,commit,file,size_bytes" > "$CSV_PATH"
+      fi
+
+      for file in "$@"; do
+        file_name=$(basename "$file")
+        size=$(stat -c %s "$file")
+        echo "$DATE_TIME,$CURRENT_BRANCH,$CURRENT_COMMIT,$file_name,$size" >> "$CSV_PATH"
+      done
     '';
   };
 }
