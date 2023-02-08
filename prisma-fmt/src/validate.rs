@@ -69,30 +69,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"error_code":"P1012","message":"error\u001b[0m: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.\n  -->  schema.prisma:5\n   | \n 4 | \n 5 |             datasøurce yolo {\n 6 |             }\n   | \nerror: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.\n  -->  schema.prisma:6\n   | \n 5 |             datasøurce yolo {\n 6 |             }\n 7 |         \n   | \nerror: Argument \"provider\" is missing in generator block \"js\".\n  -->  schema.prisma:2\n   | \n 1 | \n 2 |             generator js {\n 3 |             }\n   | \n\nValidation Error Count: 3"}"#
-        ]];
-
-        let response = validate(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
-    }
-
-    #[test]
-    fn validate_invalid_schema_with_no_colors() {
-        let schema = r#"
-            generator js {
-            }
-
-            datasøurce yolo {
-            }
-        "#;
-
-        let request = json!({
-            "prismaSchema": schema,
-            "noColor": true,
-        });
-
-        let expected = expect![[
-            r#"{"error_code":"P1012","message":"error: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.\n  -->  schema.prisma:5\n   | \n 4 | \n 5 |             datasøurce yolo {\n 6 |             }\n   | \nerror: Error validating: This line is invalid. It does not start with any known Prisma schema keyword.\n  -->  schema.prisma:6\n   | \n 5 |             datasøurce yolo {\n 6 |             }\n 7 |         \n   | \nerror: Argument \"provider\" is missing in generator block \"js\".\n  -->  schema.prisma:2\n   | \n 1 | \n 2 |             generator js {\n 3 |             }\n   | \n\nValidation Error Count: 3"}"#
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 3"}"#
         ]];
 
         let response = validate(&request.to_string()).unwrap_err();
