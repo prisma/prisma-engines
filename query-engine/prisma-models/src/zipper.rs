@@ -26,3 +26,4 @@ impl<I: Copy> Zipper<I> {
 pub type InternalEnum = Zipper<ast::EnumId>;
 pub type InternalEnumRef = InternalEnum;
 pub type InternalEnumValue = Zipper<ast::EnumValueId>;
+pub type RelationZipper = Zipper<psl::parser_database::RelationId>;

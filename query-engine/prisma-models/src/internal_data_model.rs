@@ -138,7 +138,7 @@ impl InternalDataModel {
 /// In other words, the scope for a relation name is only between two models. Every pair of models
 /// has its own scope for relation names.
 fn relation_matches(relation: &Relation, model_ids: (ast::ModelId, ast::ModelId), relation_name: &str) -> bool {
-    if relation.name != relation_name {
+    if relation.name() != relation_name {
         return false;
     }
 

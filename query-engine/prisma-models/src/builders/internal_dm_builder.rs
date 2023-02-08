@@ -5,14 +5,14 @@ use super::{
 use crate::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
     extensions::*,
-    IndexType, InlineRelation, RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
+    IndexType, RelationSide, TypeIdentifier,
 };
 use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
-use psl::{datamodel_connector::RelationMode, schema_ast::ast};
 
 pub(crate) fn model_builders(
     datamodel: &Datamodel,
     relation_placeholders: &[RelationPlaceholder],
+    schema: &psl::ValidatedSchema,
 ) -> Vec<ModelBuilder> {
     datamodel
         .models()
@@ -21,7 +21,7 @@ pub(crate) fn model_builders(
         .map(|model| ModelBuilder {
             id: model.id,
             name: model.name.clone(),
-            fields: model_field_builders(model, relation_placeholders),
+            fields: model_field_builders(model, relation_placeholders, schema),
             manifestation: model.database_name().map(|s| s.to_owned()),
             primary_key: pk_builder(model),
             indexes: index_builders(model),
@@ -31,7 +31,11 @@ pub(crate) fn model_builders(
         .collect()
 }
 
-fn model_field_builders(model: &dml::Model, relations: &[RelationPlaceholder]) -> Vec<FieldBuilder> {
+fn model_field_builders(
+    model: &dml::Model,
+    relations: &[RelationPlaceholder],
+    schema: &psl::ValidatedSchema,
+) -> Vec<FieldBuilder> {
     model
         .fields()
         .filter(|field| !field.is_ignored())
@@ -61,7 +65,7 @@ fn model_field_builders(model: &dml::Model, relations: &[RelationPlaceholder]) -
                 Some(FieldBuilder::Relation(RelationFieldBuilder {
                     name: rf.name.clone(),
                     arity: rf.arity,
-                    relation_name: relation.name.clone(),
+                    relation_name: schema.db.walk(relation.id).relation_name().to_string(),
                     relation_side: relation.relation_side(rf),
                     relation_info: rf.relation_info.clone(),
                     on_delete_default: rf.default_on_delete_action(),
@@ -133,19 +137,14 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
         .collect()
 }
 
-pub(crate) fn relation_builders(
-    placeholders: &[RelationPlaceholder],
-    relation_mode: RelationMode,
-) -> Vec<RelationBuilder> {
+pub(crate) fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilder> {
     placeholders
         .iter()
         .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
         .map(|r| RelationBuilder {
-            name: r.name(),
-            manifestation: r.manifestation(),
+            id: r.id,
             model_a_id: r.model_a.id,
             model_b_id: r.model_b.id,
-            relation_mode,
         })
         .collect()
 }
@@ -193,39 +192,37 @@ pub(crate) fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTyp
 }
 
 /// Calculates placeholders that are used to compute builders dependent on some relation information being present already.
-pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationPlaceholder> {
+pub(crate) fn relation_placeholders(
+    datamodel: &dml::Datamodel,
+    schema: &psl::ValidatedSchema,
+) -> Vec<RelationPlaceholder> {
     let mut result = Vec::new();
 
     for model in datamodel.models().filter(|model| !model.is_ignored) {
         for field in model.relation_fields().filter(|field| !field.is_ignored) {
+            let (model_id, field_id) = field.id.coarsen();
+            let relation_field = schema.db.walk(model_id).relation_field(field_id);
+            let relation_id = relation_field.relation().id;
             let dml::RelationInfo {
-                referenced_model: to,
-                references,
-                name,
-                ..
+                referenced_model: to, ..
             } = &field.relation_info;
 
             let related_model = datamodel.find_model_by_id(*to).unwrap();
 
             let (_, related_field) = datamodel.find_related_field_bang(field);
-            let related_field_info: &dml::RelationInfo = &related_field.relation_info;
 
-            let (model_a, model_b, field_a, field_b, referenced_fields_a, referenced_fields_b) = match () {
+            let (model_a, model_b, field_a, field_b) = match () {
                 _ if model.name < related_model.name => (
                     model.clone(),
                     related_model.clone(),
                     field.clone(),
                     related_field.clone(),
-                    references,
-                    &related_field_info.references,
                 ),
                 _ if related_model.name < model.name => (
                     related_model.clone(),
                     model.clone(),
                     related_field.clone(),
                     field.clone(),
-                    &related_field_info.references,
-                    references,
                 ),
                 // Self-relation case
                 _ => {
@@ -234,68 +231,16 @@ pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationP
                     } else {
                         (related_field.clone(), field.clone())
                     };
-                    (
-                        model.clone(),
-                        related_model.clone(),
-                        field_a,
-                        field_b,
-                        references,
-                        &related_field_info.references,
-                    )
+                    (model.clone(), related_model.clone(), field_a, field_b)
                 }
             };
 
-            let inline_on_model_a = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_a.id,
-                field: field_a.clone(),
-                referenced_fields: referenced_fields_a.clone(),
-            };
-
-            let inline_on_model_b = ManifestationPlaceholder::Inline {
-                in_table_of_model: model_b.id,
-                field: field_b.clone(),
-                referenced_fields: referenced_fields_b.clone(),
-            };
-
-            let inline_on_this_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: model.id,
-                field: field.clone(),
-                referenced_fields: references.clone(),
-            };
-
-            let inline_on_related_model = ManifestationPlaceholder::Inline {
-                in_table_of_model: related_model.id,
-                field: related_field.clone(),
-                referenced_fields: related_field_info.references.clone(),
-            };
-
-            let manifestation = match (field_a.is_list(), field_b.is_list()) {
-                (true, true) => ManifestationPlaceholder::Table,
-                (false, true) => inline_on_model_a,
-                (true, false) => inline_on_model_b,
-                (false, false) => match (references.first(), &related_field_info.references.first()) {
-                    (Some(_), None) => inline_on_this_model,
-                    (None, Some(_)) => inline_on_related_model,
-                    (None, None) => {
-                        if model_a.name < model_b.name {
-                            inline_on_model_a
-                        } else {
-                            inline_on_model_b
-                        }
-                    }
-                    (Some(_), Some(_)) => {
-                        panic!("It's not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.", field.name, model.name, related_field.name, related_model.name)
-                    }
-                },
-            };
-
             let placeholder = RelationPlaceholder {
-                name: name.clone(),
+                id: relation_id,
                 model_a,
                 model_b,
                 field_a,
                 field_b,
-                manifestation,
             };
 
             // Skip duplicate placeholders
@@ -309,58 +254,15 @@ pub(crate) fn relation_placeholders(datamodel: &dml::Datamodel) -> Vec<RelationP
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct RelationPlaceholder {
-    pub name: String,
+pub(crate) struct RelationPlaceholder {
+    pub id: psl::parser_database::RelationId,
     pub model_a: dml::Model,
     pub model_b: dml::Model,
     pub field_a: dml::RelationField,
     pub field_b: dml::RelationField,
-    pub manifestation: ManifestationPlaceholder,
 }
 
-#[allow(clippy::large_enum_variant)]
-#[derive(PartialEq, Debug, Clone)]
-pub enum ManifestationPlaceholder {
-    Inline {
-        in_table_of_model: ast::ModelId,
-        /// The relation field.
-        field: dml::RelationField,
-        /// The name of the (dml) fields referenced by the relation.
-        referenced_fields: Vec<String>,
-    },
-    Table,
-}
-
-#[allow(unused)]
 impl RelationPlaceholder {
-    fn name(&self) -> String {
-        // TODO: must replicate behaviour of `generateRelationName` from `SchemaInferrer`
-        match &self.name as &str {
-            "" => format!("{}To{}", &self.model_a.name, &self.model_b.name),
-            _ => self.name.clone(),
-        }
-    }
-
-    pub fn table_name(&self) -> String {
-        format!("_{}", self.name())
-    }
-
-    pub fn model_a_column(&self) -> String {
-        "A".to_string()
-    }
-
-    pub fn model_b_column(&self) -> String {
-        "B".to_string()
-    }
-
-    pub fn is_one_to_one(&self) -> bool {
-        !self.field_a.is_list() && !self.field_b.is_list()
-    }
-
-    fn is_many_to_many(&self) -> bool {
-        self.field_a.is_list() && self.field_b.is_list()
-    }
-
     fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::RelationField) -> bool {
         (&self.model_a == model && &self.field_a == field) || (&self.model_b == model && &self.field_b == field)
     }
@@ -372,22 +274,6 @@ impl RelationPlaceholder {
             RelationSide::B
         } else {
             panic!("this field is not part of the relations")
-        }
-    }
-
-    fn manifestation(&self) -> RelationLinkManifestation {
-        match &self.manifestation {
-            // TODO: relation table columns must get renamed: lowercased type names instead of A and B
-            ManifestationPlaceholder::Table => RelationLinkManifestation::RelationTable(RelationTable {
-                table: self.table_name(),
-                model_a_column: self.model_a_column(),
-                model_b_column: self.model_b_column(),
-            }),
-            ManifestationPlaceholder::Inline { in_table_of_model, .. } => {
-                RelationLinkManifestation::Inline(InlineRelation {
-                    in_table_of_model: *in_table_of_model,
-                })
-            }
         }
     }
 }

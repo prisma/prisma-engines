@@ -45,6 +45,22 @@ impl<'db> RelationWalker<'db> {
         self.get().has_field(model_id, field_id)
     }
 
+    /// The relation name, explicit or inferred.
+    ///
+    /// ```ignore
+    /// posts Post[] @relation("UserPosts")
+    ///                        ^^^^^^^^^^^
+    /// ```
+    pub fn relation_name(self) -> RelationName<'db> {
+        let relation = self.get();
+        relation
+            .relation_name
+            .map(|s| RelationName::Explicit(&self.db[s]))
+            .unwrap_or_else(|| {
+                RelationName::generated(self.walk(relation.model_a).name(), self.walk(relation.model_b).name())
+            })
+    }
+
     /// The relation attributes parsed from the AST.
     fn get(self) -> &'db Relation {
         &self.db.relations[self.id]

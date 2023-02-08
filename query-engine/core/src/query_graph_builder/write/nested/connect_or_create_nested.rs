@@ -13,7 +13,7 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-pub fn nested_connect_or_create(
+pub(crate) fn nested_connect_or_create(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
@@ -664,7 +664,7 @@ fn one_to_one_inlined_parent(
 
         let parent_model = parent_relation_field.model();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -687,7 +687,7 @@ fn one_to_one_inlined_parent(
             })),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -821,7 +821,7 @@ fn one_to_one_inlined_child(
 
     // *** Then branch handling ***
     let update_new_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
 
@@ -845,7 +845,7 @@ fn one_to_one_inlined_child(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -870,7 +870,7 @@ fn one_to_one_inlined_child(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -961,7 +961,7 @@ fn one_to_one_inlined_child(
 
         // update old child, set link to null
         let update_old_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
         let rf = Arc::clone(&parent_relation_field);

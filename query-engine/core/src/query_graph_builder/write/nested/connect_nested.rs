@@ -164,7 +164,7 @@ fn handle_one_to_many(
     if parent_relation_field.relation_is_inlined_in_parent() {
         let read_query = utils::read_ids_infallible(child_model.clone(), child_link.clone(), child_filter);
         let read_children_node = graph.create_node(read_query);
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -196,7 +196,7 @@ fn handle_one_to_many(
         let expected_id_count = child_filter.size();
         let update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
         let check_node = graph.create_node(Node::Empty);
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -222,7 +222,7 @@ fn handle_one_to_many(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
 
         // Check that all specified children have been updated.
         graph.create_edge(
@@ -416,7 +416,7 @@ fn handle_one_to_one_parent_update(
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
         let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -441,7 +441,7 @@ fn handle_one_to_one_parent_update(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -477,7 +477,7 @@ fn handle_one_to_one_parent_update(
         let child_model_name = child_model.name().to_owned();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
         let parent_linking_fields = parent_relation_field.linking_fields();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
 
         graph.create_edge(
             &read_new_child_node,
@@ -499,7 +499,7 @@ fn handle_one_to_one_parent_update(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -559,7 +559,7 @@ fn handle_one_to_one_parent_create(
         utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
     }
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
 
@@ -597,7 +597,7 @@ fn handle_one_to_one_parent_create(
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
         let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -622,7 +622,7 @@ fn handle_one_to_one_parent_create(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 

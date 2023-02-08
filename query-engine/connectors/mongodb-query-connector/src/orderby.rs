@@ -75,7 +75,7 @@ impl OrderByData {
                 let mut parts = path
                     .iter()
                     .map(|hop| match hop {
-                        OrderByHop::Relation(rf) => rf.relation().name().to_owned(),
+                        OrderByHop::Relation(rf) => rf.relation().name(),
                         OrderByHop::Composite(cf) => cf.db_name().to_owned(),
                     })
                     .collect_vec();

@@ -51,7 +51,7 @@ pub fn disconnect_records_node(
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
 
     // Edge from parent to disconnect.
     graph.create_edge(
