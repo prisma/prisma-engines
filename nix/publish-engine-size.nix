@@ -6,13 +6,13 @@
     text = ''
       set -euxo pipefail
 
-      CURRENT_SYSTEM=$(uname -s)
+      CURRENT_SYSTEM=$(uname -sm)
 
-      if [[ "$CURRENT_SYSTEM" != "Linux" ]]; then
+      if [[ "$CURRENT_SYSTEM" != "Linux x86_64" ]]; then
         : This script publishes the built engine size directly to the gh-pages
         : branch of the repository. Refusing to run on "$CURRENT_SYSTEM" to
         : avoid inconsistent data being published. Please run the script on
-        : Linux if you want to update the data manually, or use
+        : Linux x86_64 if you want to update the data manually, or use
         : "nix run .#update-engine-size" for local testing without modifying
         : the data in gh-pages branch.
         exit 1
