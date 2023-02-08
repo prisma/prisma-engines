@@ -43,6 +43,10 @@ impl Configuration {
         })
     }
 
+    // Resolve datasource url for query engine.
+    //
+    // The main interesting thing here is we want to ignore any error that may arise from resolving
+    // direct_url.
     pub fn resolve_datasource_urls_query_engine<F>(
         &mut self,
         url_overrides: &[(String, String)],
@@ -61,36 +65,11 @@ impl Configuration {
                 datasource.url.value = Some(datasource.load_url(env)?);
             }
 
-            if let (Some(direct_url), Some(span)) = (&datasource.direct_url, &datasource.direct_url_span) {
+            if let Some(direct_url) = &datasource.direct_url {
                 let result = match super::from_url(direct_url, env) {
-                        Err(err) => {
-                            match err {
-                        super::UrlValidationError::EmptyUrlValue => {
-                            let msg = "You must provide a nonempty direct URL";
-                            Err(DatamodelError::new_source_validation_error(msg, &datasource.name, *span))
-                        }
-                        super::UrlValidationError::EmptyEnvValue(env_var) => {
-                            Err(DatamodelError::new_source_validation_error(
-                                &format!(
-                                    "You must provide a nonempty direct URL. The environment variable `{env_var}` resolved to an empty string."
-                                ),
-                                &datasource.name,
-                                *span,
-                            ))
-                        },
-                        super::UrlValidationError::NoEnvValue(env_var) => {
-                            Err(DatamodelError::new_environment_functional_evaluation_error(
-                                env_var,
-                                *span,
-                            ))
-                        },
-                        super::UrlValidationError::NoUrlOrEnv => {
-                          Ok(None)
-                        },
-                    }
-                        },
-                        Ok(res) => Ok(Some(res)),
-                    }?;
+                    Err(_) => None, // ignore errors because we don't really need direct_url in QE
+                    Ok(res) => Some(res),
+                };
 
                 datasource.direct_url = Some(crate::StringFromEnvVar {
                     from_env_var: direct_url.from_env_var.clone(),
@@ -102,6 +81,13 @@ impl Configuration {
         Ok(())
     }
 
+    // Resolve datasource URL's for getConfig.
+    // The main reason this exists is:
+    //   - we want to error if we can't resolve direct_url
+    //   - we want to skip validation for url IF we have a direct_url
+    //
+    // For that last bit, we only do this currently because our validation errors on URL's starting
+    // with 'prisma://'. We would ideally like to do the other validations and ignore in this case.
     pub fn resolve_datasource_url_prisma_fmt<F>(
         &mut self,
         url_overrides: &[(String, String)],
