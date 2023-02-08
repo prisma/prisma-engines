@@ -43,7 +43,7 @@ impl Configuration {
         })
     }
 
-    pub fn resolve_datasource_urls_from_env<F>(
+    pub fn resolve_datasource_urls_query_engine<F>(
         &mut self,
         url_overrides: &[(String, String)],
         env: F,
@@ -102,7 +102,7 @@ impl Configuration {
         Ok(())
     }
 
-    pub fn resolve_datasource_direct_urls_from_env<F>(
+    pub fn resolve_datasource_url_prisma_fmt<F>(
         &mut self,
         url_overrides: &[(String, String)],
         env: F,
