@@ -67,7 +67,7 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
 
     if !ignore_env_var_errors {
         config
-            .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
+            .resolve_datasource_urls_query_engine(&overrides, |key| env.get(key).map(ToString::to_string))
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
     }
 

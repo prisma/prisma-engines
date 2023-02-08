@@ -96,7 +96,7 @@ impl CliCommand {
         let config = &mut req.config;
 
         if !req.ignore_env_var_errors {
-            config.resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
+            config.resolve_datasource_urls_query_engine(&[], |key| env::var(key).ok())?;
         }
 
         let json = psl::get_config::config_to_mcf_json_value(config);
