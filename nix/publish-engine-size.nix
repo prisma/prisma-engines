@@ -1,7 +1,5 @@
 { pkgs, self', ... }:
 
-let stdenv = pkgs.clangStdenv;
-in
 {
   packages.publish-engine-size = pkgs.writeShellApplication {
     name = "publish-engine-size";
