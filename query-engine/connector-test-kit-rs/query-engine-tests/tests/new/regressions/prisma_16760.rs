@@ -13,7 +13,7 @@ mod prisma_16760 {
         .to_owned()
     }
 
-    #[connector_test(capabilities(ScalarLists))]
+    #[connector_test(capabilities(ScalarLists, EnumArrayPush))]
     async fn regression(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation { upsertOneTestModel(
