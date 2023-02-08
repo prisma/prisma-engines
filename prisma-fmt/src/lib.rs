@@ -85,8 +85,8 @@ pub fn lint(schema: String) -> String {
 /// ```
 ///
 /// This function isn't supposed to panic.
-pub fn validate(schema: String) -> Result<(), String> {
-    validate::run(&schema)
+pub fn validate(validate_params: String) -> Result<(), String> {
+    validate::validate(&validate_params)
 }
 
 pub fn native_types(schema: String) -> String {
