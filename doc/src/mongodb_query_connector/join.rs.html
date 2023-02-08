@@ -268,7 +268,7 @@
         <span class="kw">let </span>as_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(alias) = <span class="self">self</span>.alias {
             alias
         } <span class="kw">else </span>{
-            relation.name().to_owned()
+            relation.name()
         };
 
         <span class="kw">let </span>right_model = from_field.related_model();

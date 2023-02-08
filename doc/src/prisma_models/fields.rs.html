@@ -469,7 +469,7 @@
         <span class="self">self</span>.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
-            .find(|field| field.relation().name == name &amp;&amp; field.relation_side == side)
+            .find(|field| field.relation().name() == name &amp;&amp; field.relation_side == side)
             .ok_or_else(|| DomainError::FieldForRelationNotFound {
                 relation: name.to_string(),
                 model: <span class="self">self</span>.model().name.clone(),

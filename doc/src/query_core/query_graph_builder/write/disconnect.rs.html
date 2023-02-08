@@ -147,7 +147,7 @@
     });
 
     <span class="kw">let </span>disconnect_node = graph.create_node(Query::Write(disconnect));
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
 
     <span class="comment">// Edge from parent to disconnect.
     </span>graph.create_edge(

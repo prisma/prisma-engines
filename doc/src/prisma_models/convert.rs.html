@@ -43,23 +43,17 @@
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
-<a href="#46" id="46">46</a>
-<a href="#47" id="47">47</a>
-<a href="#48" id="48">48</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;) -&gt; InternalDataModelRef {
     <span class="kw">let </span>datamodel = dml::lift(<span class="kw-2">&amp;</span>schema);
-    <span class="kw">let </span>relation_mode = schema.relation_mode();
 
-    <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel);
-    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>relation_placeholders);
+    <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>schema);
+    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>relation_placeholders, <span class="kw-2">&amp;</span>schema);
 
-    <span class="comment">// relations can be influenced by the relation mode, e.g., to let an action conditionally become an alias
-    // for another action.
-    </span><span class="kw">let </span>relations = builders::relation_builders(<span class="kw-2">&amp;</span>relation_placeholders, relation_mode);
+    <span class="kw">let </span>relations = builders::relation_builders(<span class="kw-2">&amp;</span>relation_placeholders);
 
     <span class="kw">let </span>composite_types = builders::composite_type_builders(<span class="kw-2">&amp;</span>datamodel);
     <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {

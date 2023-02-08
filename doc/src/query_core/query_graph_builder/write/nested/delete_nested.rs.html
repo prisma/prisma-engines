@@ -252,7 +252,7 @@
             <span class="kw-2">&amp;</span>delete_many_node,
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_name = child_model.name().to_owned();
 
@@ -307,7 +307,7 @@
                 <span class="kw-2">&amp;</span>delete_record_node,
             )<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+            <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
             <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
             graph.create_edge(

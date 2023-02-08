@@ -589,7 +589,7 @@
     <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
         <span class="kw">let </span>(prefix, rf) = <span class="self">self</span>;
 
-        <span class="prelude-val">Ok</span>(Bson::String(prefix.render_with(rf.relation().name().to_owned())))
+        <span class="prelude-val">Ok</span>(Bson::String(prefix.render_with(rf.relation().name())))
     }
 }
 

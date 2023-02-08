@@ -26,32 +26,24 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{InternalDataModelWeakRef, Relation, RelationLinkManifestation, RelationRef};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{InternalDataModelWeakRef, Relation, RelationRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::{datamodel_connector::RelationMode, schema_ast::ast};
+<span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>RelationBuilder {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>manifestation: RelationLinkManifestation,
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RelationBuilder {
+    <span class="kw">pub </span>id: psl::parser_database::RelationId,
     <span class="kw">pub </span>model_a_id: ast::ModelId,
     <span class="kw">pub </span>model_b_id: ast::ModelId,
-    <span class="kw">pub </span>relation_mode: RelationMode,
 }
 
 <span class="kw">impl </span>RelationBuilder {
     <span class="kw">pub fn </span>build(<span class="self">self</span>, internal_data_model: InternalDataModelWeakRef) -&gt; RelationRef {
         <span class="kw">let </span>relation = Relation {
-            name: <span class="self">self</span>.name,
-            manifestation: <span class="self">self</span>.manifestation,
+            id: <span class="self">self</span>.id,
             model_a_id: <span class="self">self</span>.model_a_id,
             model_b_id: <span class="self">self</span>.model_b_id,
-            relation_mode: <span class="self">self</span>.relation_mode,
             model_a: OnceCell::new(),
             model_b: OnceCell::new(),
             field_a: OnceCell::new(),

@@ -445,7 +445,7 @@
     </span><span class="kw">pub fn </span>relation_is_inlined_in_parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>relation = <span class="kw-2">&amp;</span><span class="self">self</span>.relation();
 
-        <span class="kw">match </span><span class="kw-2">&amp;</span>relation.manifestation {
+        <span class="kw">match </span>relation.manifestation() {
             RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; {
                 <span class="kw">let </span>is_self_rel = relation.is_self_relation();
 
@@ -478,7 +478,7 @@
     }
 
     <span class="kw">pub fn </span>is_relation_with_name_and_side(<span class="kw-2">&amp;</span><span class="self">self</span>, relation_name: <span class="kw-2">&amp;</span>str, side: RelationSide) -&gt; bool {
-        <span class="self">self</span>.relation().name == relation_name &amp;&amp; <span class="self">self</span>.relation_side == side
+        <span class="self">self</span>.relation().name() == relation_name &amp;&amp; <span class="self">self</span>.relation_side == side
     }
 
     <span class="kw">pub fn </span>type_identifiers_with_arities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(TypeIdentifier, FieldArity)&gt; {

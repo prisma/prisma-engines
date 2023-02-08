@@ -285,6 +285,13 @@
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::RelationField,
@@ -300,6 +307,13 @@
 <span class="doccomment">/// An opaque identifier for a model relation field in a schema.
 </span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash)]
 </span><span class="kw">pub struct </span>RelationFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
+
+<span class="kw">impl </span>RelationFieldId {
+    <span class="doccomment">/// Coarsen the relation field identifier to a generic field identifier.
+    </span><span class="kw">pub fn </span>coarsen(<span class="self">self</span>) -&gt; (ast::ModelId, ast::FieldId) {
+        (<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
+    }
+}
 
 <span class="doccomment">/// A relation field on a model in the schema.
 </span><span class="attr">#[derive(Copy, Clone, Debug)]

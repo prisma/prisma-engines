@@ -470,7 +470,7 @@
     });
 
     <span class="kw">let </span>disconnect_node = graph.create_node(Query::Write(disconnect));
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
 
     <span class="comment">// Edge from parent to disconnect
@@ -646,7 +646,7 @@
         })),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
 
     <span class="comment">// Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)

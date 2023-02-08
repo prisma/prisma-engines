@@ -1316,7 +1316,7 @@
 ) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
     <span class="kw">let </span>child_model = parent_relation_field.related_model();
     <span class="kw">let </span>child_model_identifier = child_model.primary_identifier();
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
 
     <span class="kw">let </span>diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
 
@@ -1481,7 +1481,7 @@
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
 
     graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>update_existing_child, QueryGraphDependency::Then)<span class="question-mark">?</span>;
     graph.create_edge(

@@ -814,7 +814,7 @@
     <span class="kw">if </span>parent_relation_field.relation_is_inlined_in_parent() {
         <span class="kw">let </span>read_query = utils::read_ids_infallible(child_model.clone(), child_link.clone(), child_filter);
         <span class="kw">let </span>read_children_node = graph.create_node(read_query);
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -846,7 +846,7 @@
         <span class="kw">let </span>expected_id_count = child_filter.size();
         <span class="kw">let </span>update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
         <span class="kw">let </span>check_node = graph.create_node(Node::Empty);
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -872,7 +872,7 @@
             ),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
 
         <span class="comment">// Check that all specified children have been updated.
         </span>graph.create_edge(
@@ -1066,7 +1066,7 @@
         <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -1091,7 +1091,7 @@
             ),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1127,7 +1127,7 @@
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
         <span class="kw">let </span>update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
         <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>read_new_child_node,
@@ -1149,7 +1149,7 @@
          )<span class="question-mark">?</span>;
 
         <span class="kw">let </span>parent_model_identifier = parent_relation_field.model().primary_identifier();
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_model.name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1209,7 +1209,7 @@
         utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>read_new_child_node, <span class="kw-2">&amp;</span>child_relation_field)<span class="question-mark">?</span>;
     }
 
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
     <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1247,7 +1247,7 @@
         <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -1272,7 +1272,7 @@
             ),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 

@@ -1021,7 +1021,7 @@
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-</span><span class="kw">pub fn </span>nested_connect_or_create(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
     parent_node: NodeRef,
@@ -1672,7 +1672,7 @@
 
         <span class="kw">let </span>parent_model = parent_relation_field.model();
         <span class="kw">let </span>update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_model.name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1695,7 +1695,7 @@
             })),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_model.name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1829,7 +1829,7 @@
 
     <span class="comment">// *** Then branch handling ***
     </span><span class="kw">let </span>update_new_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
     <span class="kw">let </span>child_model_name = child_model.name().to_owned();
 
@@ -1853,7 +1853,7 @@
         })),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
     <span class="kw">let </span>child_model_name = child_model.name().to_owned();
     <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
@@ -1878,7 +1878,7 @@
         })),
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
     <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
     <span class="kw">let </span>child_model_name = child_model.name().to_owned();
     <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
@@ -1969,7 +1969,7 @@
 
         <span class="comment">// update old child, set link to null
         </span><span class="kw">let </span>update_old_child_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
-        <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
         <span class="kw">let </span>rf = Arc::clone(<span class="kw-2">&amp;</span>parent_relation_field);
