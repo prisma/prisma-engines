@@ -358,8 +358,8 @@
 /// ```
 ///
 /// This function isn&#39;t supposed to panic.
-</span><span class="kw">pub fn </span>validate(schema: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-    validate::run(<span class="kw-2">&amp;</span>schema)
+</span><span class="kw">pub fn </span>validate(validate_params: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    validate::validate(<span class="kw-2">&amp;</span>validate_params)
 }
 
 <span class="kw">pub fn </span>native_types(schema: String) -&gt; String {

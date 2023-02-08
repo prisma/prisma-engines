@@ -110,6 +110,8 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::Deserialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::validate;
@@ -118,6 +120,8 @@
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
 </span><span class="kw">struct </span>GetDmmfParams {
     prisma_schema: String,
+    <span class="attr">#[serde(default)]
+    </span>no_color: bool,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_dmmf(params: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
@@ -128,7 +132,7 @@
         }
     };
 
-    validate::run(<span class="kw-2">&amp;</span>params.prisma_schema).map(|<span class="kw">_</span>| dmmf::dmmf_json_from_schema(<span class="kw-2">&amp;</span>params.prisma_schema))
+    validate::run(<span class="kw-2">&amp;</span>params.prisma_schema, params.no_color).map(|<span class="kw">_</span>| dmmf::dmmf_json_from_schema(<span class="kw-2">&amp;</span>params.prisma_schema))
 }
 
 <span class="attr">#[cfg(test)]
@@ -138,7 +142,7 @@
     <span class="kw">use </span>serde_json::json;
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>get_dmmf_invalid_schema() {
+    </span><span class="kw">fn </span>get_dmmf_invalid_schema_with_colors() {
         <span class="kw">let </span>schema = <span class="string">r#&quot;
             generator js {
             }
