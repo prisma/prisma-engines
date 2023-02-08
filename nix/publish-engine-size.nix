@@ -1,6 +1,12 @@
 { pkgs, self', ... }:
 
 {
+  /* Publish the size of the Query Engine binary and library to the CSV file
+     in the `gh-pages` branch of the repository.
+
+     Data: https://github.com/prisma/prisma-engines/blob/gh-pages/engines-size/data.csv
+     Dashboard: https://prisma.github.io/prisma-engines/engines-size/
+    */
   packages.publish-engine-size = pkgs.writeShellApplication {
     name = "publish-engine-size";
     text = ''
