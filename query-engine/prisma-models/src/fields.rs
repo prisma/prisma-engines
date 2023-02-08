@@ -211,7 +211,7 @@ impl Fields {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
-            .find(|field| field.relation().name == name && field.relation_side == side)
+            .find(|field| field.relation().name() == name && field.relation_side == side)
             .ok_or_else(|| DomainError::FieldForRelationNotFound {
                 relation: name.to_string(),
                 model: self.model().name.clone(),

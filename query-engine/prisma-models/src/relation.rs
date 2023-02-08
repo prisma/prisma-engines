@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
 use once_cell::sync::OnceCell;
-use psl::{datamodel_connector::RelationMode, schema_ast::ast};
+use psl::{datamodel_connector::RelationMode, parser_database::walkers, schema_ast::ast};
 use std::{
     fmt::Debug,
     sync::{Arc, Weak},
@@ -13,7 +13,7 @@ pub type RelationWeakRef = Weak<Relation>;
 /// A relation between two models. Can be either using a `RelationTable` or
 /// model a direct link between two `RelationField`s.
 pub struct Relation {
-    pub(crate) name: String,
+    pub id: psl::parser_database::RelationId,
 
     pub(crate) model_a_id: ast::ModelId,
     pub(crate) model_b_id: ast::ModelId,
@@ -24,9 +24,7 @@ pub struct Relation {
     pub(crate) field_a: OnceCell<Weak<RelationField>>,
     pub(crate) field_b: OnceCell<Weak<RelationField>>,
 
-    pub(crate) manifestation: RelationLinkManifestation,
     pub(crate) internal_data_model: InternalDataModelWeakRef,
-    pub(crate) relation_mode: RelationMode,
 }
 
 impl Relation {
@@ -34,14 +32,18 @@ impl Relation {
     pub const MODEL_B_DEFAULT_COLUMN: &'static str = "B";
     pub const TABLE_ALIAS: &'static str = "RelationTable";
 
-    pub fn name(&self) -> &str {
-        &self.name
+    pub fn zipper(&self) -> crate::RelationZipper {
+        self.internal_data_model().zip(self.id)
+    }
+
+    pub fn name(&self) -> String {
+        self.zipper().walker().relation_name().to_string()
     }
 
     /// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
     pub fn is_inline_relation(&self) -> bool {
-        matches!(self.manifestation, RelationLinkManifestation::Inline(_))
+        self.zipper().walker().refine().as_inline().is_some()
     }
 
     /// Returns `true` if the `Relation` is a table linking two models.
@@ -84,7 +86,7 @@ impl Relation {
                 let field = self
                     .model_a()
                     .fields()
-                    .find_from_relation(&self.name, RelationSide::A)
+                    .find_from_relation(&self.name(), RelationSide::A)
                     .unwrap();
 
                 Arc::downgrade(&field)
@@ -100,7 +102,7 @@ impl Relation {
                 let field = self
                     .model_b()
                     .fields()
-                    .find_from_relation(&self.name, RelationSide::B)
+                    .find_from_relation(&self.name(), RelationSide::B)
                     .unwrap();
 
                 Arc::downgrade(&field)
@@ -137,7 +139,7 @@ impl Relation {
             .or_else(|| self.field_b().on_delete().cloned())
             .unwrap_or(self.field_a().on_delete_default);
 
-        match (action, self.relation_mode) {
+        match (action, self.internal_data_model().schema.relation_mode()) {
             // NoAction is an alias for Restrict when relationMode = "prisma"
             (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
             (action, _) => action,
@@ -153,29 +155,39 @@ impl Relation {
             .or_else(|| self.field_b().on_update().cloned())
             .unwrap_or(self.field_a().on_update_default);
 
-        match (action, self.relation_mode) {
+        match (action, self.internal_data_model().schema.relation_mode()) {
             // NoAction is an alias for Restrict when relationMode = "prisma"
             (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
             (action, _) => action,
         }
     }
 
-    pub fn manifestation(&self) -> &RelationLinkManifestation {
-        &self.manifestation
+    pub fn manifestation(&self) -> RelationLinkManifestation {
+        match self.zipper().walker().refine() {
+            walkers::RefinedRelationWalker::Inline(rel) => RelationLinkManifestation::Inline(InlineRelation {
+                in_table_of_model: rel.referencing_model().id,
+            }),
+            walkers::RefinedRelationWalker::ImplicitManyToMany(rel) => {
+                RelationLinkManifestation::RelationTable(RelationTable {
+                    table: format!("_{}", rel.relation_name()),
+                    model_a_column: "A".into(),
+                    model_b_column: "B".into(),
+                })
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => todo!(),
+        }
     }
 }
 
 impl Debug for Relation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Relation")
-            .field("name", &self.name)
             .field("model_a_name", &self.model_a_id)
             .field("model_b_name", &self.model_b_id)
             .field("model_a", &self.model_a)
             .field("model_b", &self.model_b)
             .field("field_a", &self.field_a)
             .field("field_b", &self.field_b)
-            .field("manifestation", &self.manifestation)
             .field("internal_data_model", &"#InternalDataModelWeakRef#")
             .finish()
     }

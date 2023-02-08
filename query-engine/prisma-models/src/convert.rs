@@ -4,14 +4,11 @@ use std::sync::Arc;
 
 pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
     let datamodel = dml::lift(&schema);
-    let relation_mode = schema.relation_mode();
 
-    let relation_placeholders = builders::relation_placeholders(&datamodel);
-    let models = builders::model_builders(&datamodel, &relation_placeholders);
+    let relation_placeholders = builders::relation_placeholders(&datamodel, &schema);
+    let models = builders::model_builders(&datamodel, &relation_placeholders, &schema);
 
-    // relations can be influenced by the relation mode, e.g., to let an action conditionally become an alias
-    // for another action.
-    let relations = builders::relation_builders(&relation_placeholders, relation_mode);
+    let relations = builders::relation_builders(&relation_placeholders);
 
     let composite_types = builders::composite_type_builders(&datamodel);
     let internal_data_model = Arc::new(InternalDataModel {

@@ -14,6 +14,13 @@ use std::{
 #[derive(Copy, Clone, PartialEq, Debug, Hash)]
 pub struct RelationFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
 
+impl RelationFieldId {
+    /// Coarsen the relation field identifier to a generic field identifier.
+    pub fn coarsen(self) -> (ast::ModelId, ast::FieldId) {
+        (self.0, self.1)
+    }
+}
+
 /// A relation field on a model in the schema.
 #[derive(Copy, Clone, Debug)]
 pub struct RelationFieldWalker<'db> {

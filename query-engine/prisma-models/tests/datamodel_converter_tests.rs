@@ -705,7 +705,7 @@ impl RelationAssertions for Relation {
         self
     }
     fn assert_manifestation(&self, manifestation: &RelationLinkManifestation) -> &Self {
-        assert_eq!(self.manifestation(), manifestation);
+        assert_eq!(&self.manifestation(), manifestation);
         self
     }
 }

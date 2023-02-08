@@ -134,7 +134,7 @@ impl RelationField {
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = &self.relation();
 
-        match &relation.manifestation {
+        match relation.manifestation() {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
@@ -167,7 +167,7 @@ impl RelationField {
     }
 
     pub fn is_relation_with_name_and_side(&self, relation_name: &str, side: RelationSide) -> bool {
-        self.relation().name == relation_name && self.relation_side == side
+        self.relation().name() == relation_name && self.relation_side == side
     }
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
