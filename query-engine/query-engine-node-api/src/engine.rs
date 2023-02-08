@@ -158,7 +158,7 @@ impl QueryEngine {
 
         if !ignore_env_var_errors {
             config
-                .resolve_datasource_urls_from_env(&overrides, |key| env.get(key).map(ToString::to_string))
+                .resolve_datasource_urls_query_engine(&overrides, |key| env.get(key).map(ToString::to_string))
                 .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
         }
 
