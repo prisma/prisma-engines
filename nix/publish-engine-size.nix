@@ -6,8 +6,20 @@
     text = ''
       set -euxo pipefail
 
+      CURRENT_SYSTEM=$(uname -s)
+
+      if [[ "$CURRENT_SYSTEM" != "Linux" ]]; then
+        : This script publishes the built engine size directly to the gh-pages
+        : branch of the repository. Refusing to run on "$CURRENT_SYSTEM" to
+        : avoid inconsistent data being published. Please run the script on
+        : Linux if you want to update the data manually, or use
+        : "nix run .#update-engine-size" for local testing without modifying
+        : the data in gh-pages branch.
+        exit 1
+      fi
+
       if ! git diff --exit-code 1> /dev/null; then
-        : "The workspace is not clean. Please commit or reset, then try again".
+        : "The workspace is not clean. Please commit or reset, then try again."
         exit 1
       fi
 
