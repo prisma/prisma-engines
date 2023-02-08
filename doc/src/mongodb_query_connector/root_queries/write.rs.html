@@ -500,6 +500,9 @@
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
 <a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
@@ -712,7 +715,10 @@
         .instrument(span)
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if </span>update_type == UpdateType::Many &amp;&amp; res.modified_count == <span class="number">0 </span>{
+        <span class="comment">// It&#39;s important we check the `matched_count` and not the `modified_count` here.
+        // MongoDB returns `modified_count: 0` when performing a noop update, which breaks
+        // nested connect mutations as it rely on the returned count to know whether the update happened.
+        </span><span class="kw">if </span>update_type == UpdateType::Many &amp;&amp; res.matched_count == <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Vec::new());
         }
     }

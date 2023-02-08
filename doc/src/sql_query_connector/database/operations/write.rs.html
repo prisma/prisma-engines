@@ -836,7 +836,7 @@
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
     <span class="kw">let </span>update = build_update_and_set_query(model, args, ctx);
-    <span class="kw">let </span>filter_condition = record_filter.clone().filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
+    <span class="kw">let </span>filter_condition = record_filter.filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
 
     <span class="kw">let </span>update = update.so_that(filter_condition);
     <span class="kw">let </span>count = conn.execute(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
