@@ -2,8 +2,7 @@ name: Publish engine size
 on:
   push:
     branches:
-      # - main
-      - "*"
+      - main
 
 jobs:
   publish-engine-size:
