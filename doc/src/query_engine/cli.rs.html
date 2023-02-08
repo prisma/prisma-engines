@@ -233,7 +233,7 @@
         <span class="kw">let </span>config = <span class="kw-2">&amp;mut </span>req.config;
 
         <span class="kw">if </span>!req.ignore_env_var_errors {
-            config.resolve_datasource_urls_from_env(<span class="kw-2">&amp;</span>[], |key| env::var(key).ok())<span class="question-mark">?</span>;
+            config.resolve_datasource_urls_query_engine(<span class="kw-2">&amp;</span>[], |key| env::var(key).ok())<span class="question-mark">?</span>;
         }
 
         <span class="kw">let </span>json = psl::get_config::config_to_mcf_json_value(config);

@@ -336,7 +336,7 @@
     <span class="kw">if </span>!params.ignore_env_var_errors {
         <span class="kw">let </span>overrides: Vec&lt;(<span class="kw">_</span>, <span class="kw">_</span>)&gt; = params.datasource_overrides.into_iter().collect();
         config
-            .resolve_datasource_direct_urls_from_env(<span class="kw-2">&amp;</span>overrides, |key| params.env.get(key).map(String::from))
+            .resolve_datasource_urls_prisma_fmt(<span class="kw-2">&amp;</span>overrides, |key| params.env.get(key).map(String::from))
             .map_err(wrap_get_config_err)<span class="question-mark">?</span>;
     }
 
