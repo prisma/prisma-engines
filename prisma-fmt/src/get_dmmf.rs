@@ -6,6 +6,8 @@ use crate::validate;
 #[serde(rename_all = "camelCase")]
 struct GetDmmfParams {
     prisma_schema: String,
+    #[serde(default)]
+    no_color: bool,
 }
 
 pub(crate) fn get_dmmf(params: &str) -> Result<String, String> {
@@ -16,7 +18,7 @@ pub(crate) fn get_dmmf(params: &str) -> Result<String, String> {
         }
     };
 
-    validate::run(&params.prisma_schema).map(|_| dmmf::dmmf_json_from_schema(&params.prisma_schema))
+    validate::run(&params.prisma_schema, params.no_color).map(|_| dmmf::dmmf_json_from_schema(&params.prisma_schema))
 }
 
 #[cfg(test)]
@@ -26,7 +28,7 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn get_dmmf_invalid_schema() {
+    fn get_dmmf_invalid_schema_with_colors() {
         let schema = r#"
             generator js {
             }
