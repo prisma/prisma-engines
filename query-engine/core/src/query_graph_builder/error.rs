@@ -60,7 +60,7 @@ impl From<&RelationFieldRef> for RelationViolation {
         let relation = rf.relation();
 
         Self {
-            relation_name: relation.name().to_owned(),
+            relation_name: relation.name(),
             model_a_name: relation.model_a().name().to_owned(),
             model_b_name: relation.model_b().name().to_owned(),
         }

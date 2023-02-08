@@ -82,7 +82,7 @@ impl JoinStage {
         let as_name = if let Some(alias) = self.alias {
             alias
         } else {
-            relation.name().to_owned()
+            relation.name()
         };
 
         let right_model = from_field.related_model();

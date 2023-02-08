@@ -144,7 +144,7 @@ fn handle_one_to_many(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = parent_relation_field.related_model().name().to_owned();
 
@@ -335,7 +335,7 @@ fn handle_one_to_one(
         )
     };
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = extractor_model.name().to_owned();
     let child_model_name = assimilator_model.name().to_owned();
 
@@ -364,7 +364,7 @@ fn handle_one_to_one(
     // For explanation see end of doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = parent_relation_field.related_model().name().to_owned();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
@@ -390,7 +390,7 @@ fn handle_one_to_one(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
 
         graph.create_edge(
@@ -456,7 +456,7 @@ pub fn nested_create_many(
     let linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
 

@@ -103,7 +103,7 @@ impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (prefix, rf) = self;
 
-        Ok(Bson::String(prefix.render_with(rf.relation().name().to_owned())))
+        Ok(Bson::String(prefix.render_with(rf.relation().name())))
     }
 }
 

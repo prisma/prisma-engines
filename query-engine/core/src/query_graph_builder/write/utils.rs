@@ -146,7 +146,7 @@ pub fn insert_1to1_idempotent_connect_checks(
 ) -> QueryGraphBuilderResult<NodeRef> {
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.primary_identifier();
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
 
     let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
 
@@ -311,7 +311,7 @@ pub fn insert_existing_1to1_related_model_checks(
         ),
     )?;
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
 
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
     graph.create_edge(
