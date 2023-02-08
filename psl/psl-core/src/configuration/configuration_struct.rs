@@ -43,10 +43,10 @@ impl Configuration {
         })
     }
 
-    // Resolve datasource url for query engine.
-    //
-    // The main interesting thing here is we want to ignore any error that may arise from resolving
-    // direct_url.
+    /// Resolve datasource url for query engine.
+    ///
+    /// The main interesting thing here is we want to ignore any error that may arise from resolving
+    /// direct_url.
     pub fn resolve_datasource_urls_query_engine<F>(
         &mut self,
         url_overrides: &[(String, String)],
@@ -81,14 +81,14 @@ impl Configuration {
         Ok(())
     }
 
-    // Resolve datasource URL's for getConfig.
-    // The main reason this exists is:
-    //   - we want to error if we can't resolve direct_url
-    //   - we want to skip validation for url IF we have a direct_url
-    //
-    // For that last bit, we only do this currently because our validation errors on URL's starting
-    // with 'prisma://'. We would ideally like to do the other validations and ignore in this case.
-    pub fn resolve_datasource_url_prisma_fmt<F>(
+    /// Resolve datasource URL's for getConfig.
+    /// The main reason this exists is:
+    ///   - we want to error if we can't resolve direct_url
+    ///   - we want to skip validation for url IF we have a direct_url
+    ///
+    /// For that last bit, we only do this currently because our validation errors on URL's starting
+    /// with 'prisma://'. We would ideally like to do the other validations and ignore in this case.
+    pub fn resolve_datasource_urls_prisma_fmt<F>(
         &mut self,
         url_overrides: &[(String, String)],
         env: F,

@@ -61,7 +61,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
         config
-            .resolve_datasource_url_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from))
+            .resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from))
             .map_err(wrap_get_config_err)?;
     }
 
