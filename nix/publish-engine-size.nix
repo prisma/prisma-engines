@@ -13,16 +13,19 @@ in
         exit 1
       fi
 
-      export CSV_PATH="engines-size/data.csv"
-      export CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-      export CURRENT_COMMIT=$(git rev-parse HEAD)
-
+      CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      CURRENT_COMMIT=$(git rev-parse HEAD)
       CURRENT_COMMIT_SHORT=$(git rev-parse --short HEAD)
       REPO_ROOT=$(git rev-parse --show-toplevel)
+      CSV_PATH="engines-size/data.csv"
 
       pushd "$REPO_ROOT"
       git fetch --depth=1 origin gh-pages
       git checkout origin/gh-pages
+
+      export CSV_PATH
+      export CURRENT_BRANCH
+      export CURRENT_COMMIT
 
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
