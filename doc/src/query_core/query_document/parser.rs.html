@@ -555,6 +555,21 @@
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::schema::<span class="kw-2">*</span>;
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -650,7 +665,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         parent_path: QueryPath,
         schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
-        given_arguments: <span class="kw-2">&amp;</span>[(String, PrismaValue)],
+        given_arguments: <span class="kw-2">&amp;</span>[(String, ArgumentValue)],
     ) -&gt; QueryParserResult&lt;Vec&lt;ParsedArgument&gt;&gt; {
         <span class="kw">let </span>left: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
         <span class="kw">let </span>right: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = given_arguments.iter().map(|arg| arg.<span class="number">0</span>.as_str()).collect();
@@ -673,7 +688,7 @@
             .iter()
             .filter_map(|schema_input_arg| {
                 <span class="comment">// Match schema argument field to an argument field in the incoming document.
-                </span><span class="kw">let </span>selection_arg: <span class="prelude-ty">Option</span>&lt;(String, PrismaValue)&gt; = given_arguments
+                </span><span class="kw">let </span>selection_arg: <span class="prelude-ty">Option</span>&lt;(String, ArgumentValue)&gt; = given_arguments
                     .iter()
                     .find(|given_argument| given_argument.<span class="number">0 </span>== schema_input_arg.name)
                     .cloned();
@@ -703,45 +718,60 @@
             .collect()
     }
 
-    <span class="doccomment">/// Parses and validates a PrismaValue against possible input types.
+    <span class="doccomment">/// Parses and validates an ArgumentValue against possible input types.
     /// Matching is done in order of definition on the input type. First matching type wins.
     </span><span class="kw">fn </span>parse_input_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         parent_path: QueryPath,
-        value: PrismaValue,
+        value: ArgumentValue,
         possible_input_types: <span class="kw-2">&amp;</span>[InputType],
     ) -&gt; QueryParserResult&lt;ParsedInputValue&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>parse_results = <span class="macro">vec!</span>[];
 
         <span class="kw">for </span>input_type <span class="kw">in </span>possible_input_types {
-            <span class="kw">let </span>value = value.clone();
-            <span class="kw">let </span>result = <span class="kw">match </span>(<span class="kw-2">&amp;</span>value, input_type) {
-                <span class="comment">// Null handling
-                </span>(PrismaValue::Null, InputType::Scalar(ScalarType::Null)) =&gt; {
-                    <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Null))
-                }
-                (PrismaValue::Null, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                }),
+            <span class="kw">let </span>result = <span class="kw">match </span>(value.clone(), input_type) {
+                (ArgumentValue::Scalar(pv), input_type) =&gt; <span class="kw">match </span>(pv, input_type) {
+                    <span class="comment">// Null handling
+                    </span>(PrismaValue::Null, InputType::Scalar(ScalarType::Null)) =&gt; {
+                        <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Null))
+                    }
+                    (PrismaValue::Null, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
+                    }),
 
-                <span class="comment">// Scalar handling
-                </span>(<span class="kw">_</span>, InputType::Scalar(scalar)) =&gt; <span class="self">self
-                    </span>.parse_scalar(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>scalar)
-                    .map(ParsedInputValue::Single),
+                    <span class="comment">// Scalar handling
+                    </span>(value, InputType::Scalar(scalar)) =&gt; <span class="self">self
+                        </span>.parse_scalar(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>scalar)
+                        .map(ParsedInputValue::Single),
 
-                <span class="comment">// Enum handling
-                </span>(PrismaValue::Enum(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
-                (PrismaValue::String(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
-                (PrismaValue::Boolean(<span class="kw">_</span>), InputType::Enum(et)) =&gt; <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc()),
+                    <span class="comment">// Enum handling
+                    </span>(value @ PrismaValue::Enum(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc())
+                    }
+                    (value @ PrismaValue::String(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc())
+                    }
+                    (value @ PrismaValue::Boolean(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc())
+                    }
+                    <span class="comment">// Invalid combinations
+                    </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                            have: value.clone(),
+                            want: input_type.clone(),
+                        },
+                    }),
+                },
 
                 <span class="comment">// List handling.
-                </span>(PrismaValue::List(values), InputType::List(l)) =&gt; <span class="self">self
+                </span>(ArgumentValue::List(values), InputType::List(l)) =&gt; <span class="self">self
                     </span>.parse_list(<span class="kw-2">&amp;</span>parent_path, values.clone(), <span class="kw-2">&amp;</span>l)
                     .map(ParsedInputValue::List),
 
                 <span class="comment">// Object handling
-                </span>(PrismaValue::Object(o), InputType::Object(obj)) =&gt; <span class="self">self
+                </span>(ArgumentValue::Object(o), InputType::Object(obj)) =&gt; <span class="self">self
                     </span>.parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
                     .map(ParsedInputValue::Map),
 
@@ -749,7 +779,7 @@
                 </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: value,
+                        have: value.clone(),
                         want: input_type.clone(),
                     },
                 }),
@@ -839,7 +869,7 @@
                 <span class="prelude-val">Err</span>(QueryParserError {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: qv,
+                        have: qv.into(),
                         want: InputType::Scalar(scalar_type.clone()),
                     },
                 })
@@ -923,7 +953,7 @@
     <span class="kw">fn </span>parse_list(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         path: <span class="kw-2">&amp;</span>QueryPath,
-        values: Vec&lt;PrismaValue&gt;,
+        values: Vec&lt;ArgumentValue&gt;,
         value_type: <span class="kw-2">&amp;</span>InputType,
     ) -&gt; QueryParserResult&lt;Vec&lt;ParsedInputValue&gt;&gt; {
         values
@@ -978,7 +1008,7 @@
     </span><span class="kw">fn </span>parse_input_object(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         parent_path: QueryPath,
-        object: Vec&lt;(String, PrismaValue)&gt;,
+        object: ArgumentValueObject,
         schema_object: InputObjectTypeStrongRef,
     ) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
         <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
@@ -1014,7 +1044,7 @@
                             <span class="kw">_ </span>=&gt; default_value.get()<span class="question-mark">?</span>,
                         };
 
-                        <span class="kw">match </span><span class="self">self</span>.parse_input_value(path, default_pv, <span class="kw-2">&amp;</span>field.field_types) {
+                        <span class="kw">match </span><span class="self">self</span>.parse_input_value(path, default_pv.into(), <span class="kw-2">&amp;</span>field.field_types) {
                             <span class="prelude-val">Ok</span>(value) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((field.name.clone(), value))),
                             <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
                         }

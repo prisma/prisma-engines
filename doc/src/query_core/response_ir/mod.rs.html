@@ -186,6 +186,13 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Prisma Response IR (Intermediate Representation).
 //!
 //! This module takes care of processing query execution results
@@ -200,6 +207,7 @@
 <span class="kw">mod </span>ir_serializer;
 <span class="kw">mod </span>response;
 
+<span class="kw">use </span><span class="kw">crate</span>::ArgumentValue;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
@@ -231,14 +239,20 @@
         <span class="self">self</span>.len() == <span class="number">0
     </span>}
 
-    <span class="kw">pub fn </span>index_by(<span class="self">self</span>, keys: <span class="kw-2">&amp;</span>[String]) -&gt; Vec&lt;(HashMap&lt;String, PrismaValue&gt;, Map)&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>map: Vec&lt;(HashMap&lt;String, PrismaValue&gt;, Map)&gt; = Vec::with_capacity(<span class="self">self</span>.len());
+    <span class="kw">pub fn </span>index_by(<span class="self">self</span>, keys: <span class="kw-2">&amp;</span>[String]) -&gt; Vec&lt;(HashMap&lt;String, ArgumentValue&gt;, Map)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>map: Vec&lt;(HashMap&lt;String, ArgumentValue&gt;, Map)&gt; = Vec::with_capacity(<span class="self">self</span>.len());
 
         <span class="kw">for </span>item <span class="kw">in </span><span class="self">self</span>.into_iter() {
             <span class="kw">let </span>inner = item.into_map().unwrap();
-            <span class="kw">let </span>key: HashMap&lt;String, PrismaValue&gt; = keys
+            <span class="kw">let </span>key: HashMap&lt;String, ArgumentValue&gt; = keys
                 .iter()
-                .map(|key| (key.clone(), inner.get(key).unwrap().clone().into_value().unwrap()))
+                .map(|key| {
+                    <span class="kw">let </span>item = inner.get(key).unwrap().clone();
+                    <span class="kw">let </span>pv = item.into_value().unwrap();
+
+                    (key.clone(), pv)
+                })
+                .map(|(key, val)| (key, ArgumentValue::from(val)))
                 .collect();
 
             map.push((key, inner));

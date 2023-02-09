@@ -301,20 +301,20 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::PrismaValue;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ArgumentValue, ArgumentValueObject};
+
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>schema_builder::constants::filters;
 <span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">pub type </span>SelectionArgument = (String, PrismaValue);
+<span class="kw">pub type </span>SelectionArgument = (String, ArgumentValue);
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Selection {
     name: String,
     alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    arguments: Vec&lt;(String, PrismaValue)&gt;,
+    arguments: Vec&lt;(String, ArgumentValue)&gt;,
     nested_selections: Vec&lt;Selection&gt;,
 }
 
@@ -365,15 +365,15 @@
         <span class="self">self</span>.name.starts_with(<span class="string">&quot;findUnique&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>arguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(String, PrismaValue)] {
+    <span class="kw">pub fn </span>arguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(String, ArgumentValue)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.arguments
     }
 
-    <span class="kw">pub fn </span>pop_argument(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(String, PrismaValue)&gt; {
+    <span class="kw">pub fn </span>pop_argument(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(String, ArgumentValue)&gt; {
         <span class="self">self</span>.arguments.pop()
     }
 
-    <span class="kw">pub fn </span>push_argument(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw">impl </span>Into&lt;String&gt;, arg: <span class="kw">impl </span>Into&lt;PrismaValue&gt;) {
+    <span class="kw">pub fn </span>push_argument(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw">impl </span>Into&lt;String&gt;, arg: <span class="kw">impl </span>Into&lt;ArgumentValue&gt;) {
         <span class="self">self</span>.arguments.push((key.into(), arg.into()));
     }
 
@@ -408,8 +408,8 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub enum </span>SelectionSet&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Single(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Vec&lt;PrismaValue&gt;),
-    Multi(Vec&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;, Vec&lt;Vec&lt;PrismaValue&gt;&gt;),
+    Single(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Vec&lt;ArgumentValue&gt;),
+    Multi(Vec&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;, Vec&lt;Vec&lt;ArgumentValue&gt;&gt;),
     Empty,
 }
 
@@ -424,7 +424,7 @@
         <span class="self">Self</span>::default()
     }
 
-    <span class="kw">pub fn </span>push(<span class="self">self</span>, column: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, value: PrismaValue) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>push(<span class="self">self</span>, column: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, value: ArgumentValue) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>column = column.into();
 
         <span class="kw">match </span><span class="self">self </span>{
@@ -496,7 +496,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;In&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>PrismaValue {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;In&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ArgumentValue {
     <span class="kw">fn </span>from(other: In&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) =&gt; {
@@ -516,13 +516,13 @@
                     acc.or(ands)
                 });
 
-                PrismaValue::from(conjuctive)
+                ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) =&gt; PrismaValue::Object(<span class="macro">vec!</span>[(
+            SelectionSet::Single(key, vals) =&gt; ArgumentValue::object([(
                 key.to_string(),
-                PrismaValue::Object(<span class="macro">vec!</span>[(filters::IN.to_owned(), PrismaValue::List(vals))]),
+                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
             )]),
-            SelectionSet::Empty =&gt; PrismaValue::Null,
+            SelectionSet::Empty =&gt; ArgumentValue::null(),
         }
     }
 }
@@ -531,12 +531,12 @@
 </span><span class="kw">pub enum </span>Conjuctive {
     Or(Vec&lt;Conjuctive&gt;),
     And(Vec&lt;Conjuctive&gt;),
-    Single(IndexMap&lt;String, PrismaValue&gt;),
+    Single(ArgumentValueObject),
     <span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl </span>From&lt;IndexMap&lt;String, PrismaValue&gt;&gt; <span class="kw">for </span>Conjuctive {
-    <span class="kw">fn </span>from(map: IndexMap&lt;String, PrismaValue&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;ArgumentValueObject&gt; <span class="kw">for </span>Conjuctive {
+    <span class="kw">fn </span>from(map: ArgumentValueObject) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Single(map)
     }
 }
@@ -575,33 +575,31 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;Conjuctive&gt; <span class="kw">for </span>PrismaValue {
+<span class="kw">impl </span>From&lt;Conjuctive&gt; <span class="kw">for </span>ArgumentValue {
     <span class="kw">fn </span>from(conjuctive: Conjuctive) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>conjuctive {
-            Conjuctive::None =&gt; <span class="self">Self</span>::Null,
-            Conjuctive::Single(obj) =&gt; PrismaValue::Object(single_to_multi_filter(obj)), <span class="comment">// PrismaValue::Object(obj),
-            </span>Conjuctive::Or(conjuctives) =&gt; {
-                <span class="kw">let </span>conditions: Vec&lt;PrismaValue&gt; = conjuctives.into_iter().map(PrismaValue::from).collect();
+            Conjuctive::None =&gt; <span class="self">Self</span>::null(),
+            Conjuctive::Single(obj) =&gt; ArgumentValue::object(single_to_multi_filter(obj)),
+            Conjuctive::Or(conjuctives) =&gt; {
+                <span class="kw">let </span>conditions: Vec&lt;ArgumentValue&gt; = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                PrismaValue::Object(<span class="macro">vec!</span>[(<span class="string">&quot;OR&quot;</span>.to_string(), PrismaValue::List(conditions))])
+                ArgumentValue::object([(<span class="string">&quot;OR&quot;</span>.to_string(), ArgumentValue::list(conditions))])
             }
             Conjuctive::And(conjuctives) =&gt; {
-                <span class="kw">let </span>conditions: Vec&lt;PrismaValue&gt; = conjuctives.into_iter().map(PrismaValue::from).collect();
+                <span class="kw">let </span>conditions: Vec&lt;ArgumentValue&gt; = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                PrismaValue::Object(<span class="macro">vec!</span>[(<span class="string">&quot;AND&quot;</span>.to_string(), PrismaValue::List(conditions))])
+                ArgumentValue::object([(<span class="string">&quot;AND&quot;</span>.to_string(), ArgumentValue::list(conditions))])
             }
         }
     }
 }
 
 <span class="doccomment">/// Syntax for single-record and multi-record queries
-</span><span class="kw">fn </span>single_to_multi_filter(obj: IndexMap&lt;String, PrismaValue&gt;) -&gt; Vec&lt;(String, PrismaValue)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>new_obj = <span class="macro">vec!</span>[];
+</span><span class="kw">fn </span>single_to_multi_filter(obj: ArgumentValueObject) -&gt; ArgumentValueObject {
+    <span class="kw">let </span><span class="kw-2">mut </span>new_obj: ArgumentValueObject = IndexMap::new();
 
     <span class="kw">for </span>(key, value) <span class="kw">in </span>obj {
-        <span class="kw">let </span>equality_obj = <span class="macro">vec!</span>[(filters::EQUALS.to_owned(), value)].into_iter().collect();
-
-        new_obj.push((key, PrismaValue::Object(equality_obj)));
+        new_obj.insert(key, ArgumentValue::object([(filters::EQUALS.to_owned(), value)]));
     }
 
     new_obj

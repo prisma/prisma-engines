@@ -303,7 +303,6 @@
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
 <a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -320,13 +319,15 @@
 //!    - it can be aliased,
 //!    - it can have a number of nested selections (selection set in GQL).
 //! - Arguments contain concrete values and complex subtypes that are parsed and validated by the query builders, and then used for querying data (input types in GQL).
-</span><span class="kw">mod </span>error;
+</span><span class="kw">mod </span>argument_value;
+<span class="kw">mod </span>error;
 <span class="kw">mod </span>operation;
 <span class="kw">mod </span>parse_ast;
 <span class="kw">mod </span>parser;
 <span class="kw">mod </span>selection;
 <span class="kw">mod </span>transformers;
 
+<span class="kw">pub use </span>argument_value::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>error::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>operation::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>parse_ast::<span class="kw-2">*</span>;
@@ -335,7 +336,7 @@
 <span class="kw">pub use </span>transformers::<span class="kw-2">*</span>;
 
 <span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::resolve_compound_field;
-<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue};
+<span class="kw">use </span>prisma_models::ModelRef;
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>schema_builder::constants::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
@@ -385,12 +386,12 @@
 
         where_obj.iter().any(|(key, val)| <span class="kw">match </span>val {
             <span class="comment">// If it&#39;s a compound, then it&#39;s still considered as scalar
-            </span>PrismaValue::Object(<span class="kw">_</span>) <span class="kw">if </span>resolve_compound_field(key, model).is_some() =&gt; <span class="bool-val">false</span>,
+            </span>ArgumentValue::Object(<span class="kw">_</span>) <span class="kw">if </span>resolve_compound_field(key, model).is_some() =&gt; <span class="bool-val">false</span>,
             <span class="comment">// Otherwise, we just look for a scalar field inside the model. If it&#39;s not one, then we break.
             </span>val =&gt; <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>key) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">match </span>val {
                     <span class="comment">// Consider scalar _only_ if the filter object contains &quot;equals&quot;. eg: `{ scalar_field: { equals: 1 } }`
-                    </span>PrismaValue::Object(obj) =&gt; !obj.iter().any(|(k, <span class="kw">_</span>)| k.as_str() == filters::EQUALS),
+                    </span>ArgumentValue::Object(obj) =&gt; !obj.contains_key(filters::EQUALS),
                     <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
                 },
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
@@ -461,7 +462,7 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CompactedDocument {
-    <span class="kw">pub </span>arguments: Vec&lt;HashMap&lt;String, PrismaValue&gt;&gt;,
+    <span class="kw">pub </span>arguments: Vec&lt;HashMap&lt;String, ArgumentValue&gt;&gt;,
     <span class="kw">pub </span>nested_selection: Vec&lt;String&gt;,
     <span class="kw">pub </span>operation: Operation,
     <span class="kw">pub </span>keys: Vec&lt;String&gt;,
@@ -549,11 +550,11 @@
 
         <span class="comment">// Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
-        </span><span class="kw">let </span>arguments: Vec&lt;HashMap&lt;String, PrismaValue&gt;&gt; = selections
+        </span><span class="kw">let </span>arguments: Vec&lt;HashMap&lt;String, ArgumentValue&gt;&gt; = selections
             .into_iter()
             .map(|<span class="kw-2">mut </span>sel| {
                 <span class="kw">let </span>where_obj = sel.pop_argument().unwrap().<span class="number">1</span>.into_object().unwrap();
-                <span class="kw">let </span>filter_map: HashMap&lt;String, PrismaValue&gt; = extract_filter(where_obj, model).into_iter().collect();
+                <span class="kw">let </span>filter_map: HashMap&lt;String, ArgumentValue&gt; = extract_filter(where_obj, model).into_iter().collect();
 
                 filter_map
             })
@@ -563,7 +564,7 @@
         </span><span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = arguments[<span class="number">0</span>]
             .iter()
             .flat_map(|pair| <span class="kw">match </span>pair {
-                (<span class="kw">_</span>, PrismaValue::Object(obj)) =&gt; obj.iter().map(|(key, <span class="kw">_</span>)| key.to_owned()).collect(),
+                (<span class="kw">_</span>, ArgumentValue::Object(obj)) =&gt; obj.keys().map(ToOwned::to_owned).collect(),
                 (key, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[key.to_owned()],
             })
             .collect();
@@ -587,19 +588,16 @@
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
 /// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that&#39;s not worth it for now.
-</span><span class="kw">fn </span>extract_filter(where_obj: Vec&lt;SelectionArgument&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;SelectionArgument&gt; {
+</span><span class="kw">fn </span>extract_filter(where_obj: ArgumentValueObject, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;SelectionArgument&gt; {
     where_obj
         .into_iter()
         .flat_map(|(key, val)| <span class="kw">match </span>val {
             <span class="comment">// This means our query has a compound field in the form of: {co1_col2: { col1_col2: { col1: &lt;val&gt;, col2: &lt;val&gt; } }}
-            </span>PrismaValue::Object(obj) <span class="kw">if </span>resolve_compound_field(<span class="kw-2">&amp;</span>key, model).is_some() =&gt; obj.into_iter().collect(),
+            </span>ArgumentValue::Object(obj) <span class="kw">if </span>resolve_compound_field(<span class="kw-2">&amp;</span>key, model).is_some() =&gt; obj.into_iter().collect(),
             <span class="comment">// This means our query has a scalar filter in the form of {col1: { equals: &lt;val&gt; }}
-            </span>PrismaValue::Object(obj) =&gt; {
+            </span>ArgumentValue::Object(obj) =&gt; {
                 <span class="comment">// This is safe because it&#39;s been validated before in the `.can_compact` method.
-                </span><span class="kw">let </span>(<span class="kw">_</span>, equal_val) = obj
-                    .iter()
-                    .find(|(k, <span class="kw">_</span>)| k == filters::EQUALS)
-                    .expect(<span class="string">&quot;we only support scalar equals filters&quot;</span>);
+                </span><span class="kw">let </span>equal_val = obj.get(filters::EQUALS).expect(<span class="string">&quot;we only support scalar equals filters&quot;</span>);
 
                 <span class="macro">vec!</span>[(key, equal_val.clone())]
             }

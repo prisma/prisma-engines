@@ -244,6 +244,9 @@
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{GQLBatchResponse, GQLResponse, GraphQlBody};
 <span class="kw">use </span><span class="kw">crate</span>::PrismaResponse;
 <span class="kw">use </span>futures::FutureExt;
@@ -255,11 +258,12 @@
 <span class="kw">use </span>query_core::{
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
-    BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor, TxId,
+    ArgumentValue, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor,
+    TxId,
 };
 <span class="kw">use </span>std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
-<span class="kw">type </span>ArgsToResult = (HashMap&lt;String, PrismaValue&gt;, IndexMap&lt;String, Item&gt;);
+<span class="kw">type </span>ArgsToResult = (HashMap&lt;String, ArgumentValue&gt;, IndexMap&lt;String, Item&gt;);
 
 <span class="kw">pub struct </span>GraphQlHandler&lt;<span class="lifetime">&#39;a</span>&gt; {
     executor: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;a</span>),
@@ -460,7 +464,7 @@
 
     <span class="kw">fn </span>find_original_result_from_args&lt;<span class="lifetime">&#39;b</span>&gt;(
         args_to_results: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[ArgsToResult],
-        input_args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>HashMap&lt;String, PrismaValue&gt;,
+        input_args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>HashMap&lt;String, ArgumentValue&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>IndexMap&lt;String, Item&gt;&gt; {
         args_to_results
             .iter()
@@ -468,7 +472,7 @@
             .map(|(<span class="kw">_</span>, result)| result)
     }
 
-    <span class="kw">fn </span>compare_args(left: <span class="kw-2">&amp;</span>HashMap&lt;String, PrismaValue&gt;, right: <span class="kw-2">&amp;</span>HashMap&lt;String, PrismaValue&gt;) -&gt; bool {
+    <span class="kw">fn </span>compare_args(left: <span class="kw-2">&amp;</span>HashMap&lt;String, ArgumentValue&gt;, right: <span class="kw-2">&amp;</span>HashMap&lt;String, ArgumentValue&gt;) -&gt; bool {
         left.iter().all(|(key, left_value)| {
             right
                 .get(key)
@@ -480,12 +484,14 @@
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
     /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
     /// This should likely _not_ be used outside of this specific context.
-    </span><span class="kw">fn </span>compare_values(left: <span class="kw-2">&amp;</span>PrismaValue, right: <span class="kw-2">&amp;</span>PrismaValue) -&gt; bool {
+    </span><span class="kw">fn </span>compare_values(left: <span class="kw-2">&amp;</span>ArgumentValue, right: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; bool {
         <span class="kw">match </span>(left, right) {
-            (PrismaValue::String(t1), PrismaValue::DateTime(t2))
-            | (PrismaValue::DateTime(t2), PrismaValue::String(t1)) =&gt; parse_datetime(t1)
-                .map(|t1| <span class="kw-2">&amp;</span>t1 == t2)
-                .unwrap_or_else(|<span class="kw">_</span>| t1 == stringify_datetime(t2).as_str()),
+            (ArgumentValue::Scalar(PrismaValue::String(t1)), ArgumentValue::Scalar(PrismaValue::DateTime(t2)))
+            | (ArgumentValue::Scalar(PrismaValue::DateTime(t2)), ArgumentValue::Scalar(PrismaValue::String(t1))) =&gt; {
+                parse_datetime(t1)
+                    .map(|t1| <span class="kw-2">&amp;</span>t1 == t2)
+                    .unwrap_or_else(|<span class="kw">_</span>| t1 == stringify_datetime(t2).as_str())
+            }
             (left, right) =&gt; left == right,
         }
     }

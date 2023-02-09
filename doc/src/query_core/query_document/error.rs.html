@@ -173,11 +173,9 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::schema::InputType;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{schema::InputType, ArgumentValue};
 <span class="kw">use </span>fmt::Display;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>std::fmt;
 
 <span class="attr">#[derive(Debug)]
@@ -240,7 +238,7 @@
     ArgumentNotFoundError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
-    ValueTypeMismatchError { have: PrismaValue, want: InputType },
+    ValueTypeMismatchError { have: ArgumentValue, want: InputType },
     InputUnionParseError { parsing_errors: Vec&lt;QueryParserError&gt; },
     ValueFitError(String),
 }
