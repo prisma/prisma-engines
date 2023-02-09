@@ -354,7 +354,7 @@
                 ScalarWriteOperation::Field(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
                 ScalarWriteOperation::Set(rhs) =&gt; field.value(rhs).into(),
                 ScalarWriteOperation::Add(rhs) <span class="kw">if </span>field.is_list() =&gt; {
-                    <span class="kw">let </span>e: Expression = Column::from(name.clone()).into();
+                    <span class="kw">let </span>e: Expression = Column::from((table.clone(), name.clone())).into();
                     <span class="kw">let </span>vals: Vec&lt;<span class="kw">_</span>&gt; = <span class="kw">match </span>rhs {
                         PrismaValue::List(vals) =&gt; vals.into_iter().map(|val| field.value(val)).collect(),
                         <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[field.value(rhs)],
