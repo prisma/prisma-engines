@@ -56,14 +56,14 @@ impl JsonProtocolAdapter {
 
         let mut selection = Selection::new(&field.name, None, arguments, Vec::new());
 
-        if let Some(object_type) = field.field_type.as_object_type() {
+        if let Some(schema_object) = field.field_type.as_object_type() {
             let json_selection = query_selection.selection();
 
             for (selection_name, selected) in json_selection {
                 match selected {
                     // $scalars: true
                     crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
-                        Self::default_scalar_selection(&object_type, &mut selection);
+                        Self::default_scalar_selection(&schema_object, &mut selection);
                     }
                     // $composites: true
                     crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
@@ -71,6 +71,7 @@ impl JsonProtocolAdapter {
                             Self::default_composite_selection(
                                 &mut selection,
                                 container,
+                                &schema_object,
                                 &mut HashSet::<String>::new(),
                             )?;
                         }
@@ -89,14 +90,14 @@ impl JsonProtocolAdapter {
                     crate::SelectionSetValue::Shorthand(false) => (),
                     // <field_name>: { query: { ... }, arguments: { ... } }
                     crate::SelectionSetValue::Nested(nested_query) => {
-                        let nested_field = object_type.find_field(&selection_name).ok_or_else(|| {
+                        let schema_field = schema_object.find_field(&selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(format!(
                                 "Unknown nested field '{}' for operation {} does not match any query.",
                                 selection_name, &field.name
                             ))
                         })?;
 
-                        let field = container.and_then(|container| container.find_field(&nested_field.name));
+                        let field = container.and_then(|container| container.find_field(&schema_field.name));
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
                         let nested_container = field.map(|f| match f {
                             Field::Relation(rf) => ParentContainer::from(rf.related_model()),
@@ -111,7 +112,7 @@ impl JsonProtocolAdapter {
                         }
 
                         selection.push_nested_selection(Self::convert_selection(
-                            &nested_field,
+                            &schema_field,
                             nested_container.as_ref(),
                             nested_query,
                         )?);
@@ -240,8 +241,8 @@ impl JsonProtocolAdapter {
         }
     }
 
-    fn default_scalar_selection(object_type: &ObjectTypeStrongRef, selection: &mut Selection) {
-        for scalar in object_type
+    fn default_scalar_selection(schema_object: &ObjectTypeStrongRef, selection: &mut Selection) {
+        for scalar in schema_object
             .get_fields()
             .iter()
             .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list())
@@ -253,6 +254,7 @@ impl JsonProtocolAdapter {
     fn default_composite_selection(
         selection: &mut Selection,
         container: &ParentContainer,
+        schema_object: &ObjectTypeStrongRef,
         walked_types: &mut HashSet<String>,
     ) -> crate::Result<()> {
         match container {
@@ -260,15 +262,20 @@ impl JsonProtocolAdapter {
                 let model = model.upgrade().unwrap();
 
                 for cf in model.fields().composite() {
-                    let mut nested_selection = Selection::with_name(cf.name());
+                    let schema_field = schema_object.find_field(cf.name());
 
-                    Self::default_composite_selection(
-                        &mut nested_selection,
-                        &ParentContainer::from(&cf.typ),
-                        walked_types,
-                    )?;
+                    if let Some(schema_field) = schema_field {
+                        let mut nested_selection = Selection::with_name(cf.name());
 
-                    selection.push_nested_selection(nested_selection);
+                        Self::default_composite_selection(
+                            &mut nested_selection,
+                            &ParentContainer::from(&cf.typ),
+                            &schema_field.field_type.as_object_type().unwrap(),
+                            walked_types,
+                        )?;
+
+                        selection.push_nested_selection(nested_selection);
+                    }
                 }
             }
             ParentContainer::CompositeType(ct) => {
@@ -283,20 +290,27 @@ impl JsonProtocolAdapter {
                 walked_types.insert(ct.name.to_owned());
 
                 for f in ct.fields() {
-                    match f {
-                        Field::Scalar(s) => selection.push_nested_selection(Selection::with_name(s.name().to_owned())),
-                        Field::Composite(cf) => {
-                            let mut nested_selection = Selection::with_name(cf.name().to_owned());
+                    let schema_field = schema_object.find_field(f.name());
 
-                            Self::default_composite_selection(
-                                &mut nested_selection,
-                                &ParentContainer::from(&cf.typ),
-                                walked_types,
-                            )?;
+                    if let Some(schema_field) = schema_field {
+                        match f {
+                            Field::Scalar(s) => {
+                                selection.push_nested_selection(Selection::with_name(s.name().to_owned()))
+                            }
+                            Field::Composite(cf) => {
+                                let mut nested_selection = Selection::with_name(cf.name().to_owned());
 
-                            selection.push_nested_selection(nested_selection);
+                                Self::default_composite_selection(
+                                    &mut nested_selection,
+                                    &ParentContainer::from(&cf.typ),
+                                    &schema_field.field_type.as_object_type().unwrap(),
+                                    walked_types,
+                                )?;
+
+                                selection.push_nested_selection(nested_selection);
+                            }
+                            Field::Relation(_) => unreachable!(),
                         }
-                        Field::Relation(_) => unreachable!(),
                     }
                 }
             }
@@ -686,7 +700,44 @@ mod tests {
     }
 
     #[test]
-    pub fn mutation() {
+    pub fn composite_selection_should_be_based_on_schema_1() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            &r#"{
+            "modelName": "User",
+            "action": "deleteMany",
+            "query": {
+                "selection": {
+                    "$scalars": true,
+                    "$composites": true
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+
+        assert_debug_snapshot!(operation, @r###"
+        Write(
+            Selection {
+                name: "deleteManyUser",
+                alias: None,
+                arguments: [],
+                nested_selections: [
+                    Selection {
+                        name: "count",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                ],
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    pub fn simple_mutation() {
         let query: JsonSingleQuery = serde_json::from_str(
             &r#"{
             "modelName": "User",
