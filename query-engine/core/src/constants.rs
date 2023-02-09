@@ -9,6 +9,7 @@ pub mod custom_types {
     pub const DECIMAL: &str = "Decimal";
     pub const BYTES: &str = "Bytes";
     pub const JSON: &str = "Json";
+    pub const ENUM: &str = "Enum";
     pub const FIELD_REF: &str = "FieldRef";
 
     pub fn make_object(typ: &str, value: PrismaValue) -> PrismaValue {

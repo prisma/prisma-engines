@@ -1,16 +1,20 @@
 use bigdecimal::BigDecimal;
+use chrono::{DateTime, FixedOffset};
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
+use serde::Serialize;
 
 pub type ArgumentValueObject = IndexMap<String, ArgumentValue>;
 
 /// Represents the input values in a Document.
 /// This abstraction is mostly there to hold special kind of values such as `FieldRef` which have to be disambiguated at query-validation time.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(untagged)]
 pub enum ArgumentValue {
     Scalar(PrismaValue),
     Object(ArgumentValueObject),
     List(Vec<ArgumentValue>),
+    FieldRef(ArgumentValueObject),
 }
 
 impl ArgumentValue {
@@ -38,6 +42,22 @@ impl ArgumentValue {
         Self::Scalar(PrismaValue::Enum(str))
     }
 
+    pub fn json(str: String) -> Self {
+        Self::Scalar(PrismaValue::Json(str))
+    }
+
+    pub fn bytes(bytes: Vec<u8>) -> Self {
+        Self::Scalar(PrismaValue::Bytes(bytes))
+    }
+
+    pub fn bigint(i: i64) -> Self {
+        Self::Scalar(PrismaValue::BigInt(i))
+    }
+
+    pub fn datetime(dt: DateTime<FixedOffset>) -> Self {
+        Self::Scalar(PrismaValue::DateTime(dt))
+    }
+
     pub fn object(obj: impl Into<ArgumentValueObject>) -> Self {
         Self::Object(obj.into())
     }
@@ -50,6 +70,15 @@ impl ArgumentValue {
         match self {
             Self::Object(obj) => Some(obj),
             _ => None,
+        }
+    }
+
+    pub fn can_be_parsed_as_json(&self) -> bool {
+        match self {
+            ArgumentValue::Object(_) => true,
+            ArgumentValue::List(_) => true,
+            ArgumentValue::Scalar(pv) => !matches!(pv, PrismaValue::Enum(_) | PrismaValue::Json(_)),
+            ArgumentValue::FieldRef(_) => false,
         }
     }
 }

@@ -8,11 +8,12 @@ use query_core::{
     protocol::EngineProtocol,
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
-    BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor, TxId,
+    ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
+    QueryDocument, QueryExecutor, TxId,
 };
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
-type ArgsToResult = (HashMap<String, PrismaValue>, IndexMap<String, Item>);
+type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
 pub struct RequestHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
@@ -229,7 +230,7 @@ impl<'a> RequestHandler<'a> {
 
     fn find_original_result_from_args<'b>(
         args_to_results: &'b [ArgsToResult],
-        input_args: &'b HashMap<String, PrismaValue>,
+        input_args: &'b HashMap<String, ArgumentValue>,
     ) -> Option<&'b IndexMap<String, Item>> {
         args_to_results
             .iter()
@@ -237,7 +238,7 @@ impl<'a> RequestHandler<'a> {
             .map(|(_, result)| result)
     }
 
-    fn compare_args(left: &HashMap<String, PrismaValue>, right: &HashMap<String, PrismaValue>) -> bool {
+    fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
         left.iter().all(|(key, left_value)| {
             right
                 .get(key)
@@ -249,13 +250,15 @@ impl<'a> RequestHandler<'a> {
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
     /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
     /// This should likely _not_ be used outside of this specific context.
-    fn compare_values(left: &PrismaValue, right: &PrismaValue) -> bool {
+    fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
-            (PrismaValue::String(t1), PrismaValue::DateTime(t2))
-            | (PrismaValue::DateTime(t2), PrismaValue::String(t1)) => parse_datetime(t1)
-                .map(|t1| &t1 == t2)
-                .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str()),
-            (PrismaValue::Object(t1), t2) | (t2, PrismaValue::Object(t1)) => match Self::unwrap_value(t1) {
+            (ArgumentValue::Scalar(PrismaValue::String(t1)), ArgumentValue::Scalar(PrismaValue::DateTime(t2)))
+            | (ArgumentValue::Scalar(PrismaValue::DateTime(t2)), ArgumentValue::Scalar(PrismaValue::String(t1))) => {
+                parse_datetime(t1)
+                    .map(|t1| &t1 == t2)
+                    .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str())
+            }
+            (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) => match Self::unwrap_value(t1) {
                 Some(t1) => Self::compare_values(t1, t2),
                 None => left == right,
             },
@@ -263,19 +266,15 @@ impl<'a> RequestHandler<'a> {
         }
     }
 
-    fn unwrap_value(obj: &[(String, PrismaValue)]) -> Option<&PrismaValue> {
+    fn unwrap_value(obj: &ArgumentValueObject) -> Option<&ArgumentValue> {
         if obj.len() != 2 {
             return None;
         }
 
-        let mut iter = obj.iter();
-        let (key1, _) = iter.next().unwrap();
-        let (key2, unwrapped_value) = iter.next().unwrap();
-
-        if key1 == custom_types::TYPE && key2 == custom_types::VALUE {
-            Some(unwrapped_value)
-        } else {
-            None
+        if !obj.contains_key(custom_types::TYPE) || !obj.contains_key(custom_types::VALUE) {
+            return None;
         }
+
+        obj.get(custom_types::VALUE)
     }
 }

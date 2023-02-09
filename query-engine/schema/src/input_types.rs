@@ -291,6 +291,22 @@ impl InputType {
             Self::Scalar(ScalarType::Json) | Self::Scalar(ScalarType::JsonList)
         )
     }
+
+    pub fn as_object(&self) -> Option<InputObjectTypeStrongRef> {
+        if let Self::Object(v) = self {
+            Some(v.into_arc())
+        } else {
+            None
+        }
+    }
+
+    pub fn as_list(&self) -> Option<&InputType> {
+        if let Self::List(list) = self {
+            Some(list)
+        } else {
+            None
+        }
+    }
 }
 
 impl From<InputType> for Vec<InputType> {
