@@ -64,7 +64,7 @@ mod json {
               @r###"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[]","{}"]}}}"###
             );
         } else {
-          // The request transformation doesn't work well with those queries. ["[]", "{}"] ends up deserialized as [[], {}]
+            // The request transformation doesn't work well with those queries. ["[]", "{}"] ends up deserialized as [[], {}]
             let query = r#"{
             "modelName": "ScalarModel",
             "action": "updateOne",
