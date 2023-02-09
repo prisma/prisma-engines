@@ -44,7 +44,8 @@ pub(crate) fn nested_create_many_input_field(
         && !parent_field.relation().is_many_to_many()
     {
         let envelope = nested_create_many_envelope(ctx, parent_field);
-        Some(input_field("createMany", InputType::object(envelope), None).optional())
+
+        Some(input_field(operations::CREATE_MANY, InputType::object(envelope), None).optional())
     } else {
         None
     }
@@ -63,7 +64,7 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &Relation
     ctx.cache_input_type(ident, input_object.clone());
 
     let create_many_type = InputType::object(create_type);
-    let data_arg = input_field("data", InputType::list(create_many_type), None);
+    let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
 
     let fields = if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
         let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();

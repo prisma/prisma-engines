@@ -67,7 +67,7 @@ pub fn create_many_records(
     graph.flag_transactional();
 
     let data_list: ParsedInputList = match field.arguments.lookup(args::DATA) {
-        Some(data) => data.value.try_into()?,
+        Some(data) => utils::coerce_vec(data.value),
         None => vec![],
     };
 

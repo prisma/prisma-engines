@@ -37,14 +37,14 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
     let input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }
 
 /// Convenience function to return [input_type, list_input_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     if as_list {
         vec![input_type.clone(), InputType::list(input_type)]
     } else {

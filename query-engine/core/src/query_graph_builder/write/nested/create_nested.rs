@@ -427,7 +427,7 @@ pub fn nested_create_many(
     // Nested input is an object of { data: [...], skipDuplicates: bool }
     let mut obj: ParsedInputMap = value.try_into()?;
 
-    let data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()?;
+    let data_list: ParsedInputList = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,
