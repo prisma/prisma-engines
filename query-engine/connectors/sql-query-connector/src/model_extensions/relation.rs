@@ -73,10 +73,7 @@ impl AsTable for Relation {
 
                 table.add_unique_index(vec![Column::from("A"), Column::from("B")])
             }
-            RelationLinkManifestation::Inline(ref m) => self
-                .internal_data_model()
-                .find_model_by_id(m.in_table_of_model)
-                .as_table(ctx),
+            RelationLinkManifestation::Inline(ref m) => self.dm.find_model_by_id(m.in_table_of_model).as_table(ctx),
         }
     }
 }

@@ -13,6 +13,32 @@ use crate::{ast, relations::*, walkers::*};
 pub type RelationWalker<'db> = Walker<'db, RelationId>;
 
 impl<'db> RelationWalker<'db> {
+    /// The models at each end of the relation. [model A, model B]. Can be the same model twice.
+    pub fn models(self) -> [ast::ModelId; 2] {
+        let rel = self.get();
+        [rel.model_a, rel.model_b]
+    }
+
+    fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
+        let relation = self.get();
+        let (a, b) = relation.attributes.fields();
+        [(relation.model_a, a), (relation.model_b, b)]
+            .into_iter()
+            .filter_map(|(model_id, field_id)| field_id.map(|f| (model_id, f)))
+            .map(move |(model, field)| self.walk(model).relation_field(field))
+    }
+
+    /// Is any field part of the relation ignored (`@ignore`) or unsupported?
+    pub fn is_ignored(self) -> bool {
+        self.relation_fields().any(|f| {
+            f.is_ignored()
+                || f.referencing_fields()
+                    .into_iter()
+                    .flatten()
+                    .any(|scalar_field| scalar_field.is_ignored() || scalar_field.is_unsupported())
+        })
+    }
+
     /// Is this a relation where both ends are the same model?
     pub fn is_self_relation(self) -> bool {
         let r = self.get();

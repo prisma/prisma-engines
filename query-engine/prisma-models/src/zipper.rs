@@ -8,7 +8,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct Zipper<I> {
     pub id: I,
-    pub(crate) dm: InternalDataModelRef,
+    pub dm: InternalDataModelRef,
 }
 
 impl<I: PartialEq> PartialEq for Zipper<I> {
@@ -26,4 +26,3 @@ impl<I: Copy> Zipper<I> {
 pub type InternalEnum = Zipper<ast::EnumId>;
 pub type InternalEnumRef = InternalEnum;
 pub type InternalEnumValue = Zipper<ast::EnumValueId>;
-pub type RelationZipper = Zipper<psl::parser_database::RelationId>;

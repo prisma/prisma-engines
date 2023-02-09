@@ -1,7 +1,7 @@
 use crate::pk::PrimaryKey;
 use crate::*;
-use itertools::Itertools;
 use once_cell::sync::OnceCell;
+use psl::parser_database::RelationId;
 use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone)]
@@ -12,12 +12,11 @@ pub struct Fields {
     relation: OnceCell<Vec<RelationFieldWeak>>,
     composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
-    // created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Vec<ScalarFieldRef>>,
 }
 
 impl Fields {
-    pub fn new(all: Vec<Field>, model: ModelWeakRef, primary_key: Option<PrimaryKey>) -> Fields {
+    pub(crate) fn new(all: Vec<Field>, model: ModelWeakRef, primary_key: Option<PrimaryKey>) -> Fields {
         Fields {
             all,
             primary_key,
@@ -207,13 +206,13 @@ impl Fields {
             })
     }
 
-    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> crate::Result<RelationFieldRef> {
+    pub(crate) fn find_from_relation(&self, id: RelationId, side: RelationSide) -> crate::Result<RelationFieldRef> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
-            .find(|field| field.relation().name() == name && field.relation_side == side)
+            .find(|field| field.relation().id == id && field.relation_side == side)
             .ok_or_else(|| DomainError::FieldForRelationNotFound {
-                relation: name.to_string(),
+                relation: self.model().internal_data_model().walk(id).relation_name().to_string(),
                 model: self.model().name.clone(),
             })
     }
@@ -240,13 +239,6 @@ impl Fields {
         };
 
         acc
-    }
-
-    pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
-        self.all
-            .iter()
-            .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))
-            .unique()
     }
 
     pub fn filter_all<P>(&self, predicate: P) -> Vec<Field>

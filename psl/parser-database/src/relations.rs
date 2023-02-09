@@ -145,7 +145,7 @@ pub(super) enum RelationAttributes {
 }
 
 impl RelationAttributes {
-    fn fields(&self) -> (Option<ast::FieldId>, Option<ast::FieldId>) {
+    pub(crate) fn fields(&self) -> (Option<ast::FieldId>, Option<ast::FieldId>) {
         match self {
             RelationAttributes::ImplicitManyToMany { field_a, field_b }
             | RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b }

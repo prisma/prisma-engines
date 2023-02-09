@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
+use psl::parser_database::walkers::RelationFieldId;
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -12,11 +13,11 @@ pub type RelationFieldWeak = Weak<RelationField>;
 
 #[derive(Clone)]
 pub struct RelationField {
+    pub id: RelationFieldId,
     pub(crate) name: String,
     pub arity: FieldArity,
     pub relation_name: String,
     pub relation_side: RelationSide,
-    pub relation: OnceCell<RelationWeakRef>,
     pub(crate) relation_info: RelationInfo,
 
     pub on_delete_default: ReferentialAction,
@@ -111,18 +112,14 @@ impl RelationField {
     }
 
     pub fn relation(&self) -> RelationRef {
-        self.relation
-            .get_or_init(|| {
-                self.model()
-                    .internal_data_model()
-                    .find_relation(
-                        (self.model().id, self.relation_info.referenced_model),
-                        &self.relation_name,
-                    )
-                    .unwrap()
-            })
-            .upgrade()
-            .unwrap()
+        let (model_id, field_id) = self.id.coarsen();
+        let internal_data_model = self.model().internal_data_model();
+        let relation_id = internal_data_model
+            .walk(model_id)
+            .relation_field(field_id)
+            .relation()
+            .id;
+        internal_data_model.zip(relation_id)
     }
 
     /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
@@ -251,7 +248,6 @@ impl Debug for RelationField {
             .field("arity", &self.arity)
             .field("relation_name", &self.relation_name)
             .field("relation_side", &self.relation_side)
-            .field("relation", &self.relation)
             .field("relation_info", &self.relation_info)
             .field("model", &"#ModelWeakRef#")
             .field("fields", &self.fields)
