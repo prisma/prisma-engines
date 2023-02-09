@@ -1,7 +1,6 @@
-use crate::schema::InputType;
+use crate::{schema::InputType, ArgumentValue};
 use fmt::Display;
 use itertools::Itertools;
-use prisma_models::PrismaValue;
 use std::fmt;
 
 #[derive(Debug)]
@@ -64,7 +63,7 @@ pub enum QueryParserErrorKind {
     ArgumentNotFoundError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
-    ValueTypeMismatchError { have: PrismaValue, want: InputType },
+    ValueTypeMismatchError { have: ArgumentValue, want: InputType },
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
     ValueFitError(String),
 }

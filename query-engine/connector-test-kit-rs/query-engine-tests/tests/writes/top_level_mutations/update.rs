@@ -759,7 +759,7 @@ mod json_update {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "Value types mismatch. Have: Scalar(Enum(\"AnyNull\"))"
         );
 
         Ok(())

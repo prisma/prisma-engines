@@ -109,7 +109,7 @@ mod byoid {
               createOneParent(data: {p: "Parent", id: true}){p, id}
             }"#,
             2009,
-            "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
+            "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Scalar(Boolean(true)), want: String"
         );
 
         Ok(())
@@ -124,7 +124,7 @@ mod byoid {
                   createOneParent(data: {p: "Parent", id: true}){p, id}
                 }"#,
                 2009,
-                "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
+                "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Scalar(Boolean(true)), want: String"
             );
 
         Ok(())

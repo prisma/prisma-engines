@@ -1,16 +1,17 @@
-use super::PrismaValue;
+use crate::{ArgumentValue, ArgumentValueObject};
+
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema_builder::constants::filters;
 use std::borrow::Cow;
 
-pub type SelectionArgument = (String, PrismaValue);
+pub type SelectionArgument = (String, ArgumentValue);
 
 #[derive(Debug, Clone)]
 pub struct Selection {
     name: String,
     alias: Option<String>,
-    arguments: Vec<(String, PrismaValue)>,
+    arguments: Vec<(String, ArgumentValue)>,
     nested_selections: Vec<Selection>,
 }
 
@@ -61,15 +62,15 @@ impl Selection {
         self.name.starts_with("findUnique")
     }
 
-    pub fn arguments(&self) -> &[(String, PrismaValue)] {
+    pub fn arguments(&self) -> &[(String, ArgumentValue)] {
         &self.arguments
     }
 
-    pub fn pop_argument(&mut self) -> Option<(String, PrismaValue)> {
+    pub fn pop_argument(&mut self) -> Option<(String, ArgumentValue)> {
         self.arguments.pop()
     }
 
-    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<PrismaValue>) {
+    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<ArgumentValue>) {
         self.arguments.push((key.into(), arg.into()));
     }
 
@@ -104,8 +105,8 @@ impl Selection {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SelectionSet<'a> {
-    Single(Cow<'a, str>, Vec<PrismaValue>),
-    Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<PrismaValue>>),
+    Single(Cow<'a, str>, Vec<ArgumentValue>),
+    Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<ArgumentValue>>),
     Empty,
 }
 
@@ -120,7 +121,7 @@ impl<'a> SelectionSet<'a> {
         Self::default()
     }
 
-    pub fn push(self, column: impl Into<Cow<'a, str>>, value: PrismaValue) -> Self {
+    pub fn push(self, column: impl Into<Cow<'a, str>>, value: ArgumentValue) -> Self {
         let column = column.into();
 
         match self {
@@ -192,7 +193,7 @@ impl<'a> In<'a> {
     }
 }
 
-impl<'a> From<In<'a>> for PrismaValue {
+impl<'a> From<In<'a>> for ArgumentValue {
     fn from(other: In<'a>) -> Self {
         match other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) => {
@@ -212,13 +213,13 @@ impl<'a> From<In<'a>> for PrismaValue {
                     acc.or(ands)
                 });
 
-                PrismaValue::from(conjuctive)
+                ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) => PrismaValue::Object(vec![(
+            SelectionSet::Single(key, vals) => ArgumentValue::object([(
                 key.to_string(),
-                PrismaValue::Object(vec![(filters::IN.to_owned(), PrismaValue::List(vals))]),
+                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
             )]),
-            SelectionSet::Empty => PrismaValue::Null,
+            SelectionSet::Empty => ArgumentValue::null(),
         }
     }
 }
@@ -227,12 +228,12 @@ impl<'a> From<In<'a>> for PrismaValue {
 pub enum Conjuctive {
     Or(Vec<Conjuctive>),
     And(Vec<Conjuctive>),
-    Single(IndexMap<String, PrismaValue>),
+    Single(ArgumentValueObject),
     None,
 }
 
-impl From<IndexMap<String, PrismaValue>> for Conjuctive {
-    fn from(map: IndexMap<String, PrismaValue>) -> Self {
+impl From<ArgumentValueObject> for Conjuctive {
+    fn from(map: ArgumentValueObject) -> Self {
         Self::Single(map)
     }
 }
@@ -271,33 +272,31 @@ impl Conjuctive {
     }
 }
 
-impl From<Conjuctive> for PrismaValue {
+impl From<Conjuctive> for ArgumentValue {
     fn from(conjuctive: Conjuctive) -> Self {
         match conjuctive {
-            Conjuctive::None => Self::Null,
-            Conjuctive::Single(obj) => PrismaValue::Object(single_to_multi_filter(obj)), // PrismaValue::Object(obj),
+            Conjuctive::None => Self::null(),
+            Conjuctive::Single(obj) => ArgumentValue::object(single_to_multi_filter(obj)),
             Conjuctive::Or(conjuctives) => {
-                let conditions: Vec<PrismaValue> = conjuctives.into_iter().map(PrismaValue::from).collect();
+                let conditions: Vec<ArgumentValue> = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                PrismaValue::Object(vec![("OR".to_string(), PrismaValue::List(conditions))])
+                ArgumentValue::object([("OR".to_string(), ArgumentValue::list(conditions))])
             }
             Conjuctive::And(conjuctives) => {
-                let conditions: Vec<PrismaValue> = conjuctives.into_iter().map(PrismaValue::from).collect();
+                let conditions: Vec<ArgumentValue> = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                PrismaValue::Object(vec![("AND".to_string(), PrismaValue::List(conditions))])
+                ArgumentValue::object([("AND".to_string(), ArgumentValue::list(conditions))])
             }
         }
     }
 }
 
 /// Syntax for single-record and multi-record queries
-fn single_to_multi_filter(obj: IndexMap<String, PrismaValue>) -> Vec<(String, PrismaValue)> {
-    let mut new_obj = vec![];
+fn single_to_multi_filter(obj: ArgumentValueObject) -> ArgumentValueObject {
+    let mut new_obj: ArgumentValueObject = IndexMap::new();
 
     for (key, value) in obj {
-        let equality_obj = vec![(filters::EQUALS.to_owned(), value)].into_iter().collect();
-
-        new_obj.push((key, PrismaValue::Object(equality_obj)));
+        new_obj.insert(key, ArgumentValue::object([(filters::EQUALS.to_owned(), value)]));
     }
 
     new_obj

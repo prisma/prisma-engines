@@ -93,7 +93,7 @@ impl QueryDocumentParser {
         &self,
         parent_path: QueryPath,
         schema_field: &OutputFieldRef,
-        given_arguments: &[(String, PrismaValue)],
+        given_arguments: &[(String, ArgumentValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
         let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
         let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
@@ -116,7 +116,7 @@ impl QueryDocumentParser {
             .iter()
             .filter_map(|schema_input_arg| {
                 // Match schema argument field to an argument field in the incoming document.
-                let selection_arg: Option<(String, PrismaValue)> = given_arguments
+                let selection_arg: Option<(String, ArgumentValue)> = given_arguments
                     .iter()
                     .find(|given_argument| given_argument.0 == schema_input_arg.name)
                     .cloned();
@@ -146,45 +146,60 @@ impl QueryDocumentParser {
             .collect()
     }
 
-    /// Parses and validates a PrismaValue against possible input types.
+    /// Parses and validates an ArgumentValue against possible input types.
     /// Matching is done in order of definition on the input type. First matching type wins.
     fn parse_input_value(
         &self,
         parent_path: QueryPath,
-        value: PrismaValue,
+        value: ArgumentValue,
         possible_input_types: &[InputType],
     ) -> QueryParserResult<ParsedInputValue> {
         let mut parse_results = vec![];
 
         for input_type in possible_input_types {
-            let value = value.clone();
-            let result = match (&value, input_type) {
-                // Null handling
-                (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
-                    Ok(ParsedInputValue::Single(PrismaValue::Null))
-                }
-                (PrismaValue::Null, _) => Err(QueryParserError {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                }),
+            let result = match (value.clone(), input_type) {
+                (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
+                    // Null handling
+                    (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
+                        Ok(ParsedInputValue::Single(PrismaValue::Null))
+                    }
+                    (PrismaValue::Null, _) => Err(QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
+                    }),
 
-                // Scalar handling
-                (_, InputType::Scalar(scalar)) => self
-                    .parse_scalar(&parent_path, value, &scalar)
-                    .map(ParsedInputValue::Single),
+                    // Scalar handling
+                    (value, InputType::Scalar(scalar)) => self
+                        .parse_scalar(&parent_path, value, &scalar)
+                        .map(ParsedInputValue::Single),
 
-                // Enum handling
-                (PrismaValue::Enum(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
-                (PrismaValue::String(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
-                (PrismaValue::Boolean(_), InputType::Enum(et)) => self.parse_enum(&parent_path, value, &et.into_arc()),
+                    // Enum handling
+                    (value @ PrismaValue::Enum(_), InputType::Enum(et)) => {
+                        self.parse_enum(&parent_path, value, &et.into_arc())
+                    }
+                    (value @ PrismaValue::String(_), InputType::Enum(et)) => {
+                        self.parse_enum(&parent_path, value, &et.into_arc())
+                    }
+                    (value @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
+                        self.parse_enum(&parent_path, value, &et.into_arc())
+                    }
+                    // Invalid combinations
+                    _ => Err(QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                            have: value.clone(),
+                            want: input_type.clone(),
+                        },
+                    }),
+                },
 
                 // List handling.
-                (PrismaValue::List(values), InputType::List(l)) => self
+                (ArgumentValue::List(values), InputType::List(l)) => self
                     .parse_list(&parent_path, values.clone(), &l)
                     .map(ParsedInputValue::List),
 
                 // Object handling
-                (PrismaValue::Object(o), InputType::Object(obj)) => self
+                (ArgumentValue::Object(o), InputType::Object(obj)) => self
                     .parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
                     .map(ParsedInputValue::Map),
 
@@ -192,7 +207,7 @@ impl QueryDocumentParser {
                 _ => Err(QueryParserError {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: value,
+                        have: value.clone(),
                         want: input_type.clone(),
                     },
                 }),
@@ -282,7 +297,7 @@ impl QueryDocumentParser {
                 Err(QueryParserError {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: qv,
+                        have: qv.into(),
                         want: InputType::Scalar(scalar_type.clone()),
                     },
                 })
@@ -366,7 +381,7 @@ impl QueryDocumentParser {
     fn parse_list(
         &self,
         path: &QueryPath,
-        values: Vec<PrismaValue>,
+        values: Vec<ArgumentValue>,
         value_type: &InputType,
     ) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
@@ -421,7 +436,7 @@ impl QueryDocumentParser {
     fn parse_input_object(
         &self,
         parent_path: QueryPath,
-        object: Vec<(String, PrismaValue)>,
+        object: ArgumentValueObject,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
@@ -457,7 +472,7 @@ impl QueryDocumentParser {
                             _ => default_value.get()?,
                         };
 
-                        match self.parse_input_value(path, default_pv, &field.field_types) {
+                        match self.parse_input_value(path, default_pv.into(), &field.field_types) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
                         }

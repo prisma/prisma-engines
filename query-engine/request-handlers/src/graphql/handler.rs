@@ -9,11 +9,12 @@ use prisma_models::dml::{
 use query_core::{
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
-    BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor, TxId,
+    ArgumentValue, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor,
+    TxId,
 };
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
-type ArgsToResult = (HashMap<String, PrismaValue>, IndexMap<String, Item>);
+type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
 pub struct GraphQlHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
@@ -214,7 +215,7 @@ impl<'a> GraphQlHandler<'a> {
 
     fn find_original_result_from_args<'b>(
         args_to_results: &'b [ArgsToResult],
-        input_args: &'b HashMap<String, PrismaValue>,
+        input_args: &'b HashMap<String, ArgumentValue>,
     ) -> Option<&'b IndexMap<String, Item>> {
         args_to_results
             .iter()
@@ -222,7 +223,7 @@ impl<'a> GraphQlHandler<'a> {
             .map(|(_, result)| result)
     }
 
-    fn compare_args(left: &HashMap<String, PrismaValue>, right: &HashMap<String, PrismaValue>) -> bool {
+    fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
         left.iter().all(|(key, left_value)| {
             right
                 .get(key)
@@ -234,12 +235,14 @@ impl<'a> GraphQlHandler<'a> {
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
     /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
     /// This should likely _not_ be used outside of this specific context.
-    fn compare_values(left: &PrismaValue, right: &PrismaValue) -> bool {
+    fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
-            (PrismaValue::String(t1), PrismaValue::DateTime(t2))
-            | (PrismaValue::DateTime(t2), PrismaValue::String(t1)) => parse_datetime(t1)
-                .map(|t1| &t1 == t2)
-                .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str()),
+            (ArgumentValue::Scalar(PrismaValue::String(t1)), ArgumentValue::Scalar(PrismaValue::DateTime(t2)))
+            | (ArgumentValue::Scalar(PrismaValue::DateTime(t2)), ArgumentValue::Scalar(PrismaValue::String(t1))) => {
+                parse_datetime(t1)
+                    .map(|t1| &t1 == t2)
+                    .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str())
+            }
             (left, right) => left == right,
         }
     }
