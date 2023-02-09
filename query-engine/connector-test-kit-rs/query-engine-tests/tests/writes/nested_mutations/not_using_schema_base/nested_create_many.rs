@@ -53,7 +53,6 @@ mod nested_create_many {
     }
 
     // "A basic createMany on a create top level" should "work"
-    // TODO: Figure out why this doesn't work
     #[connector_test(exclude(Sqlite))]
     async fn create_many_shorthand_on_create(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
