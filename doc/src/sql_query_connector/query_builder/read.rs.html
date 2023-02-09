@@ -277,12 +277,6 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     cursor_condition, filter_conversion::AliasedCondition, model_extensions::<span class="kw-2">*</span>, nested_aggregations,
     ordering::OrderByBuilder, sql_trace::SqlTraceComment, Context,
@@ -344,7 +338,7 @@
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
         <span class="kw">let </span>order_by_definitions = OrderByBuilder::default().build(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx);
-        <span class="kw">let </span>(table_opt, cursor_condition) = cursor_condition::build(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>order_by_definitions, ctx);
+        <span class="kw">let </span>cursor_condition = cursor_condition::build(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>order_by_definitions, ctx);
         <span class="kw">let </span>aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
 
         <span class="kw">let </span>limit = <span class="kw">if </span><span class="self">self</span>.ignore_take { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="self">self</span>.take_abs() };
@@ -378,12 +372,6 @@
             .offset(skip <span class="kw">as </span>usize)
             .append_trace(<span class="kw-2">&amp;</span>Span::current())
             .add_trace_id(ctx.trace_id);
-
-        <span class="kw">let </span>select_ast = <span class="kw">if let </span><span class="prelude-val">Some</span>(table) = table_opt {
-            select_ast.and_from(table)
-        } <span class="kw">else </span>{
-            select_ast
-        };
 
         <span class="kw">let </span>select_ast = order_by_definitions
             .iter()
