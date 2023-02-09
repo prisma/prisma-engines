@@ -17,3 +17,5 @@ date_time,branch,commit,file,size_bytes
 2023-02-08T17:20:18+00:00,engine-size,1ecb10c98f264b0128f28bbe53d420d27088953d,libquery_engine.node,14674240
 2023-02-09T12:24:22+00:00,main,c9e2753d8def40b31122dcf4bc00f5c71c4af4c8,query-engine,16925464
 2023-02-09T12:24:22+00:00,main,c9e2753d8def40b31122dcf4bc00f5c71c4af4c8,libquery_engine.node,14686528
+2023-02-09T17:13:04+00:00,main,8b89135f4742dac33e5ed15d4af6bba9fee35178,query-engine,16917272
+2023-02-09T17:13:04+00:00,main,8b89135f4742dac33e5ed15d4af6bba9fee35178,libquery_engine.node,14678336
