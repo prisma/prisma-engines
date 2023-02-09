@@ -636,7 +636,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             (
                 row.get_expect_string("table_name"),
                 row.get_expect_string("namespace"),
-                row.get_expect_bool("relhassubclass"),
+                row.get_expect_bool("is_partition"),
             )
         });
 

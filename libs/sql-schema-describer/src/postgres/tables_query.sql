@@ -1,11 +1,9 @@
-SELECT tbl.relname AS table_name, namespace.nspname as namespace, tbl.relhassubclass
+SELECT tbl.relname AS table_name, namespace.nspname as namespace, (tbl.relhassubclass and tbl.relkind = 'p') as is_partition
 FROM pg_class AS tbl
 INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
 WHERE
-  ( -- grab tables when
-    -- it's an oRdinary table ('r') and is not a partition;
-    -- NOTE: CockroachDB puts NULLs in 'relispartition'
-    (tbl.relkind = 'r' AND ((tbl.relispartition is NULL) OR tbl.relispartition = 'f'))
+  ( -- (relkind = 'r' and relispartition = 't') matches partition table "duplicates"
+    (tbl.relkind = 'r' AND tbl.relispartition = 'f')
       OR -- when it's a partition
     tbl.relkind = 'p'
   )
