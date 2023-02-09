@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     relations::{ManyToManyRelationId, Relation, RelationAttributes},
     walkers::{ModelWalker, RelationFieldWalker, RelationName, RelationWalker, Walker},
@@ -53,5 +55,30 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
     /// The name of the relation.
     pub fn relation_name(self) -> RelationName<'db> {
         self.field_a().relation_name()
+    }
+
+    /// The name of the column pointing to model A in the implicit join table.
+    pub fn column_a_name(self) -> &'static str {
+        "A"
+    }
+
+    /// The name of the column pointing to model B in the implicit join table.
+    pub fn column_b_name(self) -> &'static str {
+        "B"
+    }
+
+    /// A representation of the table/collection implicit in this relation.
+    pub fn table_name(self) -> ImplicitManyToManyRelationTableName<'db> {
+        ImplicitManyToManyRelationTableName(self.relation_name())
+    }
+}
+
+/// A table name for an implicit relation's join table. Useful for its Display impl.
+pub struct ImplicitManyToManyRelationTableName<'db>(RelationName<'db>);
+
+impl Display for ImplicitManyToManyRelationTableName<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("_")?;
+        Display::fmt(&self.0, f)
     }
 }
