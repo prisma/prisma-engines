@@ -1,7 +1,6 @@
 use crate::{schema::InputType, ArgumentValue};
 use fmt::Display;
 use itertools::Itertools;
-use prisma_models::PrismaValue;
 use std::fmt;
 
 #[derive(Debug)]
