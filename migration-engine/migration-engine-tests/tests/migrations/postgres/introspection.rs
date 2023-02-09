@@ -141,6 +141,7 @@ model capitals {{
   state      String @unique @db.Char(2)
 }}
 
+/// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
 model cities {{
   name       String @unique
   population Float? @db.Real

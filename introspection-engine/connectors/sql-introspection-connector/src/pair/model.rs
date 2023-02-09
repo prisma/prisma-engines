@@ -37,6 +37,11 @@ impl<'a> ModelPair<'a> {
         self.next.is_partition()
     }
 
+    /// Whether the model has subclass tables or not.
+    pub(crate) fn has_subclass(self) -> bool {
+        self.next.has_subclass()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.

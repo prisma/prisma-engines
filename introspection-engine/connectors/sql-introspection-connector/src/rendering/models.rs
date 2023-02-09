@@ -52,6 +52,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
+    if model.has_subclass() {
+        let docs = "This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.";
+
+        rendered.documentation(docs);
+    }
+
     if let Some(namespace) = model.namespace() {
         rendered.schema(namespace);
     }

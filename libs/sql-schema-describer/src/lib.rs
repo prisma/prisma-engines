@@ -20,6 +20,7 @@ pub use self::{
     ids::*,
     walkers::*,
 };
+use enumflags2::{BitFlag, BitFlags};
 pub use prisma_value::PrismaValue;
 
 pub use either::Either;
@@ -332,17 +333,22 @@ impl SqlSchema {
         self.tables.push(Table {
             namespace_id,
             name,
-            is_partition: false,
+            properties: TableProperties::empty(),
         });
         id
     }
 
-    pub fn push_table_partitioned(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
+    pub fn push_table_with_properties(
+        &mut self,
+        name: String,
+        namespace_id: NamespaceId,
+        properties: BitFlags<TableProperties>,
+    ) -> TableId {
         let id = TableId(self.tables.len() as u32);
         self.tables.push(Table {
             namespace_id,
             name,
-            is_partition: true,
+            properties,
         });
         id
     }
@@ -440,12 +446,21 @@ impl SqlSchema {
     }
 }
 
+#[enumflags2::bitflags]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug)]
+pub enum TableProperties {
+    NoProperties,
+    IsPartition,
+    HasSubclass,
+}
+
 /// A table found in a schema.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Table {
     namespace_id: NamespaceId,
     name: String,
-    is_partition: bool,
+    properties: BitFlags<TableProperties>,
 }
 
 /// The type of an index.

@@ -637,18 +637,29 @@ impl<'a> SqlSchemaDescriber<'a> {
                 row.get_expect_string("table_name"),
                 row.get_expect_string("namespace"),
                 row.get_expect_bool("is_partition"),
+                row.get_expect_bool("has_subclass"),
             )
         });
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, is_partition) in names {
+        for (table_name, namespace, is_partition, has_subclass) in names {
             let cloned_name = table_name.clone();
-            let id = if is_partition {
-                sql_schema.push_table_partitioned(table_name, sql_schema.get_namespace_id(&namespace).unwrap())
+            let partition = if is_partition {
+                BitFlags::from_flag(TableProperties::IsPartition)
             } else {
-                sql_schema.push_table(table_name, sql_schema.get_namespace_id(&namespace).unwrap())
+                BitFlags::empty()
             };
+            let subclass = if has_subclass {
+                BitFlags::from_flag(TableProperties::HasSubclass)
+            } else {
+                BitFlags::empty()
+            };
+            let id = sql_schema.push_table_with_properties(
+                table_name,
+                sql_schema.get_namespace_id(&namespace).unwrap(),
+                partition | subclass,
+            );
             map.insert((namespace, cloned_name), id);
         }
 
