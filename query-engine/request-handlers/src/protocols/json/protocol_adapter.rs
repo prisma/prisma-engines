@@ -518,14 +518,13 @@ mod tests {
                     (
                         "where",
                         Object(
-                            [
-                                (
-                                    "id",
+                            {
+                                "id": Scalar(
                                     String(
                                         "123",
                                     ),
                                 ),
-                            ],
+                            },
                         ),
                     ),
                 ],
@@ -621,14 +620,13 @@ mod tests {
                             (
                                 "where",
                                 Object(
-                                    [
-                                        (
-                                            "title",
+                                    {
+                                        "title": Scalar(
                                             String(
                                                 "something",
                                             ),
                                         ),
-                                    ],
+                                    },
                                 ),
                             ),
                         ],
@@ -844,14 +842,13 @@ mod tests {
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
-            [
-                (
-                    "x",
+            {
+                "x": Scalar(
                     DateTime(
                         1900-10-10T01:10:10.001+00:00,
                     ),
                 ),
-            ],
+            },
         )
         "###);
     }
@@ -884,20 +881,18 @@ mod tests {
             (
                 "data",
                 Object(
-                    [
-                        (
-                            "x",
+                    {
+                        "x": Scalar(
                             BigInt(
                                 9223372036854775807,
                             ),
                         ),
-                        (
-                            "y",
+                        "y": Scalar(
                             BigInt(
                                 -9223372036854775808,
                             ),
                         ),
-                    ],
+                    },
                 ),
             ),
         ]
@@ -928,14 +923,13 @@ mod tests {
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
-            [
-                (
-                    "x",
+            {
+                "x": Scalar(
                     Float(
                         BigDecimal("123.45678910"),
                     ),
                 ),
-            ],
+            },
         )
         "###);
     }
@@ -964,9 +958,8 @@ mod tests {
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
-            [
-                (
-                    "x",
+            {
+                "x": Scalar(
                     Bytes(
                         [
                             1,
@@ -976,7 +969,7 @@ mod tests {
                         ],
                     ),
                 ),
-            ],
+            },
         )
         "###);
     }
@@ -1005,14 +998,13 @@ mod tests {
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
-            [
-                (
-                    "x",
+            {
+                "x": Scalar(
                     Json(
                         "{ \"$type\": \"foo\", \"value\": \"bar\" }",
                     ),
                 ),
-            ],
+            },
         )
         "###);
     }
@@ -1041,27 +1033,22 @@ mod tests {
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
-            [
-                (
-                    "x",
-                    Object(
-                        [
-                            (
-                                "$type",
-                                String(
-                                    "Invalid",
-                                ),
+            {
+                "x": Object(
+                    {
+                        "$type": Scalar(
+                            String(
+                                "Invalid",
                             ),
-                            (
-                                "value",
-                                String(
-                                    "nope",
-                                ),
+                        ),
+                        "value": Scalar(
+                            String(
+                                "nope",
                             ),
-                        ],
-                    ),
+                        ),
+                    },
                 ),
-            ],
+            },
         )
         "###);
     }
