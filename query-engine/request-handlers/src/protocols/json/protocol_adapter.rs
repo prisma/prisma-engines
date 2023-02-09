@@ -1,14 +1,19 @@
 use crate::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use indexmap::IndexMap;
-use prisma_models::{decode_bytes, parse_datetime};
+use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
-    schema::{Identifier, ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
+    schema::{ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
 use std::{collections::HashSet, str::FromStr};
+
+enum OperationType {
+    Read,
+    Write,
+}
 
 pub struct JsonProtocolAdapter;
 
@@ -20,79 +25,70 @@ impl JsonProtocolAdapter {
             query,
         } = query;
 
-        let (is_read, field) = {
-            if let Some(field) =
-                query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value())
-            {
-                Ok((true, field))
-            } else if let Some(field) =
-                query_schema.find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
-            {
-                Ok((false, field))
-            } else {
-                Err(HandlerError::query_conversion(format!(
-                    "Operation '{}' for model '{}' does not match any query.",
-                    action.value(),
-                    model_name.unwrap_or_else(|| "None".to_string())
-                )))
-            }
-        }?;
+        let (operation_type, field) = Self::find_schema_field(query_schema, model_name, action)?;
+        let container = field.model().map(ParentContainer::from);
 
-        let selection = Self::convert_selection(&field, query)?;
+        let selection = Self::convert_selection(&field, container.as_ref(), query)?;
 
-        match is_read {
-            true => Ok(Operation::Read(selection)),
-            false => Ok(Operation::Write(selection)),
+        match operation_type {
+            OperationType::Read => Ok(Operation::Read(selection)),
+            OperationType::Write => Ok(Operation::Write(selection)),
         }
     }
 
-    fn convert_selection(field: &OutputFieldRef, query: FieldQuery) -> crate::Result<Selection> {
+    fn convert_selection(
+        field: &OutputFieldRef,
+        container: Option<&ParentContainer>,
+        query: FieldQuery,
+    ) -> crate::Result<Selection> {
         let FieldQuery {
             arguments,
             selection: query_selection,
         } = query;
-        let model = field.model();
 
         let arguments = match arguments {
             Some(args) => Self::convert_arguments(args)?,
             None => vec![],
         };
+
         let all_scalars_set = query_selection.all_scalars();
         let all_composites_set = query_selection.all_composites();
 
         let mut selection = Selection::new(&field.name, None, arguments, Vec::new());
 
-        let json_selection = query_selection.selection();
-
-        if !json_selection.is_empty() {
-            let object_type = field.field_type.as_object_type().unwrap();
+        if let Some(object_type) = field.field_type.as_object_type() {
+            let json_selection = query_selection.selection();
 
             for (selection_name, selected) in json_selection {
                 match selected {
+                    // $scalars: true
                     crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
                         Self::default_scalar_selection(&object_type, &mut selection);
                     }
+                    // $composites: true
                     crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
-                        Self::default_composite_selection(
-                            field,
-                            &object_type,
-                            &mut selection,
-                            true,
-                            &mut HashSet::<Identifier>::new(),
-                        )?;
+                        if let Some(container) = container {
+                            Self::default_composite_selection(
+                                &mut selection,
+                                container,
+                                &mut HashSet::<String>::new(),
+                            )?;
+                        }
                     }
+                    // <field_name>: true
                     crate::SelectionSetValue::Shorthand(true) => {
                         if all_scalars_set {
                             return Err(HandlerError::query_conversion(format!(
-                                "Cannot select both all scalars and a specific scalar field '{}' for operation {}.",
-                                selection_name, &field.name
+                                "Cannot select both '$scalars: true' and a specific scalar field '{selection_name}'.",
                             )));
                         }
 
                         selection.push_nested_selection(Selection::with_name(selection_name));
                     }
+                    // <field_name>: false
                     crate::SelectionSetValue::Shorthand(false) => (),
-                    crate::SelectionSetValue::Nested(nested) => {
+                    // <field_name>: { query: { ... }, arguments: { ... } }
+                    crate::SelectionSetValue::Nested(nested_query) => {
                         let nested_field = object_type.find_field(&selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(format!(
                                 "Unknown nested field '{}' for operation {} does not match any query.",
@@ -100,18 +96,25 @@ impl JsonProtocolAdapter {
                             ))
                         })?;
 
-                        let is_composite_field = model
-                            .and_then(|model| model.fields().find_from_composite(&nested_field.name).ok())
-                            .is_some();
+                        let field = container.and_then(|container| container.find_field(&nested_field.name));
+                        let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
+                        let nested_container = field.map(|f| match f {
+                            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
+                            Field::Scalar(sf) => sf.container().clone(),
+                            Field::Composite(cf) => ParentContainer::from(&cf.typ),
+                        });
 
                         if is_composite_field && all_composites_set {
                             return Err(HandlerError::query_conversion(format!(
-                                "Cannot select both all composites and a specific composite field '{}' for operation {}.",
-                                selection_name, &field.name
+                                "Cannot select both '$composites: true' and a specific composite field '{selection_name}'.",
                             )));
                         }
 
-                        selection.push_nested_selection(Self::convert_selection(&nested_field, nested)?);
+                        selection.push_nested_selection(Self::convert_selection(
+                            &nested_field,
+                            nested_container.as_ref(),
+                            nested_query,
+                        )?);
                     }
                 }
             }
@@ -248,54 +251,79 @@ impl JsonProtocolAdapter {
     }
 
     fn default_composite_selection(
-        operation_field: &OutputFieldRef,
-        object_type: &ObjectTypeStrongRef,
         selection: &mut Selection,
-        parent_is_model: bool,
-        walked_types: &mut HashSet<Identifier>,
+        container: &ParentContainer,
+        walked_types: &mut HashSet<String>,
     ) -> crate::Result<()> {
-        let model = operation_field.model();
+        match container {
+            ParentContainer::Model(model) => {
+                let model = model.upgrade().unwrap();
 
-        // TODO: Figure out how to handle recursive types
-        for field in object_type.get_fields() {
-            // If we're traversing a composite type from another composite type
-            // and it's a scalar/scalar list field, push it.
-            if !parent_is_model && !field.field_type.is_object() {
-                selection.push_nested_selection(Selection::with_name(field.name.to_owned()));
-            } else {
-                let is_composite_field = model
-                    .and_then(|model| model.fields().find_from_composite(&field.name).ok())
-                    .is_some();
+                for cf in model.fields().composite() {
+                    let mut nested_selection = Selection::with_name(cf.name());
 
-                if parent_is_model && !is_composite_field {
-                    continue;
+                    Self::default_composite_selection(
+                        &mut nested_selection,
+                        &ParentContainer::from(&cf.typ),
+                        walked_types,
+                    )?;
+
+                    selection.push_nested_selection(nested_selection);
                 }
+            }
+            ParentContainer::CompositeType(ct) => {
+                let ct = ct.upgrade().unwrap();
 
-                let composite_type = field.field_type.as_object_type().unwrap();
-
-                if walked_types.contains(composite_type.identifier()) {
+                if walked_types.contains(&ct.name) {
                     return Err(HandlerError::query_conversion(
                         "$composites: true does not support recursive composite types.",
                     ));
                 }
 
-                walked_types.insert(composite_type.identifier().to_owned());
+                walked_types.insert(ct.name.to_owned());
 
-                let mut nested_selection = Selection::with_name(field.name.to_owned());
+                for f in ct.fields() {
+                    match f {
+                        Field::Scalar(s) => selection.push_nested_selection(Selection::with_name(s.name().to_owned())),
+                        Field::Composite(cf) => {
+                            let mut nested_selection = Selection::with_name(cf.name().to_owned());
 
-                Self::default_composite_selection(
-                    operation_field,
-                    &composite_type,
-                    &mut nested_selection,
-                    false,
-                    walked_types,
-                )?;
+                            Self::default_composite_selection(
+                                &mut nested_selection,
+                                &ParentContainer::from(&cf.typ),
+                                walked_types,
+                            )?;
 
-                selection.push_nested_selection(nested_selection);
+                            selection.push_nested_selection(nested_selection);
+                        }
+                        Field::Relation(_) => unreachable!(),
+                    }
+                }
             }
         }
 
         Ok(())
+    }
+
+    fn find_schema_field(
+        query_schema: &QuerySchemaRef,
+        model_name: Option<String>,
+        action: crate::Action,
+    ) -> crate::Result<(OperationType, OutputFieldRef)> {
+        if let Some(field) = query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value()) {
+            return Ok((OperationType::Read, field));
+        };
+
+        if let Some(field) = query_schema.find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
+        {
+            return Ok((OperationType::Write, field));
+        };
+
+        Err(HandlerError::query_conversion(format!(
+            "Operation '{}' for model '{}' does not match any query.",
+            action.value(),
+            model_name.unwrap_or_else(|| "None".to_string())
+        )))
     }
 }
 
@@ -716,7 +744,7 @@ mod tests {
         assert_debug_snapshot!(operation, @r###"
         Err(
             Configuration(
-                "Cannot select both all scalars and a specific scalar field 'id' for operation updateOneUser.",
+                "Cannot select both '$scalars: true' and a specific scalar field 'id'.",
             ),
         )
         "###);
@@ -747,7 +775,7 @@ mod tests {
         assert_debug_snapshot!(operation, @r###"
         Err(
             Configuration(
-                "Cannot select both all composites and a specific composite field 'address' for operation updateOneUser.",
+                "Cannot select both '$composites: true' and a specific composite field 'address'.",
             ),
         )
         "###);
@@ -1062,7 +1090,35 @@ mod tests {
             "query": {
                 "arguments": {
                     "data": {
-                        "x": { "$type": "Invalid", "value": "nope" }
+                        "x": "y"
+                    }
+                },
+                "selection": {}
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+
+        assert_debug_snapshot!(operation, @r###"
+        Err(
+            Configuration(
+                "Operation 'queryRaw' for model 'User' does not match any query.",
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    pub fn query_raw() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            &r#"{
+            "action": "runCommandRaw",
+            "query": {
+                "arguments": {
+                    "data": {
+                        "x": "y"
                     }
                 },
                 "selection": {
@@ -1076,9 +1132,168 @@ mod tests {
         let operation = JsonProtocolAdapter::convert_single(query, &schema());
 
         assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "runCommandRaw",
+                    alias: None,
+                    arguments: [
+                        (
+                            "data",
+                            Object(
+                                {
+                                    "x": Scalar(
+                                        String(
+                                            "y",
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    ],
+                    nested_selections: [],
+                },
+            ),
+        )
+        "###);
+    }
+
+    fn composite_schema() -> schema::QuerySchemaRef {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model Comment {
+            id String @id @default(auto()) @map("_id") @db.ObjectId
+          
+            country String?
+            content CommentContent
+          }
+          
+          type CommentContent {
+            text    String
+            upvotes CommentContentUpvotes[]
+          }
+          
+          type CommentContentUpvotes {
+            vote   Boolean
+            userId String
+          }          
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        let internal_data_model = prisma_models::convert(Arc::new(schema));
+
+        Arc::new(schema_builder::build(internal_data_model, true))
+    }
+
+    #[test]
+    fn nested_composite_selection() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            &r#"
+            {
+              "modelName": "Comment",
+              "action": "createOne",
+              "query": {
+                "selection": {
+                  "$scalars": true,
+                  "$composites": true
+                }
+              }
+            }"#,
+        )
+        .unwrap();
+
+        let selection = JsonProtocolAdapter::convert_single(query, &composite_schema())
+            .unwrap()
+            .into_selection();
+
+        assert_debug_snapshot!(selection.nested_selections(), @r###"
+        [
+            Selection {
+                name: "id",
+                alias: None,
+                arguments: [],
+                nested_selections: [],
+            },
+            Selection {
+                name: "country",
+                alias: None,
+                arguments: [],
+                nested_selections: [],
+            },
+            Selection {
+                name: "content",
+                alias: None,
+                arguments: [],
+                nested_selections: [
+                    Selection {
+                        name: "text",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: "upvotes",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [
+                            Selection {
+                                name: "vote",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "userId",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ]
+        "###);
+    }
+
+    #[test]
+    pub fn nested_composite_wildcard_and_composite_selection() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            &r#"{
+                "modelName": "Comment",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "content": {
+                        "selection": {
+                            "$composites": true,
+                            "upvotes": {
+                                "selection": { "vote": true }
+                            }
+                        }
+                    }
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &composite_schema());
+
+        assert_debug_snapshot!(operation, @r###"
         Err(
             Configuration(
-                "Operation 'queryRaw' for model 'User' does not match any query.",
+                "Cannot select both '$composites: true' and a specific composite field 'upvotes'.",
             ),
         )
         "###);
