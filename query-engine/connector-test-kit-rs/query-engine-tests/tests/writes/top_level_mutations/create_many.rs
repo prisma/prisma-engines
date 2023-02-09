@@ -360,18 +360,22 @@ mod json_create_many {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn create_many_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
-                  createManyTestModel(data: [
-                    { id: 1, json: null },
-                  ]) {
-                    count
-                  }
-                }"#,
-            2009,
-            "A value is required but not set."
-        );
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
+                    createManyTestModel(data: [
+                      { id: 1, json: null },
+                    ]) {
+                      count
+                    }
+                  }"#,
+                2009,
+                "A value is required but not set."
+            );
+        }
 
         assert_error!(
             &runner,

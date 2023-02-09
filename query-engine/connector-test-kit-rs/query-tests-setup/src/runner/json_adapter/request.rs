@@ -1,6 +1,12 @@
 use indexmap::IndexMap;
+use itertools::Itertools;
 use prisma_models::PrismaValue;
-use query_core::{constants::custom_types, schema::QuerySchemaRef, Selection};
+use query_core::{
+    constants::custom_types,
+    schema::{InputFieldRef, InputObjectTypeStrongRef, InputType, OutputFieldRef, QuerySchemaRef},
+    schema_builder::constants::{self, json_null},
+    ArgumentValue, ArgumentValueObject, Selection,
+};
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 use serde_json::{json, Value as JsonValue};
 
@@ -17,61 +23,107 @@ impl JsonRequest {
             .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
         let model_name = schema_field.model().as_ref().map(|m| m.name().to_owned());
         let query_tag = schema_field.query_tag().unwrap().to_owned();
-        let mut selection = operation.into_selection();
+        let selection = operation.into_selection();
 
         let output = JsonSingleQuery {
             model_name,
             action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(&mut selection),
+            query: graphql_selection_to_json_field_query(selection, &schema_field),
         };
 
         Ok(output)
     }
 }
 
-fn graphql_selection_to_json_field_query(selection: &mut Selection) -> FieldQuery {
+fn graphql_selection_to_json_field_query(mut selection: Selection, schema_field: &OutputFieldRef) -> FieldQuery {
     FieldQuery {
-        arguments: graphql_args_to_json_args(selection),
-        selection: graphql_selection_to_json_selection(selection),
+        arguments: graphql_args_to_json_args(&mut selection, &schema_field.arguments),
+        selection: graphql_selection_to_json_selection(selection, schema_field),
     }
 }
 
-fn graphql_args_to_json_args(selection: &mut Selection) -> Option<IndexMap<String, JsonValue>> {
+fn graphql_args_to_json_args(
+    selection: &mut Selection,
+    args_fields: &[InputFieldRef],
+) -> Option<IndexMap<String, JsonValue>> {
     if selection.arguments().is_empty() {
         return None;
     }
 
     let mut args: IndexMap<String, JsonValue> = IndexMap::new();
 
-    while let Some((arg_name, arg_value)) = selection.pop_argument() {
-        args.insert(arg_name, prisma_value_to_json(arg_value));
+    for (arg_name, arg_value) in selection.arguments().iter().cloned() {
+        let arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
+
+        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(&arg_value);
+
+        let json = arg_value_to_json(arg_value, inferrer);
+
+        args.insert(arg_name, json);
     }
 
     Some(args)
 }
 
-fn prisma_value_to_json(pv: PrismaValue) -> JsonValue {
-    match pv {
-        PrismaValue::Object(obj) => {
-            let is_field_ref_obj = obj.iter().any(|(k, _)| k == "_ref");
-            let map: serde_json::Map<String, JsonValue> =
-                obj.into_iter().map(|(k, v)| (k, prisma_value_to_json(v))).collect();
+fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
+    match (value, typ) {
+        (ArgumentValue::Object(obj), InferredType::Object(typ)) => JsonValue::Object(
+            obj.into_iter()
+                .map(|(k, v)| {
+                    let field = typ.find_field(&k);
+                    let inferrer = FieldTypeInferrer::from_field(field.as_ref());
+                    let inferred_type = inferrer.infer(&v);
 
-            if is_field_ref_obj {
-                json!({ custom_types::TYPE: custom_types::FIELD_REF, custom_types::VALUE: JsonValue::Object(map) })
-            } else {
-                JsonValue::Object(map)
-            }
+                    (k, arg_value_to_json(v, inferred_type))
+                })
+                .collect(),
+        ),
+        (obj @ ArgumentValue::Object(_), InferredType::FieldRef) => {
+            let val = arg_value_to_json(obj, InferredType::Unknown);
+
+            make_json_custom_type(custom_types::FIELD_REF, val)
         }
-        PrismaValue::List(list) => JsonValue::Array(list.into_iter().map(prisma_value_to_json).collect()),
-        _ => serde_json::to_value(&pv).unwrap(),
+        (ArgumentValue::Object(obj), InferredType::Unknown) => {
+            let obj = obj
+                .into_iter()
+                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown)))
+                .collect();
+
+            JsonValue::Object(obj)
+        }
+        (ArgumentValue::Scalar(PrismaValue::Enum(str)), InferredType::JsonNullEnum) => {
+            make_json_custom_type(custom_types::ENUM, JsonValue::String(str))
+        }
+        (ArgumentValue::Scalar(PrismaValue::String(str)), InferredType::Json) => {
+            serde_json::from_str(&str).unwrap_or_else(|_| panic!("Expected {str} to be JSON."))
+        }
+        (ArgumentValue::Scalar(pv), InferredType::Unknown) => serde_json::to_value(pv).unwrap(),
+
+        (ArgumentValue::List(list), InferredType::List(typ)) => {
+            let values = list
+                .into_iter()
+                .map(|val| {
+                    let inferred_typ = FieldTypeInferrer::new(Some(&vec![typ.clone()])).infer(&val);
+
+                    arg_value_to_json(val, inferred_typ)
+                })
+                .collect_vec();
+
+            JsonValue::Array(values)
+        }
+        (ArgumentValue::List(list), InferredType::Unknown) => JsonValue::Array(
+            list.into_iter()
+                .map(|val| arg_value_to_json(val, InferredType::Unknown))
+                .collect_vec(),
+        ),
+        _ => unreachable!(),
     }
 }
 
-fn graphql_selection_to_json_selection(selection: &mut Selection) -> SelectionSet {
+fn graphql_selection_to_json_selection(selection: Selection, schema_field: &OutputFieldRef) -> SelectionSet {
     let mut res: IndexMap<String, SelectionSetValue> = IndexMap::new();
 
-    for mut nested_selection in selection.nested_selections().iter().cloned() {
+    for nested_selection in selection.nested_selections().iter().cloned() {
         let no_args = nested_selection.arguments().is_empty();
         let no_nested_selection = nested_selection.nested_selections().is_empty();
         let selection_name = nested_selection.name().to_owned();
@@ -79,11 +131,106 @@ fn graphql_selection_to_json_selection(selection: &mut Selection) -> SelectionSe
         if no_args && no_nested_selection {
             res.insert(selection_name, SelectionSetValue::Shorthand(true));
         } else {
-            let nested = SelectionSetValue::Nested(graphql_selection_to_json_field_query(&mut nested_selection));
+            let nested_field = schema_field
+                .field_type
+                .as_object_type()
+                .unwrap()
+                .find_field(&selection_name)
+                .unwrap();
+
+            let nested =
+                SelectionSetValue::Nested(graphql_selection_to_json_field_query(nested_selection, &nested_field));
 
             res.insert(selection_name, nested);
         }
     }
 
     SelectionSet::new(res)
+}
+
+pub fn make_json_custom_type(typ: &str, val: JsonValue) -> JsonValue {
+    json!({ custom_types::TYPE: typ, custom_types::VALUE: val })
+}
+
+struct FieldTypeInferrer<'a> {
+    types: Option<&'a Vec<InputType>>,
+}
+
+enum InferredType {
+    Object(InputObjectTypeStrongRef),
+    List(InputType),
+    Json,
+    JsonNullEnum,
+    FieldRef,
+    Unknown,
+}
+
+impl<'a> FieldTypeInferrer<'a> {
+    pub(crate) fn new(types: Option<&'a Vec<InputType>>) -> Self {
+        Self { types }
+    }
+
+    pub(crate) fn from_field(field: Option<&'a InputFieldRef>) -> Self {
+        Self {
+            types: field.map(|field| &field.field_types),
+        }
+    }
+
+    pub(crate) fn infer(&self, value: &ArgumentValue) -> InferredType {
+        if self.types.is_none() {
+            return InferredType::Unknown;
+        }
+
+        match value {
+            ArgumentValue::Object(obj) => {
+                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) && obj.len() == 1;
+                let object_type = self.get_object_type();
+
+                match object_type {
+                    Some(_) if is_field_ref_obj => InferredType::FieldRef,
+                    Some(typ) if Self::obj_val_fits_obj_type(obj, &typ) => InferredType::Object(typ),
+                    _ => InferredType::Unknown,
+                }
+            }
+            ArgumentValue::Scalar(pv) => match pv {
+                PrismaValue::String(_) if self.has_json() => InferredType::Json,
+                PrismaValue::Enum(str) if Self::is_json_null_enum(str) => InferredType::JsonNullEnum,
+                _ => InferredType::Unknown,
+            },
+            ArgumentValue::List(_) => {
+                let list_type = self.get_list_type();
+
+                match list_type {
+                    Some(typ) => InferredType::List(typ),
+                    None => InferredType::Unknown,
+                }
+            }
+            ArgumentValue::FieldRef(_) => unreachable!(),
+        }
+    }
+
+    fn has_json(&self) -> bool {
+        self.types
+            .map(|types| types.iter().any(|typ| typ.is_json()))
+            .unwrap_or(false)
+    }
+
+    fn get_object_type(&self) -> Option<InputObjectTypeStrongRef> {
+        self.types
+            .and_then(|types| types.iter().find_map(|typ| typ.as_object()))
+    }
+
+    fn get_list_type(&self) -> Option<InputType> {
+        self.types
+            .and_then(|types| types.iter().find_map(|typ| typ.as_list()))
+            .map(|typ| typ.to_owned())
+    }
+
+    fn is_json_null_enum(val: &str) -> bool {
+        [json_null::DB_NULL, json_null::JSON_NULL, json_null::ANY_NULL].contains(&val)
+    }
+
+    fn obj_val_fits_obj_type(val: &ArgumentValueObject, typ: &InputObjectTypeStrongRef) -> bool {
+        val.keys().all(|key| typ.find_field(key).is_some())
+    }
 }

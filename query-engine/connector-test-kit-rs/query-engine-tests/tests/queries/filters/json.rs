@@ -212,19 +212,23 @@ mod json {
 
     #[connector_test(schema(json_opt))]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
-            2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(String(\"{}\"))}), want: Json"
-        );
+        // Those tests pass with the JSON protocol because the entire object is parsed as JSON.
+        // They remain useful to ensure we don't ever allow a full JSON filter input object type at the schema level.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
+                2009,
+                "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(String(\"{}\"))}), want: Json"
+            );
 
-        assert_error!(
-            &runner,
-            r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
-            2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(Null)}), want: Json"
-        );
+            assert_error!(
+                &runner,
+                r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
+                2009,
+                "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(Null)}), want: Json"
+            );
+        }
 
         Ok(())
     }

@@ -1,11 +1,11 @@
 use crate::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use indexmap::IndexMap;
-use prisma_models::{decode_bytes, parse_datetime, PrismaValue};
+use prisma_models::{decode_bytes, parse_datetime};
 use query_core::{
     constants::custom_types,
     schema::{Identifier, ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
-    Operation, Selection,
+    ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
 use std::{collections::HashSet, str::FromStr};
@@ -120,7 +120,7 @@ impl JsonProtocolAdapter {
         Ok(selection)
     }
 
-    fn convert_arguments(args: IndexMap<String, JsonValue>) -> crate::Result<Vec<(String, PrismaValue)>> {
+    fn convert_arguments(args: IndexMap<String, JsonValue>) -> crate::Result<Vec<(String, ArgumentValue)>> {
         let mut res = vec![];
 
         for (name, value) in args {
@@ -132,27 +132,27 @@ impl JsonProtocolAdapter {
         Ok(res)
     }
 
-    fn convert_argument(value: JsonValue) -> crate::Result<PrismaValue> {
-        let err_message = format!("Could not convert argument value {:?} to PrismaValue.", &value);
+    fn convert_argument(value: JsonValue) -> crate::Result<ArgumentValue> {
+        let err_message = format!("Could not convert argument value {:?} to ArgumentValue.", &value);
         let build_err = || HandlerError::query_conversion(err_message.clone());
 
         match value {
-            serde_json::Value::String(s) => Ok(PrismaValue::String(s)),
+            serde_json::Value::String(s) => Ok(ArgumentValue::string(s)),
             serde_json::Value::Array(v) => {
-                let vals: crate::Result<Vec<PrismaValue>> = v.into_iter().map(Self::convert_argument).collect();
+                let vals: crate::Result<Vec<ArgumentValue>> = v.into_iter().map(Self::convert_argument).collect();
 
-                Ok(PrismaValue::List(vals?))
+                Ok(ArgumentValue::List(vals?))
             }
-            serde_json::Value::Null => Ok(PrismaValue::Null),
-            serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
+            serde_json::Value::Null => Ok(ArgumentValue::null()),
+            serde_json::Value::Bool(b) => Ok(ArgumentValue::bool(b)),
             serde_json::Value::Number(num) => {
                 if num.is_i64() {
-                    Ok(PrismaValue::Int(num.as_i64().unwrap()))
+                    Ok(ArgumentValue::int(num.as_i64().unwrap()))
                 } else {
                     let fl = num.as_f64().unwrap();
                     let dec = BigDecimal::from_f64(fl).unwrap().normalized();
 
-                    Ok(PrismaValue::Float(dec))
+                    Ok(ArgumentValue::float(dec))
                 }
             }
             serde_json::Value::Object(mut obj) => match obj.get(custom_types::TYPE).as_ref().and_then(|s| s.as_str()) {
@@ -163,7 +163,7 @@ impl JsonProtocolAdapter {
                         .ok_or_else(build_err)?;
                     let date = parse_datetime(value).map_err(|_| build_err())?;
 
-                    Ok(PrismaValue::DateTime(date))
+                    Ok(ArgumentValue::datetime(date))
                 }
                 Some(custom_types::BIGINT) => {
                     let value = obj
@@ -171,7 +171,7 @@ impl JsonProtocolAdapter {
                         .and_then(|v| v.as_str())
                         .ok_or_else(build_err)?;
 
-                    i64::from_str(value).map(PrismaValue::BigInt).map_err(|_| build_err())
+                    i64::from_str(value).map(ArgumentValue::bigint).map_err(|_| build_err())
                 }
                 Some(custom_types::DECIMAL) => {
                     let value = obj
@@ -180,7 +180,7 @@ impl JsonProtocolAdapter {
                         .ok_or_else(build_err)?;
 
                     BigDecimal::from_str(value)
-                        .map(PrismaValue::Float)
+                        .map(ArgumentValue::float)
                         .map_err(|_| build_err())
                 }
                 Some(custom_types::BYTES) => {
@@ -189,7 +189,7 @@ impl JsonProtocolAdapter {
                         .and_then(|v| v.as_str())
                         .ok_or_else(build_err)?;
 
-                    decode_bytes(value).map(PrismaValue::Bytes).map_err(|_| build_err())
+                    decode_bytes(value).map(ArgumentValue::bytes).map_err(|_| build_err())
                 }
                 Some(custom_types::JSON) => {
                     let value = obj
@@ -200,7 +200,15 @@ impl JsonProtocolAdapter {
                         })
                         .ok_or_else(build_err)?;
 
-                    Ok(PrismaValue::Json(value))
+                    Ok(ArgumentValue::json(value))
+                }
+                Some(custom_types::ENUM) => {
+                    let value = obj
+                        .get(custom_types::VALUE)
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(build_err)?;
+
+                    Ok(ArgumentValue::r#enum(value.to_string()))
                 }
                 Some(custom_types::FIELD_REF) => {
                     let value = obj
@@ -210,16 +218,20 @@ impl JsonProtocolAdapter {
                             _ => None,
                         })
                         .ok_or_else(build_err)?;
+                    let values = value
+                        .into_iter()
+                        .map(|(k, v)| Ok((k, Self::convert_argument(v)?)))
+                        .collect::<crate::Result<IndexMap<_, _>>>()?;
 
-                    Self::convert_argument(JsonValue::Object(value))
+                    Ok(ArgumentValue::FieldRef(values))
                 }
                 _ => {
                     let values = obj
                         .into_iter()
                         .map(|(k, v)| Ok((k, Self::convert_argument(v)?)))
-                        .collect::<crate::Result<Vec<_>>>()?;
+                        .collect::<crate::Result<IndexMap<_, _>>>()?;
 
-                    Ok(PrismaValue::Object(values))
+                    Ok(ArgumentValue::Object(values))
                 }
             },
         }

@@ -1,5 +1,5 @@
 use super::*;
-use crate::schema::*;
+use crate::{executor::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use prisma_models::dml::{self, ValueGeneratorFn};
@@ -156,6 +156,19 @@ impl QueryDocumentParser {
 
         for input_type in possible_input_types {
             let result = match (value.clone(), input_type) {
+                (value, InputType::Scalar(ScalarType::Json))
+                    if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                {
+                    Ok(ParsedInputValue::Single(self.to_json(&parent_path, &value)?))
+                }
+                (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
+                    if get_engine_protocol().is_json() =>
+                {
+                    let json_str = serde_json::to_string(&list).unwrap();
+                    let json_list = self.parse_json_list(&parent_path, &json_str)?;
+
+                    Ok(ParsedInputValue::Single(json_list))
+                }
                 (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
                     // Null handling
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
@@ -197,7 +210,7 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::List),
 
                 // Object handling
-                (ArgumentValue::Object(o), InputType::Object(obj)) => self
+                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => self
                     .parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
                     .map(ParsedInputValue::Map),
 
@@ -215,6 +228,7 @@ impl QueryDocumentParser {
         }
 
         let (successes, mut failures): (Vec<_>, Vec<_>) = parse_results.into_iter().partition(|result| result.is_ok());
+
         if successes.is_empty() {
             if failures.len() == 1 {
                 failures.pop().unwrap()
@@ -367,6 +381,15 @@ impl QueryDocumentParser {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
         })
+    }
+
+    fn to_json(&self, path: &QueryPath, value: &ArgumentValue) -> QueryParserResult<PrismaValue> {
+        serde_json::to_string(&value)
+            .map_err(|err| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
+            })
+            .map(PrismaValue::Json)
     }
 
     fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {

@@ -1,5 +1,5 @@
 use super::Selection;
-use prisma_models::PrismaValue;
+use crate::ArgumentValue;
 use schema::QuerySchemaRef;
 
 #[derive(Debug, Clone)]
@@ -45,7 +45,7 @@ impl Operation {
         }
     }
 
-    pub fn arguments(&self) -> &[(String, PrismaValue)] {
+    pub fn arguments(&self) -> &[(String, ArgumentValue)] {
         match self {
             Operation::Read(x) => x.arguments(),
             Operation::Write(x) => x.arguments(),
