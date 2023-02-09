@@ -89,4 +89,27 @@ in
       '';
     })
     { profile = "release"; };
+
+  # TODO: try to make caching and sharing the build artifacts work with crane.  There should be
+  # separate `query-engine-lib` and `query-engine-bin` derivations instead, but we use this for now
+  # to make the CI job that uses it faster.
+  packages.query-engine-bin-and-lib = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "query-engine-bin-and-lib";
+      inherit src;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+
+      buildPhase = ''
+        cargo build --profile=${profile} --bin=query-engine
+        cargo build --profile=${profile} -p query-engine-node-api
+      '';
+
+      installPhase = ''
+        set -eu
+        mkdir -p $out/bin $out/lib
+        cp target/${profile}/query-engine $out/bin/query-engine
+        cp target/${profile}/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
+      '';
+    })
+    { profile = "release"; };
 }
