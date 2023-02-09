@@ -12,10 +12,6 @@ pub type RelationRef = Relation;
 pub type RelationWeakRef = Relation;
 
 impl Relation {
-    pub const MODEL_A_DEFAULT_COLUMN: &'static str = "A";
-    pub const MODEL_B_DEFAULT_COLUMN: &'static str = "B";
-    pub const TABLE_ALIAS: &'static str = "RelationTable";
-
     pub fn name(&self) -> String {
         self.walker().relation_name().to_string()
     }

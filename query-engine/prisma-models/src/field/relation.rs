@@ -290,18 +290,19 @@ pub enum RelationSide {
 }
 
 impl RelationSide {
-    pub fn opposite(self) -> RelationSide {
-        match self {
-            RelationSide::A => RelationSide::B,
-            RelationSide::B => RelationSide::A,
+    pub(crate) fn new(relation_field: RelationFieldId, relation: walkers::RelationWalker<'_>) -> Self {
+        let mut relation_fields = relation.relation_fields();
+        let mut relation_fields = [relation_fields.next().unwrap(), relation_fields.next().unwrap()];
+        relation_fields.sort_by_key(|rf| (rf.model().name(), rf.name()));
+
+        match relation_fields.iter().position(|w| w.id == relation_field) {
+            Some(0) => RelationSide::A,
+            Some(1) => RelationSide::B,
+            None | Some(_) => panic!("can't infer relation side"),
         }
     }
 
     pub fn is_a(self) -> bool {
         self == RelationSide::A
-    }
-
-    pub fn is_b(self) -> bool {
-        self == RelationSide::B
     }
 }
