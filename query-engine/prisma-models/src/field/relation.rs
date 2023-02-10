@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
-use psl::parser_database::walkers::RelationFieldId;
+use psl::parser_database::walkers::{self, RelationFieldId};
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -131,14 +131,14 @@ impl RelationField {
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = &self.relation();
 
-        match relation.manifestation() {
-            RelationLinkManifestation::Inline(ref m) => {
+        match relation.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel {
                     !self.relation_info.references.is_empty()
                 } else {
-                    m.in_table_of_model == self.model().id
+                    m.referencing_model().id == self.model().id
                 }
             }
             _ => false,

@@ -3,9 +3,7 @@ use dml::ReferentialAction;
 use psl::{
     datamodel_connector::RelationMode,
     parser_database::{walkers, RelationId},
-    schema_ast::ast,
 };
-use std::fmt::Debug;
 
 pub type Relation = crate::Zipper<RelationId>;
 pub type RelationRef = Relation;
@@ -109,44 +107,4 @@ impl Relation {
             (action, _) => action,
         }
     }
-
-    pub fn manifestation(&self) -> RelationLinkManifestation {
-        match self.walker().refine() {
-            walkers::RefinedRelationWalker::Inline(rel) => RelationLinkManifestation::Inline(InlineRelation {
-                in_table_of_model: rel.referencing_model().id,
-            }),
-            walkers::RefinedRelationWalker::ImplicitManyToMany(rel) => {
-                RelationLinkManifestation::RelationTable(RelationTable {
-                    table: format!("_{}", rel.relation_name()),
-                    model_a_column: "A".into(),
-                    model_b_column: "B".into(),
-                })
-            }
-            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => {
-                RelationLinkManifestation::RelationTable(RelationTable {
-                    table: String::new(),
-                    model_a_column: "A".into(),
-                    model_b_column: "B".into(),
-                })
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum RelationLinkManifestation {
-    Inline(InlineRelation),
-    RelationTable(RelationTable),
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct InlineRelation {
-    pub in_table_of_model: ast::ModelId,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct RelationTable {
-    pub table: String,
-    pub model_a_column: String,
-    pub model_b_column: String,
 }

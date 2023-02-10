@@ -43,6 +43,6 @@ pub use selection_result::*;
 
 // Re-exports
 pub use prisma_value::*;
-pub use psl::{self, schema_ast::ast};
+pub use psl::{self, parser_database::walkers, schema_ast::ast};
 
 pub type Result<T> = std::result::Result<T, DomainError>;

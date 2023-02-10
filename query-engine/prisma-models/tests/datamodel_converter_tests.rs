@@ -367,10 +367,7 @@ fn explicit_relation_fields() {
     relation
         .assert_name(relation_name)
         .assert_model_a("Blog")
-        .assert_model_b("Post")
-        .assert_manifestation(&RelationLinkManifestation::Inline(InlineRelation {
-            in_table_of_model: post.id,
-        }));
+        .assert_model_b("Post");
 }
 
 #[test]
@@ -409,12 +406,7 @@ fn many_to_many_relations() {
     relation
         .assert_name(relation_name)
         .assert_model_a("Blog")
-        .assert_model_b("Post")
-        .assert_manifestation(&RelationLinkManifestation::RelationTable(RelationTable {
-            table: format!("_{relation_name}"),
-            model_a_column: "A".to_string(),
-            model_b_column: "B".to_string(),
-        }));
+        .assert_model_b("Post");
 }
 
 #[test]
@@ -690,7 +682,6 @@ trait RelationAssertions {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_model_a(&self, name: &str) -> &Self;
     fn assert_model_b(&self, name: &str) -> &Self;
-    fn assert_manifestation(&self, mani: &RelationLinkManifestation) -> &Self;
 }
 
 impl RelationAssertions for Relation {
@@ -704,10 +695,6 @@ impl RelationAssertions for Relation {
     }
     fn assert_model_b(&self, name: &str) -> &Self {
         assert_eq!(self.model_b().name(), name);
-        self
-    }
-    fn assert_manifestation(&self, manifestation: &RelationLinkManifestation) -> &Self {
-        assert_eq!(&self.manifestation(), manifestation);
         self
     }
 }
