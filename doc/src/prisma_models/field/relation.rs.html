@@ -305,10 +305,11 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::{FieldArity, ReferentialAction, RelationInfo};
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::parser_database::walkers::RelationFieldId;
+<span class="kw">use </span>psl::parser_database::walkers::{<span class="self">self</span>, RelationFieldId};
 <span class="kw">use </span>std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -438,14 +439,14 @@
     </span><span class="kw">pub fn </span>relation_is_inlined_in_parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>relation = <span class="kw-2">&amp;</span><span class="self">self</span>.relation();
 
-        <span class="kw">match </span>relation.manifestation() {
-            RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; {
+        <span class="kw">match </span>relation.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(m) =&gt; {
                 <span class="kw">let </span>is_self_rel = relation.is_self_relation();
 
                 <span class="kw">if </span>is_self_rel {
                     !<span class="self">self</span>.relation_info.references.is_empty()
                 } <span class="kw">else </span>{
-                    m.in_table_of_model == <span class="self">self</span>.model().id
+                    m.referencing_model().id == <span class="self">self</span>.model().id
                 }
             }
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
@@ -597,19 +598,20 @@
 }
 
 <span class="kw">impl </span>RelationSide {
-    <span class="kw">pub fn </span>opposite(<span class="self">self</span>) -&gt; RelationSide {
-        <span class="kw">match </span><span class="self">self </span>{
-            RelationSide::A =&gt; RelationSide::B,
-            RelationSide::B =&gt; RelationSide::A,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(relation_field: RelationFieldId, relation: walkers::RelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = relation.relation_fields();
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = [relation_fields.next().unwrap(), relation_fields.next().unwrap()];
+        relation_fields.sort_by_key(|rf| (rf.model().name(), rf.name()));
+
+        <span class="kw">match </span>relation_fields.iter().position(|w| w.id == relation_field) {
+            <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; RelationSide::A,
+            <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; RelationSide::B,
+            <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;can&#39;t infer relation side&quot;</span>),
         }
     }
 
     <span class="kw">pub fn </span>is_a(<span class="self">self</span>) -&gt; bool {
         <span class="self">self </span>== RelationSide::A
-    }
-
-    <span class="kw">pub fn </span>is_b(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self </span>== RelationSide::B
     }
 }
 </code></pre></div>

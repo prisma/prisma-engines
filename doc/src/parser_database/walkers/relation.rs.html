@@ -120,6 +120,7 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>implicit_many_to_many;
 <span class="kw">mod </span>inline;
 <span class="kw">mod </span>two_way_embedded_many_to_many;
@@ -141,7 +142,8 @@
         [rel.model_a, rel.model_b]
     }
 
-    <span class="kw">fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+    <span class="doccomment">/// The relation fields that define the relation. A then B.
+    </span><span class="kw">pub fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
         <span class="kw">let </span>relation = <span class="self">self</span>.get();
         <span class="kw">let </span>(a, b) = relation.attributes.fields();
         [(relation.model_a, a), (relation.model_b, b)]

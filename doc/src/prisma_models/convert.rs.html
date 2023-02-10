@@ -33,7 +33,6 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
@@ -41,8 +40,7 @@
 <span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;) -&gt; InternalDataModelRef {
     <span class="kw">let </span>datamodel = dml::lift(<span class="kw-2">&amp;</span>schema);
 
-    <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>schema);
-    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>relation_placeholders, <span class="kw-2">&amp;</span>schema);
+    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>schema);
 
     <span class="kw">let </span>composite_types = builders::composite_type_builders(<span class="kw-2">&amp;</span>datamodel);
     <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {
