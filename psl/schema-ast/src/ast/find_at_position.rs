@@ -9,6 +9,9 @@ impl ast::SchemaAst {
                     SchemaPosition::Model(model_id, ModelPosition::new(&self[model_id], position))
                 }
                 ast::TopId::Enum(enum_id) => SchemaPosition::Enum(enum_id, EnumPosition::new(&self[enum_id], position)),
+                ast::TopId::Source(source_id) => {
+                    SchemaPosition::DataSource(source_id, SourcePosition::new(&self[source_id], position))
+                }
                 // Falling back to TopLevel as "not implemented"
                 _ => SchemaPosition::TopLevel,
             })
@@ -45,6 +48,8 @@ pub enum SchemaPosition<'ast> {
     Model(ast::ModelId, ModelPosition<'ast>),
     /// In an enum
     Enum(ast::EnumId, EnumPosition<'ast>),
+    /// In a datasource
+    DataSource(ast::SourceId, SourcePosition),
 }
 
 /// A cursor position in a context.
@@ -316,5 +321,25 @@ impl<'ast> ExpressionPosition<'ast> {
             }
             _ => Self::Expression,
         }
+    }
+}
+
+#[derive(Debug)]
+pub enum SourcePosition {
+    /// In the general datasource
+    Source,
+    /// In a property
+    Property,
+}
+
+impl SourcePosition {
+    fn new(source: &ast::SourceConfig, position: usize) -> Self {
+        for prop in &source.properties {
+            if prop.span.contains(position) {
+                return SourcePosition::Property;
+            }
+        }
+
+        SourcePosition::Source
     }
 }
