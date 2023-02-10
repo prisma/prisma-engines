@@ -330,6 +330,8 @@ pub enum SourcePosition {
     Source,
     /// In a property
     Property,
+    ///
+    Outer,
 }
 
 impl SourcePosition {
@@ -340,6 +342,10 @@ impl SourcePosition {
             }
         }
 
-        SourcePosition::Source
+        if source.inner_span.contains(position) {
+            return SourcePosition::Source;
+        }
+
+        SourcePosition::Outer
     }
 }

@@ -70,7 +70,7 @@ config_block = {
     (DATASOURCE_KEYWORD | GENERATOR_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
-    ~ ((key_value ~ NEWLINE) | comment_block | empty_lines| BLOCK_LEVEL_CATCH_ALL)*
+    ~ config_contents
     ~ BLOCK_CLOSE
     }
 

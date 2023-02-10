@@ -11,6 +11,8 @@ pub struct SourceConfig {
     pub(crate) documentation: Option<Comment>,
     /// The location of this source block in the text representation.
     pub span: Span,
+    ///
+    pub inner_span: Span,
 }
 
 impl WithIdentifier for SourceConfig {
