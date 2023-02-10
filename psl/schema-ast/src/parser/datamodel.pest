@@ -70,10 +70,15 @@ config_block = {
     (DATASOURCE_KEYWORD | GENERATOR_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (key_value | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+    ~ ((key_value ~ NEWLINE) | comment_block | empty_lines| BLOCK_LEVEL_CATCH_ALL)*
     ~ BLOCK_CLOSE
     }
-key_value = { identifier ~ "=" ~ expression ~ trailing_comment? ~ NEWLINE }
+
+key_value = { identifier ~ "=" ~ expression ~ trailing_comment? }
+
+config_contents = {
+    ((key_value ~ NEWLINE) | comment_block | empty_lines| BLOCK_LEVEL_CATCH_ALL)*
+}
 
 // a block definition without a keyword. Is not valid. Just acts as a catch for the parser to display a nice error.
 arbitrary_block = { identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
