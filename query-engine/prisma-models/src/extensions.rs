@@ -11,10 +11,6 @@ pub trait ModelConverterUtilities {
     // Checks if a model has a compound index that's supported
     fn has_supported_compound_index(&self) -> bool;
 
-    // Checks if a relation is supported.
-    // A relation is supported if none of its fk field are of type Unsupported
-    fn is_relation_supported(&self, rf: &dml::RelationField) -> bool;
-
     // Checks if a compound index is supported
     // A compound index is supported is none of its member are of type Unsupported
     fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool;
@@ -27,23 +23,6 @@ pub trait ModelConverterUtilities {
 impl ModelConverterUtilities for dml::Model {
     fn is_supported(&self) -> bool {
         self.has_supported_indexed_field() || self.has_supported_compound_index()
-    }
-
-    fn is_relation_supported(&self, rf: &dml::RelationField) -> bool {
-        if rf.is_ignored {
-            return false;
-        }
-
-        rf.relation_info.fields.iter().all(|fk_name| {
-            let field = self.find_field(fk_name).unwrap();
-            let is_supported = match field {
-                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                dml::Field::RelationField(_) => true,
-                dml::Field::CompositeField(_) => false,
-            };
-
-            is_supported && !field.is_ignored()
-        })
     }
 
     fn supports_create_operation(&self) -> bool {

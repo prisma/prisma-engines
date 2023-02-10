@@ -1,49 +1,29 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
-use once_cell::sync::OnceCell;
-use psl::{datamodel_connector::RelationMode, parser_database::walkers, schema_ast::ast};
-use std::{
-    fmt::Debug,
-    sync::{Arc, Weak},
+use psl::{
+    datamodel_connector::RelationMode,
+    parser_database::{walkers, RelationId},
+    schema_ast::ast,
 };
+use std::fmt::Debug;
 
-pub type RelationRef = Arc<Relation>;
-pub type RelationWeakRef = Weak<Relation>;
-
-/// A relation between two models. Can be either using a `RelationTable` or
-/// model a direct link between two `RelationField`s.
-pub struct Relation {
-    pub id: psl::parser_database::RelationId,
-
-    pub(crate) model_a_id: ast::ModelId,
-    pub(crate) model_b_id: ast::ModelId,
-
-    pub(crate) model_a: OnceCell<ModelWeakRef>,
-    pub(crate) model_b: OnceCell<ModelWeakRef>,
-
-    pub(crate) field_a: OnceCell<Weak<RelationField>>,
-    pub(crate) field_b: OnceCell<Weak<RelationField>>,
-
-    pub(crate) internal_data_model: InternalDataModelWeakRef,
-}
+pub type Relation = crate::Zipper<RelationId>;
+pub type RelationRef = Relation;
+pub type RelationWeakRef = Relation;
 
 impl Relation {
     pub const MODEL_A_DEFAULT_COLUMN: &'static str = "A";
     pub const MODEL_B_DEFAULT_COLUMN: &'static str = "B";
     pub const TABLE_ALIAS: &'static str = "RelationTable";
 
-    pub fn zipper(&self) -> crate::RelationZipper {
-        self.internal_data_model().zip(self.id)
-    }
-
     pub fn name(&self) -> String {
-        self.zipper().walker().relation_name().to_string()
+        self.walker().relation_name().to_string()
     }
 
     /// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
     pub fn is_inline_relation(&self) -> bool {
-        self.zipper().walker().refine().as_inline().is_some()
+        self.walker().refine().as_inline().is_some()
     }
 
     /// Returns `true` if the `Relation` is a table linking two models.
@@ -54,61 +34,39 @@ impl Relation {
     /// A model that relates to itself. For example a `Person` that is a parent
     /// can relate to people that are children.
     pub fn is_self_relation(&self) -> bool {
-        self.model_a_id == self.model_b_id
+        self.walker().is_self_relation()
+    }
+
+    fn sorted_models(&self) -> [walkers::ModelWalker<'_>; 2] {
+        let mut models = self.walker().models().map(|id| self.dm.walk(id));
+        models.sort_by_key(|m| m.name());
+        models
     }
 
     /// A pointer to the first `Model` in the `Relation`.
     pub fn model_a(&self) -> ModelRef {
-        self.model_a
-            .get_or_init(|| {
-                let model = self.internal_data_model().find_model_by_id(self.model_a_id);
-                Arc::downgrade(&model)
-            })
-            .upgrade()
-            .expect("Model A deleted without deleting the relations in internal_data_model.")
+        self.dm.find_model_by_id(self.sorted_models()[0].id)
     }
 
     /// A pointer to the second `Model` in the `Relation`.
     pub fn model_b(&self) -> ModelRef {
-        self.model_b
-            .get_or_init(|| {
-                let model = self.internal_data_model().find_model_by_id(self.model_b_id);
-                Arc::downgrade(&model)
-            })
-            .upgrade()
-            .expect("Model B deleted without deleting the relations in internal_data_model.")
+        self.dm.find_model_by_id(self.sorted_models()[1].id)
     }
 
     /// A pointer to the `RelationField` in the first `Model` in the `Relation`.
     pub fn field_a(&self) -> RelationFieldRef {
-        self.field_a
-            .get_or_init(|| {
-                let field = self
-                    .model_a()
-                    .fields()
-                    .find_from_relation(&self.name(), RelationSide::A)
-                    .unwrap();
-
-                Arc::downgrade(&field)
-            })
-            .upgrade()
-            .expect("Field A deleted without deleting the relations in internal_data_model.")
+        self.model_a()
+            .fields()
+            .find_from_relation(self.id, RelationSide::A)
+            .unwrap()
     }
 
     /// A pointer to the `RelationField` in the second `Model` in the `Relation`.
     pub fn field_b(&self) -> RelationFieldRef {
-        self.field_b
-            .get_or_init(|| {
-                let field = self
-                    .model_b()
-                    .fields()
-                    .find_from_relation(&self.name(), RelationSide::B)
-                    .unwrap();
-
-                Arc::downgrade(&field)
-            })
-            .upgrade()
-            .expect("Field B deleted without deleting the relations in internal_data_model.")
+        self.model_b()
+            .fields()
+            .find_from_relation(self.id, RelationSide::B)
+            .unwrap()
     }
 
     /// Practically deprecated with Prisma 2.
@@ -124,12 +82,6 @@ impl Relation {
         !self.is_many_to_many() && !self.is_one_to_one()
     }
 
-    pub fn internal_data_model(&self) -> InternalDataModelRef {
-        self.internal_data_model
-            .upgrade()
-            .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
-    }
-
     /// Retrieves the onDelete policy for this relation.
     pub fn on_delete(&self) -> ReferentialAction {
         let action = self
@@ -139,7 +91,7 @@ impl Relation {
             .or_else(|| self.field_b().on_delete().cloned())
             .unwrap_or(self.field_a().on_delete_default);
 
-        match (action, self.internal_data_model().schema.relation_mode()) {
+        match (action, self.dm.schema.relation_mode()) {
             // NoAction is an alias for Restrict when relationMode = "prisma"
             (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
             (action, _) => action,
@@ -155,7 +107,7 @@ impl Relation {
             .or_else(|| self.field_b().on_update().cloned())
             .unwrap_or(self.field_a().on_update_default);
 
-        match (action, self.internal_data_model().schema.relation_mode()) {
+        match (action, self.dm.schema.relation_mode()) {
             // NoAction is an alias for Restrict when relationMode = "prisma"
             (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
             (action, _) => action,
@@ -163,7 +115,7 @@ impl Relation {
     }
 
     pub fn manifestation(&self) -> RelationLinkManifestation {
-        match self.zipper().walker().refine() {
+        match self.walker().refine() {
             walkers::RefinedRelationWalker::Inline(rel) => RelationLinkManifestation::Inline(InlineRelation {
                 in_table_of_model: rel.referencing_model().id,
             }),
@@ -182,20 +134,6 @@ impl Relation {
                 })
             }
         }
-    }
-}
-
-impl Debug for Relation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Relation")
-            .field("model_a_name", &self.model_a_id)
-            .field("model_b_name", &self.model_b_id)
-            .field("model_a", &self.model_a)
-            .field("model_b", &self.model_b)
-            .field("field_a", &self.field_a)
-            .field("field_b", &self.field_b)
-            .field("internal_data_model", &"#InternalDataModelWeakRef#")
-            .finish()
     }
 }
 

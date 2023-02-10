@@ -1,0 +1,24 @@
+model Cat {
+    id Int @id
+    boxId Int?
+    fits Boolean @ignore
+    box Box? @relation(fields: [boxId, fits], references: [id, fits])
+}
+
+model GuineaPig {
+    id Int @id
+    boxId Int?
+    material Unsupported("material")
+    box Box? @relation(fields: [boxId, material], references: [id, material])
+}
+
+model Box {
+    id Int @id
+    fits Boolean
+    material Unsupported("material")
+    cats Cat[]
+    pig GuineaPig[]
+
+    @@unique([id, material])
+    @@unique([id, fits])
+}

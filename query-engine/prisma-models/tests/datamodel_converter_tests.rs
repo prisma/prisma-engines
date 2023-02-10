@@ -29,10 +29,10 @@ fn no_action_is_alias_for_restrict_when_prisma_relation_mode() {
         "#,
     );
 
-    let relations = datamodel.relations();
-    assert_eq!(relations.len(), 1);
+    let mut relations = datamodel.relations();
+    assert_eq!(relations.clone().count(), 1);
 
-    let relation = &relations[0];
+    let relation = relations.next().unwrap();
     assert_eq!(relation.on_update(), ReferentialAction::Restrict);
     assert_eq!(relation.on_delete(), ReferentialAction::Restrict);
 }
@@ -64,10 +64,10 @@ fn no_action_is_not_alias_for_restrict_when_foreign_keys_relation_mode() {
         "#,
     );
 
-    let relations = datamodel.relations();
-    assert_eq!(relations.len(), 1);
+    let mut relations = datamodel.relations();
+    assert_eq!(relations.clone().count(), 1);
 
-    let relation = &relations[0];
+    let relation = relations.next().unwrap();
     assert_eq!(relation.on_update(), ReferentialAction::NoAction);
     assert_eq!(relation.on_delete(), ReferentialAction::NoAction);
 }
@@ -77,7 +77,7 @@ fn an_empty_datamodel_must_work() {
     let datamodel = convert("");
     assert_eq!(datamodel.schema.db.enums_count(), 0);
     assert!(datamodel.models().is_empty());
-    assert!(datamodel.relations().is_empty());
+    assert_eq!(datamodel.relations().count(), 0);
 }
 
 #[test]
@@ -549,7 +549,7 @@ fn convert(datamodel: &str) -> Arc<InternalDataModel> {
 
 trait DatamodelAssertions {
     fn assert_model(&self, name: &str) -> Arc<Model>;
-    fn assert_relation(&self, models: (ast::ModelId, ast::ModelId), name: &str) -> Arc<Relation>;
+    fn assert_relation(self: &Arc<Self>, models: (ast::ModelId, ast::ModelId), name: &str) -> Relation;
 }
 
 impl DatamodelAssertions for InternalDataModel {
@@ -557,8 +557,10 @@ impl DatamodelAssertions for InternalDataModel {
         self.find_model(name).unwrap()
     }
 
-    fn assert_relation(&self, models: (ast::ModelId, ast::ModelId), name: &str) -> Arc<Relation> {
-        self.find_relation(models, name).unwrap().upgrade().unwrap()
+    fn assert_relation(self: &Arc<Self>, models: (ast::ModelId, ast::ModelId), name: &str) -> Relation {
+        self.relations()
+            .find(|rel| rel.model_a().id == models.0 && rel.model_b().id == models.1 && rel.name().to_owned() == name)
+            .unwrap()
     }
 }
 

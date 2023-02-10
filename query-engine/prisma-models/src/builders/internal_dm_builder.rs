@@ -1,6 +1,6 @@
 use super::{
-    field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder, FieldBuilder,
-    IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
+    field_builders::RelationFieldBuilder, CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
+    PrimaryKeyBuilder,
 };
 use crate::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
@@ -54,15 +54,13 @@ fn model_field_builders(
                     .unwrap_or_else(|| {
                         panic!("Did not find a relation for model {} and field {}", model.name, rf.name)
                     });
-
                 // If one side of the relation is not supported, filter out the relation
-                if !relation.model_a.is_relation_supported(&relation.field_a)
-                    || !relation.model_b.is_relation_supported(&relation.field_b)
-                {
+                if schema.db.walk(relation.id).is_ignored() {
                     return None;
                 }
 
                 Some(FieldBuilder::Relation(RelationFieldBuilder {
+                    id: rf.id,
                     name: rf.name.clone(),
                     arity: rf.arity,
                     relation_name: schema.db.walk(relation.id).relation_name().to_string(),
@@ -133,18 +131,6 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                 }
             }
             CompositeTypeFieldType::Unsupported(_) => None,
-        })
-        .collect()
-}
-
-pub(crate) fn relation_builders(placeholders: &[RelationPlaceholder]) -> Vec<RelationBuilder> {
-    placeholders
-        .iter()
-        .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
-        .map(|r| RelationBuilder {
-            id: r.id,
-            model_a_id: r.model_a.id,
-            model_b_id: r.model_b.id,
         })
         .collect()
 }

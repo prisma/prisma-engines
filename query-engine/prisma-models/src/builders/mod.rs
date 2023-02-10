@@ -4,7 +4,6 @@ mod index_builder;
 mod internal_dm_builder;
 mod model_builder;
 mod primary_key_builder;
-mod relation_builder;
 
 pub(crate) use internal_dm_builder::*;
 
