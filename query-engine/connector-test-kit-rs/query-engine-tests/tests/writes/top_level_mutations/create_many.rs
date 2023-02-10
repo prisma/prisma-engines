@@ -36,6 +36,20 @@ mod create_many {
         Ok(())
     }
 
+    #[connector_test(schema(schema_1))]
+    async fn basic_create_many_shorthand(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createManyTest(data: { id: 1, str1: "1", str2: "1", str3: "1"}) {
+              count
+            }
+          }"#),
+          @r###"{"data":{"createManyTest":{"count":1}}}"###
+        );
+
+        Ok(())
+    }
+
     fn schema_2() -> String {
         let schema = indoc! {
             r#"model Test {
