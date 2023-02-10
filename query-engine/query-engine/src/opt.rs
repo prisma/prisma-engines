@@ -154,12 +154,14 @@ impl PrismaOpt {
             Vec::new()
         };
 
-        if !ignore_env_errors {
-            schema
-                .configuration
-                .resolve_datasource_urls_query_engine(&datasource_url_overrides, |key| env::var(key).ok(), false)
-                .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
-        }
+        schema
+            .configuration
+            .resolve_datasource_urls_query_engine(
+                &datasource_url_overrides,
+                |key| env::var(key).ok(),
+                ignore_env_errors,
+            )
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
         Ok(schema)
     }
@@ -174,20 +176,17 @@ impl PrismaOpt {
             Vec::new()
         };
 
-        let config_result = if ignore_env_errors {
-            psl::parse_configuration(datamodel_str)
-        } else {
-            psl::parse_configuration(datamodel_str).and_then(|mut config| {
+        psl::parse_configuration(datamodel_str)
+            .and_then(|mut config| {
                 config.resolve_datasource_urls_query_engine(
                     &datasource_url_overrides,
                     |key| env::var(key).ok(),
-                    false,
+                    ignore_env_errors,
                 )?;
 
                 Ok(config)
             })
-        };
-        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.
