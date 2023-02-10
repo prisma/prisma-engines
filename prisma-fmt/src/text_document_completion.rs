@@ -12,6 +12,8 @@ use std::sync::Arc;
 
 use crate::position_to_offset;
 
+mod datasource;
+
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
         is_incomplete: true,
@@ -119,6 +121,23 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             push_namespaces(ctx, completion_list);
         }
 
+        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Source) => {
+            datasource::provider_completion(completion_list);
+            datasource::url_completion(completion_list);
+            datasource::shadow_db_completion(completion_list);
+            datasource::direct_url_completion(completion_list);
+            datasource::relation_mode_completion(completion_list);
+
+            if ctx
+                .connector()
+                .has_capability(psl::datamodel_connector::ConnectorCapability::MultiSchema)
+                && ctx.namespaces().is_empty()
+                && ctx.preview_features().contains(PreviewFeature::MultiSchema)
+            {
+                datasource::schemas_completion(completion_list);
+            }
+        }
+
         position => ctx.connector().push_completions(ctx.db, position, completion_list),
     }
 }
@@ -164,4 +183,8 @@ fn is_inside_quote(position: &lsp_types::Position, schema: &str) -> bool {
         }
         None => false,
     }
+}
+
+fn generate_pretty_doc(example: &str, description: &str) -> String {
+    format!("```prisma\n{example}\n```\n___\n{description}")
 }
