@@ -638,6 +638,8 @@
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
 <a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{
@@ -667,7 +669,7 @@
         ModelField::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; <span class="macro">vec!</span>[
             InputType::object(to_many_composite_filter_object(ctx, cf)),
             InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
-            <span class="comment">// Shorthand syntax - This is only supported because the client used to expose all
+            <span class="comment">// The object (aka shorthand) syntax is only supported because the client used to expose all
             // list input types as T | T[]. Consider removing it one day.
             </span>to_one_composite_filter_shorthand_types(ctx, cf),
         ],
@@ -828,7 +830,9 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
         input_field(
             filters::EQUALS,
-            InputType::list(InputType::object(composite_equals_object)),
+            <span class="comment">// The object (aka shorthand) syntax is only supported because the client used to expose all
+            // list input types as T | T[]. Consider removing it one day.
+            </span>list_union_type(InputType::object(composite_equals_object), <span class="bool-val">true</span>),
             <span class="prelude-val">None</span>,
         )
         .optional(),

@@ -1336,6 +1336,17 @@
 <a href="#1336" id="1336">1336</a>
 <a href="#1337" id="1337">1337</a>
 <a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -2672,6 +2683,17 @@
             <span class="string">&quot;Decimal&quot; </span>=&gt; <span class="prelude-val">Some</span>(ScalarType::Decimal),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
+    }
+}
+
+<span class="doccomment">/// An opaque identifier for a model relation field in a schema.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq)]
+</span><span class="kw">pub struct </span>RelationFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
+
+<span class="kw">impl </span>RelationFieldId {
+    <span class="doccomment">/// Coarsen the relation field identifier to a generic field identifier.
+    </span><span class="kw">pub fn </span>coarsen(<span class="self">self</span>) -&gt; (ast::ModelId, ast::FieldId) {
+        (<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
     }
 }
 </code></pre></div>

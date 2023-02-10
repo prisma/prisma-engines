@@ -149,7 +149,7 @@
         [(relation.model_a, a), (relation.model_b, b)]
             .into_iter()
             .filter_map(|(model_id, field_id)| field_id.map(|f| (model_id, f)))
-            .map(<span class="kw">move </span>|(model, field)| <span class="self">self</span>.walk(model).relation_field(field))
+            .map(<span class="kw">move </span>|(model, field)| <span class="self">self</span>.walk(RelationFieldId(model, field)))
     }
 
     <span class="doccomment">/// Is any field part of the relation ignored (`@ignore`) or unsupported?

@@ -115,10 +115,6 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker, Walker};
 <span class="kw">use </span><span class="kw">crate</span>::ScalarType;
 <span class="kw">use </span>schema_ast::ast;
@@ -148,12 +144,8 @@
             id: (model_id, field_id),
             db,
         } = <span class="self">self</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_field) = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
-            RefinedFieldWalker::Relation(RelationFieldWalker {
-                id: <span class="kw">super</span>::RelationFieldId(model_id, field_id),
-                db,
-                relation_field,
-            })
+        <span class="kw">if </span><span class="self">self</span>.db.types.relation_fields.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
+            RefinedFieldWalker::Relation(<span class="self">self</span>.walk(<span class="kw">super</span>::RelationFieldId(model_id, field_id)))
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(scalar_field) = <span class="self">self</span>.db.types.scalar_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
             RefinedFieldWalker::Scalar(ScalarFieldWalker {
                 id: ScalarFieldId(model_id, field_id),

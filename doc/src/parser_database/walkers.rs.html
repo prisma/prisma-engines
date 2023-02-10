@@ -141,6 +141,7 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.
 //!
 //! The walkers:
@@ -158,6 +159,7 @@
 <span class="kw">mod </span>relation_field;
 <span class="kw">mod </span>scalar_field;
 
+<span class="kw">pub use </span><span class="kw">crate</span>::types::RelationFieldId;
 <span class="kw">pub use </span>composite_type::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>field::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>index::<span class="kw-2">*</span>;

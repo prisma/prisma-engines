@@ -595,6 +595,7 @@
 <a href="#595" id="595">595</a>
 <a href="#596" id="596">596</a>
 <a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>many_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_many;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_one;
@@ -607,10 +608,11 @@
 <span class="kw">use </span>diagnostics::DatamodelWarning;
 <span class="kw">use </span>indoc::formatdoc;
 <span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>parser_database::walkers::RelationFieldId;
 <span class="kw">use </span>parser_database::ReferentialAction;
 <span class="kw">use </span>parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
+    walkers::{CompleteInlineRelationWalker, InlineRelationWalker},
     ScalarFieldType,
 };
 <span class="kw">use </span>std::{
@@ -836,7 +838,7 @@
     <span class="kw">let </span>parent_model = relation.referencing_model();
 
     <span class="kw">while let </span><span class="prelude-val">Some</span>((next_relation, visited_relations)) = next_relations.pop() {
-        visited.insert(next_relation.referencing_field());
+        visited.insert(next_relation.referencing_field().id);
 
         <span class="kw">let </span>related_model = next_relation.referenced_model();
 
@@ -876,7 +878,7 @@
 
             <span class="kw">let </span>relations = related_model
                 .complete_inline_relations_from()
-                .filter(|r| !visited.contains(<span class="kw-2">&amp;</span>r.referencing_field()));
+                .filter(|r| !visited.contains(<span class="kw-2">&amp;</span>r.referencing_field().id));
 
             <span class="kw">for </span>relation <span class="kw">in </span>relations {
                 next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
@@ -935,7 +937,7 @@
             (
                 relation,
                 Rc::new(VisitedRelation::root(relation)),
-                HashSet::&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;::new(),
+                HashSet::&lt;RelationFieldId&gt;::new(),
             )
         })
         .collect();
@@ -944,7 +946,7 @@
         <span class="kw">let </span>model = next_relation.referencing_model();
         <span class="kw">let </span>related_model = next_relation.referenced_model();
 
-        current_path.insert(next_relation.referencing_field());
+        current_path.insert(next_relation.referencing_field().id);
 
         <span class="comment">// Self-relations are detected elsewhere.
         </span><span class="kw">if </span>model.id == related_model.id {
@@ -959,7 +961,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>forward_relations = related_model
             .complete_inline_relations_from()
             .filter(triggers_modifications)
-            .filter(|relation| !current_path.contains(<span class="kw-2">&amp;</span>relation.referencing_field()))
+            .filter(|relation| !current_path.contains(<span class="kw-2">&amp;</span>relation.referencing_field().id))
             .map(|relation| {
                 (
                     relation,

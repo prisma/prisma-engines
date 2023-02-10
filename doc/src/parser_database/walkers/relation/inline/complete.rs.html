@@ -92,12 +92,6 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
 </pre><pre class="rust"><code><span class="kw">use </span>schema_ast::ast;
 
 <span class="kw">use crate</span>::{
@@ -127,19 +121,13 @@
     }
 
     <span class="kw">pub fn </span>referencing_field(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        RelationFieldWalker {
-            id: <span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_a.<span class="number">0</span>, <span class="self">self</span>.side_a.<span class="number">1</span>),
-            db: <span class="self">self</span>.db,
-            relation_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.side_a.<span class="number">0</span>, <span class="self">self</span>.side_a.<span class="number">1</span>)],
-        }
+        <span class="self">self</span>.db
+            .walk(<span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_a.<span class="number">0</span>, <span class="self">self</span>.side_a.<span class="number">1</span>))
     }
 
     <span class="kw">pub fn </span>referenced_field(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        RelationFieldWalker {
-            id: <span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_b.<span class="number">0</span>, <span class="self">self</span>.side_b.<span class="number">1</span>),
-            db: <span class="self">self</span>.db,
-            relation_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.side_b.<span class="number">0</span>, <span class="self">self</span>.side_b.<span class="number">1</span>)],
-        }
+        <span class="self">self</span>.db
+            .walk(<span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_b.<span class="number">0</span>, <span class="self">self</span>.side_b.<span class="number">1</span>))
     }
 
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.
@@ -154,7 +142,7 @@
             }
         };
 
-        <span class="kw">match </span><span class="self">self</span>.referencing_field().relation_field.references.as_ref() {
+        <span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().references.as_ref() {
             <span class="prelude-val">Some</span>(references) =&gt; references.iter().map(f),
             <span class="prelude-val">None </span>=&gt; [].iter().map(f),
         }
@@ -172,7 +160,7 @@
             }
         };
 
-        <span class="kw">match </span><span class="self">self</span>.referencing_field().relation_field.fields.as_ref() {
+        <span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().fields.as_ref() {
             <span class="prelude-val">Some</span>(references) =&gt; references.iter().map(f),
             <span class="prelude-val">None </span>=&gt; [].iter().map(f),
         }

@@ -531,13 +531,13 @@
             .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list()),
 
         ModelField::Composite(cf) =&gt; {
-            <span class="kw">let </span><span class="kw-2">mut </span>types = <span class="macro">vec!</span>[];
-
-            <span class="kw">if </span>cf.is_list() {
-                types.push(InputType::list(InputType::object(composite_equality_object(ctx, cf))));
+            <span class="kw">let </span>types = <span class="kw">if </span>cf.is_list() {
+                <span class="comment">// The object (aka shorthand) syntax is only supported because the client used to expose all
+                // list input types as T | T[]. Consider removing it one day.
+                </span>list_union_type(InputType::object(composite_equality_object(ctx, cf)), <span class="bool-val">true</span>)
             } <span class="kw">else </span>{
-                types.push(InputType::object(composite_equality_object(ctx, cf)));
-            }
+                <span class="macro">vec!</span>[InputType::object(composite_equality_object(ctx, cf))]
+            };
 
             input_field(cf.name.clone(), types, <span class="prelude-val">None</span>)
                 .optional_if(!cf.is_required())

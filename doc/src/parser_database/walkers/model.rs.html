@@ -301,24 +301,6 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>primary_key;
 <span class="kw">mod </span>unique_criteria;
 
@@ -327,8 +309,8 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>unique_criteria::<span class="kw-2">*</span>;
 
 <span class="kw">use super</span>::{
-    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
-    ScalarFieldWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldId, RelationFieldWalker,
+    RelationWalker, ScalarFieldWalker,
 };
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
@@ -516,30 +498,12 @@
     <span class="doccomment">/// All (concrete) relation fields of the model.
     </span><span class="kw">pub fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
         <span class="kw">let </span>model_id = <span class="self">self</span>.id;
-        <span class="kw">let </span>db = <span class="self">self</span>.db;
 
         <span class="self">self</span>.db
             .types
             .relation_fields
             .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(<span class="kw">move </span>|((<span class="kw">_</span>, field_id), relation_field)| RelationFieldWalker {
-                id: <span class="kw">super</span>::RelationFieldId(model_id, <span class="kw-2">*</span>field_id),
-                db,
-                relation_field,
-            })
-    }
-
-    <span class="doccomment">/// Find a relation field with the given id.
-    ///
-    /// ## Panics
-    ///
-    /// If the field does not exist.
-    </span><span class="kw">pub fn </span>relation_field(<span class="self">self</span>, field_id: ast::FieldId) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        RelationFieldWalker {
-            id: <span class="kw">super</span>::RelationFieldId(<span class="self">self</span>.id, field_id),
-            db: <span class="self">self</span>.db,
-            relation_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.id, field_id)],
-        }
+            .map(<span class="kw">move </span>|((<span class="kw">_</span>, field_id), <span class="kw">_</span>)| <span class="self">self</span>.walk(RelationFieldId(model_id, <span class="kw-2">*</span>field_id)))
     }
 
     <span class="doccomment">/// All relations that start from this model.

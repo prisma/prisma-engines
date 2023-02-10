@@ -132,8 +132,8 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::constraint_namespace::ConstraintNamespace;
-<span class="kw">use </span><span class="kw">crate</span>::ast::{FieldId, ModelId};
-<span class="kw">use </span>parser_database::walkers::RelationName;
+<span class="kw">use </span><span class="kw">crate</span>::ast::ModelId;
+<span class="kw">use </span>parser_database::walkers::{RelationFieldId, RelationName};
 <span class="kw">use </span>std::collections::{HashMap, HashSet};
 
 <span class="kw">type </span>RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt; = (ModelId, ModelId, RelationName&lt;<span class="lifetime">&#39;db</span>&gt;);
@@ -146,7 +146,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Names&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;FieldId&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;RelationFieldId&gt;&gt;,
     index_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt;,
     unique_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt;,
     primary_key_names: HashMap&lt;ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt;,
@@ -155,7 +155,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Names&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;FieldId&gt;&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;RelationFieldId&gt;&gt; = HashMap::new();
         <span class="kw">let </span><span class="kw-2">mut </span>index_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt; = HashSet::new();
         <span class="kw">let </span><span class="kw-2">mut </span>unique_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt; = HashSet::new();
         <span class="kw">let </span><span class="kw-2">mut </span>primary_key_names: HashMap&lt;ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; = HashMap::new();
@@ -170,7 +170,7 @@
                 <span class="kw">let </span>identifier = (model_id, related_model_id, field.relation_name());
                 <span class="kw">let </span>field_ids = relation_names.entry(identifier).or_default();
 
-                field_ids.push(field.field_id());
+                field_ids.push(field.id);
             }
 
             <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
