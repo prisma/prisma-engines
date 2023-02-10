@@ -63,8 +63,7 @@ impl Configuration {
             }
 
             if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
-                let url = datasource.load_url(env);
-                datasource.url.value = match url {
+                datasource.url.value = match datasource.load_url(env) {
                     Ok(url) => Some(url),
                     Err(_) if ignore_env_var_errors => None,
                     Err(error) => return Err(error),
