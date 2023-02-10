@@ -558,6 +558,56 @@ fn must_succeed_with_overrides() {
 }
 
 #[test]
+fn must_succeed_when_ignoring_env_errors_and_retain_env_var_name() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("MISSING_DATABASE_URL_0003")
+        }
+    "#};
+
+    let mut config = parse_configuration(schema);
+
+    config
+        .resolve_datasource_urls_query_engine(&[], load_env_var, true)
+        .unwrap();
+
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        value: None,
+        from_env_var: Some("MISSING_DATABASE_URL_0003".to_string()),
+    });
+}
+
+#[test]
+fn must_process_overrides_when_ignoring_env_errors() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("MISSING_DATABASE_URL_0004")
+        }
+    "#};
+
+    let url = "postgres://localhost".to_string();
+    let overrides = vec![("ds".to_string(), url.clone())];
+    let mut config = parse_configuration(schema);
+
+    config
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, true)
+        .unwrap();
+
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        value: Some(url),
+        from_env_var: None,
+    });
+}
+
+#[test]
 fn fail_to_load_sources_for_invalid_source() {
     let dml = indoc! {r#"
         datasource pg1 {
