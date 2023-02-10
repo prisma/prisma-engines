@@ -19,7 +19,7 @@ mod to_many {
           @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
         );
 
-        // Implicit
+        // Implicit equal
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                     findManyTestModel(where: {
@@ -29,6 +29,18 @@ mod to_many {
                     }
                 }"#),
           @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
+        );
+
+        // Implicit equal shorthand (equivalent to the one above)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        to_many_as: { a_1: "Test", a_2: 0 }
+                    }) {
+                        id
+                    }
+                }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
         );
 
         insta::assert_snapshot!(
