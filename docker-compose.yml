@@ -18,7 +18,7 @@ services:
     networks:
       - databases
 
-  cockroachdb_22_2_0:
+  cockroach_22_2_0:
     image: prismagraphql/cockroachdb-custom:22.2.0
     restart: always
     command: start-single-node --insecure
