@@ -44,6 +44,17 @@ mod to_many {
         );
 
         insta::assert_snapshot!(
+            run_query!(runner, r#"{
+                    findManyTestModel(where: {
+                        to_many_as: { equals: { a_1: "Test", a_2: 0 } }
+                    }) {
+                        id
+                    }
+                }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
           run_query!(runner, r#"{
                     findManyTestModel(where: {
                         NOT: [
@@ -234,6 +245,68 @@ mod to_many {
             }"#,
             2009,
             "`Query.findManyTestModel.where.TestModelWhereInput.to_many_as.CompositeACompositeListFilter.equals`: Value types mismatch. Have: Object({\"a_1\": Scalar(String(\"Test\")), \"a_2\": Scalar(Int(0))}), want: Object(CompositeAObjectEqualityInput)"
+        );
+
+        Ok(())
+    }
+
+    fn deep_equality_schema() -> String {
+        let schema = indoc! {
+            r#"
+              model CommentRequiredList {
+                #id(id, Int, @id)
+            
+                country String?
+                contents CommentContent[]
+              }
+            
+              type CommentContent {
+                text    String
+                upvotes CommentContentUpvotes[]
+              }
+            
+              type CommentContentUpvotes {
+                vote Boolean
+                userId String
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(deep_equality_schema))]
+    async fn deep_equality_shorthand_should_work(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneCommentRequiredList(data: {
+                    id: 1,
+                    contents: {
+                        text: "hello world",
+                        upvotes: { vote: true, userId: "10" }
+                    }
+                }) {
+                    id
+                }
+            }"#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"{
+                findManyCommentRequiredList(
+                    where: {
+                        contents: {
+                            equals: {
+                                text: "hello world",
+                                upvotes: { vote: true, userId: "10" }
+                            }
+                        }
+                    }
+                ) {
+                    id
+                }
+            }"#),
+            @r###"{"data":{"findManyCommentRequiredList":[{"id":1}]}}"###
         );
 
         Ok(())
