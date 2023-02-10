@@ -127,7 +127,7 @@ features = ["bundled"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.11.2"
+version = "0.11.6"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
