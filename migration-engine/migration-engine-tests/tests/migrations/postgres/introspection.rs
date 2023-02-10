@@ -152,3 +152,77 @@ model cities {{
     );
     pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
 }
+
+#[test]
+fn inherited_table_detect_primary_key() {
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
+        test_db.url(),
+        "inherited_table_detect_primary_key",
+    ))
+    .unwrap();
+
+    let me = migration_core::migration_api(None, None).unwrap();
+
+    let script = r#"
+CREATE TABLE cities (
+  name       text UNIQUE NOT NULL,
+  population real,
+  elevation  int     -- (in ft)
+);
+
+CREATE TABLE capitals (
+  state      char(2)
+) INHERITS (cities);
+"#;
+
+    tok(me.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url_str.clone() }),
+        script: script.to_owned(),
+    }))
+    .unwrap();
+
+    let schema = format! {
+        r#"
+            datasource db {{
+                provider = "postgres"
+                url = "{url_str}"
+            }}
+        "#,
+    };
+
+    let result = tok(me.introspect(migration_core::json_rpc::types::IntrospectParams {
+        composite_type_depth: -1,
+        force: false,
+        schema,
+        schemas: None,
+    }))
+    .unwrap();
+
+    let expected = format!(
+        r#"datasource db {{
+  provider = "postgres"
+  url      = "{}"
+}}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model capitals {{
+  name       String
+  population Float?  @db.Real
+  elevation  Int?
+  state      String? @db.Char(2)
+
+  @@ignore
+}}
+
+/// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
+model cities {{
+  name       String @unique
+  population Float? @db.Real
+  elevation  Int?
+}}
+"#,
+        url_str
+    );
+    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+}
