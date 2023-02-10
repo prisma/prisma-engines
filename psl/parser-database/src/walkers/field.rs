@@ -27,12 +27,8 @@ impl<'db> FieldWalker<'db> {
             id: (model_id, field_id),
             db,
         } = self;
-        if let Some(relation_field) = &self.db.types.relation_fields.get(&self.id) {
-            RefinedFieldWalker::Relation(RelationFieldWalker {
-                id: super::RelationFieldId(model_id, field_id),
-                db,
-                relation_field,
-            })
+        if self.db.types.relation_fields.contains_key(&self.id) {
+            RefinedFieldWalker::Relation(self.walk(super::RelationFieldId(model_id, field_id)))
         } else if let Some(scalar_field) = self.db.types.scalar_fields.get(&self.id) {
             RefinedFieldWalker::Scalar(ScalarFieldWalker {
                 id: ScalarFieldId(model_id, field_id),

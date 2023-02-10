@@ -5,7 +5,7 @@ pub use complete::CompleteInlineRelationWalker;
 use super::RelationWalker;
 use crate::{
     relations::{OneToManyRelationFields, OneToOneRelationFields, Relation, RelationAttributes},
-    walkers::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker},
+    walkers::*,
 };
 
 /// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but
@@ -80,12 +80,14 @@ impl<'db> InlineRelationWalker<'db> {
 
     /// The forward relation field (the relation field on model A, the referencing model).
     pub fn forward_relation_field(self) -> Option<RelationFieldWalker<'db>> {
-        let model = self.referencing_model();
-        match self.get().attributes {
+        let rel = self.get();
+        match rel.attributes {
             RelationAttributes::OneToOne(OneToOneRelationFields::Forward(a))
             | RelationAttributes::OneToOne(OneToOneRelationFields::Both(a, _))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(a, _))
-            | RelationAttributes::OneToMany(OneToManyRelationFields::Forward(a)) => Some(model.relation_field(a)),
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Forward(a)) => {
+                Some(self.0.walk(RelationFieldId(rel.model_a, a)))
+            }
             RelationAttributes::OneToMany(OneToManyRelationFields::Back(_)) => None,
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b: _ } => unreachable!(),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b: _ } => unreachable!(),
@@ -99,11 +101,13 @@ impl<'db> InlineRelationWalker<'db> {
 
     /// The back relation field, or virtual relation field (on model B, the referenced model).
     pub fn back_relation_field(self) -> Option<RelationFieldWalker<'db>> {
-        let model = self.referenced_model();
-        match self.get().attributes {
+        let rel = self.get();
+        match rel.attributes {
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(_, b))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(_, b))
-            | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) => Some(model.relation_field(b)),
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) => {
+                Some(self.0.walk(RelationFieldId(rel.model_b, b)))
+            }
             RelationAttributes::OneToMany(OneToManyRelationFields::Forward(_))
             | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(_)) => None,
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b: _ } => unreachable!(),

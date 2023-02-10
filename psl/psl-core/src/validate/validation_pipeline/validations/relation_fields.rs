@@ -9,18 +9,18 @@ use diagnostics::DatamodelWarning;
 use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
-    walkers::{ModelWalker, RelationFieldWalker, RelationName},
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
     ReferentialAction,
 };
 use std::fmt;
 
 struct Fields<'db> {
-    fields: &'db [ast::FieldId],
+    fields: &'db [RelationFieldId],
     model: ModelWalker<'db>,
 }
 
 impl<'db> Fields<'db> {
-    fn new(fields: &'db [ast::FieldId], model: ModelWalker<'db>) -> Self {
+    fn new(fields: &'db [RelationFieldId], model: ModelWalker<'db>) -> Self {
         Self { fields, model }
     }
 }
@@ -30,7 +30,7 @@ impl<'db> fmt::Display for Fields<'db> {
         let mut fields = self
             .fields
             .iter()
-            .map(|field_id| self.model.relation_field(*field_id).name())
+            .map(|field_id| self.model.walk(*field_id).name())
             .map(|name| format!("`{name}`"));
 
         match fields.len() {

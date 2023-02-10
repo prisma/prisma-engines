@@ -1,48 +1,13 @@
 use crate::{
     ast::{self, FieldArity},
-    types::RelationField,
-    walkers::{ModelWalker, RelationWalker, ScalarFieldWalker},
-    ParserDatabase, ReferentialAction,
+    types::{RelationField, RelationFieldId},
+    walkers::*,
+    ReferentialAction,
 };
-use std::{
-    borrow::Cow,
-    fmt,
-    hash::{Hash, Hasher},
-};
-
-/// An opaque identifier for a model relation field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Hash)]
-pub struct RelationFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
-
-impl RelationFieldId {
-    /// Coarsen the relation field identifier to a generic field identifier.
-    pub fn coarsen(self) -> (ast::ModelId, ast::FieldId) {
-        (self.0, self.1)
-    }
-}
+use std::{borrow::Cow, fmt, hash::Hasher};
 
 /// A relation field on a model in the schema.
-#[derive(Copy, Clone, Debug)]
-pub struct RelationFieldWalker<'db> {
-    /// The typed identifier for the relation field.
-    pub id: RelationFieldId,
-    pub(crate) db: &'db ParserDatabase,
-    pub(crate) relation_field: &'db RelationField,
-}
-
-impl<'db> PartialEq for RelationFieldWalker<'db> {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl<'db> Eq for RelationFieldWalker<'db> {}
-
-impl<'db> Hash for RelationFieldWalker<'db> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
+pub type RelationFieldWalker<'db> = Walker<'db, RelationFieldId>;
 
 impl<'db> RelationFieldWalker<'db> {
     /// The ID of the AST node of the field.
@@ -71,7 +36,7 @@ impl<'db> RelationFieldWalker<'db> {
     }
 
     pub(crate) fn attributes(self) -> &'db RelationField {
-        self.relation_field
+        &self.db.types.relation_fields[&self.id.coarsen()]
     }
 
     /// The onDelete argument on the relation.
@@ -96,12 +61,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The relation name explicitly written in the schema source.
     pub fn explicit_relation_name(self) -> Option<&'db str> {
-        self.relation_field.name.map(|string_id| &self.db[string_id])
+        self.attributes().name.map(|string_id| &self.db[string_id])
     }
 
     /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
-        self.relation_field.is_ignored
+        self.attributes().is_ignored
     }
 
     /// Is the field required? (not optional, not list)
@@ -121,12 +86,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// Does the relation field reference the passed in model?
     pub fn references_model(self, other: ast::ModelId) -> bool {
-        self.relation_field.referenced_model == other
+        self.attributes().referenced_model == other
     }
 
     /// The model referenced by the relation.
     pub fn related_model(self) -> ModelWalker<'db> {
-        self.db.walk(self.relation_field.referenced_model)
+        self.db.walk(self.attributes().referenced_model)
     }
 
     /// The fields in the `@relation(references: ...)` argument.

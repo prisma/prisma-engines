@@ -27,19 +27,13 @@ impl<'db> CompleteInlineRelationWalker<'db> {
     }
 
     pub fn referencing_field(self) -> RelationFieldWalker<'db> {
-        RelationFieldWalker {
-            id: crate::walkers::RelationFieldId(self.side_a.0, self.side_a.1),
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.side_a.0, self.side_a.1)],
-        }
+        self.db
+            .walk(crate::walkers::RelationFieldId(self.side_a.0, self.side_a.1))
     }
 
     pub fn referenced_field(self) -> RelationFieldWalker<'db> {
-        RelationFieldWalker {
-            id: crate::walkers::RelationFieldId(self.side_b.0, self.side_b.1),
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.side_b.0, self.side_b.1)],
-        }
+        self.db
+            .walk(crate::walkers::RelationFieldId(self.side_b.0, self.side_b.1))
     }
 
     /// The scalar fields defining the relation on the referenced model.
@@ -54,7 +48,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             }
         };
 
-        match self.referencing_field().relation_field.references.as_ref() {
+        match self.referencing_field().attributes().references.as_ref() {
             Some(references) => references.iter().map(f),
             None => [].iter().map(f),
         }
@@ -72,7 +66,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             }
         };
 
-        match self.referencing_field().relation_field.fields.as_ref() {
+        match self.referencing_field().attributes().fields.as_ref() {
             Some(references) => references.iter().map(f),
             None => [].iter().map(f),
         }

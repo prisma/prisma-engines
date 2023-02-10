@@ -1336,3 +1336,14 @@ impl ScalarType {
         }
     }
 }
+
+/// An opaque identifier for a model relation field in a schema.
+#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq)]
+pub struct RelationFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
+
+impl RelationFieldId {
+    /// Coarsen the relation field identifier to a generic field identifier.
+    pub fn coarsen(self) -> (ast::ModelId, ast::FieldId) {
+        (self.0, self.1)
+    }
+}

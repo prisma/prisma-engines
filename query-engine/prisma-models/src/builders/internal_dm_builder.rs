@@ -40,8 +40,7 @@ fn model_field_builders(model: &dml::Model, schema: &psl::ValidatedSchema) -> Ve
                 default_value: cf.default_value.clone(),
             })),
             dml::Field::RelationField(rf) => {
-                let (model_id, field_id) = rf.id.coarsen();
-                let walker = schema.db.walk(model_id).relation_field(field_id);
+                let walker = schema.db.walk(rf.id);
                 let relation = walker.relation();
 
                 if relation.is_ignored() {

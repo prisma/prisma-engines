@@ -33,16 +33,22 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
 
     /// The field that defines the relation in model a.
     pub fn field_a(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
-            RelationAttributes::ImplicitManyToMany { field_a, field_b: _ } => self.model_a().relation_field(field_a),
+        let rel = self.get();
+        match rel.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a, field_b: _ } => {
+                self.walk(crate::walkers::RelationFieldId(rel.model_a, field_a))
+            }
             _ => unreachable!(),
         }
     }
 
     /// The field that defines the relation in model b.
     pub fn field_b(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
-            RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.model_b().relation_field(field_b),
+        let rel = self.get();
+        match rel.attributes {
+            RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => {
+                self.walk(crate::walkers::RelationFieldId(rel.model_b, field_b))
+            }
             _ => unreachable!(),
         }
     }
