@@ -113,11 +113,11 @@ start-cockroach_22_1_0:
 dev-cockroach_22_1_0: start-cockroach_22_1_0
 	cp $(CONFIG_PATH)/cockroach_22_1_0 $(CONFIG_FILE)
 
-start-cockroach_22_2_0:
-	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_2_0
+start-cockroach_22_2:
+	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_2
 
-dev-cockroach_22_2_0: start-cockroach_22_2_0
-	cp $(CONFIG_PATH)/cockroach_22_2_0 $(CONFIG_FILE)
+dev-cockroach_22_2: start-cockroach_22_2
+	cp $(CONFIG_PATH)/cockroach_22_2 $(CONFIG_FILE)
 
 dev-pgbouncer:
 	docker compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
