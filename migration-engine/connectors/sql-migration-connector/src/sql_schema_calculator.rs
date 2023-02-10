@@ -187,7 +187,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         .filter_map(|relation| relation.refine().as_many_to_many());
 
     for m2m in m2m_relations {
-        let table_name = format!("_{}", m2m.relation_name());
+        let table_name = m2m.table_name().to_string();
         let table_name = table_name
             .chars()
             .take(datamodel.configuration.max_identifier_length())
@@ -196,8 +196,8 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         let model_a_table_id = ctx.model_id_to_table_id[&model_a.model_id()];
         let model_b = m2m.model_b();
         let model_b_table_id = ctx.model_id_to_table_id[&model_b.model_id()];
-        let model_a_column = "A";
-        let model_b_column = "B";
+        let model_a_column = m2m.column_a_name();
+        let model_b_column = m2m.column_b_name();
         let model_a_id = model_a.primary_key().unwrap().fields().next().unwrap();
         let model_b_id = model_b.primary_key().unwrap().fields().next().unwrap();
 

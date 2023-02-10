@@ -2,7 +2,7 @@ mod implicit_many_to_many;
 mod inline;
 mod two_way_embedded_many_to_many;
 
-pub use implicit_many_to_many::ImplicitManyToManyRelationWalker;
+pub use implicit_many_to_many::{ImplicitManyToManyRelationTableName, ImplicitManyToManyRelationWalker};
 pub use inline::{CompleteInlineRelationWalker, InlineRelationWalker};
 pub use two_way_embedded_many_to_many::TwoWayEmbeddedManyToManyRelationWalker;
 
