@@ -254,13 +254,13 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
             .nullable_if(!sf.is_required() && !sf.is_list()),
 
         ModelField::Composite(cf) => {
-            let mut types = vec![];
-
-            if cf.is_list() {
-                types.push(InputType::list(InputType::object(composite_equality_object(ctx, cf))));
+            let types = if cf.is_list() {
+                // The object (aka shorthand) syntax is only supported because the client used to expose all
+                // list input types as T | T[]. Consider removing it one day.
+                list_union_type(InputType::object(composite_equality_object(ctx, cf)), true)
             } else {
-                types.push(InputType::object(composite_equality_object(ctx, cf)));
-            }
+                vec![InputType::object(composite_equality_object(ctx, cf))]
+            };
 
             input_field(cf.name.clone(), types, None)
                 .optional_if(!cf.is_required())
