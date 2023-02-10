@@ -113,13 +113,19 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use crate</span>::{
     capitalize,
     constants::args,
     field, init_input_object_type, input_field,
-    input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
+    input_types::{
+        fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
+        list_union_type,
+    },
     output_types::objects,
     BuilderContext, ModelField,
 };
@@ -153,7 +159,7 @@
 <span class="doccomment">/// Builds &quot;skip_duplicates&quot; and &quot;data&quot; arguments intended for the create many field.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>create_many_type = InputType::object(create_many_object_type(ctx, model, <span class="prelude-val">None</span>));
-    <span class="kw">let </span>data_arg = input_field(<span class="string">&quot;data&quot;</span>, InputType::list(create_many_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>data_arg = input_field(args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
 
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
         <span class="kw">let </span>skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), <span class="prelude-val">None</span>).optional();

@@ -97,14 +97,14 @@
 
 <span class="doccomment">/// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-</span><span class="kw">fn </span>list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -&gt; Vec&lt;InputType&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -&gt; Vec&lt;InputType&gt; {
     <span class="kw">let </span>input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }
 
 <span class="doccomment">/// Convenience function to return [input_type, list_input_type]
 /// (shorthand + full type) if the field is a list.
-</span><span class="kw">fn </span>list_union_type(input_type: InputType, as_list: bool) -&gt; Vec&lt;InputType&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list_union_type(input_type: InputType, as_list: bool) -&gt; Vec&lt;InputType&gt; {
     <span class="kw">if </span>as_list {
         <span class="macro">vec!</span>[input_type.clone(), InputType::list(input_type)]
     } <span class="kw">else </span>{

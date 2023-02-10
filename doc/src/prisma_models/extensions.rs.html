@@ -115,27 +115,6 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TypeIdentifier;
 <span class="kw">use </span>dml::{<span class="self">self</span>, Ignorable, NativeTypeInstance};
 
@@ -149,10 +128,6 @@
     <span class="comment">// Checks if a model has a compound index that&#39;s supported
     </span><span class="kw">fn </span>has_supported_compound_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="comment">// Checks if a relation is supported.
-    // A relation is supported if none of its fk field are of type Unsupported
-    </span><span class="kw">fn </span>is_relation_supported(<span class="kw-2">&amp;</span><span class="self">self</span>, rf: <span class="kw-2">&amp;</span>dml::RelationField) -&gt; bool;
-
     <span class="comment">// Checks if a compound index is supported
     // A compound index is supported is none of its member are of type Unsupported
     </span><span class="kw">fn </span>is_compound_index_supported(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>dml::IndexDefinition) -&gt; bool;
@@ -165,23 +140,6 @@
 <span class="kw">impl </span>ModelConverterUtilities <span class="kw">for </span>dml::Model {
     <span class="kw">fn </span>is_supported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.has_supported_indexed_field() || <span class="self">self</span>.has_supported_compound_index()
-    }
-
-    <span class="kw">fn </span>is_relation_supported(<span class="kw-2">&amp;</span><span class="self">self</span>, rf: <span class="kw-2">&amp;</span>dml::RelationField) -&gt; bool {
-        <span class="kw">if </span>rf.is_ignored {
-            <span class="kw">return </span><span class="bool-val">false</span>;
-        }
-
-        rf.relation_info.fields.iter().all(|fk_name| {
-            <span class="kw">let </span>field = <span class="self">self</span>.find_field(fk_name).unwrap();
-            <span class="kw">let </span>is_supported = <span class="kw">match </span>field {
-                dml::Field::ScalarField(sf) =&gt; sf.type_identifier() != TypeIdentifier::Unsupported,
-                dml::Field::RelationField(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-                dml::Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            };
-
-            is_supported &amp;&amp; !field.is_ignored()
-        })
     }
 
     <span class="kw">fn </span>supports_create_operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

@@ -34,15 +34,6 @@
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
 <a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-<a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
@@ -53,13 +44,10 @@
     <span class="kw">let </span>relation_placeholders = builders::relation_placeholders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>schema);
     <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>relation_placeholders, <span class="kw-2">&amp;</span>schema);
 
-    <span class="kw">let </span>relations = builders::relation_builders(<span class="kw-2">&amp;</span>relation_placeholders);
-
     <span class="kw">let </span>composite_types = builders::composite_type_builders(<span class="kw-2">&amp;</span>datamodel);
     <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {
         models: OnceCell::new(),
         composite_types: OnceCell::new(),
-        relations: OnceCell::new(),
         relation_fields: OnceCell::new(),
         schema,
     });
@@ -79,12 +67,6 @@
 
     internal_data_model.models.set(models).unwrap();
 
-    <span class="kw">let </span>relations = relations
-        .into_iter()
-        .map(|rt| rt.build(Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model)))
-        .collect();
-
-    internal_data_model.relations.set(relations).unwrap();
     internal_data_model.finalize();
     internal_data_model
 }

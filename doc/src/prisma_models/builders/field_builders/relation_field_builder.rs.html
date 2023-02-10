@@ -30,13 +30,17 @@
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::{FieldArity, ReferentialAction, RelationInfo};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::parser_database::walkers::RelationFieldId;
 <span class="kw">use </span>std::{fmt::Debug, sync::Arc};
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>RelationFieldBuilder {
+    <span class="kw">pub </span>id: RelationFieldId,
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>arity: FieldArity,
     <span class="kw">pub </span>relation_name: String,
@@ -49,12 +53,12 @@
 <span class="kw">impl </span>RelationFieldBuilder {
     <span class="kw">pub fn </span>build(<span class="self">self</span>, model: ModelWeakRef) -&gt; RelationFieldRef {
         Arc::new(RelationField {
+            id: <span class="self">self</span>.id,
             name: <span class="self">self</span>.name,
             arity: <span class="self">self</span>.arity,
             relation_name: <span class="self">self</span>.relation_name,
             relation_side: <span class="self">self</span>.relation_side,
             model,
-            relation: OnceCell::new(),
             relation_info: <span class="self">self</span>.relation_info,
             fields: OnceCell::new(),
             on_delete_default: <span class="self">self</span>.on_delete_default,

@@ -246,6 +246,7 @@
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::objects::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
@@ -292,7 +293,8 @@
         &amp;&amp; !parent_field.relation().is_many_to_many()
     {
         <span class="kw">let </span>envelope = nested_create_many_envelope(ctx, parent_field);
-        <span class="prelude-val">Some</span>(input_field(<span class="string">&quot;createMany&quot;</span>, InputType::object(envelope), <span class="prelude-val">None</span>).optional())
+
+        <span class="prelude-val">Some</span>(input_field(operations::CREATE_MANY, InputType::object(envelope), <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -311,7 +313,7 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>create_many_type = InputType::object(create_type);
-    <span class="kw">let </span>data_arg = input_field(<span class="string">&quot;data&quot;</span>, InputType::list(create_many_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>data_arg = input_field(args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>fields = <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
         <span class="kw">let </span>skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), <span class="prelude-val">None</span>).optional();

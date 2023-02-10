@@ -94,6 +94,32 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>implicit_many_to_many;
 <span class="kw">mod </span>inline;
 <span class="kw">mod </span>two_way_embedded_many_to_many;
@@ -109,6 +135,32 @@
 </span><span class="kw">pub type </span>RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; = Walker&lt;<span class="lifetime">&#39;db</span>, RelationId&gt;;
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The models at each end of the relation. [model A, model B]. Can be the same model twice.
+    </span><span class="kw">pub fn </span>models(<span class="self">self</span>) -&gt; [ast::ModelId; <span class="number">2</span>] {
+        <span class="kw">let </span>rel = <span class="self">self</span>.get();
+        [rel.model_a, rel.model_b]
+    }
+
+    <span class="kw">fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">let </span>relation = <span class="self">self</span>.get();
+        <span class="kw">let </span>(a, b) = relation.attributes.fields();
+        [(relation.model_a, a), (relation.model_b, b)]
+            .into_iter()
+            .filter_map(|(model_id, field_id)| field_id.map(|f| (model_id, f)))
+            .map(<span class="kw">move </span>|(model, field)| <span class="self">self</span>.walk(model).relation_field(field))
+    }
+
+    <span class="doccomment">/// Is any field part of the relation ignored (`@ignore`) or unsupported?
+    </span><span class="kw">pub fn </span>is_ignored(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.relation_fields().any(|f| {
+            f.is_ignored()
+                || f.referencing_fields()
+                    .into_iter()
+                    .flatten()
+                    .any(|scalar_field| scalar_field.is_ignored() || scalar_field.is_unsupported())
+        })
+    }
+
     <span class="doccomment">/// Is this a relation where both ends are the same model?
     </span><span class="kw">pub fn </span>is_self_relation(<span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>r = <span class="self">self</span>.get();

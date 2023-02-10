@@ -305,13 +305,10 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::{FieldArity, ReferentialAction, RelationInfo};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::parser_database::walkers::RelationFieldId;
 <span class="kw">use </span>std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -323,11 +320,11 @@
 
 <span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>RelationField {
+    <span class="kw">pub </span>id: RelationFieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub </span>arity: FieldArity,
     <span class="kw">pub </span>relation_name: String,
     <span class="kw">pub </span>relation_side: RelationSide,
-    <span class="kw">pub </span>relation: OnceCell&lt;RelationWeakRef&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) relation_info: RelationInfo,
 
     <span class="kw">pub </span>on_delete_default: ReferentialAction,
@@ -422,18 +419,14 @@
     }
 
     <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationRef {
-        <span class="self">self</span>.relation
-            .get_or_init(|| {
-                <span class="self">self</span>.model()
-                    .internal_data_model()
-                    .find_relation(
-                        (<span class="self">self</span>.model().id, <span class="self">self</span>.relation_info.referenced_model),
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.relation_name,
-                    )
-                    .unwrap()
-            })
-            .upgrade()
-            .unwrap()
+        <span class="kw">let </span>(model_id, field_id) = <span class="self">self</span>.id.coarsen();
+        <span class="kw">let </span>internal_data_model = <span class="self">self</span>.model().internal_data_model();
+        <span class="kw">let </span>relation_id = internal_data_model
+            .walk(model_id)
+            .relation_field(field_id)
+            .relation()
+            .id;
+        internal_data_model.zip(relation_id)
     }
 
     <span class="doccomment">/// Alias for more clarity (in most cases, doesn&#39;t add more clarity for self-relations);
@@ -562,7 +555,6 @@
             .field(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.arity)
             .field(<span class="string">&quot;relation_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_name)
             .field(<span class="string">&quot;relation_side&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_side)
-            .field(<span class="string">&quot;relation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation)
             .field(<span class="string">&quot;relation_info&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_info)
             .field(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#ModelWeakRef#&quot;</span>)
             .field(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fields)

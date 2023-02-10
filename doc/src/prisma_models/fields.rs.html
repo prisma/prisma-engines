@@ -248,18 +248,10 @@
 <a href="#248" id="248">248</a>
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::pk::PrimaryKey;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::parser_database::RelationId;
 <span class="kw">use </span>std::{collections::BTreeSet, sync::Arc};
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -270,12 +262,11 @@
     relation: OnceCell&lt;Vec&lt;RelationFieldWeak&gt;&gt;,
     composite: OnceCell&lt;Vec&lt;CompositeFieldWeak&gt;&gt;,
     model: ModelWeakRef,
-    <span class="comment">// created_at: OnceCell&lt;Option&lt;ScalarFieldRef&gt;&gt;,
-    </span>updated_at: OnceCell&lt;Vec&lt;ScalarFieldRef&gt;&gt;,
+    updated_at: OnceCell&lt;Vec&lt;ScalarFieldRef&gt;&gt;,
 }
 
 <span class="kw">impl </span>Fields {
-    <span class="kw">pub fn </span>new(all: Vec&lt;Field&gt;, model: ModelWeakRef, primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;) -&gt; Fields {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(all: Vec&lt;Field&gt;, model: ModelWeakRef, primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;) -&gt; Fields {
         Fields {
             all,
             primary_key,
@@ -465,13 +456,13 @@
             })
     }
 
-    <span class="kw">pub fn </span>find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, side: RelationSide) -&gt; <span class="kw">crate</span>::Result&lt;RelationFieldRef&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, id: RelationId, side: RelationSide) -&gt; <span class="kw">crate</span>::Result&lt;RelationFieldRef&gt; {
         <span class="self">self</span>.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
-            .find(|field| field.relation().name() == name &amp;&amp; field.relation_side == side)
+            .find(|field| field.relation().id == id &amp;&amp; field.relation_side == side)
             .ok_or_else(|| DomainError::FieldForRelationNotFound {
-                relation: name.to_string(),
+                relation: <span class="self">self</span>.model().internal_data_model().walk(id).relation_name().to_string(),
                 model: <span class="self">self</span>.model().name.clone(),
             })
     }
@@ -498,13 +489,6 @@
         };
 
         acc
-    }
-
-    <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;_ </span>{
-        <span class="self">self</span>.all
-            .iter()
-            .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))
-            .unique()
     }
 
     <span class="kw">pub fn </span>filter_all&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; Vec&lt;Field&gt;

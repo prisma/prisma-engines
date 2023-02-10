@@ -186,7 +186,7 @@
     graph.flag_transactional();
 
     <span class="kw">let </span>data_list: ParsedInputList = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
-        <span class="prelude-val">Some</span>(data) =&gt; data.value.try_into()<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(data) =&gt; utils::coerce_vec(data.value),
         <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
     };
 

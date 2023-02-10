@@ -77,9 +77,6 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
@@ -155,10 +152,7 @@
 
                 table.add_unique_index(<span class="macro">vec!</span>[Column::from(<span class="string">&quot;A&quot;</span>), Column::from(<span class="string">&quot;B&quot;</span>)])
             }
-            RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; <span class="self">self
-                </span>.internal_data_model()
-                .find_model_by_id(m.in_table_of_model)
-                .as_table(ctx),
+            RelationLinkManifestation::Inline(<span class="kw-2">ref </span>m) =&gt; <span class="self">self</span>.dm.find_model_by_id(m.in_table_of_model).as_table(ctx),
         }
     }
 }

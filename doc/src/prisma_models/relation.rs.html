@@ -154,114 +154,32 @@
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::ReferentialAction;
-<span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::{datamodel_connector::RelationMode, parser_database::walkers, schema_ast::ast};
-<span class="kw">use </span>std::{
-    fmt::Debug,
-    sync::{Arc, Weak},
+<span class="kw">use </span>psl::{
+    datamodel_connector::RelationMode,
+    parser_database::{walkers, RelationId},
+    schema_ast::ast,
 };
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="kw">pub type </span>RelationRef = Arc&lt;Relation&gt;;
-<span class="kw">pub type </span>RelationWeakRef = Weak&lt;Relation&gt;;
-
-<span class="doccomment">/// A relation between two models. Can be either using a `RelationTable` or
-/// model a direct link between two `RelationField`s.
-</span><span class="kw">pub struct </span>Relation {
-    <span class="kw">pub </span>id: psl::parser_database::RelationId,
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a_id: ast::ModelId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b_id: ast::ModelId,
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a: OnceCell&lt;ModelWeakRef&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b: OnceCell&lt;ModelWeakRef&gt;,
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) field_a: OnceCell&lt;Weak&lt;RelationField&gt;&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) field_b: OnceCell&lt;Weak&lt;RelationField&gt;&gt;,
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) internal_data_model: InternalDataModelWeakRef,
-}
+<span class="kw">pub type </span>Relation = <span class="kw">crate</span>::Zipper&lt;RelationId&gt;;
+<span class="kw">pub type </span>RelationRef = Relation;
+<span class="kw">pub type </span>RelationWeakRef = Relation;
 
 <span class="kw">impl </span>Relation {
     <span class="kw">pub const </span>MODEL_A_DEFAULT_COLUMN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;A&quot;</span>;
     <span class="kw">pub const </span>MODEL_B_DEFAULT_COLUMN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;B&quot;</span>;
     <span class="kw">pub const </span>TABLE_ALIAS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;RelationTable&quot;</span>;
 
-    <span class="kw">pub fn </span>zipper(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::RelationZipper {
-        <span class="self">self</span>.internal_data_model().zip(<span class="self">self</span>.id)
-    }
-
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.zipper().walker().relation_name().to_string()
+        <span class="self">self</span>.walker().relation_name().to_string()
     }
 
     <span class="doccomment">/// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
     </span><span class="kw">pub fn </span>is_inline_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.zipper().walker().refine().as_inline().is_some()
+        <span class="self">self</span>.walker().refine().as_inline().is_some()
     }
 
     <span class="doccomment">/// Returns `true` if the `Relation` is a table linking two models.
@@ -272,61 +190,39 @@
     <span class="doccomment">/// A model that relates to itself. For example a `Person` that is a parent
     /// can relate to people that are children.
     </span><span class="kw">pub fn </span>is_self_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.model_a_id == <span class="self">self</span>.model_b_id
+        <span class="self">self</span>.walker().is_self_relation()
+    }
+
+    <span class="kw">fn </span>sorted_models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;; <span class="number">2</span>] {
+        <span class="kw">let </span><span class="kw-2">mut </span>models = <span class="self">self</span>.walker().models().map(|id| <span class="self">self</span>.dm.walk(id));
+        models.sort_by_key(|m| m.name());
+        models
     }
 
     <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.
     </span><span class="kw">pub fn </span>model_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
-        <span class="self">self</span>.model_a
-            .get_or_init(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model_by_id(<span class="self">self</span>.model_a_id);
-                Arc::downgrade(<span class="kw-2">&amp;</span>model)
-            })
-            .upgrade()
-            .expect(<span class="string">&quot;Model A deleted without deleting the relations in internal_data_model.&quot;</span>)
+        <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.sorted_models()[<span class="number">0</span>].id)
     }
 
     <span class="doccomment">/// A pointer to the second `Model` in the `Relation`.
     </span><span class="kw">pub fn </span>model_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
-        <span class="self">self</span>.model_b
-            .get_or_init(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model_by_id(<span class="self">self</span>.model_b_id);
-                Arc::downgrade(<span class="kw-2">&amp;</span>model)
-            })
-            .upgrade()
-            .expect(<span class="string">&quot;Model B deleted without deleting the relations in internal_data_model.&quot;</span>)
+        <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.sorted_models()[<span class="number">1</span>].id)
     }
 
     <span class="doccomment">/// A pointer to the `RelationField` in the first `Model` in the `Relation`.
     </span><span class="kw">pub fn </span>field_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
-        <span class="self">self</span>.field_a
-            .get_or_init(|| {
-                <span class="kw">let </span>field = <span class="self">self
-                    </span>.model_a()
-                    .fields()
-                    .find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>.name(), RelationSide::A)
-                    .unwrap();
-
-                Arc::downgrade(<span class="kw-2">&amp;</span>field)
-            })
-            .upgrade()
-            .expect(<span class="string">&quot;Field A deleted without deleting the relations in internal_data_model.&quot;</span>)
+        <span class="self">self</span>.model_a()
+            .fields()
+            .find_from_relation(<span class="self">self</span>.id, RelationSide::A)
+            .unwrap()
     }
 
     <span class="doccomment">/// A pointer to the `RelationField` in the second `Model` in the `Relation`.
     </span><span class="kw">pub fn </span>field_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
-        <span class="self">self</span>.field_b
-            .get_or_init(|| {
-                <span class="kw">let </span>field = <span class="self">self
-                    </span>.model_b()
-                    .fields()
-                    .find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>.name(), RelationSide::B)
-                    .unwrap();
-
-                Arc::downgrade(<span class="kw-2">&amp;</span>field)
-            })
-            .upgrade()
-            .expect(<span class="string">&quot;Field B deleted without deleting the relations in internal_data_model.&quot;</span>)
+        <span class="self">self</span>.model_b()
+            .fields()
+            .find_from_relation(<span class="self">self</span>.id, RelationSide::B)
+            .unwrap()
     }
 
     <span class="doccomment">/// Practically deprecated with Prisma 2.
@@ -342,12 +238,6 @@
         !<span class="self">self</span>.is_many_to_many() &amp;&amp; !<span class="self">self</span>.is_one_to_one()
     }
 
-    <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
-        <span class="self">self</span>.internal_data_model
-            .upgrade()
-            .expect(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
-    }
-
     <span class="doccomment">/// Retrieves the onDelete policy for this relation.
     </span><span class="kw">pub fn </span>on_delete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
         <span class="kw">let </span>action = <span class="self">self
@@ -357,7 +247,7 @@
             .or_else(|| <span class="self">self</span>.field_b().on_delete().cloned())
             .unwrap_or(<span class="self">self</span>.field_a().on_delete_default);
 
-        <span class="kw">match </span>(action, <span class="self">self</span>.internal_data_model().schema.relation_mode()) {
+        <span class="kw">match </span>(action, <span class="self">self</span>.dm.schema.relation_mode()) {
             <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;
             </span>(ReferentialAction::NoAction, RelationMode::Prisma) =&gt; ReferentialAction::Restrict,
             (action, <span class="kw">_</span>) =&gt; action,
@@ -373,7 +263,7 @@
             .or_else(|| <span class="self">self</span>.field_b().on_update().cloned())
             .unwrap_or(<span class="self">self</span>.field_a().on_update_default);
 
-        <span class="kw">match </span>(action, <span class="self">self</span>.internal_data_model().schema.relation_mode()) {
+        <span class="kw">match </span>(action, <span class="self">self</span>.dm.schema.relation_mode()) {
             <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;
             </span>(ReferentialAction::NoAction, RelationMode::Prisma) =&gt; ReferentialAction::Restrict,
             (action, <span class="kw">_</span>) =&gt; action,
@@ -381,7 +271,7 @@
     }
 
     <span class="kw">pub fn </span>manifestation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationLinkManifestation {
-        <span class="kw">match </span><span class="self">self</span>.zipper().walker().refine() {
+        <span class="kw">match </span><span class="self">self</span>.walker().refine() {
             walkers::RefinedRelationWalker::Inline(rel) =&gt; RelationLinkManifestation::Inline(InlineRelation {
                 in_table_of_model: rel.referencing_model().id,
             }),
@@ -400,20 +290,6 @@
                 })
             }
         }
-    }
-}
-
-<span class="kw">impl </span>Debug <span class="kw">for </span>Relation {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_struct(<span class="string">&quot;Relation&quot;</span>)
-            .field(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a_id)
-            .field(<span class="string">&quot;model_b_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b_id)
-            .field(<span class="string">&quot;model_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a)
-            .field(<span class="string">&quot;model_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b)
-            .field(<span class="string">&quot;field_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.field_a)
-            .field(<span class="string">&quot;field_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.field_b)
-            .field(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
-            .finish()
     }
 }
 

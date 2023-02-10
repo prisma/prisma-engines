@@ -263,23 +263,9 @@
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
-    field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder, FieldBuilder,
-    IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
+    field_builders::RelationFieldBuilder, CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
+    PrimaryKeyBuilder,
 };
 <span class="kw">use crate</span>::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
@@ -333,15 +319,13 @@
                     .unwrap_or_else(|| {
                         <span class="macro">panic!</span>(<span class="string">&quot;Did not find a relation for model {} and field {}&quot;</span>, model.name, rf.name)
                     });
-
                 <span class="comment">// If one side of the relation is not supported, filter out the relation
-                </span><span class="kw">if </span>!relation.model_a.is_relation_supported(<span class="kw-2">&amp;</span>relation.field_a)
-                    || !relation.model_b.is_relation_supported(<span class="kw-2">&amp;</span>relation.field_b)
-                {
+                </span><span class="kw">if </span>schema.db.walk(relation.id).is_ignored() {
                     <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
                 <span class="prelude-val">Some</span>(FieldBuilder::Relation(RelationFieldBuilder {
+                    id: rf.id,
                     name: rf.name.clone(),
                     arity: rf.arity,
                     relation_name: schema.db.walk(relation.id).relation_name().to_string(),
@@ -412,18 +396,6 @@
                 }
             }
             CompositeTypeFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-        })
-        .collect()
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_builders(placeholders: <span class="kw-2">&amp;</span>[RelationPlaceholder]) -&gt; Vec&lt;RelationBuilder&gt; {
-    placeholders
-        .iter()
-        .filter(|r| r.model_a.is_relation_supported(<span class="kw-2">&amp;</span>r.field_a) &amp;&amp; r.model_b.is_relation_supported(<span class="kw-2">&amp;</span>r.field_b))
-        .map(|r| RelationBuilder {
-            id: r.id,
-            model_a_id: r.model_a.id,
-            model_b_id: r.model_b.id,
         })
         .collect()
 }

@@ -915,7 +915,7 @@
     <span class="comment">// Nested input is an object of { data: [...], skipDuplicates: bool }
     </span><span class="kw">let </span><span class="kw-2">mut </span>obj: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>data_list: ParsedInputList = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     <span class="kw">let </span>skip_duplicates: bool = <span class="kw">match </span>obj.remove(args::SKIP_DUPLICATES) {
         <span class="prelude-val">Some</span>(val) =&gt; val.try_into()<span class="question-mark">?</span>,
         <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
