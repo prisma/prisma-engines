@@ -6,8 +6,8 @@ pub use primary_key::*;
 pub(crate) use unique_criteria::*;
 
 use super::{
-    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
-    ScalarFieldWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldId, RelationFieldWalker,
+    RelationWalker, ScalarFieldWalker,
 };
 use crate::{
     ast::{self, WithName},
@@ -195,30 +195,12 @@ impl<'db> ModelWalker<'db> {
     /// All (concrete) relation fields of the model.
     pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
         let model_id = self.id;
-        let db = self.db;
 
         self.db
             .types
             .relation_fields
             .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(move |((_, field_id), relation_field)| RelationFieldWalker {
-                id: super::RelationFieldId(model_id, *field_id),
-                db,
-                relation_field,
-            })
-    }
-
-    /// Find a relation field with the given id.
-    ///
-    /// ## Panics
-    ///
-    /// If the field does not exist.
-    pub fn relation_field(self, field_id: ast::FieldId) -> RelationFieldWalker<'db> {
-        RelationFieldWalker {
-            id: super::RelationFieldId(self.id, field_id),
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.id, field_id)],
-        }
+            .map(move |((_, field_id), _)| self.walk(RelationFieldId(model_id, *field_id)))
     }
 
     /// All relations that start from this model.

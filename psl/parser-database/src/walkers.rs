@@ -15,6 +15,7 @@ mod relation;
 mod relation_field;
 mod scalar_field;
 
+pub use crate::types::RelationFieldId;
 pub use composite_type::*;
 pub use field::*;
 pub use index::*;

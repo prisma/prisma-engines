@@ -27,9 +27,10 @@ impl<'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
 
     /// The field that defines the relation in model a.
     pub fn field_a(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
+        let rel = self.get();
+        match rel.attributes {
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b: _ } => {
-                self.model_a().relation_field(field_a)
+                self.0.walk(crate::walkers::RelationFieldId(rel.model_a, field_a))
             }
             _ => unreachable!(),
         }
@@ -37,10 +38,12 @@ impl<'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
 
     /// The field that defines the relation in model b.
     pub fn field_b(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
+        let rel = self.get();
+        match rel.attributes {
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b } => {
-                self.model_b().relation_field(field_b)
+                self.0.walk(crate::walkers::RelationFieldId(rel.model_b, field_b))
             }
+
             _ => unreachable!(),
         }
     }

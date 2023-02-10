@@ -26,7 +26,7 @@ impl<'db> RelationWalker<'db> {
         [(relation.model_a, a), (relation.model_b, b)]
             .into_iter()
             .filter_map(|(model_id, field_id)| field_id.map(|f| (model_id, f)))
-            .map(move |(model, field)| self.walk(model).relation_field(field))
+            .map(move |(model, field)| self.walk(RelationFieldId(model, field)))
     }
 
     /// Is any field part of the relation ignored (`@ignore`) or unsupported?

@@ -112,13 +112,8 @@ impl RelationField {
     }
 
     pub fn relation(&self) -> RelationRef {
-        let (model_id, field_id) = self.id.coarsen();
         let internal_data_model = self.model().internal_data_model();
-        let relation_id = internal_data_model
-            .walk(model_id)
-            .relation_field(field_id)
-            .relation()
-            .id;
+        let relation_id = internal_data_model.walk(self.id).relation().id;
         internal_data_model.zip(relation_id)
     }
 
