@@ -35,6 +35,10 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
+          - name: "mongodb_4_2"
+            single_threaded: true
+            connector: "mongodb"
+            version: "4.2"
         engine_protocol: [graphql, json]
 
     env:
