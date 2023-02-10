@@ -23,7 +23,7 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "26259:26257"
+      - "26258:26257"
     networks:
       - databases
 
