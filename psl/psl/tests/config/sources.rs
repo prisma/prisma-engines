@@ -495,7 +495,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
     config
-        .resolve_datasource_urls_query_engine(&overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, false)
         .unwrap();
     let data_source = config.datasources.first().unwrap();
 
@@ -522,7 +522,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let mut config = parse_configuration(schema);
 
     config
-        .resolve_datasource_urls_query_engine(&overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, false)
         .unwrap();
 
     let data_source = config.datasources.first().unwrap();
@@ -548,7 +548,7 @@ fn must_succeed_with_overrides() {
     let mut config = parse_configuration(schema);
 
     config
-        .resolve_datasource_urls_query_engine(overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(overrides, load_env_var, false)
         .unwrap();
 
     let data_source = config.datasources.first().unwrap();
