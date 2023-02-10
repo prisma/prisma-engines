@@ -51,6 +51,7 @@ impl Configuration {
         &mut self,
         url_overrides: &[(String, String)],
         env: F,
+        ignore_env_var_errors: bool,
     ) -> Result<(), Diagnostics>
     where
         F: Fn(&str) -> Option<String> + Copy,
@@ -62,7 +63,12 @@ impl Configuration {
             }
 
             if datasource.url.from_env_var.is_some() && datasource.url.value.is_none() {
-                datasource.url.value = Some(datasource.load_url(env)?);
+                let url = datasource.load_url(env);
+                datasource.url.value = match url {
+                    Ok(url) => Some(url),
+                    Err(_) if ignore_env_var_errors => None,
+                    Err(error) => return Err(error),
+                };
             }
 
             if let Some(direct_url) = &datasource.direct_url {

@@ -156,11 +156,13 @@ impl QueryEngine {
             .to_result()
             .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
-        if !ignore_env_var_errors {
-            config
-                .resolve_datasource_urls_query_engine(&overrides, |key| env.get(key).map(ToString::to_string))
-                .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
-        }
+        config
+            .resolve_datasource_urls_query_engine(
+                &overrides,
+                |key| env.get(key).map(ToString::to_string),
+                ignore_env_var_errors,
+            )
+            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
         config
             .validate_that_one_datasource_is_provided()

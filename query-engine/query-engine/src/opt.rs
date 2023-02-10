@@ -157,7 +157,7 @@ impl PrismaOpt {
         if !ignore_env_errors {
             schema
                 .configuration
-                .resolve_datasource_urls_query_engine(&datasource_url_overrides, |key| env::var(key).ok())
+                .resolve_datasource_urls_query_engine(&datasource_url_overrides, |key| env::var(key).ok(), false)
                 .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
         }
 
@@ -178,7 +178,11 @@ impl PrismaOpt {
             psl::parse_configuration(datamodel_str)
         } else {
             psl::parse_configuration(datamodel_str).and_then(|mut config| {
-                config.resolve_datasource_urls_query_engine(&datasource_url_overrides, |key| env::var(key).ok())?;
+                config.resolve_datasource_urls_query_engine(
+                    &datasource_url_overrides,
+                    |key| env::var(key).ok(),
+                    false,
+                )?;
 
                 Ok(config)
             })
