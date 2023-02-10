@@ -82,7 +82,7 @@ mod json {
 
             insta::assert_snapshot!(
               res.to_string(),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"{\"a\":\"b\"}"},{"$type":"Json","value":"{}"},{"$type":"Json","value":"2"},{"$type":"Json","value":"[\"[]\",\"{}\"]"}]}}}"###
+              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"{\"a\":\"b\"}"},{"$type":"Json","value":"{}"},{"$type":"Json","value":"2"},{"$type":"Json","value":"\"[]\""},{"$type":"Json","value":"\"{}\""}]}}}"###
             );
         }
 
@@ -176,7 +176,7 @@ mod json {
 
             insta::assert_snapshot!(
               res.to_string(),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"[\"1\",\"2\"]"}]}}}"###
+              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"\"1\""},{"$type":"Json","value":"\"2\""}]}}}"###
             );
         };
 

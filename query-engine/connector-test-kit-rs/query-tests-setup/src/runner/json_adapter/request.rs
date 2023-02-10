@@ -156,6 +156,7 @@ struct FieldTypeInferrer<'a> {
     types: Option<&'a Vec<InputType>>,
 }
 
+#[derive(Debug)]
 enum InferredType {
     Object(InputObjectTypeStrongRef),
     List(InputType),
@@ -184,11 +185,14 @@ impl<'a> FieldTypeInferrer<'a> {
         match value {
             ArgumentValue::Object(obj) => {
                 let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) && obj.len() == 1;
-                let object_type = self.get_object_type();
+                let schema_objects = self.get_object_types();
 
-                match object_type {
-                    Some(_) if is_field_ref_obj => InferredType::FieldRef,
-                    Some(typ) if Self::obj_val_fits_obj_type(obj, &typ) => InferredType::Object(typ),
+                match schema_objects {
+                    Some(schema_objects) => match Self::obj_val_fits_obj_types(obj, &schema_objects) {
+                        Some(_) if is_field_ref_obj => InferredType::FieldRef,
+                        Some(typ) => InferredType::Object(typ),
+                        None => InferredType::Unknown,
+                    },
                     _ => InferredType::Unknown,
                 }
             }
@@ -215,9 +219,9 @@ impl<'a> FieldTypeInferrer<'a> {
             .unwrap_or(false)
     }
 
-    fn get_object_type(&self) -> Option<InputObjectTypeStrongRef> {
+    fn get_object_types(&self) -> Option<Vec<InputObjectTypeStrongRef>> {
         self.types
-            .and_then(|types| types.iter().find_map(|typ| typ.as_object()))
+            .map(|types| types.iter().filter_map(|typ| typ.as_object()).collect_vec())
     }
 
     fn get_list_type(&self) -> Option<InputType> {
@@ -230,7 +234,13 @@ impl<'a> FieldTypeInferrer<'a> {
         [json_null::DB_NULL, json_null::JSON_NULL, json_null::ANY_NULL].contains(&val)
     }
 
-    fn obj_val_fits_obj_type(val: &ArgumentValueObject, typ: &InputObjectTypeStrongRef) -> bool {
-        val.keys().all(|key| typ.find_field(key).is_some())
+    fn obj_val_fits_obj_types(
+        val: &ArgumentValueObject,
+        schema_objects: &[InputObjectTypeStrongRef],
+    ) -> Option<InputObjectTypeStrongRef> {
+        schema_objects
+            .iter()
+            .find(|schema_object| val.keys().all(|key| schema_object.find_field(key).is_some()))
+            .cloned()
     }
 }
