@@ -27,6 +27,8 @@ pub(crate) fn get_field_filter_types(
         ModelField::Composite(cf) if cf.is_list() => vec![
             InputType::object(to_many_composite_filter_object(ctx, cf)),
             InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
+            // Shorthand syntax - This is only supported because the client used to expose all
+            // list input types as T | T[]. Consider removing it one day.
             to_one_composite_filter_shorthand_types(ctx, cf),
         ],
 
