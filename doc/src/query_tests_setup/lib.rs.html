@@ -352,7 +352,7 @@
 
 <span class="macro">lazy_static! </span>{
     <span class="doccomment">/// Test configuration, loaded once at runtime.
-    </span><span class="kw">pub static </span><span class="kw-2">ref </span>CONFIG: TestConfig = TestConfig::load().unwrap();
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>CONFIG: TestConfig = TestConfig::load();
 
     <span class="doccomment">/// The log level from the environment.
     </span><span class="kw">pub static </span><span class="kw-2">ref </span>ENV_LOG_LEVEL: String = std::env::var(<span class="string">&quot;LOG_LEVEL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;info&quot;</span>.to_owned());
