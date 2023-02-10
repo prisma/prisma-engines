@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
-use psl::parser_database::walkers::RelationFieldId;
+use psl::parser_database::walkers::{self, RelationFieldId};
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -131,14 +131,14 @@ impl RelationField {
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = &self.relation();
 
-        match relation.manifestation() {
-            RelationLinkManifestation::Inline(ref m) => {
+        match relation.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel {
                     !self.relation_info.references.is_empty()
                 } else {
-                    m.in_table_of_model == self.model().id
+                    m.referencing_model().id == self.model().id
                 }
             }
             _ => false,
@@ -290,18 +290,19 @@ pub enum RelationSide {
 }
 
 impl RelationSide {
-    pub fn opposite(self) -> RelationSide {
-        match self {
-            RelationSide::A => RelationSide::B,
-            RelationSide::B => RelationSide::A,
+    pub(crate) fn new(relation_field: RelationFieldId, relation: walkers::RelationWalker<'_>) -> Self {
+        let mut relation_fields = relation.relation_fields();
+        let mut relation_fields = [relation_fields.next().unwrap(), relation_fields.next().unwrap()];
+        relation_fields.sort_by_key(|rf| (rf.model().name(), rf.name()));
+
+        match relation_fields.iter().position(|w| w.id == relation_field) {
+            Some(0) => RelationSide::A,
+            Some(1) => RelationSide::B,
+            None | Some(_) => panic!("can't infer relation side"),
         }
     }
 
     pub fn is_a(self) -> bool {
         self == RelationSide::A
-    }
-
-    pub fn is_b(self) -> bool {
-        self == RelationSide::B
     }
 }

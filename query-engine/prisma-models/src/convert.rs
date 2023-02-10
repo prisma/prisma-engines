@@ -5,8 +5,7 @@ use std::sync::Arc;
 pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
     let datamodel = dml::lift(&schema);
 
-    let relation_placeholders = builders::relation_placeholders(&datamodel, &schema);
-    let models = builders::model_builders(&datamodel, &relation_placeholders, &schema);
+    let models = builders::model_builders(&datamodel, &schema);
 
     let composite_types = builders::composite_type_builders(&datamodel);
     let internal_data_model = Arc::new(InternalDataModel {
