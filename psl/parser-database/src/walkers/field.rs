@@ -1,4 +1,4 @@
-use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker, Walker};
+use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 use crate::ScalarType;
 use schema_ast::ast;
 
@@ -23,18 +23,11 @@ impl<'db> FieldWalker<'db> {
 
     /// Find out which kind of field this is.
     pub fn refine(self) -> RefinedFieldWalker<'db> {
-        let Walker {
-            id: (model_id, field_id),
-            db,
-        } = self;
+        let (model_id, field_id) = self.id;
         if self.db.types.relation_fields.contains_key(&self.id) {
             RefinedFieldWalker::Relation(self.walk(super::RelationFieldId(model_id, field_id)))
-        } else if let Some(scalar_field) = self.db.types.scalar_fields.get(&self.id) {
-            RefinedFieldWalker::Scalar(ScalarFieldWalker {
-                id: ScalarFieldId(model_id, field_id),
-                db,
-                scalar_field,
-            })
+        } else if self.db.types.scalar_fields.contains_key(&self.id) {
+            RefinedFieldWalker::Scalar(self.walk(super::ScalarFieldId(model_id, field_id)))
         } else {
             unreachable!("{:?} is neither a scalar field nor a relation field", self.id)
         }

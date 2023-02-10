@@ -1,7 +1,7 @@
 use crate::{
     ast,
     types::IdAttribute,
-    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldId, ScalarFieldWalker},
     ParserDatabase,
 };
 
@@ -68,7 +68,7 @@ impl<'db> PrimaryKeyWalker<'db> {
     pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         self.attribute.fields.iter().map(move |field| {
             let field_id = field.path.field_in_index();
-            self.model().scalar_field(field_id)
+            self.db.walk(ScalarFieldId(self.model_id, field_id))
         })
     }
 

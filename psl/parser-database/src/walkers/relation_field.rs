@@ -99,7 +99,7 @@ impl<'db> RelationFieldWalker<'db> {
         self.attributes().references.as_ref().map(|references| {
             references
                 .iter()
-                .map(move |field_id| self.related_model().scalar_field(*field_id))
+                .map(move |field_id| self.walk(ScalarFieldId(self.related_model().id, *field_id)))
         })
     }
 
@@ -159,11 +159,9 @@ impl<'db> RelationFieldWalker<'db> {
         let model_id = self.id.0;
         let attributes = self.attributes();
         attributes.fields.as_ref().map(move |fields| {
-            fields.iter().map(move |field_id| ScalarFieldWalker {
-                id: super::ScalarFieldId(model_id, *field_id),
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            })
+            fields
+                .iter()
+                .map(move |field_id| self.db.walk(super::ScalarFieldId(model_id, *field_id)))
         })
     }
 }

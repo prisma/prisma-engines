@@ -124,27 +124,13 @@ impl<'db> ModelWalker<'db> {
         })
     }
 
-    /// Walk a scalar field by id.
-    #[track_caller]
-    pub fn scalar_field(self, field_id: ast::FieldId) -> ScalarFieldWalker<'db> {
-        ScalarFieldWalker {
-            id: super::ScalarFieldId(self.id, field_id),
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.id, field_id)],
-        }
-    }
-
     /// Iterate all the scalar fields in a given model in the order they were defined.
     pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> {
         let db = self.db;
         db.types
             .scalar_fields
             .range((self.id, ast::FieldId::MIN)..=(self.id, ast::FieldId::MAX))
-            .map(move |((model_id, field_id), scalar_field)| ScalarFieldWalker {
-                id: super::ScalarFieldId(*model_id, *field_id),
-                db,
-                scalar_field,
-            })
+            .map(move |((model_id, field_id), _)| self.walk(super::ScalarFieldId(*model_id, *field_id)))
     }
 
     /// All unique criterias of the model; consisting of the primary key and

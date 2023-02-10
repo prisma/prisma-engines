@@ -13,21 +13,7 @@ use either::Either;
 pub struct ScalarFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
 
 /// A scalar field, as part of a model.
-#[derive(Debug, Copy, Clone)]
-pub struct ScalarFieldWalker<'db> {
-    /// The typed identifier for the field.
-    pub id: ScalarFieldId,
-    pub(crate) db: &'db ParserDatabase,
-    pub(crate) scalar_field: &'db ScalarField,
-}
-
-impl<'db> PartialEq for ScalarFieldWalker<'db> {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl<'db> Eq for ScalarFieldWalker<'db> {}
+pub type ScalarFieldWalker<'db> = Walker<'db, ScalarFieldId>;
 
 impl<'db> ScalarFieldWalker<'db> {
     /// The ID of the field node in the AST.
@@ -67,7 +53,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'db ast::Attribute> {
-        self.scalar_field
+        self.attributes()
             .default
             .as_ref()
             .map(|d| d.default_attribute)
@@ -118,7 +104,7 @@ impl<'db> ScalarFieldWalker<'db> {
     }
 
     fn attributes(self) -> &'db ScalarField {
-        self.scalar_field
+        &self.db.types.scalar_fields[&(self.id.0, self.id.1)]
     }
 
     /// Is this field's type an enum? If yes, walk the enum.
@@ -175,8 +161,8 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
-        match &self.scalar_field.r#type {
-            ScalarFieldType::BuiltInScalar(scalar) => Some(*scalar),
+        match self.attributes().r#type {
+            ScalarFieldType::BuiltInScalar(scalar) => Some(scalar),
             _ => None,
         }
     }
@@ -265,11 +251,7 @@ impl<'db> DefaultValueWalker<'db> {
     /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     pub fn field(self) -> ScalarFieldWalker<'db> {
-        ScalarFieldWalker {
-            id: super::ScalarFieldId(self.model_id, self.field_id),
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.field_id)],
-        }
+        self.db.walk(super::ScalarFieldId(self.model_id, self.field_id))
     }
 }
 
@@ -367,8 +349,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         match path.type_holding_the_indexed_field() {
             None => {
                 let field_id = path.field_in_index();
-                let walker = self.db.walk(self.model_id).scalar_field(field_id);
-
+                let walker = self.db.walk(ScalarFieldId(self.model_id, field_id));
                 IndexFieldWalker::new(walker)
             }
             Some(ctid) => {
