@@ -17,7 +17,7 @@ let
   };
   craneLib = flakeInputs.crane.mkLib pkgs;
   deps = craneLib.vendorCargoDeps { inherit src; };
-  libSuffix = if stdenv.isDarwin then "dylib" else "so";
+  libSuffix = stdenv.hostPlatform.extensions.sharedLibrary;
 in
 {
   packages.prisma-engines = stdenv.mkDerivation {
@@ -52,7 +52,7 @@ in
       cp target/release/migration-engine $out/bin/
       cp target/release/introspection-engine $out/bin/
       cp target/release/prisma-fmt $out/bin/
-      cp target/release/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
+      cp target/release/libquery_engine${libSuffix} $out/lib/libquery_engine.node
     '';
   };
 
@@ -108,7 +108,7 @@ in
         set -eu
         mkdir -p $out/bin $out/lib
         cp target/${profile}/query-engine $out/bin/query-engine
-        cp target/${profile}/libquery_engine.${libSuffix} $out/lib/libquery_engine.node
+        cp target/${profile}/libquery_engine${libSuffix} $out/lib/libquery_engine.node
       '';
     })
     { profile = "release"; };
