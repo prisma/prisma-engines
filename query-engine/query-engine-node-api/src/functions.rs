@@ -65,11 +65,13 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
     let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
     let mut config = psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
-    if !ignore_env_var_errors {
-        config
-            .resolve_datasource_urls_query_engine(&overrides, |key| env.get(key).map(ToString::to_string))
-            .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-    }
+    config
+        .resolve_datasource_urls_query_engine(
+            &overrides,
+            |key| env.get(key).map(ToString::to_string),
+            ignore_env_var_errors,
+        )
+        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
 
     let serialized = psl::get_config::config_to_mcf_json_value(&config);
 
