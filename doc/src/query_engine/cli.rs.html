@@ -133,8 +133,6 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     context::PrismaContext,
     opt::{CliOpt, PrismaOpt, Subcommand},
@@ -232,9 +230,7 @@
     <span class="kw">fn </span>get_config(<span class="kw-2">mut </span>req: GetConfigRequest) -&gt; PrismaResult&lt;()&gt; {
         <span class="kw">let </span>config = <span class="kw-2">&amp;mut </span>req.config;
 
-        <span class="kw">if </span>!req.ignore_env_var_errors {
-            config.resolve_datasource_urls_query_engine(<span class="kw-2">&amp;</span>[], |key| env::var(key).ok())<span class="question-mark">?</span>;
-        }
+        config.resolve_datasource_urls_query_engine(<span class="kw-2">&amp;</span>[], |key| env::var(key).ok(), req.ignore_env_var_errors)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>json = psl::get_config::config_to_mcf_json_value(config);
         <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>json)<span class="question-mark">?</span>;
