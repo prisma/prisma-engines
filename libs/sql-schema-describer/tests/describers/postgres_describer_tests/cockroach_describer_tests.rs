@@ -237,7 +237,9 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                         0,
                     ),
                     name: "indexes_test",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
