@@ -1,7 +1,4 @@
-use crate::composite_type::CompositeType;
-use crate::field::RelationField;
-use crate::model::Model;
-use crate::relation_info::RelationInfo;
+use crate::{composite_type::CompositeType, model::Model};
 use psl_core::schema_ast::ast;
 
 #[derive(Debug, Default)]
@@ -48,32 +45,5 @@ impl Datamodel {
             .iter_mut()
             .find(|m| m.name == *name)
             .expect("We assume an internally valid datamodel before mutating.")
-    }
-
-    /// Finds a relation field related to a relation info. Returns a tuple (index_of_relation_field_in_model, relation_field).
-    pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<(usize, &RelationField)> {
-        self.find_model_by_id(info.referenced_model)
-            .expect("The model referred to by a RelationInfo should always exist.")
-            .fields
-            .iter()
-            .enumerate()
-            .filter_map(|(idx, field)| field.as_relation_field().map(|f| (idx, f)))
-            .find(|(_idx, f)| {
-                f.relation_info.name == info.name
-                    && (f.relation_info.referenced_model != info.referenced_model ||
-          // This is to differentiate the opposite field from self in the self relation case.
-          f.name != exclude)
-            })
-    }
-
-    /// This finds the related field for a relationfield if available
-    pub fn find_related_field(&self, rf: &RelationField) -> Option<(usize, &RelationField)> {
-        self.find_related_field_for_info(&rf.relation_info, &rf.name)
-    }
-
-    /// This is used once we assume the datamodel to be internally valid
-    pub fn find_related_field_bang(&self, rf: &RelationField) -> (usize, &RelationField) {
-        self.find_related_field(rf)
-            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

@@ -3,7 +3,6 @@ use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
 use schema_builder::constants::{aggregations::*, args};
-use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
     from.iter()
@@ -85,7 +84,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
                 Field::Composite(_) => None,
                 Field::Relation(ref rf) => {
                     let model = rf.related_model();
-                    let parent = Arc::clone(&rf);
+                    let parent = rf.clone();
 
                     Some(related::find_related(pair.parsed_field, parent, model))
                 }

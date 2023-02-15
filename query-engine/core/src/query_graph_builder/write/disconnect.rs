@@ -4,7 +4,6 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
-use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -47,7 +46,7 @@ pub fn disconnect_records_node(
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));

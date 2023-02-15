@@ -1,43 +1,29 @@
 use crate::prelude::*;
-use dml::{FieldArity, ReferentialAction, RelationInfo};
-use once_cell::sync::OnceCell;
-use psl::parser_database::walkers::{self, RelationFieldId};
-use std::{
-    fmt::{Debug, Display},
-    hash::{Hash, Hasher},
-    sync::{Arc, Weak},
+use psl::parser_database::{
+    ast::FieldArity,
+    walkers::{self, RelationFieldId},
 };
+use std::fmt::Display;
 
-pub type RelationFieldRef = Arc<RelationField>;
-pub type RelationFieldWeak = Weak<RelationField>;
-
-#[derive(Clone)]
-pub struct RelationField {
-    pub id: RelationFieldId,
-    pub(crate) name: String,
-    pub arity: FieldArity,
-    pub relation_name: String,
-    pub relation_side: RelationSide,
-    pub(crate) relation_info: RelationInfo,
-
-    pub on_delete_default: ReferentialAction,
-    pub on_update_default: ReferentialAction,
-
-    pub(crate) model: ModelWeakRef,
-    pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
-}
+pub type RelationField = crate::Zipper<RelationFieldId>;
+pub type RelationFieldRef = RelationField;
+pub type RelationFieldWeak = RelationField;
 
 impl RelationField {
     pub fn name(&self) -> &str {
-        &self.name
+        self.walker().name()
+    }
+
+    pub fn arity(&self) -> FieldArity {
+        self.walker().ast_field().arity
     }
 
     pub fn is_list(&self) -> bool {
-        matches!(self.arity, FieldArity::List)
+        matches!(self.arity(), FieldArity::List)
     }
 
     pub fn is_required(&self) -> bool {
-        matches!(self.arity, FieldArity::Required)
+        matches!(self.arity(), FieldArity::Required)
     }
 
     /// Returns the `FieldSelection` used for this relation fields model.
@@ -49,34 +35,7 @@ impl RelationField {
     /// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)
     /// in the Prisma style.
     pub fn linking_fields(&self) -> FieldSelection {
-        if self.relation().is_many_to_many() {
-            self.model().primary_identifier()
-        } else if self.relation_info.references.is_empty() {
-            let related_field = self.related_field();
-            let model = self.model();
-            let fields = model.fields();
-
-            let referenced_fields: Vec<_> = related_field
-                .relation_info
-                .references
-                .iter()
-                .map(|field_name| {
-                    fields
-                        .find_from_all(field_name)
-                        .unwrap_or_else(|_| {
-                            panic!(
-                                "Invalid data model: To field {} can't be resolved on model {}",
-                                field_name, model.name
-                            )
-                        })
-                        .clone()
-                })
-                .collect();
-
-            FieldSelection::from(referenced_fields)
-        } else {
-            FieldSelection::from(self)
-        }
+        self.linking_fields_impl().into()
     }
 
     pub fn is_optional(&self) -> bool {
@@ -84,31 +43,26 @@ impl RelationField {
     }
 
     pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+        self.dm.find_model_by_id(self.walker().model().id)
     }
 
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
-        let fields = self.fields.get_or_init(|| {
-            let model = self.model();
-            let fields = model.fields();
-
-            self.relation_info
-                .fields
-                .iter()
-                .map(|f| {
-                    Arc::downgrade(&fields.find_from_scalar(f).unwrap_or_else(|_| {
-                        panic!(
-                            "Expected '{}' to be a scalar field on model '{}', found none.",
-                            f, model.name
-                        )
-                    }))
+        let model = self.model();
+        let fields = model.fields();
+        self.walker()
+            .fields()
+            .into_iter()
+            .flatten()
+            .map(|f| {
+                fields.find_from_scalar(f.name()).unwrap_or_else(|_| {
+                    panic!(
+                        "Expected '{}' to be a scalar field on model '{}', found none.",
+                        f.name(),
+                        model.name()
+                    )
                 })
-                .collect()
-        });
-
-        fields.iter().map(|f| f.upgrade().unwrap()).collect()
+            })
+            .collect()
     }
 
     pub fn relation(&self) -> RelationRef {
@@ -124,18 +78,8 @@ impl RelationField {
 
     /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
-        let relation = &self.relation();
-
-        match relation.walker().refine() {
-            walkers::RefinedRelationWalker::Inline(m) => {
-                let is_self_rel = relation.is_self_relation();
-
-                if is_self_rel {
-                    !self.relation_info.references.is_empty()
-                } else {
-                    m.referencing_model().id == self.model().id
-                }
-            }
+        match self.walker().relation().refine() {
+            walkers::RefinedRelationWalker::Inline(m) => m.forward_relation_field().unwrap().id == self.id,
             _ => false,
         }
     }
@@ -145,21 +89,12 @@ impl RelationField {
     }
 
     pub fn related_model(&self) -> ModelRef {
-        match self.relation_side {
-            RelationSide::A => self.relation().model_b(),
-            RelationSide::B => self.relation().model_a(),
-        }
+        self.dm.find_model_by_id(self.walker().related_model().id)
     }
 
-    pub fn related_field(&self) -> Arc<RelationField> {
-        match self.relation_side {
-            RelationSide::A => self.relation().field_b(),
-            RelationSide::B => self.relation().field_a(),
-        }
-    }
-
-    pub fn is_relation_with_name_and_side(&self, relation_name: &str, side: RelationSide) -> bool {
-        self.relation().name() == relation_name && self.relation_side == side
+    pub fn related_field(&self) -> RelationField {
+        let id = self.walker().opposite_relation_field().unwrap().id;
+        self.dm.clone().zip(id)
     }
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
@@ -170,126 +105,56 @@ impl RelationField {
     }
 
     pub fn referenced_fields(&self) -> Vec<ScalarFieldRef> {
-        self.relation_info
-            .references
-            .iter()
-            .map(|field_name| self.related_model().fields().find_from_scalar(field_name).unwrap())
+        self.walker()
+            .referenced_fields()
+            .into_iter()
+            .flatten()
+            .map(|field| self.related_model().fields().find_from_scalar(field.name()).unwrap())
             .collect()
     }
 
     // Scalar fields on the left (source) side of the relation if starting traversal from `self`.
     // Todo This is provisionary.
     pub fn left_scalars(&self) -> Vec<ScalarFieldRef> {
-        if self.relation().is_many_to_many() {
-            self.model()
-                .primary_identifier()
-                .as_scalar_fields()
-                .expect("Left scalars contain non-scalar selections.")
-        } else if self.is_inlined_on_enclosing_model() {
-            self.scalar_fields()
-        } else {
-            self.related_field().referenced_fields()
-        }
-    }
-
-    // Scalar fields on the right (target) side of the relation if starting traversal from `self`.
-    // Todo This is provisionary.
-    pub fn right_scalars(&self) -> Vec<ScalarFieldRef> {
-        if self.relation().is_many_to_many() {
-            let related_field = self.related_field();
-            let related_model = self.related_model();
-
-            if related_field.relation_info.fields.is_empty() {
-                related_model
-                    .primary_identifier()
-                    .as_scalar_fields()
-                    .expect("Right scalars contain non-scalar selections.")
-            } else {
-                related_field
-                    .relation_info
-                    .fields
-                    .iter()
-                    .map(|f| related_model.fields().find_from_scalar(f.as_str()).unwrap())
-                    .collect()
-            }
-        } else if self.is_inlined_on_enclosing_model() {
-            self.referenced_fields()
-        } else {
-            self.related_field().scalar_fields()
-        }
+        self.linking_fields_impl()
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }
 
-    pub fn relation_info(&self) -> &RelationInfo {
-        &self.relation_info
-    }
-}
-
-impl Debug for RelationField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("RelationField")
-            .field("name", &self.name)
-            .field("arity", &self.arity)
-            .field("relation_name", &self.relation_name)
-            .field("relation_side", &self.relation_side)
-            .field("relation_info", &self.relation_info)
-            .field("model", &"#ModelWeakRef#")
-            .field("fields", &self.fields)
-            .finish()
+    fn linking_fields_impl(&self) -> Vec<ScalarFieldRef> {
+        let walker = self.walker();
+        let relation = walker.relation();
+        match relation.refine() {
+            walkers::RefinedRelationWalker::Inline(rel) => {
+                let forward = rel.forward_relation_field().unwrap();
+                let model = self.model();
+                if forward.id == self.id {
+                    forward
+                        .fields()
+                        .unwrap()
+                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .collect()
+                } else {
+                    forward
+                        .referenced_fields()
+                        .unwrap()
+                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .collect()
+                }
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_)
+            | walkers::RefinedRelationWalker::ImplicitManyToMany(_) => {
+                self.model().primary_identifier().as_scalar_fields().unwrap()
+            }
+        }
     }
 }
 
 impl Display for RelationField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}", self.model().name, self.name)
-    }
-}
-
-impl Eq for RelationField {}
-
-impl Hash for RelationField {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
-        self.arity.hash(state);
-        self.relation_name.hash(state);
-        self.relation_side.hash(state);
-        self.model().hash(state);
-    }
-}
-
-impl PartialEq for RelationField {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.arity == other.arity
-            && self.relation_name == other.relation_name
-            && self.relation_side == other.relation_side
-            && self.model() == other.model()
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum RelationSide {
-    A,
-    B,
-}
-
-impl RelationSide {
-    pub(crate) fn new(relation_field: RelationFieldId, relation: walkers::RelationWalker<'_>) -> Self {
-        let mut relation_fields = relation.relation_fields();
-        let mut relation_fields = [relation_fields.next().unwrap(), relation_fields.next().unwrap()];
-        relation_fields.sort_by_key(|rf| (rf.model().name(), rf.name()));
-
-        match relation_fields.iter().position(|w| w.id == relation_field) {
-            Some(0) => RelationSide::A,
-            Some(1) => RelationSide::B,
-            None | Some(_) => panic!("can't infer relation side"),
-        }
-    }
-
-    pub fn is_a(self) -> bool {
-        self == RelationSide::A
+        let walker = self.walker();
+        write!(f, "{}.{}", walker.model().name(), walker.name())
     }
 }

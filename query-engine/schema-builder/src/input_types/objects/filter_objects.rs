@@ -41,8 +41,8 @@ pub(crate) fn scalar_filter_object_type(
         .optional(),
     ];
 
-    input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
-        ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, f, include_aggregates)),
+    input_fields.extend(model.fields().filter_all(|_| true).into_iter().filter_map(|f| match f {
+        ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, &f, include_aggregates)),
         ModelField::Relation(_) => None,
         ModelField::Composite(_) => None, // [Composites] todo
     }));
@@ -100,8 +100,11 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     return_cached_input!(ctx, &ident);
 
     // Split unique & ID fields vs all the other fields
-    let (unique_fields, rest_fields): (Vec<_>, Vec<_>) =
-        model.fields().all.iter().partition(|f| f.is_scalar() && f.is_unique());
+    let (unique_fields, rest_fields): (Vec<_>, Vec<_>) = model
+        .fields()
+        .filter_all(|_| true)
+        .into_iter()
+        .partition(|f| f.is_scalar() && f.is_unique());
     // @@unique compound fields.
     let compound_uniques: Vec<_> = model
         .unique_indexes()
@@ -186,7 +189,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
     let rest_fields: Vec<_> = rest_fields
         .into_iter()
-        .map(|f| input_fields::filter_input_field(ctx, f, false))
+        .map(|f| input_fields::filter_input_field(ctx, &f, false))
         .collect();
 
     fields.extend(compound_unique_fields);

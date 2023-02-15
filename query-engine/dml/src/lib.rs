@@ -34,5 +34,5 @@ pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Opt
 
 /// Validated schema -> dml::Datamodel.
 pub fn lift(schema: &ValidatedSchema) -> crate::Datamodel {
-    lift::LiftAstToDml::new(&schema.db, schema.connector, schema.relation_mode()).lift()
+    lift::LiftAstToDml::new(&schema.db, schema.connector).lift()
 }

@@ -179,7 +179,7 @@ impl<'db> ModelWalker<'db> {
     }
 
     /// All (concrete) relation fields of the model.
-    pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
+    pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> + Clone + 'db {
         let model_id = self.id;
 
         self.db

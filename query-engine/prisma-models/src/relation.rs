@@ -1,6 +1,9 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
-use psl::parser_database::{walkers, RelationId};
+use psl::{
+    datamodel_connector::walker_ext_traits::*,
+    parser_database::{walkers, RelationId},
+};
 
 pub type Relation = crate::Zipper<RelationId>;
 pub type RelationRef = Relation;
@@ -28,66 +31,45 @@ impl Relation {
         self.walker().is_self_relation()
     }
 
-    fn sorted_models(&self) -> [walkers::ModelWalker<'_>; 2] {
-        let mut models = self.walker().models().map(|id| self.dm.walk(id));
-        models.sort_by_key(|m| m.name());
-        models
-    }
-
-    /// A pointer to the first `Model` in the `Relation`.
-    pub fn model_a(&self) -> ModelRef {
-        self.dm.find_model_by_id(self.sorted_models()[0].id)
-    }
-
-    /// A pointer to the second `Model` in the `Relation`.
-    pub fn model_b(&self) -> ModelRef {
-        self.dm.find_model_by_id(self.sorted_models()[1].id)
-    }
-
-    /// A pointer to the `RelationField` in the first `Model` in the `Relation`.
-    pub fn field_a(&self) -> RelationFieldRef {
-        self.model_a()
-            .fields()
-            .find_from_relation(self.id, RelationSide::A)
-            .unwrap()
-    }
-
-    /// A pointer to the `RelationField` in the second `Model` in the `Relation`.
-    pub fn field_b(&self) -> RelationFieldRef {
-        self.model_b()
-            .fields()
-            .find_from_relation(self.id, RelationSide::B)
-            .unwrap()
-    }
-
     /// Practically deprecated with Prisma 2.
     pub fn is_many_to_many(&self) -> bool {
-        self.field_a().is_list() && self.field_b().is_list()
+        self.walker().relation_fields().all(|f| f.ast_field().arity.is_list())
     }
 
     pub fn is_one_to_one(&self) -> bool {
-        !self.field_a().is_list() && !self.field_b().is_list()
+        match self.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(r) => r.is_one_to_one(),
+            _ => false,
+        }
     }
 
     pub fn is_one_to_many(&self) -> bool {
-        !self.is_many_to_many() && !self.is_one_to_one()
+        match self.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(r) => !r.is_one_to_one(),
+            _ => false,
+        }
     }
 
     /// Retrieves the onDelete policy for this relation.
     pub fn on_delete(&self) -> ReferentialAction {
-        self.field_a()
-            .relation_info
-            .on_delete
-            .or_else(|| self.field_b().relation_info.on_delete)
-            .unwrap_or(self.field_a().on_delete_default)
+        let walker = self.walker();
+        walker
+            .relation_fields()
+            .find_map(|rf| rf.explicit_on_delete())
+            .unwrap_or_else(|| {
+                walker
+                    .relation_fields()
+                    .next()
+                    .unwrap()
+                    .default_on_delete_action(self.dm.schema.relation_mode(), self.dm.schema.connector)
+            })
     }
 
     /// Retrieves the onUpdate policy for this relation.
     pub fn on_update(&self) -> ReferentialAction {
-        self.field_a()
-            .relation_info
-            .on_update
-            .or_else(|| self.field_b().relation_info.on_update)
-            .unwrap_or(self.field_a().on_update_default)
+        self.walker()
+            .relation_fields()
+            .find_map(|rf| rf.explicit_on_update())
+            .unwrap_or(ReferentialAction::Cascade)
     }
 }

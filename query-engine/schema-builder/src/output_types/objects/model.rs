@@ -51,8 +51,8 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectType
 fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
     model
         .fields()
-        .all
-        .iter()
-        .map(|f| field::map_output_field(ctx, f))
+        .filter_all(|_| true)
+        .into_iter()
+        .map(|f| field::map_output_field(ctx, &f))
         .collect()
 }

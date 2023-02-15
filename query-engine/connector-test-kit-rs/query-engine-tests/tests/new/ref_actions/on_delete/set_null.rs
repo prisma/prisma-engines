@@ -5,8 +5,6 @@ use query_engine_tests::*;
 
 #[test_suite(suite = "setnull_onD_1to1_opt", schema(optional), relation_mode = "prisma")]
 mod one2one_opt {
-    use query_engine_tests::run_query;
-
     fn optional() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -214,7 +212,7 @@ mod one2one_opt {
             runner,
             r#"mutation { deleteOneA(where: { id: 1 }) { id } }"#,
             2014,
-            "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
+            "The change you are trying to make would violate the required relation 'BToC' between the `C` and `B` models."
         );
 
         Ok(())

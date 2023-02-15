@@ -1,7 +1,7 @@
 use crate::{self as dml, *};
 use either::Either;
 use psl_core::{
-    datamodel_connector::{constraint_names::ConstraintNames, walker_ext_traits::*, Connector, RelationMode},
+    datamodel_connector::{walker_ext_traits::*, Connector},
     parser_database::{
         self as db,
         ast::{self, WithDocumentation, WithName, WithSpan},
@@ -30,20 +30,11 @@ use std::collections::HashMap;
 pub(crate) struct LiftAstToDml<'a> {
     db: &'a db::ParserDatabase,
     connector: &'static dyn Connector,
-    relation_mode: RelationMode,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    pub(crate) fn new(
-        db: &'a db::ParserDatabase,
-        connector: &'static dyn Connector,
-        relation_mode: RelationMode,
-    ) -> LiftAstToDml<'a> {
-        LiftAstToDml {
-            db,
-            connector,
-            relation_mode,
-        }
+    pub(crate) fn new(db: &'a db::ParserDatabase, connector: &'static dyn Connector) -> LiftAstToDml<'a> {
+        LiftAstToDml { db, connector }
     }
 
     pub(crate) fn lift(&self) -> Datamodel {
@@ -64,8 +55,6 @@ impl<'a> LiftAstToDml<'a> {
             schema.composite_types.push(self.lift_composite_type(composite_type))
         }
 
-        self.lift_relations(&mut schema, &mut field_ids_for_sorting);
-
         for model in &mut schema.models {
             let model_name = model.name.as_str();
             model
@@ -74,231 +63,6 @@ impl<'a> LiftAstToDml<'a> {
         }
 
         schema
-    }
-
-    fn lift_relations(
-        &self,
-        schema: &mut Datamodel,
-        field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
-    ) {
-        let active_connector = self.connector;
-        let relation_mode = self.relation_mode;
-        let common_dml_fields = |field: &mut RelationField, relation_field: RelationFieldWalker<'_>| {
-            let ast_field = relation_field.ast_field();
-            field.relation_info.on_delete = relation_field.explicit_on_delete().map(From::from);
-            field.relation_info.on_update = relation_field.explicit_on_update().map(From::from);
-            field.relation_info.name = relation_field.relation_name().to_string();
-            field.documentation = ast_field.documentation().map(String::from);
-            field.is_ignored = relation_field.is_ignored();
-            field.supports_restrict_action(
-                active_connector.supports_referential_action(&relation_mode, db::ReferentialAction::Restrict),
-            );
-            field.emulates_referential_actions(relation_mode.is_prisma());
-        };
-
-        for relation in self.db.walk_relations() {
-            match relation.refine() {
-                RefinedRelationWalker::Inline(relation) => {
-                    // Forward field
-                    {
-                        // If we have an array field we detect as a
-                        // back-relation, but it has fields defined, we expect
-                        // it to be the other side of a embedded 2-way m:n
-                        // relation, and we don't want to mess around with the
-                        // data model here at all.
-                        //
-                        // Please kill this with fire when we introduce code
-                        // actions for relations.
-                        if relation
-                            .back_relation_field()
-                            .filter(|rf| rf.ast_field().arity.is_list())
-                            .and_then(|rf| rf.fields())
-                            .is_some()
-                        {
-                            continue;
-                        }
-
-                        let referenced_model = relation.referenced_model();
-
-                        let relation_info = RelationInfo::new(referenced_model.id);
-
-                        let forward_field_walker = relation.forward_relation_field().unwrap();
-                        // Construct a relation field in the DML for an existing relation field in the source.
-                        let arity = forward_field_walker.ast_field().arity;
-                        let referential_arity = forward_field_walker.referential_arity();
-                        let mut relation_field = RelationField::new(
-                            forward_field_walker.id,
-                            forward_field_walker.name(),
-                            arity,
-                            referential_arity,
-                            relation_info,
-                        );
-
-                        let column_names: Vec<&str> = relation
-                            .referencing_fields()
-                            .unwrap()
-                            .map(|f| f.database_name())
-                            .collect();
-
-                        let fk_name = relation.constraint_name(active_connector);
-
-                        let default_name = ConstraintNames::foreign_key_constraint_name(
-                            relation.referencing_model().database_name(),
-                            &column_names,
-                            self.connector,
-                        );
-
-                        let fk_name = if fk_name.as_ref() == default_name.as_str() {
-                            None
-                        } else {
-                            Some(relation.constraint_name(active_connector).to_string())
-                        };
-
-                        relation_field.relation_info.fk_name = fk_name;
-
-                        common_dml_fields(&mut relation_field, forward_field_walker);
-                        field_ids_for_sorting.insert(
-                            (forward_field_walker.model().name(), forward_field_walker.name()),
-                            forward_field_walker.field_id(),
-                        );
-
-                        relation_field.relation_info.name = relation.relation_name().to_string();
-
-                        relation_field.relation_info.references = relation
-                            .referenced_fields()
-                            .map(|field| field.name().to_owned())
-                            .collect();
-
-                        relation_field.relation_info.fields = relation
-                            .referencing_fields()
-                            .unwrap()
-                            .map(|f| f.name().to_owned())
-                            .collect();
-
-                        let model = schema.find_model_mut(relation.referencing_model().name());
-                        model.add_field(Field::RelationField(relation_field));
-                    };
-
-                    // Back field
-                    {
-                        let relation_info = RelationInfo::new(relation.referencing_model().id);
-                        let model = schema.find_model_mut(relation.referenced_model().name());
-
-                        let mut field = if let Some(relation_field) = relation.back_relation_field() {
-                            let ast_field = relation_field.ast_field();
-                            let arity = ast_field.arity;
-                            let referential_arity = relation_field.referential_arity();
-                            let mut field = RelationField::new(
-                                relation_field.id,
-                                relation_field.name(),
-                                arity,
-                                referential_arity,
-                                relation_info,
-                            );
-
-                            common_dml_fields(&mut field, relation_field);
-
-                            field_ids_for_sorting.insert(
-                                (relation_field.model().name(), relation_field.name()),
-                                relation_field.field_id(),
-                            );
-
-                            field
-                        } else {
-                            // This is part of reformatting.
-                            let arity = FieldArity::List;
-                            let referential_arity = FieldArity::List;
-                            let mut field = RelationField::new(
-                                relation.forward_relation_field().unwrap().id,
-                                relation.referencing_model().name(),
-                                arity,
-                                referential_arity,
-                                relation_info,
-                            );
-                            field.is_ignored = relation.referencing_model().is_ignored();
-                            field
-                        };
-
-                        field.relation_info.name = relation.relation_name().to_string();
-                        model.add_field(Field::RelationField(field));
-                    };
-                }
-                RefinedRelationWalker::ImplicitManyToMany(relation) => {
-                    for relation_field in [relation.field_a(), relation.field_b()] {
-                        let ast_field = relation_field.ast_field();
-                        let arity = ast_field.arity;
-                        let relation_info = RelationInfo::new(relation_field.related_model().id);
-                        let referential_arity = relation_field.referential_arity();
-                        let mut field = RelationField::new(
-                            relation_field.id,
-                            relation_field.name(),
-                            arity,
-                            referential_arity,
-                            relation_info,
-                        );
-
-                        common_dml_fields(&mut field, relation_field);
-
-                        let primary_key = relation_field.related_model().primary_key().unwrap();
-                        field.relation_info.references =
-                            primary_key.fields().map(|field| field.name().to_owned()).collect();
-
-                        field.relation_info.fields = relation_field
-                            .fields()
-                            .into_iter()
-                            .flatten()
-                            .map(|f| f.name().to_owned())
-                            .collect();
-
-                        let model = schema.find_model_mut(relation_field.model().name());
-                        model.add_field(Field::RelationField(field));
-                        field_ids_for_sorting.insert(
-                            (relation_field.model().name(), relation_field.name()),
-                            relation_field.field_id(),
-                        );
-                    }
-                }
-                RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
-                    for relation_field in [relation.field_a(), relation.field_b()] {
-                        let ast_field = relation_field.ast_field();
-                        let arity = ast_field.arity;
-                        let relation_info = RelationInfo::new(relation_field.related_model().id);
-                        let referential_arity = relation_field.referential_arity();
-
-                        let mut field = RelationField::new(
-                            relation_field.id,
-                            relation_field.name(),
-                            arity,
-                            referential_arity,
-                            relation_info,
-                        );
-
-                        common_dml_fields(&mut field, relation_field);
-
-                        field.relation_info.references = relation_field
-                            .referenced_fields()
-                            .into_iter()
-                            .flatten()
-                            .map(|f| f.name().to_owned())
-                            .collect();
-
-                        field.relation_info.fields = relation_field
-                            .fields()
-                            .into_iter()
-                            .flatten()
-                            .map(|f| f.name().to_owned())
-                            .collect();
-
-                        let model = schema.find_model_mut(relation_field.model().name());
-                        model.add_field(Field::RelationField(field));
-                        field_ids_for_sorting.insert(
-                            (relation_field.model().name(), relation_field.name()),
-                            relation_field.field_id(),
-                        );
-                    }
-                }
-            }
-        }
     }
 
     fn lift_composite_type(&self, walker: CompositeTypeWalker<'_>) -> CompositeType {

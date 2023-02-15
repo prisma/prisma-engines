@@ -8,7 +8,6 @@ use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use psl::parser_database::ReferentialAction;
 use schema::ConnectorContext;
-use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
@@ -109,7 +108,7 @@ where
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
-        parent_field: Arc::clone(parent_relation_field),
+        parent_field: parent_relation_field.clone(),
         parent_results: None,
         args: (child_model, filter).into(),
         selected_fields,
@@ -278,7 +277,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let child_model = parent_relation_field.related_model();
     let child_side_required = parent_relation_field.related_field().is_required();
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
-    let rf = Arc::clone(parent_relation_field);
+    let rf = parent_relation_field.clone();
 
     // Note: Also creates the edge between `parent` and the new node.
     let read_existing_children =
@@ -395,7 +394,7 @@ pub fn insert_emulated_on_delete(
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_delete.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_delete, false);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_delete);
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
@@ -943,7 +942,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     let join_node = graph.create_node(Flow::Return(None));
 
@@ -992,7 +991,7 @@ pub fn insert_emulated_on_update(
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
     let internal_model = model_to_update.internal_data_model();
-    let relation_fields = internal_model.fields_pointing_to_model(model_to_update, false);
+    let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     for rf in relation_fields {
         match rf.relation().on_update() {

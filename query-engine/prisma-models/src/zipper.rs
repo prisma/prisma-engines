@@ -2,6 +2,7 @@ use crate::{
     psl::{parser_database::walkers::Walker, schema_ast::ast},
     InternalDataModelRef,
 };
+use std::hash::{Hash, Hasher};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting
 // cycle (memory leak).
@@ -17,9 +18,17 @@ impl<I: PartialEq> PartialEq for Zipper<I> {
     }
 }
 
+impl<I: Eq> Eq for Zipper<I> {}
+
 impl<I: Copy> Zipper<I> {
     pub fn walker(&self) -> Walker<'_, I> {
         self.dm.schema.db.walk(self.id)
+    }
+}
+
+impl<I: Hash> Hash for Zipper<I> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state)
     }
 }
 

@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use crate::{
-    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField,
-    ScalarFieldRef, SelectionResult,
+    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, ScalarFieldRef,
+    SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -242,33 +242,10 @@ impl CompositeSelection {
     }
 }
 
-impl From<Vec<Field>> for FieldSelection {
-    fn from(fields: Vec<Field>) -> Self {
+impl From<Vec<ScalarFieldRef>> for FieldSelection {
+    fn from(fields: Vec<ScalarFieldRef>) -> Self {
         Self {
-            selections: fields
-                .into_iter()
-                .flat_map(|field| match field {
-                    Field::Relation(rf) => rf.scalar_fields().into_iter().map(Into::into).collect(),
-                    Field::Scalar(sf) => vec![sf.into()],
-                    Field::Composite(_cf) => todo!(),
-                })
-                .collect(),
-        }
-    }
-}
-
-impl From<ScalarFieldRef> for FieldSelection {
-    fn from(field: ScalarFieldRef) -> Self {
-        Self {
-            selections: vec![field.into()],
-        }
-    }
-}
-
-impl From<&RelationField> for FieldSelection {
-    fn from(rf: &RelationField) -> Self {
-        Self {
-            selections: rf.scalar_fields().into_iter().map(|sf| sf.into()).collect(),
+            selections: fields.into_iter().map(Into::into).collect(),
         }
     }
 }

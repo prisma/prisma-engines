@@ -11,7 +11,6 @@ pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
     let internal_data_model = Arc::new(InternalDataModel {
         models: OnceCell::new(),
         composite_types: OnceCell::new(),
-        relation_fields: OnceCell::new(),
         schema,
     });
 
@@ -29,7 +28,5 @@ pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModelRef {
         .collect();
 
     internal_data_model.models.set(models).unwrap();
-
-    internal_data_model.finalize();
     internal_data_model
 }

@@ -964,7 +964,7 @@ fn one_to_one_inlined_child(
         let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
-        let rf = Arc::clone(&parent_relation_field);
+        let rf = parent_relation_field.clone();
 
         // Edge: Read old child node -> update old child
         graph.create_edge(

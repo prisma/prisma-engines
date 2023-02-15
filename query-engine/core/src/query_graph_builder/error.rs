@@ -58,11 +58,13 @@ impl From<RelationFieldRef> for RelationViolation {
 impl From<&RelationFieldRef> for RelationViolation {
     fn from(rf: &RelationFieldRef) -> Self {
         let relation = rf.relation();
+        let relation_name = relation.name();
+        let [model_a_name, model_b_name] = relation.walker().models().map(|m| rf.dm.walk(m).name().to_owned());
 
         Self {
-            relation_name: relation.name(),
-            model_a_name: relation.model_a().name().to_owned(),
-            model_b_name: relation.model_b().name().to_owned(),
+            relation_name,
+            model_a_name,
+            model_b_name,
         }
     }
 }

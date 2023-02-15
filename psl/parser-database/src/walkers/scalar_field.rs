@@ -9,7 +9,7 @@ use diagnostics::Span;
 use either::Either;
 
 /// An opaque identifier for a model scalar field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug, Eq)]
 pub struct ScalarFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
 
 /// A scalar field, as part of a model.

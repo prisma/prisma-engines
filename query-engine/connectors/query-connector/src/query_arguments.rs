@@ -158,7 +158,7 @@ impl QueryArguments {
 
         let has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) => rf.arity() == dml::FieldArity::Optional,
                 OrderByHop::Composite(cf) => !cf.is_required(),
             })
         });

@@ -34,10 +34,6 @@ impl Model {
         self.dml_model.schema.clone()
     }
 
-    pub(crate) fn finalize(&self) {
-        self.fields.get().unwrap().finalize();
-    }
-
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
@@ -45,13 +41,12 @@ impl Model {
     pub fn primary_identifier(&self) -> FieldSelection {
         self.primary_identifier.get_or_init(||{
             let dml_fields = self.dml_model.first_unique_criterion();
-            let fields: Vec<Field> = dml_fields
+            let fields: Vec<_> = dml_fields
                 .iter()
                 .map(|dml_field| {
-                    let field = self.fields().find_from_all(&dml_field.name).unwrap_or_else(|_| panic!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
-                    field.clone()
+                    self.fields().find_from_scalar(&dml_field.name).unwrap_or_else(|_| panic!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name))
                 })
-                .collect();
+            .collect();
 
             FieldSelection::from(fields)
         }).clone()
