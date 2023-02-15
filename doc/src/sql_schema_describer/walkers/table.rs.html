@@ -111,11 +111,16 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use crate</span>::{
     ForeignKeyId, ForeignKeyWalker, IndexColumnWalker, IndexId, IndexWalker, NamespaceId, Table, TableColumnId,
-    TableColumnWalker, TableId, Walker,
+    TableColumnWalker, TableId, TableProperties, Walker,
 };
 
 <span class="doccomment">/// Traverse a table.
@@ -216,7 +221,12 @@
 
     <span class="doccomment">/// Is the table a partition table?
     </span><span class="kw">pub fn </span>is_partition(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.table().is_partition
+        <span class="self">self</span>.table().properties.contains(TableProperties::IsPartition)
+    }
+
+    <span class="doccomment">/// Does the table have subclasses?
+    </span><span class="kw">pub fn </span>has_subclass(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.table().properties.contains(TableProperties::HasSubclass)
     }
 
     <span class="doccomment">/// Reference to the underlying `Table` struct.

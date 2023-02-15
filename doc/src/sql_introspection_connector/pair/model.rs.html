@@ -218,6 +218,11 @@
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::walkers,
@@ -255,6 +260,11 @@
     <span class="doccomment">/// Whether the model is a partition table or not.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_partition(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.next.is_partition()
+    }
+
+    <span class="doccomment">/// Whether the model has subclass tables or not.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_subclass(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.next.has_subclass()
     }
 
     <span class="doccomment">/// Name of the model in the PSL. The value can be sanitized if it

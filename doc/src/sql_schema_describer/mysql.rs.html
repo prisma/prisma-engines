@@ -810,6 +810,10 @@
 <a href="#810" id="810">810</a>
 <a href="#811" id="811">811</a>
 <a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1098,7 +1102,11 @@
         <span class="kw">for </span>(name, is_partition) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = name.clone();
             <span class="kw">let </span>id = <span class="kw">if </span>is_partition {
-                sql_schema.push_table_partitioned(name, Default::default())
+                sql_schema.push_table_with_properties(
+                    name,
+                    Default::default(),
+                    Into::into(TableProperties::IsPartition),
+                )
             } <span class="kw">else </span>{
                 sql_schema.push_table(name, Default::default())
             };

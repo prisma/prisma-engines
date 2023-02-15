@@ -864,6 +864,20 @@
 <a href="#864" id="864">864</a>
 <a href="#865" id="865">865</a>
 <a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
@@ -886,6 +900,7 @@
     ids::<span class="kw-2">*</span>,
     walkers::<span class="kw-2">*</span>,
 };
+<span class="kw">use </span>enumflags2::{BitFlag, BitFlags};
 <span class="kw">pub use </span>prisma_value::PrismaValue;
 
 <span class="kw">pub use </span>either::Either;
@@ -1198,17 +1213,22 @@
         <span class="self">self</span>.tables.push(Table {
             namespace_id,
             name,
-            is_partition: <span class="bool-val">false</span>,
+            properties: TableProperties::empty(),
         });
         id
     }
 
-    <span class="kw">pub fn </span>push_table_partitioned(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, namespace_id: NamespaceId) -&gt; TableId {
+    <span class="kw">pub fn </span>push_table_with_properties(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: String,
+        namespace_id: NamespaceId,
+        properties: BitFlags&lt;TableProperties&gt;,
+    ) -&gt; TableId {
         <span class="kw">let </span>id = TableId(<span class="self">self</span>.tables.len() <span class="kw">as </span>u32);
         <span class="self">self</span>.tables.push(Table {
             namespace_id,
             name,
-            is_partition: <span class="bool-val">true</span>,
+            properties,
         });
         id
     }
@@ -1306,12 +1326,20 @@
     }
 }
 
+<span class="attr">#[enumflags2::bitflags]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>TableProperties {
+    IsPartition,
+    HasSubclass,
+}
+
 <span class="doccomment">/// A table found in a schema.
 </span><span class="attr">#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 </span><span class="kw">pub struct </span>Table {
     namespace_id: NamespaceId,
     name: String,
-    is_partition: bool,
+    properties: BitFlags&lt;TableProperties&gt;,
 }
 
 <span class="doccomment">/// The type of an index.
