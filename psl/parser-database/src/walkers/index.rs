@@ -1,4 +1,4 @@
-use super::CompositeTypeFieldWalker;
+use super::{CompositeTypeFieldWalker, ScalarFieldId};
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
@@ -115,7 +115,7 @@ impl<'db> IndexWalker<'db> {
                     IndexFieldWalker::new(walker)
                 }
                 None => {
-                    let walker = self.model().scalar_field(field_id);
+                    let walker = self.db.walk(ScalarFieldId(self.model_id, field_id));
                     IndexFieldWalker::new(walker)
                 }
             }
@@ -194,7 +194,7 @@ impl<'db> IndexWalker<'db> {
     pub fn source_field(self) -> Option<ScalarFieldWalker<'db>> {
         self.index_attribute
             .source_field
-            .map(|field_id| self.model().scalar_field(field_id))
+            .map(|field_id| self.db.walk(ScalarFieldId(self.model_id, field_id)))
     }
 }
 

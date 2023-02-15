@@ -1,7 +1,7 @@
 use schema_ast::ast;
 
 use crate::{
-    walkers::{ModelWalker, RelationFieldWalker, ScalarFieldWalker},
+    walkers::{ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
 
@@ -40,12 +40,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
     pub fn referenced_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.referenced_model().id;
-
-            ScalarFieldWalker {
-                id: crate::walkers::ScalarFieldId(model_id, *field_id),
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            }
+            self.db.walk(ScalarFieldId(model_id, *field_id))
         };
 
         match self.referencing_field().attributes().references.as_ref() {
@@ -58,12 +53,7 @@ impl<'db> CompleteInlineRelationWalker<'db> {
     pub fn referencing_fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         let f = move |field_id: &ast::FieldId| {
             let model_id = self.referencing_model().id;
-
-            ScalarFieldWalker {
-                id: crate::walkers::ScalarFieldId(model_id, *field_id),
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            }
+            self.db.walk(ScalarFieldId(model_id, *field_id))
         };
 
         match self.referencing_field().attributes().fields.as_ref() {
