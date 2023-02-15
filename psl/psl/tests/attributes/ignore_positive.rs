@@ -32,7 +32,7 @@ fn allow_ignore_on_valid_model() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel.assert_has_model("ModelId").assert_ignored(true);
     datamodel.assert_has_model("ModelUnique").assert_ignored(true);
     datamodel.assert_has_model("ModelCompoundId").assert_ignored(true);
@@ -74,7 +74,7 @@ fn allow_ignore_on_invalid_models() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel.assert_has_model("ModelNoFields").assert_ignored(true);
     datamodel.assert_has_model("ModelNoId").assert_ignored(true);
     datamodel.assert_has_model("ModelOptionalId").assert_ignored(true);
@@ -114,7 +114,7 @@ fn allow_ignore_on_valid_models_in_relations() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = psl::parse_schema(dml).unwrap();
     datamodel
         .assert_has_model("ModelValidA")
         .assert_ignored(true)
@@ -169,7 +169,7 @@ fn allow_ignore_on_invalid_models_in_relations() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel
         .assert_has_model("ModelInvalidA")
         .assert_ignored(true)
@@ -212,7 +212,7 @@ fn allow_ignore_on_scalar_fields() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel
         .assert_has_model("ModelA")
         .assert_has_scalar_field("b")
@@ -233,7 +233,7 @@ fn allow_ignore_on_scalar_fields_that_are_used() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel
         .assert_has_model("ModelA")
         .assert_has_scalar_field("b")
@@ -277,7 +277,7 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse_schema(dml);
     datamodel
         .assert_has_model("ModelValidA")
         .assert_has_relation_field("rel_b")

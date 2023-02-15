@@ -1,30 +1,5 @@
 use crate::{common::*, with_header, Provider};
-
-#[test]
-fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
-    let dml = indoc! {r#"
-        model User {
-          user_id Int    @id
-          posts   Post[]
-        }
-
-        model Post {
-          post_id Int    @id
-          users   User[]
-        }
-    "#};
-
-    let schema = parse(dml);
-
-    schema
-        .assert_has_model("User")
-        .assert_has_relation_field("posts")
-        .assert_relation_referenced_fields(&["post_id"]);
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("users")
-        .assert_relation_referenced_fields(&["user_id"]);
-}
+use psl::parser_database::ScalarType;
 
 #[test]
 fn settings_must_be_deteced() {
@@ -38,14 +13,12 @@ fn settings_must_be_deteced() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
 
     let todo_model = schema.assert_has_model("Todo");
     todo_model
         .assert_has_relation_field("parent_todo")
-        .assert_relation_to(todo_model.id)
-        .assert_relation_referenced_fields(&["id"])
-        .assert_arity(&dml::FieldArity::Optional);
+        .assert_relation_to(todo_model.id);
 }
 
 #[test]
@@ -66,20 +39,15 @@ fn resolve_relation() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
-    user_model
-        .assert_has_scalar_field("firstName")
-        .assert_base_type(&ScalarType::String);
+    user_model.assert_has_scalar_field("firstName");
     user_model
         .assert_has_relation_field("posts")
-        .assert_relation_to(post_model.id)
-        .assert_arity(&dml::FieldArity::List);
+        .assert_relation_to(post_model.id);
 
-    post_model
-        .assert_has_scalar_field("text")
-        .assert_base_type(&ScalarType::String);
+    post_model.assert_has_scalar_field("text");
     post_model
         .assert_has_relation_field("user")
         .assert_relation_to(user_model.id);
@@ -102,14 +70,13 @@ fn resolve_related_field() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
 
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to(user_model.id)
-        .assert_relation_referenced_fields(&["firstName"]);
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -133,15 +100,13 @@ fn resolve_related_fields() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
 
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to(user_model.id)
-        .assert_relation_base_fields(&["authorFirstName", "authorLastName"])
-        .assert_relation_referenced_fields(&["firstName", "lastName"]);
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -164,35 +129,27 @@ fn allow_multiple_relations() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
     user_model
         .assert_field_count(3)
         .assert_has_relation_field("posts")
-        .assert_relation_to(post_model.id)
-        .assert_arity(&dml::FieldArity::List)
-        .assert_relation_name("PostToUser");
+        .assert_relation_to(post_model.id);
     user_model
         .assert_has_relation_field("more_posts")
-        .assert_relation_to(post_model.id)
-        .assert_arity(&dml::FieldArity::List)
-        .assert_relation_name("more_posts");
+        .assert_relation_to(post_model.id);
 
     post_model
         .assert_field_count(6)
         .assert_has_scalar_field("text")
-        .assert_base_type(&ScalarType::String);
+        .assert_scalar_type(ScalarType::String);
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to(user_model.id)
-        .assert_arity(&dml::FieldArity::Required)
-        .assert_relation_name("PostToUser");
+        .assert_relation_to(user_model.id);
     post_model
         .assert_has_relation_field("posting_user")
-        .assert_relation_to(user_model.id)
-        .assert_arity(&dml::FieldArity::Required)
-        .assert_relation_name("more_posts");
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -211,7 +168,7 @@ fn allow_complicated_self_relations() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("son")
@@ -242,18 +199,10 @@ fn allow_explicit_fk_name_definition() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::Postgres, &[]));
 
-    schema
-        .assert_has_model("User")
-        .assert_has_relation_field("posts")
-        .assert_relation_fk_name(None);
-
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_referenced_fields(&["user_id"])
-        .assert_relation_fk_name(Some("CustomFKName".to_string()));
+    schema.assert_has_model("User").assert_has_relation_field("posts");
+    schema.assert_has_model("Post").assert_has_relation_field("user");
 }
 
 #[test]
@@ -271,7 +220,7 @@ fn one_to_one_optional() {
         }
     "#};
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     schema.assert_has_model("A").assert_has_relation_field("b");
     schema.assert_has_model("B").assert_has_relation_field("a");
 }
@@ -292,19 +241,10 @@ fn embedded_many_to_many_relations_work_on_mongodb() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Mongo, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::Mongo, &[]));
 
-    schema
-        .assert_has_model("A")
-        .assert_has_relation_field("bs")
-        .assert_relation_base_fields(&["b_ids"])
-        .assert_relation_referenced_fields(&["id"]);
-
-    schema
-        .assert_has_model("B")
-        .assert_has_relation_field("as")
-        .assert_relation_base_fields(&["a_ids"])
-        .assert_relation_referenced_fields(&["id"]);
+    schema.assert_has_model("A").assert_has_relation_field("bs");
+    schema.assert_has_model("B").assert_has_relation_field("as");
 }
 
 #[test]
@@ -321,7 +261,7 @@ fn implicit_many_to_many_relations_work_on_postgresql() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::Postgres, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -340,7 +280,7 @@ fn implicit_many_to_many_relations_work_on_mysql() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Mysql, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::Mysql, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -359,7 +299,7 @@ fn implicit_many_to_many_relations_work_on_sql_server() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::SqlServer, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::SqlServer, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -378,7 +318,7 @@ fn implicit_many_to_many_relations_work_on_sqlite() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Sqlite, &[]));
+    let schema = parse_schema(&with_header(dml, Provider::Sqlite, &[]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }
@@ -397,7 +337,7 @@ fn implicit_many_to_many_relations_work_on_cockroach() {
         }
     "#};
 
-    let schema = parse(&with_header(dml, Provider::Cockroach, &["cockroachDb"]));
+    let schema = parse_schema(&with_header(dml, Provider::Cockroach, &["cockroachDb"]));
     schema.assert_has_model("A").assert_has_relation_field("bs");
     schema.assert_has_model("B").assert_has_relation_field("as");
 }

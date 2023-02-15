@@ -1,11 +1,11 @@
 mod asserts;
 
-pub use ::indoc::{formatdoc, indoc};
+pub(crate) use ::indoc::{formatdoc, indoc};
 pub(crate) use asserts::*;
-pub use dml::*;
-pub use expect_test::expect;
+pub(crate) use dml::*;
+pub(crate) use expect_test::expect;
 
-use psl::{diagnostics::*, schema_ast::ast, Configuration, StringFromEnvVar};
+use psl::{diagnostics::*, Configuration, StringFromEnvVar};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
@@ -37,21 +37,9 @@ pub(crate) trait CompositeTypeFieldAsserts {
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
 }
 
-pub(crate) trait RelationFieldAsserts {
-    fn assert_relation_name(&self, t: &str) -> &Self;
-    fn assert_relation_to(&self, t: ast::ModelId) -> &Self;
-    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self;
-    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self;
-    fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
-    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
-    fn assert_ignored(&self, state: bool) -> &Self;
-    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self;
-}
-
 pub(crate) trait ModelAsserts {
     fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
-    fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
@@ -173,60 +161,6 @@ impl CompositeTypeFieldAsserts for dml::CompositeTypeField {
     }
 }
 
-impl FieldAsserts for dml::RelationField {
-    fn assert_arity(&self, arity: &dml::FieldArity) -> &Self {
-        assert_eq!(self.arity, *arity);
-        self
-    }
-
-    fn assert_with_documentation(&self, t: &str) -> &Self {
-        assert_eq!(self.documentation, Some(t.to_owned()));
-        self
-    }
-}
-
-impl RelationFieldAsserts for dml::RelationField {
-    fn assert_relation_name(&self, t: &str) -> &Self {
-        assert_eq!(self.relation_info.name, t.to_owned());
-        self
-    }
-
-    fn assert_relation_to(&self, t: ast::ModelId) -> &Self {
-        assert_eq!(self.relation_info.referenced_model, t);
-        self
-    }
-
-    fn assert_relation_delete_strategy(&self, t: dml::ReferentialAction) -> &Self {
-        assert_eq!(self.relation_info.on_delete, Some(t));
-        self
-    }
-
-    fn assert_relation_update_strategy(&self, t: dml::ReferentialAction) -> &Self {
-        assert_eq!(self.relation_info.on_update, Some(t));
-        self
-    }
-
-    fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self {
-        assert_eq!(self.relation_info.references, t);
-        self
-    }
-
-    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
-        assert_eq!(self.relation_info.fields, t);
-        self
-    }
-
-    fn assert_ignored(&self, state: bool) -> &Self {
-        assert_eq!(self.is_ignored, state);
-        self
-    }
-
-    fn assert_relation_fk_name(&self, name: Option<String>) -> &Self {
-        assert_eq!(self.relation_info.fk_name, name);
-        self
-    }
-}
-
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
         self.find_model(t).unwrap_or_else(|| panic!("Model {t} not found"))
@@ -241,11 +175,6 @@ impl DatamodelAsserts for dml::Datamodel {
 impl ModelAsserts for dml::Model {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
         self.find_scalar_field(t)
-            .unwrap_or_else(|| panic!("Field {t} not found"))
-    }
-
-    fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
-        self.find_relation_field(t)
             .unwrap_or_else(|| panic!("Field {t} not found"))
     }
 
@@ -352,6 +281,11 @@ impl WarningAsserts for Vec<DatamodelWarning> {
 
 pub(crate) fn parse_unwrap_err(schema: &str) -> String {
     psl::parse_schema(schema).map(drop).unwrap_err()
+}
+
+#[track_caller]
+pub(crate) fn parse_schema(datamodel_string: &str) -> psl::ValidatedSchema {
+    psl::parse_schema(datamodel_string).unwrap()
 }
 
 #[track_caller]
