@@ -3,7 +3,8 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    /// This function registers the reason for a Wasm panic via the JS function `globalThis.WASM_PANIC_REGISTRY()`
+    /// This function registers the reason for a Wasm panic via the
+    /// JS function `globalThis.WASM_PANIC_REGISTRY.set_message()`
     #[wasm_bindgen(js_namespace = ["global", "WASM_PANIC_REGISTRY"], js_name = "set_message")]
     fn prisma_set_wasm_panic_message(s: &str);
 }
@@ -20,7 +21,7 @@ fn register_panic_hook() {
     SET_HOOK.call_once(|| {
         panic::set_hook(Box::new(|info| {
             let message = &info.to_string();
-            prisma_set_wasm_panic_message(&message);
+            prisma_set_wasm_panic_message(message);
         }));
     });
 }
