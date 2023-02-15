@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use crate::{
     ForeignKeyId, ForeignKeyWalker, IndexColumnWalker, IndexId, IndexWalker, NamespaceId, Table, TableColumnId,
-    TableColumnWalker, TableId, Walker,
+    TableColumnWalker, TableId, TableProperties, Walker,
 };
 
 /// Traverse a table.
@@ -103,7 +103,12 @@ impl<'a> TableWalker<'a> {
 
     /// Is the table a partition table?
     pub fn is_partition(self) -> bool {
-        self.table().is_partition
+        self.table().properties.contains(TableProperties::IsPartition)
+    }
+
+    /// Does the table have subclasses?
+    pub fn has_subclass(self) -> bool {
+        self.table().properties.contains(TableProperties::HasSubclass)
     }
 
     /// Reference to the underlying `Table` struct.

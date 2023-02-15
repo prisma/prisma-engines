@@ -69,7 +69,9 @@ fn sqlite_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -276,7 +278,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                         0,
                     ),
                     name: "string_defaults_test",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -375,7 +379,9 @@ fn backslashes_in_string_literals(api: TestApi) {
                         0,
                     ),
                     name: "test",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -458,14 +464,18 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                         0,
                     ),
                     name: "dog",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         0,
                     ),
                     name: "platypus",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],

@@ -49,6 +49,8 @@ pub(super) struct Warnings {
     pub(super) duplicate_names: Vec<TopLevelItem>,
     /// Warn about using partition tables, which only have introspection support.
     pub(super) partition_tables: Vec<Model>,
+    /// Warn about using inherited tables, which only have introspection support.
+    pub(super) inherited_tables: Vec<Model>,
 }
 
 impl Warnings {
@@ -187,6 +189,8 @@ impl Warnings {
         );
 
         maybe_warn(&self.partition_tables, partition_tables_found, &mut self.warnings);
+
+        maybe_warn(&self.inherited_tables, inherited_tables_found, &mut self.warnings);
 
         self.warnings
     }
@@ -461,6 +465,16 @@ pub(super) fn partition_tables_found(affected: &[Model]) -> Warning {
 
     Warning {
         code: 27,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(super) fn inherited_tables_found(affected: &[Model]) -> Warning {
+    let message = "These tables are inherited tables, which are not yet fully supported.";
+
+    Warning {
+        code: 28,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

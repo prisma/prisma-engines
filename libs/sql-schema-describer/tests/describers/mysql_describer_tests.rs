@@ -96,7 +96,9 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [
@@ -888,7 +890,9 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [
@@ -1673,7 +1677,9 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [
@@ -2522,14 +2528,18 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                         0,
                     ),
                     name: "Post",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -2706,7 +2716,9 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -2779,7 +2791,9 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                         0,
                     ),
                     name: "string_defaults_test",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -2882,7 +2896,9 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                         0,
                     ),
                     name: "test",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -2966,7 +2982,9 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         0,
                     ),
                     name: "game",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [

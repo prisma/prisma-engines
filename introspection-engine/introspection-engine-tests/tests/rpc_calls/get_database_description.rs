@@ -27,7 +27,7 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> TestResult
             {
               "namespace_id": 0,
               "name": "Blog",
-              "is_partition": false
+              "properties": 0
             }
           ],
           "enums": [],
@@ -100,7 +100,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
             {
               "namespace_id": 0,
               "name": "Blog",
-              "is_partition": false
+              "properties": 0
             }
           ],
           "enums": [],
@@ -175,7 +175,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> TestRes
             {
               "namespace_id": 0,
               "name": "Blog",
-              "is_partition": false
+              "properties": 0
             }
           ],
           "enums": [],
@@ -258,7 +258,7 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> TestResul
             {
               "namespace_id": 0,
               "name": "Blog",
-              "is_partition": false
+              "properties": 0
             }
           ],
           "enums": [],

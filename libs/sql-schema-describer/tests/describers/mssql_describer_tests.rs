@@ -136,7 +136,9 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -814,14 +816,18 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Table_0",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_0",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],
@@ -987,35 +993,45 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         0,
                     ),
                     name: "Table_0",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_0",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_1",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         0,
                     ),
                     name: "Table_1",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
                 Table {
                     namespace_id: NamespaceId(
                         1,
                     ),
                     name: "Table_2",
-                    is_partition: false,
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
                 },
             ],
             enums: [],

@@ -286,7 +286,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         for (name, is_partition) in names {
             let cloned_name = name.clone();
             let id = if is_partition {
-                sql_schema.push_table_partitioned(name, Default::default())
+                sql_schema.push_table_with_properties(
+                    name,
+                    Default::default(),
+                    Into::into(TableProperties::IsPartition),
+                )
             } else {
                 sql_schema.push_table(name, Default::default())
             };
