@@ -53,9 +53,9 @@ pub fn lint(input: String) -> String {
 }
 
 #[wasm_bindgen]
-pub fn validate(params: String) -> Result<(), String> {
+pub fn validate(params: String) -> Result<(), JsError> {
     register_panic_hook();
-    prisma_fmt::validate(params)
+    prisma_fmt::validate(params).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]
