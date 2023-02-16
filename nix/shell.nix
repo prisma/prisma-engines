@@ -9,6 +9,7 @@ in
       [ devToolchain llvmPackages_latest.bintools ]
       ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
     inputsFrom = [ self'.packages.prisma-engines ];
-    shellHook = "export RUSTFLAGS='-C link-arg=-fuse-ld=lld'";
+    shellHook = pkgs.lib.optionalString pkgs.stdenv.isLinux
+      "export RUSTFLAGS='-C link-arg=-fuse-ld=lld'";
   };
 }
