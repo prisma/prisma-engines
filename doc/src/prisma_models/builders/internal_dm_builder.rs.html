@@ -164,6 +164,8 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     field_builders::RelationFieldBuilder, CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
     PrimaryKeyBuilder,
@@ -229,6 +231,7 @@
                     <span class="prelude-val">None
                 </span>} <span class="kw">else </span>{
                     <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        id: <span class="kw">crate</span>::ScalarFieldId::InModel(sf.id),
                         name: sf.name.clone(),
                         type_identifier: sf.type_identifier(),
                         is_unique: model.field_is_unique(<span class="kw-2">&amp;</span>sf.name),
@@ -269,6 +272,7 @@
                     <span class="prelude-val">None
                 </span>} <span class="kw">else </span>{
                     <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        id: <span class="kw">crate</span>::ScalarFieldId::InCompositeType(field.id),
                         name: field.name.clone(),
                         type_identifier: type_ident,
                         is_unique: <span class="bool-val">false</span>, <span class="comment">// Composites can&#39;t have uniques or ids at the moment.

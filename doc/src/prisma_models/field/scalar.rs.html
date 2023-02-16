@@ -163,9 +163,18 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>};
 <span class="kw">use </span>dml::{DefaultValue, FieldArity, NativeTypeInstance};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::parser_database::walkers;
 <span class="kw">use </span>std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -175,7 +184,14 @@
 <span class="kw">pub type </span>ScalarFieldRef = Arc&lt;ScalarField&gt;;
 <span class="kw">pub type </span>ScalarFieldWeak = Weak&lt;ScalarField&gt;;
 
+<span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>ScalarFieldId {
+    InModel(walkers::ScalarFieldId),
+    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+}
+
 <span class="kw">pub struct </span>ScalarField {
+    <span class="kw">pub </span>id: ScalarFieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) type_identifier: TypeIdentifier,
     <span class="kw">pub</span>(<span class="kw">crate</span>) is_id: bool,
