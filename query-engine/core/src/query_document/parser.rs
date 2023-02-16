@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, hash::Hash, str::FromStr, sync::Arc};
+use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
 pub struct QueryDocumentParser {
@@ -95,13 +95,11 @@ impl QueryDocumentParser {
         schema_field: &OutputFieldRef,
         given_arguments: &[(String, ArgumentValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
-        let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
-        let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
-        let diff = Diff::new(&left, &right);
+        let valid_argument_names: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
+        let given_argument_names: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
+        let invalid_argument_names = given_argument_names.difference(&valid_argument_names);
 
-        // All arguments that are not in the schema cause an error.
-        diff.right
-            .into_iter()
+        invalid_argument_names
             .map(|extra_arg| {
                 Err(QueryParserError {
                     path: parent_path.add(extra_arg.to_string()),
@@ -440,21 +438,17 @@ impl QueryDocumentParser {
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
-        let left: HashSet<&str> = schema_object
+        let valid_field_names: HashSet<&str> = schema_object
             .get_fields()
             .iter()
             .map(|field| field.name.as_str())
             .collect();
+        let given_field_names: HashSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
+        let missing_field_names = valid_field_names.difference(&given_field_names);
 
-        let right: HashSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
-        let diff = Diff::new(&left, &right);
-
-        // First, check that all fields **not** provided in the query (left diff) are optional,
-        // i.e. run the validation but disregard the result, or have defaults, in which case the
-        // value pair gets added to the result.
-        let defaults = diff
-            .left
-            .into_iter()
+        // First, filter-in those fields that are not given but have a default value in the schema.
+        // As in practise, it is like if they were given with said default value.
+        let defaults = missing_field_names
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
                 let path = path.add(field.name.clone());
@@ -551,22 +545,5 @@ impl QueryDocumentParser {
         map.set_tag(schema_object.tag.clone());
 
         Ok(map)
-    }
-}
-
-#[derive(Debug)]
-struct Diff<'a, T: Eq + Hash> {
-    pub left: Vec<&'a T>,
-    pub right: Vec<&'a T>,
-    pub _equal: Vec<&'a T>,
-}
-
-impl<'a, T: Eq + Hash> Diff<'a, T> {
-    fn new(left_side: &'a HashSet<T>, right_side: &'a HashSet<T>) -> Diff<'a, T> {
-        let left: Vec<&T> = left_side.difference(right_side).collect();
-        let right: Vec<&T> = right_side.difference(left_side).collect();
-        let _equal: Vec<&T> = left_side.intersection(right_side).collect();
-
-        Diff { left, right, _equal }
     }
 }
