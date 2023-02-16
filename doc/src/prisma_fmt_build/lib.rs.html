@@ -73,47 +73,118 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-</pre><pre class="rust"><code><span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::panic;
+<span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="doccomment">/// This function registers the reason for a Wasm panic via the
+    /// JS function `globalThis.WASM_PANIC_REGISTRY.set_message()`
+    </span><span class="attr">#[wasm_bindgen(js_namespace = [<span class="string">&quot;global&quot;</span>, <span class="string">&quot;WASM_PANIC_REGISTRY&quot;</span>]</span>, js_name = <span class="string">&quot;set_message&quot;</span>)]
+    <span class="kw">fn </span>prisma_set_wasm_panic_message(s: <span class="kw-2">&amp;</span>str);
+}
+
+<span class="doccomment">/// Registers a singleton panic hook that will register the reason for the Wasm panic in JS.
+/// Without this, the panic message would be lost: you&#39;d see `RuntimeError: unreachable` message in JS,
+/// with no reference to the Rust function and line that panicked.
+/// This function should be manually called before any other public function in this module.
+/// Note: no method is safe to call after a panic has occurred.
+</span><span class="kw">fn </span>register_panic_hook() {
+    <span class="kw">use </span>std::sync::Once;
+    <span class="kw">static </span>SET_HOOK: Once = Once::new();
+
+    SET_HOOK.call_once(|| {
+        panic::set_hook(Box::new(|info| {
+            <span class="kw">let </span>message = <span class="kw-2">&amp;</span>info.to_string();
+            prisma_set_wasm_panic_message(message);
+        }));
+    });
+}
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>format(schema: String, params: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::format(<span class="kw-2">&amp;</span>schema, <span class="kw-2">&amp;</span>params)
 }
 
 <span class="doccomment">/// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
 </span><span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>get_config(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;String, JsError&gt; {
+    register_panic_hook();
     prisma_fmt::get_config(params).map_err(|e| JsError::new(<span class="kw-2">&amp;</span>e))
 }
 
 <span class="doccomment">/// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
 </span><span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>get_dmmf(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;String, JsError&gt; {
+    register_panic_hook();
     prisma_fmt::get_dmmf(params).map_err(|e| JsError::new(<span class="kw-2">&amp;</span>e))
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>lint(input: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::lint(input)
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>validate(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    register_panic_hook();
     prisma_fmt::validate(params)
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>native_types(input: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::native_types(input)
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>referential_actions(input: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::referential_actions(input)
 }
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>preview_features() -&gt; String {
+    register_panic_hook();
     prisma_fmt::preview_features()
 }
 
@@ -123,6 +194,7 @@
 /// being a `CompletionList` object.
 </span><span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>text_document_completion(schema: String, params: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::text_document_completion(schema, <span class="kw-2">&amp;</span>params)
 }
 
@@ -133,6 +205,7 @@
 /// `CodeActionOrCommand` objects.
 </span><span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>code_actions(schema: String, params: String) -&gt; String {
+    register_panic_hook();
     prisma_fmt::code_actions(schema, <span class="kw-2">&amp;</span>params)
 }
 
@@ -140,6 +213,7 @@
 /// handling.
 </span><span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub fn </span>debug_panic() {
+    register_panic_hook();
     <span class="macro">panic!</span>(<span class="string">&quot;This is the panic triggered by `prisma_fmt::debug_panic()`&quot;</span>);
 }
 
