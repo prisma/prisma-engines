@@ -1,6 +1,7 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
+use psl::parser_database::walkers;
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
@@ -10,7 +11,14 @@ use std::{
 pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
 
+#[derive(Debug, Clone)]
+pub enum ScalarFieldId {
+    InModel(walkers::ScalarFieldId),
+    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+}
+
 pub struct ScalarField {
+    pub id: ScalarFieldId,
     pub(crate) name: String,
     pub(crate) type_identifier: TypeIdentifier,
     pub(crate) is_id: bool,

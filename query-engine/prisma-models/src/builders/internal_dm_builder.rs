@@ -63,6 +63,7 @@ fn model_field_builders(model: &dml::Model, schema: &psl::ValidatedSchema) -> Ve
                     None
                 } else {
                     Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        id: crate::ScalarFieldId::InModel(sf.id),
                         name: sf.name.clone(),
                         type_identifier: sf.type_identifier(),
                         is_unique: model.field_is_unique(&sf.name),
@@ -103,6 +104,7 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                     None
                 } else {
                     Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        id: crate::ScalarFieldId::InCompositeType(field.id),
                         name: field.name.clone(),
                         type_identifier: type_ident,
                         is_unique: false, // Composites can't have uniques or ids at the moment.

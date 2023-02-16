@@ -5,6 +5,7 @@ use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
 pub struct ScalarFieldBuilder {
+    pub id: crate::ScalarFieldId,
     pub name: String,
     pub type_identifier: TypeIdentifier,
     pub is_unique: bool,
@@ -22,6 +23,7 @@ pub struct ScalarFieldBuilder {
 impl ScalarFieldBuilder {
     pub fn build(self, container: ParentContainer) -> ScalarFieldRef {
         let scalar = ScalarField {
+            id: self.id,
             name: self.name,
             type_identifier: self.type_identifier,
             is_id: self.is_id,
