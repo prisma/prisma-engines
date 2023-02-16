@@ -165,9 +165,9 @@
 }
 
 <span class="attr">#[wasm_bindgen]
-</span><span class="kw">pub fn </span>validate(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+</span><span class="kw">pub fn </span>validate(params: String) -&gt; <span class="prelude-ty">Result</span>&lt;(), JsError&gt; {
     register_panic_hook();
-    prisma_fmt::validate(params)
+    prisma_fmt::validate(params).map_err(|e| JsError::new(<span class="kw-2">&amp;</span>e))
 }
 
 <span class="attr">#[wasm_bindgen]
