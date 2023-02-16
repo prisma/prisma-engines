@@ -79,8 +79,8 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                         input_field(
                             operations::PUSH,
                             vec![
-                                map_scalar_input_type(ctx, &sf.type_identifier(), false),
                                 list_input_type.clone(),
+                                map_scalar_input_type(ctx, &sf.type_identifier(), false),
                             ],
                             None,
                         )
