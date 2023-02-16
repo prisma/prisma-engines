@@ -23,8 +23,8 @@ pub fn lint(input: String) -> String {
 }
 
 #[wasm_bindgen]
-pub fn validate(params: String) -> Result<(), String> {
-    prisma_fmt::validate(params)
+pub fn validate(params: String) -> Result<(), JsError> {
+    prisma_fmt::validate(params).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]
