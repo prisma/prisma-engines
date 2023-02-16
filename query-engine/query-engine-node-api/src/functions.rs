@@ -87,3 +87,8 @@ pub fn debug_panic(panic_message: Option<String>) -> napi::Result<()> {
 
     Err(napi::Error::from_reason(message))
 }
+
+#[napi]
+pub fn literally_do_nothing() {
+    nope::nops();
+}

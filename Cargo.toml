@@ -18,6 +18,7 @@ members = [
   "query-engine/core",
   "query-engine/dmmf",
   "query-engine/metrics",
+  "query-engine/nope",
   "query-engine/prisma-models",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",

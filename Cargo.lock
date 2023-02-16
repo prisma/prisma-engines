@@ -2439,6 +2439,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "nope"
+version = "0.1.0"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3344,6 +3351,7 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
+ "nope",
  "opentelemetry",
  "prisma-models",
  "psl",
