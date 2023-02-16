@@ -105,7 +105,7 @@
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast,
     types::IdAttribute,
-    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldId, ScalarFieldWalker},
     ParserDatabase,
 };
 
@@ -172,7 +172,7 @@
     </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
         <span class="self">self</span>.attribute.fields.iter().map(<span class="kw">move </span>|field| {
             <span class="kw">let </span>field_id = field.path.field_in_index();
-            <span class="self">self</span>.model().scalar_field(field_id)
+            <span class="self">self</span>.db.walk(ScalarFieldId(<span class="self">self</span>.model_id, field_id))
         })
     }
 

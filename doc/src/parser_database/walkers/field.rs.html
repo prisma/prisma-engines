@@ -108,14 +108,7 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker, Walker};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 <span class="kw">use </span><span class="kw">crate</span>::ScalarType;
 <span class="kw">use </span>schema_ast::ast;
 
@@ -140,18 +133,11 @@
 
     <span class="doccomment">/// Find out which kind of field this is.
     </span><span class="kw">pub fn </span>refine(<span class="self">self</span>) -&gt; RefinedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="kw">let </span>Walker {
-            id: (model_id, field_id),
-            db,
-        } = <span class="self">self</span>;
+        <span class="kw">let </span>(model_id, field_id) = <span class="self">self</span>.id;
         <span class="kw">if </span><span class="self">self</span>.db.types.relation_fields.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
             RefinedFieldWalker::Relation(<span class="self">self</span>.walk(<span class="kw">super</span>::RelationFieldId(model_id, field_id)))
-        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(scalar_field) = <span class="self">self</span>.db.types.scalar_fields.get(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
-            RefinedFieldWalker::Scalar(ScalarFieldWalker {
-                id: ScalarFieldId(model_id, field_id),
-                db,
-                scalar_field,
-            })
+        } <span class="kw">else if </span><span class="self">self</span>.db.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
+            RefinedFieldWalker::Scalar(<span class="self">self</span>.walk(<span class="kw">super</span>::ScalarFieldId(model_id, field_id)))
         } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>(<span class="string">&quot;{:?} is neither a scalar field nor a relation field&quot;</span>, <span class="self">self</span>.id)
         }

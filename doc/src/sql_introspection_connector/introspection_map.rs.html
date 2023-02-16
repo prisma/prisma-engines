@@ -316,12 +316,6 @@
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Matching PSL and database schema information together.
 
 </span><span class="kw">mod </span>relation_names;
@@ -330,7 +324,7 @@
     datamodel_calculator::DatamodelCalculatorContext, introspection_helpers <span class="kw">as </span>helpers, pair::RelationFieldDirection,
 };
 <span class="kw">use </span>psl::{
-    parser_database::{<span class="self">self</span>, ast},
+    parser_database::{<span class="self">self</span>, ast, walkers},
     PreviewFeature,
 };
 <span class="kw">use </span>relation_names::RelationNames;
@@ -352,8 +346,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_views: HashMap&lt;sql::ViewId, ast::ModelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) missing_tables_for_previous_models: HashSet&lt;ast::ModelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) missing_views_for_previous_models: HashSet&lt;ast::ModelId&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_model_scalar_fields: HashMap&lt;sql::TableColumnId, (ast::ModelId, ast::FieldId)&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_view_scalar_fields: HashMap&lt;sql::ViewColumnId, (ast::ModelId, ast::FieldId)&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_model_scalar_fields: HashMap&lt;sql::TableColumnId, walkers::ScalarFieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_view_scalar_fields: HashMap&lt;sql::ViewColumnId, walkers::ScalarFieldId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_inline_relations: HashMap&lt;sql::ForeignKeyId, parser_database::RelationId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_m2m_relations: HashMap&lt;sql::TableId, parser_database::ManyToManyRelationId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) relation_names: RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -559,36 +553,30 @@
     map: <span class="kw-2">&amp;mut </span>IntrospectionMap,
 ) {
     <span class="kw">for </span>col <span class="kw">in </span>sql_schema.walk_table_columns() {
-        <span class="kw">let </span>ids = map.existing_models.get(<span class="kw-2">&amp;</span>col.table().id).and_then(|model_id| {
-            <span class="kw">let </span>model = prisma_schema.db.walk(<span class="kw-2">*</span>model_id);
-
-            <span class="kw">let </span>field = model
+        <span class="kw">let </span>field = map.existing_models.get(<span class="kw-2">&amp;</span>col.table().id).and_then(|model_id| {
+            prisma_schema
+                .db
+                .walk(<span class="kw-2">*</span>model_id)
                 .scalar_fields()
-                .find(|field| field.database_name() == col.name())<span class="question-mark">?</span>;
-
-            <span class="prelude-val">Some</span>((model, field))
+                .find(|field| field.database_name() == col.name())
         });
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((model, field)) = ids {
-            map.existing_model_scalar_fields
-                .insert(col.id, (model.id, field.field_id()));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = field {
+            map.existing_model_scalar_fields.insert(col.id, field.id);
         }
     }
 
     <span class="kw">for </span>col <span class="kw">in </span>sql_schema.walk_view_columns() {
-        <span class="kw">let </span>ids = map.existing_views.get(<span class="kw-2">&amp;</span>col.view().id).and_then(|view_id| {
-            <span class="kw">let </span>model = prisma_schema.db.walk(<span class="kw-2">*</span>view_id);
-
-            <span class="kw">let </span>field = model
+        <span class="kw">let </span>field = map.existing_views.get(<span class="kw-2">&amp;</span>col.view().id).and_then(|view_id| {
+            prisma_schema
+                .db
+                .walk(<span class="kw-2">*</span>view_id)
                 .scalar_fields()
-                .find(|field| field.database_name() == col.name())<span class="question-mark">?</span>;
-
-            <span class="prelude-val">Some</span>((model, field))
+                .find(|field| field.database_name() == col.name())
         });
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((model, field)) = ids {
-            map.existing_view_scalar_fields
-                .insert(col.id, (model.id, field.field_id()));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = field {
+            map.existing_view_scalar_fields.insert(col.id, field.id);
         }
     }
 }

@@ -335,7 +335,7 @@
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::CompositeTypeFieldWalker;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ScalarFieldId};
 <span class="kw">use crate</span>::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
@@ -452,7 +452,7 @@
                     IndexFieldWalker::new(walker)
                 }
                 <span class="prelude-val">None </span>=&gt; {
-                    <span class="kw">let </span>walker = <span class="self">self</span>.model().scalar_field(field_id);
+                    <span class="kw">let </span>walker = <span class="self">self</span>.db.walk(ScalarFieldId(<span class="self">self</span>.model_id, field_id));
                     IndexFieldWalker::new(walker)
                 }
             }
@@ -531,7 +531,7 @@
     </span><span class="kw">pub fn </span>source_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
         <span class="self">self</span>.index_attribute
             .source_field
-            .map(|field_id| <span class="self">self</span>.model().scalar_field(field_id))
+            .map(|field_id| <span class="self">self</span>.db.walk(ScalarFieldId(<span class="self">self</span>.model_id, field_id)))
     }
 }
 

@@ -570,14 +570,14 @@
         <span class="self">self</span>.introspection_map
             .existing_model_scalar_fields
             .get(<span class="kw-2">&amp;</span>id)
-            .map(|(model_id, field_id)| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>model_id).scalar_field(<span class="kw-2">*</span>field_id))
+            .map(|id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>id))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>existing_view_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>, id: sql::ViewColumnId) -&gt; <span class="prelude-ty">Option</span>&lt;walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.introspection_map
             .existing_view_scalar_fields
             .get(<span class="kw-2">&amp;</span>id)
-            .map(|(model_id, field_id)| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>model_id).scalar_field(<span class="kw-2">*</span>field_id))
+            .map(|id| <span class="self">self</span>.previous_schema.db.walk(<span class="kw-2">*</span>id))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_prisma_name(

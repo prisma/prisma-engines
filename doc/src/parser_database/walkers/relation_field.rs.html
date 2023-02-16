@@ -255,8 +255,6 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::{RelationField, RelationFieldId},
@@ -358,7 +356,7 @@
         <span class="self">self</span>.attributes().references.as_ref().map(|references| {
             references
                 .iter()
-                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.related_model().scalar_field(<span class="kw-2">*</span>field_id))
+                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.walk(ScalarFieldId(<span class="self">self</span>.related_model().id, <span class="kw-2">*</span>field_id)))
         })
     }
 
@@ -418,11 +416,9 @@
         <span class="kw">let </span>model_id = <span class="self">self</span>.id.<span class="number">0</span>;
         <span class="kw">let </span>attributes = <span class="self">self</span>.attributes();
         attributes.fields.as_ref().map(<span class="kw">move </span>|fields| {
-            fields.iter().map(<span class="kw">move </span>|field_id| ScalarFieldWalker {
-                id: <span class="kw">super</span>::ScalarFieldId(model_id, <span class="kw-2">*</span>field_id),
-                db: <span class="self">self</span>.db,
-                scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)],
-            })
+            fields
+                .iter()
+                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.db.walk(<span class="kw">super</span>::ScalarFieldId(model_id, <span class="kw-2">*</span>field_id)))
         })
     }
 }

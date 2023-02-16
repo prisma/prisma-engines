@@ -446,25 +446,6 @@
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
-<a href="#461" id="461">461</a>
-<a href="#462" id="462">462</a>
-<a href="#463" id="463">463</a>
-<a href="#464" id="464">464</a>
-<a href="#465" id="465">465</a>
-<a href="#466" id="466">466</a>
-<a href="#467" id="467">467</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::IndexFieldWalker;
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
@@ -480,21 +461,7 @@
 </span><span class="kw">pub struct </span>ScalarFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
 
 <span class="doccomment">/// A scalar field, as part of a model.
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
-</span><span class="kw">pub struct </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="doccomment">/// The typed identifier for the field.
-    </span><span class="kw">pub </span>id: ScalarFieldId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) scalar_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarField,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.id == other.id
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Eq <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {}
+</span><span class="kw">pub type </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; = Walker&lt;<span class="lifetime">&#39;db</span>, ScalarFieldId&gt;;
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="doccomment">/// The ID of the field node in the AST.
@@ -534,7 +501,7 @@
 
     <span class="doccomment">/// The `@default()` AST attribute on the field, if any.
     </span><span class="kw">pub fn </span>default_attribute(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute&gt; {
-        <span class="self">self</span>.scalar_field
+        <span class="self">self</span>.attributes()
             .default
             .as_ref()
             .map(|d| d.default_attribute)
@@ -585,7 +552,7 @@
     }
 
     <span class="kw">fn </span>attributes(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarField {
-        <span class="self">self</span>.scalar_field
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.id.<span class="number">0</span>, <span class="self">self</span>.id.<span class="number">1</span>)]
     }
 
     <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.
@@ -642,8 +609,8 @@
 
     <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).
     </span><span class="kw">pub fn </span>scalar_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.scalar_field.r#type {
-            ScalarFieldType::BuiltInScalar(scalar) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>scalar),
+        <span class="kw">match </span><span class="self">self</span>.attributes().r#type {
+            ScalarFieldType::BuiltInScalar(scalar) =&gt; <span class="prelude-val">Some</span>(scalar),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -732,11 +699,7 @@
     /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     </span><span class="kw">pub fn </span>field(<span class="self">self</span>) -&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        ScalarFieldWalker {
-            id: <span class="kw">super</span>::ScalarFieldId(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id),
-            db: <span class="self">self</span>.db,
-            scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id)],
-        }
+        <span class="self">self</span>.db.walk(<span class="kw">super</span>::ScalarFieldId(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id))
     }
 }
 
@@ -834,8 +797,7 @@
         <span class="kw">match </span>path.type_holding_the_indexed_field() {
             <span class="prelude-val">None </span>=&gt; {
                 <span class="kw">let </span>field_id = path.field_in_index();
-                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id).scalar_field(field_id);
-
+                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk(ScalarFieldId(<span class="self">self</span>.model_id, field_id));
                 IndexFieldWalker::new(walker)
             }
             <span class="prelude-val">Some</span>(ctid) =&gt; {
