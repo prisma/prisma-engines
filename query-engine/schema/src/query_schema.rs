@@ -31,9 +31,6 @@ pub struct QuerySchema {
     /// Internal abstraction over the datamodel AST.
     pub internal_data_model: InternalDataModelRef,
 
-    pub query_map: HashMap<QueryInfo, OutputFieldRef>,
-    pub mutation_map: HashMap<QueryInfo, OutputFieldRef>,
-
     /// Information about the connector this schema was build for.
     pub context: ConnectorContext,
 
@@ -45,6 +42,12 @@ pub struct QuerySchema {
 
     /// Internal. Stores all enum refs.
     _enum_types: Vec<EnumTypeRef>,
+
+    // Internal. Indexes query fields by their own query info for easier access.
+    _query_map: HashMap<QueryInfo, OutputFieldRef>,
+
+    // Internal. Indexes mutation fields by their own query info for easier access.
+    _mutation_map: HashMap<QueryInfo, OutputFieldRef>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -105,8 +108,8 @@ impl QuerySchema {
         QuerySchema {
             query,
             mutation,
-            query_map,
-            mutation_map,
+            _query_map: query_map,
+            _mutation_map: mutation_map,
             _input_object_types,
             _output_object_types,
             _enum_types,
@@ -139,7 +142,7 @@ impl QuerySchema {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self.query_map.get(&query_info).cloned()
+        self._query_map.get(&query_info).cloned()
     }
 
     pub fn find_mutation_field_by_model_and_action(
@@ -150,7 +153,7 @@ impl QuerySchema {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self.mutation_map.get(&query_info).cloned()
+        self._mutation_map.get(&query_info).cloned()
     }
 
     pub fn mutation(&self) -> ObjectTypeStrongRef {
