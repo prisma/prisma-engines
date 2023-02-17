@@ -518,6 +518,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
+name = "core-tests"
+version = "0.1.0"
+dependencies = [
+ "dissimilar",
+ "prisma-models",
+ "psl",
+ "query-core",
+ "request-handlers",
+ "schema",
+ "schema-builder",
+ "serde_json",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

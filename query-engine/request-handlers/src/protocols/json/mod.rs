@@ -1,4 +1,4 @@
 mod body;
 mod protocol_adapter;
 
-pub use body::*;
+pub use self::{body::*, protocol_adapter::JsonProtocolAdapter};
