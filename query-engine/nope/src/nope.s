@@ -5,7 +5,7 @@
     // value of NNOPS.
 
     // Polyglot program! Valid as both x86_64 and aarch64 assembly
-    // code.  You only need to tweak the NNOPS variable to match the
+    // code.  You only need to tweak the NNOPS constant to match the
     // desired code size: one nop instruction is 1 byte on x86_64 and
     // 4 bytes on aarch64.
 
