@@ -4,10 +4,10 @@
 extern crate tracing;
 
 use query_engine::cli::CliCommand;
+use query_engine::context;
 use query_engine::error::PrismaError;
 use query_engine::opt::PrismaOpt;
 use query_engine::server;
-use query_engine::state;
 use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
@@ -30,7 +30,7 @@ async fn main() -> Result<(), AnyError> {
             Some(cmd) => cmd.execute().await?,
             None => {
                 let span = tracing::info_span!("prisma:engine:connect");
-                let cx = state::setup(&opts, true, None).instrument(span).await?;
+                let cx = context::setup(&opts, true, None).instrument(span).await?;
                 set_panic_hook(opts.log_format());
                 server::listen(cx, &opts).await?;
             }
