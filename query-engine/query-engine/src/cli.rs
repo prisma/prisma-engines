@@ -1,5 +1,6 @@
 use crate::{
-    context::{PrismaContext, ServerConfig},
+    context::PrismaContext,
+    features::{EnabledFeatures, Feature},
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -121,9 +122,11 @@ impl CliCommand {
             .configuration
             .validate_that_one_datasource_is_provided()?;
 
-        let mut sc = ServerConfig::default();
-        sc.enable_raw_queries = request.enable_raw_queries;
-        let cx = PrismaContext::new(request.schema, request.engine_protocol, sc, None).await?;
+        let mut features = EnabledFeatures::default();
+        if request.enable_raw_queries {
+            features |= Feature::RawQueries
+        }
+        let cx = PrismaContext::new(request.schema, request.engine_protocol, features, None).await?;
 
         let cx = Arc::new(cx);
 
