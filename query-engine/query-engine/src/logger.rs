@@ -8,7 +8,7 @@ use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, Layer};
 
-use crate::LogFormat;
+use crate::{opt::PrismaOpt, LogFormat};
 
 type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
@@ -38,43 +38,33 @@ enum TracingConfig {
 
 impl Logger {
     /// Initialize a new global logger installer.
-    pub fn new(service_name: &'static str) -> Self {
-        Self {
-            service_name,
-            log_format: LogFormat::Json,
-            log_queries: false,
-            metrics: None,
-            tracing_config: TracingConfig::Disabled,
-        }
-    }
-
-    /// Sets the STDOUT log output format. Default: Json.
-    pub fn log_format(&mut self, log_format: LogFormat) {
-        self.log_format = log_format;
-    }
-
-    /// Enable query logging. Default: false.
-    pub fn log_queries(&mut self, log_queries: bool) {
-        self.log_queries = log_queries;
-    }
-
-    pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
-        self.metrics = Some(metrics);
-    }
-
-    pub fn setup_telemetry(&mut self, enable_telemetry: bool, enable_capturing: bool, endpoint: &str) {
-        let endpoint = if endpoint.is_empty() {
+    pub fn new(service_name: &'static str, metrics: Option<MetricRegistry>, opts: &PrismaOpt) -> Self {
+        let enable_telemetry = opts.enable_open_telemetry;
+        let enable_capturing = opts.enable_telemetry_in_response;
+        let endpoint = if opts.open_telemetry_endpoint.is_empty() {
             None
         } else {
-            Some(endpoint.to_owned())
+            Some(opts.open_telemetry_endpoint.to_owned())
         };
 
-        self.tracing_config = match (enable_telemetry, enable_capturing, endpoint) {
+        let tracing_config = match (enable_telemetry, enable_capturing, endpoint) {
             (_, true, _) => TracingConfig::Captured,
             (true, _, Some(endpoint)) => TracingConfig::Http(endpoint),
             (true, _, None) => TracingConfig::Stdout,
             _ => TracingConfig::Disabled,
         };
+
+        Self {
+            service_name,
+            log_format: opts.log_format(),
+            log_queries: opts.log_queries(),
+            metrics,
+            tracing_config,
+        }
+    }
+
+    pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
+        self.metrics = Some(metrics);
     }
 
     pub fn is_metrics_enabled(&self) -> bool {
