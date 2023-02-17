@@ -7,5 +7,6 @@ mod find_unique_or_throw;
 mod json_result;
 mod m2m;
 mod mongo_incorrect_fields;
+mod mongo_explicit_m2m;
 mod multi_field_unique;
 mod raw_mongo;

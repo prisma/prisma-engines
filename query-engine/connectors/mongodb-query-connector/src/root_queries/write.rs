@@ -313,7 +313,7 @@ async fn find_ids(
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect<'conn>(
+pub(crate) async fn m2m_connect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
@@ -370,7 +370,7 @@ pub async fn m2m_connect<'conn>(
     Ok(())
 }
 
-pub async fn m2m_disconnect<'conn>(
+pub(crate) async fn m2m_disconnect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
