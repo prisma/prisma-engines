@@ -220,6 +220,20 @@ impl PrismaOpt {
         PrismaOpt::from_iter_safe(list).unwrap()
     }
 
+    /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
+    /// the [PreviewFeature::JsonProtocol] flag is set to "json". Otherwise it will be
+    /// [EngineProtocol::Graphql]
+    ///
+    /// This protocol will determine how the body of an HTTP request made by the client is processed.
+    /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
+    /// of converting the respective representations into a protocol-agnostic(*)
+    /// [query_core::QueryDocument]
+    ///
+    /// (*) FIXME: at the time of writing, the heuristics to validate the [query_core::QueryDocument]
+    /// and  transform it into a [query_core::ParsedObject] require to know which protocol was used
+    /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
+    /// to understand which types certain values are. See [query_core::QueryDocumentParser]
+    ///
     pub fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
         self.engine_protocol
             .as_ref()

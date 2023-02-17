@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
-pub enum GraphQlBody {
+pub enum GraphqlBody {
     Single(SingleQuery),
     Multi(MultiQuery),
 }
@@ -52,16 +52,16 @@ impl From<&str> for SingleQuery {
     }
 }
 
-impl GraphQlBody {
+impl GraphqlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
     pub fn into_doc(self) -> crate::Result<QueryDocument> {
         match self {
-            GraphQlBody::Single(body) => {
+            GraphqlBody::Single(body) => {
                 let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;
 
                 Ok(QueryDocument::Single(operation))
             }
-            GraphQlBody::Multi(bodies) => {
+            GraphqlBody::Multi(bodies) => {
                 let operations: crate::Result<Vec<Operation>> = bodies
                     .batch
                     .into_iter()

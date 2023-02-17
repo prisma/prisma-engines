@@ -5,7 +5,7 @@ use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, QueryDocument
 
 #[derive(Debug)]
 pub enum RequestBody {
-    Graphql(graphql::GraphQlBody),
+    Graphql(graphql::GraphqlBody),
     Json(json::JsonBody),
 }
 
@@ -19,14 +19,14 @@ impl RequestBody {
 
     pub fn try_from_str(val: &str, engine_protocol: &EngineProtocol) -> Result<RequestBody, serde_json::Error> {
         match engine_protocol {
-            EngineProtocol::Graphql => serde_json::from_str::<graphql::GraphQlBody>(val).map(Self::from),
+            EngineProtocol::Graphql => serde_json::from_str::<graphql::GraphqlBody>(val).map(Self::from),
             EngineProtocol::Json => serde_json::from_str::<json::JsonBody>(val).map(Self::from),
         }
     }
 
     pub fn try_from_slice(val: &[u8], engine_protocol: &EngineProtocol) -> Result<RequestBody, serde_json::Error> {
         match engine_protocol {
-            EngineProtocol::Graphql => serde_json::from_slice::<graphql::GraphQlBody>(val).map(Self::from),
+            EngineProtocol::Graphql => serde_json::from_slice::<graphql::GraphqlBody>(val).map(Self::from),
             EngineProtocol::Json => serde_json::from_slice::<json::JsonBody>(val).map(Self::from),
         }
     }
@@ -39,8 +39,8 @@ impl RequestBody {
     }
 }
 
-impl From<graphql::GraphQlBody> for RequestBody {
-    fn from(body: graphql::GraphQlBody) -> Self {
+impl From<graphql::GraphqlBody> for RequestBody {
+    fn from(body: graphql::GraphqlBody) -> Self {
         Self::Graphql(body)
     }
 }

@@ -17,7 +17,7 @@ pub use error::*;
 pub use logging::*;
 pub use query_core;
 pub use query_result::*;
-pub use request_handlers::{GraphQlBody, MultiQuery};
+pub use request_handlers::{GraphqlBody, MultiQuery};
 pub use runner::*;
 pub use schema_gen::*;
 pub use templating::*;

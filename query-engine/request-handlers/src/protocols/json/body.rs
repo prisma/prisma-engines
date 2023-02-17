@@ -15,7 +15,7 @@ pub enum JsonBody {
 }
 
 impl JsonBody {
-    /// Convert a `GraphQlBody` into a `QueryDocument`.
+    /// Convert a `JsonBody` into a `QueryDocument`.
     pub fn into_doc(self, query_schema: &QuerySchemaRef) -> crate::Result<QueryDocument> {
         match self {
             JsonBody::Single(query) => {
