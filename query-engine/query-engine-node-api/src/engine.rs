@@ -92,7 +92,7 @@ impl ConnectedEngine {
 
     /// The query executor.
     pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
-        &*self.executor
+        self.executor.as_ref()
     }
 
     pub fn engine_protocol(&self) -> EngineProtocol {
