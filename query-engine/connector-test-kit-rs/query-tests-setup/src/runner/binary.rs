@@ -7,7 +7,7 @@ use query_engine::server::routes;
 use query_engine::state::{setup, State};
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, JsonBatchQuery, JsonBody,
+    BatchTransactionOption, GQLBatchResponse, GQLError, GQLResponse, GraphqlBody, JsonBatchQuery, JsonBody,
     JsonSingleQuery, MultiQuery, PrismaResponse, RequestBody,
 };
 
@@ -80,7 +80,7 @@ impl RunnerInterface for BinaryRunner {
             EngineProtocol::Graphql => {
                 println!("{}", query.bright_green());
 
-                let query = GraphQlBody::Single(query.into());
+                let query = GraphqlBody::Single(query.into());
 
                 serde_json::to_vec(&query).unwrap()
             }
@@ -134,7 +134,7 @@ impl RunnerInterface for BinaryRunner {
                     transaction: transaction_opts,
                 }))
             }
-            EngineProtocol::Graphql => RequestBody::Graphql(GraphQlBody::Multi(MultiQuery::new(
+            EngineProtocol::Graphql => RequestBody::Graphql(GraphqlBody::Multi(MultiQuery::new(
                 queries.into_iter().map(Into::into).collect(),
                 transaction,
                 isolation_level,

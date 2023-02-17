@@ -5,7 +5,7 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, GraphQlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
+    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
     RequestHandler,
 };
 use std::{env, sync::Arc};
@@ -59,7 +59,7 @@ impl RunnerInterface for DirectRunner {
             EngineProtocol::Graphql => {
                 println!("{}", query.bright_green());
 
-                RequestBody::Graphql(GraphQlBody::Single(query.into()))
+                RequestBody::Graphql(GraphqlBody::Single(query.into()))
             }
         };
 
@@ -124,7 +124,7 @@ impl RunnerInterface for DirectRunner {
                     transaction: transaction_opts,
                 }))
             }
-            EngineProtocol::Graphql => RequestBody::Graphql(GraphQlBody::Multi(MultiQuery::new(
+            EngineProtocol::Graphql => RequestBody::Graphql(GraphqlBody::Multi(MultiQuery::new(
                 queries.into_iter().map(Into::into).collect(),
                 transaction,
                 isolation_level,
