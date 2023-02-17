@@ -2,7 +2,7 @@ use indoc::{formatdoc, indoc};
 use query_core::protocol::EngineProtocol;
 use serde_json::json;
 
-use crate::context::{PrismaContext, ServerConfig};
+use crate::context::{EngineFlags, PrismaContext};
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
@@ -33,7 +33,7 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let dml = psl::parse_schema(dm).unwrap();
 
-        let mut sc = ServerConfig::default();
+        let mut sc = EngineFlags::default();
         sc.enable_raw_queries = true;
 
         let error = PrismaContext::new(dml, EngineProtocol::Graphql, sc, None)

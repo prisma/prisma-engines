@@ -1,3 +1,4 @@
+use crate::features::{EnabledFeatures, Feature};
 use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
 use psl::PreviewFeature;
@@ -18,8 +19,8 @@ pub struct PrismaContext {
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
     /// The engine protocol in use
     pub engine_protocol: EngineProtocol,
-    /// Server configuration
-    pub server_config: ServerConfig,
+    /// Enabled features
+    pub enabled_features: EnabledFeatures,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -27,19 +28,12 @@ impl fmt::Debug for PrismaContext {
         f.write_str("PrismaContext { .. }")
     }
 }
-#[derive(Default, Copy, Clone)]
-pub struct ServerConfig {
-    pub enable_playground: bool,
-    pub enable_debug_mode: bool,
-    pub enable_metrics: bool,
-    pub enable_raw_queries: bool,
-}
 
 impl PrismaContext {
     pub async fn new(
         schema: psl::ValidatedSchema,
         protocol: EngineProtocol,
-        server_config: ServerConfig,
+        enabled_features: EnabledFeatures,
         metrics: Option<MetricRegistry>,
     ) -> PrismaResult<PrismaContext> {
         let config = &schema.configuration;
@@ -60,7 +54,7 @@ impl PrismaContext {
         // Construct query schema
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
-            server_config.enable_raw_queries,
+            enabled_features.contains(Feature::RawQueries),
         ));
 
         let context = Self {
@@ -68,7 +62,7 @@ impl PrismaContext {
             executor,
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
-            server_config,
+            enabled_features,
         };
 
         context.verify_connection().await?;
@@ -128,18 +122,14 @@ pub async fn setup(
     let protocol = opts.engine_protocol(config.preview_features());
     config.validate_that_one_datasource_is_provided()?;
 
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
-
     let span = tracing::info_span!("prisma:engine:connect");
 
-    let sc = ServerConfig {
-        enable_playground: opts.enable_playground,
-        enable_debug_mode: opts.enable_debug_mode,
-        enable_raw_queries: opts.enable_raw_queries,
-        enable_metrics,
-    };
+    let mut features = EnabledFeatures::from(opts);
+    if config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override {
+        features |= Feature::Metrics
+    }
 
-    let cx = PrismaContext::new(datamodel, protocol, sc, Some(metrics))
+    let cx = PrismaContext::new(datamodel, protocol, features, Some(metrics))
         .instrument(span)
         .await?;
 
