@@ -258,3 +258,19 @@ qe-node-api: build target/debug/libquery_engine.node
 # otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
 	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
 	cp $< $@
+
+.PHONY: amazon-image run-amazon qe-aws
+
+amazon-image:
+	docker build -t prisma-lambda -f Dockerfile.amazonlinux .
+
+CMD ?= bash
+run-amazon: amazon-image
+	mkdir -p target/aws
+	docker run \
+		-v $(shell pwd):/engines \
+		-v $(shell pwd)/target/aws:/engines/target \
+		-it prisma-lambda $(CMD)
+
+qe-aws:
+	$(MAKE) run-amazon CMD="cargo build --release -p query-engine-node-api"

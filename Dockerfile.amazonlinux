@@ -1,0 +1,12 @@
+FROM amazonlinux
+
+VOLUME /root/.cargo/git
+VOLUME /root/.cargo/registry
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+RUN yum update -y
+RUN yum groupinstall -y 'Development Tools'
+RUN yum install -y git openssl-devel zlib-devel
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+WORKDIR /engines
