@@ -28,7 +28,7 @@ impl JsonProtocolAdapter {
         let (operation_type, field) = Self::find_schema_field(query_schema, model_name, action)?;
         let container = field.model().map(ParentContainer::from);
 
-        let selection = Self::convert_selection(&field, container.as_ref(), query)?;
+        let selection = Self::convert_selection(field, container.as_ref(), query)?;
 
         match operation_type {
             OperationType::Read => Ok(Operation::Read(selection)),
@@ -323,7 +323,7 @@ impl JsonProtocolAdapter {
         query_schema: &QuerySchemaRef,
         model_name: Option<String>,
         action: crate::Action,
-    ) -> crate::Result<(OperationType, OutputFieldRef)> {
+    ) -> crate::Result<(OperationType, &OutputFieldRef)> {
         if let Some(field) = query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value()) {
             return Ok((OperationType::Read, field));
         };

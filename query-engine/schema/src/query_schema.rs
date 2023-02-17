@@ -138,22 +138,22 @@ impl QuerySchema {
         &self,
         model_name: Option<&str>,
         tag: QueryTag,
-    ) -> Option<OutputFieldRef> {
+    ) -> Option<&OutputFieldRef> {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self._query_map.get(&query_info).cloned()
+        self._query_map.get(&query_info)
     }
 
     pub fn find_mutation_field_by_model_and_action(
         &self,
         model_name: Option<&str>,
         tag: QueryTag,
-    ) -> Option<OutputFieldRef> {
+    ) -> Option<&OutputFieldRef> {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self._mutation_map.get(&query_info).cloned()
+        self._mutation_map.get(&query_info)
     }
 
     pub fn mutation(&self) -> ObjectTypeStrongRef {
