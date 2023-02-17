@@ -6,7 +6,6 @@ pub mod error;
 pub mod logger;
 pub mod opt;
 pub mod server;
-pub mod state;
 pub mod tracer;
 
 use error::PrismaError;

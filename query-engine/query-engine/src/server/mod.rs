@@ -49,14 +49,14 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
 
     if [Method::POST, Method::GET].contains(req.method())
         && req.uri().path().starts_with("/metrics")
-        && cx.server_config.unwrap().enable_metrics
+        && cx.server_config.enable_metrics
     {
         return metrics_handler(cx, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
         (&Method::POST, "/") => request_handler(cx, req).await?,
-        (&Method::GET, "/") if cx.server_config.unwrap().enable_playground => playground_handler(),
+        (&Method::GET, "/") if cx.server_config.enable_playground => playground_handler(),
         (&Method::GET, "/status") => Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
@@ -112,7 +112,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
 /// to the query engine.
 async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     // Check for debug headers if enabled.
-    if cx.server_config.unwrap().enable_debug_mode {
+    if cx.server_config.enable_debug_mode {
         return Ok(handle_debug_headers(&req));
     }
 

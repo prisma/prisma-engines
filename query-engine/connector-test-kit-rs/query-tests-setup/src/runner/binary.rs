@@ -2,10 +2,9 @@ use crate::{ConnectorTag, JsonRequest, RunnerInterface, TestError, TestResult, T
 use colored::Colorize;
 use query_core::protocol::EngineProtocol;
 use query_core::{schema::QuerySchemaRef, TxId};
-use query_engine::context::PrismaContext;
+use query_engine::context::{self, PrismaContext};
 use query_engine::opt::PrismaOpt;
 use query_engine::server::routes;
-use query_engine::state::setup;
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
     BatchTransactionOption, GQLBatchResponse, GQLError, GQLResponse, GraphqlBody, JsonBatchQuery, JsonBody,
@@ -54,7 +53,7 @@ impl RunnerInterface for BinaryRunner {
             "--datamodel",
             &datamodel,
         ]);
-        let cx = setup(&opts, false, Some(metrics)).await.unwrap();
+        let cx = context::setup(&opts, false, Some(metrics)).await.unwrap();
 
         let configuration = opts.configuration(true).unwrap();
         let data_source = configuration.datasources.first().unwrap();

@@ -1,5 +1,5 @@
 use crate::{
-    context::PrismaContext,
+    context::{PrismaContext, ServerConfig},
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -121,14 +121,14 @@ impl CliCommand {
             .configuration
             .validate_that_one_datasource_is_provided()?;
 
-        let cx = PrismaContext::builder(request.schema, request.engine_protocol)
-            .enable_raw_queries(request.enable_raw_queries)
-            .build()
-            .await?;
+        let mut sc = ServerConfig::default();
+        sc.enable_raw_queries = request.enable_raw_queries;
+        let cx = PrismaContext::new(request.schema, request.engine_protocol, sc, None).await?;
 
         let cx = Arc::new(cx);
 
         let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+
         let body = RequestBody::try_from_str(&decoded_request, cx.engine_protocol())?;
 
         let res = handler.handle(body, None, None).await;
