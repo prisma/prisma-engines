@@ -2,9 +2,10 @@ use crate::{ConnectorTag, JsonRequest, RunnerInterface, TestError, TestResult, T
 use colored::Colorize;
 use query_core::protocol::EngineProtocol;
 use query_core::{schema::QuerySchemaRef, TxId};
+use query_engine::context::PrismaContext;
 use query_engine::opt::PrismaOpt;
 use query_engine::server::routes;
-use query_engine::state::{setup, State};
+use query_engine::state::setup;
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
     BatchTransactionOption, GQLBatchResponse, GQLError, GQLResponse, GraphqlBody, JsonBatchQuery, JsonBody,
@@ -14,11 +15,12 @@ use request_handlers::{
 use hyper::{Body, Method, Request, Response};
 use quaint::{prelude::Queryable, single::Quaint};
 use std::env;
+use std::sync::Arc;
 
 pub struct BinaryRunner {
     connector_tag: ConnectorTag,
     current_tx_id: Option<TxId>,
-    state: State,
+    cx: Arc<PrismaContext>,
     connection_url: String,
 }
 
@@ -33,7 +35,7 @@ impl BinaryRunner {
 
         let req = builder.body(Body::from(body)).unwrap();
 
-        let resp = routes(self.state.clone(), req).await.unwrap();
+        let resp = routes(self.cx.clone(), req).await.unwrap();
 
         let json_resp: serde_json::Value = response_to_json(resp).await;
         let gql_response = json_to_gql_response(&json_resp);
@@ -52,14 +54,14 @@ impl RunnerInterface for BinaryRunner {
             "--datamodel",
             &datamodel,
         ]);
-        let state = setup(&opts, false, Some(metrics)).await.unwrap();
+        let cx = setup(&opts, false, Some(metrics)).await.unwrap();
 
         let configuration = opts.configuration(true).unwrap();
         let data_source = configuration.datasources.first().unwrap();
         let connection_url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
         Ok(BinaryRunner {
-            state,
+            cx,
             connector_tag,
             connection_url,
             current_tx_id: None,
@@ -154,7 +156,7 @@ impl RunnerInterface for BinaryRunner {
 
         let req = builder.body(Body::from(body)).unwrap();
 
-        let resp = routes(self.state.clone(), req).await.unwrap();
+        let resp = routes(self.cx.clone(), req).await.unwrap();
         let json_resp: serde_json::Value = response_to_json(resp).await;
 
         let mut batch_response = GQLBatchResponse::default();
@@ -198,7 +200,7 @@ impl RunnerInterface for BinaryRunner {
             .body(Body::from(body_bytes))
             .unwrap();
 
-        let resp = routes(self.state.clone(), req).await.unwrap();
+        let resp = routes(self.cx.clone(), req).await.unwrap();
         let json_resp = response_to_json(resp).await;
         let json_obj = json_resp.as_object().unwrap();
 
@@ -219,7 +221,7 @@ impl RunnerInterface for BinaryRunner {
             .body(Body::from(r#"{}"#))
             .unwrap();
 
-        let resp = routes(self.state.clone(), req).await;
+        let resp = routes(self.cx.clone(), req).await;
         let resp = resp.unwrap();
 
         let result = response_to_json(resp).await;
@@ -241,7 +243,7 @@ impl RunnerInterface for BinaryRunner {
             .body(Body::from(r#"{}"#))
             .unwrap();
 
-        let resp = routes(self.state.clone(), req).await.unwrap();
+        let resp = routes(self.cx.clone(), req).await.unwrap();
         let result = response_to_json(resp).await;
 
         let error: Result<user_facing_errors::Error, _> = serde_json::from_value(result);
@@ -266,11 +268,11 @@ impl RunnerInterface for BinaryRunner {
     }
 
     fn get_metrics(&self) -> MetricRegistry {
-        self.state.get_metrics()
+        self.cx.metrics.clone()
     }
 
     fn query_schema(&self) -> &QuerySchemaRef {
-        self.state.query_schema()
+        self.cx.query_schema()
     }
 }
 

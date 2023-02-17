@@ -1,44 +1,14 @@
 use crate::{context::PrismaContext, logger::Logger, opt::PrismaOpt, PrismaResult};
 use psl::PreviewFeature;
-use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef};
 use query_engine_metrics::{setup as metric_setup, MetricRegistry};
 use std::sync::Arc;
 use tracing::Instrument;
 
-//// Shared application state.
-#[derive(Clone)]
-pub struct State {
-    pub cx: Arc<PrismaContext>,
-    pub enable_playground: bool,
-    pub enable_debug_mode: bool,
-    pub enable_metrics: bool,
-}
-
-impl State {
-    /// Create a new instance of `State`.
-    fn new(cx: PrismaContext, enable_playground: bool, enable_debug_mode: bool, enable_metrics: bool) -> Self {
-        Self {
-            cx: Arc::new(cx),
-            enable_playground,
-            enable_debug_mode,
-            enable_metrics,
-        }
-    }
-
-    pub fn get_metrics(&self) -> MetricRegistry {
-        self.cx.metrics.clone()
-    }
-
-    pub fn query_schema(&self) -> &QuerySchemaRef {
-        self.cx.query_schema()
-    }
-
-    pub fn engine_protocol(&self) -> &EngineProtocol {
-        self.cx.engine_protocol()
-    }
-}
-
-pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<MetricRegistry>) -> PrismaResult<State> {
+pub async fn setup(
+    opts: &PrismaOpt,
+    install_logger: bool,
+    metrics: Option<MetricRegistry>,
+) -> PrismaResult<Arc<PrismaContext>> {
     let metrics = metrics.unwrap_or_default();
 
     let mut logger = Logger::new("prisma-engine-http");
@@ -71,10 +41,11 @@ pub async fn setup(opts: &PrismaOpt, install_logger: bool, metrics: Option<Metri
     let cx = PrismaContext::builder(datamodel, protocol)
         .set_metrics(metrics)
         .enable_raw_queries(opts.enable_raw_queries)
+        .set_engine_flags(opts.enable_playground, opts.enable_debug_mode, enable_metrics)
         .build()
         .instrument(span)
         .await?;
 
-    let state = State::new(cx, opts.enable_playground, opts.enable_debug_mode, enable_metrics);
+    let state = Arc::new(cx);
     Ok(state)
 }
