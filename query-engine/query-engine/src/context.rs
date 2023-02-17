@@ -97,20 +97,10 @@ pub async fn setup(
     install_logger: bool,
     metrics: Option<MetricRegistry>,
 ) -> PrismaResult<Arc<PrismaContext>> {
-    let metrics = metrics.unwrap_or_default();
-
-    let mut logger = Logger::new("prisma-engine-http");
-    logger.log_format(opts.log_format());
-    logger.log_queries(opts.log_queries());
-    logger.enable_metrics(metrics.clone());
-    logger.setup_telemetry(
-        opts.enable_open_telemetry,
-        opts.enable_telemetry_in_response,
-        &opts.open_telemetry_endpoint,
-    );
-
     if install_logger {
-        logger.install().unwrap();
+        Logger::new("prisma-engine-http", metrics.clone(), opts)
+            .install()
+            .unwrap();
     }
 
     if opts.enable_metrics || opts.dataproxy_metric_override {
@@ -129,7 +119,7 @@ pub async fn setup(
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, Some(metrics))
+    let cx = PrismaContext::new(datamodel, protocol, features, metrics)
         .instrument(span)
         .await?;
 
