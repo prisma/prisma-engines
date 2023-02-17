@@ -75,7 +75,7 @@ impl PrismaContext {
     }
 
     pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync + 'static) {
-        &*self.executor
+        self.executor.as_ref()
     }
 
     pub fn primary_connector(&self) -> &'static str {
