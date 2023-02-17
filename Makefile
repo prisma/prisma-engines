@@ -266,11 +266,15 @@ amazon-image:
 
 CMD ?= bash
 run-amazon: amazon-image
-	mkdir -p target/aws
+	mkdir -p target/aws/cargo-cache/{git,registry}
 	docker run \
 		-v $(shell pwd):/engines \
 		-v $(shell pwd)/target/aws:/engines/target \
+		-v $(shell pwd)/target/aws/cargo-cache/git:/root/.cargo/git \
+		-v $(shell pwd)/target/aws/cargo-cache/registry:/root/.cargo/registry \
 		-it prisma-lambda $(CMD)
 
 qe-aws:
 	$(MAKE) run-amazon CMD="cargo build --release -p query-engine-node-api"
+	rm -f target/aws/release/libquery_engine.node
+	ln target/aws/release/libquery_engine.{so,node}

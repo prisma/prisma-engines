@@ -1,7 +1,5 @@
 FROM amazonlinux
 
-VOLUME /root/.cargo/git
-VOLUME /root/.cargo/registry
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN yum update -y
