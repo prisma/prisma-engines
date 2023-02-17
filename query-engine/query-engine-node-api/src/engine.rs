@@ -95,8 +95,8 @@ impl ConnectedEngine {
         &*self.executor
     }
 
-    pub fn engine_protocol(&self) -> &EngineProtocol {
-        &self.engine_protocol
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
     }
 }
 
@@ -295,7 +295,7 @@ impl QueryEngine {
                     schema: engine.schema.clone(),
                     config_dir: engine.config_dir.clone(),
                     env: engine.env.clone(),
-                    engine_protocol: *engine.engine_protocol(),
+                    engine_protocol: engine.engine_protocol(),
                 };
 
                 *inner = Inner::Builder(builder);
@@ -329,7 +329,7 @@ impl QueryEngine {
 
                 let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-                let handler = RequestHandler::new(engine.executor(), engine.query_schema(), *engine.engine_protocol());
+                let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
                 let response = handler
                     .handle(query, tx_id.map(TxId::from), trace_id)
                     .instrument(span)
@@ -359,7 +359,7 @@ impl QueryEngine {
                 let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine
                     .executor()
-                    .start_tx(engine.query_schema().clone(), *engine.engine_protocol(), tx_opts)
+                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
                     .instrument(span)
                     .await
                 {

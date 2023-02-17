@@ -128,7 +128,7 @@ impl CliCommand {
 
         let cx = Arc::new(cx);
 
-        let handler = RequestHandler::new(&*cx.executor, cx.query_schema(), *cx.engine_protocol());
+        let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
         let body = RequestBody::try_from_str(&decoded_request, cx.engine_protocol())?;
 
         let res = handler.handle(body, None, None).await;

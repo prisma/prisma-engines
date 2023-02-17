@@ -1,4 +1,4 @@
-use crate::state::State;
+use crate::context::PrismaContext;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
@@ -20,10 +20,10 @@ use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
-pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
+pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()> {
     let query_engine = make_service_fn(move |_| {
-        let state = state.clone();
-        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(state.clone(), req))) }
+        let cx = cx.clone();
+        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(cx.clone(), req))) }
     });
 
     let ip = opts.host.parse().expect("Host was not a valid IP address.");
@@ -40,23 +40,23 @@ pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
     Ok(())
 }
 
-pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
-        return transaction_handler(state, req).await;
+        return transaction_handler(cx, req).await;
     }
 
     if [Method::POST, Method::GET].contains(req.method())
         && req.uri().path().starts_with("/metrics")
-        && state.enable_metrics
+        && cx.server_config.unwrap().enable_metrics
     {
-        return metrics_handler(state, req).await;
+        return metrics_handler(cx, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
-        (&Method::POST, "/") => request_handler(state, req).await?,
-        (&Method::GET, "/") if state.enable_playground => playground_handler(),
+        (&Method::POST, "/") => request_handler(cx, req).await?,
+        (&Method::GET, "/") if cx.server_config.unwrap().enable_playground => playground_handler(),
         (&Method::GET, "/status") => Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
@@ -64,7 +64,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = GraphQLSchemaRenderer::render(state.cx.query_schema().clone());
+            let schema = GraphQLSchemaRenderer::render(cx.query_schema().clone());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -74,7 +74,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
+            let schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -87,7 +87,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             let body = json!({
                 "commit": env!("GIT_HASH"),
                 "version": env!("CARGO_PKG_VERSION"),
-                "primary_connector": state.cx.primary_connector(),
+                "primary_connector": cx.primary_connector(),
             });
 
             Response::builder()
@@ -110,9 +110,9 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
 
 /// The main query handler. This handles incoming requests and passes it
 /// to the query engine.
-async fn request_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     // Check for debug headers if enabled.
-    if state.enable_debug_mode {
+    if cx.server_config.unwrap().enable_debug_mode {
         return Ok(handle_debug_headers(&req));
     }
 
@@ -120,11 +120,11 @@ async fn request_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let capture_settings = capture_settings(headers);
 
     let tx_id = transaction_id(headers);
-    let cx = get_parent_span_context(headers);
+    let tracing_cx = get_parent_span_context(headers);
 
     let span = if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
+        span.set_parent(tracing_cx);
         span
     } else {
         Span::none()
@@ -173,13 +173,12 @@ async fn request_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), state.engine_protocol());
+    let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
 
     let work = async move {
         match serialized_body {
             Ok(body) => {
-                let handler =
-                    RequestHandler::new(&*state.cx.executor, state.cx.query_schema(), *state.engine_protocol());
+                let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                 let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
@@ -230,7 +229,7 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let format = if let Some(query) = req.uri().query() {
         if query.contains("format=json") {
             MetricFormat::Json
@@ -251,7 +250,7 @@ async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     };
 
     if format == MetricFormat::Json {
-        let metrics = state.cx.metrics.to_json(global_labels);
+        let metrics = cx.metrics.to_json(global_labels);
 
         let res = Response::builder()
             .status(StatusCode::OK)
@@ -262,7 +261,7 @@ async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         return Ok(res);
     }
 
-    let metrics = state.cx.metrics.to_prometheus(global_labels);
+    let metrics = cx.metrics.to_prometheus(global_labels);
 
     let res = Response::builder()
         .status(StatusCode::OK)
@@ -277,20 +276,20 @@ async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 /// POST /transaction/start -> start a transaction
 /// POST /transaction/{tx_id}/commit -> commit a transaction
 /// POST /transaction/{tx_id}/rollback -> rollback a transaction
-async fn transaction_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
     let sections: Vec<&str> = path.split('/').collect();
 
     if sections.len() == 3 && sections[2] == "start" {
-        return transaction_start_handler(state, req).await;
+        return transaction_start_handler(cx, req).await;
     }
 
     if sections.len() == 4 && sections[3] == "commit" {
-        return transaction_commit_handler(state, req, sections[2].into()).await;
+        return transaction_commit_handler(cx, req, sections[2].into()).await;
     }
 
     if sections.len() == 4 && sections[3] == "rollback" {
-        return transaction_rollback_handler(state, req, sections[2].into()).await;
+        return transaction_rollback_handler(cx, req, sections[2].into()).await;
     }
 
     let res = Response::builder()
@@ -300,7 +299,7 @@ async fn transaction_handler(state: State, req: Request<Body>) -> Result<Respons
     Ok(res)
 }
 
-async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let headers = req.headers().to_owned();
 
     let body_start = req.into_body();
@@ -346,10 +345,9 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
         capturer.start_capturing().await;
     }
 
-    let result = state
-        .cx
+    let result = cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), *state.engine_protocol(), tx_opts)
+        .start_tx(cx.query_schema().clone(), cx.engine_protocol(), tx_opts)
         .instrument(span)
         .await;
 
@@ -380,7 +378,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
 }
 
 async fn transaction_commit_handler(
-    state: State,
+    cx: Arc<PrismaContext>,
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
@@ -390,7 +388,7 @@ async fn transaction_commit_handler(
         capturer.start_capturing().await;
     }
 
-    let result = state.cx.executor.commit_tx(tx_id).await;
+    let result = cx.executor.commit_tx(tx_id).await;
 
     let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
         capturer.fetch_captures().await
@@ -405,7 +403,7 @@ async fn transaction_commit_handler(
 }
 
 async fn transaction_rollback_handler(
-    state: State,
+    cx: Arc<PrismaContext>,
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
@@ -415,7 +413,7 @@ async fn transaction_rollback_handler(
         capturer.start_capturing().await;
     }
 
-    let result = state.cx.executor.rollback_tx(tx_id).await;
+    let result = cx.executor.rollback_tx(tx_id).await;
 
     let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
         capturer.fetch_captures().await

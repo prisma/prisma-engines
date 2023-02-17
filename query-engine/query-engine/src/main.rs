@@ -30,9 +30,9 @@ async fn main() -> Result<(), AnyError> {
             Some(cmd) => cmd.execute().await?,
             None => {
                 let span = tracing::info_span!("prisma:engine:connect");
-                let state = state::setup(&opts, true, None).instrument(span).await?;
+                let cx = state::setup(&opts, true, None).instrument(span).await?;
                 set_panic_hook(opts.log_format());
-                server::listen(&opts, state).await?;
+                server::listen(cx, &opts).await?;
             }
         }
 

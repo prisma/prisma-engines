@@ -12,7 +12,10 @@ pub struct PrismaContext {
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+    /// The engine protocol in use
     pub engine_protocol: EngineProtocol,
+    /// Server configuration
+    pub server_config: Option<ServerConfig>,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -20,12 +23,19 @@ impl fmt::Debug for PrismaContext {
         f.write_str("PrismaContext { .. }")
     }
 }
+#[derive(Default, Copy, Clone)]
+pub struct ServerConfig {
+    pub enable_playground: bool,
+    pub enable_debug_mode: bool,
+    pub enable_metrics: bool,
+}
 
 pub struct ContextBuilder {
     enable_raw_queries: bool,
     schema: psl::ValidatedSchema,
     metrics: Option<MetricRegistry>,
     protocol: EngineProtocol,
+    engine_flags: ServerConfig,
 }
 
 impl ContextBuilder {
@@ -36,6 +46,15 @@ impl ContextBuilder {
 
     pub fn set_metrics(mut self, metrics: MetricRegistry) -> Self {
         self.metrics = Some(metrics);
+        self
+    }
+
+    pub fn set_engine_flags(mut self, enable_playground: bool, enable_debug_mode: bool, enable_metrics: bool) -> Self {
+        self.engine_flags = ServerConfig {
+            enable_debug_mode,
+            enable_metrics,
+            enable_playground,
+        };
         self
     }
 
@@ -81,6 +100,7 @@ impl PrismaContext {
             executor,
             metrics,
             engine_protocol: protocol,
+            server_config: Default::default(),
         };
 
         context.verify_connection().await?;
@@ -99,6 +119,7 @@ impl PrismaContext {
             schema,
             metrics: None,
             protocol,
+            engine_flags: Default::default(),
         }
     }
 
@@ -106,11 +127,15 @@ impl PrismaContext {
         &self.query_schema
     }
 
+    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync + 'static) {
+        &*self.executor
+    }
+
     pub fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector().name()
     }
 
-    pub fn engine_protocol(&self) -> &EngineProtocol {
-        &self.engine_protocol
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
     }
 }
