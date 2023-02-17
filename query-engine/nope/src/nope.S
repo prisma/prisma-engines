@@ -1,20 +1,27 @@
-    // We have to use a separately compiled assembly module and can't
-    // use the std::arch::asm! macro in Rust because we want to avoid
-    // LLVM messing with our beautiful nops, reduce build time, and
-    // prevent the compiler from exploding when using a big enough
-    // value of NNOPS.
+/*
+   We have to use a separately compiled assembly module and can't use
+   the std::arch::asm! macro in Rust because we want to avoid LLVM
+   messing with our beautiful nops, reduce build time, and prevent the
+   compiler from exploding when using a big enough value of NNOPS.
 
-    // Polyglot program! Valid as both x86_64 and aarch64 assembly
-    // code.  You only need to tweak the NNOPS constant to match the
-    // desired code size: one nop instruction is 1 byte on x86_64 and
-    // 4 bytes on aarch64.
+   Polyglot program! Valid as both x86_64 and aarch64 assembly code.
+   You only need to tweak the NNOPS constant to match the desired code
+   size: one nop instruction is 1 byte on x86_64 and 4 bytes on
+   aarch64.
+*/
+
+#ifdef __APPLE__
+#define SYM(X) _##X
+#else
+#define SYM(X) X
+#endif
 
     .text
 
     .set NNOPS, 20000000
-    .globl _nope_nops
+    .globl SYM(nope_nops)
 
-_nope_nops:
+SYM(nope_nops):
     .rept NNOPS
     nop
     .endr
@@ -26,6 +33,9 @@ _nope_nops:
     //                ^
     // src/nope.s:26:5: note: while in macro instantiation
     //     gen_fn 0, 3
+    //
+    // maybe TODO: use a C preprocessor macro instead if there is
+    // still need in multiple functions
 
     // .altmacro
 
