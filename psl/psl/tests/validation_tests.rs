@@ -1,8 +1,7 @@
 mod panic_with_diff;
 
-use std::{fs, io::Write as _, path, sync::Arc};
-
 use psl::{SourceFile, ValidatedSchema};
+use std::{fs, io::Write as _, path, sync::Arc};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/validation");
 

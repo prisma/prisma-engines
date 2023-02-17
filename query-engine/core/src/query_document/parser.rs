@@ -2,9 +2,10 @@ use super::*;
 use crate::{executor::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
+use indexmap::IndexSet;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
+use std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
 pub struct QueryDocumentParser {
@@ -95,8 +96,8 @@ impl QueryDocumentParser {
         schema_field: &OutputFieldRef,
         given_arguments: &[(String, ArgumentValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
-        let valid_argument_names: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
-        let given_argument_names: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
+        let valid_argument_names: IndexSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
+        let given_argument_names: IndexSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
         let invalid_argument_names = given_argument_names.difference(&valid_argument_names);
 
         invalid_argument_names
@@ -461,12 +462,12 @@ impl QueryDocumentParser {
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
-        let valid_field_names: HashSet<&str> = schema_object
+        let valid_field_names: IndexSet<&str> = schema_object
             .get_fields()
             .iter()
             .map(|field| field.name.as_str())
             .collect();
-        let given_field_names: HashSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
+        let given_field_names: IndexSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
         let missing_field_names = valid_field_names.difference(&given_field_names);
 
         // First, filter-in those fields that are not given but have a default value in the schema.
