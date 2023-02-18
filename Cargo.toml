@@ -52,6 +52,7 @@ features = [
   "postgresql",
   "sqlite",
   "uuid",
+  "vendored-openssl",
 ]
 
 [profile.dev.package.backtrace]
