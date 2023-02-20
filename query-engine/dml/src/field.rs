@@ -333,6 +333,8 @@ impl WithDatabaseName for ScalarField {
 /// Represents a composite field.
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeField {
+    pub id: ScalarFieldId,
+
     /// Name of the field.
     pub name: String,
 
@@ -359,8 +361,9 @@ pub struct CompositeField {
 }
 
 impl CompositeField {
-    pub fn new() -> Self {
+    pub fn new(id: ScalarFieldId) -> Self {
         CompositeField {
+            id,
             name: String::new(),
             database_name: None,
             composite_type: String::new(),
@@ -370,12 +373,6 @@ impl CompositeField {
             is_ignored: false,
             default_value: None,
         }
-    }
-}
-
-impl Default for CompositeField {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

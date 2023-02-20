@@ -30,6 +30,7 @@ fn model_field_builders(model: &dml::Model, _schema: &psl::ValidatedSchema) -> V
         .filter(|field| !field.is_ignored())
         .filter_map(|field| match field {
             dml::Field::CompositeField(cf) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
+                id: crate::CompositeFieldId::InModel(cf.id),
                 name: cf.name.clone(),
                 db_name: cf.database_name.clone(),
                 arity: cf.arity,
@@ -68,6 +69,7 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
         // .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.
         .filter_map(|field| match &field.r#type {
             CompositeTypeFieldType::CompositeType(type_name) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
+                id: crate::CompositeFieldId::InCompositeType(field.id),
                 name: field.name.clone(),
                 db_name: field.database_name.clone(),
                 arity: field.arity,

@@ -1,16 +1,24 @@
 use crate::{parent_container::ParentContainer, CompositeTypeRef};
 use dml::FieldArity;
+use psl::{parser_database::walkers, schema_ast::ast};
 use std::{
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
 
+#[derive(Debug, Clone)]
+pub enum CompositeFieldId {
+    InModel(walkers::ScalarFieldId),
+    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+}
+
 pub type CompositeFieldRef = Arc<CompositeField>;
 pub type CompositeFieldWeak = Weak<CompositeField>;
 
 #[derive(Clone)]
 pub struct CompositeField {
+    pub id: CompositeFieldId,
     pub name: String,
     pub typ: CompositeTypeRef,
     pub(crate) db_name: Option<String>,

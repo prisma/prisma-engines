@@ -1,9 +1,10 @@
-use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
+use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldId, CompositeFieldRef, CompositeTypeRef};
 use dml::{DefaultValue, FieldArity};
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
 pub struct CompositeFieldBuilder {
+    pub id: CompositeFieldId,
     pub name: String,
     pub db_name: Option<String>,
     pub arity: FieldArity,
@@ -15,6 +16,7 @@ impl CompositeFieldBuilder {
     pub fn build(self, container: ParentContainer, composite_types: &[CompositeTypeRef]) -> CompositeFieldRef {
         let type_name = &self.type_name;
         let composite = CompositeField {
+            id: self.id,
             name: self.name,
             db_name: self.db_name,
             typ: composite_types
