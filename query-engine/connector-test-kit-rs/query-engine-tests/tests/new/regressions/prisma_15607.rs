@@ -77,7 +77,7 @@ impl Actor {
 
         setup_project(&datamodel, &[]).await?;
 
-        let mut runner = Runner::load("direct", datamodel, tag, setup_metrics(), log_capture).await?;
+        let mut runner = Runner::load(datamodel, tag, setup_metrics(), log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {
