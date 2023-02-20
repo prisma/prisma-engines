@@ -1,6 +1,5 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
-use once_cell::sync::OnceCell;
 use psl::parser_database::walkers;
 use std::{
     fmt::{Debug, Display},
@@ -32,7 +31,6 @@ pub struct ScalarField {
     pub(crate) native_type: Option<NativeTypeInstance>,
     pub(crate) container: ParentContainer,
     pub(crate) is_unique: bool,
-    pub(crate) read_only: OnceCell<bool>,
 }
 
 impl ScalarField {
@@ -65,7 +63,14 @@ impl ScalarField {
     }
 
     pub fn is_read_only(&self) -> bool {
-        *self.read_only.get_or_init(|| false)
+        let dm = self.internal_data_model();
+        let sfid = match self.id {
+            ScalarFieldId::InModel(id) => id,
+            ScalarFieldId::InCompositeType(_) => return false,
+        };
+        let sf = dm.walk(sfid);
+        let mut relation_fields = sf.model().relation_fields();
+        relation_fields.any(|rf| rf.fields().into_iter().flatten().any(|sf2| sf.id == sf2.id))
     }
 
     pub fn is_numeric(&self) -> bool {
@@ -128,7 +133,6 @@ impl Debug for ScalarField {
             .field("default_value", &self.default_value)
             .field("container", &self.container().name())
             .field("is_unique", &self.is_unique)
-            .field("read_only", &self.read_only)
             .finish()
     }
 }

@@ -48,7 +48,7 @@ impl ParentContainer {
 
     pub fn fields(&self) -> Vec<Field> {
         match self {
-            ParentContainer::Model(model) => model.upgrade().unwrap().fields().all.clone(),
+            ParentContainer::Model(model) => model.upgrade().unwrap().fields().filter_all(|_| true),
             ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().fields().to_vec(),
         }
     }
@@ -56,13 +56,7 @@ impl ParentContainer {
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
         // Unwraps are safe: This can never fail, the models and composites are always available in memory.
         match self {
-            ParentContainer::Model(weak) => weak
-                .upgrade()
-                .unwrap()
-                .fields()
-                .find_from_all(prisma_name)
-                .ok()
-                .cloned(),
+            ParentContainer::Model(weak) => weak.upgrade().unwrap().fields().find_from_all(prisma_name).ok(),
 
             ParentContainer::CompositeType(weak) => weak
                 .upgrade()

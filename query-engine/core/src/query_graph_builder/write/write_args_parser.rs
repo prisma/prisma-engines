@@ -5,7 +5,7 @@ use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
 use schema_builder::constants::{args, json_null, operations};
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 #[derive(Debug)]
 pub struct WriteArgsParser {
@@ -29,23 +29,23 @@ impl WriteArgsParser {
                     Field::Scalar(sf) if sf.is_list() => {
                         let write_op = parse_scalar_list(v)?;
 
-                        args.args.insert(sf, write_op);
+                        args.args.insert(&sf, write_op);
                     }
                     Field::Scalar(sf) => {
-                        let write_op: WriteOperation = parse_scalar(sf, v)?;
+                        let write_op: WriteOperation = parse_scalar(&sf, v)?;
 
-                        args.args.insert(sf, write_op)
+                        args.args.insert(&sf, write_op)
                     }
 
                     Field::Relation(ref rf) => match v {
                         ParsedInputValue::Single(PrismaValue::Null) => (),
-                        _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
+                        _ => args.nested.push((rf.clone(), v.try_into()?)),
                     },
 
                     Field::Composite(cf) => {
-                        let write_op = parse_composite_writes(cf, v, &mut vec![])?;
+                        let write_op = parse_composite_writes(&cf, v, &mut vec![])?;
 
-                        args.args.insert(cf, write_op)
+                        args.args.insert(&cf, write_op)
                     }
                 };
 

@@ -74,47 +74,41 @@ pub(super) fn filter_checked_update_fields(
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<ModelField> {
-    model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| {
-            match field {
-                ModelField::Scalar(sf) => {
-                    // We forbid updating auto-increment integer unique fields as this can create problems with the
-                    // underlying sequences (checked inputs only).
-                    let is_not_autoinc = !sf.is_auto_generated_int_id()
-                        && !matches!(
-                            (&sf.type_identifier(), sf.unique(), sf.is_autoincrement()),
-                            (TypeIdentifier::Int, true, true)
-                        );
+    model.fields().filter_all(|field| {
+        match field {
+            ModelField::Scalar(sf) => {
+                // We forbid updating auto-increment integer unique fields as this can create problems with the
+                // underlying sequences (checked inputs only).
+                let is_not_autoinc = !sf.is_auto_generated_int_id()
+                    && !matches!(
+                        (&sf.type_identifier(), sf.unique(), sf.is_autoincrement()),
+                        (TypeIdentifier::Int, true, true)
+                    );
 
-                    let model_id = sf.container().as_model().unwrap().primary_identifier();
-                    let is_not_disallowed_id = if model_id.contains(sf.name()) {
-                        // Is part of the id, connector must allow updating ID fields.
-                        ctx.has_capability(ConnectorCapability::UpdateableId)
-                    } else {
-                        true
-                    };
+                let model_id = sf.container().as_model().unwrap().primary_identifier();
+                let is_not_disallowed_id = if model_id.contains(sf.name()) {
+                    // Is part of the id, connector must allow updating ID fields.
+                    ctx.has_capability(ConnectorCapability::UpdateableId)
+                } else {
+                    true
+                };
 
-                    !sf.is_read_only() && is_not_autoinc && is_not_disallowed_id
-                }
-
-                // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
-                // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
-                ModelField::Relation(rf) => {
-                    let field_was_traversed_to = parent_field
-                        .filter(|pf| pf.related_field().name() == rf.name())
-                        .is_some();
-                    !field_was_traversed_to
-                }
-
-                // Always keep composites
-                ModelField::Composite(_) => true,
+                !sf.is_read_only() && is_not_autoinc && is_not_disallowed_id
             }
-        })
-        .map(Clone::clone)
-        .collect()
+
+            // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+            // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+            ModelField::Relation(rf) => {
+                let field_was_traversed_to = parent_field
+                    .filter(|pf| pf.related_field().name() == rf.name())
+                    .is_some();
+                !field_was_traversed_to
+            }
+
+            // Always keep composites
+            ModelField::Composite(_) => true,
+        }
+    })
 }
 
 /// Filters the given model's fields down to the allowed ones for unchecked update.
@@ -138,47 +132,41 @@ pub(super) fn filter_unchecked_update_fields(
     };
 
     let id_fields = model.fields().id().map(|pk| pk.fields());
-    model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| match field {
-            // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
-            // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
-            // 2) Exclude @@id or @id fields if not updatable
-            ModelField::Scalar(sf) => {
-                !linking_fields.contains(sf)
-                    && if let Some(ref id_fields) = &id_fields {
-                        // Exclude @@id or @id fields if not updatable
-                        if id_fields.contains(sf) {
-                            ctx.has_capability(ConnectorCapability::UpdateableId)
-                        } else {
-                            true
-                        }
+    model.fields().filter_all(|field| match field {
+        // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
+        // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
+        // 2) Exclude @@id or @id fields if not updatable
+        ModelField::Scalar(sf) => {
+            !linking_fields.contains(sf)
+                && if let Some(ref id_fields) = &id_fields {
+                    // Exclude @@id or @id fields if not updatable
+                    if id_fields.contains(sf) {
+                        ctx.has_capability(ConnectorCapability::UpdateableId)
                     } else {
                         true
                     }
-            }
+                } else {
+                    true
+                }
+        }
 
-            // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
-            // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
-            //
-            // Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are
-            // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
-            ModelField::Relation(rf) => {
-                let is_not_inlined = !rf.is_inlined_on_enclosing_model();
-                let field_was_not_traversed_to = parent_field
-                    .filter(|pf| pf.related_field().name() == rf.name())
-                    .is_none();
+        // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+        // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+        //
+        // Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are
+        // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
+        ModelField::Relation(rf) => {
+            let is_not_inlined = !rf.is_inlined_on_enclosing_model();
+            let field_was_not_traversed_to = parent_field
+                .filter(|pf| pf.related_field().name() == rf.name())
+                .is_none();
 
-                field_was_not_traversed_to && is_not_inlined
-            }
+            field_was_not_traversed_to && is_not_inlined
+        }
 
-            // Always keep composites
-            ModelField::Composite(_) => true,
-        })
-        .map(Clone::clone)
-        .collect()
+        // Always keep composites
+        ModelField::Composite(_) => true,
+    })
 }
 
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.

@@ -2,9 +2,6 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod compound_fks {
-    use indoc::indoc;
-    use query_engine_tests::{assert_error, run_query};
-
     fn schema() -> String {
         let schema = indoc! {
             r#"model Post {

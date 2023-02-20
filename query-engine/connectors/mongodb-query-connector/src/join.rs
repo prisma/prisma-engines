@@ -1,6 +1,6 @@
 use crate::filter::MongoFilter;
 use mongodb::bson::{doc, Document};
-use prisma_models::RelationFieldRef;
+use prisma_models::{walkers, RelationFieldRef, ScalarFieldRef};
 
 /// A join stage describes a tree of joins and nested joins to be performed on a collection.
 /// Every document of the `source` side will be joined with the collection documents
@@ -92,7 +92,12 @@ impl JoinStage {
         let mut pipeline = Vec::with_capacity(1 + nested_stages.len());
 
         // First we start with the right side of the equation
-        let right_scalars = from_field.right_scalars();
+        let right_scalars: Vec<ScalarFieldRef> = match from_field.walker().relation().refine() {
+            walkers::RefinedRelationWalker::Inline(_) | walkers::RefinedRelationWalker::ImplicitManyToMany(_) => {
+                from_field.related_field().left_scalars()
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => from_field.related_field().scalar_fields(),
+        };
 
         // What $expr operators we will need to express this lookup? (depends on right fields)
         let ops: Vec<Document> = right_scalars

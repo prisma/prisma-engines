@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, prelude::*, CompositeTypeRef, InternalEnumRef};
+use crate::{prelude::*, CompositeTypeRef, InternalEnumRef};
 use once_cell::sync::OnceCell;
 use psl::schema_ast::ast;
 use std::sync::{Arc, Weak};
@@ -10,16 +10,11 @@ pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
 pub struct InternalDataModel {
     pub(crate) models: OnceCell<Vec<ModelRef>>,
     pub(crate) composite_types: OnceCell<Vec<CompositeTypeRef>>,
-    pub(crate) relation_fields: OnceCell<Vec<RelationFieldRef>>,
 
     pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {
-    pub(crate) fn finalize(&self) {
-        self.models().iter().for_each(|model| model.finalize());
-    }
-
     pub fn models(&self) -> &[ModelRef] {
         self.models.get().unwrap()
     }
@@ -64,45 +59,14 @@ impl InternalDataModel {
             .unwrap()
     }
 
-    /// Finds all non-list relation fields pointing to the given model.
-    /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
-    pub fn fields_pointing_to_model(&self, model: &ModelRef, required: bool) -> Vec<RelationFieldRef> {
-        self.relation_fields()
-            .iter()
-            .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
-            .filter(|rf| rf.is_inlined_on_enclosing_model()) // Not a list, not a virtual field.
-            .filter(|rf| !required || rf.is_required()) // If only required fields should be returned
-            .map(Arc::clone)
+    /// Finds all inline relation fields pointing to the given model.
+    pub fn fields_pointing_to_model(self: &Arc<Self>, model: &ModelRef) -> Vec<RelationFieldRef> {
+        self.walk(model.id)
+            .relations_to()
+            .filter_map(|rel| rel.refine().as_inline())
+            .filter_map(|inline_rel| inline_rel.forward_relation_field())
+            .map(move |rf| self.clone().zip(rf.id))
             .collect()
-    }
-
-    /// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
-    pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
-        match &field.container {
-            ParentContainer::Model(model) => {
-                let model_id = model.upgrade().unwrap().id;
-
-                self.relation_fields()
-                    .iter()
-                    .filter(|rf| rf.relation_info.referenced_model == model_id)
-                    .filter(|rf| rf.relation_info.references.contains(&field.name))
-                    .map(Arc::clone)
-                    .collect()
-            }
-            // Relation fields can not refer to composite fields.
-            ParentContainer::CompositeType(_) => vec![],
-        }
-    }
-
-    pub(crate) fn relation_fields(&self) -> &[RelationFieldRef] {
-        self.relation_fields
-            .get_or_init(|| {
-                self.models()
-                    .iter()
-                    .flat_map(|model| model.fields().relation())
-                    .collect()
-            })
-            .as_slice()
     }
 
     pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {

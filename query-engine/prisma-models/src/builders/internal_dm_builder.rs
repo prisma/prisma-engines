@@ -1,11 +1,8 @@
-use super::{
-    field_builders::RelationFieldBuilder, CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
-    PrimaryKeyBuilder,
-};
+use super::{CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder};
 use crate::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
     extensions::*,
-    IndexType, RelationSide, TypeIdentifier,
+    IndexType, TypeIdentifier,
 };
 use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 
@@ -27,7 +24,7 @@ pub(crate) fn model_builders(datamodel: &Datamodel, schema: &psl::ValidatedSchem
         .collect()
 }
 
-fn model_field_builders(model: &dml::Model, schema: &psl::ValidatedSchema) -> Vec<FieldBuilder> {
+fn model_field_builders(model: &dml::Model, _schema: &psl::ValidatedSchema) -> Vec<FieldBuilder> {
     model
         .fields()
         .filter(|field| !field.is_ignored())
@@ -39,25 +36,6 @@ fn model_field_builders(model: &dml::Model, schema: &psl::ValidatedSchema) -> Ve
                 type_name: cf.composite_type.clone(),
                 default_value: cf.default_value.clone(),
             })),
-            dml::Field::RelationField(rf) => {
-                let walker = schema.db.walk(rf.id);
-                let relation = walker.relation();
-
-                if relation.is_ignored() {
-                    return None;
-                }
-
-                Some(FieldBuilder::Relation(RelationFieldBuilder {
-                    id: rf.id,
-                    name: rf.name.clone(),
-                    arity: rf.arity,
-                    relation_name: walker.relation_name().to_string(),
-                    relation_side: RelationSide::new(rf.id, relation),
-                    relation_info: rf.relation_info.clone(),
-                    on_delete_default: rf.default_on_delete_action(),
-                    on_update_default: rf.default_on_update_action(),
-                }))
-            }
             dml::Field::ScalarField(sf) => {
                 if sf.type_identifier() == TypeIdentifier::Unsupported {
                     None

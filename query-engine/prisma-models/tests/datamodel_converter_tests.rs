@@ -262,163 +262,6 @@ fn updatedAt_works() {
         .assert_updated_at();
 }
 
-#[test]
-fn explicit_relation_fields() {
-    let datamodel = convert(
-        r#"
-            model Blog {
-                id Int @id
-                posts Post[]
-            }
-
-            model Post {
-                id     Int   @id
-                blogId Int?  @map("blog_id")
-                blog   Blog? @relation(fields: blogId, references: id)
-            }
-        "#,
-    );
-
-    let relation_name = "BlogToPost";
-    let blog = datamodel.assert_model("Blog");
-    let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation((blog.id, post.id), relation_name);
-
-    blog.assert_relation_field("posts")
-        .assert_list()
-        .assert_optional()
-        .assert_relation_name(relation_name)
-        .assert_side(RelationSide::A);
-
-    post.assert_relation_field("blog")
-        .assert_optional()
-        .assert_relation_name(relation_name)
-        .assert_side(RelationSide::B);
-
-    relation
-        .assert_name(relation_name)
-        .assert_model_a("Blog")
-        .assert_model_b("Post");
-}
-
-#[test]
-fn many_to_many_relations() {
-    let datamodel = convert(
-        r#"
-            model Post {
-                id Int @id
-                blogs Blog[]
-            }
-
-            model Blog {
-                id Int @id
-                posts Post[]
-            }
-        "#,
-    );
-
-    let relation_name = "BlogToPost";
-    let blog = datamodel.assert_model("Blog");
-    let post = datamodel.assert_model("Post");
-    let relation = datamodel.assert_relation((blog.id, post.id), relation_name);
-
-    blog.assert_relation_field("posts")
-        .assert_list()
-        .assert_optional()
-        .assert_relation_name(relation_name)
-        .assert_side(RelationSide::A);
-
-    post.assert_relation_field("blogs")
-        .assert_list()
-        .assert_optional()
-        .assert_relation_name(relation_name)
-        .assert_side(RelationSide::B);
-
-    relation
-        .assert_name(relation_name)
-        .assert_model_a("Blog")
-        .assert_model_b("Post");
-}
-
-#[test]
-fn explicit_relation_names() {
-    let datamodel = convert(
-        r#"
-            model Blog {
-                id Int @id
-                posts Post[] @relation(name: "MyRelationName")
-            }
-
-            model Post {
-                id     Int  @id
-                blogId Int?
-                blog   Blog? @relation(name: "MyRelationName", fields: blogId, references: id)
-            }
-        "#,
-    );
-
-    let blog = datamodel.assert_model("Blog");
-    let post = datamodel.assert_model("Post");
-
-    let relation_name = "MyRelationName";
-    blog.assert_relation_field("posts")
-        .assert_list()
-        .assert_optional()
-        .assert_relation_name(relation_name);
-    post.assert_relation_field("blog")
-        .assert_optional()
-        .assert_relation_name(relation_name);
-}
-
-#[test]
-#[ignore]
-fn self_relations() {
-    let datamodel = convert(
-        r#"
-            model Employee {
-                id Int @id
-                ReportsTo: Employee?
-            }
-        "#,
-    );
-
-    let employee = datamodel.assert_model("Employee");
-
-    employee
-        .assert_relation_field("ReportsTo")
-        .assert_relation_name("EmployeeToEmployee");
-    // employee.assert_relation_field("employee");
-}
-
-#[test]
-fn ambiguous_relations() {
-    let datamodel = convert(
-        r#"
-            model Blog {
-                id    Int   @id
-                post1 Post? @relation(name: "Relation1")
-                post2 Post? @relation(name: "Relation2")
-            }
-
-            model Post {
-                id      Int  @id
-                blog1Id Int  @unique
-                blog2Id Int  @unique
-                blog1   Blog @relation(name: "Relation1", fields: [blog1Id], references: [id])
-                blog2   Blog @relation(name: "Relation2", fields: [blog2Id], references: [id])
-            }
-        "#,
-    );
-
-    let blog = datamodel.assert_model("Blog");
-    blog.assert_relation_field("post1").assert_relation_name("Relation1");
-    blog.assert_relation_field("post2").assert_relation_name("Relation2");
-
-    let post = datamodel.assert_model("Post");
-    post.assert_relation_field("blog1").assert_relation_name("Relation1");
-    post.assert_relation_field("blog2").assert_relation_name("Relation2");
-}
-
 // Regression test
 // https://github.com/prisma/prisma/issues/12986
 #[test]
@@ -447,24 +290,6 @@ fn duplicate_relation_name() {
     convert(schema);
 }
 
-#[test]
-fn implicit_many_to_many_relation() {
-    let datamodel = convert(
-        r#"model Post {
-                    id         String @id @default(cuid())
-                    identifier Int?   @unique
-                    related    Post[] @relation(name: "RelatedPosts")
-                    parents   Post[] @relation(name: "RelatedPosts")
-                  }
-                  "#,
-    );
-
-    let post = datamodel.assert_model("Post");
-    post.assert_relation_field("related");
-
-    post.assert_relation_field("parents");
-}
-
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let schema = psl::parse_schema(datamodel).unwrap();
     prisma_models::convert(Arc::new(schema))
@@ -472,18 +297,11 @@ fn convert(datamodel: &str) -> Arc<InternalDataModel> {
 
 trait DatamodelAssertions {
     fn assert_model(&self, name: &str) -> Arc<Model>;
-    fn assert_relation(self: &Arc<Self>, models: (ast::ModelId, ast::ModelId), name: &str) -> Relation;
 }
 
 impl DatamodelAssertions for InternalDataModel {
     fn assert_model(&self, name: &str) -> Arc<Model> {
         self.find_model(name).unwrap()
-    }
-
-    fn assert_relation(self: &Arc<Self>, models: (ast::ModelId, ast::ModelId), name: &str) -> Relation {
-        self.relations()
-            .find(|rel| rel.model_a().id == models.0 && rel.model_b().id == models.1 && rel.name().to_owned() == name)
-            .unwrap()
     }
 }
 
@@ -491,7 +309,6 @@ trait ModelAssertions {
     fn assert_indexes_length(&self, len: usize) -> &Self;
     fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self;
     fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField>;
-    fn assert_relation_field(&self, name: &str) -> Arc<RelationField>;
 }
 
 impl ModelAssertions for Model {
@@ -518,10 +335,6 @@ impl ModelAssertions for Model {
     fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField> {
         self.fields().find_from_scalar(name).unwrap()
     }
-
-    fn assert_relation_field(&self, name: &str) -> Arc<RelationField> {
-        self.fields().find_from_relation_fields(name).unwrap()
-    }
 }
 
 trait FieldAssertions {
@@ -535,11 +348,6 @@ trait ScalarFieldAssertions {
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
     fn assert_is_id(&self) -> &Self;
     fn assert_unique(&self) -> &Self;
-}
-
-trait RelationFieldAssertions {
-    fn assert_relation_name(&self, name: &str) -> &Self;
-    fn assert_side(&self, side: RelationSide) -> &Self;
 }
 
 impl FieldAssertions for ScalarField {
@@ -581,51 +389,13 @@ impl ScalarFieldAssertions for ScalarField {
     }
 }
 
-impl FieldAssertions for RelationField {
-    fn assert_type_identifier(&self, _ti: TypeIdentifier) -> &Self {
-        panic!("Can't assert type identifier of relation.")
-    }
-
-    fn assert_optional(&self) -> &Self {
-        assert!(!self.is_required());
-        self
-    }
-
-    fn assert_list(&self) -> &Self {
-        assert!(self.is_list());
-        self
-    }
-}
-
-impl RelationFieldAssertions for RelationField {
-    fn assert_relation_name(&self, name: &str) -> &Self {
-        assert_eq!(self.relation_name, name);
-        self
-    }
-
-    fn assert_side(&self, side: RelationSide) -> &Self {
-        assert_eq!(self.relation_side, side);
-        self
-    }
-}
-
 trait RelationAssertions {
     fn assert_name(&self, name: &str) -> &Self;
-    fn assert_model_a(&self, name: &str) -> &Self;
-    fn assert_model_b(&self, name: &str) -> &Self;
 }
 
 impl RelationAssertions for Relation {
     fn assert_name(&self, name: &str) -> &Self {
         assert_eq!(self.name(), name);
-        self
-    }
-    fn assert_model_a(&self, name: &str) -> &Self {
-        assert_eq!(self.model_a().name(), name);
-        self
-    }
-    fn assert_model_b(&self, name: &str) -> &Self {
-        assert_eq!(self.model_b().name(), name);
         self
     }
 }

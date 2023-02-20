@@ -97,7 +97,7 @@ fn handle_many_to_many(
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
@@ -324,7 +324,7 @@ fn handle_one_to_many(
         utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
 
     let child_side_required = parent_relation_field.related_field().is_required();
-    let rf = Arc::clone(parent_relation_field);
+    let rf = parent_relation_field.clone();
 
     graph.create_edge(
         &diff_node,

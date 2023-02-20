@@ -59,7 +59,6 @@ impl ModelConverterUtilities for dml::Model {
             let field = self.find_field(&field.path.first().unwrap().0).unwrap();
             let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                dml::Field::RelationField(_) => true,
                 dml::Field::CompositeField(_) => false,
             };
 

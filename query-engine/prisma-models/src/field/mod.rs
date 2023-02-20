@@ -21,7 +21,7 @@ impl Field {
     pub fn name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => &sf.name,
-            Field::Relation(ref rf) => &rf.name,
+            Field::Relation(ref rf) => rf.walker().name(),
             Field::Composite(ref cf) => &cf.name,
         }
     }
@@ -29,7 +29,7 @@ impl Field {
     pub fn db_name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => sf.db_name(),
-            Field::Relation(ref rf) => &rf.name,
+            Field::Relation(rf) => rf.name(),
             Field::Composite(ref cf) => cf.db_name(),
         }
     }
@@ -110,7 +110,7 @@ impl Field {
 
     pub fn downgrade(&self) -> FieldWeak {
         match self {
-            Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Relation(field) => FieldWeak::Relation(field.clone()),
             Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
             Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
         }
@@ -143,7 +143,7 @@ pub enum FieldWeak {
 impl FieldWeak {
     pub fn upgrade(&self) -> Field {
         match self {
-            Self::Relation(rf) => rf.upgrade().unwrap().into(),
+            Self::Relation(rf) => rf.clone().into(),
             Self::Scalar(sf) => sf.upgrade().unwrap().into(),
             Self::Composite(cf) => cf.upgrade().unwrap().into(),
         }
@@ -168,7 +168,7 @@ impl From<&ScalarFieldRef> for FieldWeak {
 
 impl From<&RelationFieldRef> for FieldWeak {
     fn from(f: &RelationFieldRef) -> Self {
-        FieldWeak::Relation(Arc::downgrade(f))
+        FieldWeak::Relation(f.clone())
     }
 }
 

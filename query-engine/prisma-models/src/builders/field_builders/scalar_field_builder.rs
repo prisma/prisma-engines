@@ -1,6 +1,5 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*};
 use dml::{DefaultValue, FieldArity, NativeTypeInstance};
-use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
@@ -37,7 +36,6 @@ impl ScalarFieldBuilder {
             native_type: self.native_type,
             container,
             is_unique: self.is_unique,
-            read_only: OnceCell::new(),
         };
 
         Arc::new(scalar)

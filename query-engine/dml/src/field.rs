@@ -6,13 +6,7 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use crate::{CompositeTypeFieldType, FieldArity};
-use psl_core::{
-    parser_database::{
-        walkers::{RelationFieldId, ScalarFieldId},
-        ReferentialAction,
-    },
-    schema_ast::ast,
-};
+use psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
 
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
@@ -103,25 +97,10 @@ impl FieldType {
 #[derive(Debug, PartialEq, Clone)]
 pub enum Field {
     ScalarField(ScalarField),
-    RelationField(RelationField),
     CompositeField(CompositeField),
 }
 
 impl Field {
-    pub fn as_relation_field(&self) -> Option<&RelationField> {
-        match self {
-            Field::RelationField(sf) => Some(sf),
-            _ => None,
-        }
-    }
-
-    pub fn as_relation_field_mut(&mut self) -> Option<&mut RelationField> {
-        match self {
-            Field::RelationField(ref mut rf) => Some(rf),
-            _ => None,
-        }
-    }
-
     pub fn as_scalar_field(&self) -> Option<&ScalarField> {
         match self {
             Field::ScalarField(sf) => Some(sf),
@@ -143,10 +122,6 @@ impl Field {
         }
     }
 
-    pub fn is_relation(&self) -> bool {
-        matches!(self, Field::RelationField(_))
-    }
-
     pub fn is_scalar_field(&self) -> bool {
         matches!(self, Field::ScalarField(_))
     }
@@ -154,7 +129,6 @@ impl Field {
     pub fn name(&self) -> &str {
         match &self {
             Field::ScalarField(sf) => &sf.name,
-            Field::RelationField(rf) => &rf.name,
             Field::CompositeField(cf) => &cf.name,
         }
     }
@@ -162,7 +136,6 @@ impl Field {
     pub fn documentation(&self) -> Option<&str> {
         match self {
             Field::ScalarField(sf) => sf.documentation.as_deref(),
-            Field::RelationField(rf) => rf.documentation.as_deref(),
             Field::CompositeField(cf) => cf.documentation.as_deref(),
         }
     }
@@ -170,7 +143,6 @@ impl Field {
     pub fn set_documentation(&mut self, documentation: Option<String>) {
         match self {
             Field::ScalarField(sf) => sf.documentation = documentation,
-            Field::RelationField(rf) => rf.documentation = documentation,
             Field::CompositeField(cf) => cf.documentation = documentation,
         }
     }
@@ -179,14 +151,12 @@ impl Field {
         match self {
             Field::ScalarField(sf) => sf.is_commented_out,
             Field::CompositeField(cf) => cf.is_commented_out,
-            _ => false,
         }
     }
 
     pub fn arity(&self) -> &FieldArity {
         match &self {
             Field::ScalarField(sf) => &sf.arity,
-            Field::RelationField(rf) => &rf.arity,
             Field::CompositeField(rf) => &rf.arity,
         }
     }
@@ -194,7 +164,6 @@ impl Field {
     pub fn field_type(&self) -> FieldType {
         match &self {
             Field::ScalarField(sf) => sf.field_type.clone(),
-            Field::RelationField(rf) => FieldType::Relation(rf.relation_info.clone()),
             Field::CompositeField(cf) => FieldType::CompositeType(cf.composite_type.clone()),
         }
     }
@@ -202,7 +171,6 @@ impl Field {
     pub fn default_value(&self) -> Option<&DefaultValue> {
         match &self {
             Field::ScalarField(sf) => sf.default_value.as_ref(),
-            Field::RelationField(_) => None,
             Field::CompositeField(_) => None,
         }
     }
@@ -210,7 +178,6 @@ impl Field {
     pub fn is_updated_at(&self) -> bool {
         match &self {
             Field::ScalarField(sf) => sf.is_updated_at,
-            Field::RelationField(_) => false,
             Field::CompositeField(_) => false,
         }
     }
@@ -220,14 +187,12 @@ impl WithName for Field {
     fn name(&self) -> &String {
         match self {
             Field::ScalarField(sf) => sf.name(),
-            Field::RelationField(rf) => rf.name(),
             Field::CompositeField(cf) => cf.name(),
         }
     }
     fn set_name(&mut self, name: &str) {
         match self {
             Field::ScalarField(sf) => sf.set_name(name),
-            Field::RelationField(rf) => rf.set_name(name),
             Field::CompositeField(cf) => cf.set_name(name),
         }
     }
@@ -238,7 +203,6 @@ impl WithDatabaseName for Field {
         match self {
             Field::ScalarField(sf) => sf.database_name.as_deref(),
             Field::CompositeField(cf) => cf.database_name.as_deref(),
-            Field::RelationField(_) => None,
         }
     }
 
@@ -246,7 +210,6 @@ impl WithDatabaseName for Field {
         match self {
             Field::ScalarField(sf) => sf.set_database_name(database_name),
             Field::CompositeField(cf) => cf.set_database_name(database_name),
-            Field::RelationField(_) => (),
         }
     }
 }
@@ -254,7 +217,6 @@ impl WithDatabaseName for Field {
 impl Ignorable for Field {
     fn is_ignored(&self) -> bool {
         match self {
-            Field::RelationField(rf) => rf.is_ignored,
             Field::ScalarField(sf) => sf.is_ignored,
             Field::CompositeField(cf) => cf.is_ignored,
         }
@@ -262,107 +224,9 @@ impl Ignorable for Field {
 
     fn ignore(&mut self) {
         match self {
-            Field::RelationField(rf) => rf.is_ignored = true,
             Field::ScalarField(sf) => sf.is_ignored = true,
             Field::CompositeField(cf) => cf.is_ignored = true,
         }
-    }
-}
-
-/// Represents a relation field in a model.
-#[derive(Debug, PartialEq, Clone)]
-pub struct RelationField {
-    pub id: RelationFieldId,
-
-    /// Name of the field.
-    pub name: String,
-
-    /// The field's type.
-    pub relation_info: RelationInfo,
-
-    /// The field's arity.
-    pub arity: FieldArity,
-
-    /// The arity of underlying fields for referential actions.
-    pub referential_arity: FieldArity,
-
-    /// Comments associated with this field.
-    pub documentation: Option<String>,
-
-    /// Indicates if this field has to be ignored by the Client.
-    pub is_ignored: bool,
-
-    /// Is `ON DELETE/UPDATE RESTRICT` allowed.
-    pub supports_restrict_action: Option<bool>,
-
-    /// Do we run the referential actions in the core instead of the database.
-    pub emulates_referential_actions: Option<bool>,
-}
-
-impl RelationField {
-    /// Creates a new field with the given name and type.
-    pub fn new(
-        id: RelationFieldId,
-        name: &str,
-        arity: FieldArity,
-        referential_arity: FieldArity,
-        relation_info: RelationInfo,
-    ) -> Self {
-        RelationField {
-            id,
-            name: String::from(name),
-            arity,
-            referential_arity,
-            relation_info,
-            documentation: None,
-            is_ignored: false,
-            supports_restrict_action: None,
-            emulates_referential_actions: None,
-        }
-    }
-
-    /// The default `onDelete` can be `Restrict`.
-    pub fn supports_restrict_action(&mut self, value: bool) {
-        self.supports_restrict_action = Some(value);
-    }
-
-    /// The referential actions should be handled by the core.
-    pub fn emulates_referential_actions(&mut self, value: bool) {
-        self.emulates_referential_actions = Some(value);
-    }
-
-    pub fn is_required(&self) -> bool {
-        self.arity.is_required()
-    }
-
-    pub fn is_list(&self) -> bool {
-        self.arity.is_list()
-    }
-
-    pub fn default_on_delete_action(&self) -> ReferentialAction {
-        use ReferentialAction::*;
-
-        match self.referential_arity {
-            FieldArity::Required if self.supports_restrict_action.unwrap_or(true) => Restrict,
-            FieldArity::Required => NoAction,
-            _ => SetNull,
-        }
-    }
-
-    pub fn default_on_update_action(&self) -> ReferentialAction {
-        use ReferentialAction::*;
-
-        Cascade
-    }
-}
-
-impl WithName for RelationField {
-    fn name(&self) -> &String {
-        &self.name
-    }
-
-    fn set_name(&mut self, name: &str) {
-        self.name = String::from(name)
     }
 }
 

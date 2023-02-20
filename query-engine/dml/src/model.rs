@@ -1,5 +1,5 @@
 use crate::default_value::DefaultKind;
-use crate::field::{Field, FieldType, RelationField, ScalarField};
+use crate::field::{Field, FieldType, ScalarField};
 use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use indoc::formatdoc;
@@ -376,26 +376,11 @@ impl Model {
         self.fields.iter().filter_map(|f| f.as_scalar_field())
     }
 
-    /// Gets an iterator over all relation fields.
-    pub fn relation_fields(&self) -> impl Iterator<Item = &RelationField> {
-        self.fields.iter().filter_map(|f| f.as_relation_field())
-    }
-
     /// Gets a mutable iterator over all scalar fields.
     pub fn scalar_fields_mut(&mut self) -> impl Iterator<Item = &mut ScalarField> {
         self.fields_mut().filter_map(|fw| match fw {
-            Field::RelationField(_) => None,
             Field::CompositeField(_) => None,
             Field::ScalarField(sf) => Some(sf),
-        })
-    }
-
-    /// Gets a mutable iterator over all relation fields.
-    pub fn relation_fields_mut(&mut self) -> impl Iterator<Item = &mut RelationField> {
-        self.fields_mut().filter_map(|fw| match fw {
-            Field::RelationField(rf) => Some(rf),
-            Field::CompositeField(_) => None,
-            Field::ScalarField(_) => None,
         })
     }
 
@@ -414,11 +399,6 @@ impl Model {
         self.scalar_fields().find(|f| f.name == *name)
     }
 
-    /// Finds a scalar field by name.
-    pub fn find_relation_field(&self, name: &str) -> Option<&RelationField> {
-        self.relation_fields().find(|f| f.name == *name)
-    }
-
     /// Finds a field by database name.
     pub fn find_scalar_field_db_name(&self, db_name: &str) -> Option<&ScalarField> {
         self.scalar_fields()
@@ -435,15 +415,6 @@ impl Model {
         self.scalar_fields_mut()
             .find(|rf| rf.name == *name)
             .unwrap_or_else(|| panic!("Could not find scalar field {name} on model {model_name}."))
-    }
-
-    /// Finds a relation field by name and returns a mutable reference.
-    #[track_caller]
-    pub fn find_relation_field_mut(&mut self, name: &str) -> &mut RelationField {
-        let model_name = &self.name.clone();
-        self.relation_fields_mut()
-            .find(|rf| rf.name == *name)
-            .unwrap_or_else(|| panic!("Could not find relation field {name} on model {model_name}."))
     }
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.

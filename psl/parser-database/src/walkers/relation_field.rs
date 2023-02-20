@@ -79,6 +79,12 @@ impl<'db> RelationFieldWalker<'db> {
         self.db.walk(self.id.0)
     }
 
+    /// A valid relation is defined by two relation fields. This method returns the _other_
+    /// relation field in the same relation.
+    pub fn opposite_relation_field(self) -> Option<RelationFieldWalker<'db>> {
+        self.relation().relation_fields().find(|rf| rf.id != self.id)
+    }
+
     /// The `@relation` attribute in the field AST.
     pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
         self.attributes().relation_attribute.map(|id| &self.db.ast[id])
