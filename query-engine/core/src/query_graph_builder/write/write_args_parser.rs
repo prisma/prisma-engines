@@ -159,7 +159,7 @@ fn parse_composite_update_many(
     path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
-    let filter = extract_filter(where_map, &cf.typ)?;
+    let filter = extract_filter(where_map, &cf.typ())?;
 
     let update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update_map, path)?
@@ -174,7 +174,7 @@ fn parse_composite_delete_many(
     mut value: ParsedInputMap,
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
-    let filter = extract_filter(where_map, &cf.typ)?;
+    let filter = extract_filter(where_map, &cf.typ())?;
 
     Ok(WriteOperation::composite_delete_many(filter))
 }
@@ -206,7 +206,8 @@ fn parse_composite_updates(
     let mut writes = vec![];
 
     for (k, v) in map {
-        let field = cf.typ.find_field(&k).unwrap();
+        let typ = cf.typ();
+        let field = typ.find_field(&k).unwrap();
 
         let field_name: DatasourceFieldName = match field {
             Field::Scalar(sf) => sf.into(),
@@ -216,8 +217,8 @@ fn parse_composite_updates(
 
         let write_op = match field {
             Field::Scalar(sf) if sf.is_list() => parse_scalar_list(v),
-            Field::Scalar(sf) => parse_scalar(sf, v),
-            Field::Composite(cf) => parse_composite_writes(cf, v, &mut path.to_owned()),
+            Field::Scalar(sf) => parse_scalar(&sf, v),
+            Field::Composite(cf) => parse_composite_writes(&cf, v, &mut path.to_owned()),
             _ => unreachable!(),
         }?;
 

@@ -72,7 +72,7 @@ impl IntoUpdateOperation for CompositeWriteOperation {
                 let mut update_docs = vec![];
 
                 for (write_op, field, field_path) in nested_write.unfold(field, path) {
-                    update_docs.extend(write_op.into_update_operations(field, field_path)?);
+                    update_docs.extend(write_op.into_update_operations(&field, field_path)?);
                 }
 
                 update_docs

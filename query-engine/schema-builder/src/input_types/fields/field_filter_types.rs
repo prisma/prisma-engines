@@ -132,7 +132,7 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &Compos
 fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let nullable = if cf.is_optional() { "Nullable" } else { "" };
     let ident = Identifier::new(
-        format!("{}{}CompositeFilter", capitalize(&cf.typ.name), nullable),
+        format!("{}{}CompositeFilter", capitalize(&cf.typ().name), nullable),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -145,7 +145,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
 
     ctx.cache_input_type(ident, object.clone());
 
-    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ());
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     let mut fields = vec![
@@ -170,7 +170,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
 
 fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        format!("{}CompositeListFilter", capitalize(&cf.typ.name)),
+        format!("{}CompositeListFilter", capitalize(&cf.typ().name)),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -182,7 +182,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ());
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     let mut fields = vec![

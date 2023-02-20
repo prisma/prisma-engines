@@ -243,7 +243,7 @@ fn compound_field_unique_object_type(
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ.name), PRISMA_NAMESPACE);
+    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ().name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -251,7 +251,8 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
 
     let mut fields = vec![];
 
-    let input_fields = cf.typ.fields().iter().map(|f| match f {
+    let composite_type = cf.typ();
+    let input_fields = composite_type.fields().iter().map(|f| match f {
         ModelField::Scalar(sf) => input_field(sf.name(), map_scalar_input_type_for_field(ctx, sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),
@@ -265,7 +266,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
                 vec![InputType::object(composite_equality_object(ctx, cf))]
             };
 
-            input_field(cf.name.clone(), types, None)
+            input_field(&(*cf.name()), types, None)
                 .optional_if(!cf.is_required())
                 .nullable_if(!cf.is_required() && !cf.is_list())
         }

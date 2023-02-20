@@ -22,7 +22,7 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => &sf.name,
             Field::Relation(ref rf) => rf.walker().name(),
-            Field::Composite(ref cf) => &cf.name,
+            Field::Composite(ref cf) => cf.name(),
         }
     }
 
@@ -96,7 +96,7 @@ impl Field {
         match self {
             Self::Scalar(sf) => sf.container.as_model(),
             Self::Relation(rf) => Some(rf.model()),
-            Self::Composite(cf) => cf.container.as_model(),
+            Self::Composite(cf) => cf.container().as_model(),
         }
     }
 
@@ -112,7 +112,7 @@ impl Field {
         match self {
             Field::Relation(field) => FieldWeak::Relation(field.clone()),
             Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
-            Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
+            Field::Composite(field) => FieldWeak::Composite(field.clone()),
         }
     }
 
@@ -145,7 +145,7 @@ impl FieldWeak {
         match self {
             Self::Relation(rf) => rf.clone().into(),
             Self::Scalar(sf) => sf.upgrade().unwrap().into(),
-            Self::Composite(cf) => cf.upgrade().unwrap().into(),
+            Self::Composite(cf) => cf.clone().into(),
         }
     }
 }
@@ -174,7 +174,7 @@ impl From<&RelationFieldRef> for FieldWeak {
 
 impl From<&CompositeFieldRef> for FieldWeak {
     fn from(f: &CompositeFieldRef) -> Self {
-        FieldWeak::Composite(Arc::downgrade(f))
+        FieldWeak::Composite(f.clone())
     }
 }
 

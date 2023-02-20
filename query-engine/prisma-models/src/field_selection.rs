@@ -28,7 +28,7 @@ impl FieldSelection {
         other.selections.iter().all(|selection| match selection {
             SelectedField::Scalar(sf) => self.contains(&sf.name),
             SelectedField::Composite(other_cs) => self
-                .get(&other_cs.field.name)
+                .get(other_cs.field.name())
                 .and_then(|selection| selection.as_composite())
                 .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(false),
@@ -154,7 +154,7 @@ impl SelectedField {
     pub fn prisma_name(&self) -> &str {
         match self {
             SelectedField::Scalar(sf) => &sf.name,
-            SelectedField::Composite(cf) => &cf.field.name,
+            SelectedField::Composite(cf) => cf.field.name(),
         }
     }
 
@@ -172,9 +172,9 @@ impl SelectedField {
         }
     }
 
-    pub fn container(&self) -> &ParentContainer {
+    pub fn container(&self) -> ParentContainer {
         match self {
-            SelectedField::Scalar(sf) => sf.container(),
+            SelectedField::Scalar(sf) => sf.container().clone(),
             SelectedField::Composite(cs) => cs.field.container(),
         }
     }
@@ -196,11 +196,11 @@ pub struct CompositeSelection {
 
 impl CompositeSelection {
     pub fn is_superset_of(&self, other: &Self) -> bool {
-        self.field.typ == other.field.typ
+        self.field.typ() == other.field.typ()
             && other.selections.iter().all(|selection| match selection {
                 SelectedField::Scalar(sf) => self.contains(&sf.name),
                 SelectedField::Composite(other_cs) => self
-                    .get(&other_cs.field.name)
+                    .get(&other_cs.field.name())
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
@@ -227,7 +227,7 @@ impl CompositeSelection {
                         Some(selection) => Ok((key, selection.coerce_value(value)?)),
                         None => Err(DomainError::FieldNotFound {
                             name: key.clone(),
-                            container_name: self.field.name.clone(),
+                            container_name: self.field.name().to_owned(),
                             container_type: "composite type",
                         }),
                     })

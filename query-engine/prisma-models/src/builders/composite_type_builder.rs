@@ -1,10 +1,12 @@
 use super::FieldBuilder;
 use crate::{CompositeType, CompositeTypeRef, InternalDataModelWeakRef};
 use once_cell::sync::OnceCell;
+use psl::schema_ast::ast;
 use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct CompositeTypeBuilder {
+    pub id: ast::CompositeTypeId,
     pub name: String,
     pub fields: Vec<FieldBuilder>,
 }
@@ -20,6 +22,7 @@ pub(crate) fn build_composites(
     // First pass: Builder the references (arcs) and store the fields for processing.
     for builder in builders {
         composites.push(Arc::new(CompositeType {
+            id: builder.id,
             name: builder.name.clone(),
             internal_data_model: internal_data_model.clone(),
             fields: OnceCell::new(),
@@ -33,7 +36,7 @@ pub(crate) fn build_composites(
         let composite = composites.iter().find(|c| c.name == name).unwrap();
         let fields = fields
             .into_iter()
-            .map(|builder| builder.build(Arc::downgrade(composite).into(), &composites))
+            .map(|builder| builder.build(Arc::downgrade(composite).into()))
             .collect();
 
         // Unwrap is safe - the fields have been empty so far.

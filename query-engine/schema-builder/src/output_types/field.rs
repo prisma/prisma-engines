@@ -60,7 +60,7 @@ pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, rf: &RelationFi
 }
 
 fn map_composite_field_output_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> OutputType {
-    let obj = objects::composite::map_type(ctx, &cf.typ);
+    let obj = objects::composite::map_type(ctx, &cf.typ());
     let typ = OutputType::Object(obj);
 
     if cf.is_list() {

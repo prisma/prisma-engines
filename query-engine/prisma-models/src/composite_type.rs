@@ -1,5 +1,6 @@
 use crate::{Field, InternalDataModelRef, InternalDataModelWeakRef};
 use once_cell::sync::OnceCell;
+use psl::schema_ast::ast;
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -10,6 +11,8 @@ pub type CompositeTypeWeakRef = Weak<CompositeType>;
 
 #[derive(Debug)]
 pub struct CompositeType {
+    pub id: ast::CompositeTypeId,
+
     /// Then name of the composite type.
     /// Unique across all models, enums, composite types.
     pub name: String,

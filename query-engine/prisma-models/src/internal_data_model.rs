@@ -51,6 +51,14 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
+    pub fn find_composite_type_by_id(&self, ctid: ast::CompositeTypeId) -> CompositeTypeRef {
+        self.composite_types
+            .get()
+            .and_then(|ct| ct.iter().find(|ct| ct.id == ctid))
+            .cloned()
+            .unwrap()
+    }
+
     pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
         self.models
             .get()

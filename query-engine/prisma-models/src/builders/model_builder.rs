@@ -1,5 +1,5 @@
 use super::{FieldBuilder, IndexBuilder, PrimaryKeyBuilder};
-use crate::{CompositeTypeRef, Fields, InternalDataModelWeakRef, Model, ModelRef};
+use crate::{Fields, InternalDataModelWeakRef, Model, ModelRef};
 use once_cell::sync::OnceCell;
 use psl::schema_ast::ast;
 use std::sync::Arc;
@@ -17,11 +17,7 @@ pub struct ModelBuilder {
 }
 
 impl ModelBuilder {
-    pub fn build(
-        self,
-        internal_data_model: InternalDataModelWeakRef,
-        composite_types: &[CompositeTypeRef],
-    ) -> ModelRef {
+    pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> ModelRef {
         let model = Arc::new(Model {
             id: self.id,
             name: self.name,
@@ -37,7 +33,7 @@ impl ModelBuilder {
         let all_fields: Vec<_> = self
             .fields
             .into_iter()
-            .map(|ft| ft.build(Arc::downgrade(&model).into(), composite_types))
+            .map(|ft| ft.build(Arc::downgrade(&model).into()))
             .collect();
 
         let pk = self.primary_key.map(|pk| pk.build(&all_fields));

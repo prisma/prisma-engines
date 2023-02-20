@@ -457,7 +457,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
                 .as_object_type()
                 .expect("Composite output field is not an object.");
 
-            let composite_type = &cf.typ;
+            let composite_type = cf.typ();
 
             for (field_name, value) in pairs {
                 // The field on the composite type.
@@ -494,7 +494,9 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize '{}' with non-composite compatible type '{:?}' for field {}.",
-            val, cf.typ.name, cf.name
+            val,
+            cf.typ().name,
+            cf.name()
         ))),
     }
 }

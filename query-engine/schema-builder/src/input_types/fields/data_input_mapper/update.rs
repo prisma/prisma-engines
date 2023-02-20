@@ -159,7 +159,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name.clone(), input_types, None)
+        input_field(cf.name(), input_types, None)
             .nullable_if(cf.is_optional() && !cf.is_list())
             .optional()
     }
@@ -225,7 +225,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         ""
     };
 
-    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
+    let name = format!("{}{}UpdateEnvelopeInput", cf.typ().name, arity);
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
 
     return_cached_input!(ctx, &ident);
@@ -253,7 +253,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
 /// Builds the `update` input object type. Should be used in the envelope type.
 fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateInput", cf.typ.name);
+    let name = format!("{}UpdateInput", cf.typ().name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -265,7 +265,7 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     ctx.cache_input_type(ident, input_object.clone());
 
     let mapper = UpdateDataInputFieldMapper::new_checked();
-    let fields = mapper.map_all(ctx, cf.typ.fields());
+    let fields = mapper.map_all(ctx, cf.typ().fields());
 
     input_object.set_fields(fields);
 
@@ -321,7 +321,7 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
 fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpsertInput", cf.typ.name);
+    let name = format!("{}UpsertInput", cf.typ().name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -356,7 +356,7 @@ fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeF
 }
 
 fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateManyInput", cf.typ.name);
+    let name = format!("{}UpdateManyInput", cf.typ().name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -368,7 +368,7 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ);
+    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ());
     let where_field = input_field(args::WHERE, InputType::object(where_object_type), None);
 
     let update_object_type = composite_update_object_type(ctx, cf);
@@ -382,7 +382,7 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}DeleteManyInput", cf.typ.name);
+    let name = format!("{}DeleteManyInput", cf.typ().name);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -394,7 +394,7 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ);
+    let where_object_type = objects::filter_objects::where_object_type(ctx, &cf.typ());
     let where_field = input_field(args::WHERE, InputType::object(where_object_type), None);
 
     let fields = vec![where_field];
