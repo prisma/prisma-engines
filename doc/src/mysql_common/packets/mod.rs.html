@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mysql_common-0.29.1/src/packets/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mysql_common-0.29.2/src/packets/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3447,6 +3447,87 @@
 <a href="#3447" id="3447">3447</a>
 <a href="#3448" id="3448">3448</a>
 <a href="#3449" id="3449">3449</a>
+<a href="#3450" id="3450">3450</a>
+<a href="#3451" id="3451">3451</a>
+<a href="#3452" id="3452">3452</a>
+<a href="#3453" id="3453">3453</a>
+<a href="#3454" id="3454">3454</a>
+<a href="#3455" id="3455">3455</a>
+<a href="#3456" id="3456">3456</a>
+<a href="#3457" id="3457">3457</a>
+<a href="#3458" id="3458">3458</a>
+<a href="#3459" id="3459">3459</a>
+<a href="#3460" id="3460">3460</a>
+<a href="#3461" id="3461">3461</a>
+<a href="#3462" id="3462">3462</a>
+<a href="#3463" id="3463">3463</a>
+<a href="#3464" id="3464">3464</a>
+<a href="#3465" id="3465">3465</a>
+<a href="#3466" id="3466">3466</a>
+<a href="#3467" id="3467">3467</a>
+<a href="#3468" id="3468">3468</a>
+<a href="#3469" id="3469">3469</a>
+<a href="#3470" id="3470">3470</a>
+<a href="#3471" id="3471">3471</a>
+<a href="#3472" id="3472">3472</a>
+<a href="#3473" id="3473">3473</a>
+<a href="#3474" id="3474">3474</a>
+<a href="#3475" id="3475">3475</a>
+<a href="#3476" id="3476">3476</a>
+<a href="#3477" id="3477">3477</a>
+<a href="#3478" id="3478">3478</a>
+<a href="#3479" id="3479">3479</a>
+<a href="#3480" id="3480">3480</a>
+<a href="#3481" id="3481">3481</a>
+<a href="#3482" id="3482">3482</a>
+<a href="#3483" id="3483">3483</a>
+<a href="#3484" id="3484">3484</a>
+<a href="#3485" id="3485">3485</a>
+<a href="#3486" id="3486">3486</a>
+<a href="#3487" id="3487">3487</a>
+<a href="#3488" id="3488">3488</a>
+<a href="#3489" id="3489">3489</a>
+<a href="#3490" id="3490">3490</a>
+<a href="#3491" id="3491">3491</a>
+<a href="#3492" id="3492">3492</a>
+<a href="#3493" id="3493">3493</a>
+<a href="#3494" id="3494">3494</a>
+<a href="#3495" id="3495">3495</a>
+<a href="#3496" id="3496">3496</a>
+<a href="#3497" id="3497">3497</a>
+<a href="#3498" id="3498">3498</a>
+<a href="#3499" id="3499">3499</a>
+<a href="#3500" id="3500">3500</a>
+<a href="#3501" id="3501">3501</a>
+<a href="#3502" id="3502">3502</a>
+<a href="#3503" id="3503">3503</a>
+<a href="#3504" id="3504">3504</a>
+<a href="#3505" id="3505">3505</a>
+<a href="#3506" id="3506">3506</a>
+<a href="#3507" id="3507">3507</a>
+<a href="#3508" id="3508">3508</a>
+<a href="#3509" id="3509">3509</a>
+<a href="#3510" id="3510">3510</a>
+<a href="#3511" id="3511">3511</a>
+<a href="#3512" id="3512">3512</a>
+<a href="#3513" id="3513">3513</a>
+<a href="#3514" id="3514">3514</a>
+<a href="#3515" id="3515">3515</a>
+<a href="#3516" id="3516">3516</a>
+<a href="#3517" id="3517">3517</a>
+<a href="#3518" id="3518">3518</a>
+<a href="#3519" id="3519">3519</a>
+<a href="#3520" id="3520">3520</a>
+<a href="#3521" id="3521">3521</a>
+<a href="#3522" id="3522">3522</a>
+<a href="#3523" id="3523">3523</a>
+<a href="#3524" id="3524">3524</a>
+<a href="#3525" id="3525">3525</a>
+<a href="#3526" id="3526">3526</a>
+<a href="#3527" id="3527">3527</a>
+<a href="#3528" id="3528">3528</a>
+<a href="#3529" id="3529">3529</a>
+<a href="#3530" id="3530">3530</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
 //
 // Licensed under the Apache License, Version 2.0
@@ -3849,11 +3930,65 @@
     ) -&gt; io::Result&lt;OkPacketBody&lt;<span class="lifetime">&#39;de</span>&gt;&gt;;
 }
 
-<span class="doccomment">/// Ok pakcet that terminates a result set (text or binary).
+<span class="doccomment">/// Ok packet that terminates a result set (text or binary).
 </span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>ResultSetTerminator;
 
 <span class="kw">impl </span>OkPacketKind <span class="kw">for </span>ResultSetTerminator {
+    <span class="kw">const </span>HEADER: u8 = <span class="number">0xFE</span>;
+
+    <span class="kw">fn </span>parse_body&lt;<span class="lifetime">&#39;de</span>&gt;(
+        capabilities: CapabilityFlags,
+        buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;,
+    ) -&gt; io::Result&lt;OkPacketBody&lt;<span class="lifetime">&#39;de</span>&gt;&gt; {
+        <span class="comment">// We need to skip affected_rows and insert_id here
+        // because valid content of EOF packet includes
+        // packet marker, server status and warning count only.
+        // (see `read_ok_ex` in sql-common/client.cc)
+        </span>buf.parse::&lt;RawInt&lt;LenEnc&gt;&gt;(())<span class="question-mark">?</span>;
+        buf.parse::&lt;RawInt&lt;LenEnc&gt;&gt;(())<span class="question-mark">?</span>;
+
+        <span class="comment">// assume CLIENT_PROTOCOL_41 flag
+        </span><span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">4</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>status_flags: Const&lt;StatusFlags, LeU16&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>warnings = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>(info, session_state_info) =
+            <span class="kw">if </span>capabilities.contains(CapabilityFlags::CLIENT_SESSION_TRACK) &amp;&amp; !buf.is_empty() {
+                <span class="kw">let </span>info = buf.parse(())<span class="question-mark">?</span>;
+                <span class="kw">let </span>session_state_info =
+                    <span class="kw">if </span>status_flags.contains(StatusFlags::SERVER_SESSION_STATE_CHANGED) {
+                        buf.parse(())<span class="question-mark">?
+                    </span>} <span class="kw">else </span>{
+                        RawBytes::default()
+                    };
+                (info, session_state_info)
+            } <span class="kw">else if </span>!buf.is_empty() &amp;&amp; buf.<span class="number">0</span>[<span class="number">0</span>] &gt; <span class="number">0 </span>{
+                <span class="comment">// The `info` field is a `string&lt;EOF&gt;` according to the MySQL Internals
+                // Manual, but actually it&#39;s a `string&lt;lenenc&gt;`.
+                // SEE: sql/protocol_classics.cc `net_send_ok`
+                </span><span class="kw">let </span>info = buf.parse(())<span class="question-mark">?</span>;
+                (info, RawBytes::default())
+            } <span class="kw">else </span>{
+                (RawBytes::default(), RawBytes::default())
+            };
+
+        <span class="prelude-val">Ok</span>(OkPacketBody {
+            affected_rows: RawInt::new(<span class="number">0</span>),
+            last_insert_id: RawInt::new(<span class="number">0</span>),
+            status_flags,
+            warnings,
+            info,
+            session_state_info,
+        })
+    }
+}
+
+<span class="doccomment">/// Old deprecated EOF packet.
+</span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>OldEofPacket;
+
+<span class="kw">impl </span>OkPacketKind <span class="kw">for </span>OldEofPacket {
     <span class="kw">const </span>HEADER: u8 = <span class="number">0xFE</span>;
 
     <span class="kw">fn </span>parse_body&lt;<span class="lifetime">&#39;de</span>&gt;(
@@ -3887,7 +4022,7 @@
         flags: CapabilityFlags,
         buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;,
     ) -&gt; io::Result&lt;OkPacketBody&lt;<span class="lifetime">&#39;de</span>&gt;&gt; {
-        ResultSetTerminator::parse_body(flags, buf)
+        OldEofPacket::parse_body(flags, buf)
     }
 }
 
@@ -3904,6 +4039,7 @@
     ) -&gt; io::Result&lt;OkPacketBody&lt;<span class="lifetime">&#39;de</span>&gt;&gt; {
         <span class="kw">let </span>affected_rows = buf.parse(())<span class="question-mark">?</span>;
         <span class="kw">let </span>last_insert_id = buf.parse(())<span class="question-mark">?</span>;
+
         <span class="comment">// We assume that CLIENT_PROTOCOL_41 was set
         </span><span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">4</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>status_flags: Const&lt;StatusFlags, LeU16&gt; = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
@@ -6666,6 +6802,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>should_parse_ok_packet() {
         <span class="kw">const </span>PLAIN_OK: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x00\x01\x00\x02\x00\x00\x00&quot;</span>;
+        <span class="kw">const </span>RESULT_SET_TERMINATOR: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
+            <span class="number">0xfe</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x42</span>, <span class="number">0x52</span>, <span class="number">0x65</span>, <span class="number">0x61</span>, <span class="number">0x64</span>, <span class="number">0x20</span>, <span class="number">0x31</span>,
+            <span class="number">0x20</span>, <span class="number">0x72</span>, <span class="number">0x6f</span>, <span class="number">0x77</span>, <span class="number">0x73</span>, <span class="number">0x2c</span>, <span class="number">0x20</span>, <span class="number">0x31</span>, <span class="number">0x2e</span>, <span class="number">0x30</span>, <span class="number">0x30</span>, <span class="number">0x20</span>, <span class="number">0x42</span>, <span class="number">0x20</span>,
+            <span class="number">0x69</span>, <span class="number">0x6e</span>, <span class="number">0x20</span>, <span class="number">0x30</span>, <span class="number">0x2e</span>, <span class="number">0x30</span>, <span class="number">0x30</span>, <span class="number">0x32</span>, <span class="number">0x20</span>, <span class="number">0x73</span>, <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x2e</span>, <span class="number">0x2c</span>,
+            <span class="number">0x20</span>, <span class="number">0x36</span>, <span class="number">0x31</span>, <span class="number">0x31</span>, <span class="number">0x2e</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x20</span>, <span class="number">0x72</span>, <span class="number">0x6f</span>, <span class="number">0x77</span>, <span class="number">0x73</span>, <span class="number">0x2f</span>, <span class="number">0x73</span>,
+            <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x2e</span>, <span class="number">0x2c</span>, <span class="number">0x20</span>, <span class="number">0x36</span>, <span class="number">0x31</span>, <span class="number">0x31</span>, <span class="number">0x2e</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x20</span>, <span class="number">0x42</span>, <span class="number">0x2f</span>,
+            <span class="number">0x73</span>, <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x2e</span>,
+        ];
         <span class="kw">const </span>SESS_STATE_SYS_VAR_OK: <span class="kw-2">&amp;</span>[u8] =
             <span class="string">b&quot;\x00\x00\x00\x02\x40\x00\x00\x00\x11\x00\x0f\x0a\x61\
               \x75\x74\x6f\x63\x6f\x6d\x6d\x69\x74\x03\x4f\x46\x46&quot;</span>;
@@ -6711,6 +6855,24 @@
         );
         <span class="macro">assert_eq!</span>(ok_packet.warnings(), <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(ok_packet.info_ref(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(ok_packet.session_state_info_ref(), <span class="prelude-val">None</span>);
+
+        <span class="kw">let </span>ok_packet: OkPacket = OkPacketDeserializer::&lt;ResultSetTerminator&gt;::deserialize(
+            CapabilityFlags::CLIENT_SESSION_TRACK,
+            <span class="kw-2">&amp;mut </span>ParseBuf(RESULT_SET_TERMINATOR),
+        )
+        .unwrap()
+        .into();
+        <span class="macro">assert_eq!</span>(ok_packet.affected_rows(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(ok_packet.last_insert_id(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(ok_packet.status_flags(), StatusFlags::empty());
+        <span class="macro">assert_eq!</span>(ok_packet.warnings(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(
+            ok_packet.info_str(),
+            <span class="prelude-val">Some</span>(Cow::Borrowed(
+                <span class="string">&quot;Read 1 rows, 1.00 B in 0.002 sec., 611.34 rows/sec., 611.34 B/sec.&quot;
+            </span>))
+        );
         <span class="macro">assert_eq!</span>(ok_packet.session_state_info_ref(), <span class="prelude-val">None</span>);
 
         <span class="kw">let </span>ok_packet: OkPacket = OkPacketDeserializer::&lt;CommonOkPacket&gt;::deserialize(
@@ -6779,7 +6941,7 @@
             SessionStateChange::IsTracked(<span class="bool-val">true</span>),
         );
 
-        <span class="kw">let </span>ok_packet: OkPacket = OkPacketDeserializer::&lt;ResultSetTerminator&gt;::deserialize(
+        <span class="kw">let </span>ok_packet: OkPacket = OkPacketDeserializer::&lt;OldEofPacket&gt;::deserialize(
             CapabilityFlags::CLIENT_SESSION_TRACK,
             <span class="kw-2">&amp;mut </span>ParseBuf(EOF),
         )

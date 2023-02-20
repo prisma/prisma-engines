@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/555234956bb3a6ce8e4291b13d3ad0bf1b4bbc81a0fc1448cfe3ba02823ef277/quaint-0.2.0-alpha.13/src/visitor/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/555234956bb3a6ce8e4291b13d3ad0bf1b4bbc81a0fc1448cfe3ba02823ef277/quaint-0.2.0-alpha.13/src/visitor/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1025,7 +1025,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sqlite&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>visit_order_by(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: <span class="kw-2">&amp;</span>str, value: Expression&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="self">self</span>.visit_expression(value)<span class="question-mark">?</span>;
-        <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot; {}&quot;</span>, direction))<span class="question-mark">?</span>;
+        <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot; {direction}&quot;</span>))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1075,7 +1075,7 @@
     }
 
     <span class="kw">fn </span>write&lt;D: fmt::Display&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: D) -&gt; visitor::Result {
-        <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.query, <span class="string">&quot;{}&quot;</span>, s)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.query, <span class="string">&quot;{s}&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1083,22 +1083,22 @@
         <span class="kw">let </span>res = <span class="kw">match </span>value {
             Value::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
             Value::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, t))),
+            Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
             Value::Enum(e) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
             Value::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, hex::encode(b)))),
             Value::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
-            Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, c))),
+            Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
             Value::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, v)),
+                v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
             Value::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, v)),
+                v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
             Value::Array(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in SQLite.&quot;</span>;
@@ -1113,7 +1113,7 @@
             </span>Value::Json(j) =&gt; <span class="kw">match </span>j {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>j) =&gt; {
                     <span class="kw">let </span>s = serde_json::to_string(j)<span class="question-mark">?</span>;
-                    <span class="prelude-val">Some</span>(<span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, s)))
+                    <span class="prelude-val">Some</span>(<span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{s}&#39;&quot;</span>)))
                 }
                 <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             },
@@ -1124,10 +1124,10 @@
             <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
             </span>Value::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, date))),
+            </span>Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, time))),
-            Value::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, cow))),
+            </span>Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
+            Value::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{cow}&#39;&quot;</span>))),
         };
 
         <span class="kw">match </span>res {
@@ -1216,9 +1216,9 @@
 
                 <span class="kw">for </span>(i, column) <span class="kw">in </span>returning.into_iter().enumerate() {
                     <span class="comment">//yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    </span><span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;*</span>column.name)<span class="question-mark">?</span>;
+                    </span><span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
                     <span class="self">self</span>.write(<span class="string">&quot; AS &quot;</span>)<span class="question-mark">?</span>;
-                    <span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;*</span>column.name)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
                     <span class="kw">if </span>i &lt; (values_len - <span class="number">1</span>) {
                         <span class="self">self</span>.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
                     }
@@ -1861,7 +1861,7 @@
             })
             .unwrap();
 
-        <span class="kw">let </span>person: Person = person_iter.nth(<span class="number">0</span>).unwrap().unwrap();
+        <span class="kw">let </span>person: Person = person_iter.next().unwrap().unwrap();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;Alice&quot;</span>, person.name);
         <span class="macro">assert_eq!</span>(<span class="number">42.69</span>, person.age);
@@ -1980,7 +1980,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_returning() {
         <span class="kw">let </span>insert = Insert::single_into(<span class="string">&quot;test&quot;</span>).value(<span class="string">&quot;user id&quot;</span>, <span class="number">1</span>).value(<span class="string">&quot;txt&quot;</span>, <span class="string">&quot;hello&quot;</span>);
-        <span class="kw">let </span>insert: Insert = Insert::from(insert).returning(<span class="kw-2">&amp;</span>[<span class="string">&quot;user id&quot;</span>]).into();
+        <span class="kw">let </span>insert: Insert = Insert::from(insert).returning([<span class="string">&quot;user id&quot;</span>]);
 
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Sqlite::build(insert).unwrap();
 
@@ -2004,7 +2004,7 @@
 
         <span class="kw">let </span>query = query.on_conflict(OnConflict::Update(update, Vec::from([<span class="string">&quot;foo&quot;</span>.into()])));
 
-        <span class="kw">let </span>(sql, params) = Postgres::build(Insert::from(query).returning(<span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>])).unwrap();
+        <span class="kw">let </span>(sql, params) = Postgres::build(query.returning(<span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>])).unwrap();
 
         <span class="macro">assert_eq!</span>(expected.<span class="number">0</span>, sql);
         <span class="macro">assert_eq!</span>(expected.<span class="number">1</span>, params);

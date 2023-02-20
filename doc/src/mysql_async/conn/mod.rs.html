@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.30.0/src/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.31.3/src/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2004,6 +2004,33 @@
 <a href="#2004" id="2004">2004</a>
 <a href="#2005" id="2005">2005</a>
 <a href="#2006" id="2006">2006</a>
+<a href="#2007" id="2007">2007</a>
+<a href="#2008" id="2008">2008</a>
+<a href="#2009" id="2009">2009</a>
+<a href="#2010" id="2010">2010</a>
+<a href="#2011" id="2011">2011</a>
+<a href="#2012" id="2012">2012</a>
+<a href="#2013" id="2013">2013</a>
+<a href="#2014" id="2014">2014</a>
+<a href="#2015" id="2015">2015</a>
+<a href="#2016" id="2016">2016</a>
+<a href="#2017" id="2017">2017</a>
+<a href="#2018" id="2018">2018</a>
+<a href="#2019" id="2019">2019</a>
+<a href="#2020" id="2020">2020</a>
+<a href="#2021" id="2021">2021</a>
+<a href="#2022" id="2022">2022</a>
+<a href="#2023" id="2023">2023</a>
+<a href="#2024" id="2024">2024</a>
+<a href="#2025" id="2025">2025</a>
+<a href="#2026" id="2026">2026</a>
+<a href="#2027" id="2027">2027</a>
+<a href="#2028" id="2028">2028</a>
+<a href="#2029" id="2029">2029</a>
+<a href="#2030" id="2030">2030</a>
+<a href="#2031" id="2031">2031</a>
+<a href="#2032" id="2032">2032</a>
+<a href="#2033" id="2033">2033</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
 //
 // Licensed under the Apache License, Version 2.0
@@ -2016,13 +2043,13 @@
 <span class="kw">pub use </span>mysql_common::named_params;
 
 <span class="kw">use </span>mysql_common::{
-    constants::{DEFAULT_MAX_ALLOWED_PACKET, UTF8_GENERAL_CI},
+    constants::{DEFAULT_MAX_ALLOWED_PACKET, UTF8MB4_GENERAL_CI, UTF8_GENERAL_CI},
     crypto,
     io::ParseBuf,
     packets::{
         binlog_request::BinlogRequest, AuthPlugin, AuthSwitchRequest, CommonOkPacket, ErrPacket,
         HandshakePacket, HandshakeResponse, OkPacket, OkPacketDeserializer, OldAuthSwitchRequest,
-        ResultSetTerminator, SslRequest,
+        OldEofPacket, ResultSetTerminator, SslRequest,
     },
     proto::MySerialize,
 };
@@ -2421,12 +2448,16 @@
 
     <span class="doccomment">/// Returns true if io stream is encrypted.
     </span><span class="kw">fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stream) = <span class="self">self</span>.inner.stream {
+        <span class="attr">#[cfg(any(feature = <span class="string">&quot;native-tls-tls&quot;</span>, feature = <span class="string">&quot;rustls-tls&quot;</span>))]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stream) = <span class="self">self</span>.inner.stream {
             stream.is_secure()
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
-    }
+
+        <span class="attr">#[cfg(not(any(feature = <span class="string">&quot;native-tls-tls&quot;</span>, feature = <span class="string">&quot;rustls-tls&quot;</span>)))]
+        </span><span class="bool-val">false
+    </span>}
 
     <span class="doccomment">/// Hacky way to move connection through &amp;mut. `self` becomes unusable.
     </span><span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Conn {
@@ -2496,10 +2527,24 @@
             .get_capabilities()
             .contains(CapabilityFlags::CLIENT_SSL)
         {
+            <span class="kw">if </span>!<span class="self">self
+                </span>.inner
+                .capabilities
+                .contains(CapabilityFlags::CLIENT_SSL)
+            {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DriverError::NoClientSslFlagFromServer.into());
+            }
+
+            <span class="kw">let </span>collation = <span class="kw">if </span><span class="self">self</span>.inner.version &gt;= (<span class="number">5</span>, <span class="number">5</span>, <span class="number">3</span>) {
+                UTF8MB4_GENERAL_CI
+            } <span class="kw">else </span>{
+                UTF8_GENERAL_CI
+            };
+
             <span class="kw">let </span>ssl_request = SslRequest::new(
                 <span class="self">self</span>.inner.capabilities,
                 DEFAULT_MAX_ALLOWED_PACKET <span class="kw">as </span>u32,
-                UTF8_GENERAL_CI <span class="kw">as </span>u8,
+                collation <span class="kw">as </span>u8,
             );
             <span class="self">self</span>.write_struct(<span class="kw-2">&amp;</span>ssl_request).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span>conn = <span class="self">self</span>;
@@ -2685,9 +2730,18 @@
     <span class="doccomment">/// Returns `true` for ProgressReport packet.
     </span><span class="kw">fn </span>handle_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>, packet: <span class="kw-2">&amp;</span>PooledBuf) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="kw">let </span>ok_packet = <span class="kw">if </span><span class="self">self</span>.has_pending_result() {
-            ParseBuf(<span class="kw-2">&amp;*</span>packet)
-                .parse::&lt;OkPacketDeserializer&lt;ResultSetTerminator&gt;&gt;(<span class="self">self</span>.capabilities())
-                .map(|x| x.into_inner())
+            <span class="kw">if </span><span class="self">self
+                </span>.capabilities()
+                .contains(CapabilityFlags::CLIENT_DEPRECATE_EOF)
+            {
+                ParseBuf(<span class="kw-2">&amp;*</span>packet)
+                    .parse::&lt;OkPacketDeserializer&lt;ResultSetTerminator&gt;&gt;(<span class="self">self</span>.capabilities())
+                    .map(|x| x.into_inner())
+            } <span class="kw">else </span>{
+                ParseBuf(<span class="kw-2">&amp;*</span>packet)
+                    .parse::&lt;OkPacketDeserializer&lt;OldEofPacket&gt;&gt;(<span class="self">self</span>.capabilities())
+                    .map(|x| x.into_inner())
+            }
         } <span class="kw">else </span>{
             ParseBuf(<span class="kw-2">&amp;*</span>packet)
                 .parse::&lt;OkPacketDeserializer&lt;CommonOkPacket&gt;&gt;(<span class="self">self</span>.capabilities())
@@ -2866,8 +2920,8 @@
     /// Do nothing if socket address is already in [`Opts`] or if `prefer_socket` is `false`.
     </span><span class="kw">async fn </span>read_socket(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.inner.opts.prefer_socket() &amp;&amp; <span class="self">self</span>.inner.socket.is_none() {
-            <span class="kw">let </span>row_opt = <span class="self">self</span>.query_first(<span class="string">&quot;SELECT @@socket&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.inner.socket = row_opt.unwrap_or((<span class="prelude-val">None</span>,)).<span class="number">0</span>;
+            <span class="kw">let </span>row_opt = <span class="self">self</span>.query_internal(<span class="string">&quot;SELECT @@socket&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.inner.socket = row_opt.unwrap_or(<span class="prelude-val">None</span>);
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -2877,7 +2931,7 @@
         <span class="kw">let </span>max_allowed_packet = <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.opts().max_allowed_packet() {
             <span class="prelude-val">Some</span>(value)
         } <span class="kw">else </span>{
-            <span class="self">self</span>.query_first(<span class="string">&quot;SELECT @@max_allowed_packet&quot;</span>).<span class="kw">await</span><span class="question-mark">?
+            <span class="self">self</span>.query_internal(<span class="string">&quot;SELECT @@max_allowed_packet&quot;</span>).<span class="kw">await</span><span class="question-mark">?
         </span>};
         <span class="kw">if let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.inner.stream.as_mut() {
             stream.set_max_allowed_packet(max_allowed_packet.unwrap_or(DEFAULT_MAX_ALLOWED_PACKET));
@@ -2890,7 +2944,7 @@
         <span class="kw">let </span>wait_timeout = <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.opts().wait_timeout() {
             <span class="prelude-val">Some</span>(value)
         } <span class="kw">else </span>{
-            <span class="self">self</span>.query_first(<span class="string">&quot;SELECT @@wait_timeout&quot;</span>).<span class="kw">await</span><span class="question-mark">?
+            <span class="self">self</span>.query_internal(<span class="string">&quot;SELECT @@wait_timeout&quot;</span>).<span class="kw">await</span><span class="question-mark">?
         </span>};
         <span class="self">self</span>.inner.wait_timeout = Duration::from_secs(wait_timeout.unwrap_or(<span class="number">28800</span>) <span class="kw">as </span>u64);
         <span class="prelude-val">Ok</span>(())
@@ -3047,7 +3101,7 @@
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span>bytes::Bytes;
     <span class="kw">use </span>futures_util::stream::{<span class="self">self</span>, StreamExt};
-    <span class="kw">use </span>mysql_common::binlog::events::EventData;
+    <span class="kw">use </span>mysql_common::{binlog::events::EventData, constants::MAX_PAYLOAD_LEN};
     <span class="kw">use </span>tokio::time::timeout;
 
     <span class="kw">use </span>std::time::Duration;
@@ -3436,15 +3490,15 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>should_perform_queries() -&gt; <span class="kw">super</span>::Result&lt;()&gt; {
-        <span class="kw">let </span>long_string = ::std::iter::repeat(<span class="string">&#39;A&#39;</span>)
-            .take(<span class="number">18 </span>* <span class="number">1024 </span>* <span class="number">1024</span>)
-            .collect::&lt;String&gt;();
         <span class="kw">let </span><span class="kw-2">mut </span>conn = Conn::new(get_opts()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>result: Vec&lt;(String, u8)&gt; = conn
-            .query(<span class="macro">format!</span>(<span class="string">r&quot;SELECT &#39;{}&#39;, 231&quot;</span>, long_string))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for </span>x <span class="kw">in </span>(MAX_PAYLOAD_LEN - <span class="number">2</span>)..=(MAX_PAYLOAD_LEN + <span class="number">2</span>) {
+            <span class="kw">let </span>long_string = ::std::iter::repeat(<span class="string">&#39;A&#39;</span>).take(x).collect::&lt;String&gt;();
+            <span class="kw">let </span>result: Vec&lt;(String, u8)&gt; = conn
+                .query(<span class="macro">format!</span>(<span class="string">r&quot;SELECT &#39;{}&#39;, 231&quot;</span>, long_string))
+                .<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="macro">assert_eq!</span>((long_string, <span class="number">231_u8</span>), result[<span class="number">0</span>]);
+        }
         conn.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>((long_string, <span class="number">231_u8</span>), result[<span class="number">0</span>]);
         <span class="prelude-val">Ok</span>(())
     }
 

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["core_iterators","This module defines iterator types that are used with both the `PriorityQueue` and the `DoublePriorityQueue`"],["double_priority_queue","This module contains the [`DoublePriorityQueue`] type and the related iterators."],["priority_queue","This module contains the [`PriorityQueue`] type and the related iterators."]]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.30.0/src/conn/pool/futures/get_conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.31.3/src/conn/pool/futures/get_conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -164,6 +164,32 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
 //
 // Licensed under the Apache License, Version 2.0
@@ -180,9 +206,17 @@
 };
 
 <span class="kw">use </span>futures_core::ready;
+<span class="attr">#[cfg(feature = <span class="string">&quot;tracing&quot;</span>)]
+</span><span class="kw">use </span>{
+    std::sync::Arc,
+    tracing::{debug_span, Span},
+};
 
 <span class="kw">use crate</span>::{
-    conn::{pool::Pool, Conn},
+    conn::{
+        pool::{Pool, QueueId},
+        Conn,
+    },
     error::<span class="kw-2">*</span>,
 };
 
@@ -224,15 +258,21 @@
 </span><span class="attr">#[derive(Debug)]
 #[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
 </span><span class="kw">pub struct </span>GetConn {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) queue_id: <span class="prelude-ty">Option</span>&lt;QueueId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) pool: <span class="prelude-ty">Option</span>&lt;Pool&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) inner: GetConnInner,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;tracing&quot;</span>)]
+    </span>span: Arc&lt;Span&gt;,
 }
 
 <span class="kw">impl </span>GetConn {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(pool: <span class="kw-2">&amp;</span>Pool) -&gt; GetConn {
         GetConn {
+            queue_id: <span class="prelude-val">None</span>,
             pool: <span class="prelude-val">Some</span>(pool.clone()),
             inner: GetConnInner::New,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;tracing&quot;</span>)]
+            </span>span: Arc::new(<span class="macro">debug_span!</span>(<span class="string">&quot;mysql_async::get_conn&quot;</span>)),
         }
     }
 
@@ -255,25 +295,32 @@
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Conn&gt;;
 
     <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="attr">#[cfg(feature = <span class="string">&quot;tracing&quot;</span>)]
+        </span><span class="kw">let </span>span = <span class="self">self</span>.span.clone();
+        <span class="attr">#[cfg(feature = <span class="string">&quot;tracing&quot;</span>)]
+        </span><span class="kw">let </span>_span_guard = span.enter();
         <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.inner {
-                GetConnInner::New =&gt; <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.pool_mut()).poll_new_conn(cx))<span class="question-mark">?
-                    </span>.inner
-                    .take()
-                {
-                    GetConnInner::Connecting(conn_fut) =&gt; {
-                        <span class="self">self</span>.inner = GetConnInner::Connecting(conn_fut);
+                GetConnInner::New =&gt; {
+                    <span class="kw">let </span>queued = <span class="self">self</span>.queue_id.is_some();
+                    <span class="kw">let </span>queue_id = <span class="kw-2">*</span><span class="self">self</span>.queue_id.get_or_insert_with(QueueId::next);
+                    <span class="kw">let </span>next =
+                        <span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.pool_mut()).poll_new_conn(cx, queued, queue_id))<span class="question-mark">?</span>;
+                    <span class="kw">match </span>next {
+                        GetConnInner::Connecting(conn_fut) =&gt; {
+                            <span class="self">self</span>.inner = GetConnInner::Connecting(conn_fut);
+                        }
+                        GetConnInner::Checking(conn_fut) =&gt; {
+                            <span class="self">self</span>.inner = GetConnInner::Checking(conn_fut);
+                        }
+                        GetConnInner::Done =&gt; <span class="macro">unreachable!</span>(
+                            <span class="string">&quot;Pool::poll_new_conn never gives out already-consumed GetConns&quot;
+                        </span>),
+                        GetConnInner::New =&gt; {
+                            <span class="macro">unreachable!</span>(<span class="string">&quot;Pool::poll_new_conn never gives out GetConnInner::New&quot;</span>)
+                        }
                     }
-                    GetConnInner::Checking(conn_fut) =&gt; {
-                        <span class="self">self</span>.inner = GetConnInner::Checking(conn_fut);
-                    }
-                    GetConnInner::Done =&gt; <span class="macro">unreachable!</span>(
-                        <span class="string">&quot;Pool::poll_new_conn never gives out already-consumed GetConns&quot;
-                    </span>),
-                    GetConnInner::New =&gt; {
-                        <span class="macro">unreachable!</span>(<span class="string">&quot;Pool::poll_new_conn never gives out GetConnInner::New&quot;</span>)
-                    }
-                },
+                }
                 GetConnInner::Done =&gt; {
                     <span class="macro">unreachable!</span>(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>);
                 }
@@ -324,6 +371,11 @@
         <span class="comment">// We drop a connection before it can be resolved, a.k.a. cancelling it.
         // Make sure we maintain the necessary invariants towards the pool.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(pool) = <span class="self">self</span>.pool.take() {
+            <span class="comment">// Remove the waker from the pool&#39;s waitlist in case this task was
+            // woken by another waker, like from tokio::time::timeout.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(queue_id) = <span class="self">self</span>.queue_id {
+                pool.unqueue(queue_id);
+            }
             <span class="kw">if let </span>GetConnInner::Connecting(..) = <span class="self">self</span>.inner.take() {
                 pool.cancel_connection();
             }

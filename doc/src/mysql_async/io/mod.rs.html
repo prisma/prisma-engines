@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.30.0/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/9653e0051d7a91969741adf50c70da5f38f977be782476560bcdc3960bcbd818/mysql_async-0.31.3/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -515,6 +515,8 @@
 <a href="#515" id="515">515</a>
 <a href="#516" id="516">516</a>
 <a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
 //
 // Licensed under the Apache License, Version 2.0
@@ -528,7 +530,6 @@
 <span class="kw">use </span>bytes::BytesMut;
 <span class="kw">use </span>futures_core::{ready, stream};
 <span class="kw">use </span>mysql_common::proto::codec::PacketCodec <span class="kw">as </span>PacketCodecInner;
-<span class="kw">use </span>native_tls::{Certificate, Identity, TlsConnector};
 <span class="kw">use </span>pin_project::pin_project;
 <span class="kw">use </span>socket2::{Socket <span class="kw">as </span>Socket2Socket, TcpKeepalive};
 <span class="attr">#[cfg(unix)]
@@ -543,12 +544,10 @@
 </span><span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::{
     fmt,
-    fs::File,
     future::Future,
     io::{
         <span class="self">self</span>,
         ErrorKind::{BrokenPipe, NotConnected, Other},
-        Read,
     },
     mem::replace,
     ops::{Deref, DerefMut},
@@ -565,6 +564,8 @@
 
 <span class="attr">#[cfg(unix)]
 </span><span class="kw">use </span><span class="kw">crate</span>::io::socket::Socket;
+
+<span class="kw">mod </span>tls;
 
 <span class="macro">macro_rules! </span>with_interrupted {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
@@ -636,7 +637,10 @@
 #[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Endpoint {
     Plain(<span class="prelude-ty">Option</span>&lt;TcpStream&gt;),
-    Secure(<span class="attr">#[pin] </span>tokio_native_tls::TlsStream&lt;TcpStream&gt;),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+    </span>Secure(<span class="attr">#[pin] </span>tokio_native_tls::TlsStream&lt;TcpStream&gt;),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+    </span>Secure(<span class="attr">#[pin] </span>tokio_rustls::client::TlsStream&lt;tokio::net::TcpStream&gt;),
     <span class="attr">#[cfg(unix)]
     </span>Socket(<span class="attr">#[pin] </span>Socket),
 }
@@ -668,6 +672,14 @@
 }
 
 <span class="kw">impl </span>Endpoint {
+    <span class="attr">#[cfg(all(any(feature = <span class="string">&quot;native-tls-tls&quot;</span>, feature = <span class="string">&quot;rustls-tls&quot;</span>), unix))]
+    </span><span class="kw">fn </span>is_socket(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Socket(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        }
+    }
+
     <span class="doccomment">/// Checks, that connection is alive.
     </span><span class="kw">async fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::result::Result&lt;(), IoError&gt; {
         <span class="comment">//return Ok(());
@@ -676,8 +688,15 @@
                 CheckTcpStream(stream).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            Endpoint::Secure(tls_stream) =&gt; {
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>Endpoint::Secure(tls_stream) =&gt; {
                 CheckTcpStream(tls_stream.get_mut().get_mut().get_mut()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(())
+            }
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>Endpoint::Secure(tls_stream) =&gt; {
+                <span class="kw">let </span>stream = tls_stream.get_mut().<span class="number">0</span>;
+                CheckTcpStream(stream).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
             <span class="attr">#[cfg(unix)]
@@ -689,75 +708,39 @@
         }
     }
 
-    <span class="kw">pub fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;native-tls-tls&quot;</span>, feature = <span class="string">&quot;rustls-tls&quot;</span>))]
+    </span><span class="kw">pub fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, Endpoint::Secure(<span class="kw">_</span>))
+    }
+
+    <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;native-tls&quot;</span>), not(feature = <span class="string">&quot;rustls&quot;</span>)))]
+    </span><span class="kw">pub async fn </span>make_secure(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _domain: String,
+        _ssl_opts: <span class="kw">crate</span>::SslOpts,
+    ) -&gt; <span class="kw">crate</span>::error::Result&lt;()&gt; {
+        <span class="macro">panic!</span>(
+            <span class="string">&quot;Client had asked for TLS connection but TLS support is disabled. \
+            Please enable one of the following features: [\&quot;native-tls-tls\&quot;, \&quot;rustls-tls\&quot;]&quot;
+        </span>)
     }
 
     <span class="kw">pub fn </span>set_tcp_nodelay(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool) -&gt; io::Result&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             Endpoint::Plain(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stream)) =&gt; stream.set_nodelay(val)<span class="question-mark">?</span>,
             Endpoint::Plain(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
-            Endpoint::Secure(<span class="kw-2">ref </span>stream) =&gt; {
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>Endpoint::Secure(<span class="kw-2">ref </span>stream) =&gt; {
                 stream.get_ref().get_ref().get_ref().set_nodelay(val)<span class="question-mark">?
             </span>}
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>Endpoint::Secure(<span class="kw-2">ref </span>stream) =&gt; {
+                <span class="kw">let </span>stream = stream.get_ref().<span class="number">0</span>;
+                stream.set_nodelay(val)<span class="question-mark">?</span>;
+            }
             <span class="attr">#[cfg(unix)]
             </span>Endpoint::Socket(<span class="kw">_</span>) =&gt; (<span class="comment">/* inapplicable */</span>),
         }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">pub async fn </span>make_secure(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        domain: String,
-        ssl_opts: SslOpts,
-    ) -&gt; std::result::Result&lt;(), IoError&gt; {
-        <span class="attr">#[cfg(unix)]
-        </span><span class="kw">if let </span>Endpoint::Socket(<span class="kw">_</span>) = <span class="self">self </span>{
-            <span class="comment">// inapplicable
-            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = TlsConnector::builder();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(root_cert_path) = ssl_opts.root_cert_path() {
-            <span class="kw">let </span><span class="kw-2">mut </span>root_cert_data = <span class="macro">vec!</span>[];
-            <span class="kw">let </span><span class="kw-2">mut </span>root_cert_file = File::open(root_cert_path)<span class="question-mark">?</span>;
-            root_cert_file.read_to_end(<span class="kw-2">&amp;mut </span>root_cert_data)<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>root_certs = Certificate::from_der(<span class="kw-2">&amp;*</span>root_cert_data)
-                .map(|x| <span class="macro">vec!</span>[x])
-                .or_else(|<span class="kw">_</span>| {
-                    pem::parse_many(<span class="kw-2">&amp;*</span>root_cert_data)
-                        .unwrap_or_default()
-                        .iter()
-                        .map(pem::encode)
-                        .map(|s| Certificate::from_pem(s.as_bytes()))
-                        .collect()
-                })<span class="question-mark">?</span>;
-
-            <span class="kw">for </span>root_cert <span class="kw">in </span>root_certs {
-                builder.add_root_certificate(root_cert);
-            }
-        }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(pkcs12_path) = ssl_opts.pkcs12_path() {
-            <span class="kw">let </span>der = std::fs::read(pkcs12_path)<span class="question-mark">?</span>;
-            <span class="kw">let </span>identity = Identity::from_pkcs12(<span class="kw-2">&amp;*</span>der, ssl_opts.password().unwrap_or(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
-            builder.identity(identity);
-        }
-        builder.danger_accept_invalid_hostnames(ssl_opts.skip_domain_validation());
-        builder.danger_accept_invalid_certs(ssl_opts.accept_invalid_certs());
-        <span class="kw">let </span>tls_connector: tokio_native_tls::TlsConnector = builder.build()<span class="question-mark">?</span>.into();
-
-        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span><span class="self">self </span>{
-            Endpoint::Plain(stream) =&gt; {
-                <span class="kw">let </span>stream = stream.take().unwrap();
-                <span class="kw">let </span>tls_stream = tls_connector.connect(<span class="kw-2">&amp;*</span>domain, stream).<span class="kw">await</span><span class="question-mark">?</span>;
-                Endpoint::Secure(tls_stream)
-            }
-            Endpoint::Secure(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-            <span class="attr">#[cfg(unix)]
-            </span>Endpoint::Socket(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-        };
-
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -775,13 +758,18 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;tokio_native_tls::TlsStream&lt;TcpStream&gt;&gt; <span class="kw">for </span>Endpoint {
+<span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;tokio_native_tls::TlsStream&lt;TcpStream&gt;&gt; <span class="kw">for </span>Endpoint {
     <span class="kw">fn </span>from(stream: tokio_native_tls::TlsStream&lt;TcpStream&gt;) -&gt; <span class="self">Self </span>{
         Endpoint::Secure(stream)
     }
 }
 
-<span class="kw">impl </span>AsyncRead <span class="kw">for </span>Endpoint {
+<span class="comment">/* TODO
+#[cfg(feature = &quot;rustls-tls&quot;)]
+*/
+
+</span><span class="kw">impl </span>AsyncRead <span class="kw">for </span>Endpoint {
     <span class="kw">fn </span>poll_read(
         <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
         cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -792,7 +780,10 @@
             EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
                 Pin::new(stream.as_mut().unwrap()).poll_read(cx, buf)
             }
-            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
             <span class="attr">#[cfg(unix)]
             </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
         })
@@ -810,7 +801,10 @@
             EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
                 Pin::new(stream.as_mut().unwrap()).poll_write(cx, buf)
             }
-            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
             <span class="attr">#[cfg(unix)]
             </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
         })
@@ -825,7 +819,10 @@
             EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
                 Pin::new(stream.as_mut().unwrap()).poll_flush(cx)
             }
-            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
             <span class="attr">#[cfg(unix)]
             </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
         })
@@ -840,7 +837,10 @@
             EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
                 Pin::new(stream.as_mut().unwrap()).poll_shutdown(cx)
             }
-            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span>EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
             <span class="attr">#[cfg(unix)]
             </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
         })
@@ -933,7 +933,8 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;native-tls-tls&quot;</span>, feature = <span class="string">&quot;rustls-tls&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.codec.as_ref().unwrap().get_ref().is_secure()
     }
 
@@ -1013,7 +1014,10 @@
         <span class="kw">let </span>endpoint = stream.codec.as_mut().unwrap().get_ref();
         <span class="kw">let </span>stream = <span class="kw">match </span>endpoint {
             <span class="kw">super</span>::Endpoint::Plain(<span class="prelude-val">Some</span>(stream)) =&gt; stream,
-            <span class="kw">super</span>::Endpoint::Secure(tls_stream) =&gt; tls_stream.get_ref().get_ref().get_ref(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;rustls-tls&quot;</span>)]
+            </span><span class="kw">super</span>::Endpoint::Secure(tls_stream) =&gt; tls_stream.get_ref().<span class="number">0</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;native-tls&quot;</span>)]
+            </span><span class="kw">super</span>::Endpoint::Secure(tls_stream) =&gt; tls_stream.get_ref().get_ref().get_ref(),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
         <span class="kw">let </span>sock = <span class="kw">unsafe </span>{

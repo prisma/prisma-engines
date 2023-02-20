@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["iterators","This module defines iterator types that are used only with the [`DoublePriorityQueue`]"]],"struct":[["DoublePriorityQueue","A double priority queue with efficient change function to change the priority of an element."]]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/555234956bb3a6ce8e4291b13d3ad0bf1b4bbc81a0fc1448cfe3ba02823ef277/quaint-0.2.0-alpha.13/src/connector/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/555234956bb3a6ce8e4291b13d3ad0bf1b4bbc81a0fc1448cfe3ba02823ef277/quaint-0.2.0-alpha.13/src/connector/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -629,6 +629,27 @@
 <a href="#629" id="629">629</a>
 <a href="#630" id="630">630</a>
 <a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">mod </span>error;
 
@@ -648,7 +669,7 @@
 <span class="kw">use </span>std::{
     borrow::Cow,
     future::Future,
-    path::Path,
+    path::{Path, PathBuf},
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
@@ -794,6 +815,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>max_idle_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">300</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>prefer_socket = <span class="prelude-val">None</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>statement_cache_size = <span class="number">100</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>identity: <span class="prelude-ty">Option</span>&lt;(<span class="prelude-ty">Option</span>&lt;PathBuf&gt;, <span class="prelude-ty">Option</span>&lt;String&gt;)&gt; = <span class="prelude-val">None</span>;
 
         <span class="kw">for </span>(k, v) <span class="kw">in </span>url.query_pairs() {
             <span class="kw">match </span>k.as_ref() {
@@ -815,14 +837,22 @@
                 }
                 <span class="string">&quot;sslidentity&quot; </span>=&gt; {
                     use_ssl = <span class="bool-val">true</span>;
-                    ssl_opts = ssl_opts.with_pkcs12_path(<span class="prelude-val">Some</span>(Path::new(<span class="kw-2">&amp;*</span>v).to_path_buf()));
+
+                    identity = <span class="kw">match </span>identity {
+                        <span class="prelude-val">Some</span>((<span class="kw">_</span>, pw)) =&gt; <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(Path::new(<span class="kw-2">&amp;*</span>v).to_path_buf()), pw)),
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(Path::new(<span class="kw-2">&amp;*</span>v).to_path_buf()), <span class="prelude-val">None</span>)),
+                    };
                 }
                 <span class="string">&quot;sslpassword&quot; </span>=&gt; {
                     use_ssl = <span class="bool-val">true</span>;
-                    ssl_opts = ssl_opts.with_password(<span class="prelude-val">Some</span>(v.to_string()));
+
+                    identity = <span class="kw">match </span>identity {
+                        <span class="prelude-val">Some</span>((path, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>((path, <span class="prelude-val">Some</span>(v.to_string()))),
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(v.to_string()))),
+                    };
                 }
                 <span class="string">&quot;socket&quot; </span>=&gt; {
-                    socket = <span class="prelude-val">Some</span>(v.replace(<span class="string">&#39;(&#39;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&#39;)&#39;</span>, <span class="string">&quot;&quot;</span>));
+                    socket = <span class="prelude-val">Some</span>(v.replace([<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>], <span class="string">&quot;&quot;</span>));
                 }
                 <span class="string">&quot;socket_timeout&quot; </span>=&gt; {
                     <span class="kw">let </span>as_int = v
@@ -898,6 +928,18 @@
                 }
             };
         }
+
+        ssl_opts = <span class="kw">match </span>identity {
+            <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(path), <span class="prelude-val">Some</span>(pw))) =&gt; {
+                <span class="kw">let </span>identity = mysql_async::ClientIdentity::new(path).with_password(pw);
+                ssl_opts.with_client_identity(<span class="prelude-val">Some</span>(identity))
+            }
+            <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(path), <span class="prelude-val">None</span>)) =&gt; {
+                <span class="kw">let </span>identity = mysql_async::ClientIdentity::new(path);
+                ssl_opts.with_client_identity(<span class="prelude-val">Some</span>(identity))
+            }
+            <span class="kw">_ </span>=&gt; ssl_opts,
+        };
 
         <span class="prelude-val">Ok</span>(MysqlUrlQueryParams {
             ssl_opts,
@@ -1173,7 +1215,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
         }
 
-        <span class="self">self</span>.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {}&quot;</span>, isolation_level))
+        <span class="self">self</span>.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {isolation_level}&quot;</span>))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -1229,7 +1271,7 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>should_map_nonexisting_database_error() {
-        <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;*</span>CONN_STR).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;</span>CONN_STR).unwrap();
         url.set_username(<span class="string">&quot;root&quot;</span>).unwrap();
         url.set_path(<span class="string">&quot;/this_does_not_exist&quot;</span>);
 

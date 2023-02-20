@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xkvi9028r7cyr64kc0k2rwdvvymf1qg7-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tiberius-0.11.2/src/client/config/ado_net.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ado_net.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/00jcjpv070qykvi94xplmgipmxgl43y1-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tiberius-0.11.6/src/client/config/ado_net.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ado_net.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -443,6 +443,48 @@
 <a href="#443" id="443">443</a>
 <a href="#444" id="444">444</a>
 <a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{ConfigString, ServerDefinition};
 <span class="kw">use </span>std::str::FromStr;
 
@@ -482,14 +524,14 @@
                 <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = parts[<span class="number">0</span>].split(<span class="string">&#39;\\&#39;</span>).collect();
 
                 ServerDefinition {
-                    host: <span class="prelude-val">Some</span>(parts[<span class="number">0</span>].into()),
+                    host: <span class="prelude-val">Some</span>(parts[<span class="number">0</span>].replace(<span class="string">&quot;(local)&quot;</span>, <span class="string">&quot;localhost&quot;</span>).into()),
                     port,
                     instance: <span class="prelude-val">Some</span>(parts[<span class="number">1</span>].into()),
                 }
             } <span class="kw">else </span>{
                 <span class="comment">// Connect using a TCP target
                 </span>ServerDefinition {
-                    host: <span class="prelude-val">Some</span>(parts[<span class="number">0</span>].into()),
+                    host: <span class="prelude-val">Some</span>(parts[<span class="number">0</span>].replace(<span class="string">&quot;(local)&quot;</span>, <span class="string">&quot;localhost&quot;</span>).into()),
                     port: parse_port(<span class="kw-2">&amp;</span>parts[<span class="number">1</span>..])<span class="question-mark">?</span>,
                     instance: <span class="prelude-val">None</span>,
                 }
@@ -564,6 +606,48 @@
         <span class="kw">let </span>server = ado.server()<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;my-server.com&quot;</span>.to_string()), server.host);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">4200</span>), server.port);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, server.instance);
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>server_parsing_local() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>test_str = <span class="string">&quot;server=tcp:(local),4200&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>server = ado.server()<span class="question-mark">?</span>;
+
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>.to_string()), server.host);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">4200</span>), server.port);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, server.instance);
+
+        <span class="kw">let </span>test_str = <span class="string">&quot;data source=tcp:(local),4200&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>server = ado.server()<span class="question-mark">?</span>;
+
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>.to_string()), server.host);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">4200</span>), server.port);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, server.instance);
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>server_parsing_local_no_tcp() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>test_str = <span class="string">&quot;server=(local),4200&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>server = ado.server()<span class="question-mark">?</span>;
+
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>.to_string()), server.host);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">4200</span>), server.port);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, server.instance);
+
+        <span class="kw">let </span>test_str = <span class="string">&quot;data source=(local),4200&quot;</span>;
+        <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>server = ado.server()<span class="question-mark">?</span>;
+
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;localhost&quot;</span>.to_string()), server.host);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">4200</span>), server.port);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, server.instance);
 
@@ -658,7 +742,7 @@
         <span class="kw">let </span>test_str = <span class="string">&quot;TrustServerCertificate=true&quot;</span>;
         <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, ado.trust_cert()<span class="question-mark">?</span>);
+        <span class="macro">assert!</span>(ado.trust_cert()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -668,7 +752,7 @@
         <span class="kw">let </span>test_str = <span class="string">&quot;TrustServerCertificate=false&quot;</span>;
         <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, ado.trust_cert()<span class="question-mark">?</span>);
+        <span class="macro">assert!</span>(!ado.trust_cert()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -678,7 +762,7 @@
         <span class="kw">let </span>test_str = <span class="string">&quot;TrustServerCertificate=yes&quot;</span>;
         <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, ado.trust_cert()<span class="question-mark">?</span>);
+        <span class="macro">assert!</span>(ado.trust_cert()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -688,7 +772,7 @@
         <span class="kw">let </span>test_str = <span class="string">&quot;TrustServerCertificate=no&quot;</span>;
         <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, ado.trust_cert()<span class="question-mark">?</span>);
+        <span class="macro">assert!</span>(!ado.trust_cert()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -698,7 +782,7 @@
         <span class="kw">let </span>test_str = <span class="string">&quot;Something=foo;&quot;</span>;
         <span class="kw">let </span>ado: AdoNetConfig = test_str.parse()<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, ado.trust_cert()<span class="question-mark">?</span>);
+        <span class="macro">assert!</span>(!ado.trust_cert()<span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
