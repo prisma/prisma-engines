@@ -1,12 +1,8 @@
-mod binary;
 mod direct;
 mod json_adapter;
-mod node_api;
 
-pub use binary::*;
 pub use direct::*;
 pub use json_adapter::*;
-pub use node_api::*;
 
 use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, TxId};
 use query_engine_metrics::MetricRegistry;
@@ -73,12 +69,6 @@ pub trait RunnerInterface: Sized {
 enum RunnerType {
     /// Using the QE crate directly for queries.
     Direct(DirectRunner),
-
-    /// Using a NodeJS runner.
-    NodeApi(NodeApiRunner),
-
-    /// Using the HTTP bridge
-    Binary(BinaryRunner),
 }
 
 pub struct Runner {
@@ -97,8 +87,6 @@ impl Runner {
     ) -> TestResult<Self> {
         let inner = match ident {
             "direct" => Self::direct(datamodel, connector_tag, metrics).await,
-            "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{unknown}'"))),
         }?;
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
@@ -120,8 +108,6 @@ impl Runner {
 
         let response = match &self.inner {
             RunnerType::Direct(r) => r.query_graphql(gql_query, self.protocol()).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query_graphql(gql_query, self.protocol()).await,
         }?;
 
         if response.failed() {
@@ -143,8 +129,6 @@ impl Runner {
 
         let response = match &self.inner {
             RunnerType::Direct(r) => r.query_json(json_query).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query_json(json_query).await,
         }?;
 
         if response.failed() {
@@ -165,8 +149,6 @@ impl Runner {
 
         match &self.inner {
             RunnerType::Direct(r) => r.raw_execute(sql).await,
-            RunnerType::Binary(r) => r.raw_execute(sql).await,
-            RunnerType::NodeApi(_) => todo!(),
         }
     }
 
@@ -181,27 +163,18 @@ impl Runner {
                 r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, self.protocol)
                     .await
             }
-            RunnerType::Binary(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, self.protocol)
-                    .await
-            }
-            RunnerType::NodeApi(_) => todo!(),
         }
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
         match &self.inner {
             RunnerType::Direct(r) => r.commit_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.commit_tx(tx_id).await,
         }
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
         match &self.inner {
             RunnerType::Direct(r) => r.rollback_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.rollback_tx(tx_id).await,
         }
     }
 
@@ -213,8 +186,6 @@ impl Runner {
     ) -> TestResult<QueryResult> {
         match &self.inner {
             RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level, self.protocol).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level, self.protocol).await,
         }
     }
 
@@ -224,49 +195,33 @@ impl Runner {
         Ok(RunnerType::Direct(runner))
     }
 
-    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
-
-        Ok(RunnerType::Binary(runner))
-    }
-
     pub fn connector(&self) -> &ConnectorTag {
         match &self.inner {
             RunnerType::Direct(r) => r.connector(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.connector(),
         }
     }
 
     pub fn connector_version(&self) -> ConnectorVersion {
         match &self.inner {
             RunnerType::Direct(r) => ConnectorVersion::from(r.connector()),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => ConnectorVersion::from(r.connector()),
         }
     }
 
     pub fn set_active_tx(&mut self, tx_id: TxId) {
         match &mut self.inner {
             RunnerType::Direct(r) => r.set_active_tx(tx_id),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.set_active_tx(tx_id),
         }
     }
 
     pub fn clear_active_tx(&mut self) {
         match &mut self.inner {
             RunnerType::Direct(r) => r.clear_active_tx(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.clear_active_tx(),
         }
     }
 
     pub fn get_metrics(&self) -> MetricRegistry {
         match &self.inner {
             RunnerType::Direct(r) => r.get_metrics(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.get_metrics(),
         }
     }
 
@@ -277,8 +232,6 @@ impl Runner {
     pub fn query_schema(&self) -> &QuerySchemaRef {
         match &self.inner {
             RunnerType::Direct(r) => r.query_schema(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query_schema(),
         }
     }
 
