@@ -250,7 +250,7 @@ pub trait Visitor<'a> {
                                 let mut unjoined_table = table.clone();
                                 // Convert the table typ to a `TableType::Table` for the SELECT statement print
                                 // We only want the join to appear in the FROM clause
-                                unjoined_table.typ = TableType::Table(jt.0.to_owned());
+                                unjoined_table.typ = TableType::Table(jt.0.clone());
 
                                 self.visit_table(unjoined_table, false)?;
                                 self.write(".*")?;

@@ -97,7 +97,7 @@ impl<'a> fmt::Display for Params<'a> {
 
         write!(f, "[")?;
         for (i, val) in self.0.iter().enumerate() {
-            write!(f, "{}", val)?;
+            write!(f, "{val}")?;
 
             if i < (len - 1) {
                 write!(f, ",")?;
@@ -110,21 +110,21 @@ impl<'a> fmt::Display for Params<'a> {
 impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
-            Value::Int32(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Int64(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Float(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Double(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
+            Value::Int32(val) => val.map(|v| write!(f, "{v}")),
+            Value::Int64(val) => val.map(|v| write!(f, "{v}")),
+            Value::Float(val) => val.map(|v| write!(f, "{v}")),
+            Value::Double(val) => val.map(|v| write!(f, "{v}")),
+            Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
             Value::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
-            Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
-            Value::Boolean(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Char(val) => val.map(|v| write!(f, "'{}'", v)),
+            Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            Value::Boolean(val) => val.map(|v| write!(f, "{v}")),
+            Value::Char(val) => val.map(|v| write!(f, "'{v}'")),
             Value::Array(vals) => vals.as_ref().map(|vals| {
                 let len = vals.len();
 
                 write!(f, "[")?;
                 for (i, val) in vals.iter().enumerate() {
-                    write!(f, "{}", val)?;
+                    write!(f, "{val}")?;
 
                     if i < (len - 1) {
                         write!(f, ",")?;
@@ -132,19 +132,19 @@ impl<'a> fmt::Display for Value<'a> {
                 }
                 write!(f, "]")
             }),
-            Value::Xml(val) => val.as_ref().map(|v| write!(f, "{}", v)),
+            Value::Xml(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(val) => val.as_ref().map(|v| write!(f, "{}", v)),
+            Value::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "json")]
-            Value::Json(val) => val.as_ref().map(|v| write!(f, "{}", v)),
+            Value::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "uuid")]
-            Value::Uuid(val) => val.map(|v| write!(f, "\"{}\"", v)),
+            Value::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
             #[cfg(feature = "chrono")]
-            Value::DateTime(val) => val.map(|v| write!(f, "\"{}\"", v)),
+            Value::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             #[cfg(feature = "chrono")]
-            Value::Date(val) => val.map(|v| write!(f, "\"{}\"", v)),
+            Value::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             #[cfg(feature = "chrono")]
-            Value::Time(val) => val.map(|v| write!(f, "\"{}\"", v)),
+            Value::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
         };
 
         match res {
@@ -170,7 +170,7 @@ impl<'a> From<Value<'a>> for serde_json::Value {
                 None => serde_json::Value::Null,
             }),
             Value::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
-            Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(&bytes))),
+            Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
             Value::Enum(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Boolean(b) => b.map(serde_json::Value::Bool),
             Value::Char(c) => c.map(|c| {
@@ -193,9 +193,9 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| serde_json::Value::String(format!("{}", date))),
+            Value::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| serde_json::Value::String(format!("{}", time))),
+            Value::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
         };
 
         match res {
@@ -427,7 +427,7 @@ impl<'a> Value<'a> {
     pub fn to_bytes(&self) -> Option<Vec<u8>> {
         match self {
             Value::Text(Some(cow)) => Some(cow.to_string().into_bytes()),
-            Value::Bytes(Some(cow)) => Some(cow.to_owned().into()),
+            Value::Bytes(Some(cow)) => Some(cow.to_vec()),
             _ => None,
         }
     }
@@ -785,7 +785,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
             v if v.is_null() => Ok(None),
             v => {
                 let kind =
-                    ErrorKind::conversion(format!("Couldn't convert value of type `{:?}` to std::net::IpAddr.", v));
+                    ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to std::net::IpAddr."));
 
                 Err(Error::builder(kind).build())
             }
@@ -818,7 +818,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
             }
             v if v.is_null() => Ok(None),
             v => {
-                let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{:?}` to uuid::Uuid.", v));
+                let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to uuid::Uuid."));
 
                 Err(Error::builder(kind).build())
             }
@@ -974,7 +974,7 @@ mod tests {
         let dt: DateTime<Utc> = DateTime::from_str("2019-07-27T05:30:30Z").expect("failed while parsing date");
         let pv = Value::datetime(dt);
 
-        assert_eq!(format!("{}", pv), "\"2019-07-27 05:30:30 UTC\"");
+        assert_eq!(format!("{pv}"), "\"2019-07-27 05:30:30 UTC\"");
     }
 
     #[test]
@@ -983,7 +983,7 @@ mod tests {
         let date = NaiveDate::from_ymd_opt(2022, 8, 11).unwrap();
         let pv = Value::date(date);
 
-        assert_eq!(format!("{}", pv), "\"2022-08-11\"");
+        assert_eq!(format!("{pv}"), "\"2022-08-11\"");
     }
 
     #[test]
@@ -992,7 +992,7 @@ mod tests {
         let time = NaiveTime::from_hms_opt(16, 17, 00).unwrap();
         let pv = Value::time(time);
 
-        assert_eq!(format!("{}", pv), "\"16:17:00\"");
+        assert_eq!(format!("{pv}"), "\"16:17:00\"");
     }
 
     #[test]
@@ -1001,6 +1001,6 @@ mod tests {
         let id = Uuid::from_str("67e5504410b1426f9247bb680e5fe0c8").unwrap();
         let pv = Value::uuid(id);
 
-        assert_eq!(format!("{}", pv), "\"67e55044-10b1-426f-9247-bb680e5fe0c8\"");
+        assert_eq!(format!("{pv}"), "\"67e55044-10b1-426f-9247-bb680e5fe0c8\"");
     }
 }

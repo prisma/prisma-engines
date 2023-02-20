@@ -343,9 +343,9 @@ mod tests {
         assert_eq!(result.get("txt space").unwrap(), &Value::text("henlo"));
 
         let insert = Insert::single_into("test").value("txt space", "henlo");
-        let insert: Insert = Insert::from(insert).returning(&["txt space"]).into();
+        let insert: Insert = Insert::from(insert).returning(["txt space"]);
 
-        let result = conn.insert(insert.into()).await.unwrap();
+        let result = conn.insert(insert).await.unwrap();
         let result = result.into_single().unwrap();
 
         assert_eq!(result.get("txt space").unwrap(), &Value::text("henlo"));

@@ -12,8 +12,7 @@ impl From<tiberius::error::Error> for Error {
             e @ tiberius::error::Error::Io { .. } => Error::builder(ErrorKind::ConnectionError(e.into())).build(),
             tiberius::error::Error::Tls(message) => {
                 let message = format!(
-                    "The TLS settings didn't allow the connection to be established. Please review your connection string. (error: {})",
-                    message
+                    "The TLS settings didn't allow the connection to be established. Please review your connection string. (error: {message})"
                 );
 
                 Error::builder(ErrorKind::TlsError { message }).build()

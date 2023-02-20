@@ -126,12 +126,12 @@ impl TypeIdentifier for Column<'_> {
         false
     }
     fn is_null(&self) -> bool {
-        self.decl_type() == None
+        self.decl_type().is_none()
     }
 }
 
 impl<'a> GetRow for SqliteRow<'a> {
-    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<Value<'static>>> {
+    fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         let mut row = Vec::with_capacity(self.columns().len());
 
         for (i, column) in self.columns().iter().enumerate() {
@@ -153,7 +153,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_bool() => Value::Boolean(None),
                     c => match c.decl_type() {
                         Some(n) => {
-                            let msg = format!("Value {} not supported", n);
+                            let msg = format!("Value {n} not supported");
                             let kind = ErrorKind::conversion(msg);
 
                             return Err(Error::builder(kind).build());

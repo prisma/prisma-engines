@@ -26,13 +26,13 @@ impl ValueIndex<ResultRowRef<'_>, Value<'static>> for &str {
 }
 
 impl ValueIndex<ResultRow, Value<'static>> for usize {
-    fn index_into<'v>(self, row: &'v ResultRow) -> &'v Value<'static> {
+    fn index_into(self, row: &ResultRow) -> &Value<'static> {
         row.at(self).unwrap()
     }
 }
 
 impl ValueIndex<ResultRow, Value<'static>> for &str {
-    fn index_into<'v>(self, row: &'v ResultRow) -> &'v Value<'static> {
+    fn index_into(self, row: &ResultRow) -> &Value<'static> {
         row.get(self).unwrap()
     }
 }

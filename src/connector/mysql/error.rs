@@ -28,7 +28,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::UniqueConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -44,7 +44,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -61,7 +61,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::NullConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -87,7 +87,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::NullConstraintViolation { constraint };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -102,7 +102,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::DatabaseDoesNotExist { db_name };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -117,7 +117,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::DatabaseAlreadyExists { db_name };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -132,7 +132,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::DatabaseAccessDenied { db_name };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -148,7 +148,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::AuthenticationFailed { user };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -164,7 +164,7 @@ impl From<my::Error> for Error {
                 let kind = ErrorKind::TableDoesNotExist { table };
                 let mut builder = Error::builder(kind);
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -178,7 +178,7 @@ impl From<my::Error> for Error {
 
                 let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
 
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()
@@ -217,7 +217,7 @@ impl From<my::Error> for Error {
                 state: _,
             }) if code == 1213 => {
                 let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
                 builder.build()
             }
@@ -236,7 +236,7 @@ impl From<my::Error> for Error {
                 );
 
                 let mut builder = Error::builder(kind);
-                builder.set_original_code(format!("{}", code));
+                builder.set_original_code(format!("{code}"));
                 builder.set_original_message(message);
 
                 builder.build()

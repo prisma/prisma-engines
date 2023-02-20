@@ -19,7 +19,7 @@ pub struct MsSql<'a> {
 impl<'a> MsSql<'a> {
     pub async fn new() -> crate::Result<MsSql<'a>> {
         let names = Generator::default();
-        let conn = Quaint::new(&*CONN_STR).await?;
+        let conn = Quaint::new(&CONN_STR).await?;
 
         Ok(Self { names, conn })
     }
@@ -59,9 +59,8 @@ impl<'a> TestApi for MsSql<'a> {
 
         let create = format!(
             r##"
-            CREATE UNIQUE INDEX {} ON {} ({})
-            "##,
-            name, table, columns
+            CREATE UNIQUE INDEX {name} ON {table} ({columns})
+            "##
         );
 
         self.conn().raw_cmd(&create).await?;
@@ -74,24 +73,23 @@ impl<'a> TestApi for MsSql<'a> {
     }
 
     async fn create_additional_connection(&self) -> crate::Result<Quaint> {
-        Quaint::new(&*CONN_STR).await
+        Quaint::new(&CONN_STR).await
     }
 
     fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
-        let table_name = format!("##{}", table_name);
+        let table_name = format!("##{table_name}");
         let create = format!(
             r##"
-            CREATE TABLE {} ({})
+            CREATE TABLE {table_name} ({columns})
             "##,
-            table_name, columns,
         );
 
         (table_name, create)
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {
-        let name = format!("{}", self.names.next().unwrap().replace('-', ""));
-        format!("CONSTRAINT {} UNIQUE({})", name, column)
+        let name = self.names.next().unwrap().replace('-', "");
+        format!("CONSTRAINT {name} UNIQUE({column})")
     }
 
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
@@ -104,7 +102,7 @@ impl<'a> TestApi for MsSql<'a> {
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} INT IDENTITY(1,1) PRIMARY KEY", name)
+        format!("{name} INT IDENTITY(1,1) PRIMARY KEY")
     }
 
     fn get_name(&mut self) -> String {

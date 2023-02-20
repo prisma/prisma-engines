@@ -49,9 +49,8 @@ impl<'a> MySql<'a> {
     fn render_perm_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
         let create = format!(
             r##"
-            CREATE TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+            CREATE TABLE `{table_name}` ({columns}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
             "##,
-            table_name, columns,
         );
 
         (table_name.to_string(), create)
@@ -92,9 +91,8 @@ impl<'a> TestApi for MySql<'a> {
     async fn delete_table(&mut self, table_name: &str) -> crate::Result<()> {
         let delete = format!(
             r##"
-            DROP TABLE `{}`
-            "##,
-            table_name
+            DROP TABLE `{table_name}`
+            "##
         );
         self.conn().raw_cmd(&delete).await
     }
@@ -102,9 +100,8 @@ impl<'a> TestApi for MySql<'a> {
     fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
         let create = format!(
             r##"
-            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+            CREATE TEMPORARY TABLE `{table_name}` ({columns}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
             "##,
-            table_name, columns,
         );
 
         (table_name.to_string(), create)
@@ -115,9 +112,8 @@ impl<'a> TestApi for MySql<'a> {
 
         let create = format!(
             r##"
-            CREATE UNIQUE INDEX {} ON {} ({})
-            "##,
-            name, table, columns
+            CREATE UNIQUE INDEX {name} ON {table} ({columns})
+            "##
         );
 
         self.conn().raw_cmd(&create).await?;
@@ -134,7 +130,7 @@ impl<'a> TestApi for MySql<'a> {
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {
-        format!("UNIQUE({})", column)
+        format!("UNIQUE({column})")
     }
 
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
@@ -147,7 +143,7 @@ impl<'a> TestApi for MySql<'a> {
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY", name)
+        format!("{name} INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY")
     }
 
     fn get_name(&mut self) -> String {

@@ -305,7 +305,7 @@ impl Mssql {
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {
-            this.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation))
+            this.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation}"))
                 .await?;
         };
 
@@ -435,7 +435,7 @@ impl Queryable for Mssql {
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
-        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await?;
 
         Ok(())
@@ -465,7 +465,7 @@ impl MssqlUrl {
         if input.starts_with("jdbc:sqlserver") {
             input.into()
         } else {
-            format!("jdbc:{}", input)
+            format!("jdbc:{input}")
         }
     }
 
@@ -473,7 +473,7 @@ impl MssqlUrl {
         let mut conn = JdbcString::from_str(&Self::with_jdbc_prefix(input))?;
 
         let host = conn.server_name().map(|server_name| match conn.instance_name() {
-            Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
+            Some(instance_name) => format!(r#"{server_name}\{instance_name}"#),
             None => server_name.to_string(),
         });
 
@@ -495,7 +495,7 @@ impl MssqlUrl {
             .or_else(|| props.remove("isolation_level"))
             .map(|level| {
                 IsolationLevel::from_str(&level).map_err(|_| {
-                    let kind = ErrorKind::database_url_is_invalid(format!("Invalid isolation level `{}`", level));
+                    let kind = ErrorKind::database_url_is_invalid(format!("Invalid isolation level `{level}`"));
                     Error::builder(kind).build()
                 })
             })

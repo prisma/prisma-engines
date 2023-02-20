@@ -122,7 +122,7 @@ impl SslParams {
         if let Some(ref cert_file) = self.certificate_file {
             let cert = fs::read(cert_file).map_err(|err| {
                 Error::builder(ErrorKind::TlsError {
-                    message: format!("cert file not found ({})", err),
+                    message: format!("cert file not found ({err})"),
                 })
                 .build()
             })?;
@@ -133,7 +133,7 @@ impl SslParams {
         if let Some(ref identity_file) = self.identity_file {
             let db = fs::read(identity_file).map_err(|err| {
                 Error::builder(ErrorKind::TlsError {
-                    message: format!("identity file not found ({})", err),
+                    message: format!("identity file not found ({err})"),
                 })
                 .build()
             })?;
@@ -816,7 +816,7 @@ impl Queryable for PostgreSql {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await?;
 
         Ok(())

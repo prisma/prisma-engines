@@ -34,7 +34,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{}", s)?;
+        write!(&mut self.query, "{s}")?;
         Ok(())
     }
 
@@ -72,23 +72,23 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let res = match value {
             Value::Int32(i) => i.map(|i| self.write(i)),
             Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
-            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
             Value::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Array(ary) => ary.map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
@@ -114,9 +114,9 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
+            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
+            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
         };
 
         match res {
@@ -590,7 +590,7 @@ mod tests {
 
         let query = query.on_conflict(OnConflict::Update(update, Vec::from(["foo".into()])));
 
-        let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
+        let (sql, params) = Postgres::build(query.returning(vec!["foo"])).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);

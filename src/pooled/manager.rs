@@ -217,7 +217,7 @@ mod tests {
     #[tokio::test]
     #[cfg(feature = "sqlite")]
     async fn test_default_connection_limit() {
-        let conn_string = format!("file:db/test.db",);
+        let conn_string = "file:db/test.db".to_string();
         let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
@@ -226,7 +226,7 @@ mod tests {
     #[tokio::test]
     #[cfg(feature = "sqlite")]
     async fn test_custom_connection_limit() {
-        let conn_string = format!("file:db/test.db?connection_limit=10",);
+        let conn_string = "file:db/test.db?connection_limit=10".to_string();
         let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(10, pool.capacity().await as usize);

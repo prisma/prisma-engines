@@ -669,10 +669,7 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.get_name();
 
     api.conn()
-        .raw_cmd(&format!(
-            "CREATE TABLE {} (id int primary key, name varchar(255))",
-            table
-        ))
+        .raw_cmd(&format!("CREATE TABLE {table} (id int primary key, name varchar(255))"))
         .await?;
 
     let insert = Insert::single_into(&table).value("id", 1).value("name", "Naukio");
@@ -686,7 +683,7 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
         )
         .await;
 
-    api.conn().raw_cmd(&format!("DROP TABLE {}", table)).await?;
+    api.conn().raw_cmd(&format!("DROP TABLE {table}")).await?;
 
     let res = res?;
 
@@ -841,7 +838,7 @@ async fn single_insert_conflict_do_nothing_single_unique(api: &mut dyn TestApi) 
     let constraint = api.unique_constraint("id");
 
     let table_name = api
-        .create_temp_table(&format!("id int, name varchar(255), {}", constraint))
+        .create_temp_table(&format!("id int, name varchar(255), {constraint}"))
         .await?;
 
     let insert = Insert::single_into(&table_name).value("id", 1).value("name", "Musti");
@@ -881,7 +878,7 @@ async fn single_insert_conflict_do_nothing_single_unique_with_default(api: &mut 
     let constraint = api.unique_constraint("id");
 
     let table_name = api
-        .create_temp_table(&format!("id int default 10, name varchar(255), {}", constraint))
+        .create_temp_table(&format!("id int default 10, name varchar(255), {constraint}"))
         .await?;
 
     let insert = Insert::single_into(&table_name).value("id", 10).value("name", "Musti");
@@ -950,7 +947,7 @@ async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi)
     let constraint = api.unique_constraint("id");
 
     let table_name = api
-        .create_temp_table(&format!("id int, name varchar(255), {}", constraint))
+        .create_temp_table(&format!("id int, name varchar(255), {constraint}"))
         .await?;
 
     let insert = Insert::single_into(&table_name).value("id", 1).value("name", "Musti");
@@ -985,8 +982,7 @@ async fn single_insert_conflict_do_nothing_two_uniques(api: &mut dyn TestApi) ->
 
     let table_name = api
         .create_temp_table(&format!(
-            "id int, name varchar(255), {}, {}",
-            id_constraint, name_constraint
+            "id int, name varchar(255), {id_constraint}, {name_constraint}"
         ))
         .await?;
 
@@ -1033,8 +1029,7 @@ async fn single_insert_conflict_do_nothing_two_uniques_with_default(api: &mut dy
 
     let table_name = api
         .create_temp_table(&format!(
-            "id int, name varchar(255) default 'Musti', {}, {}",
-            id_constraint, name_constraint
+            "id int, name varchar(255) default 'Musti', {id_constraint}, {name_constraint}"
         ))
         .await?;
 
@@ -1305,7 +1300,7 @@ async fn filtering_by_json_values_does_not_work_but_does_not_crash(api: &mut dyn
         .create_temp_table("id int4 auto_increment primary key, nested json not null")
         .await?;
 
-    let insert = Insert::multi_into(&table, &["nested"])
+    let insert = Insert::multi_into(&table, ["nested"])
         .values(vec!["{\"isTrue\": true}"])
         .values(vec!["{\"isTrue\": false}"]);
 
@@ -1361,7 +1356,7 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
         .create_temp_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
 
-    let insert = Insert::multi_into(&table, &["big"])
+    let insert = Insert::multi_into(&table, ["big"])
         .values((2,))
         .values((std::i64::MAX,));
     api.conn().insert(insert.into()).await?;
@@ -1977,7 +1972,7 @@ async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> 
 
     let table = api.create_temp_table("id int, value numeric(12,2)").await?;
 
-    let insert = Insert::multi_into(&table, &["id", "value"])
+    let insert = Insert::multi_into(&table, ["id", "value"])
         .values(vec![Value::integer(1), Value::double(1234.5)])
         .values(vec![Value::integer(2), Value::integer(1234)])
         .values(vec![Value::integer(3), Value::integer(12345)]);
@@ -2007,7 +2002,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
     let table = api.create_temp_table("id int, a float4, b float8").await?;
     let val = BigDecimal::from_str("0.1").unwrap();
 
-    let insert = Insert::multi_into(&table, &["id", "a", "b"]).values(vec![
+    let insert = Insert::multi_into(&table, ["id", "a", "b"]).values(vec![
         Value::integer(1),
         Value::numeric(val.clone()),
         Value::numeric(val.clone()),
@@ -2040,8 +2035,8 @@ fn value_into_json(value: &Value) -> Option<serde_json::Value> {
     match value.clone() {
         // MariaDB returns JSON as text
         Value::Text(Some(text)) => {
-            let json: serde_json::Value =
-                serde_json::from_str(&text).expect(format!("expected parsable text to json, found {}", text).as_str());
+            let json: serde_json::Value = serde_json::from_str(&text)
+                .unwrap_or_else(|_| panic!("expected parsable text to json, found {}", text));
 
             Some(json)
         }
@@ -2915,7 +2910,7 @@ async fn insert_comment(api: &mut dyn TestApi) -> crate::Result<()> {
     let query = Insert::single_into(&table).value("name", "Chicken Curry");
     let insert =
         Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
-    api.conn().insert(insert.into()).await?;
+    api.conn().insert(insert).await?;
 
     Ok(())
 }
@@ -2930,7 +2925,7 @@ async fn update_comment(api: &mut dyn TestApi) -> crate::Result<()> {
     let update = Update::table(&table)
         .set("name", "Caesar Salad")
         .comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
-    let res = api.conn().update(update.into()).await?;
+    let res = api.conn().update(update).await?;
 
     assert_eq!(res, 1);
 
@@ -2946,7 +2941,7 @@ async fn delete_comment(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let delete =
         Delete::from_table(&table).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
-    api.conn().delete(delete.into()).await?;
+    api.conn().delete(delete).await?;
 
     Ok(())
 }
@@ -3303,7 +3298,7 @@ async fn concat_expressions(api: &mut dyn TestApi) -> crate::Result<()> {
     api.conn().insert(insert.into()).await?;
 
     let concat: Expression<'_> =
-        concat::<'_, Expression<'_>>(vec![col!("firstname").into(), " ".into(), col!("lastname").into()]).into();
+        concat::<'_, Expression<'_>>(vec![col!("firstname"), " ".into(), col!("lastname")]).into();
     let query = Select::from_table(table).value(concat.alias("concat"));
 
     let res = api.conn().select(query).await?.into_single()?;
@@ -3371,7 +3366,7 @@ async fn json_unquote_fun(api: &mut dyn TestApi) -> crate::Result<()> {
         "postgres" => "jsonb",
         _ => "json",
     };
-    let table = api.create_temp_table(&format!("json {}", json_type)).await?;
+    let table = api.create_temp_table(&format!("json {json_type}")).await?;
 
     let insert = Insert::multi_into(&table, vec!["json"])
         .values(vec![serde_json::json!("a")])

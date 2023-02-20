@@ -40,12 +40,12 @@ all = [
   "serde-support",
   "sqlite",
   "uuid",
-  "bigdecimal"
+  "bigdecimal",
 ]
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
-  "mysql_async/vendored-openssl"
+  "mysql_async/vendored-openssl",
 ]
 
 postgresql = [

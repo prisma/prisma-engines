@@ -145,7 +145,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
                 let de = value.into_deserializer();
 
                 de.deserialize_any(visitor)
-                    .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {}", err)))
+                    .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {err}")))
             }
             #[cfg(feature = "json")]
             Value::Json(None) => visitor.visit_none(),
@@ -159,12 +159,12 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::DateTime(None) => visitor.visit_none(),
 
             #[cfg(feature = "chrono")]
-            Value::Date(Some(d)) => visitor.visit_string(format!("{}", d)),
+            Value::Date(Some(d)) => visitor.visit_string(format!("{d}")),
             #[cfg(feature = "chrono")]
             Value::Date(None) => visitor.visit_none(),
 
             #[cfg(feature = "chrono")]
-            Value::Time(Some(t)) => visitor.visit_string(format!("{}", t)),
+            Value::Time(Some(t)) => visitor.visit_string(format!("{t}")),
             #[cfg(feature = "chrono")]
             Value::Time(None) => visitor.visit_none(),
 

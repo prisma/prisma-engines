@@ -147,7 +147,7 @@ impl From<rusqlite::Error> for Error {
                 description,
             ) => {
                 let mut builder = Error::builder(ErrorKind::SocketTimeout);
-                builder.set_original_code(format!("{}", extended_code));
+                builder.set_original_code(format!("{extended_code}"));
 
                 if let Some(description) = description {
                     builder.set_original_message(description);
@@ -162,7 +162,7 @@ impl From<rusqlite::Error> for Error {
                     let kind = ErrorKind::TableDoesNotExist { table };
 
                     let mut builder = Error::builder(kind);
-                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_code(format!("{extended_code}"));
                     builder.set_original_message(d);
 
                     builder.build()
@@ -172,7 +172,7 @@ impl From<rusqlite::Error> for Error {
                     let kind = ErrorKind::ColumnNotFound { column };
 
                     let mut builder = Error::builder(kind);
-                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_code(format!("{extended_code}"));
                     builder.set_original_message(d);
 
                     builder.build()
@@ -182,7 +182,7 @@ impl From<rusqlite::Error> for Error {
                     let kind = ErrorKind::ColumnNotFound { column };
 
                     let mut builder = Error::builder(kind);
-                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_code(format!("{extended_code}"));
                     builder.set_original_message(d);
 
                     builder.build()
@@ -190,7 +190,7 @@ impl From<rusqlite::Error> for Error {
                 _ => {
                     let description = description.as_ref().map(|d| d.to_string());
                     let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
-                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_code(format!("{extended_code}"));
 
                     if let Some(description) = description {
                         builder.set_original_message(description);

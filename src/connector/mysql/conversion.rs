@@ -25,9 +25,9 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 Value::Int64(i) => i.map(my::Value::Int),
                 Value::Float(f) => f.map(my::Value::Float),
                 Value::Double(f) => f.map(my::Value::Double),
-                Value::Text(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
+                Value::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
                 Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
+                Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
                 Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
                 Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
                 Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
@@ -331,10 +331,7 @@ impl TakeRow for my::Row {
                     #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
                     typ => {
-                        let msg = format!(
-                            "Value of type {:?} is not supported with the current configuration",
-                            typ
-                        );
+                        let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 
                         let kind = ErrorKind::conversion(msg);
                         return Err(Error::builder(kind).build());

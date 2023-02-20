@@ -19,7 +19,7 @@ pub struct Sqlite<'a> {
 impl<'a> Sqlite<'a> {
     fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
         self.visit_expression(value)?;
-        self.write(format!(" {}", direction))?;
+        self.write(format!(" {direction}"))?;
 
         Ok(())
     }
@@ -69,7 +69,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{}", s)?;
+        write!(&mut self.query, "{s}")?;
         Ok(())
     }
 
@@ -77,22 +77,22 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         let res = match value {
             Value::Int32(i) => i.map(|i| self.write(i)),
             Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
             Value::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Array(_) => {
                 let msg = "Arrays are not supported in SQLite.";
@@ -107,7 +107,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             Value::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(j)?;
-                    Some(self.write(format!("'{}'", s)))
+                    Some(self.write(format!("'{s}'")))
                 }
                 None => None,
             },
@@ -118,10 +118,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
+            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
+            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -210,9 +210,9 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
                 for (i, column) in returning.into_iter().enumerate() {
                     //yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&*column.name)?;
+                    self.surround_with_backticks(&column.name)?;
                     self.write(" AS ")?;
-                    self.surround_with_backticks(&*column.name)?;
+                    self.surround_with_backticks(&column.name)?;
                     if i < (values_len - 1) {
                         self.write(", ")?;
                     }
@@ -855,7 +855,7 @@ mod tests {
             })
             .unwrap();
 
-        let person: Person = person_iter.nth(0).unwrap().unwrap();
+        let person: Person = person_iter.next().unwrap().unwrap();
 
         assert_eq!("Alice", person.name);
         assert_eq!(42.69, person.age);
@@ -974,7 +974,7 @@ mod tests {
     #[test]
     fn test_returning() {
         let insert = Insert::single_into("test").value("user id", 1).value("txt", "hello");
-        let insert: Insert = Insert::from(insert).returning(&["user id"]).into();
+        let insert: Insert = Insert::from(insert).returning(["user id"]);
 
         let (sql, _) = Sqlite::build(insert).unwrap();
 
@@ -998,7 +998,7 @@ mod tests {
 
         let query = query.on_conflict(OnConflict::Update(update, Vec::from(["foo".into()])));
 
-        let (sql, params) = Postgres::build(Insert::from(query).returning(vec!["foo"])).unwrap();
+        let (sql, params) = Postgres::build(query.returning(vec!["foo"])).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);

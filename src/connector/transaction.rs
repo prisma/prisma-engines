@@ -164,7 +164,7 @@ impl FromStr for IsolationLevel {
             "snapshot" => Ok(Self::Snapshot),
             "serializable" => Ok(Self::Serializable),
             _ => {
-                let kind = ErrorKind::conversion(format!("Invalid isolation level `{}`", s));
+                let kind = ErrorKind::conversion(format!("Invalid isolation level `{s}`"));
                 Err(Error::builder(kind).build())
             }
         }

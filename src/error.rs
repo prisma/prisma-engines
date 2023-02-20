@@ -305,7 +305,7 @@ impl From<Error> for ErrorKind {
 #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
 impl From<bigdecimal::ParseBigDecimalError> for Error {
     fn from(e: bigdecimal::ParseBigDecimalError) -> Self {
-        let kind = ErrorKind::conversion(format!("{}", e));
+        let kind = ErrorKind::conversion(format!("{e}"));
         Self::builder(kind).build()
     }
 }
@@ -373,8 +373,7 @@ impl From<std::string::FromUtf8Error> for Error {
 impl From<std::net::AddrParseError> for Error {
     fn from(e: std::net::AddrParseError) -> Self {
         Error::builder(ErrorKind::conversion(format!(
-            "Couldn't convert data to std::net::IpAddr: {}",
-            e
+            "Couldn't convert data to std::net::IpAddr: {e}"
         )))
         .build()
     }
@@ -383,6 +382,6 @@ impl From<std::net::AddrParseError> for Error {
 #[cfg(feature = "uuid")]
 impl From<uuid::Error> for Error {
     fn from(e: uuid::Error) -> Self {
-        Error::builder(ErrorKind::UUIDError(format!("{}", e))).build()
+        Error::builder(ErrorKind::UUIDError(format!("{e}"))).build()
     }
 }

@@ -49,7 +49,7 @@ impl<'a> Mysql<'a> {
                     }
                 }
                 x => {
-                    let msg = format!("Expected JSON string or number, found: {}", x);
+                    let msg = format!("Expected JSON string or number, found: {x}");
                     let kind = ErrorKind::conversion(msg.clone());
 
                     let mut builder = Error::builder(kind);
@@ -66,7 +66,7 @@ impl<'a> Mysql<'a> {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
                 self.visit_parameterized(quaint_value)?;
-                self.write(format!(" {} ", sign))?;
+                self.write(format!(" {sign} "))?;
                 self.visit_expression(right)?;
             }
             #[cfg(feature = "json")]
@@ -74,12 +74,12 @@ impl<'a> Mysql<'a> {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
                 self.visit_expression(left)?;
-                self.write(format!(" {} ", sign))?;
+                self.write(format!(" {sign} "))?;
                 self.visit_parameterized(quaint_value)?;
             }
             (left, right) => {
                 self.visit_expression(left)?;
-                self.write(format!(" {} ", sign))?;
+                self.write(format!(" {sign} "))?;
                 self.visit_expression(right)?;
             }
         }
@@ -89,7 +89,7 @@ impl<'a> Mysql<'a> {
 
     fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
         self.visit_expression(value)?;
-        self.write(format!(" {}", direction))?;
+        self.write(format!(" {direction}"))?;
 
         Ok(())
     }
@@ -117,7 +117,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{}", s)?;
+        write!(&mut self.query, "{s}")?;
         Ok(())
     }
 
@@ -129,19 +129,19 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
-            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
             Value::Array(_) => {
                 let msg = "Arrays are not supported in MySQL.";
                 let kind = ErrorKind::conversion(msg);
@@ -157,7 +157,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             Value::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(&j)?;
-                    Some(self.write(format!("CONVERT('{}', JSON)", s)))
+                    Some(self.write(format!("CONVERT('{s}', JSON)")))
                 }
                 None => None,
             },
@@ -166,10 +166,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
+            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
+            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {

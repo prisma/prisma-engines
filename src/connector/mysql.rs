@@ -17,7 +17,7 @@ use percent_encoding::percent_decode;
 use std::{
     borrow::Cow,
     future::Future,
-    path::Path,
+    path::{Path, PathBuf},
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
@@ -163,6 +163,7 @@ impl MysqlUrl {
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
         let mut prefer_socket = None;
         let mut statement_cache_size = 100;
+        let mut identity: Option<(Option<PathBuf>, Option<String>)> = None;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -184,14 +185,22 @@ impl MysqlUrl {
                 }
                 "sslidentity" => {
                     use_ssl = true;
-                    ssl_opts = ssl_opts.with_pkcs12_path(Some(Path::new(&*v).to_path_buf()));
+
+                    identity = match identity {
+                        Some((_, pw)) => Some((Some(Path::new(&*v).to_path_buf()), pw)),
+                        None => Some((Some(Path::new(&*v).to_path_buf()), None)),
+                    };
                 }
                 "sslpassword" => {
                     use_ssl = true;
-                    ssl_opts = ssl_opts.with_password(Some(v.to_string()));
+
+                    identity = match identity {
+                        Some((path, _)) => Some((path, Some(v.to_string()))),
+                        None => Some((None, Some(v.to_string()))),
+                    };
                 }
                 "socket" => {
-                    socket = Some(v.replace('(', "").replace(')', ""));
+                    socket = Some(v.replace(['(', ')'], ""));
                 }
                 "socket_timeout" => {
                     let as_int = v
@@ -267,6 +276,18 @@ impl MysqlUrl {
                 }
             };
         }
+
+        ssl_opts = match identity {
+            Some((Some(path), Some(pw))) => {
+                let identity = mysql_async::ClientIdentity::new(path).with_password(pw);
+                ssl_opts.with_client_identity(Some(identity))
+            }
+            Some((Some(path), None)) => {
+                let identity = mysql_async::ClientIdentity::new(path);
+                ssl_opts.with_client_identity(Some(identity))
+            }
+            _ => ssl_opts,
+        };
 
         Ok(MysqlUrlQueryParams {
             ssl_opts,
@@ -542,7 +563,7 @@ impl Queryable for Mysql {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation_level))
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await?;
 
         Ok(())
@@ -598,7 +619,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_map_nonexisting_database_error() {
-        let mut url = Url::parse(&*CONN_STR).unwrap();
+        let mut url = Url::parse(&CONN_STR).unwrap();
         url.set_username("root").unwrap();
         url.set_path("/this_does_not_exist");
 

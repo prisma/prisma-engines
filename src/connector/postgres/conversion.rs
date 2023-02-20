@@ -179,7 +179,7 @@ impl<'a> FromSql<'a> for NaiveMoney {
 }
 
 impl GetRow for PostgresRow {
-    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<Value<'static>>> {
+    fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => Value::Boolean(row.try_get(i)?),
@@ -630,290 +630,279 @@ impl<'a> ToSql for Value<'a> {
         ty: &PostgresType,
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
-        let res =
-            match (self, ty) {
-                (Value::Int32(integer), &PostgresType::INT2) => match integer {
-                    Some(i) => {
-                        let integer = i16::try_from(*i).map_err(|_| {
-                            let kind = ErrorKind::conversion(format!(
-                                "Unable to fit integer value '{}' into an INT2 (16-bit signed integer).",
-                                i
-                            ));
+        let res = match (self, ty) {
+            (Value::Int32(integer), &PostgresType::INT2) => match integer {
+                Some(i) => {
+                    let integer = i16::try_from(*i).map_err(|_| {
+                        let kind = ErrorKind::conversion(format!(
+                            "Unable to fit integer value '{i}' into an INT2 (16-bit signed integer)."
+                        ));
 
-                            Error::builder(kind).build()
-                        })?;
-
-                        Some(integer.to_sql(ty, out))
-                    }
-                    _ => None,
-                },
-                (Value::Int32(integer), &PostgresType::INT4) => integer.map(|integer| (integer as i32).to_sql(ty, out)),
-                (Value::Int32(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
-                (Value::Int64(integer), &PostgresType::INT2) => match integer {
-                    Some(i) => {
-                        let integer = i16::try_from(*i).map_err(|_| {
-                            let kind = ErrorKind::conversion(format!(
-                                "Unable to fit integer value '{}' into an INT2 (16-bit signed integer).",
-                                i
-                            ));
-
-                            Error::builder(kind).build()
-                        })?;
-
-                        Some(integer.to_sql(ty, out))
-                    }
-                    _ => None,
-                },
-                (Value::Int64(integer), &PostgresType::INT4) => match integer {
-                    Some(i) => {
-                        let integer = i32::try_from(*i).map_err(|_| {
-                            let kind = ErrorKind::conversion(format!(
-                                "Unable to fit integer value '{}' into an INT4 (32-bit signed integer).",
-                                i
-                            ));
-
-                            Error::builder(kind).build()
-                        })?;
-
-                        Some(integer.to_sql(ty, out))
-                    }
-                    _ => None,
-                },
-                (Value::Int64(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Int32(integer), &PostgresType::NUMERIC) => integer
-                    .map(|integer| BigDecimal::from_i32(integer).unwrap())
-                    .map(DecimalWrapper)
-                    .map(|dw| dw.to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Int64(integer), &PostgresType::NUMERIC) => integer
-                    .map(|integer| BigDecimal::from_i64(integer).unwrap())
-                    .map(DecimalWrapper)
-                    .map(|dw| dw.to_sql(ty, out)),
-                (Value::Int32(integer), &PostgresType::TEXT) => {
-                    integer.map(|integer| format!("{}", integer).to_sql(ty, out))
-                }
-                (Value::Int64(integer), &PostgresType::TEXT) => {
-                    integer.map(|integer| format!("{}", integer).to_sql(ty, out))
-                }
-                (Value::Int32(integer), &PostgresType::OID) => match integer {
-                    Some(i) => {
-                        let integer = u32::try_from(*i).map_err(|_| {
-                            let kind = ErrorKind::conversion(format!(
-                                "Unable to fit integer value '{}' into an OID (32-bit unsigned integer).",
-                                i
-                            ));
-
-                            Error::builder(kind).build()
-                        })?;
-
-                        Some(integer.to_sql(ty, out))
-                    }
-                    _ => None,
-                },
-                (Value::Int64(integer), &PostgresType::OID) => match integer {
-                    Some(i) => {
-                        let integer = u32::try_from(*i).map_err(|_| {
-                            let kind = ErrorKind::conversion(format!(
-                                "Unable to fit integer value '{}' into an OID (32-bit unsigned integer).",
-                                i
-                            ));
-
-                            Error::builder(kind).build()
-                        })?;
-
-                        Some(integer.to_sql(ty, out))
-                    }
-                    _ => None,
-                },
-                (Value::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
-                (Value::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
-                (Value::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Float(float), &PostgresType::NUMERIC) => float
-                    .map(|float| BigDecimal::from_f32(float).unwrap())
-                    .map(DecimalWrapper)
-                    .map(|dw| dw.to_sql(ty, out)),
-                (Value::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
-                (Value::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Double(double), &PostgresType::NUMERIC) => double
-                    .map(|double| BigDecimal::from_f64(double).unwrap())
-                    .map(DecimalWrapper)
-                    .map(|dw| dw.to_sql(ty, out)),
-                (Value::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
-                    let f = decimal.to_string().parse::<f32>().expect("decimal to f32 conversion");
-                    f.to_sql(ty, out)
-                }),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
-                    let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
-                    f.to_sql(ty, out)
-                }),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
-                    let mut floats = Vec::with_capacity(values.len());
-
-                    for value in values.iter() {
-                        let float = match value {
-                            Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
-                            Value::Int64(n) => n.map(|n| n as f32),
-                            Value::Float(f) => *f,
-                            Value::Double(d) => d.map(|d| d as f32),
-                            v if v.is_null() => None,
-                            v => {
-                                let kind = ErrorKind::conversion(format!(
-                                    "Couldn't add value of type `{:?}` into a float array.",
-                                    v
-                                ));
-
-                                return Err(Error::builder(kind).build().into());
-                            }
-                        };
-
-                        floats.push(float);
-                    }
-
-                    floats.to_sql(ty, out)
-                }),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
-                    let mut floats = Vec::with_capacity(values.len());
-
-                    for value in values.iter() {
-                        let float = match value {
-                            Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
-                            Value::Int64(n) => n.map(|n| n as f64),
-                            Value::Float(f) => f.map(|f| f as f64),
-                            Value::Double(d) => *d,
-                            v if v.is_null() => None,
-                            v => {
-                                let kind = ErrorKind::conversion(format!(
-                                    "Couldn't add value of type `{:?}` into a double array.",
-                                    v
-                                ));
-
-                                return Err(Error::builder(kind).build().into());
-                            }
-                        };
-
-                        floats.push(float);
-                    }
-
-                    floats.to_sql(ty, out)
-                }),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {
-                    let decimal = (decimal * BigInt::from_i32(100).unwrap()).round(0);
-
-                    let i = decimal.to_i64().ok_or_else(|| {
-                        let kind = ErrorKind::conversion("Couldn't convert BigDecimal to i64.");
                         Error::builder(kind).build()
                     })?;
 
-                    i.to_sql(ty, out)
-                }),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Numeric(decimal), &PostgresType::NUMERIC) => decimal
-                    .as_ref()
-                    .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
-                #[cfg(feature = "bigdecimal")]
-                (Value::Numeric(float), _) => float
-                    .as_ref()
-                    .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
-                #[cfg(feature = "uuid")]
-                (Value::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
-                    let parsed_uuid: Uuid = string.parse()?;
-                    parsed_uuid.to_sql(ty, out)
-                }),
-                #[cfg(feature = "uuid")]
-                (Value::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
-                    let parsed_uuid: Vec<Option<Uuid>> = values
-                        .iter()
-                        .map(<Option<Uuid>>::try_from)
-                        .collect::<crate::Result<Vec<_>>>()?;
-
-                    parsed_uuid.to_sql(ty, out)
-                }),
-                (Value::Text(string), &PostgresType::INET) | (Value::Text(string), &PostgresType::CIDR) => {
-                    string.as_ref().map(|string| {
-                        let parsed_ip_addr: std::net::IpAddr = string.parse()?;
-                        parsed_ip_addr.to_sql(ty, out)
-                    })
+                    Some(integer.to_sql(ty, out))
                 }
-                (Value::Array(values), &PostgresType::INET_ARRAY)
-                | (Value::Array(values), &PostgresType::CIDR_ARRAY) => values.as_ref().map(|values| {
+                _ => None,
+            },
+            (Value::Int32(integer), &PostgresType::INT4) => integer.map(|integer| integer.to_sql(ty, out)),
+            (Value::Int32(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
+            (Value::Int64(integer), &PostgresType::INT2) => match integer {
+                Some(i) => {
+                    let integer = i16::try_from(*i).map_err(|_| {
+                        let kind = ErrorKind::conversion(format!(
+                            "Unable to fit integer value '{i}' into an INT2 (16-bit signed integer)."
+                        ));
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    Some(integer.to_sql(ty, out))
+                }
+                _ => None,
+            },
+            (Value::Int64(integer), &PostgresType::INT4) => match integer {
+                Some(i) => {
+                    let integer = i32::try_from(*i).map_err(|_| {
+                        let kind = ErrorKind::conversion(format!(
+                            "Unable to fit integer value '{i}' into an INT4 (32-bit signed integer)."
+                        ));
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    Some(integer.to_sql(ty, out))
+                }
+                _ => None,
+            },
+            (Value::Int64(integer), &PostgresType::INT8) => integer.map(|integer| integer.to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Int32(integer), &PostgresType::NUMERIC) => integer
+                .map(|integer| BigDecimal::from_i32(integer).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Int64(integer), &PostgresType::NUMERIC) => integer
+                .map(|integer| BigDecimal::from_i64(integer).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
+            (Value::Int32(integer), &PostgresType::TEXT) => integer.map(|integer| format!("{integer}").to_sql(ty, out)),
+            (Value::Int64(integer), &PostgresType::TEXT) => integer.map(|integer| format!("{integer}").to_sql(ty, out)),
+            (Value::Int32(integer), &PostgresType::OID) => match integer {
+                Some(i) => {
+                    let integer = u32::try_from(*i).map_err(|_| {
+                        let kind = ErrorKind::conversion(format!(
+                            "Unable to fit integer value '{i}' into an OID (32-bit unsigned integer)."
+                        ));
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    Some(integer.to_sql(ty, out))
+                }
+                _ => None,
+            },
+            (Value::Int64(integer), &PostgresType::OID) => match integer {
+                Some(i) => {
+                    let integer = u32::try_from(*i).map_err(|_| {
+                        let kind = ErrorKind::conversion(format!(
+                            "Unable to fit integer value '{i}' into an OID (32-bit unsigned integer)."
+                        ));
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    Some(integer.to_sql(ty, out))
+                }
+                _ => None,
+            },
+            (Value::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
+            (Value::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
+            (Value::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Float(float), &PostgresType::NUMERIC) => float
+                .map(|float| BigDecimal::from_f32(float).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
+            (Value::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
+            (Value::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Double(double), &PostgresType::NUMERIC) => double
+                .map(|double| BigDecimal::from_f64(double).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
+            (Value::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
+                let f = decimal.to_string().parse::<f32>().expect("decimal to f32 conversion");
+                f.to_sql(ty, out)
+            }),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
+                let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
+                f.to_sql(ty, out)
+            }),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
+                let mut floats = Vec::with_capacity(values.len());
+
+                for value in values.iter() {
+                    let float = match value {
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
+                        Value::Int64(n) => n.map(|n| n as f32),
+                        Value::Float(f) => *f,
+                        Value::Double(d) => d.map(|d| d as f32),
+                        v if v.is_null() => None,
+                        v => {
+                            let kind = ErrorKind::conversion(format!(
+                                "Couldn't add value of type `{v:?}` into a float array."
+                            ));
+
+                            return Err(Error::builder(kind).build().into());
+                        }
+                    };
+
+                    floats.push(float);
+                }
+
+                floats.to_sql(ty, out)
+            }),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
+                let mut floats = Vec::with_capacity(values.len());
+
+                for value in values.iter() {
+                    let float = match value {
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
+                        Value::Int64(n) => n.map(|n| n as f64),
+                        Value::Float(f) => f.map(|f| f as f64),
+                        Value::Double(d) => *d,
+                        v if v.is_null() => None,
+                        v => {
+                            let kind = ErrorKind::conversion(format!(
+                                "Couldn't add value of type `{v:?}` into a double array."
+                            ));
+
+                            return Err(Error::builder(kind).build().into());
+                        }
+                    };
+
+                    floats.push(float);
+                }
+
+                floats.to_sql(ty, out)
+            }),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {
+                let decimal = (decimal * BigInt::from_i32(100).unwrap()).round(0);
+
+                let i = decimal.to_i64().ok_or_else(|| {
+                    let kind = ErrorKind::conversion("Couldn't convert BigDecimal to i64.");
+                    Error::builder(kind).build()
+                })?;
+
+                i.to_sql(ty, out)
+            }),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Numeric(decimal), &PostgresType::NUMERIC) => decimal
+                .as_ref()
+                .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Numeric(float), _) => float
+                .as_ref()
+                .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
+            #[cfg(feature = "uuid")]
+            (Value::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
+                let parsed_uuid: Uuid = string.parse()?;
+                parsed_uuid.to_sql(ty, out)
+            }),
+            #[cfg(feature = "uuid")]
+            (Value::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
+                let parsed_uuid: Vec<Option<Uuid>> = values
+                    .iter()
+                    .map(<Option<Uuid>>::try_from)
+                    .collect::<crate::Result<Vec<_>>>()?;
+
+                parsed_uuid.to_sql(ty, out)
+            }),
+            (Value::Text(string), &PostgresType::INET) | (Value::Text(string), &PostgresType::CIDR) => {
+                string.as_ref().map(|string| {
+                    let parsed_ip_addr: std::net::IpAddr = string.parse()?;
+                    parsed_ip_addr.to_sql(ty, out)
+                })
+            }
+            (Value::Array(values), &PostgresType::INET_ARRAY) | (Value::Array(values), &PostgresType::CIDR_ARRAY) => {
+                values.as_ref().map(|values| {
                     let parsed_ip_addr: Vec<Option<std::net::IpAddr>> = values
                         .iter()
                         .map(<Option<std::net::IpAddr>>::try_from)
                         .collect::<crate::Result<_>>()?;
 
                     parsed_ip_addr.to_sql(ty, out)
-                }),
-                #[cfg(feature = "json")]
-                (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
-                    .as_ref()
-                    .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
-                (Value::Text(string), &PostgresType::BIT) | (Value::Text(string), &PostgresType::VARBIT) => {
-                    string.as_ref().map(|string| {
-                        let bits: BitVec = string_to_bits(string)?;
+                })
+            }
+            #[cfg(feature = "json")]
+            (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
+                .as_ref()
+                .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
+            (Value::Text(string), &PostgresType::BIT) | (Value::Text(string), &PostgresType::VARBIT) => {
+                string.as_ref().map(|string| {
+                    let bits: BitVec = string_to_bits(string)?;
 
-                        bits.to_sql(ty, out)
-                    })
-                }
-                (Value::Text(string), _) => string.as_ref().map(|ref string| string.to_sql(ty, out)),
-                (Value::Array(values), &PostgresType::BIT_ARRAY)
-                | (Value::Array(values), &PostgresType::VARBIT_ARRAY) => values.as_ref().map(|values| {
+                    bits.to_sql(ty, out)
+                })
+            }
+            (Value::Text(string), _) => string.as_ref().map(|ref string| string.to_sql(ty, out)),
+            (Value::Array(values), &PostgresType::BIT_ARRAY) | (Value::Array(values), &PostgresType::VARBIT_ARRAY) => {
+                values.as_ref().map(|values| {
                     let bitvecs: Vec<Option<BitVec>> = values
                         .iter()
                         .map(<Option<BitVec>>::try_from)
                         .collect::<crate::Result<Vec<_>>>()?;
 
                     bitvecs.to_sql(ty, out)
-                }),
-                (Value::Bytes(bytes), _) => bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
-                (Value::Enum(string), _) => string.as_ref().map(|string| {
-                    out.extend_from_slice(string.as_bytes());
-                    Ok(IsNull::No)
-                }),
-                (Value::Boolean(boo), _) => boo.map(|boo| boo.to_sql(ty, out)),
-                (Value::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
-                (Value::Array(vec), typ) if matches!(typ.kind(), Kind::Array(_)) => {
-                    vec.as_ref().map(|vec| vec.to_sql(ty, out))
-                }
-                (Value::Array(vec), typ) => {
-                    let kind = ErrorKind::conversion(format!(
-                        "Couldn't serialize value `{:?}` into a `{}`. Value is a list but `{}` is not.",
-                        vec, typ, typ
-                    ));
+                })
+            }
+            (Value::Bytes(bytes), _) => bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
+            (Value::Enum(string), _) => string.as_ref().map(|string| {
+                out.extend_from_slice(string.as_bytes());
+                Ok(IsNull::No)
+            }),
+            (Value::Boolean(boo), _) => boo.map(|boo| boo.to_sql(ty, out)),
+            (Value::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
+            (Value::Array(vec), typ) if matches!(typ.kind(), Kind::Array(_)) => {
+                vec.as_ref().map(|vec| vec.to_sql(ty, out))
+            }
+            (Value::Array(vec), typ) => {
+                let kind = ErrorKind::conversion(format!(
+                    "Couldn't serialize value `{vec:?}` into a `{typ}`. Value is a list but `{typ}` is not."
+                ));
 
-                    return Err(Error::builder(kind).build().into());
-                }
-                #[cfg(feature = "json")]
-                (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-                (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-                #[cfg(feature = "uuid")]
-                (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
-                #[cfg(feature = "chrono")]
-                (Value::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
-                #[cfg(feature = "chrono")]
-                (Value::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
-                #[cfg(feature = "chrono")]
-                (Value::Time(value), _) => value.map(|value| value.to_sql(ty, out)),
-                #[cfg(feature = "chrono")]
-                (Value::DateTime(value), &PostgresType::TIME) => value.map(|value| value.time().to_sql(ty, out)),
-                #[cfg(feature = "chrono")]
-                (Value::DateTime(value), &PostgresType::TIMETZ) => value.map(|value| {
-                    let result = value.time().to_sql(ty, out)?;
-                    // We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
-                    out.extend_from_slice(&[0; 4]);
-                    Ok(result)
-                }),
-                #[cfg(feature = "chrono")]
-                (Value::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
-            };
+                return Err(Error::builder(kind).build().into());
+            }
+            #[cfg(feature = "json")]
+            (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
+            (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
+            #[cfg(feature = "uuid")]
+            (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
+            #[cfg(feature = "chrono")]
+            (Value::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
+            #[cfg(feature = "chrono")]
+            (Value::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
+            #[cfg(feature = "chrono")]
+            (Value::Time(value), _) => value.map(|value| value.to_sql(ty, out)),
+            #[cfg(feature = "chrono")]
+            (Value::DateTime(value), &PostgresType::TIME) => value.map(|value| value.time().to_sql(ty, out)),
+            #[cfg(feature = "chrono")]
+            (Value::DateTime(value), &PostgresType::TIMETZ) => value.map(|value| {
+                let result = value.time().to_sql(ty, out)?;
+                // We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
+                out.extend_from_slice(&[0; 4]);
+                Ok(result)
+            }),
+            #[cfg(feature = "chrono")]
+            (Value::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
+        };
 
         match res {
             Some(res) => res,
@@ -980,8 +969,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<BitVec> {
             }
             v if v.is_null() => Ok(None),
             v => {
-                let kind =
-                    ErrorKind::conversion(format!("Couldn't convert value of type `{:?}` to bit_vec::BitVec.", v));
+                let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to bit_vec::BitVec."));
 
                 Err(Error::builder(kind).build())
             }

@@ -65,7 +65,7 @@ async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<(
     let insert = Insert::single_into(&table).value("id1", 1);
     api.conn().insert(insert.clone().into()).await?;
 
-    let select = format!("Select does_not_exist from {}", table);
+    let select = format!("Select does_not_exist from {table}");
     let res = api.conn().query_raw(&select, &[]).await;
 
     assert!(res.is_err());
@@ -154,7 +154,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 
     // Negative value
     {
-        let insert = Insert::multi_into(&table, &["big"]).values((-22,));
+        let insert = Insert::multi_into(&table, ["big"]).values((-22,));
         let result = api.conn().insert(insert.into()).await;
 
         assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
@@ -162,7 +162,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 
     // Value too big
     {
-        let insert = Insert::multi_into(&table, &["big"]).values((std::i64::MAX,));
+        let insert = Insert::multi_into(&table, ["big"]).values((std::i64::MAX,));
         let result = api.conn().insert(insert.into()).await;
 
         assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
@@ -177,7 +177,7 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> c
         .create_temp_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
 
-    let insert = format!(r#"INSERT INTO `{}` (`big`) VALUES (18446744073709551615)"#, table);
+    let insert = format!(r#"INSERT INTO `{table}` (`big`) VALUES (18446744073709551615)"#);
     api.conn().execute_raw(&insert, &[]).await.unwrap();
     let result = api.conn().select(Select::from_table(&table)).await;
 
@@ -229,7 +229,7 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
     let child_table = api.get_name();
     let constraint = api.get_name();
 
-    let create_table = format!("CREATE TABLE {} (id smallint not null primary key)", parent_table);
+    let create_table = format!("CREATE TABLE {parent_table} (id smallint not null primary key)");
     api.conn().raw_cmd(&create_table).await?;
 
     let create_table = format!(
@@ -268,7 +268,7 @@ async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
         .create_temp_table("data datetime not null default '0000-00-00 00:00:00'")
         .await?;
 
-    let insert = format!("INSERT INTO {} () VALUES ()", table);
+    let insert = format!("INSERT INTO {table} () VALUES ()");
     api.conn().raw_cmd(&insert).await?;
 
     let res = api.conn().select(Select::from_table(&table)).await;
@@ -279,7 +279,8 @@ async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
     match err.kind() {
         ErrorKind::ValueOutOfRange { message } => {
             let expected_message =
-                format!("The column `data` contained an invalid datetime value with either day or month set to zero.");
+                "The column `data` contained an invalid datetime value with either day or month set to zero."
+                    .to_string();
 
             assert_eq!(&expected_message, message);
         }
@@ -317,12 +318,11 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
 
     let query = format!(
         r#"
-        {};
-        {};
-        INSERT INTO {} (id) VALUES (51);
-        INSERT INTO {} (id) VALUES (52);
+        {create_table_1};
+        {create_table_2};
+        INSERT INTO {table_name_1} (id) VALUES (51);
+        INSERT INTO {table_name_2} (id) VALUES (52);
         "#,
-        create_table_1, create_table_2, table_name_1, table_name_2,
     );
 
     conn.raw_cmd(&query).await.unwrap();
@@ -448,7 +448,7 @@ async fn snapshot_isolation_error(api: &mut dyn TestApi) -> crate::Result<()> {
 #[test_each_connector(tags("postgresql"))]
 async fn concurrent_transaction_conflict(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.get_name();
-    let create_table = format!("CREATE TABLE {} (id int not null primary key, count int)", table);
+    let create_table = format!("CREATE TABLE {table} (id int not null primary key, count int)");
     api.conn().raw_cmd(&create_table).await?;
     api.conn()
         .insert(Insert::single_into(&table).value("id", 1).value("count", 1).into())
@@ -463,12 +463,12 @@ async fn concurrent_transaction_conflict(api: &mut dyn TestApi) -> crate::Result
     tx1.query(Select::from_table(&table).into()).await?;
     tx2.query(Select::from_table(&table).into()).await?;
 
-    tx1.update(Update::table(&table).set("count", 2).into()).await?;
+    tx1.update(Update::table(&table).set("count", 2)).await?;
     tx1.commit().await?;
 
-    let res = tx2.update(Update::table(&table).set("count", 3).into());
+    let res = tx2.update(Update::table(&table).set("count", 3));
 
-    let err = res.await.err().expect("Conflicting transaction must fail");
+    let err = res.await.expect_err("Conflicting transaction must fail");
 
     assert!(matches!(err.kind(), ErrorKind::TransactionWriteConflict));
 

@@ -149,7 +149,7 @@ impl<'a> Mssql<'a> {
 
     fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
         self.visit_expression(value)?;
-        self.write(format!(" {}", direction))?;
+        self.write(format!(" {direction}"))?;
 
         Ok(())
     }
@@ -200,7 +200,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn write<D: std::fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{}", s)?;
+        write!(&mut self.query, "{s}")?;
         Ok(())
     }
 
@@ -317,19 +317,19 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
             Value::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{:?}", v)),
+                v => self.write(format!("{v:?}")),
             }),
-            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
-            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
             Value::Array(_) => {
                 let msg = "Arrays are not supported in T-SQL.";
                 let kind = ErrorKind::conversion(msg);
@@ -355,17 +355,17 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             }),
             #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| {
-                let s = format!("CONVERT(date, N'{}')", date);
+                let s = format!("CONVERT(date, N'{date}')");
                 self.write(s)
             }),
             #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| {
-                let s = format!("CONVERT(time, N'{}')", time);
+                let s = format!("CONVERT(time, N'{time}')");
                 self.write(s)
             }),
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{}', 3)", cow))),
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
         };
 
         match res {

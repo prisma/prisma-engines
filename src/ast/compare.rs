@@ -105,7 +105,7 @@ impl<'a> Compare<'a> {
             let mut cols = row.into_columns();
 
             // The name of the CTE in the query
-            let ident = format!("cte_{}", level);
+            let ident = format!("cte_{level}");
 
             let (select, ctes) = select.convert_tuple_selects_to_ctes(level);
 
