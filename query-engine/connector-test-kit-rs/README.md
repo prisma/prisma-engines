@@ -42,7 +42,6 @@ export WORKSPACE_ROOT=/path/to/engines/repository/root
 
 Test run env vars:
 ```shell
-export TEST_RUNNER="direct" # Currently only `direct`, later `node-api` and `binary` as well.
 export TEST_CONNECTOR="postgres" # One of the supported providers.
 export TEST_CONNECTOR_VERSION="10" # One of the supported versions.
 ```
@@ -51,8 +50,7 @@ As previously stated, the above can be omitted in favor of the `.test_config` co
 ```json
 {
     "connector": "postgres",
-    "version": "10",
-    "runner": "direct"
+    "version": "10"
 }
 ```
 The config file must be either in the current working folder from which you invoke a test run or in `$WORKSPACE_ROOT`.

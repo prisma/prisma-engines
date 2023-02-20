@@ -208,7 +208,7 @@ impl Runner {
         let res = self.executor.commit_tx(tx_id).await;
 
         if let Err(error) = res {
-            return Ok(Err(error.into()));
+            Ok(Err(error.into()))
         } else {
             Ok(Ok(()))
         }
@@ -218,7 +218,7 @@ impl Runner {
         let res = self.executor.rollback_tx(tx_id).await;
 
         if let Err(error) = res {
-            return Ok(Err(error.into()));
+            Ok(Err(error.into()))
         } else {
             Ok(Ok(()))
         }

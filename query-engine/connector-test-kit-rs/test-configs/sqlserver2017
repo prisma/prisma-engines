@@ -1,5 +1,3 @@
 {
     "connector": "sqlserver",
-    "version": "2017",
-    "runner": "direct"
-}
+    "version": "2017"}
