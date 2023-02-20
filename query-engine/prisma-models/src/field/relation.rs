@@ -223,14 +223,6 @@ impl RelationField {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }
 
-    pub fn on_delete(&self) -> Option<&ReferentialAction> {
-        self.relation_info.on_delete.as_ref()
-    }
-
-    pub fn on_update(&self) -> Option<&ReferentialAction> {
-        self.relation_info.on_update.as_ref()
-    }
-
     pub fn relation_info(&self) -> &RelationInfo {
         &self.relation_info
     }

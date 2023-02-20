@@ -399,8 +399,9 @@ pub fn insert_emulated_on_delete(
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
-            ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_on_delete_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::NoAction | ReferentialAction::Restrict => {
+                emulate_on_delete_restrict(graph, &rf, parent_node, child_node)?
+            }
             ReferentialAction::SetNull => {
                 emulate_on_delete_set_null(graph, connector_ctx, &rf, parent_node, child_node)?
             }
@@ -671,8 +672,7 @@ pub fn emulate_on_delete_set_null(
     // For every relation fields sharing one common foreign key on the updated model, apply onUpdate emulations.
     for rf in overlapping_relation_fields {
         match rf.relation().on_update() {
-            ReferentialAction::NoAction => continue,
-            ReferentialAction::Restrict => {
+            ReferentialAction::NoAction | ReferentialAction::Restrict => {
                 emulate_on_update_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
             }
             ReferentialAction::SetNull => emulate_on_update_set_null(
@@ -816,8 +816,7 @@ pub fn emulate_on_update_set_null(
     // For every relation fields sharing one common foreign key, recurse
     for rf in overlapping_relation_fields {
         match rf.relation().on_update() {
-            ReferentialAction::NoAction => continue,
-            ReferentialAction::Restrict => {
+            ReferentialAction::NoAction | ReferentialAction::Restrict => {
                 emulate_on_update_restrict(graph, &rf, &dependent_records_node, &set_null_dependents_node)?
             }
             ReferentialAction::SetNull => emulate_on_update_set_null(
@@ -965,8 +964,9 @@ pub fn insert_emulated_on_update_with_intermediary_node(
 
     for rf in relation_fields {
         match rf.relation().on_update() {
-            ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, &join_node, child_node)?,
+            ReferentialAction::NoAction | ReferentialAction::Restrict => {
+                emulate_on_update_restrict(graph, &rf, &join_node, child_node)?
+            }
             ReferentialAction::SetNull => {
                 emulate_on_update_set_null(graph, &rf, connector_ctx, &join_node, child_node)?
             }
@@ -996,8 +996,9 @@ pub fn insert_emulated_on_update(
 
     for rf in relation_fields {
         match rf.relation().on_update() {
-            ReferentialAction::NoAction => continue, // Explicitly do nothing.
-            ReferentialAction::Restrict => emulate_on_update_restrict(graph, &rf, parent_node, child_node)?,
+            ReferentialAction::NoAction | ReferentialAction::Restrict => {
+                emulate_on_update_restrict(graph, &rf, parent_node, child_node)?
+            }
             ReferentialAction::SetNull => {
                 emulate_on_update_set_null(graph, &rf, connector_ctx, parent_node, child_node)?
             }
