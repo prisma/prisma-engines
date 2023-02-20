@@ -457,7 +457,7 @@
 <span class="kw">use </span>either::Either;
 
 <span class="doccomment">/// An opaque identifier for a model scalar field in a schema.
-</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug)]
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Eq)]
 </span><span class="kw">pub struct </span>ScalarFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
 
 <span class="doccomment">/// A scalar field, as part of a model.

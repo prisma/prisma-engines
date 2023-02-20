@@ -1972,7 +1972,7 @@
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
         <span class="kw">let </span>child_model_name = child_model.name().to_owned();
-        <span class="kw">let </span>rf = Arc::clone(<span class="kw-2">&amp;</span>parent_relation_field);
+        <span class="kw">let </span>rf = parent_relation_field.clone();
 
         <span class="comment">// Edge: Read old child node -&gt; update old child
         </span>graph.create_edge(

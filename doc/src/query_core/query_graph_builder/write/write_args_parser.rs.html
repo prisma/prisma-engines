@@ -244,7 +244,7 @@
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
 <span class="kw">use </span>schema_builder::constants::{args, json_null, operations};
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>WriteArgsParser {
@@ -268,23 +268,23 @@
                     Field::Scalar(sf) <span class="kw">if </span>sf.is_list() =&gt; {
                         <span class="kw">let </span>write_op = parse_scalar_list(v)<span class="question-mark">?</span>;
 
-                        args.args.insert(sf, write_op);
+                        args.args.insert(<span class="kw-2">&amp;</span>sf, write_op);
                     }
                     Field::Scalar(sf) =&gt; {
-                        <span class="kw">let </span>write_op: WriteOperation = parse_scalar(sf, v)<span class="question-mark">?</span>;
+                        <span class="kw">let </span>write_op: WriteOperation = parse_scalar(<span class="kw-2">&amp;</span>sf, v)<span class="question-mark">?</span>;
 
-                        args.args.insert(sf, write_op)
+                        args.args.insert(<span class="kw-2">&amp;</span>sf, write_op)
                     }
 
                     Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw">match </span>v {
                         ParsedInputValue::Single(PrismaValue::Null) =&gt; (),
-                        <span class="kw">_ </span>=&gt; args.nested.push((Arc::clone(rf), v.try_into()<span class="question-mark">?</span>)),
+                        <span class="kw">_ </span>=&gt; args.nested.push((rf.clone(), v.try_into()<span class="question-mark">?</span>)),
                     },
 
                     Field::Composite(cf) =&gt; {
-                        <span class="kw">let </span>write_op = parse_composite_writes(cf, v, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[])<span class="question-mark">?</span>;
+                        <span class="kw">let </span>write_op = parse_composite_writes(<span class="kw-2">&amp;</span>cf, v, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[])<span class="question-mark">?</span>;
 
-                        args.args.insert(cf, write_op)
+                        args.args.insert(<span class="kw-2">&amp;</span>cf, write_op)
                     }
                 };
 

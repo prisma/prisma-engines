@@ -30,9 +30,6 @@
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-<a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
@@ -46,7 +43,6 @@
     <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {
         models: OnceCell::new(),
         composite_types: OnceCell::new(),
-        relation_fields: OnceCell::new(),
         schema,
     });
 
@@ -64,8 +60,6 @@
         .collect();
 
     internal_data_model.models.set(models).unwrap();
-
-    internal_data_model.finalize();
     internal_data_model
 }
 </code></pre></div>

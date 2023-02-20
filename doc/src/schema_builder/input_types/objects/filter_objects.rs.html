@@ -275,6 +275,9 @@
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use </span>constants::filters;
@@ -318,8 +321,8 @@
         .optional(),
     ];
 
-    input_fields.extend(model.fields().all.iter().filter_map(|f| <span class="kw">match </span>f {
-        ModelField::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(input_fields::filter_input_field(ctx, f, include_aggregates)),
+    input_fields.extend(model.fields().filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>).into_iter().filter_map(|f| <span class="kw">match </span>f {
+        ModelField::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(input_fields::filter_input_field(ctx, <span class="kw-2">&amp;</span>f, include_aggregates)),
         ModelField::Relation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// [Composites] todo
     </span>}));
@@ -377,8 +380,11 @@
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="comment">// Split unique &amp; ID fields vs all the other fields
-    </span><span class="kw">let </span>(unique_fields, rest_fields): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) =
-        model.fields().all.iter().partition(|f| f.is_scalar() &amp;&amp; f.is_unique());
+    </span><span class="kw">let </span>(unique_fields, rest_fields): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = model
+        .fields()
+        .filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>)
+        .into_iter()
+        .partition(|f| f.is_scalar() &amp;&amp; f.is_unique());
     <span class="comment">// @@unique compound fields.
     </span><span class="kw">let </span>compound_uniques: Vec&lt;<span class="kw">_</span>&gt; = model
         .unique_indexes()
@@ -463,7 +469,7 @@
 
     <span class="kw">let </span>rest_fields: Vec&lt;<span class="kw">_</span>&gt; = rest_fields
         .into_iter()
-        .map(|f| input_fields::filter_input_field(ctx, f, <span class="bool-val">false</span>))
+        .map(|f| input_fields::filter_input_field(ctx, <span class="kw-2">&amp;</span>f, <span class="bool-val">false</span>))
         .collect();
 
     fields.extend(compound_unique_fields);

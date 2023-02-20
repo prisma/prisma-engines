@@ -123,11 +123,6 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>psl::schema_ast::ast;
@@ -164,10 +159,6 @@
         <span class="self">self</span>.dml_model.schema.clone()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>finalize(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.fields.get().unwrap().finalize();
-    }
-
     <span class="doccomment">/// Returns the set of fields to be used as the primary identifier for a record of that model.
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
@@ -175,13 +166,12 @@
     </span><span class="kw">pub fn </span>primary_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
         <span class="self">self</span>.primary_identifier.get_or_init(||{
             <span class="kw">let </span>dml_fields = <span class="self">self</span>.dml_model.first_unique_criterion();
-            <span class="kw">let </span>fields: Vec&lt;Field&gt; = dml_fields
+            <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = dml_fields
                 .iter()
                 .map(|dml_field| {
-                    <span class="kw">let </span>field = <span class="self">self</span>.fields().find_from_all(<span class="kw-2">&amp;</span>dml_field.name).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.&quot;</span>, <span class="kw-2">&amp;</span>dml_field.name));
-                    field.clone()
+                    <span class="self">self</span>.fields().find_from_scalar(<span class="kw-2">&amp;</span>dml_field.name).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.&quot;</span>, <span class="kw-2">&amp;</span>dml_field.name))
                 })
-                .collect();
+            .collect();
 
             FieldSelection::from(fields)
         }).clone()

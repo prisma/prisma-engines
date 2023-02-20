@@ -171,9 +171,12 @@
 <a href="#171" id="171">171</a>
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>};
 <span class="kw">use </span>dml::{DefaultValue, FieldArity, NativeTypeInstance};
-<span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>psl::parser_database::walkers;
 <span class="kw">use </span>std::{
     fmt::{Debug, Display},
@@ -205,7 +208,6 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) native_type: <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) container: ParentContainer,
     <span class="kw">pub</span>(<span class="kw">crate</span>) is_unique: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) read_only: OnceCell&lt;bool&gt;,
 }
 
 <span class="kw">impl </span>ScalarField {
@@ -238,7 +240,14 @@
     }
 
     <span class="kw">pub fn </span>is_read_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw-2">*</span><span class="self">self</span>.read_only.get_or_init(|| <span class="bool-val">false</span>)
+        <span class="kw">let </span>dm = <span class="self">self</span>.internal_data_model();
+        <span class="kw">let </span>sfid = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; id,
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+        };
+        <span class="kw">let </span>sf = dm.walk(sfid);
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = sf.model().relation_fields();
+        relation_fields.any(|rf| rf.fields().into_iter().flatten().any(|sf2| sf.id == sf2.id))
     }
 
     <span class="kw">pub fn </span>is_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -301,7 +310,6 @@
             .field(<span class="string">&quot;default_value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.default_value)
             .field(<span class="string">&quot;container&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.container().name())
             .field(<span class="string">&quot;is_unique&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_unique)
-            .field(<span class="string">&quot;read_only&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.read_only)
             .finish()
     }
 }

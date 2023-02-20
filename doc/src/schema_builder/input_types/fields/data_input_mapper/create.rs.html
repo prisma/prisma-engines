@@ -297,7 +297,7 @@
                 // (that has caused stack overflows on large schemas in
                 // the past).
                 </span>ctx.nested_create_inputs_queue
-                    .push((Arc::clone(<span class="kw-2">&amp;</span>input_object), Arc::clone(rf)));
+                    .push((Arc::clone(<span class="kw-2">&amp;</span>input_object), rf.clone()));
 
                 Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
             }

@@ -184,9 +184,14 @@
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::MongoFilter;
 <span class="kw">use </span>mongodb::bson::{doc, Document};
-<span class="kw">use </span>prisma_models::RelationFieldRef;
+<span class="kw">use </span>prisma_models::{walkers, RelationFieldRef, ScalarFieldRef};
 
 <span class="doccomment">/// A join stage describes a tree of joins and nested joins to be performed on a collection.
 /// Every document of the `source` side will be joined with the collection documents
@@ -278,7 +283,12 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>pipeline = Vec::with_capacity(<span class="number">1 </span>+ nested_stages.len());
 
         <span class="comment">// First we start with the right side of the equation
-        </span><span class="kw">let </span>right_scalars = from_field.right_scalars();
+        </span><span class="kw">let </span>right_scalars: Vec&lt;ScalarFieldRef&gt; = <span class="kw">match </span>from_field.walker().relation().refine() {
+            walkers::RefinedRelationWalker::Inline(<span class="kw">_</span>) | walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw">_</span>) =&gt; {
+                from_field.related_field().left_scalars()
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(<span class="kw">_</span>) =&gt; from_field.related_field().scalar_fields(),
+        };
 
         <span class="comment">// What $expr operators we will need to express this lookup? (depends on right fields)
         </span><span class="kw">let </span>ops: Vec&lt;Document&gt; = right_scalars

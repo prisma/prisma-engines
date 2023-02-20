@@ -255,6 +255,12 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::{RelationField, RelationFieldId},
@@ -334,6 +340,12 @@
     <span class="doccomment">/// The model containing the field.
     </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// A valid relation is defined by two relation fields. This method returns the _other_
+    /// relation field in the same relation.
+    </span><span class="kw">pub fn </span>opposite_relation_field(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.relation().relation_fields().find(|rf| rf.id != <span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// The `@relation` attribute in the field AST.

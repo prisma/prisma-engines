@@ -401,7 +401,7 @@
 
         <span class="kw">let </span>has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| <span class="kw">match </span>hop {
-                OrderByHop::Relation(rf) =&gt; rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) =&gt; rf.arity() == dml::FieldArity::Optional,
                 OrderByHop::Composite(cf) =&gt; !cf.is_required(),
             })
         });

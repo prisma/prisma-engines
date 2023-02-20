@@ -20,23 +20,16 @@
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>composite_field_builder;
-<span class="kw">mod </span>relation_field_builder;
 <span class="kw">mod </span>scalar_field_builder;
 
 <span class="kw">pub use </span>composite_field_builder::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>relation_field_builder::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>scalar_field_builder::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeTypeRef, Field};
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>FieldBuilder {
-    Relation(RelationFieldBuilder),
     Scalar(ScalarFieldBuilder),
     Composite(CompositeFieldBuilder),
 }
@@ -45,8 +38,7 @@
     <span class="kw">pub fn </span>build(<span class="self">self</span>, container: ParentContainer, composite_types: <span class="kw-2">&amp;</span>[CompositeTypeRef]) -&gt; Field {
         <span class="kw">match </span><span class="self">self </span>{
             FieldBuilder::Scalar(st) =&gt; Field::Scalar(st.build(container)),
-            FieldBuilder::Relation(rt) =&gt; Field::Relation(rt.build(container.as_model_weak().unwrap())), <span class="comment">// Relations are only possible between models.
-            </span>FieldBuilder::Composite(ct) =&gt; Field::Composite(ct.build(container, composite_types)),
+            FieldBuilder::Composite(ct) =&gt; Field::Composite(ct.build(container, composite_types)),
         }
     }
 }

@@ -289,7 +289,7 @@
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
-            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw-2">&amp;</span>rf.name,
+            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; rf.walker().name(),
             Field::Composite(<span class="kw-2">ref </span>cf) =&gt; <span class="kw-2">&amp;</span>cf.name,
         }
     }
@@ -297,7 +297,7 @@
     <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.db_name(),
-            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw-2">&amp;</span>rf.name,
+            Field::Relation(rf) =&gt; rf.name(),
             Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.db_name(),
         }
     }
@@ -378,7 +378,7 @@
 
     <span class="kw">pub fn </span>downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldWeak {
         <span class="kw">match </span><span class="self">self </span>{
-            Field::Relation(field) =&gt; FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Relation(field) =&gt; FieldWeak::Relation(field.clone()),
             Field::Scalar(field) =&gt; FieldWeak::Scalar(Arc::downgrade(field)),
             Field::Composite(field) =&gt; FieldWeak::Composite(Arc::downgrade(field)),
         }
@@ -411,7 +411,7 @@
 <span class="kw">impl </span>FieldWeak {
     <span class="kw">pub fn </span>upgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Field {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Relation(rf) =&gt; rf.upgrade().unwrap().into(),
+            <span class="self">Self</span>::Relation(rf) =&gt; rf.clone().into(),
             <span class="self">Self</span>::Scalar(sf) =&gt; sf.upgrade().unwrap().into(),
             <span class="self">Self</span>::Composite(cf) =&gt; cf.upgrade().unwrap().into(),
         }
@@ -436,7 +436,7 @@
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; <span class="kw">for </span>FieldWeak {
     <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="self">Self </span>{
-        FieldWeak::Relation(Arc::downgrade(f))
+        FieldWeak::Relation(f.clone())
     }
 }
 

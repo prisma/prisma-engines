@@ -88,12 +88,11 @@
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
 };
-<span class="kw">use </span>prisma_models::{walkers, ModelProjection, Relation, RelationField, RelationSide};
+<span class="kw">use </span>prisma_models::{walkers, ModelProjection, Relation, RelationField};
 <span class="kw">use </span>quaint::{ast::Table, prelude::Column};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>RelationFieldExt {
@@ -105,39 +104,38 @@
 
 <span class="kw">impl </span>RelationFieldExt <span class="kw">for </span>RelationField {
     <span class="kw">fn </span>m2m_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
-        <span class="kw">let </span>references = <span class="kw-2">&amp;</span><span class="self">self</span>.relation_info().references;
-        <span class="kw">let </span>prefix = <span class="kw">if </span><span class="self">self</span>.relation_side.is_a() { <span class="string">&quot;B&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;A&quot; </span>};
-
-        <span class="kw">if </span>references.len() &gt; <span class="number">1 </span>{
-            references
-                .iter()
-                .map(|to_field| <span class="macro">format!</span>(<span class="string">&quot;{prefix}_{to_field}&quot;</span>))
-                .map(|name| Column::from(name).table(<span class="self">self</span>.as_table(ctx)))
-                .collect()
-        } <span class="kw">else </span>{
-            <span class="macro">vec!</span>[Column::from(prefix).table(<span class="self">self</span>.as_table(ctx))]
-        }
+        <span class="kw">let </span>is_side_a = <span class="self">self</span>.walker().relation().relation_fields().next().map(|rf| rf.id) == <span class="prelude-val">Some</span>(<span class="self">self</span>.id);
+        <span class="kw">let </span>prefix = <span class="kw">if </span>is_side_a { <span class="string">&quot;B&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;A&quot; </span>};
+        <span class="macro">vec!</span>[Column::from(prefix).table(<span class="self">self</span>.as_table(ctx))]
     }
 
     <span class="kw">fn </span>join_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ColumnIterator {
-        <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>.relation().walker().refine(), <span class="kw-2">&amp;</span><span class="self">self</span>.relation_side) {
-            (walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw-2">ref </span>m), RelationSide::A) =&gt; {
-                ColumnIterator::from(<span class="macro">vec!</span>[m.column_b_name().into()])
-            }
-            (walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw-2">ref </span>m), RelationSide::B) =&gt; {
-                ColumnIterator::from(<span class="macro">vec!</span>[m.column_a_name().into()])
+        <span class="kw">let </span>relation = <span class="self">self</span>.walker().relation();
+        <span class="kw">match </span>relation.refine() {
+            walkers::RefinedRelationWalker::ImplicitManyToMany(m) =&gt; {
+                <span class="kw">let </span>is_side_a = relation.relation_fields().next().map(|rf| rf.id) == <span class="prelude-val">Some</span>(<span class="self">self</span>.id);
+                <span class="kw">let </span>column_name = <span class="kw">if </span>is_side_a {
+                    m.column_b_name()
+                } <span class="kw">else </span>{
+                    m.column_a_name()
+                };
+                ColumnIterator::from(<span class="macro">vec!</span>[column_name.into()])
             }
             <span class="kw">_ </span>=&gt; ModelProjection::from(<span class="self">self</span>.linking_fields()).as_columns(ctx),
         }
     }
 
     <span class="kw">fn </span>identifier_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ColumnIterator {
-        <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>.relation().walker().refine(), <span class="kw-2">&amp;</span><span class="self">self</span>.relation_side) {
-            (walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw-2">ref </span>m), RelationSide::A) =&gt; {
-                ColumnIterator::from(<span class="macro">vec!</span>[m.column_a_name().into()])
-            }
-            (walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw-2">ref </span>m), RelationSide::B) =&gt; {
-                ColumnIterator::from(<span class="macro">vec!</span>[m.column_b_name().into()])
+        <span class="kw">let </span>relation = <span class="self">self</span>.walker().relation();
+        <span class="kw">match </span>relation.refine() {
+            walkers::RefinedRelationWalker::ImplicitManyToMany(m) =&gt; {
+                <span class="kw">let </span>is_side_a = relation.relation_fields().next().map(|rf| rf.id) == <span class="prelude-val">Some</span>(<span class="self">self</span>.id);
+                <span class="kw">let </span>column_name = <span class="kw">if </span>is_side_a {
+                    m.column_a_name()
+                } <span class="kw">else </span>{
+                    m.column_b_name()
+                };
+                ColumnIterator::from(<span class="macro">vec!</span>[column_name.into()])
             }
             <span class="kw">_ </span>=&gt; ModelProjection::from(<span class="self">self</span>.model().primary_identifier()).as_columns(ctx),
         }
@@ -165,8 +163,8 @@
             // table, so MSSQL can convert the `INSERT .. ON CONFLICT IGNORE` into
             // a `MERGE` statement.
             </span>walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw-2">ref </span>m) =&gt; {
-                <span class="kw">let </span>model_a = <span class="self">self</span>.model_a();
-                <span class="kw">let </span>prefix = model_a.schema_name().unwrap_or_else(|| ctx.schema_name().to_owned());
+                <span class="kw">let </span>model_a = m.model_a();
+                <span class="kw">let </span>prefix = model_a.schema_name().unwrap_or_else(|| ctx.schema_name()).to_owned();
                 <span class="kw">let </span>table: Table = (prefix, m.table_name().to_string()).into();
 
                 table.add_unique_index(<span class="macro">vec!</span>[Column::from(<span class="string">&quot;A&quot;</span>), Column::from(<span class="string">&quot;B&quot;</span>)])

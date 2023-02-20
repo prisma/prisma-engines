@@ -73,27 +73,12 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::ReferentialAction;
-<span class="kw">use </span>psl::parser_database::{walkers, RelationId};
+<span class="kw">use </span>psl::{
+    datamodel_connector::walker_ext_traits::<span class="kw-2">*</span>,
+    parser_database::{walkers, RelationId},
+};
 
 <span class="kw">pub type </span>Relation = <span class="kw">crate</span>::Zipper&lt;RelationId&gt;;
 <span class="kw">pub type </span>RelationRef = Relation;
@@ -121,67 +106,46 @@
         <span class="self">self</span>.walker().is_self_relation()
     }
 
-    <span class="kw">fn </span>sorted_models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;; <span class="number">2</span>] {
-        <span class="kw">let </span><span class="kw-2">mut </span>models = <span class="self">self</span>.walker().models().map(|id| <span class="self">self</span>.dm.walk(id));
-        models.sort_by_key(|m| m.name());
-        models
-    }
-
-    <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.
-    </span><span class="kw">pub fn </span>model_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
-        <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.sorted_models()[<span class="number">0</span>].id)
-    }
-
-    <span class="doccomment">/// A pointer to the second `Model` in the `Relation`.
-    </span><span class="kw">pub fn </span>model_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
-        <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.sorted_models()[<span class="number">1</span>].id)
-    }
-
-    <span class="doccomment">/// A pointer to the `RelationField` in the first `Model` in the `Relation`.
-    </span><span class="kw">pub fn </span>field_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
-        <span class="self">self</span>.model_a()
-            .fields()
-            .find_from_relation(<span class="self">self</span>.id, RelationSide::A)
-            .unwrap()
-    }
-
-    <span class="doccomment">/// A pointer to the `RelationField` in the second `Model` in the `Relation`.
-    </span><span class="kw">pub fn </span>field_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
-        <span class="self">self</span>.model_b()
-            .fields()
-            .find_from_relation(<span class="self">self</span>.id, RelationSide::B)
-            .unwrap()
-    }
-
     <span class="doccomment">/// Practically deprecated with Prisma 2.
     </span><span class="kw">pub fn </span>is_many_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.field_a().is_list() &amp;&amp; <span class="self">self</span>.field_b().is_list()
+        <span class="self">self</span>.walker().relation_fields().all(|f| f.ast_field().arity.is_list())
     }
 
     <span class="kw">pub fn </span>is_one_to_one(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        !<span class="self">self</span>.field_a().is_list() &amp;&amp; !<span class="self">self</span>.field_b().is_list()
+        <span class="kw">match </span><span class="self">self</span>.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(r) =&gt; r.is_one_to_one(),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        }
     }
 
     <span class="kw">pub fn </span>is_one_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        !<span class="self">self</span>.is_many_to_many() &amp;&amp; !<span class="self">self</span>.is_one_to_one()
+        <span class="kw">match </span><span class="self">self</span>.walker().refine() {
+            walkers::RefinedRelationWalker::Inline(r) =&gt; !r.is_one_to_one(),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        }
     }
 
     <span class="doccomment">/// Retrieves the onDelete policy for this relation.
     </span><span class="kw">pub fn </span>on_delete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
-        <span class="self">self</span>.field_a()
-            .relation_info
-            .on_delete
-            .or_else(|| <span class="self">self</span>.field_b().relation_info.on_delete)
-            .unwrap_or(<span class="self">self</span>.field_a().on_delete_default)
+        <span class="kw">let </span>walker = <span class="self">self</span>.walker();
+        walker
+            .relation_fields()
+            .find_map(|rf| rf.explicit_on_delete())
+            .unwrap_or_else(|| {
+                walker
+                    .relation_fields()
+                    .next()
+                    .unwrap()
+                    .default_on_delete_action(<span class="self">self</span>.dm.schema.relation_mode(), <span class="self">self</span>.dm.schema.connector)
+            })
     }
 
     <span class="doccomment">/// Retrieves the onUpdate policy for this relation.
     </span><span class="kw">pub fn </span>on_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
-        <span class="self">self</span>.field_a()
-            .relation_info
-            .on_update
-            .or_else(|| <span class="self">self</span>.field_b().relation_info.on_update)
-            .unwrap_or(<span class="self">self</span>.field_a().on_update_default)
+        <span class="self">self</span>.walker()
+            .relation_fields()
+            .find_map(|rf| rf.explicit_on_update())
+            .unwrap_or(ReferentialAction::Cascade)
     }
 }
 </code></pre></div>

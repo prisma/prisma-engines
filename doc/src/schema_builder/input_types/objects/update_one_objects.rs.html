@@ -233,18 +233,6 @@
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{arguments, fields::data_input_mapper::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::args;
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
@@ -321,47 +309,41 @@
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; Vec&lt;ModelField&gt; {
-    model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| {
-            <span class="kw">match </span>field {
-                ModelField::Scalar(sf) =&gt; {
-                    <span class="comment">// We forbid updating auto-increment integer unique fields as this can create problems with the
-                    // underlying sequences (checked inputs only).
-                    </span><span class="kw">let </span>is_not_autoinc = !sf.is_auto_generated_int_id()
-                        &amp;&amp; !<span class="macro">matches!</span>(
-                            (<span class="kw-2">&amp;</span>sf.type_identifier(), sf.unique(), sf.is_autoincrement()),
-                            (TypeIdentifier::Int, <span class="bool-val">true</span>, <span class="bool-val">true</span>)
-                        );
+    model.fields().filter_all(|field| {
+        <span class="kw">match </span>field {
+            ModelField::Scalar(sf) =&gt; {
+                <span class="comment">// We forbid updating auto-increment integer unique fields as this can create problems with the
+                // underlying sequences (checked inputs only).
+                </span><span class="kw">let </span>is_not_autoinc = !sf.is_auto_generated_int_id()
+                    &amp;&amp; !<span class="macro">matches!</span>(
+                        (<span class="kw-2">&amp;</span>sf.type_identifier(), sf.unique(), sf.is_autoincrement()),
+                        (TypeIdentifier::Int, <span class="bool-val">true</span>, <span class="bool-val">true</span>)
+                    );
 
-                    <span class="kw">let </span>model_id = sf.container().as_model().unwrap().primary_identifier();
-                    <span class="kw">let </span>is_not_disallowed_id = <span class="kw">if </span>model_id.contains(sf.name()) {
-                        <span class="comment">// Is part of the id, connector must allow updating ID fields.
-                        </span>ctx.has_capability(ConnectorCapability::UpdateableId)
-                    } <span class="kw">else </span>{
-                        <span class="bool-val">true
-                    </span>};
+                <span class="kw">let </span>model_id = sf.container().as_model().unwrap().primary_identifier();
+                <span class="kw">let </span>is_not_disallowed_id = <span class="kw">if </span>model_id.contains(sf.name()) {
+                    <span class="comment">// Is part of the id, connector must allow updating ID fields.
+                    </span>ctx.has_capability(ConnectorCapability::UpdateableId)
+                } <span class="kw">else </span>{
+                    <span class="bool-val">true
+                </span>};
 
-                    !sf.is_read_only() &amp;&amp; is_not_autoinc &amp;&amp; is_not_disallowed_id
-                }
-
-                <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
-                // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
-                </span>ModelField::Relation(rf) =&gt; {
-                    <span class="kw">let </span>field_was_traversed_to = parent_field
-                        .filter(|pf| pf.related_field().name() == rf.name())
-                        .is_some();
-                    !field_was_traversed_to
-                }
-
-                <span class="comment">// Always keep composites
-                </span>ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+                !sf.is_read_only() &amp;&amp; is_not_autoinc &amp;&amp; is_not_disallowed_id
             }
-        })
-        .map(Clone::clone)
-        .collect()
+
+            <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+            // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+            </span>ModelField::Relation(rf) =&gt; {
+                <span class="kw">let </span>field_was_traversed_to = parent_field
+                    .filter(|pf| pf.related_field().name() == rf.name())
+                    .is_some();
+                !field_was_traversed_to
+            }
+
+            <span class="comment">// Always keep composites
+            </span>ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        }
+    })
 }
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for unchecked update.
@@ -385,47 +367,41 @@
     };
 
     <span class="kw">let </span>id_fields = model.fields().id().map(|pk| pk.fields());
-    model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| <span class="kw">match </span>field {
-            <span class="comment">// 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn&#39;t make any sense to be able to write the scalars that
-            // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don&#39;t want to deal with right now.
-            // 2) Exclude @@id or @id fields if not updatable
-            </span>ModelField::Scalar(sf) =&gt; {
-                !linking_fields.contains(sf)
-                    &amp;&amp; <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>id_fields) = <span class="kw-2">&amp;</span>id_fields {
-                        <span class="comment">// Exclude @@id or @id fields if not updatable
-                        </span><span class="kw">if </span>id_fields.contains(sf) {
-                            ctx.has_capability(ConnectorCapability::UpdateableId)
-                        } <span class="kw">else </span>{
-                            <span class="bool-val">true
-                        </span>}
+    model.fields().filter_all(|field| <span class="kw">match </span>field {
+        <span class="comment">// 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn&#39;t make any sense to be able to write the scalars that
+        // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don&#39;t want to deal with right now.
+        // 2) Exclude @@id or @id fields if not updatable
+        </span>ModelField::Scalar(sf) =&gt; {
+            !linking_fields.contains(sf)
+                &amp;&amp; <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>id_fields) = <span class="kw-2">&amp;</span>id_fields {
+                    <span class="comment">// Exclude @@id or @id fields if not updatable
+                    </span><span class="kw">if </span>id_fields.contains(sf) {
+                        ctx.has_capability(ConnectorCapability::UpdateableId)
                     } <span class="kw">else </span>{
                         <span class="bool-val">true
                     </span>}
-            }
+                } <span class="kw">else </span>{
+                    <span class="bool-val">true
+                </span>}
+        }
 
-            <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
-            // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
-            //
-            // Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are
-            // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
-            </span>ModelField::Relation(rf) =&gt; {
-                <span class="kw">let </span>is_not_inlined = !rf.is_inlined_on_enclosing_model();
-                <span class="kw">let </span>field_was_not_traversed_to = parent_field
-                    .filter(|pf| pf.related_field().name() == rf.name())
-                    .is_none();
+        <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+        // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+        //
+        // Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are
+        // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
+        </span>ModelField::Relation(rf) =&gt; {
+            <span class="kw">let </span>is_not_inlined = !rf.is_inlined_on_enclosing_model();
+            <span class="kw">let </span>field_was_not_traversed_to = parent_field
+                .filter(|pf| pf.related_field().name() == rf.name())
+                .is_none();
 
-                field_was_not_traversed_to &amp;&amp; is_not_inlined
-            }
+            field_was_not_traversed_to &amp;&amp; is_not_inlined
+        }
 
-            <span class="comment">// Always keep composites
-            </span>ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        })
-        .map(Clone::clone)
-        .collect()
+        <span class="comment">// Always keep composites
+        </span>ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+    })
 }
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateWithWhereUniqueNestedInput&quot; / &quot;&lt;x&gt;UpdateWithWhereUniqueWithout&lt;y&gt;Input&quot; input object types.

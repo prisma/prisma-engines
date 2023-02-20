@@ -503,6 +503,24 @@
 <a href="#503" id="503">503</a>
 <a href="#504" id="504">504</a>
 <a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
@@ -691,8 +709,8 @@
     <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids.clone() } };
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
         .fields()
-        .all
-        .iter()
+        .filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>)
+        .into_iter()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))
@@ -834,7 +852,7 @@
     <span class="kw">let </span>parent_id = parent_id.values().next().unwrap();
     <span class="kw">let </span>parent_id_field = pick_singular_id(<span class="kw-2">&amp;</span>parent_model);
 
-    <span class="kw">let </span>parent_ids_scalar_field_name = field.relation_info().fields.get(<span class="number">0</span>).unwrap();
+    <span class="kw">let </span>parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     <span class="kw">let </span>parent_id = (<span class="kw-2">&amp;</span>parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>parent_id_field)<span class="question-mark">?</span>;
@@ -862,7 +880,16 @@
 
     <span class="comment">// Then update all children and add the parent
     </span><span class="kw">let </span>child_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: child_ids } };
-    <span class="kw">let </span>child_ids_scalar_field_name = field.related_field().relation_info().fields.get(<span class="number">0</span>).unwrap().clone();
+    <span class="kw">let </span>child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
     <span class="kw">let </span>child_update = <span class="macro">doc! </span>{ <span class="string">&quot;$addToSet&quot;</span>: { child_ids_scalar_field_name: parent_id } };
 
     <span class="kw">let </span>child_updates = <span class="macro">vec!</span>[child_update.clone()];
@@ -891,7 +918,7 @@
     <span class="kw">let </span>parent_id = parent_id.values().next().unwrap();
     <span class="kw">let </span>parent_id_field = pick_singular_id(<span class="kw-2">&amp;</span>parent_model);
 
-    <span class="kw">let </span>parent_ids_scalar_field_name = field.relation_info().fields.get(<span class="number">0</span>).unwrap();
+    <span class="kw">let </span>parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     <span class="kw">let </span>parent_id = (<span class="kw-2">&amp;</span>parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>parent_id_field)<span class="question-mark">?</span>;
@@ -919,7 +946,16 @@
 
     <span class="comment">// Then update all children and add the parent
     </span><span class="kw">let </span>child_filter = <span class="macro">doc! </span>{ <span class="string">&quot;_id&quot;</span>: { <span class="string">&quot;$in&quot;</span>: child_ids } };
-    <span class="kw">let </span>child_ids_scalar_field_name = field.related_field().relation_info().fields.get(<span class="number">0</span>).unwrap().clone();
+    <span class="kw">let </span>child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
 
     <span class="kw">let </span>child_update = <span class="macro">doc! </span>{ <span class="string">&quot;$pull&quot;</span>: { child_ids_scalar_field_name: parent_id } };
 

@@ -144,36 +144,11 @@
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{
-    field_builders::RelationFieldBuilder, CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder,
-    PrimaryKeyBuilder,
-};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder};
 <span class="kw">use crate</span>::{
     builders::{CompositeFieldBuilder, ScalarFieldBuilder},
     extensions::<span class="kw-2">*</span>,
-    IndexType, RelationSide, TypeIdentifier,
+    IndexType, TypeIdentifier,
 };
 <span class="kw">use </span>dml::{<span class="self">self</span>, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 
@@ -195,7 +170,7 @@
         .collect()
 }
 
-<span class="kw">fn </span>model_field_builders(model: <span class="kw-2">&amp;</span>dml::Model, schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;FieldBuilder&gt; {
+<span class="kw">fn </span>model_field_builders(model: <span class="kw-2">&amp;</span>dml::Model, _schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;FieldBuilder&gt; {
     model
         .fields()
         .filter(|field| !field.is_ignored())
@@ -207,25 +182,6 @@
                 type_name: cf.composite_type.clone(),
                 default_value: cf.default_value.clone(),
             })),
-            dml::Field::RelationField(rf) =&gt; {
-                <span class="kw">let </span>walker = schema.db.walk(rf.id);
-                <span class="kw">let </span>relation = walker.relation();
-
-                <span class="kw">if </span>relation.is_ignored() {
-                    <span class="kw">return </span><span class="prelude-val">None</span>;
-                }
-
-                <span class="prelude-val">Some</span>(FieldBuilder::Relation(RelationFieldBuilder {
-                    id: rf.id,
-                    name: rf.name.clone(),
-                    arity: rf.arity,
-                    relation_name: walker.relation_name().to_string(),
-                    relation_side: RelationSide::new(rf.id, relation),
-                    relation_info: rf.relation_info.clone(),
-                    on_delete_default: rf.default_on_delete_action(),
-                    on_update_default: rf.default_on_update_action(),
-                }))
-            }
             dml::Field::ScalarField(sf) =&gt; {
                 <span class="kw">if </span>sf.type_identifier() == TypeIdentifier::Unsupported {
                     <span class="prelude-val">None

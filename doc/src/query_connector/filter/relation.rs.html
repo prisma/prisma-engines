@@ -142,18 +142,14 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::compare::RelationCompare;
 <span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
 <span class="kw">use </span>prisma_models::RelationField;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>RelationFilter {
     <span class="doccomment">/// Starting field of the relation traversal.
-    </span><span class="kw">pub </span>field: Arc&lt;RelationField&gt;,
+    </span><span class="kw">pub </span>field: RelationField,
 
     <span class="doccomment">/// Filter the related records need to fulfill.
     </span><span class="kw">pub </span>nested_filter: Box&lt;Filter&gt;,
@@ -195,7 +191,7 @@
 /// Todo there&#39;s no good, obvious reason why this is a separate filter.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>OneRelationIsNullFilter {
-    <span class="kw">pub </span>field: Arc&lt;RelationField&gt;,
+    <span class="kw">pub </span>field: RelationField,
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -236,14 +232,14 @@
     }
 }
 
-<span class="kw">impl </span>RelationCompare <span class="kw">for </span>Arc&lt;RelationField&gt; {
+<span class="kw">impl </span>RelationCompare <span class="kw">for </span>RelationField {
     <span class="doccomment">/// Every related record matches the filter.
     </span><span class="kw">fn </span>every_related&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: T) -&gt; Filter
     <span class="kw">where
         </span>T: Into&lt;Filter&gt;,
     {
         Filter::from(RelationFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             nested_filter: Box::new(filter.into()),
             condition: RelationCondition::EveryRelatedRecord,
         })
@@ -255,7 +251,7 @@
         </span>T: Into&lt;Filter&gt;,
     {
         Filter::from(RelationFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             nested_filter: Box::new(filter.into()),
             condition: RelationCondition::AtLeastOneRelatedRecord,
         })
@@ -267,7 +263,7 @@
         </span>T: Into&lt;Filter&gt;,
     {
         Filter::from(RelationFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             nested_filter: Box::new(filter.into()),
             condition: RelationCondition::ToOneRelatedRecord,
         })
@@ -279,7 +275,7 @@
         </span>T: Into&lt;Filter&gt;,
     {
         Filter::from(RelationFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             nested_filter: Box::new(filter.into()),
             condition: RelationCondition::NoRelatedRecord,
         })
@@ -287,9 +283,7 @@
 
     <span class="doccomment">/// One of the relations is `Null`.
     </span><span class="kw">fn </span>one_relation_is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Filter {
-        Filter::from(OneRelationIsNullFilter {
-            field: Arc::clone(<span class="self">self</span>),
-        })
+        Filter::from(OneRelationIsNullFilter { field: <span class="self">self</span>.clone() })
     }
 }
 </code></pre></div>

@@ -104,14 +104,12 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 <span class="kw">use </span>prisma_models::RelationFieldRef;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Only for many to many relations.
 ///
@@ -156,7 +154,7 @@
     <span class="kw">let </span>connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent_id: <span class="prelude-val">None</span>,
         child_ids: <span class="macro">vec!</span>[],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     <span class="kw">let </span>connect_node = graph.create_node(Query::Write(connect));

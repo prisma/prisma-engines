@@ -468,7 +468,7 @@
     }
 
     <span class="doccomment">/// All (concrete) relation fields of the model.
-    </span><span class="kw">pub fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone + <span class="lifetime">&#39;db </span>{
         <span class="kw">let </span>model_id = <span class="self">self</span>.id;
 
         <span class="self">self</span>.db

@@ -466,7 +466,7 @@
     <span class="kw">let </span>disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: <span class="prelude-val">None</span>,
         child_ids: <span class="macro">vec!</span>[],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     <span class="kw">let </span>disconnect_node = graph.create_node(Query::Write(disconnect));
@@ -693,7 +693,7 @@
         utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(<span class="kw-2">&amp;</span>child_model));
 
     <span class="kw">let </span>child_side_required = parent_relation_field.related_field().is_required();
-    <span class="kw">let </span>rf = Arc::clone(parent_relation_field);
+    <span class="kw">let </span>rf = parent_relation_field.clone();
 
     graph.create_edge(
         <span class="kw-2">&amp;</span>diff_node,
