@@ -1,9 +1,6 @@
 use crate::prelude::*;
 use dml::ReferentialAction;
-use psl::{
-    datamodel_connector::RelationMode,
-    parser_database::{walkers, RelationId},
-};
+use psl::parser_database::{walkers, RelationId};
 
 pub type Relation = crate::Zipper<RelationId>;
 pub type RelationRef = Relation;
@@ -78,33 +75,19 @@ impl Relation {
 
     /// Retrieves the onDelete policy for this relation.
     pub fn on_delete(&self) -> ReferentialAction {
-        let action = self
-            .field_a()
-            .on_delete()
-            .cloned()
-            .or_else(|| self.field_b().on_delete().cloned())
-            .unwrap_or(self.field_a().on_delete_default);
-
-        match (action, self.dm.schema.relation_mode()) {
-            // NoAction is an alias for Restrict when relationMode = "prisma"
-            (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
-            (action, _) => action,
-        }
+        self.field_a()
+            .relation_info
+            .on_delete
+            .or_else(|| self.field_b().relation_info.on_delete)
+            .unwrap_or(self.field_a().on_delete_default)
     }
 
     /// Retrieves the onUpdate policy for this relation.
     pub fn on_update(&self) -> ReferentialAction {
-        let action = self
-            .field_a()
-            .on_update()
-            .cloned()
-            .or_else(|| self.field_b().on_update().cloned())
-            .unwrap_or(self.field_a().on_update_default);
-
-        match (action, self.dm.schema.relation_mode()) {
-            // NoAction is an alias for Restrict when relationMode = "prisma"
-            (ReferentialAction::NoAction, RelationMode::Prisma) => ReferentialAction::Restrict,
-            (action, _) => action,
-        }
+        self.field_a()
+            .relation_info
+            .on_update
+            .or_else(|| self.field_b().relation_info.on_update)
+            .unwrap_or(self.field_a().on_update_default)
     }
 }
