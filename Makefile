@@ -259,7 +259,7 @@ qe-node-api: build target/debug/libquery_engine.node
 	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
 	cp $< $@
 
-.PHONY: amazon-image run-amazon qe-aws
+.PHONY: amazon-image run-amazon qe-aws qe-stub-aws qe-stub-debug
 
 amazon-image:
 	docker build -t prisma-lambda -f Dockerfile.amazonlinux .
@@ -278,3 +278,10 @@ qe-aws:
 	$(MAKE) run-amazon CMD="cargo build --release -p query-engine-node-api"
 	rm -f target/aws/release/libquery_engine.node
 	ln target/aws/release/libquery_engine.{so,node}
+
+qe-stub-aws:
+	$(MAKE) run-amazon CMD="cargo build --release -p stub-node-api"
+	rm -f target/aws/release/libquery_engine_stub.node
+	ln target/aws/release/libquery_engine_stub.{so,node}
+
+qe-stub-debug: build target/debug/libquery_engine_stub.node

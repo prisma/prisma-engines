@@ -1,0 +1,19 @@
+[package]
+name = "stub-node-api"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "query_engine_stub"
+
+[dependencies]
+napi = { version = "2.10.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
+napi-derive = "2.9.3"
+nope.path = "../nope"
+serde_json.workspace = true
+serde.workspace = true
+
+[build-dependencies]
+napi-build = "1"

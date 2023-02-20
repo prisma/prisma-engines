@@ -4272,6 +4272,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "stub-node-api"
+version = "0.1.0"
+dependencies = [
+ "napi",
+ "napi-build",
+ "napi-derive",
+ "nope",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "subprocess"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
