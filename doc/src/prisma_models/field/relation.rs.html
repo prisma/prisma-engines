@@ -293,14 +293,6 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>dml::{FieldArity, ReferentialAction, RelationInfo};
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -524,14 +516,6 @@
 
     <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; {
         <span class="self">self</span>.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
-    }
-
-    <span class="kw">pub fn </span>on_delete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReferentialAction&gt; {
-        <span class="self">self</span>.relation_info.on_delete.as_ref()
-    }
-
-    <span class="kw">pub fn </span>on_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReferentialAction&gt; {
-        <span class="self">self</span>.relation_info.on_update.as_ref()
     }
 
     <span class="kw">pub fn </span>relation_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RelationInfo {

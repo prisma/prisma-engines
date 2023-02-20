@@ -1168,6 +1168,7 @@
 <a href="#1168" id="1168">1168</a>
 <a href="#1169" id="1169">1169</a>
 <a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -1569,8 +1570,9 @@
 
     <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
         <span class="kw">match </span>rf.relation().on_delete() {
-            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
-            </span>ReferentialAction::Restrict =&gt; emulate_on_delete_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
+                emulate_on_delete_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
+            </span>}
             ReferentialAction::SetNull =&gt; {
                 emulate_on_delete_set_null(graph, connector_ctx, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
             </span>}
@@ -1841,8 +1843,7 @@
     <span class="comment">// For every relation fields sharing one common foreign key on the updated model, apply onUpdate emulations.
     </span><span class="kw">for </span>rf <span class="kw">in </span>overlapping_relation_fields {
         <span class="kw">match </span>rf.relation().on_update() {
-            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>,
-            ReferentialAction::Restrict =&gt; {
+            ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
                 emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>dependent_records_node, <span class="kw-2">&amp;</span>set_null_dependents_node)<span class="question-mark">?
             </span>}
             ReferentialAction::SetNull =&gt; emulate_on_update_set_null(
@@ -1986,8 +1987,7 @@
     <span class="comment">// For every relation fields sharing one common foreign key, recurse
     </span><span class="kw">for </span>rf <span class="kw">in </span>overlapping_relation_fields {
         <span class="kw">match </span>rf.relation().on_update() {
-            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>,
-            ReferentialAction::Restrict =&gt; {
+            ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
                 emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>dependent_records_node, <span class="kw-2">&amp;</span>set_null_dependents_node)<span class="question-mark">?
             </span>}
             ReferentialAction::SetNull =&gt; emulate_on_update_set_null(
@@ -2135,8 +2135,9 @@
 
     <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
         <span class="kw">match </span>rf.relation().on_update() {
-            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
-            </span>ReferentialAction::Restrict =&gt; emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
+                emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?
+            </span>}
             ReferentialAction::SetNull =&gt; {
                 emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?
             </span>}
@@ -2166,8 +2167,9 @@
 
     <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
         <span class="kw">match </span>rf.relation().on_update() {
-            ReferentialAction::NoAction =&gt; <span class="kw">continue</span>, <span class="comment">// Explicitly do nothing.
-            </span>ReferentialAction::Restrict =&gt; emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
+                emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
+            </span>}
             ReferentialAction::SetNull =&gt; {
                 emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, parent_node, child_node)<span class="question-mark">?
             </span>}
