@@ -59,7 +59,7 @@ impl<'a> LiftAstToDml<'a> {
             let model_name = model.name.as_str();
             model
                 .fields
-                .sort_by_key(|field| field_ids_for_sorting.get(&(model_name, field.name())).cloned());
+                .sort_by_key(|field| field_ids_for_sorting.get(&(model_name, &field.name)).cloned());
         }
 
         schema
@@ -183,18 +183,7 @@ impl<'a> LiftAstToDml<'a> {
             field_ids_for_sorting.insert((ast_model.name(), ast_field.name()), field_id);
 
             let field_type = match &scalar_field.scalar_field_type() {
-                db::ScalarFieldType::CompositeType(ctid) => {
-                    let mut field = CompositeField::new(scalar_field.id);
-                    field.name = scalar_field.name().to_owned();
-                    field.composite_type = self.db.ast()[*ctid].name().to_owned();
-                    field.documentation = ast_field.documentation().map(String::from);
-                    field.is_ignored = scalar_field.is_ignored();
-                    field.database_name = scalar_field.mapped_name().map(String::from);
-                    field.arity = ast_field.arity;
-
-                    model.add_field(Field::CompositeField(field));
-                    continue;
-                }
+                db::ScalarFieldType::CompositeType(_) => continue,
                 _ => self.lift_scalar_field_type(ast_field, &scalar_field.scalar_field_type(), scalar_field),
             };
 
@@ -210,7 +199,7 @@ impl<'a> LiftAstToDml<'a> {
                     .filter(|_| self.connector.supports_named_default_values()),
             });
 
-            model.add_field(Field::ScalarField(field));
+            model.add_field(field);
         }
 
         model

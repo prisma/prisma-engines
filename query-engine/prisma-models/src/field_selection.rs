@@ -200,7 +200,7 @@ impl CompositeSelection {
             && other.selections.iter().all(|selection| match selection {
                 SelectedField::Scalar(sf) => self.contains(&sf.name),
                 SelectedField::Composite(other_cs) => self
-                    .get(&other_cs.field.name())
+                    .get(other_cs.field.name())
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),

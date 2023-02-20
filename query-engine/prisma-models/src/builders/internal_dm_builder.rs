@@ -23,29 +23,26 @@ pub(crate) fn model_builders(datamodel: &Datamodel, schema: &psl::ValidatedSchem
 fn model_field_builders(model: &dml::Model, _schema: &psl::ValidatedSchema) -> Vec<FieldBuilder> {
     model
         .fields()
-        .filter(|field| !field.is_ignored())
-        .filter_map(|field| match field {
-            dml::Field::CompositeField(_) => None,
-            dml::Field::ScalarField(sf) => {
-                if sf.type_identifier() == TypeIdentifier::Unsupported {
-                    None
-                } else {
-                    Some(FieldBuilder::Scalar(ScalarFieldBuilder {
-                        id: crate::ScalarFieldId::InModel(sf.id),
-                        name: sf.name.clone(),
-                        type_identifier: sf.type_identifier(),
-                        is_unique: model.field_is_unique(&sf.name),
-                        is_id: model.field_is_primary(&sf.name),
-                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
-                        is_autoincrement: sf.is_auto_increment(),
-                        is_updated_at: sf.is_updated_at,
-                        internal_enum: sf.field_type.as_enum(),
-                        arity: sf.arity,
-                        db_name: sf.database_name.clone(),
-                        default_value: sf.default_value.clone(),
-                        native_type: sf.native_type(),
-                    }))
-                }
+        .filter(|field| !field.is_ignored)
+        .filter_map(|sf| {
+            if sf.type_identifier() == TypeIdentifier::Unsupported {
+                None
+            } else {
+                Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                    id: crate::ScalarFieldId::InModel(sf.id),
+                    name: sf.name.clone(),
+                    type_identifier: sf.type_identifier(),
+                    is_unique: model.field_is_unique(&sf.name),
+                    is_id: model.field_is_primary(&sf.name),
+                    is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
+                    is_autoincrement: sf.is_auto_increment(),
+                    is_updated_at: sf.is_updated_at,
+                    internal_enum: sf.field_type.as_enum(),
+                    arity: sf.arity,
+                    db_name: sf.database_name.clone(),
+                    default_value: sf.default_value.clone(),
+                    native_type: sf.native_type(),
+                }))
             }
         })
         .collect()

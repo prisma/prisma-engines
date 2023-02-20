@@ -266,7 +266,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
                 vec![InputType::object(composite_equality_object(ctx, cf))]
             };
 
-            input_field(&(*cf.name()), types, None)
+            input_field(cf.name(), types, None)
                 .optional_if(!cf.is_required())
                 .nullable_if(!cf.is_required() && !cf.is_list())
         }

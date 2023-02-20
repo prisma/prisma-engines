@@ -1,5 +1,5 @@
 use crate::TypeIdentifier;
-use dml::{self, Ignorable, NativeTypeInstance};
+use dml::{self, NativeTypeInstance};
 
 pub trait ModelConverterUtilities {
     // A model is supported if it has at least one indexed/unique field or compound index that's supported.
@@ -26,13 +26,10 @@ impl ModelConverterUtilities for dml::Model {
     }
 
     fn supports_create_operation(&self) -> bool {
-        let has_unsupported_field = self.fields.iter().any(|field| match field {
-            dml::Field::ScalarField(sf) => {
-                (sf.type_identifier() == TypeIdentifier::Unsupported || field.is_ignored())
-                    && sf.is_required()
-                    && sf.default_value.is_none()
-            }
-            _ => false,
+        let has_unsupported_field = self.fields.iter().any(|sf| {
+            (sf.type_identifier() == TypeIdentifier::Unsupported || sf.is_ignored)
+                && sf.is_required()
+                && sf.default_value.is_none()
         });
 
         !has_unsupported_field
@@ -40,12 +37,8 @@ impl ModelConverterUtilities for dml::Model {
 
     fn has_supported_indexed_field(&self) -> bool {
         self.fields.iter().any(|field| {
-            let is_supported_field = match field {
-                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                _ => false,
-            };
-
-            self.field_is_indexed(field.name()) && !field.is_ignored() && is_supported_field
+            let is_supported_field = field.type_identifier() != TypeIdentifier::Unsupported;
+            self.field_is_indexed(&field.name) && !field.is_ignored && is_supported_field
         })
     }
 
@@ -57,12 +50,8 @@ impl ModelConverterUtilities for dml::Model {
             }
 
             let field = self.find_field(&field.path.first().unwrap().0).unwrap();
-            let is_supported = match field {
-                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                dml::Field::CompositeField(_) => false,
-            };
-
-            is_supported && !field.is_ignored()
+            let is_supported = field.type_identifier() != TypeIdentifier::Unsupported;
+            is_supported && !field.is_ignored
         })
     }
 
