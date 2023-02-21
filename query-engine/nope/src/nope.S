@@ -29,8 +29,8 @@
     .text
 
     .set    N_NOPS, 10000000
-    .set    N_CALL_GROUPS, 1100
-    .set    N_NOPS_PER_CALL, 3
+    .set    N_CALL_GROUPS, 200
+    .set    N_NOPS_PER_CALL, 30
     .globl  SYM(nope_nops)
 
 #if defined(__aarch64__) || defined(_M_ARM64)
