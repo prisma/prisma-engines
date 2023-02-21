@@ -15,6 +15,7 @@ use crate::TestResult;
 pub struct JsonRequest;
 
 impl JsonRequest {
+    /// Translates a GraphQL query to a JSON query. This is used to keep the same test-suite running on both protocols.
     pub fn from_graphql(gql: &str, query_schema: &QuerySchemaRef) -> TestResult<JsonSingleQuery> {
         let operation = GraphQLProtocolAdapter::convert_query_to_operation(gql, None).unwrap();
         let operation_name = operation.name();
@@ -152,18 +153,11 @@ pub fn make_json_custom_type(typ: &str, val: JsonValue) -> JsonValue {
     json!({ custom_types::TYPE: typ, custom_types::VALUE: val })
 }
 
+/// Tiny abstraction which helps inferring what type a value should be coerced to
+/// when translated from GraphQL to JSON.
 struct FieldTypeInferrer<'a> {
+    /// The list of input types of an input field.
     types: Option<&'a Vec<InputType>>,
-}
-
-#[derive(Debug)]
-enum InferredType {
-    Object(InputObjectTypeStrongRef),
-    List(InputType),
-    Json,
-    JsonNullEnum,
-    FieldRef,
-    Unknown,
 }
 
 impl<'a> FieldTypeInferrer<'a> {
@@ -177,6 +171,9 @@ impl<'a> FieldTypeInferrer<'a> {
         }
     }
 
+    /// Given a list of input types and an ArgumentValue, attempts to infer to the best of our ability
+    /// what types it should be transformed to.
+    /// If we cannot confidently infer the type, we return InferredType::Unknown.
     pub(crate) fn infer(&self, value: &ArgumentValue) -> InferredType {
         if self.types.is_none() {
             return InferredType::Unknown;
@@ -243,4 +240,14 @@ impl<'a> FieldTypeInferrer<'a> {
             .find(|schema_object| val.keys().all(|key| schema_object.find_field(key).is_some()))
             .cloned()
     }
+}
+
+#[derive(Debug)]
+enum InferredType {
+    Object(InputObjectTypeStrongRef),
+    List(InputType),
+    Json,
+    JsonNullEnum,
+    FieldRef,
+    Unknown,
 }

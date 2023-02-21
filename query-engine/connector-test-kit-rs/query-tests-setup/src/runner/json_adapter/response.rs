@@ -8,6 +8,9 @@ use request_handlers::{GQLBatchResponse, GQLResponse, PrismaResponse};
 pub struct JsonResponse;
 
 impl JsonResponse {
+    /// Translates a GraphQL response to a JSON response. This is used to keep the same test-suite running on both protocols.
+    /// JSON responses returns type-hinted scalars. This module mostly _removes_ those type-hints so that we can work with
+    /// consistent data regardless of which protocol is being used to run the tests.
     pub fn from_graphql(response: PrismaResponse) -> PrismaResponse {
         if response.has_errors() {
             return response;
@@ -52,6 +55,10 @@ fn graphql_item_to_json_item(item: Item) -> Item {
     }
 }
 
+/// The serialization layer can use an `Item::Ref` to allow multiple parent records
+/// to claim the same item without copying data. Given that we cannot mutate those Arcs,
+/// we stupidly clone all those Refs so that we own them.
+/// This is only ok because we're doing that in our test environment.
 fn item_ref_to_owned_item(item_ref: ItemRef) -> Item {
     let item_ref = item_ref.as_ref();
 

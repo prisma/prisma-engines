@@ -157,16 +157,24 @@ impl QueryDocumentParser {
 
         for input_type in possible_input_types {
             let result = match (value.clone(), input_type) {
+                // With the JSON protocol, JSON values are sent as deserialized values.
+                // This means JSON can match with pretty much anything. A string, an int, an object, an array.
+                // This is an early catch-all.
+                // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
+                // We don't because they've already been desambiguified at the procotol adapter level.
                 (value, InputType::Scalar(ScalarType::Json))
                     if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
                     Ok(ParsedInputValue::Single(self.to_json(&parent_path, &value)?))
                 }
+                // With the JSON protocol, JSON values are sent as deserialized values.
+                // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
+                // We need this early matcher to make sure we coerce this array back to JSON.
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_str = serde_json::to_string(&list).unwrap();
-                    let json_list = self.parse_json_list(&parent_path, &json_str)?;
+                    let json_val = serde_json::to_value(list).unwrap();
+                    let json_list = self.parse_json_list_from_value(&parent_path, json_val)?;
 
                     Ok(ParsedInputValue::Single(json_list))
                 }
@@ -273,7 +281,7 @@ impl QueryDocumentParser {
 
             // String coercion matchers
             (PrismaValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
-            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list(parent_path, &s),
+            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list_from_str(parent_path, &s),
             (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(parent_path, s),
             (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(parent_path, s),
             (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(parent_path, s),
@@ -355,9 +363,13 @@ impl QueryDocumentParser {
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.
-    fn parse_json_list(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
+    fn parse_json_list_from_str(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = self.parse_json(path, s)?;
 
+        self.parse_json_list_from_value(path, json)
+    }
+
+    fn parse_json_list_from_value(&self, path: &QueryPath, json: serde_json::Value) -> QueryParserResult<PrismaValue> {
         let values = json.as_array().ok_or_else(|| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::AssertionError("JSON parameter needs to be an array".into()),
