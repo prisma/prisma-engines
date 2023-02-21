@@ -70,6 +70,8 @@ pub struct Enum {
     pub(crate) documentation: Option<Comment>,
     /// The location of this enum in the text representation.
     pub span: Span,
+    /// The span of the inner contents.
+    pub inner_span: Span,
 }
 
 impl Enum {

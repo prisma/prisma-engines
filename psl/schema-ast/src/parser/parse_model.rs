@@ -13,28 +13,38 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut fields: Vec<Field> = Vec::new();
-    let mut pending_field_comment: Option<Pair<'_>> = None;
+    let mut inner_span: Option<Span> = None;
 
     for current in pair.into_inner() {
         match current.as_rule() {
             Rule::MODEL_KEYWORD | Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => {}
             Rule::identifier => name = Some(current.into()),
-            Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
-            Rule::field_declaration => match parse_field(
-                &name.as_ref().unwrap().name,
-                "model",
-                current,
-                pending_field_comment.take(),
-                diagnostics,
-            ) {
-                Ok(field) => fields.push(field),
-                Err(err) => diagnostics.push_error(err),
-            },
-            Rule::comment_block => pending_field_comment = Some(current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid field or attribute definition.",
-                current.as_span().into(),
-            )),
+            Rule::model_contents => {
+                let mut pending_field_comment: Option<Pair<'_>> = None;
+                inner_span = Some(current.as_span().into());
+
+                for item in current.into_inner() {
+                    match item.as_rule() {
+                        Rule::block_attribute => attributes.push(parse_attribute(item, diagnostics)),
+                        Rule::field_declaration => match parse_field(
+                            &name.as_ref().unwrap().name,
+                            "model",
+                            item,
+                            pending_field_comment.take(),
+                            diagnostics,
+                        ) {
+                            Ok(field) => fields.push(field),
+                            Err(err) => diagnostics.push_error(err),
+                        },
+                        Rule::comment_block => pending_field_comment = Some(item),
+                        Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
+                            "This line is not a valid field or attribute definition.",
+                            item.as_span().into(),
+                        )),
+                        _ => parsing_catch_all(&item, "model"),
+                    }
+                }
+            }
             _ => parsing_catch_all(&current, "model"),
         }
     }
@@ -47,6 +57,7 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             documentation: doc_comment.and_then(parse_comment_block),
             is_view: false,
             span: Span::from(pair_span),
+            inner_span: inner_span.unwrap(),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }
