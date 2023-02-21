@@ -8,6 +8,9 @@ doc = false
 crate-type = ["cdylib"]
 name = "query_engine_stub"
 
+[features]
+vendored-openssl = ["openssl/vendored"]
+
 [dependencies]
 napi = { version = "2.10.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
 napi-derive = "2.9.3"
