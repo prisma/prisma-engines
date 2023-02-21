@@ -71,7 +71,7 @@ impl Fields {
             .collect()
     }
 
-    fn composite(&self) -> Vec<CompositeFieldRef> {
+    pub fn composite(&self) -> Vec<CompositeFieldRef> {
         let model = self.model();
         let internal_data_model = model.internal_data_model();
         internal_data_model

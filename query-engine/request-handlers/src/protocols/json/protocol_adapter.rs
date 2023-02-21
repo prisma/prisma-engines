@@ -102,7 +102,7 @@ impl JsonProtocolAdapter {
                         let nested_container = field.map(|f| match f {
                             Field::Relation(rf) => ParentContainer::from(rf.related_model()),
                             Field::Scalar(sf) => sf.container().clone(),
-                            Field::Composite(cf) => ParentContainer::from(&cf.typ),
+                            Field::Composite(cf) => ParentContainer::from(cf.typ()),
                         });
 
                         if is_composite_field && all_composites_set {
@@ -269,7 +269,7 @@ impl JsonProtocolAdapter {
 
                         Self::default_composite_selection(
                             &mut nested_selection,
-                            &ParentContainer::from(&cf.typ),
+                            &ParentContainer::from(cf.typ()),
                             &schema_field.field_type.as_object_type().unwrap(),
                             walked_types,
                         )?;
@@ -302,7 +302,7 @@ impl JsonProtocolAdapter {
 
                                 Self::default_composite_selection(
                                     &mut nested_selection,
-                                    &ParentContainer::from(&cf.typ),
+                                    &ParentContainer::from(cf.typ()),
                                     &schema_field.field_type.as_object_type().unwrap(),
                                     walked_types,
                                 )?;
