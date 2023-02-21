@@ -44,8 +44,8 @@ all = [
 ]
 
 vendored-openssl = [
-  "postgres-native-tls/vendored-openssl",
-  "mysql_async/vendored-openssl",
+  "native-tls/vendored",
+  "tokio-native-tls/vendored",
 ]
 
 postgresql = [
@@ -81,6 +81,7 @@ tracing = "0.1"
 futures = "0.3"
 url = "2.1"
 hex = "0.4"
+tokio-native-tls = "0.3"
 
 either = { version = "1.6", optional = true }
 base64 = { version = "0.12.3", optional = true }
@@ -111,9 +112,8 @@ optional = true
 version = ">1.4.0"
 
 [dependencies.mysql_async]
-git = "https://github.com/prisma/mysql_async"
+version = "0.31"
 optional = true
-branch = "vendored-openssl"
 
 [dependencies.rusqlite]
 version = "0.25"
