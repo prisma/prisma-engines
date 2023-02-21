@@ -5,6 +5,11 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN yum update -y
 RUN yum groupinstall -y 'Development Tools'
 RUN yum install -y git openssl-devel zlib-devel
+
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+RUN curl -sL https://rpm.nodesource.com/setup_16.x | bash -
+RUN yum install -y nodejs
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/engines/target/release/libquery_engine.node
 
 WORKDIR /engines
