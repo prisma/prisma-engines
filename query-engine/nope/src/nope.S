@@ -57,6 +57,8 @@ SYM(nope_nops):
 #else
 
 // nm -D /lib64/libc.so.6 | awk '{ print "    X(" $3 ") \\" }'
+// manually edited to prevent some linker errors
+// 2206 symbols
 #define LIBC_FUNCTIONS \
     X(_Exit) \
     X(_IO_2_1_stderr_) \
