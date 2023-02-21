@@ -14,6 +14,8 @@ napi-derive = "2.9.3"
 nope.path = "../nope"
 serde_json.workspace = true
 serde.workspace = true
+openssl = "0.10.45"
+libz-sys = "1.1.8"
 
 [build-dependencies]
 napi-build = "1"

@@ -1,5 +1,6 @@
 use napi::{Env, JsFunction, JsUnknown};
 use napi_derive::napi;
+use std::ffi::CStr;
 
 fn not_a_real_qe() -> napi::Error {
     napi::Error::from_reason("Not a real Query Engine")
@@ -12,6 +13,10 @@ pub struct QueryEngine;
 impl QueryEngine {
     #[napi(constructor)]
     pub fn new(_napi_env: Env, _options: JsUnknown, _callback: JsFunction) -> napi::Result<Self> {
+        println!("OpenSSL version: {}", openssl::version::version());
+        println!("zlib version: {}", unsafe {
+            CStr::from_ptr(libz_sys::zlibVersion()).to_string_lossy()
+        });
         Ok(Self)
     }
 
