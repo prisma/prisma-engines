@@ -252,8 +252,8 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
     let mut fields = vec![];
 
     let composite_type = cf.typ();
-    let input_fields = composite_type.fields().iter().map(|f| match f {
-        ModelField::Scalar(sf) => input_field(sf.name(), map_scalar_input_type_for_field(ctx, sf), None)
+    let input_fields = composite_type.fields().map(|f| match f {
+        ModelField::Scalar(sf) => input_field(sf.name(), map_scalar_input_type_for_field(ctx, &sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),
 
@@ -261,9 +261,9 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
             let types = if cf.is_list() {
                 // The object (aka shorthand) syntax is only supported because the client used to expose all
                 // list input types as T | T[]. Consider removing it one day.
-                list_union_type(InputType::object(composite_equality_object(ctx, cf)), true)
+                list_union_type(InputType::object(composite_equality_object(ctx, &cf)), true)
             } else {
-                vec![InputType::object(composite_equality_object(ctx, cf))]
+                vec![InputType::object(composite_equality_object(ctx, &cf))]
             };
 
             input_field(cf.name(), types, None)

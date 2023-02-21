@@ -209,7 +209,7 @@ fn parse_composite_updates(
         let typ = cf.typ();
         let field = typ.find_field(&k).unwrap();
 
-        let field_name: DatasourceFieldName = match field {
+        let field_name: DatasourceFieldName = match &field {
             Field::Scalar(sf) => sf.into(),
             Field::Composite(cf) => cf.into(),
             _ => unreachable!(),

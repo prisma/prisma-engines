@@ -296,7 +296,7 @@ impl NestedWrite {
             let nested_field = nested_ct.find_field_by_db_name(&db_name).unwrap();
             let mut new_path = field_path.clone();
 
-            new_path.add_segment(nested_field);
+            new_path.add_segment(&nested_field);
 
             match write {
                 WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) => {

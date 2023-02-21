@@ -470,11 +470,11 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
                 // The field on the output object type. Used for the actual serialization process.
                 let inner_out_field = object_type.find_field(inner_field.name()).unwrap();
 
-                match inner_field {
+                match &inner_field {
                     Field::Composite(cf) => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, &inner_out_field, value)?,
+                            serialize_composite(&cf, &inner_out_field, value)?,
                         );
                     }
 

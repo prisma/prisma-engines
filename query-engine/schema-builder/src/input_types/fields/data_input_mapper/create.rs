@@ -197,7 +197,8 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &Compos
     ctx.cache_input_type(ident, input_object.clone());
 
     let mapper = CreateDataInputFieldMapper::new_checked();
-    let fields = mapper.map_all(ctx, cf.typ().fields());
+    let fields = cf.typ().fields().collect::<Vec<_>>();
+    let fields = mapper.map_all(ctx, &fields);
 
     input_object.set_fields(fields);
 
