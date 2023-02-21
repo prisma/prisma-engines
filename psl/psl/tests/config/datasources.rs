@@ -132,7 +132,6 @@ fn datasource_should_not_allow_arbitrary_parameters() {
         [1;94m   | [0m
         [1;94m 3 | [0m  url = "mysql://localhost"
         [1;94m 4 | [0m  [1;91mfoo = "bar"[0m
-        [1;94m 5 | [0m}
         [1;94m   | [0m
     "#]];
 

@@ -8,5 +8,4 @@ datasource db {
 // [1;94m   | [0m
 // [1;94m 3 | [0m  url = "sqlite"
 // [1;94m 4 | [0m  [1;93mreferentialIntegrity = "foreignKeys"[0m
-// [1;94m 5 | [0m}
 // [1;94m   | [0m

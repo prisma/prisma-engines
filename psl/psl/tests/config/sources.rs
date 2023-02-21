@@ -648,7 +648,6 @@ fn fail_when_preview_features_are_declared() {
         [1;94m   | [0m
         [1;94m 3 | [0m  url = "mysql://"
         [1;94m 4 | [0m  [1;91mpreviewFeatures = ["foo"][0m
-        [1;94m 5 | [0m}
         [1;94m   | [0m
     "#]];
 
