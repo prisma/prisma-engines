@@ -182,15 +182,15 @@ impl From<CoreError> for user_facing_errors::Error {
 
             CoreError::QueryParserError(query_parser_error)
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                let known_error = match query_parser_error.error_kind {
+                let known_error = match query_parser_error.error_kind() {
                     QueryParserErrorKind::RequiredValueNotSetError => {
                         user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", query_parser_error.path),
+                            path: format!("{}", query_parser_error.path()),
                         })
                     }
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: format!("{}", query_parser_error.error_kind),
-                        query_position: format!("{}", query_parser_error.path),
+                        query_validation_error: format!("{}", query_parser_error.error_kind()),
+                        query_position: format!("{}", query_parser_error.path()),
                     }),
                 };
 

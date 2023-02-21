@@ -4,25 +4,43 @@ use itertools::Itertools;
 use std::fmt;
 
 #[derive(Debug)]
-pub struct QueryParserError {
-    pub path: QueryPath,
-    pub error_kind: QueryParserErrorKind,
+pub enum QueryParserError {
+    New,
+    Legacy {
+        path: QueryPath,
+        error_kind: QueryParserErrorKind,
+    },
 }
 
 impl QueryParserError {
     /// Create a new instance of `QueryParserError`.
-    pub fn new(path: QueryPath, error_kind: QueryParserErrorKind) -> Self {
-        Self { path, error_kind }
+    pub fn new_legacy(path: QueryPath, error_kind: QueryParserErrorKind) -> Self {
+        Self::Legacy { path, error_kind }
+    }
+
+    pub fn path(&self) -> QueryPath {
+        match self {
+            Self::Legacy { path, error_kind: _ } => path.clone(),
+            Self::New => todo!(),
+        }
+    }
+
+    pub fn error_kind(&self) -> &QueryParserErrorKind {
+        match self {
+            Self::Legacy { path: _, error_kind } => error_kind,
+            Self::New => todo!(),
+        }
     }
 }
 
 impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Query parsing/validation error at `{}`: {}",
-            self.path, self.error_kind,
-        )
+        match self {
+            Self::Legacy { path, error_kind } => {
+                write!(f, "Query parsing/validation error at `{}`: {}", path, error_kind,)
+            }
+            Self::New => todo!(),
+        }
     }
 }
 
@@ -176,9 +194,9 @@ impl Display for FieldCountError {
 
 impl From<prisma_models::DomainError> for QueryParserError {
     fn from(err: prisma_models::DomainError) -> Self {
-        QueryParserError {
-            path: QueryPath::default(),
-            error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
-        }
+        QueryParserError::new_legacy(
+            QueryPath::default(),
+            QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
+        )
     }
 }
