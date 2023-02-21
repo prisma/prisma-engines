@@ -75,6 +75,20 @@ pub enum CoreError {
     BatchError { request_idx: usize, error: Box<CoreError> },
 }
 
+// gradual json serialization. Default to a json string, equal to to_string (auto-implemented by
+// fmt::Display)
+impl serde::Serialize for CoreError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::QueryGraphBuilderError(err) => err.serialize(serializer),
+            err @ _ => serializer.serialize_str(err.to_string().as_str()),
+        }
+    }
+}
+
 impl CoreError {
     pub fn null_serialization_error(field_name: &str) -> Self {
         CoreError::SerializationError(format!(
