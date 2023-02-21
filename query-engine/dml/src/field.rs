@@ -4,7 +4,7 @@ use crate::default_value::{DefaultKind, DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
-use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use crate::traits::{WithDatabaseName, WithName};
 use crate::{CompositeTypeFieldType, FieldArity};
 use psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
 
@@ -93,142 +93,7 @@ impl FieldType {
     }
 }
 
-/// Represents a Field in a Model.
-#[derive(Debug, PartialEq, Clone)]
-pub enum Field {
-    ScalarField(ScalarField),
-    CompositeField(CompositeField),
-}
-
-impl Field {
-    pub fn as_scalar_field(&self) -> Option<&ScalarField> {
-        match self {
-            Field::ScalarField(sf) => Some(sf),
-            _ => None,
-        }
-    }
-
-    pub fn as_scalar_field_mut(&mut self) -> Option<&mut ScalarField> {
-        match self {
-            Field::ScalarField(sf) => Some(sf),
-            _ => None,
-        }
-    }
-
-    pub fn as_composite_field(&self) -> Option<&CompositeField> {
-        match self {
-            Field::CompositeField(cf) => Some(cf),
-            _ => None,
-        }
-    }
-
-    pub fn is_scalar_field(&self) -> bool {
-        matches!(self, Field::ScalarField(_))
-    }
-
-    pub fn name(&self) -> &str {
-        match &self {
-            Field::ScalarField(sf) => &sf.name,
-            Field::CompositeField(cf) => &cf.name,
-        }
-    }
-
-    pub fn documentation(&self) -> Option<&str> {
-        match self {
-            Field::ScalarField(sf) => sf.documentation.as_deref(),
-            Field::CompositeField(cf) => cf.documentation.as_deref(),
-        }
-    }
-
-    pub fn set_documentation(&mut self, documentation: Option<String>) {
-        match self {
-            Field::ScalarField(sf) => sf.documentation = documentation,
-            Field::CompositeField(cf) => cf.documentation = documentation,
-        }
-    }
-
-    pub fn is_commented_out(&self) -> bool {
-        match self {
-            Field::ScalarField(sf) => sf.is_commented_out,
-            Field::CompositeField(cf) => cf.is_commented_out,
-        }
-    }
-
-    pub fn arity(&self) -> &FieldArity {
-        match &self {
-            Field::ScalarField(sf) => &sf.arity,
-            Field::CompositeField(rf) => &rf.arity,
-        }
-    }
-
-    pub fn field_type(&self) -> FieldType {
-        match &self {
-            Field::ScalarField(sf) => sf.field_type.clone(),
-            Field::CompositeField(cf) => FieldType::CompositeType(cf.composite_type.clone()),
-        }
-    }
-
-    pub fn default_value(&self) -> Option<&DefaultValue> {
-        match &self {
-            Field::ScalarField(sf) => sf.default_value.as_ref(),
-            Field::CompositeField(_) => None,
-        }
-    }
-
-    pub fn is_updated_at(&self) -> bool {
-        match &self {
-            Field::ScalarField(sf) => sf.is_updated_at,
-            Field::CompositeField(_) => false,
-        }
-    }
-}
-
-impl WithName for Field {
-    fn name(&self) -> &String {
-        match self {
-            Field::ScalarField(sf) => sf.name(),
-            Field::CompositeField(cf) => cf.name(),
-        }
-    }
-    fn set_name(&mut self, name: &str) {
-        match self {
-            Field::ScalarField(sf) => sf.set_name(name),
-            Field::CompositeField(cf) => cf.set_name(name),
-        }
-    }
-}
-
-impl WithDatabaseName for Field {
-    fn database_name(&self) -> Option<&str> {
-        match self {
-            Field::ScalarField(sf) => sf.database_name.as_deref(),
-            Field::CompositeField(cf) => cf.database_name.as_deref(),
-        }
-    }
-
-    fn set_database_name(&mut self, database_name: Option<String>) {
-        match self {
-            Field::ScalarField(sf) => sf.set_database_name(database_name),
-            Field::CompositeField(cf) => cf.set_database_name(database_name),
-        }
-    }
-}
-
-impl Ignorable for Field {
-    fn is_ignored(&self) -> bool {
-        match self {
-            Field::ScalarField(sf) => sf.is_ignored,
-            Field::CompositeField(cf) => cf.is_ignored,
-        }
-    }
-
-    fn ignore(&mut self) {
-        match self {
-            Field::ScalarField(sf) => sf.is_ignored = true,
-            Field::CompositeField(cf) => cf.is_ignored = true,
-        }
-    }
-}
+pub type Field = ScalarField;
 
 /// Represents a scalar field in a model.
 #[derive(Debug, PartialEq, Clone)]
@@ -322,74 +187,6 @@ impl WithName for ScalarField {
 }
 
 impl WithDatabaseName for ScalarField {
-    fn database_name(&self) -> Option<&str> {
-        self.database_name.as_deref()
-    }
-    fn set_database_name(&mut self, database_name: Option<String>) {
-        self.database_name = database_name;
-    }
-}
-
-/// Represents a composite field.
-#[derive(Debug, PartialEq, Clone)]
-pub struct CompositeField {
-    /// Name of the field.
-    pub name: String,
-
-    /// The database internal name.
-    pub database_name: Option<String>,
-
-    /// The name of the composite type that backs this field.
-    pub composite_type: String,
-
-    /// The field's arity.
-    pub arity: FieldArity,
-
-    /// Comments associated with this field.
-    pub documentation: Option<String>,
-
-    /// Indicates if this field has to be commented out.
-    pub is_commented_out: bool,
-
-    /// Indicates if this field has to be ignored by the Client.
-    pub is_ignored: bool,
-
-    /// The default value of this field
-    pub default_value: Option<DefaultValue>,
-}
-
-impl CompositeField {
-    pub fn new() -> Self {
-        CompositeField {
-            name: String::new(),
-            database_name: None,
-            composite_type: String::new(),
-            arity: FieldArity::Optional,
-            documentation: None,
-            is_commented_out: false,
-            is_ignored: false,
-            default_value: None,
-        }
-    }
-}
-
-impl Default for CompositeField {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl WithName for CompositeField {
-    fn name(&self) -> &String {
-        &self.name
-    }
-
-    fn set_name(&mut self, name: &str) {
-        self.name = String::from(name)
-    }
-}
-
-impl WithDatabaseName for CompositeField {
     fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }

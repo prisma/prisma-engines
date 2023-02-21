@@ -1,73 +1,73 @@
 use crate::{parent_container::ParentContainer, CompositeTypeRef};
 use dml::FieldArity;
-use std::{
-    fmt::{Debug, Display},
-    hash::{Hash, Hasher},
-    sync::{Arc, Weak},
-};
+use psl::{parser_database::walkers, schema_ast::ast};
+use std::fmt::{Debug, Display};
 
-pub type CompositeFieldRef = Arc<CompositeField>;
-pub type CompositeFieldWeak = Weak<CompositeField>;
-
-#[derive(Clone)]
-pub struct CompositeField {
-    pub name: String,
-    pub typ: CompositeTypeRef,
-    pub(crate) db_name: Option<String>,
-    pub(crate) arity: FieldArity,
-    pub(crate) container: ParentContainer,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CompositeFieldId {
+    InModel(walkers::ScalarFieldId),
+    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 
+pub type CompositeField = crate::Zipper<CompositeFieldId>;
+pub type CompositeFieldRef = CompositeField;
+pub type CompositeFieldWeak = CompositeField;
+
 impl CompositeField {
+    fn arity(&self) -> FieldArity {
+        match self.id {
+            CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).ast_field().arity,
+            CompositeFieldId::InCompositeType(id) => self.dm.walk(id).arity(),
+        }
+    }
+
+    pub fn typ(&self) -> CompositeTypeRef {
+        let id = match self.id {
+            CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).scalar_field_type().as_composite_type().unwrap(),
+            CompositeFieldId::InCompositeType(ctid) => self.dm.walk(ctid).r#type().as_composite_type().unwrap(),
+        };
+        self.dm.find_composite_type_by_id(id)
+    }
+
     pub fn is_list(&self) -> bool {
-        matches!(self.arity, FieldArity::List)
+        matches!(self.arity(), FieldArity::List)
     }
 
     pub fn is_required(&self) -> bool {
-        matches!(self.arity, FieldArity::Required)
+        matches!(self.arity(), FieldArity::Required)
     }
 
     pub fn is_optional(&self) -> bool {
-        matches!(self.arity, FieldArity::Optional)
+        matches!(self.arity(), FieldArity::Optional)
+    }
+
+    pub fn name(&self) -> &str {
+        match self.id {
+            CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).name(),
+            CompositeFieldId::InCompositeType(id) => self.dm.walk(id).name(),
+        }
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name.as_deref().unwrap_or(self.name.as_str())
+        match self.id {
+            CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).database_name(),
+            CompositeFieldId::InCompositeType(id) => self.dm.walk(id).database_name(),
+        }
     }
 
-    pub fn container(&self) -> &ParentContainer {
-        &self.container
-    }
-}
-
-impl Debug for CompositeField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CompositeField")
-            .field("name", &self.name)
-            .field("arity", &self.arity)
-            .field("container", &self.container)
-            .field("composite_type", &self.typ.name)
-            .finish()
+    pub fn container(&self) -> ParentContainer {
+        match self.id {
+            CompositeFieldId::InModel(id) => {
+                let id = self.dm.walk(id).model().id;
+                self.dm.find_model_by_id(id).into()
+            }
+            CompositeFieldId::InCompositeType((ct_id, _)) => self.dm.find_composite_type_by_id(ct_id).into(),
+        }
     }
 }
 
 impl Display for CompositeField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}", self.container().name(), self.name)
-    }
-}
-
-impl Hash for CompositeField {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        // Names are unique in the data model.
-        self.name.hash(state);
-    }
-}
-
-impl Eq for CompositeField {}
-
-impl PartialEq for CompositeField {
-    fn eq(&self, other: &CompositeField) -> bool {
-        self.name == other.name
+        write!(f, "{}.{}", self.container().name(), self.name())
     }
 }

@@ -70,12 +70,12 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     let mut doc = Document::new();
 
     for (field, value) in pairs {
-        let field = cf
-            .typ
+        let composite_type = cf.typ();
+        let field = composite_type
             .find_field(&field) // Todo: This is assuming a lot by only checking the prisma names, not DB names.
             .expect("Writing unavailable composite field.");
 
-        let converted = (field, value).into_bson()?;
+        let converted = (&field, value).into_bson()?;
 
         doc.insert(field.db_name(), converted);
     }

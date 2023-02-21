@@ -111,6 +111,14 @@ impl ScalarFieldType {
         }
     }
 
+    /// Try to interpret this field type as a Composite Type.
+    pub fn as_composite_type(self) -> Option<ast::CompositeTypeId> {
+        match self {
+            ScalarFieldType::CompositeType(id) => Some(id),
+            _ => None,
+        }
+    }
+
     /// Is the type of the field `Unsupported("...")`?
     pub fn is_unsupported(self) -> bool {
         matches!(self, Self::Unsupported(_))

@@ -1,9 +1,5 @@
 use super::{CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder};
-use crate::{
-    builders::{CompositeFieldBuilder, ScalarFieldBuilder},
-    extensions::*,
-    IndexType, TypeIdentifier,
-};
+use crate::{builders::ScalarFieldBuilder, extensions::*, IndexType, TypeIdentifier};
 use dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 
 pub(crate) fn model_builders(datamodel: &Datamodel, schema: &psl::ValidatedSchema) -> Vec<ModelBuilder> {
@@ -27,35 +23,26 @@ pub(crate) fn model_builders(datamodel: &Datamodel, schema: &psl::ValidatedSchem
 fn model_field_builders(model: &dml::Model, _schema: &psl::ValidatedSchema) -> Vec<FieldBuilder> {
     model
         .fields()
-        .filter(|field| !field.is_ignored())
-        .filter_map(|field| match field {
-            dml::Field::CompositeField(cf) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
-                name: cf.name.clone(),
-                db_name: cf.database_name.clone(),
-                arity: cf.arity,
-                type_name: cf.composite_type.clone(),
-                default_value: cf.default_value.clone(),
-            })),
-            dml::Field::ScalarField(sf) => {
-                if sf.type_identifier() == TypeIdentifier::Unsupported {
-                    None
-                } else {
-                    Some(FieldBuilder::Scalar(ScalarFieldBuilder {
-                        id: crate::ScalarFieldId::InModel(sf.id),
-                        name: sf.name.clone(),
-                        type_identifier: sf.type_identifier(),
-                        is_unique: model.field_is_unique(&sf.name),
-                        is_id: model.field_is_primary(&sf.name),
-                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
-                        is_autoincrement: sf.is_auto_increment(),
-                        is_updated_at: sf.is_updated_at,
-                        internal_enum: sf.field_type.as_enum(),
-                        arity: sf.arity,
-                        db_name: sf.database_name.clone(),
-                        default_value: sf.default_value.clone(),
-                        native_type: sf.native_type(),
-                    }))
-                }
+        .filter(|field| !field.is_ignored)
+        .filter_map(|sf| {
+            if sf.type_identifier() == TypeIdentifier::Unsupported {
+                None
+            } else {
+                Some(FieldBuilder::Scalar(ScalarFieldBuilder {
+                    id: crate::ScalarFieldId::InModel(sf.id),
+                    name: sf.name.clone(),
+                    type_identifier: sf.type_identifier(),
+                    is_unique: model.field_is_unique(&sf.name),
+                    is_id: model.field_is_primary(&sf.name),
+                    is_auto_generated_int_id: model.field_is_auto_generated_int_id(&sf.name),
+                    is_autoincrement: sf.is_auto_increment(),
+                    is_updated_at: sf.is_updated_at,
+                    internal_enum: sf.field_type.as_enum(),
+                    arity: sf.arity,
+                    db_name: sf.database_name.clone(),
+                    default_value: sf.default_value.clone(),
+                    native_type: sf.native_type(),
+                }))
             }
         })
         .collect()
@@ -65,16 +52,8 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
     composite
         .fields
         .iter()
-        // .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.
         .filter_map(|field| match &field.r#type {
-            CompositeTypeFieldType::CompositeType(type_name) => Some(FieldBuilder::Composite(CompositeFieldBuilder {
-                name: field.name.clone(),
-                db_name: field.database_name.clone(),
-                arity: field.arity,
-                type_name: type_name.clone(),
-                // No defaults on composite fields of type composite
-                default_value: None,
-            })),
+            CompositeTypeFieldType::CompositeType(_) => None,
             CompositeTypeFieldType::Scalar(_, _) | CompositeTypeFieldType::Enum(_) => {
                 let type_ident = field.type_identifier();
 
@@ -139,6 +118,7 @@ pub(crate) fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTyp
         .composite_types
         .iter()
         .map(|ct| CompositeTypeBuilder {
+            id: ct.id,
             name: ct.name.clone(),
             fields: composite_field_builders(ct),
         })

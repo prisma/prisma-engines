@@ -1,15 +1,14 @@
-use super::IndexFieldWalker;
 use crate::{
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
-    walkers::{EnumWalker, ModelWalker, Walker},
+    walkers::*,
     OperatorClass, ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
 use either::Either;
 
 /// An opaque identifier for a model scalar field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Eq)]
+#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
 pub struct ScalarFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
 
 /// A scalar field, as part of a model.
@@ -110,10 +109,7 @@ impl<'db> ScalarFieldWalker<'db> {
     /// Is this field's type an enum? If yes, walk the enum.
     pub fn field_type_as_enum(self) -> Option<EnumWalker<'db>> {
         match self.scalar_field_type() {
-            ScalarFieldType::Enum(enum_id) => Some(Walker {
-                db: self.db,
-                id: enum_id,
-            }),
+            ScalarFieldType::Enum(enum_id) => Some(self.db.walk(enum_id)),
             _ => None,
         }
     }

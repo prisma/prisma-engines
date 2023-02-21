@@ -159,7 +159,7 @@ fn process_order_object(
                     let object: ParsedInputMap = field_value.try_into()?;
                     path.push((&cf).into());
 
-                    process_order_object(&cf.typ.clone().into(), object, path, None)
+                    process_order_object(&cf.typ().into(), object, path, None)
                 }
             }
         }

@@ -62,7 +62,7 @@ fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> Select
         .nested_fields
         .expect("Invalid composite query shape: Composite field selected without sub-selection.");
 
-    let typ = cf.typ.clone();
+    let typ = cf.typ();
 
     SelectedField::Composite(CompositeSelection {
         field: cf,

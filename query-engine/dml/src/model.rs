@@ -373,15 +373,12 @@ impl Model {
 
     /// Gets an iterator over all scalar fields.
     pub fn scalar_fields(&self) -> impl Iterator<Item = &ScalarField> {
-        self.fields.iter().filter_map(|f| f.as_scalar_field())
+        self.fields.iter()
     }
 
     /// Gets a mutable iterator over all scalar fields.
     pub fn scalar_fields_mut(&mut self) -> impl Iterator<Item = &mut ScalarField> {
-        self.fields_mut().filter_map(|fw| match fw {
-            Field::CompositeField(_) => None,
-            Field::ScalarField(sf) => Some(sf),
-        })
+        self.fields_mut()
     }
 
     /// Finds a field by name.

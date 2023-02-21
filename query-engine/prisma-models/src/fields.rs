@@ -8,7 +8,6 @@ pub struct Fields {
     all: Vec<Field>,
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
-    composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     updated_at: OnceCell<Vec<ScalarFieldRef>>,
 }
@@ -19,7 +18,6 @@ impl Fields {
             all,
             primary_key,
             scalar: OnceCell::new(),
-            composite: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
         }
@@ -72,14 +70,15 @@ impl Fields {
             .collect()
     }
 
-    pub fn composite(&self) -> Vec<CompositeFieldRef> {
-        self.composite_weak().iter().map(|f| f.upgrade().unwrap()).collect()
-    }
-
-    fn composite_weak(&self) -> &[CompositeFieldWeak] {
-        self.composite
-            .get_or_init(|| self.all.iter().fold(Vec::new(), Self::composite_filter))
-            .as_slice()
+    fn composite(&self) -> Vec<CompositeFieldRef> {
+        let model = self.model();
+        let internal_data_model = model.internal_data_model();
+        internal_data_model
+            .walk(model.id)
+            .scalar_fields()
+            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
+            .map(|sf| internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id)))
+            .collect()
     }
 
     pub fn non_relational(&self) -> Vec<Field> {
@@ -108,6 +107,16 @@ impl Fields {
                 let internal_data_model = model.internal_data_model();
                 let id = internal_data_model
                     .walk(model.id)
+                    .scalar_fields()
+                    .find(|sf| sf.name() == prisma_name)
+                    .map(|sf| sf.id);
+                id.map(|id| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(id))))
+            })
+            .or_else(|| {
+                let model = self.model();
+                let internal_data_model = model.internal_data_model();
+                let id = internal_data_model
+                    .walk(model.id)
                     .relation_fields()
                     .find(|rf| rf.name() == prisma_name)
                     .map(|rf| rf.id);
@@ -122,13 +131,10 @@ impl Fields {
 
     /// Non-virtual: Fields actually existing on the database level, this (currently) excludes relations, which are
     /// purely virtual on a model.
-    pub fn find_from_non_virtual_by_db_name(&self, db_name: &str) -> crate::Result<&Field> {
-        self.all
-            .iter()
-            .find(|field| match field {
-                Field::Relation(_) => false,
-                field => field.db_name() == db_name,
-            })
+    pub fn find_from_non_virtual_by_db_name(&self, db_name: &str) -> crate::Result<Field> {
+        self.filter_all(|f| f.db_name() == db_name)
+            .into_iter()
+            .next()
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
                 container_name: self.model().name.clone(),
@@ -169,14 +175,6 @@ impl Fields {
         acc
     }
 
-    fn composite_filter(mut acc: Vec<CompositeFieldWeak>, field: &Field) -> Vec<CompositeFieldWeak> {
-        if let Field::Composite(composite_field) = field {
-            acc.push(Arc::downgrade(composite_field));
-        };
-
-        acc
-    }
-
     pub fn filter_all<P>(&self, predicate: P) -> Vec<Field>
     where
         P: Fn(&&Field) -> bool,
@@ -188,6 +186,18 @@ impl Fields {
             .relation_fields()
             .map(|rf| Field::from(internal_data_model.clone().zip(rf.id)))
             .filter(|f| predicate(&f));
-        self.all.iter().filter(&predicate).map(Clone::clone).chain(rf).collect()
+        let composite_type_fields = internal_data_model
+            .walk(model.id)
+            .scalar_fields()
+            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
+            .map(|sf| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id))))
+            .filter(|f| predicate(&f));
+        self.all
+            .iter()
+            .filter(&predicate)
+            .map(Clone::clone)
+            .chain(rf)
+            .chain(composite_type_fields)
+            .collect()
     }
 }
