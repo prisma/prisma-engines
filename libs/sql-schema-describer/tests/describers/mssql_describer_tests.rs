@@ -852,6 +852,23 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 ),
                 (
                     TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "int",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
                         1,
                     ),
                     Column {
@@ -870,23 +887,6 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                 (
                     TableId(
                         1,
-                    ),
-                    Column {
-                        name: "int",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
                     ),
                     Column {
                         name: "int",
@@ -940,7 +940,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                         1,
                     ),
                     column_id: TableColumnId(
-                        1,
+                        2,
                     ),
                     sort_order: Some(
                         Asc,
@@ -1056,23 +1056,6 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 ),
                 (
                     TableId(
-                        1,
-                    ),
-                    Column {
-                        name: "id_2",
-                        tpe: ColumnType {
-                            full_data_type: "int",
-                            family: Int,
-                            arity: Required,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: true,
-                    },
-                ),
-                (
-                    TableId(
                         0,
                     ),
                     Column {
@@ -1090,10 +1073,10 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 ),
                 (
                     TableId(
-                        3,
+                        1,
                     ),
                     Column {
-                        name: "id_1",
+                        name: "id_2",
                         tpe: ColumnType {
                             full_data_type: "int",
                             family: Int,
@@ -1137,6 +1120,23 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                    },
+                ),
+                (
+                    TableId(
+                        3,
+                    ),
+                    Column {
+                        name: "id_1",
+                        tpe: ColumnType {
+                            full_data_type: "int",
+                            family: Int,
+                            arity: Required,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: true,
                     },
                 ),
                 (
@@ -1230,6 +1230,17 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         6,
                     ),
                     referenced_column: TableColumnId(
+                        1,
+                    ),
+                },
+                ForeignKeyColumn {
+                    foreign_key_id: ForeignKeyId(
+                        0,
+                    ),
+                    constrained_column: TableColumnId(
+                        4,
+                    ),
+                    referenced_column: TableColumnId(
                         2,
                     ),
                 },
@@ -1241,7 +1252,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         8,
                     ),
                     referenced_column: TableColumnId(
-                        2,
+                        1,
                     ),
                 },
             ],
@@ -1251,6 +1262,20 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         0,
                     ),
                     index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        1,
+                    ),
+                    index_name: "Table_0_pkey",
+                    tpe: PrimaryKey,
+                },
+                Index {
+                    table_id: TableId(
+                        3,
+                    ),
+                    index_name: "Table_1_pkey",
                     tpe: PrimaryKey,
                 },
                 Index {
@@ -1274,7 +1299,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         0,
                     ),
                     column_id: TableColumnId(
-                        2,
+                        1,
                     ),
                     sort_order: Some(
                         Asc,
@@ -1286,7 +1311,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                         1,
                     ),
                     column_id: TableColumnId(
-                        4,
+                        2,
                     ),
                     sort_order: Some(
                         Asc,
@@ -1296,6 +1321,30 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                 IndexColumn {
                     index_id: IndexId(
                         2,
+                    ),
+                    column_id: TableColumnId(
+                        5,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        3,
+                    ),
+                    column_id: TableColumnId(
+                        3,
+                    ),
+                    sort_order: Some(
+                        Asc,
+                    ),
+                    length: None,
+                },
+                IndexColumn {
+                    index_id: IndexId(
+                        4,
                     ),
                     column_id: TableColumnId(
                         7,

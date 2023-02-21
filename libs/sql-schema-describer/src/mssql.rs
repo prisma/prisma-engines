@@ -5,6 +5,7 @@ use crate::{
     DescriberError, DescriberErrorKind, DescriberResult, ForeignKeyAction, IndexColumn, Procedure, SQLSortOrder,
     SqlMetadata, SqlSchema, UserDefinedType, View,
 };
+use either::Either;
 use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
@@ -129,12 +130,12 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         let table_names = self.get_table_names(&mut sql_schema).await?;
 
+        self.get_views(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
         self.get_all_indices(&mut mssql_ext, &table_names, &mut sql_schema)
             .await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
 
-        self.get_views(&mut sql_schema).await?;
         self.get_procedures(&mut sql_schema).await?;
         self.get_user_defined_types(&mut sql_schema).await?;
 
@@ -283,21 +284,27 @@ impl<'a> SqlSchemaDescriber<'a> {
                     ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale,
                 OBJECT_SCHEMA_NAME(c.object_id) AS namespace
             FROM sys.columns c
-                    INNER JOIN sys.tables t ON c.object_id = t.object_id
+                    INNER JOIN sys.objects obj ON c.object_id = obj.object_id
                     INNER JOIN sys.types typ ON c.user_type_id = typ.user_type_id
-            WHERE t.is_ms_shipped = 0
+            WHERE obj.is_ms_shipped = 0
             ORDER BY table_name, COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
         let rows = self.conn.query_raw(sql, &[]).await?;
+        let mut table_defaults = Vec::new();
+        let mut view_defaults = Vec::new();
 
         for col in rows {
             let namespace = col.get_expect_string("namespace");
             let table_name = col.get_expect_string("table_name");
 
-            let table_id = match sql_schema.table_walker_ns(&namespace, &table_name) {
-                Some(t_walker) => t_walker.id,
-                None => continue, // we only care about columns in tables we have access to
+            let table_id = sql_schema.table_walker_ns(&namespace, &table_name);
+            let view_id = sql_schema.view_walker_ns(&namespace, &table_name);
+
+            let container_id = match (table_id, view_id) {
+                (Some(t_walker), _) => Either::Left(t_walker.id),
+                (_, Some(v_walker)) => Either::Right(v_walker.id),
+                (None, None) => continue, // we only care about columns in tables we have access to
             };
 
             let name = col.get_expect_string("column_name");
@@ -384,22 +391,41 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            let column_id = TableColumnId(sql_schema.table_columns.len() as u32);
-
-            if let Some(default) = default {
-                sql_schema.push_table_default_value(column_id, default);
-            }
-
             let column = Column {
                 name,
                 tpe,
                 auto_increment,
             };
 
-            sql_schema.table_columns.push((table_id, column));
+            match container_id {
+                Either::Left(table_id) => {
+                    table_defaults.push((table_id, default));
+                    sql_schema.push_table_column(table_id, column);
+                }
+                Either::Right(view_id) => {
+                    view_defaults.push((view_id, default));
+                    sql_schema.push_view_column(view_id, column);
+                }
+            }
         }
 
-        sql_schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
+        sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.view_columns.sort_by_key(|(table_id, _)| *table_id);
+
+        table_defaults.sort_by_key(|(table_id, _)| *table_id);
+        view_defaults.sort_by_key(|(view_id, _)| *view_id);
+
+        for (i, (_, default)) in table_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_table_default_value(TableColumnId(i as u32), default);
+            }
+        }
+
+        for (i, (_, default)) in view_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_view_default_value(ViewColumnId(i as u32), default);
+            }
+        }
 
         Ok(())
     }
