@@ -285,3 +285,8 @@ qe-stub-aws:
 	ln target/aws/release/libquery_engine_stub.{so,node}
 
 qe-stub-debug: build target/debug/libquery_engine_stub.node
+
+qe-static-aws:
+	$(MAKE) run-amazon CMD="bash -c 'LIBZ_SYS_STATIC=1 cargo build --release -p query-engine-node-api --features vendored-openssl'"
+	rm -f target/aws/release/libquery_engine.node
+	ln target/aws/release/libquery_engine.{so,node}
