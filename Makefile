@@ -259,7 +259,8 @@ qe-node-api: build target/debug/libquery_engine.node
 	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
 	cp $< $@
 
-.PHONY: amazon-image run-amazon qe-aws qe-stub-aws qe-stub-debug
+.PHONY: amazon-image run-amazon qe-aws qe-stub-aws qe-stub-debug qe-static-aws
+.PHONY: cross-x86 qe-cross-x86 qe-stub-cross-x86
 
 amazon-image:
 	docker build -t prisma-lambda -f Dockerfile.amazonlinux .
@@ -290,3 +291,15 @@ qe-static-aws:
 	$(MAKE) run-amazon CMD="bash -c 'LIBZ_SYS_STATIC=1 cargo build --release -p query-engine-node-api --features vendored-openssl'"
 	rm -f target/aws/release/libquery_engine.node
 	ln target/aws/release/libquery_engine.{so,node}
+
+CROSS_X86_PACKAGE ?= query-engine-node-api
+cross-x86:
+	LIBZ_SYS_STATIC=1 cargo zigbuild --release --target x86_64-unknown-linux-gnu.2.17 -p $(CROSS_X86_PACKAGE) --features vendored-openssl
+
+qe-cross-x86:
+	$(MAKE) cross-x86 CROSS_X86_PACKAGE=query-engine-node-api
+	ln target/x86_64-unknown-linux-gnu/release/libquery_engine.{so,node}
+
+qe-stub-cross-x86:
+	$(MAKE) cross-x86 CROSS_X86_PACKAGE=stub-node-api
+	ln target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.{so,node}
