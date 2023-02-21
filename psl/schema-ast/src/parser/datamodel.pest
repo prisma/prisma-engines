@@ -30,7 +30,7 @@ model_declaration = {
     (MODEL_KEYWORD | TYPE_KEYWORD | VIEW_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (field_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+    ~ model_contents
     ~ BLOCK_CLOSE
     }
 
@@ -42,6 +42,10 @@ field_declaration = {
     ~ trailing_comment?
     ~ NEWLINE
     }
+
+model_contents = {
+    (field_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+}
 
 // ######################################
 // Field Type
@@ -90,11 +94,14 @@ enum_declaration = {
     ENUM_KEYWORD
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)* 
+    ~ enum_contents
     ~ BLOCK_CLOSE
     }
 
 enum_value_declaration = { identifier ~ field_attribute* ~ trailing_comment? ~ NEWLINE }
+enum_contents = {
+    (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)* 
+}
 
 // ######################################
 // Attributes

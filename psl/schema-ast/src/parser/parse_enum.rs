@@ -13,29 +13,40 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut values: Vec<EnumValue> = vec![];
-    let mut pending_value_comment = None;
-    let mut pairs = pair.into_inner().peekable();
+    let pairs = pair.into_inner().peekable();
+    let mut inner_span: Option<Span> = None;
 
-    while let Some(current) = pairs.next() {
+    for current in pairs {
         match current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE | Rule::ENUM_KEYWORD => {}
             Rule::identifier => name = Some(current.into()),
-            Rule::block_attribute => attributes.push(parse_attribute(current, diagnostics)),
-            Rule::enum_value_declaration => {
-                match parse_enum_value(current, pending_value_comment.take(), diagnostics) {
-                    Ok(enum_value) => values.push(enum_value),
-                    Err(err) => diagnostics.push_error(err),
+            Rule::enum_contents => {
+                let mut pending_value_comment = None;
+                inner_span = Some(current.as_span().into());
+
+                let mut items = current.into_inner();
+                while let Some(item) = items.next() {
+                    match item.as_rule() {
+                        Rule::block_attribute => attributes.push(parse_attribute(item, diagnostics)),
+                        Rule::enum_value_declaration => {
+                            match parse_enum_value(item, pending_value_comment.take(), diagnostics) {
+                                Ok(enum_value) => values.push(enum_value),
+                                Err(err) => diagnostics.push_error(err),
+                            }
+                        }
+                        Rule::comment_block => {
+                            if let Some(Rule::enum_value_declaration) = items.peek().map(|t| t.as_rule()) {
+                                pending_value_comment = Some(item);
+                            }
+                        }
+                        Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
+                            "This line is not an enum value definition.",
+                            item.as_span().into(),
+                        )),
+                        _ => parsing_catch_all(&item, "enum"),
+                    }
                 }
             }
-            Rule::comment_block => {
-                if let Some(Rule::enum_value_declaration) = pairs.peek().map(|t| t.as_rule()) {
-                    pending_value_comment = Some(current);
-                }
-            }
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not an enum value definition.",
-                current.as_span().into(),
-            )),
             _ => parsing_catch_all(&current, "enum"),
         }
     }
@@ -47,6 +58,7 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
             attributes,
             documentation: comment,
             span: Span::from(pair_span),
+            inner_span: inner_span.unwrap(),
         },
         _ => panic!("Encountered impossible enum declaration during parsing, name is missing.",),
     }
