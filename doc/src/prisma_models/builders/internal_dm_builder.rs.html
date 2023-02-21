@@ -124,32 +124,8 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder};
-<span class="kw">use crate</span>::{
-    builders::{CompositeFieldBuilder, ScalarFieldBuilder},
-    extensions::<span class="kw-2">*</span>,
-    IndexType, TypeIdentifier,
-};
+<span class="kw">use crate</span>::{builders::ScalarFieldBuilder, extensions::<span class="kw-2">*</span>, IndexType, TypeIdentifier};
 <span class="kw">use </span>dml::{<span class="self">self</span>, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_builders(datamodel: <span class="kw-2">&amp;</span>Datamodel, schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;ModelBuilder&gt; {
@@ -173,35 +149,26 @@
 <span class="kw">fn </span>model_field_builders(model: <span class="kw-2">&amp;</span>dml::Model, _schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;FieldBuilder&gt; {
     model
         .fields()
-        .filter(|field| !field.is_ignored())
-        .filter_map(|field| <span class="kw">match </span>field {
-            dml::Field::CompositeField(cf) =&gt; <span class="prelude-val">Some</span>(FieldBuilder::Composite(CompositeFieldBuilder {
-                name: cf.name.clone(),
-                db_name: cf.database_name.clone(),
-                arity: cf.arity,
-                type_name: cf.composite_type.clone(),
-                default_value: cf.default_value.clone(),
-            })),
-            dml::Field::ScalarField(sf) =&gt; {
-                <span class="kw">if </span>sf.type_identifier() == TypeIdentifier::Unsupported {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
-                        id: <span class="kw">crate</span>::ScalarFieldId::InModel(sf.id),
-                        name: sf.name.clone(),
-                        type_identifier: sf.type_identifier(),
-                        is_unique: model.field_is_unique(<span class="kw-2">&amp;</span>sf.name),
-                        is_id: model.field_is_primary(<span class="kw-2">&amp;</span>sf.name),
-                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(<span class="kw-2">&amp;</span>sf.name),
-                        is_autoincrement: sf.is_auto_increment(),
-                        is_updated_at: sf.is_updated_at,
-                        internal_enum: sf.field_type.as_enum(),
-                        arity: sf.arity,
-                        db_name: sf.database_name.clone(),
-                        default_value: sf.default_value.clone(),
-                        native_type: sf.native_type(),
-                    }))
-                }
+        .filter(|field| !field.is_ignored)
+        .filter_map(|sf| {
+            <span class="kw">if </span>sf.type_identifier() == TypeIdentifier::Unsupported {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
+                    id: <span class="kw">crate</span>::ScalarFieldId::InModel(sf.id),
+                    name: sf.name.clone(),
+                    type_identifier: sf.type_identifier(),
+                    is_unique: model.field_is_unique(<span class="kw-2">&amp;</span>sf.name),
+                    is_id: model.field_is_primary(<span class="kw-2">&amp;</span>sf.name),
+                    is_auto_generated_int_id: model.field_is_auto_generated_int_id(<span class="kw-2">&amp;</span>sf.name),
+                    is_autoincrement: sf.is_auto_increment(),
+                    is_updated_at: sf.is_updated_at,
+                    internal_enum: sf.field_type.as_enum(),
+                    arity: sf.arity,
+                    db_name: sf.database_name.clone(),
+                    default_value: sf.default_value.clone(),
+                    native_type: sf.native_type(),
+                }))
             }
         })
         .collect()
@@ -211,16 +178,8 @@
     composite
         .fields
         .iter()
-        <span class="comment">// .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.
-        </span>.filter_map(|field| <span class="kw">match </span><span class="kw-2">&amp;</span>field.r#type {
-            CompositeTypeFieldType::CompositeType(type_name) =&gt; <span class="prelude-val">Some</span>(FieldBuilder::Composite(CompositeFieldBuilder {
-                name: field.name.clone(),
-                db_name: field.database_name.clone(),
-                arity: field.arity,
-                type_name: type_name.clone(),
-                <span class="comment">// No defaults on composite fields of type composite
-                </span>default_value: <span class="prelude-val">None</span>,
-            })),
+        .filter_map(|field| <span class="kw">match </span><span class="kw-2">&amp;</span>field.r#type {
+            CompositeTypeFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             CompositeTypeFieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>) | CompositeTypeFieldType::Enum(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>type_ident = field.type_identifier();
 
@@ -285,6 +244,7 @@
         .composite_types
         .iter()
         .map(|ct| CompositeTypeBuilder {
+            id: ct.id,
             name: ct.name.clone(),
             fields: composite_field_builders(ct),
         })

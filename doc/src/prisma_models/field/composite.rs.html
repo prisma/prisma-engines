@@ -73,75 +73,75 @@
 <a href="#73" id="73">73</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeTypeRef};
 <span class="kw">use </span>dml::FieldArity;
-<span class="kw">use </span>std::{
-    fmt::{Debug, Display},
-    hash::{Hash, Hasher},
-    sync::{Arc, Weak},
-};
+<span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
+<span class="kw">use </span>std::fmt::{Debug, Display};
 
-<span class="kw">pub type </span>CompositeFieldRef = Arc&lt;CompositeField&gt;;
-<span class="kw">pub type </span>CompositeFieldWeak = Weak&lt;CompositeField&gt;;
-
-<span class="attr">#[derive(Clone)]
-</span><span class="kw">pub struct </span>CompositeField {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>typ: CompositeTypeRef,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) arity: FieldArity,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) container: ParentContainer,
+<span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>CompositeFieldId {
+    InModel(walkers::ScalarFieldId),
+    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 
+<span class="kw">pub type </span>CompositeField = <span class="kw">crate</span>::Zipper&lt;CompositeFieldId&gt;;
+<span class="kw">pub type </span>CompositeFieldRef = CompositeField;
+<span class="kw">pub type </span>CompositeFieldWeak = CompositeField;
+
 <span class="kw">impl </span>CompositeField {
+    <span class="kw">fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldArity {
+        <span class="kw">match </span><span class="self">self</span>.id {
+            CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).ast_field().arity,
+            CompositeFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).arity(),
+        }
+    }
+
+    <span class="kw">pub fn </span>typ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompositeTypeRef {
+        <span class="kw">let </span>id = <span class="kw">match </span><span class="self">self</span>.id {
+            CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).scalar_field_type().as_composite_type().unwrap(),
+            CompositeFieldId::InCompositeType(ctid) =&gt; <span class="self">self</span>.dm.walk(ctid).r#type().as_composite_type().unwrap(),
+        };
+        <span class="self">self</span>.dm.find_composite_type_by_id(id)
+    }
+
     <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::List)
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity(), FieldArity::List)
     }
 
     <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::Required)
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity(), FieldArity::Required)
     }
 
     <span class="kw">pub fn </span>is_optional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::Optional)
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity(), FieldArity::Optional)
+    }
+
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self</span>.id {
+            CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).name(),
+            CompositeFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).name(),
+        }
     }
 
     <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.db_name.as_deref().unwrap_or(<span class="self">self</span>.name.as_str())
+        <span class="kw">match </span><span class="self">self</span>.id {
+            CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).database_name(),
+            CompositeFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).database_name(),
+        }
     }
 
-    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ParentContainer {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.container
-    }
-}
-
-<span class="kw">impl </span>Debug <span class="kw">for </span>CompositeField {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_struct(<span class="string">&quot;CompositeField&quot;</span>)
-            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.arity)
-            .field(<span class="string">&quot;container&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.container)
-            .field(<span class="string">&quot;composite_type&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.typ.name)
-            .finish()
+    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParentContainer {
+        <span class="kw">match </span><span class="self">self</span>.id {
+            CompositeFieldId::InModel(id) =&gt; {
+                <span class="kw">let </span>id = <span class="self">self</span>.dm.walk(id).model().id;
+                <span class="self">self</span>.dm.find_model_by_id(id).into()
+            }
+            CompositeFieldId::InCompositeType((ct_id, <span class="kw">_</span>)) =&gt; <span class="self">self</span>.dm.find_composite_type_by_id(ct_id).into(),
+        }
     }
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>CompositeField {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name)
-    }
-}
-
-<span class="kw">impl </span>Hash <span class="kw">for </span>CompositeField {
-    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
-        <span class="comment">// Names are unique in the data model.
-        </span><span class="self">self</span>.name.hash(state);
-    }
-}
-
-<span class="kw">impl </span>Eq <span class="kw">for </span>CompositeField {}
-
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>CompositeField {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>CompositeField) -&gt; bool {
-        <span class="self">self</span>.name == other.name
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name())
     }
 }
 </code></pre></div>

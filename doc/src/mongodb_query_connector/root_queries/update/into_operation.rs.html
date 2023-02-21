@@ -243,7 +243,7 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>update_docs = <span class="macro">vec!</span>[];
 
                 <span class="kw">for </span>(write_op, field, field_path) <span class="kw">in </span>nested_write.unfold(field, path) {
-                    update_docs.extend(write_op.into_update_operations(field, field_path)<span class="question-mark">?</span>);
+                    update_docs.extend(write_op.into_update_operations(<span class="kw-2">&amp;</span>field, field_path)<span class="question-mark">?</span>);
                 }
 
                 update_docs

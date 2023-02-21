@@ -425,6 +425,7 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -586,7 +587,7 @@
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name.clone(), input_types, <span class="prelude-val">None</span>)
+        input_field(cf.name(), input_types, <span class="prelude-val">None</span>)
             .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list())
             .optional()
     }
@@ -652,7 +653,7 @@
         <span class="string">&quot;&quot;
     </span>};
 
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}UpdateEnvelopeInput&quot;</span>, cf.typ.name, arity);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}UpdateEnvelopeInput&quot;</span>, cf.typ().name, arity);
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -680,7 +681,7 @@
 
 <span class="doccomment">/// Builds the `update` input object type. Should be used in the envelope type.
 </span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, cf.typ.name);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, cf.typ().name);
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -692,7 +693,8 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>mapper = UpdateDataInputFieldMapper::new_checked();
-    <span class="kw">let </span>fields = mapper.map_all(ctx, cf.typ.fields());
+    <span class="kw">let </span>fields = cf.typ().fields().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    <span class="kw">let </span>fields = mapper.map_all(ctx, <span class="kw-2">&amp;</span>fields);
 
     input_object.set_fields(fields);
 
@@ -748,7 +750,7 @@
 
 <span class="doccomment">/// Builds the `upsert` input object type. Should only be used in the envelope type.
 </span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpsertInput&quot;</span>, cf.typ.name);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpsertInput&quot;</span>, cf.typ().name);
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -783,7 +785,7 @@
 }
 
 <span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyInput&quot;</span>, cf.typ.name);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyInput&quot;</span>, cf.typ().name);
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -795,7 +797,7 @@
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
@@ -809,7 +811,7 @@
 }
 
 <span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, cf.typ.name);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, cf.typ().name);
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -821,7 +823,7 @@
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field];

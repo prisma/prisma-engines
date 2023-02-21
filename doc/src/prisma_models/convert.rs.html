@@ -25,11 +25,6 @@
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>std::sync::Arc;
@@ -51,12 +46,7 @@
 
     <span class="kw">let </span>models = models
         .into_iter()
-        .map(|mt| {
-            mt.build(
-                Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model),
-                internal_data_model.composite_types.get().unwrap(),
-            )
-        })
+        .map(|mt| mt.build(Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model)))
         .collect();
 
     internal_data_model.models.set(models).unwrap();

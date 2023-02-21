@@ -585,7 +585,7 @@
     }
 
     <span class="kw">fn </span>decorate_with_composite_field_info(<span class="self">self</span>, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(<span class="kw-2">&amp;</span>cf.name))
+        <span class="self">self</span>.map_err(|err| err.decorate_with_field_name(<span class="kw-2">&amp;</span>cf.name()))
     }
 }
 </code></pre></div>

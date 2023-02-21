@@ -237,6 +237,7 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::query_document::{ParsedInputMap, ParsedInputValue};
 <span class="kw">use </span>connector::{DatasourceFieldName, WriteArgs, WriteOperation};
@@ -398,7 +399,7 @@
     path: <span class="kw-2">&amp;mut </span>[DatasourceFieldName],
 ) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
     <span class="kw">let </span>where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
-    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ)<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ())<span class="question-mark">?</span>;
 
     <span class="kw">let </span>update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()<span class="question-mark">?</span>;
     <span class="kw">let </span>update = parse_composite_updates(cf, update_map, path)<span class="question-mark">?
@@ -413,7 +414,7 @@
     <span class="kw-2">mut </span>value: ParsedInputMap,
 ) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
     <span class="kw">let </span>where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
-    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ)<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ())<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(WriteOperation::composite_delete_many(filter))
 }
@@ -445,9 +446,10 @@
     <span class="kw">let </span><span class="kw-2">mut </span>writes = <span class="macro">vec!</span>[];
 
     <span class="kw">for </span>(k, v) <span class="kw">in </span>map {
-        <span class="kw">let </span>field = cf.typ.find_field(<span class="kw-2">&amp;</span>k).unwrap();
+        <span class="kw">let </span>typ = cf.typ();
+        <span class="kw">let </span>field = typ.find_field(<span class="kw-2">&amp;</span>k).unwrap();
 
-        <span class="kw">let </span>field_name: DatasourceFieldName = <span class="kw">match </span>field {
+        <span class="kw">let </span>field_name: DatasourceFieldName = <span class="kw">match </span><span class="kw-2">&amp;</span>field {
             Field::Scalar(sf) =&gt; sf.into(),
             Field::Composite(cf) =&gt; cf.into(),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
@@ -455,8 +457,8 @@
 
         <span class="kw">let </span>write_op = <span class="kw">match </span>field {
             Field::Scalar(sf) <span class="kw">if </span>sf.is_list() =&gt; parse_scalar_list(v),
-            Field::Scalar(sf) =&gt; parse_scalar(sf, v),
-            Field::Composite(cf) =&gt; parse_composite_writes(cf, v, <span class="kw-2">&amp;mut </span>path.to_owned()),
+            Field::Scalar(sf) =&gt; parse_scalar(<span class="kw-2">&amp;</span>sf, v),
+            Field::Composite(cf) =&gt; parse_composite_writes(<span class="kw-2">&amp;</span>cf, v, <span class="kw-2">&amp;mut </span>path.to_owned()),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }<span class="question-mark">?</span>;
 

@@ -431,17 +431,6 @@
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="self">self </span><span class="kw">as </span>dml, <span class="kw-2">*</span>};
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl_core::{
@@ -503,7 +492,7 @@
             <span class="kw">let </span>model_name = model.name.as_str();
             model
                 .fields
-                .sort_by_key(|field| field_ids_for_sorting.get(<span class="kw-2">&amp;</span>(model_name, field.name())).cloned());
+                .sort_by_key(|field| field_ids_for_sorting.get(<span class="kw-2">&amp;</span>(model_name, <span class="kw-2">&amp;</span>field.name)).cloned());
         }
 
         schema
@@ -627,18 +616,7 @@
             field_ids_for_sorting.insert((ast_model.name(), ast_field.name()), field_id);
 
             <span class="kw">let </span>field_type = <span class="kw">match </span><span class="kw-2">&amp;</span>scalar_field.scalar_field_type() {
-                db::ScalarFieldType::CompositeType(ctid) =&gt; {
-                    <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeField::new();
-                    field.name = scalar_field.name().to_owned();
-                    field.composite_type = <span class="self">self</span>.db.ast()[<span class="kw-2">*</span>ctid].name().to_owned();
-                    field.documentation = ast_field.documentation().map(String::from);
-                    field.is_ignored = scalar_field.is_ignored();
-                    field.database_name = scalar_field.mapped_name().map(String::from);
-                    field.arity = ast_field.arity;
-
-                    model.add_field(Field::CompositeField(field));
-                    <span class="kw">continue</span>;
-                }
+                db::ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
                 <span class="kw">_ </span>=&gt; <span class="self">self</span>.lift_scalar_field_type(ast_field, <span class="kw-2">&amp;</span>scalar_field.scalar_field_type(), scalar_field),
             };
 
@@ -654,7 +632,7 @@
                     .filter(|<span class="kw">_</span>| <span class="self">self</span>.connector.supports_named_default_values()),
             });
 
-            model.add_field(Field::ScalarField(field));
+            model.add_field(field);
         }
 
         model

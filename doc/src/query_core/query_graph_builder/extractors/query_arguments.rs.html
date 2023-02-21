@@ -506,7 +506,7 @@
                     <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
                     path.push((<span class="kw-2">&amp;</span>cf).into());
 
-                    process_order_object(<span class="kw-2">&amp;</span>cf.typ.clone().into(), object, path, <span class="prelude-val">None</span>)
+                    process_order_object(<span class="kw-2">&amp;</span>cf.typ().into(), object, path, <span class="prelude-val">None</span>)
                 }
             }
         }

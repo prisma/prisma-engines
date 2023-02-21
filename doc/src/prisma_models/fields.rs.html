@@ -191,6 +191,16 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::pk::PrimaryKey;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -201,7 +211,6 @@
     all: Vec&lt;Field&gt;,
     primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;,
     scalar: OnceCell&lt;Vec&lt;ScalarFieldWeak&gt;&gt;,
-    composite: OnceCell&lt;Vec&lt;CompositeFieldWeak&gt;&gt;,
     model: ModelWeakRef,
     updated_at: OnceCell&lt;Vec&lt;ScalarFieldRef&gt;&gt;,
 }
@@ -212,7 +221,6 @@
             all,
             primary_key,
             scalar: OnceCell::new(),
-            composite: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
         }
@@ -265,14 +273,15 @@
             .collect()
     }
 
-    <span class="kw">pub fn </span>composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeFieldRef&gt; {
-        <span class="self">self</span>.composite_weak().iter().map(|f| f.upgrade().unwrap()).collect()
-    }
-
-    <span class="kw">fn </span>composite_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[CompositeFieldWeak] {
-        <span class="self">self</span>.composite
-            .get_or_init(|| <span class="self">self</span>.all.iter().fold(Vec::new(), <span class="self">Self</span>::composite_filter))
-            .as_slice()
+    <span class="kw">fn </span>composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeFieldRef&gt; {
+        <span class="kw">let </span>model = <span class="self">self</span>.model();
+        <span class="kw">let </span>internal_data_model = model.internal_data_model();
+        internal_data_model
+            .walk(model.id)
+            .scalar_fields()
+            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
+            .map(|sf| internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id)))
+            .collect()
     }
 
     <span class="kw">pub fn </span>non_relational(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Field&gt; {
@@ -301,6 +310,16 @@
                 <span class="kw">let </span>internal_data_model = model.internal_data_model();
                 <span class="kw">let </span>id = internal_data_model
                     .walk(model.id)
+                    .scalar_fields()
+                    .find(|sf| sf.name() == prisma_name)
+                    .map(|sf| sf.id);
+                id.map(|id| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(id))))
+            })
+            .or_else(|| {
+                <span class="kw">let </span>model = <span class="self">self</span>.model();
+                <span class="kw">let </span>internal_data_model = model.internal_data_model();
+                <span class="kw">let </span>id = internal_data_model
+                    .walk(model.id)
                     .relation_fields()
                     .find(|rf| rf.name() == prisma_name)
                     .map(|rf| rf.id);
@@ -315,13 +334,10 @@
 
     <span class="doccomment">/// Non-virtual: Fields actually existing on the database level, this (currently) excludes relations, which are
     /// purely virtual on a model.
-    </span><span class="kw">pub fn </span>find_from_non_virtual_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="kw-2">&amp;</span>Field&gt; {
-        <span class="self">self</span>.all
-            .iter()
-            .find(|field| <span class="kw">match </span>field {
-                Field::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-                field =&gt; field.db_name() == db_name,
-            })
+    </span><span class="kw">pub fn </span>find_from_non_virtual_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Field&gt; {
+        <span class="self">self</span>.filter_all(|f| f.db_name() == db_name)
+            .into_iter()
+            .next()
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
                 container_name: <span class="self">self</span>.model().name.clone(),
@@ -362,14 +378,6 @@
         acc
     }
 
-    <span class="kw">fn </span>composite_filter(<span class="kw-2">mut </span>acc: Vec&lt;CompositeFieldWeak&gt;, field: <span class="kw-2">&amp;</span>Field) -&gt; Vec&lt;CompositeFieldWeak&gt; {
-        <span class="kw">if let </span>Field::Composite(composite_field) = field {
-            acc.push(Arc::downgrade(composite_field));
-        };
-
-        acc
-    }
-
     <span class="kw">pub fn </span>filter_all&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; Vec&lt;Field&gt;
     <span class="kw">where
         </span>P: Fn(&amp;&amp;Field) -&gt; bool,
@@ -381,7 +389,19 @@
             .relation_fields()
             .map(|rf| Field::from(internal_data_model.clone().zip(rf.id)))
             .filter(|f| predicate(<span class="kw-2">&amp;</span>f));
-        <span class="self">self</span>.all.iter().filter(<span class="kw-2">&amp;</span>predicate).map(Clone::clone).chain(rf).collect()
+        <span class="kw">let </span>composite_type_fields = internal_data_model
+            .walk(model.id)
+            .scalar_fields()
+            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
+            .map(|sf| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id))))
+            .filter(|f| predicate(<span class="kw-2">&amp;</span>f));
+        <span class="self">self</span>.all
+            .iter()
+            .filter(<span class="kw-2">&amp;</span>predicate)
+            .map(Clone::clone)
+            .chain(rf)
+            .chain(composite_type_fields)
+            .collect()
     }
 }
 </code></pre></div>

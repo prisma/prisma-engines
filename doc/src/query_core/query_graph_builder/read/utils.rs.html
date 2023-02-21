@@ -227,7 +227,7 @@
         .nested_fields
         .expect(<span class="string">&quot;Invalid composite query shape: Composite field selected without sub-selection.&quot;</span>);
 
-    <span class="kw">let </span>typ = cf.typ.clone();
+    <span class="kw">let </span>typ = cf.typ();
 
     SelectedField::Composite(CompositeSelection {
         field: cf,

@@ -597,6 +597,8 @@
 <a href="#597" id="597">597</a>
 <a href="#598" id="598">598</a>
 <a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{CoreError, QueryResult, RecordAggregations, RecordSelection};
 <span class="kw">use </span>connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
@@ -1056,7 +1058,7 @@
                 .as_object_type()
                 .expect(<span class="string">&quot;Composite output field is not an object.&quot;</span>);
 
-            <span class="kw">let </span>composite_type = <span class="kw-2">&amp;</span>cf.typ;
+            <span class="kw">let </span>composite_type = cf.typ();
 
             <span class="kw">for </span>(field_name, value) <span class="kw">in </span>pairs {
                 <span class="comment">// The field on the composite type.
@@ -1069,11 +1071,11 @@
                 <span class="comment">// The field on the output object type. Used for the actual serialization process.
                 </span><span class="kw">let </span>inner_out_field = object_type.find_field(inner_field.name()).unwrap();
 
-                <span class="kw">match </span>inner_field {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>inner_field {
                     Field::Composite(cf) =&gt; {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, <span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
+                            serialize_composite(<span class="kw-2">&amp;</span>cf, <span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
                         );
                     }
 
@@ -1093,7 +1095,9 @@
 
         val =&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Attempted to serialize &#39;{}&#39; with non-composite compatible type &#39;{:?}&#39; for field {}.&quot;</span>,
-            val, cf.typ.name, cf.name
+            val,
+            cf.typ().name,
+            cf.name()
         ))),
     }
 }

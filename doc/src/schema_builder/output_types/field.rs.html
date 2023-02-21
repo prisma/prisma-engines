@@ -196,7 +196,7 @@
 }
 
 <span class="kw">fn </span>map_composite_field_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; OutputType {
-    <span class="kw">let </span>obj = objects::composite::map_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>obj = objects::composite::map_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>typ = OutputType::Object(obj);
 
     <span class="kw">if </span>cf.is_list() {

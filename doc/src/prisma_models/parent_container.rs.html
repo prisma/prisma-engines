@@ -152,8 +152,6 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeTypeRef, CompositeTypeWeakRef, Field, InternalDataModelRef, ModelRef, ModelWeakRef};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::hash::{Hash, Hasher};
@@ -205,7 +203,7 @@
     <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Field&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(model) =&gt; model.upgrade().unwrap().fields().filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>),
-            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().fields().to_vec(),
+            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().fields().collect(),
         }
     }
 
@@ -218,9 +216,7 @@
                 .upgrade()
                 .unwrap()
                 .fields()
-                .iter()
-                .find(|field| field.name() == prisma_name)
-                .cloned(),
+                .find(|field| field.name() == prisma_name),
         }
     }
 

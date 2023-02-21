@@ -333,7 +333,7 @@
         other.selections.iter().all(|selection| <span class="kw">match </span>selection {
             SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>sf.name),
             SelectedField::Composite(other_cs) =&gt; <span class="self">self
-                </span>.get(<span class="kw-2">&amp;</span>other_cs.field.name)
+                </span>.get(other_cs.field.name())
                 .and_then(|selection| selection.as_composite())
                 .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(<span class="bool-val">false</span>),
@@ -459,7 +459,7 @@
     <span class="kw">pub fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             SelectedField::Scalar(sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
-            SelectedField::Composite(cf) =&gt; <span class="kw-2">&amp;</span>cf.field.name,
+            SelectedField::Composite(cf) =&gt; cf.field.name(),
         }
     }
 
@@ -477,9 +477,9 @@
         }
     }
 
-    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ParentContainer {
+    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParentContainer {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; sf.container(),
+            SelectedField::Scalar(sf) =&gt; sf.container().clone(),
             SelectedField::Composite(cs) =&gt; cs.field.container(),
         }
     }
@@ -501,11 +501,11 @@
 
 <span class="kw">impl </span>CompositeSelection {
     <span class="kw">pub fn </span>is_superset_of(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.field.typ == other.field.typ
+        <span class="self">self</span>.field.typ() == other.field.typ()
             &amp;&amp; other.selections.iter().all(|selection| <span class="kw">match </span>selection {
                 SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>sf.name),
                 SelectedField::Composite(other_cs) =&gt; <span class="self">self
-                    </span>.get(<span class="kw-2">&amp;</span>other_cs.field.name)
+                    </span>.get(other_cs.field.name())
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(<span class="bool-val">false</span>),
@@ -532,7 +532,7 @@
                         <span class="prelude-val">Some</span>(selection) =&gt; <span class="prelude-val">Ok</span>((key, selection.coerce_value(value)<span class="question-mark">?</span>)),
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(DomainError::FieldNotFound {
                             name: key.clone(),
-                            container_name: <span class="self">self</span>.field.name.clone(),
+                            container_name: <span class="self">self</span>.field.name().to_owned(),
                             container_type: <span class="string">&quot;composite type&quot;</span>,
                         }),
                     })

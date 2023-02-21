@@ -471,14 +471,14 @@
 
         <span class="comment">// Composite field.
         </span>ModelField::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; {
-            <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ).into());
-            <span class="prelude-val">Some</span>(input_field(cf.name.clone(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
+            <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ()).into());
+            <span class="prelude-val">Some</span>(input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
         }
 
         ModelField::Composite(cf) =&gt; {
-            <span class="kw">let </span>composite_order_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ).into(), <span class="kw-2">&amp;</span>OrderByOptions::new());
+            <span class="kw">let </span>composite_order_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ()).into(), <span class="kw-2">&amp;</span>OrderByOptions::new());
 
-            <span class="prelude-val">Some</span>(input_field(cf.name.clone(), InputType::object(composite_order_object_type), <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(cf.name(), InputType::object(composite_order_object_type), <span class="prelude-val">None</span>).optional())
         }
 
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,

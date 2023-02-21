@@ -492,10 +492,6 @@
 <a href="#492" id="492">492</a>
 <a href="#493" id="493">493</a>
 <a href="#494" id="494">494</a>
-<a href="#495" id="495">495</a>
-<a href="#496" id="496">496</a>
-<a href="#497" id="497">497</a>
-<a href="#498" id="498">498</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     error::{ConnectorError, ErrorKind},
     Filter,
@@ -782,30 +778,26 @@
     ///  - `Set(&quot;3&quot;)` is the write operation to execute
     ///  - `Field(&quot;field_b&quot;)` is the field on which to execute the write operation
     /// - `&quot;field_a.field_b&quot;` is the path for MongoDB to access the nested field
-    </span><span class="kw">pub fn </span>unfold(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span>Field, FieldPath)&gt; {
-        <span class="self">self</span>.unfold_internal(field, field_path)
+    </span><span class="kw">pub fn </span>unfold(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, Field, FieldPath)&gt; {
+        <span class="self">self</span>.unfold_internal(field.clone(), field_path)
     }
 
-    <span class="kw">fn </span>unfold_internal(<span class="self">self</span>, field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Field, FieldPath)&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>nested_writes: Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span>Field, FieldPath)&gt; = <span class="macro">vec!</span>[];
+    <span class="kw">fn </span>unfold_internal(<span class="self">self</span>, field: Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, Field, FieldPath)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>nested_writes: Vec&lt;(WriteOperation, Field, FieldPath)&gt; = <span class="macro">vec!</span>[];
 
         <span class="kw">for </span>(DatasourceFieldName(db_name), write) <span class="kw">in </span><span class="self">self</span>.writes {
-            <span class="kw">let </span>nested_field = field
-                .as_composite()
-                .unwrap()
-                .typ
-                .find_field_by_db_name(<span class="kw-2">&amp;</span>db_name)
-                .unwrap();
+            <span class="kw">let </span>nested_ct = field.as_composite().unwrap().typ();
+            <span class="kw">let </span>nested_field = nested_ct.find_field_by_db_name(<span class="kw-2">&amp;</span>db_name).unwrap();
             <span class="kw">let </span><span class="kw-2">mut </span>new_path = field_path.clone();
 
-            new_path.add_segment(nested_field);
+            new_path.add_segment(<span class="kw-2">&amp;</span>nested_field);
 
             <span class="kw">match </span>write {
                 WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) =&gt; {
-                    nested_writes.extend(nested_write.unfold_internal(nested_field, new_path));
+                    nested_writes.extend(nested_write.unfold_internal(nested_field.clone(), new_path));
                 }
                 <span class="kw">_ </span>=&gt; {
-                    nested_writes.push((write, nested_field, new_path));
+                    nested_writes.push((write, nested_field.clone(), new_path));
                 }
             }
         }

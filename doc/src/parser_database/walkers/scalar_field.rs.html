@@ -442,22 +442,17 @@
 <a href="#442" id="442">442</a>
 <a href="#443" id="443">443</a>
 <a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::IndexFieldWalker;
-<span class="kw">use crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
-    walkers::{EnumWalker, ModelWalker, Walker},
+    walkers::<span class="kw-2">*</span>,
     OperatorClass, ParserDatabase, ScalarFieldType,
 };
 <span class="kw">use </span>diagnostics::Span;
 <span class="kw">use </span>either::Either;
 
 <span class="doccomment">/// An opaque identifier for a model scalar field in a schema.
-</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Eq)]
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
 </span><span class="kw">pub struct </span>ScalarFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
 
 <span class="doccomment">/// A scalar field, as part of a model.
@@ -558,10 +553,7 @@
     <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.
     </span><span class="kw">pub fn </span>field_type_as_enum(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;EnumWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
         <span class="kw">match </span><span class="self">self</span>.scalar_field_type() {
-            ScalarFieldType::Enum(enum_id) =&gt; <span class="prelude-val">Some</span>(Walker {
-                db: <span class="self">self</span>.db,
-                id: enum_id,
-            }),
+            ScalarFieldType::Enum(enum_id) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.db.walk(enum_id)),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

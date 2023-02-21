@@ -57,8 +57,16 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{Field, InternalDataModelRef, InternalDataModelWeakRef};
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeFieldId, Field, InternalDataModelRef, InternalDataModelWeakRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -69,6 +77,8 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CompositeType {
+    <span class="kw">pub </span>id: ast::CompositeTypeId,
+
     <span class="doccomment">/// Then name of the composite type.
     /// Unique across all models, enums, composite types.
     </span><span class="kw">pub </span>name: String,
@@ -88,19 +98,23 @@
             .expect(<span class="string">&quot;Invalid back-reference to internal data model.&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Field] {
-        <span class="self">self</span>.fields
-            .get()
-            .ok_or_else(|| String::from(<span class="string">&quot;Composite fields must be set.&quot;</span>))
-            .unwrap()
+    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Field&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="kw">let </span>internal_data_model = <span class="self">self</span>.internal_data_model();
+        <span class="kw">let </span>cf: Vec&lt;<span class="kw">_</span>&gt; = internal_data_model
+            .walk(<span class="self">self</span>.id)
+            .fields()
+            .filter(|f| f.r#type().as_composite_type().is_some())
+            .map(|f| Field::from(internal_data_model.clone().zip(CompositeFieldId::InCompositeType(f.id))))
+            .collect();
+        <span class="self">self</span>.fields.get().unwrap().iter().cloned().chain(cf)
     }
 
-    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, prisma_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Field&gt; {
-        <span class="self">self</span>.fields().iter().find(|f| f.name() == prisma_name)
+    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, prisma_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Field&gt; {
+        <span class="self">self</span>.fields().find(|f| f.name() == prisma_name)
     }
 
-    <span class="kw">pub fn </span>find_field_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Field&gt; {
-        <span class="self">self</span>.fields().iter().find(|f| f.db_name() == db_name)
+    <span class="kw">pub fn </span>find_field_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Field&gt; {
+        <span class="self">self</span>.fields().find(|f| f.db_name() == db_name)
     }
 }
 

@@ -774,7 +774,7 @@
 <span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>nullable = <span class="kw">if </span>cf.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
     <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ.name), nullable),
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ().name), nullable),
         PRISMA_NAMESPACE,
     );
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -787,7 +787,7 @@
 
     ctx.cache_input_type(ident, object.clone());
 
-    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
@@ -812,7 +812,7 @@
 
 <span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ.name)),
+        <span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ().name)),
         PRISMA_NAMESPACE,
     );
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -824,7 +824,7 @@
     <span class="kw">let </span>object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[

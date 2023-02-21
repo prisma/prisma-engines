@@ -1347,6 +1347,14 @@
 <a href="#1347" id="1347">1347</a>
 <a href="#1348" id="1348">1348</a>
 <a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -1456,6 +1464,14 @@
     </span><span class="kw">pub fn </span>as_builtin_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ScalarFieldType::BuiltInScalar(s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Try to interpret this field type as a Composite Type.
+    </span><span class="kw">pub fn </span>as_composite_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::CompositeTypeId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScalarFieldType::CompositeType(id) =&gt; <span class="prelude-val">Some</span>(id),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

@@ -42,13 +42,18 @@
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::FieldBuilder;
 <span class="kw">use crate</span>::{CompositeType, CompositeTypeRef, InternalDataModelWeakRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CompositeTypeBuilder {
+    <span class="kw">pub </span>id: ast::CompositeTypeId,
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>fields: Vec&lt;FieldBuilder&gt;,
 }
@@ -64,6 +69,7 @@
     <span class="comment">// First pass: Builder the references (arcs) and store the fields for processing.
     </span><span class="kw">for </span>builder <span class="kw">in </span>builders {
         composites.push(Arc::new(CompositeType {
+            id: builder.id,
             name: builder.name.clone(),
             internal_data_model: internal_data_model.clone(),
             fields: OnceCell::new(),
@@ -77,7 +83,7 @@
         <span class="kw">let </span>composite = composites.iter().find(|c| c.name == name).unwrap();
         <span class="kw">let </span>fields = fields
             .into_iter()
-            .map(|builder| builder.build(Arc::downgrade(composite).into(), <span class="kw-2">&amp;</span>composites))
+            .map(|builder| builder.build(Arc::downgrade(composite).into()))
             .collect();
 
         <span class="comment">// Unwrap is safe - the fields have been empty so far.

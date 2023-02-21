@@ -278,6 +278,7 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use </span>constants::filters;
@@ -523,7 +524,7 @@
 <span class="doccomment">/// Object used for full composite equality, e.g. `{ field: &quot;value&quot;, field2: 123 } == { field: &quot;value&quot; }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ.name), PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ().name), PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -531,8 +532,9 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
 
-    <span class="kw">let </span>input_fields = cf.typ.fields().iter().map(|f| <span class="kw">match </span>f {
-        ModelField::Scalar(sf) =&gt; input_field(sf.name(), map_scalar_input_type_for_field(ctx, sf), <span class="prelude-val">None</span>)
+    <span class="kw">let </span>composite_type = cf.typ();
+    <span class="kw">let </span>input_fields = composite_type.fields().map(|f| <span class="kw">match </span>f {
+        ModelField::Scalar(sf) =&gt; input_field(sf.name(), map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>sf), <span class="prelude-val">None</span>)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list()),
 
@@ -540,12 +542,12 @@
             <span class="kw">let </span>types = <span class="kw">if </span>cf.is_list() {
                 <span class="comment">// The object (aka shorthand) syntax is only supported because the client used to expose all
                 // list input types as T | T[]. Consider removing it one day.
-                </span>list_union_type(InputType::object(composite_equality_object(ctx, cf)), <span class="bool-val">true</span>)
+                </span>list_union_type(InputType::object(composite_equality_object(ctx, <span class="kw-2">&amp;</span>cf)), <span class="bool-val">true</span>)
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[InputType::object(composite_equality_object(ctx, cf))]
+                <span class="macro">vec!</span>[InputType::object(composite_equality_object(ctx, <span class="kw-2">&amp;</span>cf))]
             };
 
-            input_field(cf.name.clone(), types, <span class="prelude-val">None</span>)
+            input_field(cf.name(), types, <span class="prelude-val">None</span>)
                 .optional_if(!cf.is_required())
                 .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
         }
