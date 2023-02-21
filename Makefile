@@ -298,10 +298,10 @@ cross-x86:
 
 qe-cross-x86:
 	$(MAKE) cross-x86 CROSS_X86_PACKAGE=query-engine-node-api
-	rm target/x86_64-unknown-linux-gnu/release/libquery_engine.node
+	rm -f target/x86_64-unknown-linux-gnu/release/libquery_engine.node
 	ln target/x86_64-unknown-linux-gnu/release/libquery_engine.{so,node}
 
 qe-stub-cross-x86:
 	$(MAKE) cross-x86 CROSS_X86_PACKAGE=stub-node-api
-	rm target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.node
+	rm -f target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.node
 	ln target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.{so,node}
