@@ -386,6 +386,11 @@ impl SqlSchema {
         Some(self.walk(TableId(table_idx as u32)))
     }
 
+    pub fn view_walker<'a>(&'a self, name: &str) -> Option<ViewWalker<'a>> {
+        let view_idx = self.views.iter().position(|view| view.name == name)?;
+        Some(self.walk(ViewId(view_idx as u32)))
+    }
+
     pub fn view_walker_ns<'a>(&'a self, namespace: &str, name: &str) -> Option<ViewWalker<'a>> {
         let namespace_idx = self.namespace_walker(namespace)?.id;
 
