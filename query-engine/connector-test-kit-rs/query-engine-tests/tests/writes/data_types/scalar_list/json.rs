@@ -52,6 +52,21 @@ mod json {
           @r###"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2"]}}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {
+              jsons:  { push: "[[], {}]" }
+            }) {
+              jsons
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[[],{}]"]}}}"###
+        );
+
+        // TODO: This specific query currently cannot be sent from the JS client.
+        // The client _always_ sends an array as plain json and never as an array of json.
+        // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
+        // https://github.com/prisma/prisma/issues/18019
         if runner.protocol().is_graphql() {
             insta::assert_snapshot!(
               run_query!(&runner, r#"mutation {
@@ -61,28 +76,7 @@ mod json {
                 jsons
               }
             }"#),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[]","{}"]}}}"###
-            );
-        } else {
-            // The request transformation doesn't work well with those queries. ["[]", "{}"] ends up deserialized as [[], {}]
-            let query = r#"{
-            "modelName": "ScalarModel",
-            "action": "updateOne",
-            "query": {
-              "arguments": {
-                "where": { "id": 1 },
-                "data": { "jsons": { "push": ["[]", "{}"] } }
-              },
-              "selection": { "jsons": true }
-            }
-          }"#;
-
-            let res = runner.query_json(query).await?;
-            res.assert_success();
-
-            insta::assert_snapshot!(
-              res.to_string(),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"{\"a\":\"b\"}"},{"$type":"Json","value":"{}"},{"$type":"Json","value":"2"},{"$type":"Json","value":"\"[]\""},{"$type":"Json","value":"\"{}\""}]}}}"###
+              @r###"{"data":{"updateOneScalarModel":{"jsons":["{\"a\":\"b\"}","{}","2","[[],{}]","[]","{}"]}}}"###
             );
         }
 
@@ -143,6 +137,24 @@ mod json {
           @r###"{"data":{"updateOneScalarModel":{"jsons":["2"]}}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"mutation {
+              updateOneScalarModel(where: { id: 2 }, data: {
+                jsons:  { push: "[\"1\", \"2\"]" }
+              }) {
+                jsons
+              }
+            }"#
+          ),
+          @r###"{"data":{"updateOneScalarModel":{"jsons":["[\"1\",\"2\"]"]}}}"###
+        );
+
+        // TODO: This specific query currently cannot be sent from the JS client.
+        // The client _always_ sends an array as plain json and never as an array of json.
+        // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
+        // https://github.com/prisma/prisma/issues/18019
         if runner.protocol().is_graphql() {
             insta::assert_snapshot!(
               run_query!(
@@ -155,30 +167,9 @@ mod json {
                   }
                 }"#
               ),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":["1","2"]}}}"###
+              @r###"{"data":{"updateOneScalarModel":{"jsons":["[\"1\",\"2\"]","1","2"]}}}"###
             );
-        } else {
-            // The request transformation doesn't work well with those queries. ["1", "2"] ends up deserialized as [1, 2]
-            let query = r#"{
-              "modelName": "ScalarModel",
-              "action": "updateOne",
-              "query": {
-                "arguments": {
-                  "where": { "id": 2 },
-                  "data": { "jsons": { "push": ["1", "2"] } }
-                },
-                "selection": { "jsons": true }
-              }
-            }"#;
-
-            let res = runner.query_json(query).await?;
-            res.assert_success();
-
-            insta::assert_snapshot!(
-              res.to_string(),
-              @r###"{"data":{"updateOneScalarModel":{"jsons":[{"$type":"Json","value":"\"1\""},{"$type":"Json","value":"\"2\""}]}}}"###
-            );
-        };
+        }
 
         Ok(())
     }
