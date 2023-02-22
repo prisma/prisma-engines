@@ -22,8 +22,6 @@ pub struct Model {
     pub indices: Vec<IndexDefinition>,
     /// Describes the Primary Keys
     pub primary_key: Option<PrimaryKeyDefinition>,
-    /// Indicates if this model has to be commented out.
-    pub is_commented_out: bool,
     /// Indicates if this model has to be ignored by the Client.
     pub is_ignored: bool,
     /// The contents of the `@@schema("...")` attribute.
@@ -288,8 +286,6 @@ pub struct PrimaryKeyDefinition {
     pub name: Option<String>,
     pub db_name: Option<String>,
     pub fields: Vec<PrimaryKeyField>,
-    pub defined_on_field: bool,
-    pub clustered: Option<bool>,
 }
 
 /// A field in a Primary Key that optionally defines a sort order and length limit.
@@ -349,7 +345,6 @@ impl Model {
             primary_key: None,
             documentation: None,
             database_name,
-            is_commented_out: false,
             is_ignored: false,
             is_view: false,
             schema: None,
@@ -394,12 +389,6 @@ impl Model {
     /// Finds a scalar field by name.
     pub fn find_scalar_field(&self, name: &str) -> Option<&ScalarField> {
         self.scalar_fields().find(|f| f.name == *name)
-    }
-
-    /// Finds a field by database name.
-    pub fn find_scalar_field_db_name(&self, db_name: &str) -> Option<&ScalarField> {
-        self.scalar_fields()
-            .find(|f| f.database_name.as_deref() == Some(db_name))
     }
 
     pub fn has_field(&self, name: &str) -> bool {
@@ -467,11 +456,7 @@ impl Model {
                     })
                     .collect();
 
-                if !id_fields.is_empty()
-                    && !id_fields
-                        .iter()
-                        .any(|f| f.is_commented_out || (f.is_optional() && !allow_optional))
-                {
+                if !id_fields.is_empty() && !id_fields.iter().any(|f| f.is_optional() && !allow_optional) {
                     result.push(UniqueCriterion::new(id_fields));
                 }
             }
@@ -492,10 +477,8 @@ impl Model {
                         .map(|f| &f.path.first().unwrap().0)
                         .map(|name| self.find_scalar_field(name).unwrap())
                         .collect();
-                    let no_fields_are_ineligible = !fields.iter().any(|f| f.is_commented_out);
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
-                    ((all_fields_are_required || allow_optional) && no_fields_are_ineligible)
-                        .then(|| UniqueCriterion::new(fields))
+                    (all_fields_are_required || allow_optional).then(|| UniqueCriterion::new(fields))
                 })
                 .collect();
 
@@ -583,10 +566,6 @@ impl Model {
 
     pub fn field_is_primary(&self, field_name: &str) -> bool {
         matches!(&self.primary_key, Some(pk) if pk.fields.len() == 1 && pk.fields.first().unwrap().name == field_name)
-    }
-
-    pub fn field_is_primary_and_defined_on_field(&self, field_name: &str) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{ fields, defined_on_field , ..}) if fields.len()  == 1 && fields.first().unwrap().name == field_name && *defined_on_field)
     }
 
     pub fn field_is_auto_generated_int_id(&self, name: &str) -> bool {

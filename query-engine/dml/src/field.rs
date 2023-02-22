@@ -125,9 +125,6 @@ pub struct ScalarField {
     /// automatically.
     pub is_updated_at: bool,
 
-    /// Indicates if this field has to be commented out.
-    pub is_commented_out: bool,
-
     /// Indicates if this field is ignored by the Client.
     pub is_ignored: bool,
 }
@@ -145,7 +142,6 @@ impl ScalarField {
             documentation: None,
             is_generated: false,
             is_updated_at: false,
-            is_commented_out: false,
             is_ignored: false,
         }
     }

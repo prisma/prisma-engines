@@ -124,9 +124,6 @@ impl<'a> LiftAstToDml<'a> {
                          length: field.length(),
                      })
                 .collect(),
-            defined_on_field: pk.is_defined_on_field(),
-            // By default a primary key is always clustered in any database.
-            clustered: pk.clustered(),
         });
 
         model.indices = walker

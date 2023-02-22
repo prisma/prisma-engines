@@ -126,8 +126,6 @@ fn multi_field_ids_must_work() {
         name: None,
         db_name: None,
         fields: vec![PrimaryKeyField::new("a"), PrimaryKeyField::new("b")],
-        defined_on_field: false,
-        clustered: None,
     });
 }
 
@@ -145,8 +143,6 @@ fn should_allow_unique_and_id_on_same_field() {
         name: None,
         db_name: None,
         fields: vec![PrimaryKeyField::new("id")],
-        defined_on_field: true,
-        clustered: None,
     });
 
     user_model.assert_has_index(IndexDefinition {
@@ -328,8 +324,6 @@ fn id_accepts_length_arg_on_mysql() {
                 length: None,
             },
         ],
-        defined_on_field: false,
-        clustered: None,
     });
 
     blog_model.assert_has_pk(PrimaryKeyDefinition {
@@ -340,8 +334,6 @@ fn id_accepts_length_arg_on_mysql() {
             sort_order: None,
             length: Some(5),
         }],
-        defined_on_field: true,
-        clustered: None,
     });
 }
 
@@ -389,8 +381,6 @@ fn id_accepts_sort_arg_on_sqlserver() {
                 length: None,
             },
         ],
-        defined_on_field: false,
-        clustered: None,
     });
 
     blog_model.assert_has_pk(PrimaryKeyDefinition {
@@ -401,8 +391,6 @@ fn id_accepts_sort_arg_on_sqlserver() {
             sort_order: Some(SortOrder::Desc),
             length: None,
         }],
-        defined_on_field: true,
-        clustered: None,
     });
 }
 

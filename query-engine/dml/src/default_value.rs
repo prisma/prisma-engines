@@ -1,4 +1,3 @@
-use crate::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use std::fmt;
 
@@ -238,17 +237,6 @@ impl ValueGenerator {
         self.generator.invoke()
     }
 
-    pub fn check_compatibility_with_scalar_type(&self, scalar_type: ScalarType) -> Result<(), String> {
-        if self.generator.can_handle(scalar_type) {
-            Ok(())
-        } else {
-            Err(format!(
-                "The function `{}()` cannot be used on fields of type `{scalar_type}`.",
-                &self.name
-            ))
-        }
-    }
-
     pub fn is_dbgenerated(&self) -> bool {
         self.name == "dbgenerated"
     }
@@ -294,21 +282,6 @@ impl ValueGeneratorFn {
             Self::Autoincrement => None,
             Self::DbGenerated => None,
             Self::Auto => None,
-        }
-    }
-
-    fn can_handle(&self, scalar_type: ScalarType) -> bool {
-        #[allow(clippy::match_like_matches_macro)]
-        match (self, scalar_type) {
-            (Self::Uuid, ScalarType::String) => true,
-            (Self::Cuid, ScalarType::String) => true,
-            (Self::Nanoid(_), ScalarType::String) => true,
-            (Self::Now, ScalarType::DateTime) => true,
-            (Self::Autoincrement, ScalarType::Int) => true,
-            (Self::Autoincrement, ScalarType::BigInt) => true,
-            (Self::DbGenerated, _) => true,
-            (Self::Auto, _) => true,
-            _ => false,
         }
     }
 
