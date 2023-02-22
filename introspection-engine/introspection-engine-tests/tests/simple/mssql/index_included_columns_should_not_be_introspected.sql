@@ -27,14 +27,15 @@ ALTER TABLE a ADD CONSTRAINT a_pkey PRIMARY KEY (aid);
 CREATE UNIQUE INDEX bidx ON b (bid) INCLUDE (bcol);
 
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlserver"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model a {

@@ -6,14 +6,15 @@ CREATE TABLE [dbo].[User] (
     CONSTRAINT [PK_User] PRIMARY KEY ([id], [name])
 )
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlserver"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model User {

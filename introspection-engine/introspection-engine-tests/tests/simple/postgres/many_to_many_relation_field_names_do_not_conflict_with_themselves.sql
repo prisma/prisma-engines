@@ -22,14 +22,15 @@ CREATE UNIQUE INDEX "_Frenemyship_AB_unique" ON "_Frenemyship"("A", "B");
 CREATE INDEX "_Frenemyship_B_index" ON "_Frenemyship"("B");
 
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model User {

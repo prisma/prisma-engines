@@ -4,6 +4,7 @@
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
+pub mod mssql;
 pub mod mysql;
 pub mod postgres;
 /// Tokio test runtime utils.
@@ -12,7 +13,6 @@ pub mod runtime;
 mod capabilities;
 mod diff;
 mod logging;
-mod mssql;
 mod sqlite;
 mod tags;
 mod test_api_args;

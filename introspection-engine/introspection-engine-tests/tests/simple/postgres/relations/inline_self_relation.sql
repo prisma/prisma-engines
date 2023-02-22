@@ -7,14 +7,15 @@ CREATE TABLE "Biscuit" (
 );
 
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model Biscuit {

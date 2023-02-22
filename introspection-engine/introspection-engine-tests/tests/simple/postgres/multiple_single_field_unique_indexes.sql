@@ -10,14 +10,15 @@ CREATE UNIQUE INDEX unq2 ON mymodel(thefield);
 CREATE UNIQUE INDEX unq3 ON mymodel(thefield);
 CREATE UNIQUE INDEX unq1 ON mymodel(thefield);
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model mymodel {
