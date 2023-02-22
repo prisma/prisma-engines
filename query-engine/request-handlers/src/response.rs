@@ -138,15 +138,25 @@ impl From<GQLError> for GQLResponse {
 //   the nested structure of variants.
 impl From<HandlerError> for GQLError {
     fn from(err: HandlerError) -> Self {
-        let user_facing: user_facing_errors::Error = match err {
+        use user_facing_errors::{Error, KnownError, UnknownError};
+
+        let user_facing: Error = match err {
+            // core errors
             HandlerError::Core(ref ce) => match ce {
                 CoreError::QueryParserError(QueryParserError::Structured(se))
                 | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
                     QueryParserError::Structured(se),
-                )) => user_facing_errors::KnownError::new(se.to_owned()).into(),
-                _ => user_facing_errors::UnknownError::new(&err).into(),
+                )) => KnownError::new(se.to_owned()).into(),
+                _ => UnknownError::new(&err).into(),
             },
-            _ => user_facing_errors::UnknownError::new(&err).into(),
+
+            // value fit error
+            HandlerError::ValueFitError(details) => KnownError::new(user_facing_errors::query_engine::ValueFitError {
+                details: details.clone(),
+            })
+            .into(),
+
+            _ => UnknownError::new(&err).into(),
         };
 
         GQLError::from(user_facing)

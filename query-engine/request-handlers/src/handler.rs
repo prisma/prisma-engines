@@ -1,5 +1,5 @@
 use super::{GQLBatchResponse, GQLResponse};
-use crate::{PrismaResponse, RequestBody};
+use crate::{GQLError, PrismaResponse, RequestBody};
 use futures::FutureExt;
 use indexmap::IndexMap;
 use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
@@ -51,10 +51,7 @@ impl<'a> RequestHandler<'a> {
                 }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
-            Err(err) => match err.as_known_error() {
-                Some(transformed) => PrismaResponse::Single(user_facing_errors::Error::new_known(transformed).into()),
-                None => PrismaResponse::Single(err.into()),
-            },
+            Err(err) => PrismaResponse::Single(GQLResponse::from(GQLError::from(err))),
         }
     }
 

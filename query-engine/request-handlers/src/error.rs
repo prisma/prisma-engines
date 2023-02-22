@@ -1,7 +1,6 @@
 use query_core::CoreError;
 use serde::Serialize;
 use thiserror::Error;
-use user_facing_errors::KnownError;
 
 #[derive(Debug, Error)]
 #[allow(clippy::large_enum_variant)]
@@ -62,17 +61,6 @@ impl HandlerError {
 
     pub fn value_fit(details: impl ToString) -> Self {
         Self::ValueFitError(details.to_string())
-    }
-
-    pub fn as_known_error(&self) -> Option<KnownError> {
-        match self {
-            HandlerError::ValueFitError(details) => {
-                Some(KnownError::new(user_facing_errors::query_engine::ValueFitError {
-                    details: details.clone(),
-                }))
-            }
-            _ => None,
-        }
     }
 }
 
