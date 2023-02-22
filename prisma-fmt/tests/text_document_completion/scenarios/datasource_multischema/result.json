@@ -1,0 +1,65 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "engines provider",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nprovider = \"foo\"\n```\n___\nDescribes which datasource connector to use. Can be one of the following datasource providers: `postgresql`, `mysql`, `sqlserver`, `sqlite`, `mongodb` or `cockroachdb`."
+      },
+      "insertText": "provider = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "engines url",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nurl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/connection-strings)."
+      },
+      "insertText": "url = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "engines shadowDatabaseUrl",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nshadowDatabaseUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow)."
+      },
+      "insertText": "shadowDatabaseUrl = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "engines directUrl",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\ndirectUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli)."
+      },
+      "insertText": "directUrl = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "engines relationMode",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nrelationMode = \"foreignKeys\" | \"prisma\"\n```\n___\nSet the global relation mode for all relations. Values can be either \"foreignKeys\" (Default), or \"prisma\". [Learn more](https://pris.ly/d/relation-mode)"
+      },
+      "insertText": "relationmode = $0",
+      "insertTextFormat": 2
+    },
+    {
+      "label": "engines schemas",
+      "kind": 5,
+      "documentation": {
+        "kind": "markdown",
+        "value": "```prisma\nschemas = [\"foo\", \"bar\", \"baz\"]\n```\n___\nThe list of database schemas. [Learn More](https://pris.ly/d/multi-schema-configuration)"
+      },
+      "insertText": "schemas = [$0]",
+      "insertTextFormat": 2
+    }
+  ]
+}

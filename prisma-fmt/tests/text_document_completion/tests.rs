@@ -36,4 +36,6 @@ scenarios! {
     referential_actions_middle_of_args_list
     referential_actions_mssql
     referential_actions_with_trailing_comma
+    datasource_default_completions
+    datasource_multischema
 }
