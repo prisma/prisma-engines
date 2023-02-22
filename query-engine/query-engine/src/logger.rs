@@ -63,14 +63,6 @@ impl Logger {
         }
     }
 
-    pub fn enable_metrics(&mut self, metrics: MetricRegistry) {
-        self.metrics = Some(metrics);
-    }
-
-    pub fn is_metrics_enabled(&self) -> bool {
-        self.metrics.is_some()
-    }
-
     /// Install logger as a global. Can be called only once per application
     /// instance. The returned guard value needs to stay in scope for the whole
     /// lifetime of the service.

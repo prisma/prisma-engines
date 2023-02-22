@@ -97,8 +97,10 @@ pub async fn setup(
     install_logger: bool,
     metrics: Option<MetricRegistry>,
 ) -> PrismaResult<Arc<PrismaContext>> {
+    let metrics = metrics.unwrap_or_default();
+
     if install_logger {
-        Logger::new("prisma-engine-http", metrics.clone(), opts)
+        Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
             .install()
             .unwrap();
     }
@@ -115,11 +117,12 @@ pub async fn setup(
     let span = tracing::info_span!("prisma:engine:connect");
 
     let mut features = EnabledFeatures::from(opts);
+
     if config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override {
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, metrics)
+    let cx = PrismaContext::new(datamodel, protocol, features, Some(metrics))
         .instrument(span)
         .await?;
 
