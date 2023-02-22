@@ -59,11 +59,15 @@ impl<'a> ScalarFieldPair<'a> {
         self.previous.and_then(|f| f.ast_field().documentation())
     }
 
-    /// Optional, required or a list. For columns in views, if changed in PSL,
+    /// Optional, required or a list. For columns in PostgreSQL views, if changed in PSL,
     /// we use the changed arity instead of the always optional value from the
     /// database.
     pub fn arity(self) -> ColumnArity {
-        if self.next.is_in_view() && self.next.column_type().arity.is_nullable() {
+        let keep_previous_arity = self.next.is_in_view()
+            && self.next.column_type().arity.is_nullable()
+            && self.context.sql_family.is_postgres();
+
+        if keep_previous_arity {
             match self.previous.map(|prev| prev.ast_field().arity) {
                 Some(arity) if arity.is_required() => ColumnArity::Required,
                 Some(arity) if arity.is_list() => ColumnArity::List,

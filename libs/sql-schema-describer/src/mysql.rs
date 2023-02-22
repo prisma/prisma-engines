@@ -71,6 +71,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
+        sql_schema.views = self.get_views(schema).await?;
+
         let table_names = self.get_table_names(schema, &mut sql_schema).await?;
         sql_schema.tables.reserve(table_names.len());
         sql_schema.table_columns.reserve(table_names.len());
@@ -79,7 +81,6 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
         push_indexes(&table_names, schema, &mut sql_schema, self.conn).await?;
 
-        sql_schema.views = self.get_views(schema).await?;
         sql_schema.procedures = self.get_procedures(schema).await?;
 
         Ok(sql_schema)
@@ -354,17 +355,23 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY ordinal_position
         ";
 
-        let mut defaults = Vec::new();
+        let mut table_defaults = Vec::new();
+        let mut view_defaults = Vec::new();
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for col in rows {
             trace!("Got column: {col:?}");
             let table_name = col.get_expect_string("table_name");
-            let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
-                *id
-            } else {
-                continue;
+
+            let table_id = table_ids.get(table_name.as_str());
+            let view_id = sql_schema.view_walker(table_name.as_str());
+
+            let container_id = match (table_id, view_id) {
+                (Some(id), _) => Either::Left(id),
+                (_, Some(v_walker)) => Either::Right(v_walker.id),
+                (None, None) => continue, // we only care about columns in tables we have access to
             };
+
             let name = col.get_expect_string("column_name");
             let data_type = col.get_expect_string("data_type");
             let full_data_type = col.get_expect_string("full_data_type");
@@ -500,8 +507,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                 },
             };
 
-            // defaults has to be in the same order as the columns
-            defaults.push((table_id, default));
+            match container_id {
+                Either::Left(table_id) => {
+                    table_defaults.push((table_id, default));
+                }
+                Either::Right(view_id) => {
+                    view_defaults.push((view_id, default));
+                }
+            }
 
             let col = Column {
                 name,
@@ -509,15 +522,31 @@ impl<'a> SqlSchemaDescriber<'a> {
                 auto_increment,
             };
 
-            sql_schema.table_columns.push((table_id, col));
+            match container_id {
+                Either::Left(table_id) => {
+                    sql_schema.table_columns.push((*table_id, col));
+                }
+                Either::Right(view_id) => {
+                    sql_schema.view_columns.push((view_id, col));
+                }
+            }
         }
 
         sql_schema.table_columns.sort_by_key(|(table_id, _)| *table_id);
-        defaults.sort_by_key(|(table_id, _)| *table_id);
+        sql_schema.view_columns.sort_by_key(|(view_id, _)| *view_id);
 
-        for (i, (_, default)) in defaults.into_iter().enumerate() {
+        table_defaults.sort_by_key(|(table_id, _)| *table_id);
+        view_defaults.sort_by_key(|(view_id, _)| *view_id);
+
+        for (i, (_, default)) in table_defaults.into_iter().enumerate() {
             if let Some(default) = default {
                 sql_schema.push_table_default_value(TableColumnId(i as u32), default);
+            }
+        }
+
+        for (i, (_, default)) in view_defaults.into_iter().enumerate() {
+            if let Some(default) = default {
+                sql_schema.push_view_default_value(ViewColumnId(i as u32), default);
             }
         }
 
