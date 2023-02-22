@@ -5,7 +5,6 @@ use crate::{
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
-use serde::Serialize;
 use thiserror::Error;
 use user_facing_errors::UnknownError;
 
@@ -75,20 +74,6 @@ pub enum CoreError {
 
     #[error("Error in batch request {request_idx}: {error}")]
     BatchError { request_idx: usize, error: Box<CoreError> },
-}
-
-// gradual json serialization. Default to a json string, equal to to_string (auto-implemented by
-// fmt::Display)
-impl Serialize for CoreError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::QueryGraphBuilderError(err) => err.serialize(serializer),
-            err => serializer.serialize_str(err.to_string().as_str()),
-        }
-    }
 }
 
 impl CoreError {

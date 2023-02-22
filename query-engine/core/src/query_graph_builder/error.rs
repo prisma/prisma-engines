@@ -49,20 +49,6 @@ pub struct RelationViolation {
     pub(crate) model_b_name: String,
 }
 
-// gradual json serialization. Default to a json string, equal to to_string (auto-implemented by
-// fmt::Display)
-impl serde::Serialize for QueryGraphBuilderError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::QueryParserError(err) => err.serialize(serializer),
-            err @ _ => serializer.serialize_str(format!("{:?}", err).as_str()),
-        }
-    }
-}
-
 impl From<RelationFieldRef> for RelationViolation {
     fn from(rf: RelationFieldRef) -> Self {
         Self::from(&rf)

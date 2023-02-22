@@ -1,1 +1,1 @@
-"Query parsing/validation error at `Query.findManyUser.User`: Expected a minimum of 1 fields to be present, got 0."
+{"is_panic":false,"message":"Error in query graph construction: QueryParserError(Legacy { path: QueryPath { segments: [\"Query\", \"findManyUser\", \"User\"] }, error_kind: FieldCountError(FieldCountError { min: Some(1), max: None, fields: None, got: 0 }) })","backtrace":null}

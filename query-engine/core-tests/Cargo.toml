@@ -7,6 +7,7 @@ edition = "2021"
 
 [dev-dependencies]
 dissimilar = "1.0.4"
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 request-handlers = { path = "../request-handlers" }
 query-core = { path = "../core" }
 schema-builder = { path = "../schema-builder" }

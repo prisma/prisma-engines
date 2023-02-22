@@ -47,19 +47,6 @@ impl fmt::Display for QueryParserError {
         }
     }
 }
-
-impl serde::Serialize for QueryParserError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            QueryParserError::Structured(s) => s.serialize(serializer),
-            legacy => serializer.serialize_str(format!("{}", legacy).as_str()),
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Clone)]
 pub struct StructuredQueryParseError {}
 

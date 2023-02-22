@@ -1,1 +1,1 @@
-"Operation 'findMany' for model 'Alpaca' does not match any query."
+{"is_panic":false,"message":"Operation 'findMany' for model 'Alpaca' does not match any query.","backtrace":null}
