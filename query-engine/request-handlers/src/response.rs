@@ -111,8 +111,12 @@ impl From<GQLError> for GQLResponse {
 }
 
 impl From<HandlerError> for GQLError {
-    fn from(other: HandlerError) -> Self {
-        GQLError::from(user_facing_errors::Error::from_dyn_error(&other))
+    fn from(err: HandlerError) -> Self {
+        let user_facing = match err {
+            HandlerError::Core(ce) => user_facing_errors::Error::from(ce),
+            _ => user_facing_errors::Error::to_unknown(&err),
+        };
+        GQLError::from(user_facing)
     }
 }
 
