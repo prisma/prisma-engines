@@ -188,7 +188,7 @@ impl ConnectorError {
     pub fn to_user_facing(&self) -> user_facing_errors::Error {
         match &self.0.user_facing_error {
             Some(known_error) => known_error.clone().into(),
-            None => user_facing_errors::Error::to_unknown(self),
+            None => user_facing_errors::UnknownError::new(self).into(),
         }
     }
 

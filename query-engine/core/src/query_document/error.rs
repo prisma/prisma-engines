@@ -60,7 +60,7 @@ impl serde::Serialize for QueryParserError {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct StructuredQueryParseError {}
 
 impl UserFacingError for StructuredQueryParseError {

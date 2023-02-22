@@ -7,6 +7,7 @@ use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use serde::Serialize;
 use thiserror::Error;
+use user_facing_errors::UnknownError;
 
 #[derive(Debug, Error)]
 #[error(
@@ -202,6 +203,11 @@ impl From<CoreError> for user_facing_errors::Error {
                 known_error.into()
             }
 
+            CoreError::QueryParserError(QueryParserError::Structured(se))
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
+                QueryParserError::Structured(se),
+            )) => user_facing_errors::KnownError::new(se).into(),
+
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,
                 object_name,
@@ -304,7 +310,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 inner_error
             }
 
-            _ => user_facing_errors::Error::to_unknown(&err),
+            _ => UnknownError::new(&err).into(),
         }
     }
 }

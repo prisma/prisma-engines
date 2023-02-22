@@ -63,6 +63,15 @@ pub struct UnknownError {
     pub backtrace: Option<String>,
 }
 
+impl UnknownError {
+    pub fn new(err: &dyn std::error::Error) -> Self {
+        UnknownError {
+            message: err.to_string(),
+            backtrace: None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Error {
     is_panic: bool,
@@ -105,17 +114,6 @@ impl Error {
             inner: ErrorType::Unknown(UnknownError {
                 message,
                 backtrace: Some(format!("{:?}", backtrace::Backtrace::new())),
-            }),
-            is_panic: false,
-            batch_request_idx: None,
-        }
-    }
-
-    pub fn to_unknown(err: &dyn std::error::Error) -> Self {
-        Error {
-            inner: ErrorType::Unknown(UnknownError {
-                message: err.to_string(),
-                backtrace: None,
             }),
             is_panic: false,
             batch_request_idx: None,

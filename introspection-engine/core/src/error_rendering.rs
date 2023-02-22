@@ -3,6 +3,7 @@ use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
 use user_facing_errors::{
     common::SchemaParserError, introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError,
+    UnknownError,
 };
 
 pub fn render_error(crate_error: Error) -> UserFacingError {
@@ -13,7 +14,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
         }) => user_facing_error.into(),
         Error::IntrospectionResultEmpty => KnownError::new(IntrospectionResultEmpty).into(),
         Error::DatamodelError(full_error) => KnownError::new(SchemaParserError { full_error }).into(),
-        _ => UserFacingError::to_unknown(&crate_error),
+        _ => UnknownError::new(&crate_error).into(),
     }
 }
 
