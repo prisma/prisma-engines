@@ -17,7 +17,7 @@ fn run_query_validation_test(query_file_path: &str) {
 
     let err_string = match validate(&query, schema) {
         Ok(()) => panic!("these tests are only for errors, the query should fail to validate, but it did not"),
-        Err(err) => err.to_string(),
+        Err(err) => serde_json::to_string(&err).unwrap(),
     };
 
     let snapshot_path = query_file_path.parent().unwrap().with_file_name(

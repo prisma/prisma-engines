@@ -5,6 +5,7 @@ use crate::{
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
+use serde::Serialize;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -77,14 +78,14 @@ pub enum CoreError {
 
 // gradual json serialization. Default to a json string, equal to to_string (auto-implemented by
 // fmt::Display)
-impl serde::Serialize for CoreError {
+impl Serialize for CoreError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
         match self {
             Self::QueryGraphBuilderError(err) => err.serialize(serializer),
-            err @ _ => serializer.serialize_str(err.to_string().as_str()),
+            err => serializer.serialize_str(err.to_string().as_str()),
         }
     }
 }
@@ -180,12 +181,16 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            CoreError::QueryParserError(query_parser_error)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                let known_error = match query_parser_error.error_kind() {
+            // legacy query validation errors. This block should go away
+            CoreError::QueryParserError(QueryParserError::Legacy { path, error_kind })
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
+                path,
+                error_kind,
+            })) => {
+                let known_error = match error_kind {
                     QueryParserErrorKind::RequiredValueNotSetError => {
                         user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", query_parser_error.path()),
+                            path: format!("{}", path),
                         })
                     }
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {

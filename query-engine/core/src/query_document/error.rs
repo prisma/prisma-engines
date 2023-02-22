@@ -49,7 +49,10 @@ impl serde::Serialize for QueryParserError {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(format!("{:?}", self).as_str())
+        match self {
+            QueryParserError::New => todo!(),
+            legacy @ _ => serializer.serialize_str(format!("{}", legacy).as_str()),
+        }
     }
 }
 

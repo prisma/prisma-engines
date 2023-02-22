@@ -25,6 +25,26 @@ pub enum HandlerError {
     ValueFitError(String),
 }
 
+// Implements a custom serializer to provide a structured json format for validation errors.
+// Custom serializers are implemented down CoreError through QueryGraphBuilderError to ParseError
+// where the errors messages have a well-defined json structure.
+//
+// Different error variants can progressively implement a typed structured that can be serialized
+// as JSON. Until that migration is complete happens, their json representation will be the error
+// message as stringified JSON. (Given the error message was what was returned to the client before
+// any kind of JSON structure for messages was considered)
+impl serde::Serialize for HandlerError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            HandlerError::Core(e) => e.serialize(serializer),
+            err @ _ => serializer.serialize_str(format!("{}", err).as_str()),
+        }
+    }
+}
+
 impl HandlerError {
     pub fn configuration(message: impl ToString) -> Self {
         Self::Configuration(message.to_string())
