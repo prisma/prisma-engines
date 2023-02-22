@@ -921,3 +921,74 @@ fn load_url_no_validation_should_work_with_proxy_url() {
 
     expectation.assert_eq(&result)
 }
+
+#[test]
+fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0004")
+          url = env("DATABASE_URL_0004")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0004", "prisma://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a direct URL that points directly to the database. Using `prisma` in URL scheme is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgres"
+        [1;94m 3 | [0m  directUrl = [1;91menv("DIRECT_URL_0004")[0m
+        [1;94m   | [0m
+    "#]);
+
+    expectation.assert_eq(&error);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0004");
+    std::env::remove_var("DIRECT_URL_0004");
+}
+
+#[test]
+fn directurl_should_not_use_prisma_scheme() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = "prisma://kekw.lol"
+          url = env("DATABASE_URL_0004")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a direct URL that points directly to the database. Using `prisma` in URL scheme is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgres"
+        [1;94m 3 | [0m  directUrl = [1;91m"prisma://kekw.lol"[0m
+        [1;94m   | [0m
+    "#]);
+
+    expectation.assert_eq(&error);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0004");
+    std::env::remove_var("DIRECT_URL_0004");
+}
