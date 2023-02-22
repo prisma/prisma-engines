@@ -201,6 +201,8 @@
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
 <a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::pk::PrimaryKey;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -269,6 +271,7 @@
         internal_data_model
             .walk(model.id)
             .relation_fields()
+            .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| internal_data_model.clone().zip(rf.id))
             .collect()
     }
@@ -387,6 +390,7 @@
         <span class="kw">let </span>rf = internal_data_model
             .walk(model.id)
             .relation_fields()
+            .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| Field::from(internal_data_model.clone().zip(rf.id)))
             .filter(|f| predicate(<span class="kw-2">&amp;</span>f));
         <span class="kw">let </span>composite_type_fields = internal_data_model

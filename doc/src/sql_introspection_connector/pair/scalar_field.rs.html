@@ -210,6 +210,10 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sanitize_datamodel_names;
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl::{
@@ -271,11 +275,15 @@
         <span class="self">self</span>.previous.and_then(|f| f.ast_field().documentation())
     }
 
-    <span class="doccomment">/// Optional, required or a list. For columns in views, if changed in PSL,
+    <span class="doccomment">/// Optional, required or a list. For columns in PostgreSQL views, if changed in PSL,
     /// we use the changed arity instead of the always optional value from the
     /// database.
     </span><span class="kw">pub fn </span>arity(<span class="self">self</span>) -&gt; ColumnArity {
-        <span class="kw">if </span><span class="self">self</span>.next.is_in_view() &amp;&amp; <span class="self">self</span>.next.column_type().arity.is_nullable() {
+        <span class="kw">let </span>keep_previous_arity = <span class="self">self</span>.next.is_in_view()
+            &amp;&amp; <span class="self">self</span>.next.column_type().arity.is_nullable()
+            &amp;&amp; <span class="self">self</span>.context.sql_family.is_postgres();
+
+        <span class="kw">if </span>keep_previous_arity {
             <span class="kw">match </span><span class="self">self</span>.previous.map(|prev| prev.ast_field().arity) {
                 <span class="prelude-val">Some</span>(arity) <span class="kw">if </span>arity.is_required() =&gt; ColumnArity::Required,
                 <span class="prelude-val">Some</span>(arity) <span class="kw">if </span>arity.is_list() =&gt; ColumnArity::List,

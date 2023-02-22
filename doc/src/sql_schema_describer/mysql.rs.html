@@ -814,6 +814,35 @@
 <a href="#814" id="814">814</a>
 <a href="#815" id="815">815</a>
 <a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -887,6 +916,8 @@
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
+        sql_schema.views = <span class="self">self</span>.get_views(schema).<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         sql_schema.tables.reserve(table_names.len());
         sql_schema.table_columns.reserve(table_names.len());
@@ -895,7 +926,6 @@
         push_foreign_keys(schema, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
         push_indexes(<span class="kw-2">&amp;</span>table_names, schema, <span class="kw-2">&amp;mut </span>sql_schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        sql_schema.views = <span class="self">self</span>.get_views(schema).<span class="kw">await</span><span class="question-mark">?</span>;
         sql_schema.procedures = <span class="self">self</span>.get_procedures(schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(sql_schema)
@@ -1170,17 +1200,23 @@
             ORDER BY ordinal_position
         &quot;</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>defaults = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>table_defaults = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>view_defaults = Vec::new();
         <span class="kw">let </span>rows = conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema_name.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>col <span class="kw">in </span>rows {
             <span class="macro">trace!</span>(<span class="string">&quot;Got column: {col:?}&quot;</span>);
             <span class="kw">let </span>table_name = col.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let </span>table_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = table_ids.get(table_name.as_str()) {
-                <span class="kw-2">*</span>id
-            } <span class="kw">else </span>{
-                <span class="kw">continue</span>;
-            };
+
+            <span class="kw">let </span>table_id = table_ids.get(table_name.as_str());
+            <span class="kw">let </span>view_id = sql_schema.view_walker(table_name.as_str());
+
+            <span class="kw">let </span>container_id = <span class="kw">match </span>(table_id, view_id) {
+                (<span class="prelude-val">Some</span>(id), <span class="kw">_</span>) =&gt; Either::Left(id),
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(v_walker)) =&gt; Either::Right(v_walker.id),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">continue</span>, <span class="comment">// we only care about columns in tables we have access to
+            </span>};
+
             <span class="kw">let </span>name = col.get_expect_string(<span class="string">&quot;column_name&quot;</span>);
             <span class="kw">let </span>data_type = col.get_expect_string(<span class="string">&quot;data_type&quot;</span>);
             <span class="kw">let </span>full_data_type = col.get_expect_string(<span class="string">&quot;full_data_type&quot;</span>);
@@ -1316,8 +1352,14 @@
                 },
             };
 
-            <span class="comment">// defaults has to be in the same order as the columns
-            </span>defaults.push((table_id, default));
+            <span class="kw">match </span>container_id {
+                Either::Left(table_id) =&gt; {
+                    table_defaults.push((table_id, default));
+                }
+                Either::Right(view_id) =&gt; {
+                    view_defaults.push((view_id, default));
+                }
+            }
 
             <span class="kw">let </span>col = Column {
                 name,
@@ -1325,15 +1367,31 @@
                 auto_increment,
             };
 
-            sql_schema.table_columns.push((table_id, col));
+            <span class="kw">match </span>container_id {
+                Either::Left(table_id) =&gt; {
+                    sql_schema.table_columns.push((<span class="kw-2">*</span>table_id, col));
+                }
+                Either::Right(view_id) =&gt; {
+                    sql_schema.view_columns.push((view_id, col));
+                }
+            }
         }
 
         sql_schema.table_columns.sort_by_key(|(table_id, <span class="kw">_</span>)| <span class="kw-2">*</span>table_id);
-        defaults.sort_by_key(|(table_id, <span class="kw">_</span>)| <span class="kw-2">*</span>table_id);
+        sql_schema.view_columns.sort_by_key(|(view_id, <span class="kw">_</span>)| <span class="kw-2">*</span>view_id);
 
-        <span class="kw">for </span>(i, (<span class="kw">_</span>, default)) <span class="kw">in </span>defaults.into_iter().enumerate() {
+        table_defaults.sort_by_key(|(table_id, <span class="kw">_</span>)| <span class="kw-2">*</span>table_id);
+        view_defaults.sort_by_key(|(view_id, <span class="kw">_</span>)| <span class="kw-2">*</span>view_id);
+
+        <span class="kw">for </span>(i, (<span class="kw">_</span>, default)) <span class="kw">in </span>table_defaults.into_iter().enumerate() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = default {
                 sql_schema.push_table_default_value(TableColumnId(i <span class="kw">as </span>u32), default);
+            }
+        }
+
+        <span class="kw">for </span>(i, (<span class="kw">_</span>, default)) <span class="kw">in </span>view_defaults.into_iter().enumerate() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = default {
+                sql_schema.push_view_default_value(ViewColumnId(i <span class="kw">as </span>u32), default);
             }
         }
 
