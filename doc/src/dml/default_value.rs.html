@@ -378,35 +378,7 @@
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
 <a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
-<span class="kw">use </span>prisma_value::PrismaValue;
+</pre><pre class="rust"><code><span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>std::fmt;
 
 <span class="doccomment">/// Represents a default specified on a field.
@@ -645,17 +617,6 @@
         <span class="self">self</span>.generator.invoke()
     }
 
-    <span class="kw">pub fn </span>check_compatibility_with_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: ScalarType) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="kw">if </span><span class="self">self</span>.generator.can_handle(scalar_type) {
-            <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
-                <span class="string">&quot;The function `{}()` cannot be used on fields of type `{scalar_type}`.&quot;</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.name
-            ))
-        }
-    }
-
     <span class="kw">pub fn </span>is_dbgenerated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.name == <span class="string">&quot;dbgenerated&quot;
     </span>}
@@ -701,21 +662,6 @@
             <span class="self">Self</span>::Autoincrement =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::DbGenerated =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::Auto =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">fn </span>can_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: ScalarType) -&gt; bool {
-        <span class="attr">#[allow(clippy::match_like_matches_macro)]
-        </span><span class="kw">match </span>(<span class="self">self</span>, scalar_type) {
-            (<span class="self">Self</span>::Uuid, ScalarType::String) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Cuid, ScalarType::String) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Nanoid(<span class="kw">_</span>), ScalarType::String) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Now, ScalarType::DateTime) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Autoincrement, ScalarType::Int) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Autoincrement, ScalarType::BigInt) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::DbGenerated, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="self">Self</span>::Auto, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 

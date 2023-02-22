@@ -190,10 +190,6 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::default_value::{DefaultKind, DefaultValue, ValueGenerator};
@@ -321,9 +317,6 @@
     /// automatically.
     </span><span class="kw">pub </span>is_updated_at: bool,
 
-    <span class="doccomment">/// Indicates if this field has to be commented out.
-    </span><span class="kw">pub </span>is_commented_out: bool,
-
     <span class="doccomment">/// Indicates if this field is ignored by the Client.
     </span><span class="kw">pub </span>is_ignored: bool,
 }
@@ -341,7 +334,6 @@
             documentation: <span class="prelude-val">None</span>,
             is_generated: <span class="bool-val">false</span>,
             is_updated_at: <span class="bool-val">false</span>,
-            is_commented_out: <span class="bool-val">false</span>,
             is_ignored: <span class="bool-val">false</span>,
         }
     }
