@@ -229,7 +229,12 @@ impl QueryEngine {
 
                 let executor = executor::load(data_source, preview_features, &url).await?;
                 let connector = executor.primary_connector();
-                connector.get_connection().await?;
+                let conn_span = tracing::info_span!(
+                    "prisma:engine:connection",
+                    user_facing = true,
+                    "db.type" = connector.name(),
+                );
+                connector.get_connection().instrument(conn_span).await?;
 
                 // Build internal data model
                 let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
@@ -375,13 +380,27 @@ impl QueryEngine {
     }
 
     #[napi]
-    pub async fn dmmf(&self) -> napi::Result<String> {
+    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
-            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
 
-            Ok(serde_json::to_string(&dmmf)?)
+            let dispatcher = self.logger.dispatcher();
+
+            tracing::dispatcher::with_default(&dispatcher, || {
+                let span = tracing::info_span!("prisma:engine:dmmf");
+                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let _guard = span.enter();
+                let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
+
+                let json = {
+                    let span = tracing::info_span!("prisma:engine:dmmf_to_json");
+                    let _guard = span.enter();
+                    serde_json::to_string(&dmmf)?
+                };
+
+                Ok(json)
+            })
         })
         .await
     }
