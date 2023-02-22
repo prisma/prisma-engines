@@ -173,7 +173,12 @@ impl QueryDocumentParser {
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_val = serde_json::to_value(list).unwrap();
+                    let json_val = serde_json::to_value(list).map_err(|err| QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::ValueParseError(format!(
+                            "Cannot deserialize argument value: {err}"
+                        )),
+                    })?;
                     let json_list = self.parse_json_list_from_value(&parent_path, json_val)?;
 
                     Ok(ParsedInputValue::Single(json_list))
@@ -362,7 +367,6 @@ impl QueryDocumentParser {
         })
     }
 
-    // [DTODO] This is likely incorrect or at least using the wrong abstractions.
     fn parse_json_list_from_str(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = self.parse_json(path, s)?;
 

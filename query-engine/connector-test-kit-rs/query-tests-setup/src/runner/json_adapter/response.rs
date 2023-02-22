@@ -57,7 +57,7 @@ fn graphql_item_to_json_item(item: Item) -> Item {
 
 /// The serialization layer can use an `Item::Ref` to allow multiple parent records
 /// to claim the same item without copying data. Given that we cannot mutate those Arcs,
-/// we stupidly clone all those Refs so that we own them.
+/// we have to clone all those Refs so that we own them.
 /// This is only ok because we're doing that in our test environment.
 fn item_ref_to_owned_item(item_ref: ItemRef) -> Item {
     let item_ref = item_ref.as_ref();
