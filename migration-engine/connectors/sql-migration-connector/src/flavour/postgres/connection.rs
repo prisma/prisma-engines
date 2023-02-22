@@ -21,11 +21,28 @@ impl Connection {
                 details: err.to_string(),
             })
         })?;
-        Ok(Connection(
-            connector::PostgreSql::new(url.clone())
+
+        let quaint = connector::PostgreSql::new(url.clone())
+            .await
+            .map_err(quaint_err(&url))?;
+
+        let version = quaint.version().await.map_err(quaint_err(&url))?;
+
+        if version.map(|v| v.starts_with("CockroachDB CCL v22.2")).unwrap_or(false) {
+            // issue: https://github.com/prisma/prisma/issues/16909
+            quaint
+                .raw_cmd("SET enable_implicit_transaction_for_batch_statements=off")
                 .await
-                .map_err(quaint_err(&url))?,
-        ))
+                .map_err(quaint_err(&url))?;
+
+            // Until at least version 22.2.5, enums are not type-sensitive without this.
+            quaint
+                .raw_cmd("SET use_declarative_schema_changer=off")
+                .await
+                .map_err(quaint_err(&url))?;
+        }
+
+        Ok(Connection(quaint))
     }
 
     #[tracing::instrument(skip(self, circumstances, params))]
