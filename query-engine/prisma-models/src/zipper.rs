@@ -2,14 +2,23 @@ use crate::{
     psl::{parser_database::walkers::Walker, schema_ast::ast},
     InternalDataModelRef,
 };
-use std::hash::{Hash, Hasher};
+use std::{
+    fmt,
+    hash::{Hash, Hasher},
+};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting
 // cycle (memory leak).
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Zipper<I> {
     pub id: I,
     pub dm: InternalDataModelRef,
+}
+
+impl<I: fmt::Debug> fmt::Debug for Zipper<I> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.id.fmt(f)
+    }
 }
 
 impl<I: PartialEq> PartialEq for Zipper<I> {

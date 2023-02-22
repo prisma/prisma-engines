@@ -1,6 +1,5 @@
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
-use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::{collections::HashSet, convert::TryInto};
@@ -72,7 +71,11 @@ pub(crate) fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields.iter().collect_vec().as_columns(ctx);
+    let columns = affected_fields
+        .iter()
+        .map(Clone::clone)
+        .collect::<Vec<_>>()
+        .as_columns(ctx);
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();

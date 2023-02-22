@@ -101,7 +101,7 @@ impl JsonProtocolAdapter {
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
                         let nested_container = field.map(|f| match f {
                             Field::Relation(rf) => ParentContainer::from(rf.related_model()),
-                            Field::Scalar(sf) => sf.container().clone(),
+                            Field::Scalar(sf) => sf.container(),
                             Field::Composite(cf) => ParentContainer::from(cf.typ()),
                         });
 

@@ -98,8 +98,8 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         relation_to_fields: None,
         relation_on_delete: None,
         field_type: match field.r#type() {
-            ScalarFieldType::CompositeType(ct) => field.walk(*ct).name().to_owned(),
-            ScalarFieldType::Enum(enm) => field.walk(*enm).name().to_owned(),
+            ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
+            ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },

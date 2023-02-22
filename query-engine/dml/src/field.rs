@@ -5,7 +5,7 @@ use crate::native_type_instance::NativeTypeInstance;
 use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{WithDatabaseName, WithName};
-use crate::{CompositeTypeFieldType, FieldArity};
+use crate::FieldArity;
 use psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
 
 /// Datamodel field type.
@@ -20,17 +20,6 @@ pub enum FieldType {
     Scalar(ScalarType, Option<NativeTypeInstance>),
     /// This is a composite type fields, with a composite type of the given type.
     CompositeType(String),
-}
-
-impl From<CompositeTypeFieldType> for FieldType {
-    fn from(typ: CompositeTypeFieldType) -> Self {
-        match typ {
-            CompositeTypeFieldType::CompositeType(t) => Self::CompositeType(t),
-            CompositeTypeFieldType::Scalar(t, nt) => Self::Scalar(t, nt),
-            CompositeTypeFieldType::Enum(e) => Self::Enum(e),
-            CompositeTypeFieldType::Unsupported(u) => Self::Unsupported(u),
-        }
-    }
 }
 
 impl FieldType {
@@ -72,10 +61,6 @@ impl FieldType {
 
     pub fn is_composite(&self) -> bool {
         matches!(self, Self::CompositeType(_))
-    }
-
-    pub fn is_unsupported(&self) -> bool {
-        matches!(self, Self::Unsupported(_))
     }
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
@@ -164,7 +149,7 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        let kind = self.default_value().map(|val| val.kind());
+        let kind = self.default_value().map(|val| &val.kind);
         matches!(kind, Some(DefaultKind::Expression(ref expr)) if expr == &ValueGenerator::new_autoincrement())
     }
 

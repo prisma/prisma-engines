@@ -1,9 +1,6 @@
 use super::{field_ref_type::WithFieldRefInputExt, objects::*, *};
 use constants::{aggregations, filters};
-use prisma_models::{
-    dml::{self, DefaultValue},
-    CompositeFieldRef, PrismaValue,
-};
+use prisma_models::{dml, CompositeFieldRef, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds filter types for the given model field.
@@ -43,7 +40,7 @@ pub(crate) fn get_field_filter_types(
             let mut types = vec![InputType::object(full_scalar_filter_type(
                 ctx,
                 &sf.type_identifier(),
-                sf.native_type(),
+                sf.native_type().as_ref(),
                 sf.is_list(),
                 !sf.is_required(),
                 false,
@@ -554,7 +551,7 @@ fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Ite
         let field = input_field(
             filters::MODE,
             InputType::enum_type(enum_type),
-            Some(DefaultValue::new_single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            Some(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 

@@ -110,7 +110,7 @@ impl InputObjectType {
 #[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
-    pub default_value: Option<dml::DefaultValue>,
+    pub default_value: Option<dml::DefaultKind>,
     pub deprecation: Option<Deprecation>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.

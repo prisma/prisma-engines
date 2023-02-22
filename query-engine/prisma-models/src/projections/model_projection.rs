@@ -78,7 +78,7 @@ impl ModelProjection {
                 Field::Composite(_) => todo!(), // [Composites] todo
             })
             .into_iter()
-            .unique_by(|field| field.name.clone())
+            .unique_by(|field| field.name().to_owned())
     }
 
     pub fn map_db_name(&self, name: &str) -> Option<ScalarFieldRef> {

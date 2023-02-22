@@ -1,5 +1,4 @@
 use crate::{Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
-use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct IndexBuilder {
@@ -26,12 +25,11 @@ impl IndexBuilder {
         field_names
             .into_iter()
             .map(|name| {
-                let field = fields
+                fields
                     .iter()
-                    .find(|sf| sf.name == name)
-                    .unwrap_or_else(|| panic!("Unable to resolve field '{name}'"));
-
-                Arc::downgrade(field)
+                    .find(|sf| sf.name() == name)
+                    .unwrap_or_else(|| panic!("Unable to resolve field '{name}'"))
+                    .clone()
             })
             .collect()
     }

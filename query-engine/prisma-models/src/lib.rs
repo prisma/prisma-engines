@@ -1,10 +1,7 @@
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 mod builders;
 mod composite_type;
 mod convert;
 mod error;
-mod extensions;
 mod field;
 mod field_selection;
 mod fields;

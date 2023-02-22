@@ -20,7 +20,6 @@ pub struct Model {
     pub(crate) dml_model: dml::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
-    pub supports_create_operation: bool,
 }
 
 impl Model {
@@ -60,7 +59,13 @@ impl Model {
     }
 
     pub fn supports_create_operation(&self) -> bool {
-        self.supports_create_operation
+        let dm = self.internal_data_model();
+        let walker = dm.walk(self.id);
+        let has_unsupported_field = walker
+            .scalar_fields()
+            .any(|sf| sf.ast_field().arity.is_required() && sf.is_unsupported() && sf.default_value().is_none());
+
+        !has_unsupported_field
     }
 
     pub fn indexes(&self) -> &[Index] {

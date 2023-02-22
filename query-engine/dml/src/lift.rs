@@ -72,7 +72,7 @@ impl<'a> LiftAstToDml<'a> {
             let field = CompositeTypeField {
                 id: field.id,
                 name: field.name().to_owned(),
-                r#type: self.lift_composite_type_field_type(field, field.r#type()),
+                r#type: self.lift_composite_type_field_type(field, &field.r#type()),
                 arity: field.arity(),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),

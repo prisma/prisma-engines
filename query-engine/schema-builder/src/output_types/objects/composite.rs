@@ -31,5 +31,9 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, ct: &CompositeTypeRef) -> Objec
 /// Computes composite output type fields.
 /// Requires an initialized cache.
 fn compute_composite_object_type_fields(ctx: &mut BuilderContext, composite: &CompositeTypeRef) -> Vec<OutputField> {
-    composite.fields().map(|f| field::map_output_field(ctx, &f)).collect()
+    composite
+        .fields()
+        .into_iter()
+        .map(|f| field::map_output_field(ctx, &f))
+        .collect()
 }

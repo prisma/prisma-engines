@@ -1,11 +1,10 @@
-use std::fmt::Display;
-
 use crate::{
     parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, ScalarFieldRef,
     SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
+use std::fmt::Display;
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
@@ -26,7 +25,7 @@ impl FieldSelection {
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
         other.selections.iter().all(|selection| match selection {
-            SelectedField::Scalar(sf) => self.contains(&sf.name),
+            SelectedField::Scalar(sf) => self.contains(sf.name()),
             SelectedField::Composite(other_cs) => self
                 .get(other_cs.field.name())
                 .and_then(|selection| selection.as_composite())
@@ -153,7 +152,7 @@ pub enum SelectedField {
 impl SelectedField {
     pub fn prisma_name(&self) -> &str {
         match self {
-            SelectedField::Scalar(sf) => &sf.name,
+            SelectedField::Scalar(sf) => sf.name(),
             SelectedField::Composite(cf) => cf.field.name(),
         }
     }
@@ -174,7 +173,7 @@ impl SelectedField {
 
     pub fn container(&self) -> ParentContainer {
         match self {
-            SelectedField::Scalar(sf) => sf.container().clone(),
+            SelectedField::Scalar(sf) => sf.container(),
             SelectedField::Composite(cs) => cs.field.container(),
         }
     }
@@ -182,7 +181,7 @@ impl SelectedField {
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier),
+            SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier()),
             SelectedField::Composite(cs) => cs.coerce_value(value),
         }
     }
@@ -198,7 +197,7 @@ impl CompositeSelection {
     pub fn is_superset_of(&self, other: &Self) -> bool {
         self.field.typ() == other.field.typ()
             && other.selections.iter().all(|selection| match selection {
-                SelectedField::Scalar(sf) => self.contains(&sf.name),
+                SelectedField::Scalar(sf) => self.contains(sf.name()),
                 SelectedField::Composite(other_cs) => self
                     .get(other_cs.field.name())
                     .and_then(|selection| selection.as_composite())

@@ -2,7 +2,7 @@ use prisma_value::PrismaValue;
 use std::fmt;
 
 /// Represents a default specified on a field.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct DefaultValue {
     pub kind: DefaultKind,
     pub db_name: Option<String>,
@@ -54,6 +54,25 @@ impl DefaultKind {
             _ => panic!("called DefaultValue::unwrap_single() on wrong variant"),
         }
     }
+
+    // Returns the dbgenerated function for a default value
+    // intended for primary key values!
+    pub fn to_dbgenerated_func(&self) -> Option<String> {
+        match self {
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.1.to_string()),
+            _ => None,
+        }
+    }
+
+    /// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
+    #[cfg(feature = "default_generators")]
+    pub fn get(&self) -> Option<PrismaValue> {
+        match self {
+            DefaultKind::Single(ref v) => Some(v.clone()),
+            DefaultKind::Expression(ref g) => g.generate(),
+        }
+    }
 }
 
 impl DefaultValue {
@@ -68,28 +87,6 @@ impl DefaultValue {
         match self.kind {
             DefaultKind::Single(ref v) => Some(v),
             _ => None,
-        }
-    }
-
-    pub fn kind(&self) -> &DefaultKind {
-        &self.kind
-    }
-
-    pub fn into_kind(self) -> DefaultKind {
-        self.kind
-    }
-
-    pub fn mut_kind(&mut self) -> &mut DefaultKind {
-        &mut self.kind
-    }
-
-    /// Returns either a copy of the contained single value or produces a new
-    /// value as defined by the expression.
-    #[cfg(feature = "default_generators")]
-    pub fn get(&self) -> Option<PrismaValue> {
-        match self.kind {
-            DefaultKind::Single(ref v) => Some(v.clone()),
-            DefaultKind::Expression(ref g) => g.generate(),
         }
     }
 
@@ -142,15 +139,6 @@ impl DefaultValue {
     /// The default value constraint name.
     pub fn db_name(&self) -> Option<&str> {
         self.db_name.as_deref()
-    }
-
-    // Returns the dbgenerated function for a default value
-    // intended for primary key values!
-    pub fn to_dbgenerated_func(&self) -> Option<String> {
-        match self.kind {
-            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.1.to_string()),
-            _ => None,
-        }
     }
 }
 
@@ -317,9 +305,9 @@ impl PartialEq for ValueGenerator {
     }
 }
 
-impl fmt::Debug for DefaultValue {
+impl fmt::Debug for DefaultKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.kind {
+        match &self {
             DefaultKind::Single(ref v) => write!(f, "DefaultValue::Single({v:?})"),
             DefaultKind::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
         }

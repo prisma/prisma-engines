@@ -87,14 +87,14 @@ impl<'db> CompositeTypeFieldWalker<'db> {
     }
 
     /// The type of the field, e.g. `String` in `streetName String?`.
-    pub fn r#type(self) -> &'db ScalarFieldType {
-        &self.field().r#type
+    pub fn r#type(self) -> ScalarFieldType {
+        self.field().r#type
     }
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
         match self.r#type() {
-            ScalarFieldType::BuiltInScalar(scalar) => Some(*scalar),
+            ScalarFieldType::BuiltInScalar(scalar) => Some(scalar),
             _ => None,
         }
     }

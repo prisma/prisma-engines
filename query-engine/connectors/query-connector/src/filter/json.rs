@@ -1,8 +1,6 @@
 use super::scalar::*;
 use crate::{Filter, JsonCompare, ScalarFilter};
-
 use prisma_models::ScalarFieldRef;
-use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum JsonTargetType {
@@ -27,7 +25,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -42,7 +40,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -57,7 +55,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -72,7 +70,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -87,7 +85,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -102,7 +100,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: Some(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -117,7 +115,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -132,7 +130,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -147,7 +145,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -162,7 +160,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -177,7 +175,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -192,7 +190,7 @@ impl JsonCompare for ScalarFieldRef {
                 path,
                 target_type: None,
             }),
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }

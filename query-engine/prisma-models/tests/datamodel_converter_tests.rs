@@ -308,7 +308,7 @@ impl DatamodelAssertions for InternalDataModel {
 trait ModelAssertions {
     fn assert_indexes_length(&self, len: usize) -> &Self;
     fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self;
-    fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField>;
+    fn assert_scalar_field(&self, name: &str) -> ScalarField;
 }
 
 impl ModelAssertions for Model {
@@ -332,7 +332,7 @@ impl ModelAssertions for Model {
         self
     }
 
-    fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField> {
+    fn assert_scalar_field(&self, name: &str) -> ScalarField {
         self.fields().find_from_scalar(name).unwrap()
     }
 }

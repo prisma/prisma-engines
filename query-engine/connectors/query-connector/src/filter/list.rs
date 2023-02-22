@@ -1,8 +1,6 @@
 use super::*;
-
 use crate::compare::ScalarListCompare;
 use prisma_models::{ScalarField, ScalarFieldRef};
-use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarListFilter {
@@ -45,13 +43,13 @@ impl ScalarListCondition {
 }
 
 #[allow(warnings)]
-impl ScalarListCompare for Arc<ScalarField> {
+impl ScalarListCompare for ScalarField {
     fn contains_element<T>(&self, value: T) -> Filter
     where
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(self),
+            field: self.clone(),
             condition: ScalarListCondition::Contains(value.into()),
         })
     }
@@ -61,7 +59,7 @@ impl ScalarListCompare for Arc<ScalarField> {
         T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(self),
+            field: self.clone(),
             condition: ScalarListCondition::ContainsEvery(values.into()),
         })
     }
@@ -71,14 +69,14 @@ impl ScalarListCompare for Arc<ScalarField> {
         T: Into<ConditionListValue>,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(self),
+            field: self.clone(),
             condition: ScalarListCondition::ContainsSome(values.into()),
         })
     }
 
     fn is_empty_list(&self, b: bool) -> Filter {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(self),
+            field: self.clone(),
             condition: ScalarListCondition::IsEmpty(b),
         })
     }
