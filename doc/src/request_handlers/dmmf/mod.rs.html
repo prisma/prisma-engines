@@ -4,12 +4,10 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
 </pre><pre class="rust"><code><span class="kw">use </span>dmmf_crate::DataModelMetaFormat;
 <span class="kw">use </span>query_core::schema::QuerySchemaRef;
 
-<span class="attr">#[tracing::instrument(name = <span class="string">&quot;prisma:engine:render_dmmf&quot;</span>)]
-</span><span class="kw">pub fn </span>render_dmmf(query_schema: QuerySchemaRef) -&gt; DataModelMetaFormat {
+<span class="kw">pub fn </span>render_dmmf(query_schema: QuerySchemaRef) -&gt; DataModelMetaFormat {
     dmmf_crate::from_precomputed_parts(query_schema)
 }
 </code></pre></div>
