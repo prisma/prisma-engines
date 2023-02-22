@@ -66,6 +66,7 @@ impl Fields {
         internal_data_model
             .walk(model.id)
             .relation_fields()
+            .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| internal_data_model.clone().zip(rf.id))
             .collect()
     }
@@ -184,6 +185,7 @@ impl Fields {
         let rf = internal_data_model
             .walk(model.id)
             .relation_fields()
+            .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| Field::from(internal_data_model.clone().zip(rf.id)))
             .filter(|f| predicate(&f));
         let composite_type_fields = internal_data_model
