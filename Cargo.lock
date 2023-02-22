@@ -3821,7 +3821,6 @@ dependencies = [
  "prisma-models",
  "psl",
  "schema",
- "tracing",
 ]
 
 [[package]]

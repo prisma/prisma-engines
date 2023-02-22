@@ -173,8 +173,6 @@ impl TypeCache {
 }
 
 pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> QuerySchema {
-    let span = tracing::info_span!("prisma:engine:schema");
-    let _guard = span.enter();
     let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries);
 
     output_types::objects::initialize_caches(&mut ctx);
