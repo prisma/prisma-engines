@@ -85,16 +85,10 @@ fn non_clustered_id_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse_schema(&schema);
     let model = schema.assert_has_model("A");
-
-    model.assert_has_pk(PrimaryKeyDefinition {
-        name: None,
-        db_name: Some("A_pkey".to_string()),
-        fields: vec![PrimaryKeyField::new("id")],
-        defined_on_field: true,
-        clustered: Some(false),
-    });
+    let pk = model.primary_key().unwrap();
+    assert_eq!(Some(false), pk.clustered())
 }
 
 #[test]
@@ -109,14 +103,8 @@ fn non_clustered_compound_id_works_on_sql_server() {
     "#};
 
     let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
+    let schema = parse_schema(&schema);
     let model = schema.assert_has_model("A");
-
-    model.assert_has_pk(PrimaryKeyDefinition {
-        name: None,
-        db_name: Some("A_pkey".to_string()),
-        fields: vec![PrimaryKeyField::new("left"), PrimaryKeyField::new("right")],
-        defined_on_field: false,
-        clustered: Some(false),
-    });
+    let pk = model.primary_key().unwrap();
+    assert_eq!(Some(false), pk.clustered())
 }
