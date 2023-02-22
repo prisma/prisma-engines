@@ -84,7 +84,7 @@ impl<'a> Datamodel<'a> {
 
     /// True if the render output would be an empty string.
     pub fn is_empty(&self) -> bool {
-        self.models.is_empty() && self.enums.is_empty() && self.composite_types.is_empty()
+        self.models.is_empty() && self.enums.is_empty() && self.composite_types.is_empty() && self.views.is_empty()
     }
 }
 
