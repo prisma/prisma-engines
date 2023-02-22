@@ -1,11 +1,13 @@
 use crate::{schema::InputType, ArgumentValue};
 use fmt::Display;
 use itertools::Itertools;
+use serde::Serialize;
 use std::fmt;
+use user_facing_errors::UserFacingError;
 
 #[derive(Debug)]
 pub enum QueryParserError {
-    New,
+    Structured(StructuredQueryParseError),
     Legacy {
         path: QueryPath,
         error_kind: QueryParserErrorKind,
@@ -18,17 +20,19 @@ impl QueryParserError {
         Self::Legacy { path, error_kind }
     }
 
-    pub fn path(&self) -> QueryPath {
+    // deprecated: This must dissappear as soon as errors transition to the StructuredQueryParserError type
+    pub fn path(&self) -> Option<QueryPath> {
         match self {
-            Self::Legacy { path, error_kind: _ } => path.clone(),
-            Self::New => todo!(),
+            Self::Legacy { path, error_kind: _ } => Some(path.clone()),
+            Self::Structured(_) => None,
         }
     }
 
-    pub fn error_kind(&self) -> &QueryParserErrorKind {
+    // deprecated: This must dissappear as soon as errors transition to the StructuredQueryParserError type
+    pub fn error_kind(&self) -> Option<&QueryParserErrorKind> {
         match self {
-            Self::Legacy { path: _, error_kind } => error_kind,
-            Self::New => todo!(),
+            Self::Legacy { path: _, error_kind } => Some(error_kind),
+            _ => None,
         }
     }
 }
@@ -39,7 +43,7 @@ impl fmt::Display for QueryParserError {
             Self::Legacy { path, error_kind } => {
                 write!(f, "Query parsing/validation error at `{}`: {}", path, error_kind,)
             }
-            Self::New => todo!(),
+            Self::Structured(_) => todo!(),
         }
     }
 }
@@ -50,9 +54,20 @@ impl serde::Serialize for QueryParserError {
         S: serde::Serializer,
     {
         match self {
-            QueryParserError::New => todo!(),
-            legacy @ _ => serializer.serialize_str(format!("{}", legacy).as_str()),
+            QueryParserError::Structured(s) => s.serialize(serializer),
+            legacy => serializer.serialize_str(format!("{}", legacy).as_str()),
         }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct StructuredQueryParseError {}
+
+impl UserFacingError for StructuredQueryParseError {
+    const ERROR_CODE: &'static str = "P2009";
+
+    fn message(&self) -> String {
+        todo!()
     }
 }
 

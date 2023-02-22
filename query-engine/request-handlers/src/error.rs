@@ -1,5 +1,5 @@
-use graphql_parser::query::ParseError;
 use query_core::CoreError;
+use serde::Serialize;
 use thiserror::Error;
 use user_facing_errors::KnownError;
 
@@ -30,10 +30,10 @@ pub enum HandlerError {
 // where the errors messages have a well-defined json structure.
 //
 // Different error variants can progressively implement a typed structured that can be serialized
-// as JSON. Until that migration is complete happens, their json representation will be the error
-// message as stringified JSON. (Given the error message was what was returned to the client before
-// any kind of JSON structure for messages was considered)
-impl serde::Serialize for HandlerError {
+// as JSON. Until that migration is complete, their json representation will be the error message
+// as stringified JSON. (Given the error message was what was returned to the client before any kind
+// of JSON structure for messages was considered)
+impl Serialize for HandlerError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -88,8 +88,8 @@ impl From<connection_string::Error> for HandlerError {
     }
 }
 
-impl From<ParseError> for HandlerError {
-    fn from(e: ParseError) -> Self {
+impl From<graphql_parser::query::ParseError> for HandlerError {
+    fn from(e: graphql_parser::query::ParseError) -> Self {
         Self::configuration(format!("Error parsing GraphQL query: {e}"))
     }
 }

@@ -194,8 +194,8 @@ impl From<CoreError> for user_facing_errors::Error {
                         })
                     }
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: format!("{}", query_parser_error.error_kind()),
-                        query_position: format!("{}", query_parser_error.path()),
+                        query_validation_error: format!("{}", error_kind),
+                        query_position: format!("{}", path),
                     }),
                 };
 
@@ -304,7 +304,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 inner_error
             }
 
-            _ => user_facing_errors::Error::from_dyn_error(&err),
+            _ => user_facing_errors::Error::to_unknown(&err),
         }
     }
 }

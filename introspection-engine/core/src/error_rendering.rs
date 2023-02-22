@@ -13,7 +13,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
         }) => user_facing_error.into(),
         Error::IntrospectionResultEmpty => KnownError::new(IntrospectionResultEmpty).into(),
         Error::DatamodelError(full_error) => KnownError::new(SchemaParserError { full_error }).into(),
-        _ => UserFacingError::from_dyn_error(&crate_error),
+        _ => UserFacingError::to_unknown(&crate_error),
     }
 }
 

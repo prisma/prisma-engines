@@ -111,7 +111,7 @@ impl Error {
         }
     }
 
-    pub fn from_dyn_error(err: &dyn std::error::Error) -> Self {
+    pub fn to_unknown(err: &dyn std::error::Error) -> Self {
         Error {
             inner: ErrorType::Unknown(UnknownError {
                 message: err.to_string(),
