@@ -924,6 +924,9 @@ fn load_url_no_validation_should_work_with_proxy_url() {
 
 #[test]
 fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
+    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0004", "prisma://hostfoo");
+
     let dml = indoc! {r#"
         datasource myds {
           provider = "postgres"
@@ -931,9 +934,6 @@ fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
           url = env("DATABASE_URL_0004")
         }
     "#};
-
-    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
-    std::env::set_var("DIRECT_URL_0004", "prisma://hostfoo");
 
     let config = parse_config(dml).unwrap();
 
@@ -954,8 +954,8 @@ fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
     expectation.assert_eq(&error);
 
     // make sure other tests that run afterwards are not run in a modified environment
-    std::env::remove_var("DATABASE_URL_0004");
     std::env::remove_var("DIRECT_URL_0004");
+    std::env::remove_var("DATABASE_URL_0004");
 }
 
 #[test]
@@ -964,11 +964,11 @@ fn directurl_should_not_use_prisma_scheme() {
         datasource myds {
           provider = "postgres"
           directUrl = "prisma://kekw.lol"
-          url = env("DATABASE_URL_0004")
+          url = env("DATABASE_URL_0005")
         }
     "#};
 
-    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
+    std::env::set_var("DATABASE_URL_0005", "prisma://hostbar");
 
     let config = parse_config(dml).unwrap();
 
@@ -989,6 +989,5 @@ fn directurl_should_not_use_prisma_scheme() {
     expectation.assert_eq(&error);
 
     // make sure other tests that run afterwards are not run in a modified environment
-    std::env::remove_var("DATABASE_URL_0004");
-    std::env::remove_var("DIRECT_URL_0004");
+    std::env::remove_var("DIRECT_URL_0005");
 }

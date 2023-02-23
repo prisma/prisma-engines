@@ -9,7 +9,7 @@ use psl::{
     builtin_connectors::*,
     datamodel_connector::Connector,
     parser_database::{ast, walkers},
-    Configuration,
+    Configuration, PreviewFeature,
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
@@ -70,9 +70,16 @@ impl<'a> DatamodelCalculatorContext<'a> {
 
     /// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
-    pub(crate) fn enum_pairs(&'a self) -> impl ExactSizeIterator<Item = EnumPair<'a>> + 'a {
+    pub(crate) fn enum_pairs(&'a self) -> impl Iterator<Item = EnumPair<'a>> + 'a {
+        let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+        let is_mysql = self.sql_family.is_mysql();
+
         self.sql_schema
             .enum_walkers()
+            // MySQL enums are taken from the columns, which means a rogue enum might appear
+            // for users not using the views preview feature, but having views with enums
+            // in their database.
+            .filter(move |e| !is_mysql || uses_views || self.sql_schema.enum_used_in_tables(e.id))
             .map(|next| Pair::new(self, self.existing_enum(next.id), next))
     }
 
