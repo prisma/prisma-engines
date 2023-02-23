@@ -363,7 +363,7 @@ async fn defaults_are_introspected(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+#[test_connector(tags(Mysql8), exclude(Vitess), preview_features("views"))]
 async fn views_are_rendered_with_enums(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
