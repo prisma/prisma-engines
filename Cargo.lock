@@ -1529,6 +1529,7 @@ name = "introspection-engine-tests"
 version = "0.1.0"
 dependencies = [
  "barrel",
+ "connection-string",
  "enumflags2",
  "expect-test",
  "indoc",

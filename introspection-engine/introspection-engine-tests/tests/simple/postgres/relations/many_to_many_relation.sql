@@ -13,14 +13,15 @@ CREATE TABLE "_BiscuitToBiscuit" (
 CREATE UNIQUE INDEX "AB_unique" ON "_BiscuitToBiscuit"("A","B");
 CREATE INDEX "B_index" ON "_BiscuitToBiscuit"("B");
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model Biscuit {

@@ -10,31 +10,32 @@ CREATE TABLE _nodes(
 );
 
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model prisma_tests__nodes {
+model public__nodes {
   node_a                    Int
   node_b                    Int
-  nodes_nodes_node_aTonodes prisma_tests_nodes @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
-  nodes_nodes_node_bTonodes prisma_tests_nodes @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
+  nodes_nodes_node_aTonodes public_nodes @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
+  nodes_nodes_node_bTonodes public_nodes @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
 
   @@map("_nodes")
   @@ignore
 }
 
-model prisma_tests_nodes {
-  id                        Int                   @id @default(autoincrement())
-  nodes_nodes_node_aTonodes prisma_tests__nodes[] @relation("nodes_node_aTonodes") @ignore
-  nodes_nodes_node_bTonodes prisma_tests__nodes[] @relation("nodes_node_bTonodes") @ignore
+model public_nodes {
+  id                        Int             @id @default(autoincrement())
+  nodes_nodes_node_aTonodes public__nodes[] @relation("nodes_node_aTonodes") @ignore
+  nodes_nodes_node_bTonodes public__nodes[] @relation("nodes_node_bTonodes") @ignore
 
   @@map("nodes")
 }

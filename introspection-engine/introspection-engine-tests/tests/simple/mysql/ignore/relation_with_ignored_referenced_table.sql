@@ -17,14 +17,15 @@ CREATE TABLE `topping` (
     CONSTRAINT `pastryfk` FOREIGN KEY (`pastryName`) REFERENCES `pastry`(`name`) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
