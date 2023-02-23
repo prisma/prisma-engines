@@ -1,4 +1,3 @@
-use crate::HandlerError;
 use indexmap::IndexMap;
 use query_core::{
     response_ir::{Item, Map, ResponseData},
@@ -94,25 +93,11 @@ impl GQLResponse {
     }
 }
 
-impl From<HandlerError> for GQLResponse {
-    fn from(err: HandlerError) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
-    }
-}
-
 impl From<GQLError> for GQLResponse {
     fn from(err: GQLError) -> Self {
         let mut responses = Self::default();
         responses.insert_error(err);
         responses
-    }
-}
-
-impl From<HandlerError> for GQLError {
-    fn from(err: HandlerError) -> Self {
-        GQLError::from(user_facing_errors::Error::from(err))
     }
 }
 
@@ -206,14 +191,6 @@ impl From<CoreError> for GQLBatchResponse {
 
         batch_response.insert_error(err);
         batch_response
-    }
-}
-
-impl From<HandlerError> for GQLBatchResponse {
-    fn from(err: HandlerError) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
     }
 }
 

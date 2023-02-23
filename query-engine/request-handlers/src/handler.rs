@@ -51,13 +51,15 @@ impl<'a> RequestHandler<'a> {
                 }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
-            Err(err) => PrismaResponse::Single(GQLResponse::from(GQLError::from(err))),
+
+            Err(err) => {
+                let gql_error = GQLError::from(user_facing_errors::Error::from(err));
+                PrismaResponse::Single(GQLResponse::from(gql_error))
+            }
         }
     }
 
     async fn handle_single(&self, query: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
-        use user_facing_errors::Error;
-
         let gql_response = match AssertUnwindSafe(self.handle_request(query, tx_id, trace_id))
             .catch_unwind()
             .await
@@ -66,7 +68,7 @@ impl<'a> RequestHandler<'a> {
             Ok(Err(err)) => err.into(),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(err);
+                let error = user_facing_errors::Error::from_panic_payload(err);
                 error.into()
             }
         };
@@ -81,8 +83,6 @@ impl<'a> RequestHandler<'a> {
         tx_id: Option<TxId>,
         trace_id: Option<String>,
     ) -> PrismaResponse {
-        use user_facing_errors::Error;
-
         match AssertUnwindSafe(self.executor.execute_all(
             tx_id,
             queries,
@@ -108,7 +108,7 @@ impl<'a> RequestHandler<'a> {
             Ok(Err(err)) => PrismaResponse::Multi(err.into()),
             Err(err) => {
                 // panicked
-                let error = Error::from_panic_payload(err);
+                let error = user_facing_errors::Error::from_panic_payload(err);
                 let resp: GQLBatchResponse = error.into();
 
                 PrismaResponse::Multi(resp)
