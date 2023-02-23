@@ -71,12 +71,12 @@ impl<'a> DatamodelCalculatorContext<'a> {
     /// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
     pub(crate) fn enum_pairs(&'a self) -> impl Iterator<Item = EnumPair<'a>> + 'a {
+        let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+
         self.sql_schema
             .enum_walkers()
-            .filter(|e| {
-                let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+            .filter(move |e| {
                 let used_in_tables = self.sql_schema.enum_used_in_tables(e.id);
-
                 uses_views || used_in_tables
             })
             .map(|next| Pair::new(self, self.existing_enum(next.id), next))
