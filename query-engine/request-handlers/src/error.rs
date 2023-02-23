@@ -65,7 +65,7 @@ impl From<graphql_parser::query::ParseError> for HandlerError {
 impl From<HandlerError> for user_facing_errors::Error {
     fn from(err: HandlerError) -> Self {
         match err {
-            HandlerError::Core(ce) => user_facing_errors::Error::from(ce).into(),
+            HandlerError::Core(ce) => user_facing_errors::Error::from(ce),
 
             // value fit error
             HandlerError::ValueFitError(details) => KnownError::new(user_facing_errors::query_engine::ValueFitError {
