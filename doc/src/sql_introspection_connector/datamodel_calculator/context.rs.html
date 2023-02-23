@@ -383,6 +383,13 @@
 <a href="#383" id="383">383</a>
 <a href="#384" id="384">384</a>
 <a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
     introspection_map::{IntrospectionMap, RelationName},
@@ -394,7 +401,7 @@
     builtin_connectors::<span class="kw-2">*</span>,
     datamodel_connector::Connector,
     parser_database::{ast, walkers},
-    Configuration,
+    Configuration, PreviewFeature,
 };
 <span class="kw">use </span>quaint::prelude::SqlFamily;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
@@ -455,9 +462,16 @@
 
     <span class="doccomment">/// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">let </span>uses_views = <span class="self">self</span>.config.preview_features().contains(PreviewFeature::Views);
+        <span class="kw">let </span>is_mysql = <span class="self">self</span>.sql_family.is_mysql();
+
         <span class="self">self</span>.sql_schema
             .enum_walkers()
+            <span class="comment">// MySQL enums are taken from the columns, which means a rogue enum might appear
+            // for users not using the views preview feature, but having views with enums
+            // in their database.
+            </span>.filter(<span class="kw">move </span>|e| !is_mysql || uses_views || <span class="self">self</span>.sql_schema.enum_used_in_tables(e.id))
             .map(|next| Pair::new(<span class="self">self</span>, <span class="self">self</span>.existing_enum(next.id), next))
     }
 

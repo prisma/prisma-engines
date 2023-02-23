@@ -883,6 +883,13 @@
 <a href="#883" id="883">883</a>
 <a href="#884" id="884">884</a>
 <a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
@@ -991,6 +998,13 @@
     <span class="doccomment">/// The id of the next column
     </span><span class="kw">pub fn </span>next_view_column_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ViewColumnId {
         ViewColumnId(<span class="self">self</span>.view_columns.len() <span class="kw">as </span>u32)
+    }
+
+    <span class="doccomment">/// The given enum is used in tables.
+    </span><span class="kw">pub fn </span>enum_used_in_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, id: EnumId) -&gt; bool {
+        <span class="self">self</span>.table_columns
+            .iter()
+            .any(|col| col.<span class="number">1</span>.tpe.family == ColumnTypeFamily::Enum(id))
     }
 
     <span class="doccomment">/// Extract connector-specific constructs mutably. The type parameter must be the right one.
