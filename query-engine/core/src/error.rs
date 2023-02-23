@@ -179,10 +179,12 @@ impl From<CoreError> for user_facing_errors::Error {
                             path: format!("{}", path),
                         })
                     }
-                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: format!("{}", error_kind),
-                        query_position: format!("{}", path),
-                    }),
+                    _ => user_facing_errors::KnownError::new(
+                        user_facing_errors::query_engine::LegacyQueryValidationFailed {
+                            query_validation_error: format!("{}", error_kind),
+                            query_position: format!("{}", path),
+                        },
+                    ),
                 };
 
                 known_error.into()
