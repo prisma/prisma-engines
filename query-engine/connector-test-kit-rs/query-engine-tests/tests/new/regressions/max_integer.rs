@@ -2,6 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(schema(schema))]
 mod max_integer {
+    use query_engine_tests::Runner;
+
     fn schema() -> String {
         let schema = indoc! {r#"
         model Test {
@@ -33,24 +35,80 @@ mod max_integer {
 
     #[connector_test]
     async fn transform_gql_parser_too_large(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            "mutation { createOneTest(data: { id: 1, int: 100000000000000000000 }) { id int } }",
-            2033,
-            "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
-        );
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                assert_error!(
+                    runner,
+                    "mutation { createOneTest(data: { id: 1, int: 100000000000000000000 }) { id int } }",
+                    2033,
+                    "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                        "modelName": "Test",
+                        "action": "createOne",
+                        "query": {
+                            "arguments": {
+                                "data": {
+                                    "id": 1,
+                                    "int": 100000000000000000000
+                                }
+                            },
+                            "selection": {
+                                "id": true,
+                                "int": true
+                            }
+                        }
+                    }"#,
+                    )
+                    .await?;
+
+                res.assert_failure(2009, Some("Unable to fit float value (or large JS integer serialized in exponent notation) '100000000000000000000' into a 64 Bit signed integer for field 'int'".to_string()))
+            }
+        }
 
         Ok(())
     }
 
     #[connector_test]
     async fn transform_gql_parser_too_small(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            "mutation { createOneTest(data: { id: 1, int: -100000000000000000000 }) { id int } }",
-            2033,
-            "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
-        );
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                assert_error!(
+                    runner,
+                    "mutation { createOneTest(data: { id: 1, int: -100000000000000000000 }) { id int } }",
+                    2033,
+                    "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                        "modelName": "Test",
+                        "action": "createOne",
+                        "query": {
+                            "arguments": {
+                                "data": {
+                                    "id": 1,
+                                    "int": -100000000000000000000
+                                }
+                            },
+                            "selection": {
+                                "id": true,
+                                "int": true
+                            }
+                        }
+                    }"#,
+                    )
+                    .await?;
+
+                res.assert_failure(2009, Some("Unable to fit float value (or large JS integer serialized in exponent notation) '-100000000000000000000' into a 64 Bit signed integer for field 'int'".to_string()))
+            }
+        }
 
         Ok(())
     }
@@ -651,6 +709,8 @@ mod max_integer {
 
 #[test_suite(schema(schema))]
 mod float_serialization_issues {
+    use query_engine_tests::Runner;
+
     fn schema() -> String {
         let schema = indoc! {r#"
         model Test {
@@ -675,12 +735,44 @@ mod float_serialization_issues {
     // The same number as above, just not in the exponent notation. That one fails, because f64 can represent the number, i64 can't.
     #[connector_test]
     async fn int_range_overlap_fails(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            "mutation { createOneTest(data: { id: 1, float: 100000000000000000000 }) { id float } }",
-            2033,
-            "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
-        );
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                assert_error!(
+                    runner,
+                    "mutation { createOneTest(data: { id: 1, float: 100000000000000000000 }) { id float } }",
+                    2033,
+                    "A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you're trying to store large integers."
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                        "modelName": "Test",
+                        "action": "createOne",
+                        "query": {
+                            "arguments": {
+                                "data": {
+                                    "id": 1,
+                                    "float": 100000000000000000000
+                                }
+                            },
+                            "selection": {
+                                "id": true,
+                                "float": true
+                            }
+                        }
+                    }"#,
+                    )
+                    .await?;
+
+                // Succeeds because the JSON protocol lifts some limitation of the GraphQL parser.
+                insta::assert_snapshot!(
+                  res.to_string(),
+                  @r###"{"data":{"createOneTest":{"id":1,"float":1e20}}}"###
+                );
+            }
+        }
 
         Ok(())
     }

@@ -372,7 +372,7 @@ mod compound_batch {
         // Ensure batched queries are valid
         runner.batch(queries.clone(), false, None).await?.assert_success();
 
-        let doc = GraphQlBody::Multi(MultiQuery::new(
+        let doc = GraphqlBody::Multi(MultiQuery::new(
             queries.into_iter().map(Into::into).collect(),
             false,
             None,

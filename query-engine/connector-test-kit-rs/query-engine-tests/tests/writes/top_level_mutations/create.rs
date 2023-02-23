@@ -195,7 +195,7 @@ mod create {
             }
           ){ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#,
           2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch. Have: Scalar(Enum(\"B\")), want: Int"
+          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch"
         );
 
         Ok(())
@@ -353,16 +353,20 @@ mod json_create {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn create_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
-                  createOneTestModel(data: { id: 1, json: null }) {
-                    json
-                  }
-                }"#,
-            2009,
-            "A value is required but not set."
-        );
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
+                    createOneTestModel(data: { id: 1, json: null }) {
+                      json
+                    }
+                  }"#,
+                2009,
+                "A value is required but not set."
+            );
+        }
 
         assert_error!(
             &runner,
@@ -372,7 +376,7 @@ mod json_create {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Scalar(Enum(\"AnyNull\"))"
+            "Enum value 'AnyNull' is invalid for enum type NullableJsonNullValueInput"
         );
 
         Ok(())

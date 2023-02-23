@@ -1,10 +1,11 @@
 use super::*;
-use crate::schema::*;
+use crate::{executor::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
+use indexmap::IndexSet;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
+use std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
 pub struct QueryDocumentParser {
@@ -95,8 +96,8 @@ impl QueryDocumentParser {
         schema_field: &OutputFieldRef,
         given_arguments: &[(String, ArgumentValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
-        let valid_argument_names: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
-        let given_argument_names: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
+        let valid_argument_names: IndexSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
+        let given_argument_names: IndexSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
         let invalid_argument_names = given_argument_names.difference(&valid_argument_names);
 
         invalid_argument_names
@@ -156,6 +157,32 @@ impl QueryDocumentParser {
 
         for input_type in possible_input_types {
             let result = match (value.clone(), input_type) {
+                // With the JSON protocol, JSON values are sent as deserialized values.
+                // This means JSON can match with pretty much anything. A string, an int, an object, an array.
+                // This is an early catch-all.
+                // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
+                // We don't because they've already been desambiguified at the procotol adapter level.
+                (value, InputType::Scalar(ScalarType::Json))
+                    if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                {
+                    Ok(ParsedInputValue::Single(self.to_json(&parent_path, &value)?))
+                }
+                // With the JSON protocol, JSON values are sent as deserialized values.
+                // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
+                // We need this early matcher to make sure we coerce this array back to JSON.
+                (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
+                    if get_engine_protocol().is_json() =>
+                {
+                    let json_val = serde_json::to_value(list).map_err(|err| QueryParserError {
+                        path: parent_path.clone(),
+                        error_kind: QueryParserErrorKind::ValueParseError(format!(
+                            "Cannot deserialize argument value: {err}"
+                        )),
+                    })?;
+                    let json_list = self.parse_json_list_from_value(&parent_path, json_val)?;
+
+                    Ok(ParsedInputValue::Single(json_list))
+                }
                 (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
                     // Null handling
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
@@ -197,7 +224,7 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::List),
 
                 // Object handling
-                (ArgumentValue::Object(o), InputType::Object(obj)) => self
+                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => self
                     .parse_input_object(parent_path.clone(), o.clone(), obj.into_arc())
                     .map(ParsedInputValue::Map),
 
@@ -215,6 +242,7 @@ impl QueryDocumentParser {
         }
 
         let (successes, mut failures): (Vec<_>, Vec<_>) = parse_results.into_iter().partition(|result| result.is_ok());
+
         if successes.is_empty() {
             if failures.len() == 1 {
                 failures.pop().unwrap()
@@ -258,7 +286,7 @@ impl QueryDocumentParser {
 
             // String coercion matchers
             (PrismaValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
-            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list(parent_path, &s),
+            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list_from_str(parent_path, &s),
             (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(parent_path, s),
             (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(parent_path, s),
             (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(parent_path, s),
@@ -339,10 +367,13 @@ impl QueryDocumentParser {
         })
     }
 
-    // [DTODO] This is likely incorrect or at least using the wrong abstractions.
-    fn parse_json_list(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
+    fn parse_json_list_from_str(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = self.parse_json(path, s)?;
 
+        self.parse_json_list_from_value(path, json)
+    }
+
+    fn parse_json_list_from_value(&self, path: &QueryPath, json: serde_json::Value) -> QueryParserResult<PrismaValue> {
         let values = json.as_array().ok_or_else(|| QueryParserError {
             path: path.clone(),
             error_kind: QueryParserErrorKind::AssertionError("JSON parameter needs to be an array".into()),
@@ -367,6 +398,15 @@ impl QueryDocumentParser {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
         })
+    }
+
+    fn to_json(&self, path: &QueryPath, value: &ArgumentValue) -> QueryParserResult<PrismaValue> {
+        serde_json::to_string(&value)
+            .map_err(|err| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
+            })
+            .map(PrismaValue::Json)
     }
 
     fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
@@ -438,12 +478,12 @@ impl QueryDocumentParser {
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
-        let valid_field_names: HashSet<&str> = schema_object
+        let valid_field_names: IndexSet<&str> = schema_object
             .get_fields()
             .iter()
             .map(|field| field.name.as_str())
             .collect();
-        let given_field_names: HashSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
+        let given_field_names: IndexSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
         let missing_field_names = valid_field_names.difference(&given_field_names);
 
         // First, filter-in those fields that are not given but have a default value in the schema.

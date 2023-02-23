@@ -121,6 +121,7 @@ impl GraphQLProtocolAdapter {
     /// Checks if the given GraphQL definition matches the operation name that should be executed.
     fn matches_operation(def: &Definition<String>, operation: &str) -> bool {
         let check = |n: Option<&String>| n.filter(|name| name.as_str() == operation).is_some();
+
         match def {
             Definition::Fragment(_) => false,
             Definition::Operation(op) => match op {

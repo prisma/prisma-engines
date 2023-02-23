@@ -1,4 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
+use psl::{PreviewFeature, PreviewFeatures};
+use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -113,6 +115,10 @@ pub struct PrismaOpt {
     #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
 
+    /// The protocol the Query Engine will used. Affects mostly the request and response format.
+    #[structopt(long, env = "PRISMA_ENGINE_PROTOCOL")]
+    pub engine_protocol: Option<String>,
+
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
 }
@@ -212,6 +218,30 @@ impl PrismaOpt {
     // Ok to unwrap here as this is only used in tests
     pub fn from_list(list: &[&str]) -> Self {
         PrismaOpt::from_iter_safe(list).unwrap()
+    }
+
+    /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
+    /// the [PreviewFeature::JsonProtocol] flag is set to "json". Otherwise it will be
+    /// [EngineProtocol::Graphql]
+    ///
+    /// This protocol will determine how the body of an HTTP request made by the client is processed.
+    /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
+    /// of converting the respective representations into a protocol-agnostic(*)
+    /// [query_core::QueryDocument]
+    ///
+    /// (*) FIXME: at the time of writing, the heuristics to validate the [query_core::QueryDocument]
+    /// and  transform it into a [query_core::ParsedObject] require to know which protocol was used
+    /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
+    /// to understand which types certain values are. See [query_core::QueryDocumentParser]
+    ///
+    pub fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
+        self.engine_protocol
+            .as_ref()
+            .map(EngineProtocol::from)
+            .unwrap_or_else(|| match preview_features.contains(PreviewFeature::JsonProtocol) {
+                true => EngineProtocol::Json,
+                false => EngineProtocol::Graphql,
+            })
     }
 }
 

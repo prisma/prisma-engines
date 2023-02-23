@@ -1,14 +1,17 @@
 mod binary;
 mod direct;
+mod json_adapter;
 mod node_api;
 
 pub use binary::*;
 pub use direct::*;
+pub use json_adapter::*;
 pub use node_api::*;
-use query_core::{schema::QuerySchemaRef, TxId};
+
+use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, TxId};
 use query_engine_metrics::MetricRegistry;
 
-use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
+use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult, ENGINE_PROTOCOL};
 use colored::*;
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
@@ -18,8 +21,12 @@ pub trait RunnerInterface: Sized {
     /// Initializes the runner.
     async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
 
-    /// Queries the engine.
-    async fn query(&self, query: String) -> TestResult<QueryResult>;
+    /// Queries the engine using GraphQL.
+    /// If 'protocol' is set to JSON, then the GQL query will be translated to JSON before being sent to the QueryEngine.
+    async fn query_graphql(&self, query: String, protocol: &EngineProtocol) -> TestResult<QueryResult>;
+
+    /// Queries the engine using JSON.
+    async fn query_json(&self, query: String) -> TestResult<QueryResult>;
 
     /// Queries the engine with a batch.
     async fn batch(
@@ -27,6 +34,7 @@ pub trait RunnerInterface: Sized {
         queries: Vec<String>,
         transaction: bool,
         isolation_level: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> TestResult<QueryResult>;
 
     /// Execute a raw query on the underlying connected database.
@@ -38,6 +46,7 @@ pub trait RunnerInterface: Sized {
         max_acquisition_millis: u64,
         valid_for_millis: u64,
         isolation_level: Option<String>,
+        engine_protocol: EngineProtocol,
     ) -> TestResult<TxId>;
 
     /// commit transaction
@@ -75,6 +84,7 @@ enum RunnerType {
 pub struct Runner {
     log_capture: TestLogCapture,
     inner: RunnerType,
+    protocol: EngineProtocol,
 }
 
 impl Runner {
@@ -91,8 +101,13 @@ impl Runner {
             "binary" => Self::binary(datamodel, connector_tag, metrics).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{unknown}'"))),
         }?;
+        let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
 
-        Ok(Self { log_capture, inner })
+        Ok(Self {
+            log_capture,
+            inner,
+            protocol,
+        })
     }
 
     pub async fn query<T>(&self, gql_query: T) -> TestResult<QueryResult>
@@ -100,12 +115,36 @@ impl Runner {
         T: Into<String>,
     {
         let gql_query = gql_query.into();
+
         tracing::debug!("Querying: {}", gql_query.clone().green());
 
         let response = match &self.inner {
-            RunnerType::Direct(r) => r.query(gql_query).await,
+            RunnerType::Direct(r) => r.query_graphql(gql_query, self.protocol()).await,
             RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query(gql_query).await,
+            RunnerType::Binary(r) => r.query_graphql(gql_query, self.protocol()).await,
+        }?;
+
+        if response.failed() {
+            tracing::debug!("Response: {}", response.to_string().red());
+        } else {
+            tracing::debug!("Response: {}", response.to_string().green());
+        }
+
+        Ok(response)
+    }
+
+    pub async fn query_json<T>(&self, json_query: T) -> TestResult<QueryResult>
+    where
+        T: Into<String>,
+    {
+        let json_query = json_query.into();
+
+        tracing::debug!("Querying: {}", json_query.clone().green());
+
+        let response = match &self.inner {
+            RunnerType::Direct(r) => r.query_json(json_query).await,
+            RunnerType::NodeApi(_) => todo!(),
+            RunnerType::Binary(r) => r.query_json(json_query).await,
         }?;
 
         if response.failed() {
@@ -139,11 +178,11 @@ impl Runner {
     ) -> TestResult<TxId> {
         match &self.inner {
             RunnerType::Direct(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, self.protocol)
                     .await
             }
             RunnerType::Binary(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, self.protocol)
                     .await
             }
             RunnerType::NodeApi(_) => todo!(),
@@ -173,9 +212,9 @@ impl Runner {
         isolation_level: Option<String>,
     ) -> TestResult<QueryResult> {
         match &self.inner {
-            RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level).await,
+            RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level, self.protocol).await,
             RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level).await,
+            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level, self.protocol).await,
         }
     }
 
@@ -241,5 +280,9 @@ impl Runner {
             RunnerType::NodeApi(_) => todo!(),
             RunnerType::Binary(r) => r.query_schema(),
         }
+    }
+
+    pub fn protocol(&self) -> &EngineProtocol {
+        &self.protocol
     }
 }

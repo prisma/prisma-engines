@@ -86,7 +86,7 @@ impl TestConfig {
     }
 
     fn from_env() -> Option<Self> {
-        let runner = std::env::var("TEST_RUNNER").ok();
+        let runner = Some(std::env::var("TEST_RUNNER").unwrap_or("direct".to_string()));
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
 

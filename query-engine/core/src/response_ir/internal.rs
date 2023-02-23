@@ -1,5 +1,7 @@
 use super::*;
-use crate::{CoreError, QueryResult, RecordAggregations, RecordSelection};
+use crate::{
+    constants::custom_types, protocol::EngineProtocol, CoreError, QueryResult, RecordAggregations, RecordSelection,
+};
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
@@ -50,7 +52,6 @@ pub fn serialize_internal(
 
             Ok(result)
         }
-
         QueryResult::Json(_) => unimplemented!(),
         QueryResult::Id(_) => unimplemented!(),
         QueryResult::Unit => unimplemented!(),
@@ -540,7 +541,18 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
     }
 }
 
-fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarType) -> crate::Result<PrismaValue> {
+    match crate::executor::get_engine_protocol() {
+        EngineProtocol::Graphql => convert_prisma_value_graphql_protocol(field, value, st),
+        EngineProtocol::Json => convert_prisma_value_json_protocol(field, value, st),
+    }
+}
+
+fn convert_prisma_value_graphql_protocol(
+    field: &OutputFieldRef,
+    value: PrismaValue,
+    st: &ScalarType,
+) -> crate::Result<PrismaValue> {
     let item_value = match (st, value) {
         // Identity matchers
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
@@ -574,7 +586,57 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
     Ok(item_value)
 }
 
-fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, CoreError> {
+/// Since the JSON protocol is "schema-less" by design, clients require type information for them to
+/// properly deserialize special values such as bytes, decimal, datetime, etc.
+fn convert_prisma_value_json_protocol(
+    field: &OutputFieldRef,
+    value: PrismaValue,
+    st: &ScalarType,
+) -> crate::Result<PrismaValue> {
+    let item_value = match (st, value) {
+        // Coerced to tagged object matchers
+        (ScalarType::Json, PrismaValue::Json(x)) => custom_types::make_object(custom_types::JSON, PrismaValue::Json(x)),
+        (ScalarType::DateTime, PrismaValue::DateTime(x)) => {
+            custom_types::make_object(custom_types::DATETIME, PrismaValue::DateTime(x))
+        }
+        (ScalarType::Decimal, PrismaValue::Float(x)) => {
+            custom_types::make_object(custom_types::DECIMAL, PrismaValue::String(x.to_string()))
+        }
+        (ScalarType::Decimal, PrismaValue::Int(x)) => {
+            custom_types::make_object(custom_types::DECIMAL, PrismaValue::String(x.to_string()))
+        }
+        (ScalarType::BigInt, PrismaValue::BigInt(x)) => {
+            custom_types::make_object(custom_types::BIGINT, PrismaValue::BigInt(x))
+        }
+        (ScalarType::Bytes, PrismaValue::Bytes(x)) => {
+            custom_types::make_object(custom_types::BYTES, PrismaValue::Bytes(x))
+        }
+
+        // Identity matchers
+        (ScalarType::String, PrismaValue::String(x)) => PrismaValue::String(x),
+        (ScalarType::UUID, PrismaValue::Uuid(x)) => PrismaValue::Uuid(x),
+        (ScalarType::Boolean, PrismaValue::Boolean(x)) => PrismaValue::Boolean(x),
+        (ScalarType::Int, PrismaValue::Int(x)) => PrismaValue::Int(x),
+        (ScalarType::Float, PrismaValue::Float(x)) => PrismaValue::Float(x),
+
+        // TODO: Xml is no longer a native Prisma type. It should not exist as special PrismaValue.
+        (ScalarType::String | ScalarType::Xml, PrismaValue::Xml(xml) | PrismaValue::String(xml)) => {
+            PrismaValue::String(xml)
+        }
+
+        (st, pv) => {
+            return Err(crate::FieldConversionError::create(
+                field.name.clone(),
+                format!("{st:?}"),
+                format!("{pv}"),
+            ))
+        }
+    };
+
+    Ok(item_value)
+}
+
+fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> crate::Result<Item> {
     match value {
         PrismaValue::String(s) | PrismaValue::Enum(s) => match dbt.map_output_value(&s) {
             Some(inum) => Ok(Item::Value(inum)),

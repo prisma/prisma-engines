@@ -1,41 +1,49 @@
-use super::{GQLBatchResponse, GQLResponse, GraphQlBody};
-use crate::PrismaResponse;
+use super::{GQLBatchResponse, GQLResponse};
+use crate::{PrismaResponse, RequestBody};
 use futures::FutureExt;
 use indexmap::IndexMap;
-use prisma_models::dml::{
-    prisma_value::{parse_datetime, stringify_datetime},
-    PrismaValue,
-};
+use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
+    constants::custom_types,
+    protocol::EngineProtocol,
     response_ir::{Item, ResponseData},
     schema::QuerySchemaRef,
-    ArgumentValue, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation, QueryDocument, QueryExecutor,
-    TxId,
+    ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
+    QueryDocument, QueryExecutor, TxId,
 };
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
-pub struct GraphQlHandler<'a> {
+pub struct RequestHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
     query_schema: &'a QuerySchemaRef,
+    engine_protocol: EngineProtocol,
 }
 
-impl<'a> fmt::Debug for GraphQlHandler<'a> {
+impl<'a> fmt::Debug for RequestHandler<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("GraphQlHandler").finish()
+        f.debug_struct("RequestHandler").finish()
     }
 }
 
-impl<'a> GraphQlHandler<'a> {
-    pub fn new(executor: &'a (dyn QueryExecutor + Send + Sync + 'a), query_schema: &'a QuerySchemaRef) -> Self {
-        Self { executor, query_schema }
+impl<'a> RequestHandler<'a> {
+    pub fn new(
+        executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
+        query_schema: &'a QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+    ) -> Self {
+        Self {
+            executor,
+            query_schema,
+            engine_protocol,
+        }
     }
 
-    pub async fn handle(&self, body: GraphQlBody, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
+    pub async fn handle(&self, body: RequestBody, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
         tracing::debug!("Incoming GraphQL query: {:?}", &body);
 
-        match body.into_doc() {
+        match body.into_doc(self.query_schema) {
             Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, trace_id).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact(self.query_schema) {
                 BatchDocument::Multi(batch, transaction) => {
@@ -53,7 +61,7 @@ impl<'a> GraphQlHandler<'a> {
     async fn handle_single(&self, query: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
         use user_facing_errors::Error;
 
-        let gql_response = match AssertUnwindSafe(self.handle_graphql(query, tx_id, trace_id))
+        let gql_response = match AssertUnwindSafe(self.handle_request(query, tx_id, trace_id))
             .catch_unwind()
             .await
         {
@@ -84,6 +92,7 @@ impl<'a> GraphQlHandler<'a> {
             transaction,
             self.query_schema.clone(),
             trace_id,
+            self.engine_protocol,
         ))
         .catch_unwind()
         .await
@@ -124,7 +133,7 @@ impl<'a> GraphQlHandler<'a> {
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
-        match AssertUnwindSafe(self.handle_graphql(document.operation, tx_id, trace_id))
+        match AssertUnwindSafe(self.handle_request(document.operation, tx_id, trace_id))
             .catch_unwind()
             .await
         {
@@ -202,14 +211,20 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
-    async fn handle_graphql(
+    async fn handle_request(
         &self,
         query_doc: Operation,
         tx_id: Option<TxId>,
         trace_id: Option<String>,
     ) -> query_core::Result<ResponseData> {
         self.executor
-            .execute(tx_id, query_doc, self.query_schema.clone(), trace_id)
+            .execute(
+                tx_id,
+                query_doc,
+                self.query_schema.clone(),
+                trace_id,
+                self.engine_protocol,
+            )
             .await
     }
 
@@ -243,7 +258,23 @@ impl<'a> GraphQlHandler<'a> {
                     .map(|t1| &t1 == t2)
                     .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str())
             }
+            (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) => match Self::unwrap_value(t1) {
+                Some(t1) => Self::compare_values(t1, t2),
+                None => left == right,
+            },
             (left, right) => left == right,
         }
+    }
+
+    fn unwrap_value(obj: &ArgumentValueObject) -> Option<&ArgumentValue> {
+        if obj.len() != 2 {
+            return None;
+        }
+
+        if !obj.contains_key(custom_types::TYPE) || !obj.contains_key(custom_types::VALUE) {
+            return None;
+        }
+
+        obj.get(custom_types::VALUE)
     }
 }

@@ -51,6 +51,13 @@ impl GQLError {
 }
 
 impl GQLResponse {
+    pub fn new(data: Map) -> Self {
+        Self {
+            data,
+            ..Default::default()
+        }
+    }
+
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: IndexMap::with_capacity(capacity),
@@ -72,6 +79,14 @@ impl GQLResponse {
 
     pub fn errors(&self) -> impl Iterator<Item = &GQLError> {
         self.errors.iter()
+    }
+
+    pub fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    pub fn into_data(self) -> Map {
+        self.data
     }
 
     pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
@@ -162,6 +177,14 @@ impl GQLBatchResponse {
         self.errors
             .iter()
             .chain(self.batch_result.iter().flat_map(|res| res.errors()))
+    }
+
+    pub fn into_responses(self) -> Vec<GQLResponse> {
+        self.batch_result
+    }
+
+    pub fn has_errors(&self) -> bool {
+        !self.errors.is_empty() || self.batch_result.iter().any(|res| res.has_errors())
     }
 
     pub fn set_extension(&mut self, key: String, val: serde_json::Value) {

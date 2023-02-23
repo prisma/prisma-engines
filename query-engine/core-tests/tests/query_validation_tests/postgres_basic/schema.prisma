@@ -1,0 +1,9 @@
+datasource test {
+  provider = "postgresql"
+  url = env("TEST_DATABASE_URL")
+}
+
+model User {
+    id Int @id
+    email String
+}

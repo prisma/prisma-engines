@@ -75,6 +75,7 @@ features!(
     Deno,
     ExtendedWhereUnique,
     Views,
+    JsonProtocol
 );
 
 /// Generator preview features
@@ -93,6 +94,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | ClientExtensions
          | MultiSchema
          | Views
+         | JsonProtocol
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

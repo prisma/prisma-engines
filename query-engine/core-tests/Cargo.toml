@@ -1,0 +1,16 @@
+[package]
+name = "core-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]
+dissimilar = "1.0.4"
+request-handlers = { path = "../request-handlers" }
+query-core = { path = "../core" }
+schema-builder = { path = "../schema-builder" }
+schema = { path = "../schema" }
+prisma-models = { path = "../prisma-models" }
+psl.workspace = true
+serde_json.workspace = true

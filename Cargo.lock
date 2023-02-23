@@ -518,6 +518,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
+name = "core-tests"
+version = "0.1.0"
+dependencies = [
+ "dissimilar",
+ "prisma-models",
+ "psl",
+ "query-core",
+ "request-handlers",
+ "schema",
+ "schema-builder",
+ "serde_json",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2293,7 +2307,7 @@ dependencies = [
  "socket2",
  "thiserror",
  "tokio",
- "tokio-native-tls 0.3.1",
+ "tokio-native-tls",
  "tokio-util 0.7.3",
  "twox-hash",
  "url",
@@ -2898,18 +2912,18 @@ checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#064a6a50427542e2c166e870027735aab3b52e77"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
 dependencies = [
  "native-tls",
  "tokio",
- "tokio-native-tls 0.3.0",
+ "tokio-native-tls",
  "tokio-postgres",
 ]
 
 [[package]]
 name = "postgres-protocol"
 version = "0.6.4"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#064a6a50427542e2c166e870027735aab3b52e77"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
 dependencies = [
  "base64 0.13.1",
  "byteorder",
@@ -2926,7 +2940,7 @@ dependencies = [
 [[package]]
 name = "postgres-types"
 version = "0.2.4"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#064a6a50427542e2c166e870027735aab3b52e77"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -3184,7 +3198,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#2aa9ac0d501a042d281918ff1d22ec904d9de482"
+source = "git+https://github.com/prisma/quaint#53c756a67a0ff3f1b6023c64bec9dc9280bdc1cd"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3309,6 +3323,7 @@ dependencies = [
  "async-trait",
  "base64 0.12.3",
  "connection-string",
+ "enumflags2",
  "graphql-parser",
  "hyper",
  "indoc",
@@ -3624,10 +3639,12 @@ dependencies = [
  "futures",
  "graphql-parser",
  "indexmap",
+ "insta",
  "itertools",
  "prisma-models",
  "psl",
  "query-core",
+ "schema-builder",
  "serde",
  "serde_json",
  "thiserror",
@@ -4576,15 +4593,6 @@ dependencies = [
 
 [[package]]
 name = "tokio-native-tls"
-version = "0.3.0"
-source = "git+https://github.com/pimeys/tls?branch=vendored-openssl#6d0e6fc7a4bf6f290b1033764b47cb3f26d7fceb"
-dependencies = [
- "native-tls",
- "tokio",
-]
-
-[[package]]
-name = "tokio-native-tls"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbae76ab933c85776efabc971569dd6119c580d8f5d448769dec1764bf796ef2"
@@ -4596,7 +4604,7 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.7.7"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#064a6a50427542e2c166e870027735aab3b52e77"
+source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
 dependencies = [
  "async-trait",
  "byteorder",

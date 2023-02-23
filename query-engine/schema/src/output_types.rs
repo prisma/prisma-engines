@@ -87,6 +87,17 @@ impl OutputType {
     pub fn is_object(&self) -> bool {
         matches!(self, OutputType::Object(_))
     }
+
+    pub fn is_scalar(&self) -> bool {
+        matches!(self, OutputType::Scalar(_))
+    }
+
+    pub fn is_scalar_list(&self) -> bool {
+        match self {
+            OutputType::List(typ) => typ.is_scalar(),
+            _ => false,
+        }
+    }
 }
 
 pub struct ObjectType {
@@ -196,7 +207,11 @@ impl OutputField {
         matches!(self.query_tag(), Some(&QueryTag::FindUnique))
     }
 
-    fn query_tag(&self) -> Option<&QueryTag> {
-        self.query_info.as_ref().map(|info| &info.tag)
+    pub fn query_info(&self) -> Option<&QueryInfo> {
+        self.query_info.as_ref()
+    }
+
+    pub fn query_tag(&self) -> Option<&QueryTag> {
+        self.query_info().map(|info| &info.tag)
     }
 }
