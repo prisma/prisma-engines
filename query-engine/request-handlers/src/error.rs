@@ -67,11 +67,9 @@ impl From<HandlerError> for user_facing_errors::Error {
         match err {
             HandlerError::Core(ce) => user_facing_errors::Error::from(ce),
 
-            // value fit error
-            HandlerError::ValueFitError(details) => KnownError::new(user_facing_errors::query_engine::ValueFitError {
-                details: details.clone(),
-            })
-            .into(),
+            HandlerError::ValueFitError(details) => {
+                KnownError::new(user_facing_errors::query_engine::ValueFitError { details }).into()
+            }
 
             _ => UnknownError::new(&err).into(),
         }
