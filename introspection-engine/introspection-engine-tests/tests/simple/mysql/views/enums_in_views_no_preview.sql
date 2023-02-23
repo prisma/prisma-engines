@@ -1,4 +1,5 @@
 -- tags=mysql
+-- exclude=vitess
 
 CREATE TABLE A (
     id INT PRIMARY KEY,
@@ -8,14 +9,15 @@ CREATE TABLE A (
 CREATE VIEW B AS SELECT id, val from A;
 
 
+
 /*
-generator client {
+generator js {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
-  url      = "env(TEST_DATABASE_URL)"
+  url      = env("DATABASE_URL")
 }
 
 model A {
