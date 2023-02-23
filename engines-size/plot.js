@@ -79,7 +79,7 @@ function formatMB(bytes, digitsAfterComma = 2) {
 
 new Grid(document.querySelector("#grid"), {
   columnDefs: [
-    { headerName: "Date and time", field: "date_time" },
+    { headerName: "Date and time", field: "date_time", sort: "desc" },
     { headerName: "Branch", field: "branch" },
     { headerName: "Commit", field: "commit" },
     { headerName: "File", field: "file" },
