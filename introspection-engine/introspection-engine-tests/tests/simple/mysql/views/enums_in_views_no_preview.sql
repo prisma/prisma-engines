@@ -7,6 +7,7 @@ CREATE TABLE A (
 
 CREATE VIEW B AS SELECT id, val from A;
 
+
 /*
 generator client {
   provider = "prisma-client-js"
