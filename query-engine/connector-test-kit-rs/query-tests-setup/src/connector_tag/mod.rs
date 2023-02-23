@@ -188,6 +188,7 @@ impl ConnectorTag {
 impl TryFrom<&str> for ConnectorTag {
     type Error = TestError;
 
+    #[track_caller]
     fn try_from(tag: &str) -> Result<Self, Self::Error> {
         Self::try_from((tag, None))
     }
@@ -196,13 +197,14 @@ impl TryFrom<&str> for ConnectorTag {
 impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
     type Error = TestError;
 
+    #[track_caller]
     fn try_from(value: (&str, Option<&str>)) -> Result<Self, Self::Error> {
         let (connector, version) = value;
 
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
+            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new(version)),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),

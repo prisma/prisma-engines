@@ -39,6 +39,10 @@ jobs:
             single_threaded: true
             connector: "mongodb"
             version: "4.2"
+          - name: "cockroach_22_2"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "22.2"
         engine_protocol: [graphql, json]
 
     env:
