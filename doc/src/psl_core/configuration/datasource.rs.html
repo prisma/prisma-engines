@@ -266,6 +266,8 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -422,40 +424,42 @@
     <span class="kw">where
         </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt;,
     {
-        <span class="self">self</span>.direct_url.clone()
+        <span class="kw">let </span>validate_direct_url = |(url, span)| {
+            <span class="kw">let </span>handle_err = |err| <span class="kw">match </span>err {
+                UrlValidationError::EmptyUrlValue =&gt; {
+                    <span class="kw">let </span>msg = <span class="string">&quot;You must provide a nonempty direct URL&quot;</span>;
+                    <span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, span).into())
+                }
+                UrlValidationError::EmptyEnvValue(env_var) =&gt; {
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                        <span class="string">&quot;You must provide a nonempty direct URL. The environment variable `{env_var}` resolved to an empty string.&quot;
+                    </span>);
+
+                    <span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(<span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, span).into())
+                }
+                UrlValidationError::NoEnvValue(env_var) =&gt; {
+                    <span class="kw">let </span>e = DatamodelError::new_environment_functional_evaluation_error(env_var, span);
+                    <span class="prelude-val">Err</span>(e.into())
+                }
+                UrlValidationError::NoUrlOrEnv =&gt; <span class="self">self</span>.load_url(<span class="kw-2">&amp;</span>env),
+            };
+
+            <span class="kw">let </span>url = from_url(<span class="kw-2">&amp;</span>url, <span class="kw-2">&amp;</span>env).map_or_else(handle_err, Result::Ok)<span class="question-mark">?</span>;
+
+            <span class="kw">if </span>url.starts_with(<span class="string">&quot;prisma://&quot;</span>) {
+                <span class="kw">let </span>msg = <span class="string">&quot;You must provide a direct URL that points directly to the database. Using `prisma` in URL scheme is not allowed.&quot;</span>;
+                <span class="kw">let </span>e = DatamodelError::new_source_validation_error(msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, span);
+
+                <span class="prelude-val">Err</span>(e.into())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(url)
+            }
+        };
+
+        <span class="self">self</span>.direct_url
+            .clone()
             .and_then(|url| <span class="self">self</span>.direct_url_span.map(|span| (url, span)))
-            .map_or_else(
-            || <span class="self">self</span>.load_url(<span class="kw-2">&amp;</span>env),
-            |(url, span)| {
-                from_url(<span class="kw-2">&amp;</span>url, <span class="kw-2">&amp;</span>env).map_or_else(
-                    |err| <span class="kw">match </span>err {
-                        UrlValidationError::EmptyUrlValue =&gt; {
-                            <span class="kw">let </span>msg = <span class="string">&quot;You must provide a nonempty direct URL&quot;</span>;
-                            <span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(msg, <span class="kw-2">&amp;</span><span class="self">self</span>.name, span).into())
-                        }
-                        UrlValidationError::EmptyEnvValue(env_var) =&gt; {
-                            <span class="prelude-val">Err</span>(DatamodelError::new_source_validation_error(
-                                <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                                    <span class="string">&quot;You must provide a nonempty direct URL. The environment variable `{env_var}` resolved to an empty string.&quot;
-                                </span>),
-                                <span class="kw-2">&amp;</span><span class="self">self</span>.name,
-                                span,
-                            )
-                            .into())
-                        }
-                        UrlValidationError::NoEnvValue(env_var) =&gt; {
-                            <span class="prelude-val">Err</span>(DatamodelError::new_environment_functional_evaluation_error(
-                                env_var,
-                                span,
-                            )
-                            .into())
-                        }
-                        UrlValidationError::NoUrlOrEnv =&gt; <span class="self">self</span>.load_url(<span class="kw-2">&amp;</span>env),
-                    },
-                    Result::Ok,
-                )
-            },
-        )
+            .map_or_else(|| <span class="self">self</span>.load_url(<span class="kw-2">&amp;</span>env), validate_direct_url)
     }
 
     <span class="doccomment">/// Same as `load_url()`, with the following difference.
