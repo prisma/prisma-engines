@@ -58,7 +58,10 @@ impl GQLError {
     }
 
     pub fn from_core_error(err: CoreError) -> Self {
-        Self::from_user_facing_error(user_facing_errors::Error::from(err))
+        GQLError {
+            error: format!("{err}"),
+            user_facing_error: user_facing_errors::Error::from(err),
+        }
     }
 
     pub fn from_handler_error(err: HandlerError) -> Self {
