@@ -9,12 +9,12 @@ datasource db {
   url      = "file:dev.db"
 }
 
-// / User model comment
+/// User model comment
 model User {
   id    String  @id @default(uuid())
   email String  @unique
   age   Int
-  // / name comment
+  /// name comment
   name  String?
   posts Post[]  @ignore
 }
