@@ -9,7 +9,7 @@ use psl::{
     builtin_connectors::*,
     datamodel_connector::Connector,
     parser_database::{ast, walkers},
-    Configuration,
+    Configuration, PreviewFeature,
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
@@ -70,9 +70,15 @@ impl<'a> DatamodelCalculatorContext<'a> {
 
     /// Iterate over the database enums, combined together with a
     /// possible existing enum in the PSL.
-    pub(crate) fn enum_pairs(&'a self) -> impl ExactSizeIterator<Item = EnumPair<'a>> + 'a {
+    pub(crate) fn enum_pairs(&'a self) -> impl Iterator<Item = EnumPair<'a>> + 'a {
         self.sql_schema
             .enum_walkers()
+            .filter(|e| {
+                let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+                let used_in_tables = self.sql_schema.enum_used_in_tables(e.id);
+
+                uses_views || used_in_tables
+            })
             .map(|next| Pair::new(self, self.existing_enum(next.id), next))
     }
 

@@ -108,6 +108,13 @@ impl SqlSchema {
         ViewColumnId(self.view_columns.len() as u32)
     }
 
+    /// The given enum is used in tables.
+    pub fn enum_used_in_tables(&self, id: EnumId) -> bool {
+        self.table_columns
+            .iter()
+            .any(|col| col.1.tpe.family == ColumnTypeFamily::Enum(id))
+    }
+
     /// Extract connector-specific constructs mutably. The type parameter must be the right one.
     #[track_caller]
     pub fn downcast_connector_data_mut<T: 'static>(&mut self) -> &mut T {

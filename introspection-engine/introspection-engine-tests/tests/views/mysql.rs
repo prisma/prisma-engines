@@ -362,3 +362,56 @@ async fn defaults_are_introspected(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+async fn views_are_rendered_with_enums(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            val ENUM('a', 'b')
+        );
+
+        CREATE VIEW B AS SELECT id, val from A;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model A {
+          id  Int    @id
+          val A_val?
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view B {
+          id  Int
+          val B_val?
+
+          @@ignore
+        }
+
+        enum A_val {
+          a
+          b
+        }
+
+        enum B_val {
+          a
+          b
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
