@@ -1,5 +1,5 @@
 use crate::field::{Field, ScalarField};
-use crate::traits::{Ignorable, WithDatabaseName, WithName};
+use crate::traits::{WithDatabaseName, WithName};
 use indoc::formatdoc;
 use psl_core::parser_database::{ast, IndexType};
 use std::{borrow::Cow, fmt};
@@ -476,30 +476,6 @@ impl Model {
         is_first_in_index || is_first_in_primary_key
     }
 
-    /// Determines whether there is a singular primary key
-    pub fn has_single_id_field(&self) -> bool {
-        matches!(&self.primary_key, Some(PrimaryKeyDefinition{fields, ..}) if fields.len() ==1)
-    }
-
-    pub fn add_index(&mut self, index: IndexDefinition) {
-        self.indices.push(index)
-    }
-
-    pub fn has_created_at_and_updated_at(&self) -> bool {
-        /// Finds a field by name.
-        fn has_field(model: &Model, name: &str) -> bool {
-            match model
-                .find_scalar_field(name)
-                .or_else(|| model.find_scalar_field(name.to_lowercase().as_ref()))
-            {
-                Some(f) => f.field_type.is_datetime(),
-                None => false,
-            }
-        }
-
-        has_field(self, "createdAt") && has_field(self, "updatedAt")
-    }
-
     pub fn field_is_unique(&self, name: &str) -> bool {
         self.indices.iter().any(|i| {
             let names_match = i
@@ -549,15 +525,5 @@ impl WithDatabaseName for Model {
 
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
-    }
-}
-
-impl Ignorable for Model {
-    fn is_ignored(&self) -> bool {
-        self.is_ignored
-    }
-
-    fn ignore(&mut self) {
-        self.is_ignored = true;
     }
 }

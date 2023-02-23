@@ -12,7 +12,6 @@ pub struct CompositeType {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeTypeField {
-    pub id: (ast::CompositeTypeId, ast::FieldId),
     pub name: String,
     pub r#type: CompositeTypeFieldType,
     pub arity: FieldArity,
@@ -20,14 +19,8 @@ pub struct CompositeTypeField {
     /// The database internal name.
     pub database_name: Option<String>,
 
-    /// Comments associated with this field.
-    pub documentation: Option<String>,
-
     /// The default value of this field
     pub default_value: Option<DefaultValue>,
-
-    /// Should we comment this field out.
-    pub is_commented_out: bool,
 }
 
 impl CompositeType {
@@ -58,11 +51,6 @@ impl CompositeType {
             .iter()
             .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Unsupported(_)))
     }
-
-    /// Finds a field by name.
-    pub fn find_field(&self, name: &str) -> Option<&CompositeTypeField> {
-        self.fields.iter().find(|f| f.name == name)
-    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -76,38 +64,11 @@ pub enum CompositeTypeFieldType {
 }
 
 impl CompositeTypeFieldType {
-    pub fn as_enum(&self) -> Option<ast::EnumId> {
-        match self {
-            CompositeTypeFieldType::Enum(id) => Some(*id),
-            _ => None,
-        }
-    }
-
-    pub fn as_composite_type(&self) -> Option<&String> {
-        if let Self::CompositeType(v) = self {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
     pub fn as_scalar(&self) -> Option<(&ScalarType, &Option<NativeTypeInstance>)> {
         if let Self::Scalar(typ, native_type) = self {
             Some((typ, native_type))
         } else {
             None
         }
-    }
-
-    pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
-        if let Self::Scalar(typ, Some(native_type)) = self {
-            Some((typ, native_type))
-        } else {
-            None
-        }
-    }
-
-    pub fn is_unsupported(&self) -> bool {
-        matches!(self, Self::Unsupported(_))
     }
 }
