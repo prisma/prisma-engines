@@ -279,15 +279,13 @@ impl JsonProtocolAdapter {
                 }
             }
             ParentContainer::CompositeType(ct) => {
-                let ct = ct.upgrade().unwrap();
-
-                if walked_types.contains(&ct.name) {
+                if walked_types.contains(ct.name()) {
                     return Err(HandlerError::query_conversion(
                         "$composites: true does not support recursive composite types.",
                     ));
                 }
 
-                walked_types.insert(ct.name.to_owned());
+                walked_types.insert(ct.name().to_owned());
 
                 for f in ct.fields() {
                     let schema_field = schema_object.find_field(f.name());

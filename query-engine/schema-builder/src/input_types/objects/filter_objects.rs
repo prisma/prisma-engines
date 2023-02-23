@@ -243,7 +243,7 @@ fn compound_field_unique_object_type(
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ().name), PRISMA_NAMESPACE);
+    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ().name()), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

@@ -14,7 +14,7 @@ impl ParentContainer {
         // Unwraps are safe - the models and composites must exist after DML translation.
         match self {
             ParentContainer::Model(model) => model.upgrade().unwrap().internal_data_model(),
-            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().internal_data_model(),
+            ParentContainer::CompositeType(composite) => composite.dm.clone(),
         }
     }
 
@@ -35,21 +35,21 @@ impl ParentContainer {
     pub fn as_composite(&self) -> Option<CompositeTypeRef> {
         match self {
             ParentContainer::Model(_) => None,
-            ParentContainer::CompositeType(ct) => ct.upgrade(),
+            ParentContainer::CompositeType(ct) => Some(ct.clone()),
         }
     }
 
     pub fn name(&self) -> String {
         match self {
             ParentContainer::Model(model) => model.upgrade().unwrap().name.clone(),
-            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().name.clone(),
+            ParentContainer::CompositeType(composite) => composite.walker().name().to_owned(),
         }
     }
 
     pub fn fields(&self) -> Vec<Field> {
         match self {
             ParentContainer::Model(model) => model.upgrade().unwrap().fields().filter_all(|_| true),
-            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().fields(),
+            ParentContainer::CompositeType(composite) => composite.fields().collect(),
         }
     }
 
@@ -58,12 +58,7 @@ impl ParentContainer {
         match self {
             ParentContainer::Model(weak) => weak.upgrade().unwrap().fields().find_from_all(prisma_name).ok(),
 
-            ParentContainer::CompositeType(weak) => weak
-                .upgrade()
-                .unwrap()
-                .fields()
-                .into_iter()
-                .find(|field| field.name() == prisma_name),
+            ParentContainer::CompositeType(weak) => weak.fields().into_iter().find(|field| field.name() == prisma_name),
         }
     }
 
@@ -96,21 +91,15 @@ impl From<ModelWeakRef> for ParentContainer {
 
 impl From<CompositeTypeRef> for ParentContainer {
     fn from(composite: CompositeTypeRef) -> Self {
-        Self::CompositeType(Arc::downgrade(&composite))
-    }
-}
-
-impl From<&CompositeTypeRef> for ParentContainer {
-    fn from(composite: &CompositeTypeRef) -> Self {
-        Self::CompositeType(Arc::downgrade(composite))
-    }
-}
-
-impl From<CompositeTypeWeakRef> for ParentContainer {
-    fn from(composite: CompositeTypeWeakRef) -> Self {
         Self::CompositeType(composite)
     }
 }
+
+// impl From<&CompositeTypeRef> for ParentContainer {
+//     fn from(composite: &CompositeTypeRef) -> Self {
+//         Self::CompositeType(composite.clone())
+//     }
+// }
 
 impl Debug for ParentContainer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -124,7 +113,7 @@ impl Debug for ParentContainer {
             ParentContainer::CompositeType(ct) => f
                 .debug_struct("ParentContainer")
                 .field("enum_variant", &"CompositeType")
-                .field("name", &ct.upgrade().unwrap().name)
+                .field("name", &ct.walker().name())
                 .finish(),
         }
     }
@@ -135,7 +124,7 @@ impl Hash for ParentContainer {
         // Unwraps are safe - the models and composites must exist after DML translation.
         match self {
             ParentContainer::Model(model) => model.upgrade().unwrap().hash(state),
-            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().hash(state),
+            ParentContainer::CompositeType(composite) => composite.hash(state),
         }
     }
 }

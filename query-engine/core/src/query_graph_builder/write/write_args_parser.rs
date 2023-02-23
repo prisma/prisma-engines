@@ -159,7 +159,7 @@ fn parse_composite_update_many(
     path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
-    let filter = extract_filter(where_map, &cf.typ())?;
+    let filter = extract_filter(where_map, cf.typ())?;
 
     let update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update_map, path)?
@@ -174,7 +174,7 @@ fn parse_composite_delete_many(
     mut value: ParsedInputMap,
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
-    let filter = extract_filter(where_map, &cf.typ())?;
+    let filter = extract_filter(where_map, cf.typ())?;
 
     Ok(WriteOperation::composite_delete_many(filter))
 }

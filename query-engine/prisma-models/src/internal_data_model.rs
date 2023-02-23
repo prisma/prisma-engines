@@ -9,7 +9,6 @@ pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
 #[derive(Debug)]
 pub struct InternalDataModel {
     pub(crate) models: OnceCell<Vec<ModelRef>>,
-    pub(crate) composite_types: OnceCell<Vec<CompositeTypeRef>>,
 
     pub schema: Arc<psl::ValidatedSchema>,
 }
@@ -19,8 +18,11 @@ impl InternalDataModel {
         self.models.get().unwrap()
     }
 
-    pub fn composite_types(&self) -> &[CompositeTypeRef] {
-        self.composite_types.get().unwrap()
+    pub fn composite_types<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = CompositeTypeRef> + 'a {
+        self.schema
+            .db
+            .walk_composite_types()
+            .map(move |ct| self.clone().zip(ct.id))
     }
 
     pub fn models_cloned(&self) -> Vec<ModelRef> {
@@ -51,12 +53,8 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_composite_type_by_id(&self, ctid: ast::CompositeTypeId) -> CompositeTypeRef {
-        self.composite_types
-            .get()
-            .and_then(|ct| ct.iter().find(|ct| ct.id == ctid))
-            .cloned()
-            .unwrap()
+    pub fn find_composite_type_by_id(self: &Arc<Self>, ctid: ast::CompositeTypeId) -> CompositeTypeRef {
+        self.clone().zip(ctid)
     }
 
     pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
