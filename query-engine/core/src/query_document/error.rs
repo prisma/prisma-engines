@@ -14,29 +14,6 @@ pub enum QueryParserError {
     },
 }
 
-impl QueryParserError {
-    /// Create a new instance of `QueryParserError`.
-    pub fn new_legacy(path: QueryPath, error_kind: QueryParserErrorKind) -> Self {
-        Self::Legacy { path, error_kind }
-    }
-
-    // deprecated: This must dissappear as soon as errors transition to the StructuredQueryParserError type
-    pub fn path(&self) -> Option<QueryPath> {
-        match self {
-            Self::Legacy { path, error_kind: _ } => Some(path.clone()),
-            Self::Structured(_) => None,
-        }
-    }
-
-    // deprecated: This must dissappear as soon as errors transition to the StructuredQueryParserError type
-    pub fn error_kind(&self) -> Option<&QueryParserErrorKind> {
-        match self {
-            Self::Legacy { path: _, error_kind } => Some(error_kind),
-            _ => None,
-        }
-    }
-}
-
 impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -199,9 +176,9 @@ impl Display for FieldCountError {
 
 impl From<prisma_models::DomainError> for QueryParserError {
     fn from(err: prisma_models::DomainError) -> Self {
-        QueryParserError::new_legacy(
-            QueryPath::default(),
-            QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
-        )
+        QueryParserError::Legacy {
+            path: QueryPath::default(),
+            error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
+        }
     }
 }

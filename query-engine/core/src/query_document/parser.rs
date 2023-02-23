@@ -311,23 +311,26 @@ impl QueryDocumentParser {
             (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
             (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
-                None => Err(QueryParserError::new_legacy(parent_path.clone(), QueryParserErrorKind::ValueFitError(
-                            format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
+                None => {
+                    let error_kind = QueryParserErrorKind::ValueFitError(format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap()));
+                    Err(QueryParserError::Legacy {
+                        path: parent_path.clone(),
+                        error_kind,
+                    })
+                }
             },
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // All other combinations are value type mismatches.
-            (qv, _) => {
-                Err(QueryParserError::Legacy {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: qv.into(),
-                        want: InputType::Scalar(scalar_type.clone()),
-                    },
-                })
-            },
+            (qv, _) => Err(QueryParserError::Legacy {
+                path: parent_path.clone(),
+                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                    have: qv.into(),
+                    want: InputType::Scalar(scalar_type.clone()),
+                },
+            }),
         }
     }
 
@@ -514,8 +517,8 @@ impl QueryDocumentParser {
                     }
                     None => {
                         if field.is_required {
-                            let kind = QueryParserErrorKind::RequiredValueNotSetError;
-                            Some(Err(QueryParserError::new_legacy(path, kind)))
+                            let error_kind = QueryParserErrorKind::RequiredValueNotSetError;
+                            Some(Err(QueryParserError::Legacy { path, error_kind }))
                         } else {
                             None
                         }
@@ -530,8 +533,11 @@ impl QueryDocumentParser {
             .into_iter()
             .map(|(k, v)| {
                 let field = schema_object.find_field(k.as_str()).ok_or_else(|| {
-                    let kind = QueryParserErrorKind::FieldNotFoundError;
-                    QueryParserError::new_legacy(path.add(k.clone()), kind)
+                    let error_kind = QueryParserErrorKind::FieldNotFoundError;
+                    QueryParserError::Legacy {
+                        path: path.add(k.clone()),
+                        error_kind,
+                    }
                 })?;
 
                 let path = path.add(field.name.clone());
@@ -580,7 +586,7 @@ impl QueryDocumentParser {
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
             ));
-            return Err(QueryParserError::new_legacy(path, error_kind));
+            return Err(QueryParserError::Legacy { path, error_kind });
         }
 
         map.set_tag(schema_object.tag.clone());
