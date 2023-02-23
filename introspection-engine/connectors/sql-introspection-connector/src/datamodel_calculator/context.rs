@@ -72,13 +72,14 @@ impl<'a> DatamodelCalculatorContext<'a> {
     /// possible existing enum in the PSL.
     pub(crate) fn enum_pairs(&'a self) -> impl Iterator<Item = EnumPair<'a>> + 'a {
         let uses_views = self.config.preview_features().contains(PreviewFeature::Views);
+        let is_mysql = self.sql_family.is_mysql();
 
         self.sql_schema
             .enum_walkers()
-            .filter(move |e| {
-                let used_in_tables = self.sql_schema.enum_used_in_tables(e.id);
-                uses_views || used_in_tables
-            })
+            // MySQL enums are taken from the columns, which means a rogue enum might appear
+            // for users not using the views preview feature, but having views with enums
+            // in their database.
+            .filter(move |e| !is_mysql || uses_views || self.sql_schema.enum_used_in_tables(e.id))
             .map(|next| Pair::new(self, self.existing_enum(next.id), next))
     }
 
