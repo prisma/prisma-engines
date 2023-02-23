@@ -32,7 +32,20 @@
       svg {
         font-size: 10px;
       }
+
+      #grid {
+        height: 400px;
+      }
     </style>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/ag-grid-community@29.1.0/styles/ag-grid.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/ag-grid-community@29.1.0/styles/ag-theme-alpine.min.css"
+    />
   </head>
 
   <body>
@@ -49,6 +62,9 @@
 
     <h2>query-engine</h2>
     <div class="plot" id="plot-bin"></div>
+
+    <h2>Raw data</h2>
+    <div id="grid" class="ag-theme-alpine"></div>
 
     <script type="module" src="plot.js"></script>
   </body>

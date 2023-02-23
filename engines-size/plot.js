@@ -1,5 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+import { Grid } from "https://cdn.jsdelivr.net/npm/ag-grid-community@29.1.0/+esm";
 
 const data = d3.csvParse(
   await fetch("data.csv").then((response) => response.text()),
@@ -75,3 +76,25 @@ function formatMB(bytes, digitsAfterComma = 2) {
   const megabytes = bytes / 1024 / 1024;
   return `${megabytes.toFixed(digitsAfterComma)} MB`;
 }
+
+new Grid(document.querySelector("#grid"), {
+  columnDefs: [
+    { headerName: "Date and time", field: "date_time" },
+    { headerName: "Branch", field: "branch" },
+    { headerName: "Commit", field: "commit" },
+    { headerName: "File", field: "file" },
+    { headerName: "Size (bytes)", field: "size_bytes" },
+    {
+      headerName: "Size (MB)",
+      field: "size_bytes",
+      valueFormatter: ({ value }) => formatMB(value),
+    },
+  ],
+  rowData: data,
+  defaultColDef: {
+    sortable: true,
+    filter: true,
+    resizable: true,
+  },
+  enableCellTextSelection: true,
+});
