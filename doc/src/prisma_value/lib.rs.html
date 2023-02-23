@@ -403,6 +403,21 @@
 <a href="#403" id="403">403</a>
 <a href="#404" id="404">404</a>
 <a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>arithmetic;
 
 <span class="kw">mod </span>error;
@@ -410,6 +425,7 @@
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>chrono::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>serde::de::Unexpected;
+<span class="kw">use </span>serde::ser::SerializeMap;
 <span class="kw">use </span>serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 <span class="kw">use </span>std::{convert::TryFrom, fmt, str::FromStr};
 <span class="kw">use </span>uuid::Uuid;
@@ -431,6 +447,7 @@
     Xml(String),
 
     <span class="doccomment">/// A collections of key-value pairs constituting an object.
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_object&quot;</span>)]
     </span>Object(Vec&lt;(String, PrismaValue)&gt;),
 
     <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_null&quot;</span>)]
@@ -582,6 +599,19 @@
     </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
     deserializer.deserialize_f64(BigDecimalVisitor)
+}
+
+<span class="kw">fn </span>serialize_object&lt;S&gt;(obj: <span class="kw-2">&amp;</span>Vec&lt;(String, PrismaValue)&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+<span class="kw">where
+    </span>S: Serializer,
+{
+    <span class="kw">let </span><span class="kw-2">mut </span>map = serializer.serialize_map(<span class="prelude-val">Some</span>(obj.len()))<span class="question-mark">?</span>;
+
+    <span class="kw">for </span>(k, v) <span class="kw">in </span>obj {
+        map.serialize_entry(k, v)<span class="question-mark">?</span>;
+    }
+
+    map.end()
 }
 
 <span class="kw">struct </span>BigDecimalVisitor;

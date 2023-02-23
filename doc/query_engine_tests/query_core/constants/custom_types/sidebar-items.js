@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["BIGINT",""],["BYTES",""],["DATETIME",""],["DECIMAL",""],["ENUM",""],["FIELD_REF",""],["JSON",""],["TYPE",""],["VALUE",""]],"fn":[["make_object",""]]};

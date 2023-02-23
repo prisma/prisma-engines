@@ -25,15 +25,30 @@
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::upper_case_acronyms)]
 
 </span><span class="kw">pub mod </span>dmmf;
 
 <span class="kw">mod </span>error;
-<span class="kw">mod </span>graphql;
+<span class="kw">mod </span>handler;
+<span class="kw">mod </span>protocols;
+<span class="kw">mod </span>response;
 
 <span class="kw">pub use </span>error::HandlerError;
-<span class="kw">pub use </span>graphql::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>handler::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>protocols::{graphql::<span class="kw-2">*</span>, json::<span class="kw-2">*</span>, RequestBody};
+<span class="kw">pub use </span>response::<span class="kw-2">*</span>;
 
 <span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, HandlerError&gt;;
 
@@ -45,6 +60,13 @@
 }
 
 <span class="kw">impl </span>PrismaResponse {
+    <span class="kw">pub fn </span>has_errors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            PrismaResponse::Single(x) =&gt; x.has_errors(),
+            PrismaResponse::Multi(x) =&gt; x.has_errors(),
+        }
+    }
+
     <span class="kw">pub fn </span>set_extension(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: String, val: serde_json::Value) {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Single(r) =&gt; r.set_extension(key, val),

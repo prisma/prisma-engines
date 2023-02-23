@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Feature","Feature models the engine feature toggles that can be set up during the startup via options See [PrismaOpt]’s boolean flags, for each of the corresponding feature toggles."]],"type":[["EnabledFeatures","EnabledFeatures represents a collection of the engine features that are enabled, masked in a byte"]]};

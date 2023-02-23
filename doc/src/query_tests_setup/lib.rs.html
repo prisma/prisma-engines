@@ -314,6 +314,9 @@
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
 
 </span><span class="kw">mod </span>config;
@@ -333,7 +336,7 @@
 <span class="kw">pub use </span>logging::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>query_core;
 <span class="kw">pub use </span>query_result::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>request_handlers::{GraphQlBody, MultiQuery};
+<span class="kw">pub use </span>request_handlers::{GraphqlBody, MultiQuery};
 <span class="kw">pub use </span>runner::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>schema_gen::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>templating::<span class="kw-2">*</span>;
@@ -356,6 +359,9 @@
 
     <span class="doccomment">/// The log level from the environment.
     </span><span class="kw">pub static </span><span class="kw-2">ref </span>ENV_LOG_LEVEL: String = std::env::var(<span class="string">&quot;LOG_LEVEL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;info&quot;</span>.to_owned());
+
+    <span class="doccomment">/// Engine protocol used to run tests. Either &#39;graphql&#39; or &#39;json&#39;.
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>ENGINE_PROTOCOL: String = std::env::var(<span class="string">&quot;PRISMA_ENGINE_PROTOCOL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;graphql&quot;</span>.to_owned());
 }
 
 <span class="doccomment">/// Setup of everything as defined in the passed datamodel.

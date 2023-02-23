@@ -555,7 +555,9 @@
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::state::State;
+<a href="#558" id="558">558</a>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::PrismaContext;
+<span class="kw">use </span><span class="kw">crate</span>::features::Feature;
 <span class="kw">use crate</span>::{opt::PrismaOpt, PrismaResult};
 <span class="kw">use </span>hyper::service::{make_service_fn, service_fn};
 <span class="kw">use </span>hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
@@ -567,7 +569,7 @@
     schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
 };
 <span class="kw">use </span>query_engine_metrics::MetricFormat;
-<span class="kw">use </span>request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
+<span class="kw">use </span>request_handlers::{dmmf, GraphQLSchemaRenderer, RequestBody, RequestHandler};
 <span class="kw">use </span>serde_json::json;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::net::SocketAddr;
@@ -577,10 +579,10 @@
 <span class="kw">use </span>tracing_opentelemetry::OpenTelemetrySpanExt;
 
 <span class="doccomment">/// Starts up the graphql query engine server
-</span><span class="kw">pub async fn </span>listen(opts: <span class="kw-2">&amp;</span>PrismaOpt, state: State) -&gt; PrismaResult&lt;()&gt; {
+</span><span class="kw">pub async fn </span>listen(cx: Arc&lt;PrismaContext&gt;, opts: <span class="kw-2">&amp;</span>PrismaOpt) -&gt; PrismaResult&lt;()&gt; {
     <span class="kw">let </span>query_engine = make_service_fn(<span class="kw">move </span>|<span class="kw">_</span>| {
-        <span class="kw">let </span>state = state.clone();
-        <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(service_fn(<span class="kw">move </span>|req| routes(state.clone(), req))) }
+        <span class="kw">let </span>cx = cx.clone();
+        <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(service_fn(<span class="kw">move </span>|req| routes(cx.clone(), req))) }
     });
 
     <span class="kw">let </span>ip = opts.host.parse().expect(<span class="string">&quot;Host was not a valid IP address.&quot;</span>);
@@ -597,23 +599,23 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub async fn </span>routes(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+<span class="kw">pub async fn </span>routes(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>start = Instant::now();
 
     <span class="kw">if </span>req.method() == Method::POST &amp;&amp; req.uri().path().starts_with(<span class="string">&quot;/transaction&quot;</span>) {
-        <span class="kw">return </span>transaction_handler(state, req).<span class="kw">await</span>;
+        <span class="kw">return </span>transaction_handler(cx, req).<span class="kw">await</span>;
     }
 
     <span class="kw">if </span>[Method::POST, Method::GET].contains(req.method())
         &amp;&amp; req.uri().path().starts_with(<span class="string">&quot;/metrics&quot;</span>)
-        &amp;&amp; state.enable_metrics
+        &amp;&amp; cx.enabled_features.contains(Feature::Metrics)
     {
-        <span class="kw">return </span>metrics_handler(state, req).<span class="kw">await</span>;
+        <span class="kw">return </span>metrics_handler(cx, req).<span class="kw">await</span>;
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="kw">match </span>(req.method(), req.uri().path()) {
-        (<span class="kw-2">&amp;</span>Method::POST, <span class="string">&quot;/&quot;</span>) =&gt; graphql_handler(state, req).<span class="kw">await</span><span class="question-mark">?</span>,
-        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/&quot;</span>) <span class="kw">if </span>state.enable_playground =&gt; playground_handler(),
+        (<span class="kw-2">&amp;</span>Method::POST, <span class="string">&quot;/&quot;</span>) =&gt; request_handler(cx, req).<span class="kw">await</span><span class="question-mark">?</span>,
+        (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/&quot;</span>) <span class="kw">if </span>cx.enabled_features.contains(Feature::Playground) =&gt; playground_handler(),
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/status&quot;</span>) =&gt; Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
@@ -621,7 +623,7 @@
             .unwrap(),
 
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
-            <span class="kw">let </span>schema = GraphQLSchemaRenderer::render(state.cx.query_schema().clone());
+            <span class="kw">let </span>schema = GraphQLSchemaRenderer::render(cx.query_schema().clone());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -631,7 +633,7 @@
         }
 
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/dmmf&quot;</span>) =&gt; {
-            <span class="kw">let </span>schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
+            <span class="kw">let </span>schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -644,7 +646,7 @@
             <span class="kw">let </span>body = <span class="macro">json!</span>({
                 <span class="string">&quot;commit&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>),
                 <span class="string">&quot;version&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
-                <span class="string">&quot;primary_connector&quot;</span>: state.cx.primary_connector(),
+                <span class="string">&quot;primary_connector&quot;</span>: cx.primary_connector(),
             });
 
             Response::builder()
@@ -665,11 +667,11 @@
     <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="doccomment">/// The main query handler. This handles incoming GraphQL queries and passes it
+<span class="doccomment">/// The main query handler. This handles incoming requests and passes it
 /// to the query engine.
-</span><span class="kw">async fn </span>graphql_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+</span><span class="kw">async fn </span>request_handler(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="comment">// Check for debug headers if enabled.
-    </span><span class="kw">if </span>state.enable_debug_mode {
+    </span><span class="kw">if </span>cx.enabled_features.contains(Feature::DebugMode) {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(handle_debug_headers(<span class="kw-2">&amp;</span>req));
     }
 
@@ -677,11 +679,11 @@
     <span class="kw">let </span>capture_settings = capture_settings(headers);
 
     <span class="kw">let </span>tx_id = transaction_id(headers);
-    <span class="kw">let </span>cx = get_parent_span_context(headers);
+    <span class="kw">let </span>tracing_cx = get_parent_span_context(headers);
 
     <span class="kw">let </span>span = <span class="kw">if </span>tx_id.is_none() {
         <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine&quot;</span>, user_facing = <span class="bool-val">true</span>);
-        span.set_parent(cx);
+        span.set_parent(tracing_cx);
         span
     } <span class="kw">else </span>{
         Span::none()
@@ -727,14 +729,15 @@
         capturer.start_capturing().<span class="kw">await</span>;
     }
 
-    <span class="kw">let </span>work = <span class="kw">async move </span>{
-        <span class="kw">let </span>body_start = req.into_body();
-        <span class="comment">// block and buffer request until the request has completed
-        </span><span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>body_start = req.into_body();
+    <span class="comment">// block and buffer request until the request has completed
+    </span><span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
 
-        <span class="kw">match </span>serde_json::from_slice(full_body.as_ref()) {
+    <span class="kw">let </span>work = <span class="kw">async move </span>{
+        <span class="kw">match </span>serialized_body {
             <span class="prelude-val">Ok</span>(body) =&gt; {
-                <span class="kw">let </span>handler = GraphQlHandler::new(<span class="kw-2">&amp;*</span>state.cx.executor, state.cx.query_schema());
+                <span class="kw">let </span>handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                 <span class="kw">let </span><span class="kw-2">mut </span>result = handler.handle(body, tx_id, traceparent).instrument(span).<span class="kw">await</span>;
 
                 <span class="kw">if let </span>telemetry::capturing::Capturer::Enabled(capturer) = <span class="kw-2">&amp;</span>capture_config {
@@ -785,7 +788,7 @@
         .unwrap()
 }
 
-<span class="kw">async fn </span>metrics_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+<span class="kw">async fn </span>metrics_handler(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>format = <span class="kw">if let </span><span class="prelude-val">Some</span>(query) = req.uri().query() {
         <span class="kw">if </span>query.contains(<span class="string">&quot;format=json&quot;</span>) {
             MetricFormat::Json
@@ -806,7 +809,7 @@
     };
 
     <span class="kw">if </span>format == MetricFormat::Json {
-        <span class="kw">let </span>metrics = state.cx.metrics.to_json(global_labels);
+        <span class="kw">let </span>metrics = cx.metrics.to_json(global_labels);
 
         <span class="kw">let </span>res = Response::builder()
             .status(StatusCode::OK)
@@ -817,7 +820,7 @@
         <span class="kw">return </span><span class="prelude-val">Ok</span>(res);
     }
 
-    <span class="kw">let </span>metrics = state.cx.metrics.to_prometheus(global_labels);
+    <span class="kw">let </span>metrics = cx.metrics.to_prometheus(global_labels);
 
     <span class="kw">let </span>res = Response::builder()
         .status(StatusCode::OK)
@@ -832,20 +835,20 @@
 /// POST /transaction/start -&gt; start a transaction
 /// POST /transaction/{tx_id}/commit -&gt; commit a transaction
 /// POST /transaction/{tx_id}/rollback -&gt; rollback a transaction
-</span><span class="kw">async fn </span>transaction_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+</span><span class="kw">async fn </span>transaction_handler(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>path = req.uri().path().to_owned();
     <span class="kw">let </span>sections: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">&#39;/&#39;</span>).collect();
 
     <span class="kw">if </span>sections.len() == <span class="number">3 </span>&amp;&amp; sections[<span class="number">2</span>] == <span class="string">&quot;start&quot; </span>{
-        <span class="kw">return </span>transaction_start_handler(state, req).<span class="kw">await</span>;
+        <span class="kw">return </span>transaction_start_handler(cx, req).<span class="kw">await</span>;
     }
 
     <span class="kw">if </span>sections.len() == <span class="number">4 </span>&amp;&amp; sections[<span class="number">3</span>] == <span class="string">&quot;commit&quot; </span>{
-        <span class="kw">return </span>transaction_commit_handler(state, req, sections[<span class="number">2</span>].into()).<span class="kw">await</span>;
+        <span class="kw">return </span>transaction_commit_handler(cx, req, sections[<span class="number">2</span>].into()).<span class="kw">await</span>;
     }
 
     <span class="kw">if </span>sections.len() == <span class="number">4 </span>&amp;&amp; sections[<span class="number">3</span>] == <span class="string">&quot;rollback&quot; </span>{
-        <span class="kw">return </span>transaction_rollback_handler(state, req, sections[<span class="number">2</span>].into()).<span class="kw">await</span>;
+        <span class="kw">return </span>transaction_rollback_handler(cx, req, sections[<span class="number">2</span>].into()).<span class="kw">await</span>;
     }
 
     <span class="kw">let </span>res = Response::builder()
@@ -855,7 +858,7 @@
     <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="kw">async fn </span>transaction_start_handler(state: State, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+<span class="kw">async fn </span>transaction_start_handler(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>headers = req.headers().to_owned();
 
     <span class="kw">let </span>body_start = req.into_body();
@@ -901,10 +904,9 @@
         capturer.start_capturing().<span class="kw">await</span>;
     }
 
-    <span class="kw">let </span>result = state
-        .cx
+    <span class="kw">let </span>result = cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), tx_opts)
+        .start_tx(cx.query_schema().clone(), cx.engine_protocol(), tx_opts)
         .instrument(span)
         .<span class="kw">await</span>;
 
@@ -935,7 +937,7 @@
 }
 
 <span class="kw">async fn </span>transaction_commit_handler(
-    state: State,
+    cx: Arc&lt;PrismaContext&gt;,
     req: Request&lt;Body&gt;,
     tx_id: TxId,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
@@ -945,7 +947,7 @@
         capturer.start_capturing().<span class="kw">await</span>;
     }
 
-    <span class="kw">let </span>result = state.cx.executor.commit_tx(tx_id).<span class="kw">await</span>;
+    <span class="kw">let </span>result = cx.executor.commit_tx(tx_id).<span class="kw">await</span>;
 
     <span class="kw">let </span>telemetry = <span class="kw">if let </span>telemetry::capturing::Capturer::Enabled(capturer) = <span class="kw-2">&amp;</span>capture_config {
         capturer.fetch_captures().<span class="kw">await
@@ -960,7 +962,7 @@
 }
 
 <span class="kw">async fn </span>transaction_rollback_handler(
-    state: State,
+    cx: Arc&lt;PrismaContext&gt;,
     req: Request&lt;Body&gt;,
     tx_id: TxId,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
@@ -970,7 +972,7 @@
         capturer.start_capturing().<span class="kw">await</span>;
     }
 
-    <span class="kw">let </span>result = state.cx.executor.rollback_tx(tx_id).<span class="kw">await</span>;
+    <span class="kw">let </span>result = cx.executor.rollback_tx(tx_id).<span class="kw">await</span>;
 
     <span class="kw">let </span>telemetry = <span class="kw">if let </span>telemetry::capturing::Capturer::Enabled(capturer) = <span class="kw-2">&amp;</span>capture_config {
         capturer.fetch_captures().<span class="kw">await

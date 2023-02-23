@@ -264,6 +264,79 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
@@ -271,7 +344,7 @@
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-<span class="kw">use </span>std::{borrow::Borrow, fmt};
+<span class="kw">use </span>std::{borrow::Borrow, collections::HashMap, fmt};
 
 <span class="doccomment">/// The query schema.
 /// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
@@ -299,6 +372,12 @@
 
     <span class="doccomment">/// Information about the connector this schema was build for.
     </span><span class="kw">pub </span>context: ConnectorContext,
+
+    <span class="comment">// Indexes query fields by their own query info for easier access.
+    </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
+
+    <span class="comment">// Indexes mutation fields by their own query info for easier access.
+    </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
 
     <span class="doccomment">/// Internal. Stores all strong Arc refs to the input object types.
     </span>_input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
@@ -350,9 +429,26 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>features = internal_data_model.schema.configuration.preview_features();
         <span class="kw">let </span>relation_mode = internal_data_model.schema.relation_mode();
+        <span class="kw">let </span><span class="kw-2">mut </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
+
+        <span class="kw">for </span>field <span class="kw">in </span>query.as_object_type().unwrap().get_fields() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
+                query_map.insert(query_info.to_owned(), field.clone());
+            }
+        }
+
+        <span class="kw">for </span>field <span class="kw">in </span>mutation.as_object_type().unwrap().get_fields() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
+                mutation_map.insert(query_info.to_owned(), field.clone());
+            }
+        }
+
         QuerySchema {
             query,
             mutation,
+            query_map,
+            mutation_map,
             _input_object_types,
             _output_object_types,
             _enum_types,
@@ -375,6 +471,28 @@
     {
         <span class="kw">let </span>name = name.into();
         <span class="self">self</span>.query().get_fields().iter().find(|f| f.name == name).cloned()
+    }
+
+    <span class="kw">pub fn </span>find_query_field_by_model_and_action(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        tag: QueryTag,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputFieldRef&gt; {
+        <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
+        <span class="kw">let </span>query_info = QueryInfo { model, tag };
+
+        <span class="self">self</span>.query_map.get(<span class="kw-2">&amp;</span>query_info)
+    }
+
+    <span class="kw">pub fn </span>find_mutation_field_by_model_and_action(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        tag: QueryTag,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputFieldRef&gt; {
+        <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
+        <span class="kw">let </span>query_info = QueryInfo { model, tag };
+
+        <span class="self">self</span>.mutation_map.get(<span class="kw-2">&amp;</span>query_info)
     }
 
     <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectTypeStrongRef {
@@ -401,14 +519,14 @@
 }
 
 <span class="doccomment">/// Designates a specific top-level operation on a corresponding model.
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 </span><span class="kw">pub struct </span>QueryInfo {
     <span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
     <span class="kw">pub </span>tag: QueryTag,
 }
 
 <span class="doccomment">/// A `QueryTag` designates a top level query possible with Prisma.
-</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 </span><span class="kw">pub enum </span>QueryTag {
     FindUnique,
     FindUniqueOrThrow,
@@ -424,7 +542,8 @@
     UpsertOne,
     Aggregate,
     GroupBy,
-    ExecuteRaw,
+    <span class="comment">// Raw operations
+    </span>ExecuteRaw,
     QueryRaw,
     RunCommandRaw,
     FindRaw,
@@ -456,6 +575,33 @@
         };
 
         <span class="macro">write!</span>(f, <span class="string">&quot;{s}&quot;</span>)
+    }
+}
+
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>QueryTag {
+    <span class="kw">fn </span>from(value: String) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value.as_str() {
+            <span class="string">&quot;findUnique&quot; </span>=&gt; <span class="self">Self</span>::FindUnique,
+            <span class="string">&quot;findUniqueOrThrow&quot; </span>=&gt; <span class="self">Self</span>::FindUniqueOrThrow,
+            <span class="string">&quot;findFirst&quot; </span>=&gt; <span class="self">Self</span>::FindFirst,
+            <span class="string">&quot;findFirstOrThrow&quot; </span>=&gt; <span class="self">Self</span>::FindFirstOrThrow,
+            <span class="string">&quot;findMany&quot; </span>=&gt; <span class="self">Self</span>::FindMany,
+            <span class="string">&quot;createOne&quot; </span>=&gt; <span class="self">Self</span>::CreateOne,
+            <span class="string">&quot;createMany&quot; </span>=&gt; <span class="self">Self</span>::CreateMany,
+            <span class="string">&quot;updateOne&quot; </span>=&gt; <span class="self">Self</span>::UpdateOne,
+            <span class="string">&quot;updateMany&quot; </span>=&gt; <span class="self">Self</span>::UpdateMany,
+            <span class="string">&quot;deleteOne&quot; </span>=&gt; <span class="self">Self</span>::DeleteOne,
+            <span class="string">&quot;deleteMany&quot; </span>=&gt; <span class="self">Self</span>::DeleteMany,
+            <span class="string">&quot;upsertOne&quot; </span>=&gt; <span class="self">Self</span>::UpsertOne,
+            <span class="string">&quot;aggregate&quot; </span>=&gt; <span class="self">Self</span>::Aggregate,
+            <span class="string">&quot;groupBy&quot; </span>=&gt; <span class="self">Self</span>::GroupBy,
+            <span class="string">&quot;executeRaw&quot; </span>=&gt; <span class="self">Self</span>::ExecuteRaw,
+            <span class="string">&quot;queryRaw&quot; </span>=&gt; <span class="self">Self</span>::QueryRaw,
+            <span class="string">&quot;findRaw&quot; </span>=&gt; <span class="self">Self</span>::FindRaw,
+            <span class="string">&quot;aggregateRaw&quot; </span>=&gt; <span class="self">Self</span>::AggregateRaw,
+            <span class="string">&quot;runCommandRaw&quot; </span>=&gt; <span class="self">Self</span>::RunCommandRaw,
+            v =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown query tag: {v}&quot;</span>),
+        }
     }
 }
 

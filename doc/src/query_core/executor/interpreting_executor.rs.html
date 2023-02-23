@@ -190,10 +190,19 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
+<span class="kw">use </span><span class="kw">super</span>::request_context;
 <span class="kw">use crate</span>::{
-    BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData, TransactionActorManager,
-    TransactionError, TransactionManager, TransactionOptions, TxId,
+    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData,
+    TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
 <span class="kw">use </span>async_trait::async_trait;
@@ -239,12 +248,13 @@
         operation: Operation,
         query_schema: QuerySchemaRef,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="comment">// If a Tx id is provided, execute on that one. Else execute normally as a single operation.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(tx_id) = tx_id {
             <span class="self">self</span>.itx_manager.execute(<span class="kw-2">&amp;</span>tx_id, operation, trace_id).<span class="kw">await
         </span>} <span class="kw">else </span>{
-            <span class="kw">super</span>::with_request_now(<span class="kw">async move </span>{
+            request_context::with_request_context(engine_protocol, <span class="kw">async move </span>{
                 execute_single_self_contained(
                     <span class="kw-2">&amp;</span><span class="self">self</span>.connector,
                     query_schema,
@@ -277,6 +287,7 @@
         transaction: <span class="prelude-ty">Option</span>&lt;BatchDocumentTransaction&gt;,
         query_schema: QuerySchemaRef,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">crate</span>::Result&lt;ResponseData&gt;&gt;&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(tx_id) = tx_id {
             <span class="kw">let </span>batch_isolation_level = transaction.and_then(|t| t.isolation_level());
@@ -295,12 +306,10 @@
             <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">self</span>.connector.get_connection().instrument(conn_span).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(transaction.isolation_level()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let </span>results = <span class="kw">super</span>::with_request_now(execute_many_operations(
-                query_schema,
-                tx.as_connection_like(),
-                <span class="kw-2">&amp;</span>operations,
-                trace_id,
-            ))
+            <span class="kw">let </span>results = request_context::with_request_context(
+                engine_protocol,
+                execute_many_operations(query_schema, tx.as_connection_like(), <span class="kw-2">&amp;</span>operations, trace_id),
+            )
             .<span class="kw">await</span>;
 
             <span class="kw">if </span>results.is_err() {
@@ -311,13 +320,14 @@
 
             results
         } <span class="kw">else </span>{
-            <span class="kw">super</span>::with_request_now(<span class="kw">async move </span>{
+            request_context::with_request_context(engine_protocol, <span class="kw">async move </span>{
                 execute_many_self_contained(
                     <span class="kw-2">&amp;</span><span class="self">self</span>.connector,
                     query_schema,
                     <span class="kw-2">&amp;</span>operations,
                     trace_id,
                     <span class="self">self</span>.force_transactions,
+                    engine_protocol,
                 )
                 .<span class="kw">await
             </span>})
@@ -335,8 +345,13 @@
 <span class="kw">where
     </span>C: Connector + Send + Sync,
 {
-    <span class="kw">async fn </span>start_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: QuerySchemaRef, tx_opts: TransactionOptions) -&gt; <span class="kw">crate</span>::Result&lt;TxId&gt; {
-        <span class="kw">super</span>::with_request_now(<span class="kw">async move </span>{
+    <span class="kw">async fn </span>start_tx(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        query_schema: QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+        tx_opts: TransactionOptions,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;TxId&gt; {
+        <span class="kw">super</span>::with_request_context(engine_protocol, <span class="kw">async move </span>{
             <span class="kw">let </span>isolation_level = tx_opts.isolation_level;
             <span class="kw">let </span>valid_for_millis = tx_opts.valid_for_millis;
             <span class="kw">let </span>id = tx_opts.new_tx_id.unwrap_or_default();
@@ -363,6 +378,7 @@
                     id.clone(),
                     c_tx,
                     Duration::from_millis(valid_for_millis),
+                    engine_protocol,
                 )
                 .<span class="kw">await</span>;
 

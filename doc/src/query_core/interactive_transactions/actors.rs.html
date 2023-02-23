@@ -374,10 +374,11 @@
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 <span class="kw">use crate</span>::{
-    execute_many_operations, execute_single_operation, telemetry::helpers::set_span_link_from_traceparent, ClosedTx,
-    OpenTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
+    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, OpenTx, Operation, ResponseData, TxId,
 };
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
@@ -626,6 +627,7 @@
     timeout: Duration,
     channel_size: usize,
     send_done: Sender&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
+    engine_protocol: EngineProtocol,
 ) -&gt; ITXClient {
     <span class="kw">let </span>(tx_to_server, rx_from_client) = channel::&lt;TxOpRequest&gt;(channel_size);
 
@@ -648,7 +650,7 @@
     span.record(<span class="string">&quot;itx_id&quot;</span>, <span class="kw-2">&amp;</span>tx_id_str.as_str());
 
     tokio::task::spawn(
-        <span class="kw">crate</span>::executor::with_request_now(<span class="kw">async move </span>{
+        <span class="kw">crate</span>::executor::with_request_context(engine_protocol, <span class="kw">async move </span>{
             <span class="kw">let </span>start_time = Instant::now();
             <span class="kw">let </span>sleep = time::sleep(timeout);
             <span class="macro">tokio::pin!</span>(sleep);

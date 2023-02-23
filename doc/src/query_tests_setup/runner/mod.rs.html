@@ -243,17 +243,63 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>binary;
 <span class="kw">mod </span>direct;
+<span class="kw">mod </span>json_adapter;
 <span class="kw">mod </span>node_api;
 
 <span class="kw">pub use </span>binary::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>direct::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>node_api::<span class="kw-2">*</span>;
-<span class="kw">use </span>query_core::{schema::QuerySchemaRef, TxId};
+
+<span class="kw">use </span>query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 
-<span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
+<span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult, ENGINE_PROTOCOL};
 <span class="kw">use </span>colored::<span class="kw-2">*</span>;
 
 <span class="kw">pub type </span>TxResult = <span class="prelude-ty">Result</span>&lt;(), user_facing_errors::Error&gt;;
@@ -263,8 +309,12 @@
     <span class="doccomment">/// Initializes the runner.
     </span><span class="kw">async fn </span>load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Queries the engine.
-    </span><span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, query: String) -&gt; TestResult&lt;QueryResult&gt;;
+    <span class="doccomment">/// Queries the engine using GraphQL.
+    /// If &#39;protocol&#39; is set to JSON, then the GQL query will be translated to JSON before being sent to the QueryEngine.
+    </span><span class="kw">async fn </span>query_graphql(<span class="kw-2">&amp;</span><span class="self">self</span>, query: String, protocol: <span class="kw-2">&amp;</span>EngineProtocol) -&gt; TestResult&lt;QueryResult&gt;;
+
+    <span class="doccomment">/// Queries the engine using JSON.
+    </span><span class="kw">async fn </span>query_json(<span class="kw-2">&amp;</span><span class="self">self</span>, query: String) -&gt; TestResult&lt;QueryResult&gt;;
 
     <span class="doccomment">/// Queries the engine with a batch.
     </span><span class="kw">async fn </span>batch(
@@ -272,6 +322,7 @@
         queries: Vec&lt;String&gt;,
         transaction: bool,
         isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; TestResult&lt;QueryResult&gt;;
 
     <span class="doccomment">/// Execute a raw query on the underlying connected database.
@@ -283,6 +334,7 @@
         max_acquisition_millis: u64,
         valid_for_millis: u64,
         isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; TestResult&lt;TxId&gt;;
 
     <span class="doccomment">/// commit transaction
@@ -320,6 +372,7 @@
 <span class="kw">pub struct </span>Runner {
     log_capture: TestLogCapture,
     inner: RunnerType,
+    protocol: EngineProtocol,
 }
 
 <span class="kw">impl </span>Runner {
@@ -336,8 +389,13 @@
             <span class="string">&quot;binary&quot; </span>=&gt; <span class="self">Self</span>::binary(datamodel, connector_tag, metrics).<span class="kw">await</span>,
             unknown =&gt; <span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown test runner &#39;{unknown}&#39;&quot;</span>))),
         }<span class="question-mark">?</span>;
+        <span class="kw">let </span>protocol = EngineProtocol::from(<span class="kw-2">&amp;</span>ENGINE_PROTOCOL.to_string());
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ log_capture, inner })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            log_capture,
+            inner,
+            protocol,
+        })
     }
 
     <span class="kw">pub async fn </span>query&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, gql_query: T) -&gt; TestResult&lt;QueryResult&gt;
@@ -345,12 +403,36 @@
         </span>T: Into&lt;String&gt;,
     {
         <span class="kw">let </span>gql_query = gql_query.into();
+
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, gql_query.clone().green());
 
         <span class="kw">let </span>response = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
-            RunnerType::Direct(r) =&gt; r.query(gql_query).<span class="kw">await</span>,
+            RunnerType::Direct(r) =&gt; r.query_graphql(gql_query, <span class="self">self</span>.protocol()).<span class="kw">await</span>,
             RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            RunnerType::Binary(r) =&gt; r.query(gql_query).<span class="kw">await</span>,
+            RunnerType::Binary(r) =&gt; r.query_graphql(gql_query, <span class="self">self</span>.protocol()).<span class="kw">await</span>,
+        }<span class="question-mark">?</span>;
+
+        <span class="kw">if </span>response.failed() {
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, response.to_string().red());
+        } <span class="kw">else </span>{
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, response.to_string().green());
+        }
+
+        <span class="prelude-val">Ok</span>(response)
+    }
+
+    <span class="kw">pub async fn </span>query_json&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, json_query: T) -&gt; TestResult&lt;QueryResult&gt;
+    <span class="kw">where
+        </span>T: Into&lt;String&gt;,
+    {
+        <span class="kw">let </span>json_query = json_query.into();
+
+        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, json_query.clone().green());
+
+        <span class="kw">let </span>response = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.query_json(json_query).<span class="kw">await</span>,
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.query_json(json_query).<span class="kw">await</span>,
         }<span class="question-mark">?</span>;
 
         <span class="kw">if </span>response.failed() {
@@ -384,11 +466,11 @@
     ) -&gt; TestResult&lt;TxId&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
             RunnerType::Direct(r) =&gt; {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, <span class="self">self</span>.protocol)
                     .<span class="kw">await
             </span>}
             RunnerType::Binary(r) =&gt; {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level, <span class="self">self</span>.protocol)
                     .<span class="kw">await
             </span>}
             RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
@@ -418,9 +500,9 @@
         isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; TestResult&lt;QueryResult&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
-            RunnerType::Direct(r) =&gt; r.batch(queries, transaction, isolation_level).<span class="kw">await</span>,
+            RunnerType::Direct(r) =&gt; r.batch(queries, transaction, isolation_level, <span class="self">self</span>.protocol).<span class="kw">await</span>,
             RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            RunnerType::Binary(r) =&gt; r.batch(queries, transaction, isolation_level).<span class="kw">await</span>,
+            RunnerType::Binary(r) =&gt; r.batch(queries, transaction, isolation_level, <span class="self">self</span>.protocol).<span class="kw">await</span>,
         }
     }
 
@@ -486,6 +568,10 @@
             RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
             RunnerType::Binary(r) =&gt; r.query_schema(),
         }
+    }
+
+    <span class="kw">pub fn </span>protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>EngineProtocol {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.protocol
     }
 }
 </code></pre></div>

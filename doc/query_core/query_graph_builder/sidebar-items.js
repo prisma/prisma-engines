@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["QueryGraphBuilder",""]],"type":[["QueryGraphBuilderResult","Query graph builder sub-result type."]]};

@@ -238,7 +238,39 @@
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
 <a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{error::PrismaError, PrismaResult};
+<span class="kw">use </span>psl::{PreviewFeature, PreviewFeatures};
+<span class="kw">use </span>query_core::protocol::EngineProtocol;
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::{env, ffi::OsStr, fs::File, io::Read};
 <span class="kw">use </span>structopt::StructOpt;
@@ -353,6 +385,10 @@
     </span><span class="attr">#[structopt(long, default_value)]
     </span><span class="kw">pub </span>open_telemetry_endpoint: String,
 
+    <span class="doccomment">/// The protocol the Query Engine will used. Affects mostly the request and response format.
+    </span><span class="attr">#[structopt(long, env = <span class="string">&quot;PRISMA_ENGINE_PROTOCOL&quot;</span>)]
+    </span><span class="kw">pub </span>engine_protocol: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
     <span class="attr">#[structopt(subcommand)]
     </span><span class="kw">pub </span>subcommand: <span class="prelude-ty">Option</span>&lt;Subcommand&gt;,
 }
@@ -452,6 +488,30 @@
     // Ok to unwrap here as this is only used in tests
     </span><span class="kw">pub fn </span>from_list(list: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; <span class="self">Self </span>{
         PrismaOpt::from_iter_safe(list).unwrap()
+    }
+
+    <span class="doccomment">/// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
+    /// the [PreviewFeature::JsonProtocol] flag is set to &quot;json&quot;. Otherwise it will be
+    /// [EngineProtocol::Graphql]
+    ///
+    /// This protocol will determine how the body of an HTTP request made by the client is processed.
+    /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
+    /// of converting the respective representations into a protocol-agnostic(*)
+    /// [query_core::QueryDocument]
+    ///
+    /// (*) FIXME: at the time of writing, the heuristics to validate the [query_core::QueryDocument]
+    /// and  transform it into a [query_core::ParsedObject] require to know which protocol was used
+    /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
+    /// to understand which types certain values are. See [query_core::QueryDocumentParser]
+    ///
+    </span><span class="kw">pub fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>, preview_features: PreviewFeatures) -&gt; EngineProtocol {
+        <span class="self">self</span>.engine_protocol
+            .as_ref()
+            .map(EngineProtocol::from)
+            .unwrap_or_else(|| <span class="kw">match </span>preview_features.contains(PreviewFeature::JsonProtocol) {
+                <span class="bool-val">true </span>=&gt; EngineProtocol::Json,
+                <span class="bool-val">false </span>=&gt; EngineProtocol::Graphql,
+            })
     }
 }
 

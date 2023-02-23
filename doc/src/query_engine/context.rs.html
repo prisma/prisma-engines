@@ -99,10 +99,45 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{PrismaError, PrismaResult};
-<span class="kw">use </span>query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::features::{EnabledFeatures, Feature};
+<span class="kw">use crate</span>::{logger::Logger, opt::PrismaOpt};
+<span class="kw">use crate</span>::{PrismaError, PrismaResult};
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>query_core::{executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+<span class="kw">use </span>query_engine_metrics::setup <span class="kw">as </span>metric_setup;
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>std::{env, fmt, sync::Arc};
+<span class="kw">use </span>tracing::Instrument;
 
 <span class="doccomment">/// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -113,6 +148,10 @@
     </span><span class="kw">pub </span>metrics: MetricRegistry,
     <span class="doccomment">/// Central query executor.
     </span><span class="kw">pub </span>executor: Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
+    <span class="doccomment">/// The engine protocol in use
+    </span><span class="kw">pub </span>engine_protocol: EngineProtocol,
+    <span class="doccomment">/// Enabled features
+    </span><span class="kw">pub </span>enabled_features: EnabledFeatures,
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>PrismaContext {
@@ -121,35 +160,13 @@
     }
 }
 
-<span class="kw">pub struct </span>ContextBuilder {
-    enable_raw_queries: bool,
-    schema: psl::ValidatedSchema,
-    metrics: <span class="prelude-ty">Option</span>&lt;MetricRegistry&gt;,
-}
-
-<span class="kw">impl </span>ContextBuilder {
-    <span class="kw">pub fn </span>enable_raw_queries(<span class="kw-2">mut </span><span class="self">self</span>, val: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.enable_raw_queries = val;
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub fn </span>set_metrics(<span class="kw-2">mut </span><span class="self">self</span>, metrics: MetricRegistry) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.metrics = <span class="prelude-val">Some</span>(metrics);
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub async fn </span>build(<span class="self">self</span>) -&gt; PrismaResult&lt;PrismaContext&gt; {
-        PrismaContext::new(<span class="self">self</span>.schema, <span class="self">self</span>.enable_raw_queries, <span class="self">self</span>.metrics.unwrap_or_default()).<span class="kw">await
-    </span>}
-}
-
 <span class="kw">impl </span>PrismaContext {
-    <span class="doccomment">/// Initializes a new Prisma context.
-    </span><span class="kw">async fn </span>new(
+    <span class="kw">pub async fn </span>new(
         schema: psl::ValidatedSchema,
-        enable_raw_queries: bool,
-        metrics: MetricRegistry,
-    ) -&gt; PrismaResult&lt;<span class="self">Self</span>&gt; {
+        protocol: EngineProtocol,
+        enabled_features: EnabledFeatures,
+        metrics: <span class="prelude-ty">Option</span>&lt;MetricRegistry&gt;,
+    ) -&gt; PrismaResult&lt;PrismaContext&gt; {
         <span class="kw">let </span>config = <span class="kw-2">&amp;</span>schema.configuration;
         <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).
         </span><span class="kw">let </span>data_source = config
@@ -166,12 +183,17 @@
         </span><span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
 
         <span class="comment">// Construct query schema
-        </span><span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, enable_raw_queries));
+        </span><span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
+            internal_data_model,
+            enabled_features.contains(Feature::RawQueries),
+        ));
 
         <span class="kw">let </span>context = <span class="self">Self </span>{
             query_schema,
             executor,
-            metrics,
+            metrics: metrics.unwrap_or_default(),
+            engine_protocol: protocol,
+            enabled_features,
         };
 
         context.verify_connection().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -179,26 +201,64 @@
         <span class="prelude-val">Ok</span>(context)
     }
 
-    <span class="kw">async fn </span>verify_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PrismaResult&lt;()&gt; {
-        <span class="self">self</span>.executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">pub fn </span>builder(schema: psl::ValidatedSchema) -&gt; ContextBuilder {
-        ContextBuilder {
-            enable_raw_queries: <span class="bool-val">false</span>,
-            schema,
-            metrics: <span class="prelude-val">None</span>,
-        }
-    }
-
     <span class="kw">pub fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
         <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema
+    }
+
+    <span class="kw">pub fn </span>executor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>) {
+        <span class="self">self</span>.executor.as_ref()
     }
 
     <span class="kw">pub fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="self">self</span>.executor.primary_connector().name()
     }
+
+    <span class="kw">pub fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {
+        <span class="self">self</span>.engine_protocol
+    }
+
+    <span class="kw">async fn </span>verify_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PrismaResult&lt;()&gt; {
+        <span class="self">self</span>.executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">pub async fn </span>setup(
+    opts: <span class="kw-2">&amp;</span>PrismaOpt,
+    install_logger: bool,
+    metrics: <span class="prelude-ty">Option</span>&lt;MetricRegistry&gt;,
+) -&gt; PrismaResult&lt;Arc&lt;PrismaContext&gt;&gt; {
+    <span class="kw">let </span>metrics = metrics.unwrap_or_default();
+
+    <span class="kw">if </span>install_logger {
+        Logger::new(<span class="string">&quot;prisma-engine-http&quot;</span>, <span class="prelude-val">Some</span>(metrics.clone()), opts)
+            .install()
+            .unwrap();
+    }
+
+    <span class="kw">if </span>opts.enable_metrics || opts.dataproxy_metric_override {
+        metric_setup();
+    }
+
+    <span class="kw">let </span>datamodel = opts.schema(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>datamodel.configuration;
+    <span class="kw">let </span>protocol = opts.engine_protocol(config.preview_features());
+    config.validate_that_one_datasource_is_provided()<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:connect&quot;</span>);
+
+    <span class="kw">let </span><span class="kw-2">mut </span>features = EnabledFeatures::from(opts);
+
+    <span class="kw">if </span>config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override {
+        features |= Feature::Metrics
+    }
+
+    <span class="kw">let </span>cx = PrismaContext::new(datamodel, protocol, features, <span class="prelude-val">Some</span>(metrics))
+        .instrument(span)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let </span>state = Arc::new(cx);
+    <span class="prelude-val">Ok</span>(state)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="query_engine" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

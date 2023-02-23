@@ -200,6 +200,21 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -288,6 +303,17 @@
 
     <span class="kw">pub fn </span>is_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, OutputType::Object(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>is_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, OutputType::Scalar(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub fn </span>is_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            OutputType::List(typ) =&gt; typ.is_scalar(),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        }
     }
 }
 
@@ -398,8 +424,12 @@
         <span class="macro">matches!</span>(<span class="self">self</span>.query_tag(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>QueryTag::FindUnique))
     }
 
-    <span class="kw">fn </span>query_tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryTag&gt; {
-        <span class="self">self</span>.query_info.as_ref().map(|info| <span class="kw-2">&amp;</span>info.tag)
+    <span class="kw">pub fn </span>query_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryInfo&gt; {
+        <span class="self">self</span>.query_info.as_ref()
+    }
+
+    <span class="kw">pub fn </span>query_tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryTag&gt; {
+        <span class="self">self</span>.query_info().map(|info| <span class="kw-2">&amp;</span>info.tag)
     }
 }
 </code></pre></div>

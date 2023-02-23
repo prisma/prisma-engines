@@ -133,19 +133,31 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     context::PrismaContext,
+    features::{EnabledFeatures, Feature},
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-<span class="kw">use </span>query_core::{schema::QuerySchemaRef, schema_builder};
-<span class="kw">use </span>request_handlers::{dmmf, GraphQlHandler};
+<span class="kw">use </span>query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder};
+<span class="kw">use </span>request_handlers::{dmmf, RequestBody, RequestHandler};
 <span class="kw">use </span>std::{env, sync::Arc};
 
 <span class="kw">pub struct </span>ExecuteRequest {
     query: String,
     schema: psl::ValidatedSchema,
     enable_raw_queries: bool,
+    engine_protocol: EngineProtocol,
 }
 
 <span class="kw">pub struct </span>DmmfRequest {
@@ -188,11 +200,17 @@
                     config: opts.configuration(input.ignore_env_var_errors)<span class="question-mark">?</span>,
                     ignore_env_var_errors: input.ignore_env_var_errors,
                 }))),
-                CliOpt::ExecuteRequest(input) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(CliCommand::ExecuteRequest(ExecuteRequest {
-                    query: input.query.clone(),
-                    enable_raw_queries: opts.enable_raw_queries,
-                    schema: opts.schema(<span class="bool-val">false</span>)<span class="question-mark">?</span>,
-                }))),
+                CliOpt::ExecuteRequest(input) =&gt; {
+                    <span class="kw">let </span>schema = opts.schema(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>features = schema.configuration.preview_features();
+
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(CliCommand::ExecuteRequest(ExecuteRequest {
+                        query: input.query.clone(),
+                        enable_raw_queries: opts.enable_raw_queries,
+                        schema,
+                        engine_protocol: opts.engine_protocol(features),
+                    })))
+                }
                 CliOpt::DebugPanic(input) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
                 }))),
@@ -249,17 +267,19 @@
             .configuration
             .validate_that_one_datasource_is_provided()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>cx = PrismaContext::builder(request.schema)
-            .enable_raw_queries(request.enable_raw_queries)
-            .build()
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>features = EnabledFeatures::default();
+        <span class="kw">if </span>request.enable_raw_queries {
+            features |= Feature::RawQueries
+        }
+        <span class="kw">let </span>cx = PrismaContext::new(request.schema, request.engine_protocol, features, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>cx = Arc::new(cx);
 
-        <span class="kw">let </span>handler = GraphQlHandler::new(<span class="kw-2">&amp;*</span>cx.executor, cx.query_schema());
-        <span class="kw">let </span>res = handler
-            .handle(serde_json::from_str(<span class="kw-2">&amp;</span>decoded_request)<span class="question-mark">?</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-            .<span class="kw">await</span>;
+        <span class="kw">let </span>handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+
+        <span class="kw">let </span>body = RequestBody::try_from_str(<span class="kw-2">&amp;</span>decoded_request, cx.engine_protocol())<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>res = handler.handle(body, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
         <span class="kw">let </span>res = serde_json::to_string(<span class="kw-2">&amp;</span>res).unwrap();
 
         <span class="kw">let </span>encoded_response = base64::encode(res);

@@ -276,7 +276,7 @@
             .collect()
     }
 
-    <span class="kw">fn </span>composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeFieldRef&gt; {
+    <span class="kw">pub fn </span>composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeFieldRef&gt; {
         <span class="kw">let </span>model = <span class="self">self</span>.model();
         <span class="kw">let </span>internal_data_model = model.internal_data_model();
         internal_data_model

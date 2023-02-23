@@ -133,33 +133,6 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::declare_interior_mutable_const)]
 
 </span><span class="doccomment">//! What the executor module DOES:
@@ -173,13 +146,16 @@
 <span class="kw">mod </span>interpreting_executor;
 <span class="kw">mod </span>loader;
 <span class="kw">mod </span>pipeline;
+<span class="kw">mod </span>request_context;
 
 <span class="kw">pub use </span>execute_operation::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>loader::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>request_context::<span class="kw-2">*</span>;
 <span class="kw">use </span>serde::Deserialize;
 
 <span class="kw">use crate</span>::{
-    query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, BatchDocumentTransaction, TxId,
+    protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
+    BatchDocumentTransaction, TxId,
 };
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::Connector;
@@ -196,6 +172,7 @@
         operation: Operation,
         query_schema: QuerySchemaRef,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt;;
 
     <span class="doccomment">/// Executes a collection of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
@@ -211,6 +188,7 @@
         transaction: <span class="prelude-ty">Option</span>&lt;BatchDocumentTransaction&gt;,
         query_schema: QuerySchemaRef,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        engine_protocol: EngineProtocol,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">crate</span>::Result&lt;ResponseData&gt;&gt;&gt;;
 
     <span class="kw">fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Connector + Send + Sync);
@@ -260,7 +238,12 @@
     /// Expected to throw an error if no transaction could be opened for `opts.max_acquisition_millis` milliseconds.
     /// The new transaction must only live for `opts.valid_for_millis` milliseconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    </span><span class="kw">async fn </span>start_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: QuerySchemaRef, opts: TransactionOptions) -&gt; <span class="kw">crate</span>::Result&lt;TxId&gt;;
+    </span><span class="kw">async fn </span>start_tx(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        query_schema: QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+        opts: TransactionOptions,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;TxId&gt;;
 
     <span class="doccomment">/// Commits a transaction.
     </span><span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
@@ -284,43 +267,6 @@
 
 </span><span class="kw">pub fn </span>get_current_dispatcher() -&gt; Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
-}
-
-<span class="macro">tokio::task_local! </span>{
-    <span class="kw">static </span>REQUEST_NOW: prisma_value::PrismaValue;
-}
-
-<span class="doccomment">/// A timestamp that should be the `NOW()` value for the whole duration of a request. So all
-/// `@default(now())` and `@updatedAt` should use it.
-///
-/// That panics if REQUEST_NOW has not been set with with_request_now().
-///
-/// If we had a query context we carry for all the lifetime of the query, it would belong there.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_request_now() -&gt; prisma_value::PrismaValue {
-    REQUEST_NOW.with(|rn| rn.clone())
-}
-
-<span class="doccomment">/// Execute a future with the current &quot;now&quot; timestamp that can be retrieved through
-/// `get_request_now()`, initializing it if necessary.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>with_request_now&lt;F, R&gt;(fut: F) -&gt; R
-<span class="kw">where
-    </span>F: std::future::Future&lt;Output = R&gt;,
-{
-    <span class="kw">use </span>chrono::{Duration, DurationRound};
-
-    <span class="kw">let </span>is_set = REQUEST_NOW.try_with(|<span class="kw">_</span>| <span class="kw">async </span>{}).is_ok();
-
-    <span class="kw">if </span>is_set {
-        fut.<span class="kw">await
-    </span>} <span class="kw">else </span>{
-        <span class="kw">let </span>timestamp_precision = Duration::milliseconds(<span class="number">1</span>);
-        <span class="comment">// We round because in create operations, we select after creation and we will fail to
-        // select back what we inserted if the timestamp we have is higher precision than the one
-        // the database persisted.
-        </span><span class="kw">let </span>dt = chrono::Utc::now().duration_round(timestamp_precision).unwrap();
-        <span class="kw">let </span>now = prisma_value::PrismaValue::DateTime(dt.into());
-        REQUEST_NOW.scope(now, fut).<span class="kw">await
-    </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

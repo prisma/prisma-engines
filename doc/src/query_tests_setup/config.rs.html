@@ -254,7 +254,7 @@ Use the Makefile.
     }
 
     <span class="kw">fn </span>from_env() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>runner = std::env::var(<span class="string">&quot;TEST_RUNNER&quot;</span>).ok();
+        <span class="kw">let </span>runner = <span class="prelude-val">Some</span>(std::env::var(<span class="string">&quot;TEST_RUNNER&quot;</span>).unwrap_or(<span class="string">&quot;direct&quot;</span>.to_string()));
         <span class="kw">let </span>connector = std::env::var(<span class="string">&quot;TEST_CONNECTOR&quot;</span>).ok();
         <span class="kw">let </span>connector_version = std::env::var(<span class="string">&quot;TEST_CONNECTOR_VERSION&quot;</span>).ok();
 
