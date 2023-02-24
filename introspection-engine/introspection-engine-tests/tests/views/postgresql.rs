@@ -86,7 +86,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
         [
           {
             "code": 24,
-            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             "affected": [
               {
                 "view": "Schwuser"
@@ -708,7 +708,7 @@ async fn unsupported_types_trigger_a_warning(api: &TestApi) -> TestResult {
         [
           {
             "code": 24,
-            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             "affected": [
               {
                 "view": "A"
@@ -971,7 +971,7 @@ async fn invalid_field_names_trigger_warnings(api: &TestApi) -> TestResult {
         [
           {
             "code": 24,
-            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             "affected": [
               {
                 "view": "A"
@@ -1045,7 +1045,7 @@ async fn dupes_are_renamed(api: &TestApi) -> TestResult {
         [
           {
             "code": 24,
-            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             "affected": [
               {
                 "view": "public_A"

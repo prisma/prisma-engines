@@ -437,7 +437,7 @@ pub(super) fn warning_enriched_with_map_on_view(affected: &[View]) -> Warning {
 pub(super) fn warning_views_without_identifier(affected: &[View]) -> Warning {
     Warning {
         code: 24,
-        message: "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.".into(),
+        message: "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers".into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }
