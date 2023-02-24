@@ -5,11 +5,14 @@ on:
       - main
   pull_request:
     paths-ignore:
+      # Generic
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
+      # Specific
+      - 'query-engine/**'
 
 jobs:
   test-mongodb-introspection-and-migration-connector:
