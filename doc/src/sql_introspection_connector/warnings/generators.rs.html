@@ -918,7 +918,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>warning_views_without_identifier(affected: <span class="kw-2">&amp;</span>[View]) -&gt; Warning {
     Warning {
         code: <span class="number">24</span>,
-        message: <span class="string">&quot;The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.&quot;</span>.into(),
+        message: <span class="string">&quot;The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers&quot;</span>.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
 }
