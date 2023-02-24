@@ -24,7 +24,7 @@ pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputFi
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::CreateOne,
         }),
     )

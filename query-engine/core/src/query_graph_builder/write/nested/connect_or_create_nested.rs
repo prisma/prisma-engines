@@ -7,7 +7,7 @@ use crate::{
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested connect or create cases.
 ///
@@ -112,7 +112,7 @@ fn handle_many_to_many(
             filter,
         ));
 
-        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
+        let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
         let if_node = graph.create_node(Flow::default_if());
 
         let connect_exists_node =
@@ -274,8 +274,8 @@ fn one_to_many_inlined_child(
         ));
 
         let if_node = graph.create_node(Flow::default_if());
-        let update_child_node = utils::update_records_node_placeholder(graph, filter, Arc::clone(child_model));
-        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
+        let update_child_node = utils::update_records_node_placeholder(graph, filter, child_model.clone());
+        let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(&if_node, &update_child_node, QueryGraphDependency::Then)?;
@@ -416,7 +416,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
+    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
@@ -578,7 +578,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 

@@ -44,7 +44,7 @@ pub use self::utils::{compound_id_field_name, compound_index_field_name};
 
 use cache::TypeRefCache;
 use prisma_models::{
-    ast, CompositeTypeRef, Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
+    ast, CompositeTypeRef, Field as ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 use psl::{
     datamodel_connector::{Connector, ConnectorCapability},

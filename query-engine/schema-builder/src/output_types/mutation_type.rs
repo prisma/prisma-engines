@@ -159,7 +159,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             args,
             OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::DeleteOne,
             }),
         )
@@ -177,7 +177,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         arguments,
         OutputType::object(objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::DeleteMany,
         }),
     )
@@ -193,7 +193,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             args,
             OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::UpdateOne,
             }),
         )
@@ -211,7 +211,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         arguments,
         OutputType::object(objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::UpdateMany,
         }),
     )
@@ -227,7 +227,7 @@ fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             args,
             OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::UpsertOne,
             }),
         )

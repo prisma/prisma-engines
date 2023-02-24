@@ -8,7 +8,6 @@ use connector::{Filter, IntoFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::convert::TryInto;
-use std::sync::Arc;
 
 /// Handles nested connect cases.
 ///
@@ -194,7 +193,7 @@ fn handle_one_to_many(
         )?;
     } else {
         let expected_id_count = child_filter.size();
-        let update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
+        let update_node = utils::update_records_node_placeholder(graph, child_filter, child_model.clone());
         let check_node = graph.create_node(Node::Empty);
         let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
@@ -410,8 +409,7 @@ fn handle_one_to_one_parent_update(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if relation_inlined_child {
-        let update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        let update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
@@ -591,8 +589,7 @@ fn handle_one_to_one_parent_create(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if relation_inlined_child {
-        let update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        let update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();

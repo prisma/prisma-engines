@@ -7,7 +7,7 @@ use std::sync::Arc;
 fn an_empty_datamodel_must_work() {
     let datamodel = convert("");
     assert_eq!(datamodel.schema.db.enums_count(), 0);
-    assert!(datamodel.models().is_empty());
+    assert_eq!(datamodel.models().count(), 0);
     assert_eq!(datamodel.relations().count(), 0);
 }
 
@@ -151,32 +151,6 @@ fn unique_works() {
 }
 
 #[test]
-fn multi_field_unique_with_1_field_must_be_transformed_to_is_unique_on_field() {
-    let datamodel = convert(
-        r#"
-            model Test {
-                id     String @id
-                a      String
-                b      String
-                @@unique([a])
-                @@unique([a,b])
-                @@index([b,a])
-            }
-        "#,
-    );
-
-    let model = datamodel.assert_model("Test");
-    model
-        .assert_indexes_length(2)
-        .assert_index(&["a", "b"], IndexType::Unique)
-        .assert_index(&["b", "a"], IndexType::Normal);
-    model
-        .assert_scalar_field("a")
-        .assert_type_identifier(TypeIdentifier::String)
-        .assert_unique();
-}
-
-#[test]
 fn multi_field_id_with_1_field_must_be_transformed_to_is_id_on_field() {
     let datamodel = convert(
         r#"
@@ -296,42 +270,20 @@ fn convert(datamodel: &str) -> Arc<InternalDataModel> {
 }
 
 trait DatamodelAssertions {
-    fn assert_model(&self, name: &str) -> Arc<Model>;
+    fn assert_model(self: &Arc<Self>, name: &str) -> Model;
 }
 
 impl DatamodelAssertions for InternalDataModel {
-    fn assert_model(&self, name: &str) -> Arc<Model> {
-        self.find_model(name).unwrap()
+    fn assert_model(self: &Arc<Self>, name: &str) -> Model {
+        self.clone().find_model(name).unwrap()
     }
 }
 
 trait ModelAssertions {
-    fn assert_indexes_length(&self, len: usize) -> &Self;
-    fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self;
     fn assert_scalar_field(&self, name: &str) -> ScalarField;
 }
 
 impl ModelAssertions for Model {
-    fn assert_indexes_length(&self, len: usize) -> &Self {
-        assert_eq!(self.indexes().len(), len);
-        self
-    }
-
-    fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self {
-        self.indexes()
-            .iter()
-            .find(|index| {
-                let has_right_type = index.typ == tpe;
-                let field_names: Vec<String> = index.fields().iter().map(|f| f.name().to_owned()).collect();
-                let expected_field_names: Vec<String> = fields.iter().map(|f| f.to_string()).collect();
-                let is_for_right_fields = field_names == expected_field_names;
-
-                is_for_right_fields && has_right_type
-            })
-            .unwrap_or_else(|| panic!("Could not find the index for fields {fields:?} and type {tpe:?}"));
-        self
-    }
-
     fn assert_scalar_field(&self, name: &str) -> ScalarField {
         self.fields().find_from_scalar(name).unwrap()
     }

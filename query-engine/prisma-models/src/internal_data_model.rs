@@ -1,5 +1,4 @@
 use crate::{prelude::*, CompositeTypeRef, InternalEnumRef};
-use once_cell::sync::OnceCell;
 use psl::schema_ast::ast;
 use std::sync::{Arc, Weak};
 
@@ -8,14 +7,16 @@ pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
 
 #[derive(Debug)]
 pub struct InternalDataModel {
-    pub(crate) models: OnceCell<Vec<ModelRef>>,
-
     pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {
-    pub fn models(&self) -> &[ModelRef] {
-        self.models.get().unwrap()
+    pub fn models<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = ModelRef> + 'a {
+        self.schema
+            .db
+            .walk_models()
+            .chain(self.schema.db.walk_views())
+            .map(|model| self.clone().zip(model.id))
     }
 
     pub fn composite_types<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = CompositeTypeRef> + 'a {
@@ -25,8 +26,8 @@ impl InternalDataModel {
             .map(move |ct| self.clone().zip(ct.id))
     }
 
-    pub fn models_cloned(&self) -> Vec<ModelRef> {
-        self.models.get().unwrap().iter().map(Arc::clone).collect()
+    pub fn models_cloned(self: &Arc<Self>) -> Vec<ModelRef> {
+        self.models().collect()
     }
 
     pub fn relations<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = RelationRef> + Clone + 'a {
@@ -45,11 +46,13 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
-        self.models
-            .get()
-            .and_then(|models| models.iter().find(|model| model.name == name))
-            .cloned()
+    pub fn find_model(self: &Arc<Self>, name: &str) -> crate::Result<ModelRef> {
+        self.schema
+            .db
+            .walk_models()
+            .chain(self.schema.db.walk_views())
+            .find(|model| model.name() == name)
+            .map(|m| self.clone().zip(m.id))
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
@@ -57,12 +60,8 @@ impl InternalDataModel {
         self.clone().zip(ctid)
     }
 
-    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
-        self.models
-            .get()
-            .and_then(|models| models.iter().find(|model| model.id == model_id))
-            .cloned()
-            .unwrap()
+    pub fn find_model_by_id(self: &Arc<Self>, model_id: ast::ModelId) -> ModelRef {
+        self.clone().zip(model_id)
     }
 
     /// Finds all inline relation fields pointing to the given model.

@@ -1,7 +1,7 @@
 use super::*;
 use once_cell::sync::OnceCell;
 use prisma_models::pk::PrimaryKey;
-use prisma_models::{dml, ModelRef};
+use prisma_models::{dml, walkers, ModelRef};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
@@ -86,10 +86,9 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 }
 
 /// Computes a compound field name based on an index.
-pub fn compound_index_field_name(index: &Index) -> String {
-    index.name.clone().unwrap_or_else(|| {
-        let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name()).collect();
+pub fn compound_index_field_name(index: &walkers::IndexWalker<'_>) -> String {
+    index.name().map(ToOwned::to_owned).unwrap_or_else(|| {
+        let field_names: Vec<&str> = index.fields().map(|sf| sf.name()).collect();
 
         field_names.join("_")
     })

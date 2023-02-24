@@ -29,7 +29,7 @@ pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<
             arguments,
             OutputType::object(objects::affected_records_object_type(ctx)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::CreateMany,
             }),
         ))

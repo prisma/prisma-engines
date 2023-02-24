@@ -4,7 +4,6 @@ use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
-use std::sync::Arc;
 
 /// Only for x-to-many relations.
 ///
@@ -260,7 +259,7 @@ fn handle_one_to_many(
 
     // Update (connect) case: Check left diff IDs
     let connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
         &diff_node,
@@ -320,8 +319,7 @@ fn handle_one_to_many(
 
     // Update (disconnect) case: Check right diff IDs.
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_disconnect_node =
-        utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
 
     let child_side_required = parent_relation_field.related_field().is_required();
     let rf = parent_relation_field.clone();

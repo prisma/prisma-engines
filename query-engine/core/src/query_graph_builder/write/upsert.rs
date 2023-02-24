@@ -7,7 +7,6 @@ use crate::{
 use connector::IntoFilter;
 use prisma_models::ModelRef;
 use schema::ConnectorContext;
-use std::sync::Arc;
 
 /// Handles a top-level upsert
 ///
@@ -102,9 +101,9 @@ pub fn upsert_record(
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), create_argument)?;
+    let create_node = create::create_record_node(graph, connector_ctx, model.clone(), create_argument)?;
 
-    let update_node = update::update_record_node(graph, connector_ctx, filter, Arc::clone(&model), update_argument)?;
+    let update_node = update::update_record_node(graph, connector_ctx, filter, model.clone(), update_argument)?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));

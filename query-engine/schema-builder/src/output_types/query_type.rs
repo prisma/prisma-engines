@@ -44,7 +44,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             vec![arg],
             OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::FindUnique,
             }),
         )
@@ -63,7 +63,7 @@ fn find_unique_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Opt
             vec![arg],
             OutputType::object(objects::model::map_type(ctx, model)),
             Some(QueryInfo {
-                model: Some(Arc::clone(model)),
+                model: Some(model.clone()),
                 tag: QueryTag::FindUniqueOrThrow,
             }),
         )
@@ -81,7 +81,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::FindFirst,
         }),
     )
@@ -99,7 +99,7 @@ fn find_first_or_throw_field(ctx: &mut BuilderContext, model: &ModelRef) -> Outp
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::FindFirstOrThrow,
         }),
     )
@@ -117,7 +117,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
         args,
         OutputType::list(OutputType::object(object_type)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::FindMany,
         }),
     )
@@ -130,7 +130,7 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
         arguments::relation_to_many_selection_arguments(ctx, model, false),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::Aggregate,
         }),
     )
@@ -145,7 +145,7 @@ fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Out
             ctx, model,
         ))),
         Some(QueryInfo {
-            model: Some(Arc::clone(model)),
+            model: Some(model.clone()),
             tag: QueryTag::GroupBy,
         }),
     )

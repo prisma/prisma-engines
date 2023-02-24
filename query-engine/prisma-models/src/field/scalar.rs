@@ -173,3 +173,12 @@ impl Display for ScalarField {
         write!(f, "{}.{}", self.container().name(), self.name())
     }
 }
+
+impl From<(InternalDataModelRef, walkers::IndexFieldWalker<'_>)> for ScalarFieldRef {
+    fn from((dm, f): (InternalDataModelRef, walkers::IndexFieldWalker<'_>)) -> Self {
+        match f {
+            walkers::IndexFieldWalker::Scalar(sf) => dm.zip(ScalarFieldId::InModel(sf.id)),
+            walkers::IndexFieldWalker::Composite(cf) => dm.zip(ScalarFieldId::InCompositeType(cf.id)),
+        }
+    }
+}
