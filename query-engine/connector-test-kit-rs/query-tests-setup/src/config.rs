@@ -7,10 +7,6 @@ static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 /// The central test configuration.
 #[derive(Debug, Default, Deserialize)]
 pub struct TestConfig {
-    /// The test runner to use for the tests.
-    /// Env key: `TEST_RUNNER`
-    runner: String,
-
     /// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
     connector: String,
@@ -40,7 +36,6 @@ Test config can come from the environment, or a config file.
 
 Set the following env vars:
 
-- TEST_RUNNER
 - TEST_CONNECTOR
 - TEST_CONNECTOR_VERSION (optional)
 
@@ -75,7 +70,6 @@ impl TestConfig {
     fn log_info(&self) {
         println!("******************************");
         println!("* Test run information:");
-        println!("* Runner: {}", self.runner);
         println!(
             "* Connector: {} {}",
             self.connector,
@@ -86,22 +80,17 @@ impl TestConfig {
     }
 
     fn from_env() -> Option<Self> {
-        let runner = Some(std::env::var("TEST_RUNNER").unwrap_or("direct".to_string()));
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
 
         // Just care for a set value for now.
         let is_ci = std::env::var("BUILDKITE").is_ok();
 
-        match (runner, connector) {
-            (Some(runner), Some(connector)) => Some(Self {
-                runner,
-                connector,
-                connector_version,
-                is_ci,
-            }),
-            _ => None,
-        }
+        connector.map(|connector| Self {
+            connector,
+            connector_version,
+            is_ci,
+        })
     }
 
     fn from_file() -> Option<Self> {
@@ -124,10 +113,6 @@ impl TestConfig {
     }
 
     fn validate(&self) {
-        if self.runner.is_empty() {
-            exit_with_message("A test runner is required but was not set.");
-        }
-
         if self.connector.is_empty() {
             exit_with_message("A test connector is required but was not set.");
         }
@@ -139,10 +124,6 @@ impl TestConfig {
             Ok(_) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
-    }
-
-    pub fn runner(&self) -> &str {
-        self.runner.as_str()
     }
 
     pub fn connector(&self) -> &str {

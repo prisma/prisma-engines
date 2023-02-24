@@ -167,7 +167,7 @@ fn run_relation_link_test_impl(
                 println!("Used datamodel:\n {}", datamodel.clone().yellow());
                 setup_project(&datamodel, Default::default()).await.unwrap();
 
-                let runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
+                let runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
                     .await
                     .unwrap();
 
@@ -275,15 +275,9 @@ pub fn run_connector_test_impl(
             println!("Used datamodel:\n {}", datamodel.clone().yellow());
             crate::setup_project(&datamodel, db_schemas).await.unwrap();
 
-            let runner = Runner::load(
-                crate::CONFIG.runner(),
-                datamodel.clone(),
-                connector,
-                metrics,
-                log_capture,
-            )
-            .await
-            .unwrap();
+            let runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+                .await
+                .unwrap();
 
             test_fn(runner).await.unwrap();
 

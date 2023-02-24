@@ -1,4 +1,2 @@
 {
-    "connector": "cockroachdb",
-    "runner": "direct"
-}
+    "connector": "cockroachdb"}
