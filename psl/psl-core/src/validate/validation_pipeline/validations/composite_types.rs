@@ -32,10 +32,10 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
         };
 
         match field.r#type() {
-            ScalarFieldType::CompositeType(ctid) if field.composite_type().composite_type_id() == *ctid => {
+            ScalarFieldType::CompositeType(ctid) if field.composite_type().composite_type_id() == ctid => {
                 let msg = "The type is the same as the parent and causes an endless cycle. Please change the field to be either optional or a list.";
                 errors.push((
-                    *ctid,
+                    ctid,
                     DatamodelError::new_composite_type_field_validation_error(
                         msg,
                         field.composite_type().name(),
@@ -44,13 +44,13 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
                     ),
                 ));
             }
-            ScalarFieldType::CompositeType(ctid) if visited.first() == Some(ctid) => {
+            ScalarFieldType::CompositeType(ctid) if visited.first() == Some(&ctid) => {
                 let msg = format!(
                     "The types cause an endless cycle in the path {path}. Please change one of the fields to be either optional or a list to break the cycle."
                 );
 
                 errors.push((
-                    *ctid,
+                    ctid,
                     DatamodelError::new_composite_type_field_validation_error(
                         &msg,
                         field.composite_type().name(),
@@ -60,9 +60,9 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
                 ));
             }
             ScalarFieldType::CompositeType(ctid) => {
-                visited.push(*ctid);
+                visited.push(ctid);
 
-                for field in ctx.db.walk(*ctid).fields().filter(|f| f.arity().is_required()) {
+                for field in ctx.db.walk(ctid).fields().filter(|f| f.arity().is_required()) {
                     let path = Rc::new(path.link(field.composite_type()));
                     fields_to_traverse.push((field, Some(path)));
                 }

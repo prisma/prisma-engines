@@ -90,18 +90,13 @@ where
     }
 }
 
-impl<T> AsColumn for T
-where
-    T: AsRef<ScalarField>,
-{
+impl AsColumn for ScalarField {
     fn as_column(&self, ctx: &Context<'_>) -> Column<'static> {
-        let sf = self.as_ref();
-
         // Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        let full_table_name = super::table::db_name_with_schema(&sf.container().as_model().unwrap(), ctx);
-        let col = sf.db_name().to_string();
+        let full_table_name = super::table::db_name_with_schema(&self.container().as_model().unwrap(), ctx);
+        let col = self.db_name().to_string();
 
-        let column = Column::from((full_table_name, col)).type_family(sf.type_family());
+        let column = Column::from((full_table_name, col)).type_family(self.type_family());
         column.default(quaint::ast::DefaultValue::Generated)
     }
 }

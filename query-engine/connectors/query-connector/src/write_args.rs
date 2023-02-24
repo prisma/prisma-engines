@@ -398,7 +398,7 @@ impl WriteArgs {
 
         for f in updated_at_fields {
             if self.args.get(f.db_name()).is_none() {
-                self.args.insert(f.into(), WriteOperation::scalar_set(value.clone()));
+                self.args.insert((&f).into(), WriteOperation::scalar_set(value.clone()));
             }
         }
     }

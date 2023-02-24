@@ -4,8 +4,8 @@ use std::fmt;
 /// Represents an instance of a native type declared in the Prisma schema.
 #[derive(Clone)]
 pub struct NativeTypeInstance {
-    pub(crate) native_type: PslNativeTypeInstance,
-    pub(crate) connector: &'static dyn Connector,
+    pub native_type: PslNativeTypeInstance,
+    pub connector: &'static dyn Connector,
 }
 
 impl fmt::Debug for NativeTypeInstance {

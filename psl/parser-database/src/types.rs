@@ -119,6 +119,14 @@ impl ScalarFieldType {
         }
     }
 
+    /// Try to interpret this field type as an enum.
+    pub fn as_enum(self) -> Option<ast::EnumId> {
+        match self {
+            ScalarFieldType::Enum(id) => Some(id),
+            _ => None,
+        }
+    }
+
     /// Is the type of the field `Unsupported("...")`?
     pub fn is_unsupported(self) -> bool {
         matches!(self, Self::Unsupported(_))

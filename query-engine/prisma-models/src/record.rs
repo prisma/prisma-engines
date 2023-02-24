@@ -183,7 +183,7 @@ impl Record {
                 field
                     .scalar_fields()
                     .into_iter()
-                    .map(|source_field| self.get_field_value(field_names, &source_field.name))
+                    .map(|source_field| self.get_field_value(field_names, source_field.name()))
             })
             .collect::<crate::Result<Vec<_>>>()?;
 

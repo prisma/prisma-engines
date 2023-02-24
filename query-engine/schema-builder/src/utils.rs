@@ -51,7 +51,7 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn input_field<T, S>(name: T, field_types: S, default_value: Option<dml::DefaultValue>) -> InputField
+pub fn input_field<T, S>(name: T, field_types: S, default_value: Option<dml::DefaultKind>) -> InputField
 where
     T: Into<String>,
     S: Into<Vec<InputType>>,

@@ -497,7 +497,7 @@ impl QueryDocumentParser {
                 // If it's not optional and has no default, a required field has not been provided.
                 match &field.default_value {
                     Some(default_value) => {
-                        let default_pv = match &default_value.kind {
+                        let default_pv = match &default_value {
                             dml::DefaultKind::Expression(ref expr)
                                 if matches!(expr.generator(), ValueGeneratorFn::Now) =>
                             {

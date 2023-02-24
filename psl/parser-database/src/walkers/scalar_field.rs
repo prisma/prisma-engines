@@ -108,10 +108,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// Is this field's type an enum? If yes, walk the enum.
     pub fn field_type_as_enum(self) -> Option<EnumWalker<'db>> {
-        match self.scalar_field_type() {
-            ScalarFieldType::Enum(enum_id) => Some(self.db.walk(enum_id)),
-            _ => None,
-        }
+        self.scalar_field_type().as_enum().map(|id| self.db.walk(id))
     }
 
     /// The name in the `@map(<name>)` attribute.

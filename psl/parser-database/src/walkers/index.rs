@@ -277,7 +277,7 @@ impl<'db> IndexFieldWalker<'db> {
     pub fn scalar_field_type(self) -> ScalarFieldType {
         match self {
             IndexFieldWalker::Scalar(sf) => sf.scalar_field_type(),
-            IndexFieldWalker::Composite(cf) => *cf.r#type(),
+            IndexFieldWalker::Composite(cf) => cf.r#type(),
         }
     }
 

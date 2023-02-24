@@ -49,7 +49,7 @@ impl ParentContainer {
     pub fn fields(&self) -> Vec<Field> {
         match self {
             ParentContainer::Model(model) => model.upgrade().unwrap().fields().filter_all(|_| true),
-            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().fields().collect(),
+            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().fields(),
         }
     }
 
@@ -62,6 +62,7 @@ impl ParentContainer {
                 .upgrade()
                 .unwrap()
                 .fields()
+                .into_iter()
                 .find(|field| field.name() == prisma_name),
         }
     }

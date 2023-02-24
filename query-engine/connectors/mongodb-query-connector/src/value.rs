@@ -111,13 +111,14 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        let mongo_type: Option<&MongoDbType> = sf.native_type().map(|nt| nt.deserialize_native_type());
+        let nt = sf.native_type();
+        let mongo_type: Option<MongoDbType> = nt.map(|nt| nt.deserialize_native_type::<MongoDbType>().to_owned());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
         match (mongo_type, &sf.type_identifier(), value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
-            (Some(mt), _, value) => (mt, value).into_bson(),
+            (Some(mt), _, value) => (&mt, value).into_bson(),
             (_, field_type, value) => (field_type, value).into_bson(),
         }
     }
