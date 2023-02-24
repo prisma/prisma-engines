@@ -7,7 +7,7 @@ use prisma_models::CompositeTypeRef;
 /// need all composites to be present, then we can compute fields in a second pass.
 pub(crate) fn initialize_cache(ctx: &mut BuilderContext) {
     ctx.composite_types().into_iter().for_each(|composite| {
-        let ident = Identifier::new(composite.name.clone(), MODEL_NAMESPACE);
+        let ident = Identifier::new(composite.name(), MODEL_NAMESPACE);
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, None)));
     });
 }
@@ -23,7 +23,7 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext) {
 }
 
 pub(crate) fn map_type(ctx: &mut BuilderContext, ct: &CompositeTypeRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(ct.name.clone(), MODEL_NAMESPACE);
+    let ident = Identifier::new(ct.name(), MODEL_NAMESPACE);
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each composite.")
 }

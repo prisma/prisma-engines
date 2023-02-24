@@ -129,7 +129,7 @@ impl BuilderContext {
     }
 
     pub fn composite_types(&self) -> Vec<CompositeTypeRef> {
-        self.internal_data_model.composite_types().to_owned()
+        self.internal_data_model.composite_types().collect()
     }
 
     pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {

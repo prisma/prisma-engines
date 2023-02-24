@@ -157,7 +157,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         ""
     };
 
-    let name = format!("{}{}CreateEnvelopeInput", cf.typ().name, arity);
+    let name = format!("{}{}CreateEnvelopeInput", cf.typ().name(), arity);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -188,7 +188,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
 pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
-    let name = format!("{}CreateInput", cf.typ().name);
+    let name = format!("{}CreateInput", cf.typ().name());
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -197,7 +197,7 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &Compos
     ctx.cache_input_type(ident, input_object.clone());
 
     let mapper = CreateDataInputFieldMapper::new_checked();
-    let fields = cf.typ().fields();
+    let fields = cf.typ().fields().collect::<Vec<_>>();
     let fields = mapper.map_all(ctx, &fields);
 
     input_object.set_fields(fields);

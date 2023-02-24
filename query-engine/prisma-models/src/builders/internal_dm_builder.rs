@@ -1,4 +1,4 @@
-use super::{CompositeTypeBuilder, IndexBuilder, ModelBuilder};
+use super::{IndexBuilder, ModelBuilder};
 use crate::IndexType;
 use dml::{self, Datamodel, WithDatabaseName};
 
@@ -50,17 +50,6 @@ fn index_builders(model: &dml::Model) -> Vec<IndexBuilder> {
                 // TODO: When introducing the indexes in QE, change this.
                 dml::IndexType::Fulltext => IndexType::Normal,
             },
-        })
-        .collect()
-}
-
-pub(crate) fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
-    datamodel
-        .composite_types
-        .iter()
-        .map(|ct| CompositeTypeBuilder {
-            id: ct.id,
-            name: ct.name.clone(),
         })
         .collect()
 }

@@ -66,7 +66,7 @@ fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> Select
 
     SelectedField::Composite(CompositeSelection {
         field: cf,
-        selections: pairs_to_selections(&typ, &object.fields),
+        selections: pairs_to_selections(typ, &object.fields),
     })
 }
 

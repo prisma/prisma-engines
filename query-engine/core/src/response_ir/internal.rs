@@ -496,7 +496,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize '{}' with non-composite compatible type '{:?}' for field {}.",
             val,
-            cf.typ().name,
+            cf.typ().name(),
             cf.name()
         ))),
     }

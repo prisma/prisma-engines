@@ -150,12 +150,12 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 
         // Composite field.
         ModelField::Composite(cf) if cf.is_list() => {
-            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &(&cf.typ()).into());
+            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &(cf.typ()).into());
             Some(input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
         ModelField::Composite(cf) => {
-            let composite_order_object_type = order_by_object_type(ctx, &(&cf.typ()).into(), &OrderByOptions::new());
+            let composite_order_object_type = order_by_object_type(ctx, &(cf.typ()).into(), &OrderByOptions::new());
 
             Some(input_field(cf.name(), InputType::object(composite_order_object_type), None).optional())
         }
