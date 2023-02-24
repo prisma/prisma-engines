@@ -68,10 +68,6 @@ impl<'db> RelationWalker<'db> {
         self.get().relation_name.map(|string_id| &self.db[string_id])
     }
 
-    pub(crate) fn has_field(self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
-        self.get().has_field(model_id, field_id)
-    }
-
     /// The relation name, explicit or inferred.
     ///
     /// ```ignore

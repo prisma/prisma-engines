@@ -1,11 +1,15 @@
 use crate::{
     ast::{self, WithName},
     interner::StringId,
+    walkers::RelationFieldId,
     DatamodelError, Diagnostics,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
-use std::{collections::BTreeSet, fmt};
+use std::{
+    collections::{BTreeSet, HashMap},
+    fmt,
+};
 
 /// Detect relation types and construct relation objects to the database.
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
@@ -53,6 +57,10 @@ pub(crate) struct Relations {
     /// Storage. Private. Do not use directly.
     relations_storage: Vec<Relation>,
 
+    /// Which field belongs to which relation. Secondary index for optimization after an observed
+    /// performance regression in schema-builder.
+    fields: HashMap<RelationFieldId, RelationId>,
+
     // Indexes for efficient querying.
     //
     // Why BTreeSets?
@@ -84,6 +92,14 @@ impl std::ops::Index<RelationId> for Relations {
     }
 }
 
+impl std::ops::Index<RelationFieldId> for Relations {
+    type Output = RelationId;
+
+    fn index(&self, index: RelationFieldId) -> &Self::Output {
+        &self.fields[&index]
+    }
+}
+
 impl Relations {
     /// Iterate over all relations in the schema.
     pub(crate) fn iter(&self) -> impl ExactSizeIterator<Item = RelationId> + Clone {
@@ -93,10 +109,11 @@ impl Relations {
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
-    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation)> + '_ {
-        self.forward
+    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (&Relation, RelationId)> + '_ {
+        self.relations_storage
             .iter()
-            .map(move |(model_a_id, model_b_id, relation_idx)| (*model_a_id, *model_b_id, &self[*relation_idx]))
+            .enumerate()
+            .map(|(idx, rel)| (rel, RelationId(idx as u32)))
     }
 
     /// Iterator over relations where the provided model is model A, or the forward side of the
@@ -170,14 +187,6 @@ pub(crate) struct Relation {
 }
 
 impl Relation {
-    pub(crate) fn has_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
-        match self.attributes.fields() {
-            (Some(field_a), _) if self.model_a == model_id && field_a == field_id => true,
-            (_, Some(field_b)) if self.model_b == model_id && field_b == field_id => true,
-            _ => false,
-        }
-    }
-
     pub(crate) fn is_implicit_many_to_many(&self) -> bool {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
@@ -391,6 +400,15 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
     let relation_id = RelationId(relations.relations_storage.len() as u32);
 
     relations.relations_storage.push(relation);
+    relations
+        .fields
+        .insert(RelationFieldId(evidence.model_id, evidence.field_id), relation_id);
+    if let Some((opposite_field_id, _, _)) = evidence.opposite_relation_field {
+        relations.fields.insert(
+            RelationFieldId(evidence.relation_field.referenced_model, opposite_field_id),
+            relation_id,
+        );
+    }
 
     relations
         .forward
