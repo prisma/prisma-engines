@@ -311,12 +311,6 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
 
 </span><span class="kw">mod </span>config;
@@ -486,7 +480,7 @@
                 <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.clone().yellow());
                 setup_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
 
-                <span class="kw">let </span>runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
+                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
                     .<span class="kw">await
                     </span>.unwrap();
 
@@ -594,15 +588,9 @@
             <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.clone().yellow());
             <span class="kw">crate</span>::setup_project(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span>.unwrap();
 
-            <span class="kw">let </span>runner = Runner::load(
-                <span class="kw">crate</span>::CONFIG.runner(),
-                datamodel.clone(),
-                connector,
-                metrics,
-                log_capture,
-            )
-            .<span class="kw">await
-            </span>.unwrap();
+            <span class="kw">let </span>runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+                .<span class="kw">await
+                </span>.unwrap();
 
             test_fn(runner).<span class="kw">await</span>.unwrap();
 
