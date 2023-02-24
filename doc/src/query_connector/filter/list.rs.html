@@ -81,13 +81,9 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-
 <span class="kw">use </span><span class="kw">crate</span>::compare::ScalarListCompare;
 <span class="kw">use </span>prisma_models::{ScalarField, ScalarFieldRef};
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>ScalarListFilter {
@@ -130,13 +126,13 @@
 }
 
 <span class="attr">#[allow(warnings)]
-</span><span class="kw">impl </span>ScalarListCompare <span class="kw">for </span>Arc&lt;ScalarField&gt; {
+</span><span class="kw">impl </span>ScalarListCompare <span class="kw">for </span>ScalarField {
     <span class="kw">fn </span>contains_element&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; Filter
     <span class="kw">where
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             condition: ScalarListCondition::Contains(value.into()),
         })
     }
@@ -146,7 +142,7 @@
         </span>T: Into&lt;ConditionListValue&gt;,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             condition: ScalarListCondition::ContainsEvery(values.into()),
         })
     }
@@ -156,14 +152,14 @@
         </span>T: Into&lt;ConditionListValue&gt;,
     {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             condition: ScalarListCondition::ContainsSome(values.into()),
         })
     }
 
     <span class="kw">fn </span>is_empty_list(<span class="kw-2">&amp;</span><span class="self">self</span>, b: bool) -&gt; Filter {
         Filter::from(ScalarListFilter {
-            field: Arc::clone(<span class="self">self</span>),
+            field: <span class="self">self</span>.clone(),
             condition: ScalarListCondition::IsEmpty(b),
         })
     }

@@ -1159,7 +1159,7 @@
         val =&gt; <span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Attempted to serialize &#39;{}&#39; with non-composite compatible type &#39;{:?}&#39; for field {}.&quot;</span>,
             val,
-            cf.typ().name,
+            cf.typ().name(),
             cf.name()
         ))),
     }

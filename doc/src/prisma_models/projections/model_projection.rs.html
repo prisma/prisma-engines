@@ -197,7 +197,7 @@
                 Field::Composite(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(), <span class="comment">// [Composites] todo
             </span>})
             .into_iter()
-            .unique_by(|field| field.name.clone())
+            .unique_by(|field| field.name().to_owned())
     }
 
     <span class="kw">pub fn </span>map_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {

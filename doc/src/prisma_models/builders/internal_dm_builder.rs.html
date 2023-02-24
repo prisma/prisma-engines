@@ -53,157 +53,34 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeBuilder, FieldBuilder, IndexBuilder, ModelBuilder, PrimaryKeyBuilder};
-<span class="kw">use crate</span>::{builders::ScalarFieldBuilder, extensions::<span class="kw-2">*</span>, IndexType, TypeIdentifier};
-<span class="kw">use </span>dml::{<span class="self">self</span>, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{IndexBuilder, ModelBuilder};
+<span class="kw">use </span><span class="kw">crate</span>::IndexType;
+<span class="kw">use </span>dml::{<span class="self">self</span>, Datamodel, WithDatabaseName};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_builders(datamodel: <span class="kw-2">&amp;</span>Datamodel, schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;ModelBuilder&gt; {
     datamodel
         .models()
-        .filter(|model| !model.is_ignored())
-        .filter(|model| model.is_supported())
+        .filter(|model| !schema.db.walk(model.id).is_ignored())
+        .filter(|model| {
+            <span class="kw">let </span>walker = schema.db.walk(model.id);
+
+            walker
+                .primary_key()
+                .map(|pk| pk.fields())
+                .into_iter()
+                .flatten()
+                .all(|f| !f.is_unsupported())
+                || walker
+                    .indexes()
+                    .filter(|idx| idx.is_unique())
+                    .any(|idx| idx.fields().all(|f| !f.is_unsupported()))
+        })
         .map(|model| ModelBuilder {
             id: model.id,
             name: model.name.clone(),
-            fields: model_field_builders(model, schema),
             manifestation: model.database_name().map(|s| s.to_owned()),
-            primary_key: pk_builder(model),
             indexes: index_builders(model),
-            supports_create_operation: model.supports_create_operation(),
             dml_model: model.clone(),
-        })
-        .collect()
-}
-
-<span class="kw">fn </span>model_field_builders(model: <span class="kw-2">&amp;</span>dml::Model, _schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Vec&lt;FieldBuilder&gt; {
-    model
-        .fields()
-        .filter(|field| !field.is_ignored)
-        .filter_map(|sf| {
-            <span class="kw">if </span>sf.type_identifier() == TypeIdentifier::Unsupported {
-                <span class="prelude-val">None
-            </span>} <span class="kw">else </span>{
-                <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
-                    id: <span class="kw">crate</span>::ScalarFieldId::InModel(sf.id),
-                    name: sf.name.clone(),
-                    type_identifier: sf.type_identifier(),
-                    is_unique: model.field_is_unique(<span class="kw-2">&amp;</span>sf.name),
-                    is_id: model.field_is_primary(<span class="kw-2">&amp;</span>sf.name),
-                    is_auto_generated_int_id: model.field_is_auto_generated_int_id(<span class="kw-2">&amp;</span>sf.name),
-                    is_autoincrement: sf.is_auto_increment(),
-                    is_updated_at: sf.is_updated_at,
-                    internal_enum: sf.field_type.as_enum(),
-                    arity: sf.arity,
-                    db_name: sf.database_name.clone(),
-                    default_value: sf.default_value.clone(),
-                    native_type: sf.native_type(),
-                }))
-            }
-        })
-        .collect()
-}
-
-<span class="kw">fn </span>composite_field_builders(composite: <span class="kw-2">&amp;</span>dml::CompositeType) -&gt; Vec&lt;FieldBuilder&gt; {
-    composite
-        .fields
-        .iter()
-        .filter_map(|field| <span class="kw">match </span><span class="kw-2">&amp;</span>field.r#type {
-            CompositeTypeFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            CompositeTypeFieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>) | CompositeTypeFieldType::Enum(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let </span>type_ident = field.type_identifier();
-
-                <span class="kw">if </span>type_ident == TypeIdentifier::Unsupported {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
-                        id: <span class="kw">crate</span>::ScalarFieldId::InCompositeType(field.id),
-                        name: field.name.clone(),
-                        type_identifier: type_ident,
-                        is_unique: <span class="bool-val">false</span>, <span class="comment">// Composites can&#39;t have uniques or ids at the moment.
-                        </span>is_id: <span class="bool-val">false</span>,
-                        is_auto_generated_int_id: <span class="bool-val">false</span>,
-                        is_autoincrement: <span class="bool-val">false</span>,
-                        is_updated_at: <span class="bool-val">false</span>, <span class="comment">// Todo: This info isn&#39;t available here.
-                        </span>internal_enum: field.r#type.as_enum(),
-                        arity: field.arity,
-                        db_name: field.database_name.clone(),
-                        default_value: field.default_value.as_ref().cloned(),
-                        native_type: field.native_type(),
-                    }))
-                }
-            }
-            CompositeTypeFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         })
         .collect()
 }
@@ -212,7 +89,7 @@
     model
         .indices
         .iter()
-        .filter(|i| i.fields.len() &gt; <span class="number">1 </span>&amp;&amp; model.is_compound_index_supported(i)) <span class="comment">// @@unique for 1 field are transformed to is_unique instead
+        .filter(|i| i.fields.len() &gt; <span class="number">1</span>) <span class="comment">// @@unique for 1 field are transformed to is_unique instead
         </span>.filter(|i| i.fields.iter().all(|f| f.path.len() &lt;= <span class="number">1</span>)) <span class="comment">// TODO: we do not take indices with composite fields for now
         </span>.map(|i| IndexBuilder {
             name: i.name.clone(),
@@ -228,25 +105,6 @@
                 <span class="comment">// TODO: When introducing the indexes in QE, change this.
                 </span>dml::IndexType::Fulltext =&gt; IndexType::Normal,
             },
-        })
-        .collect()
-}
-
-<span class="kw">fn </span>pk_builder(model: <span class="kw-2">&amp;</span>dml::Model) -&gt; <span class="prelude-ty">Option</span>&lt;PrimaryKeyBuilder&gt; {
-    model.primary_key.as_ref().map(|pk| PrimaryKeyBuilder {
-        fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
-        alias: pk.name.to_owned(),
-    })
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_type_builders(datamodel: <span class="kw-2">&amp;</span>Datamodel) -&gt; Vec&lt;CompositeTypeBuilder&gt; {
-    datamodel
-        .composite_types
-        .iter()
-        .map(|ct| CompositeTypeBuilder {
-            id: ct.id,
-            name: ct.name.clone(),
-            fields: composite_field_builders(ct),
         })
         .collect()
 }

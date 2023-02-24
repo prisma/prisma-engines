@@ -175,21 +175,6 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::default_value::{DefaultKind, DefaultValue, ValueGenerator};
@@ -197,7 +182,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::relation_info::RelationInfo;
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
 <span class="kw">use </span><span class="kw">crate</span>::traits::{WithDatabaseName, WithName};
-<span class="kw">use crate</span>::{CompositeTypeFieldType, FieldArity};
+<span class="kw">use </span><span class="kw">crate</span>::FieldArity;
 <span class="kw">use </span>psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
 
 <span class="doccomment">/// Datamodel field type.
@@ -212,17 +197,6 @@
     Scalar(ScalarType, <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;),
     <span class="doccomment">/// This is a composite type fields, with a composite type of the given type.
     </span>CompositeType(String),
-}
-
-<span class="kw">impl </span>From&lt;CompositeTypeFieldType&gt; <span class="kw">for </span>FieldType {
-    <span class="kw">fn </span>from(typ: CompositeTypeFieldType) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>typ {
-            CompositeTypeFieldType::CompositeType(t) =&gt; <span class="self">Self</span>::CompositeType(t),
-            CompositeTypeFieldType::Scalar(t, nt) =&gt; <span class="self">Self</span>::Scalar(t, nt),
-            CompositeTypeFieldType::Enum(e) =&gt; <span class="self">Self</span>::Enum(e),
-            CompositeTypeFieldType::Unsupported(u) =&gt; <span class="self">Self</span>::Unsupported(u),
-        }
-    }
 }
 
 <span class="kw">impl </span>FieldType {
@@ -264,10 +238,6 @@
 
     <span class="kw">pub fn </span>is_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::CompositeType(<span class="kw">_</span>))
-    }
-
-    <span class="kw">pub fn </span>is_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Unsupported(<span class="kw">_</span>))
     }
 
     <span class="kw">pub fn </span>scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
@@ -356,7 +326,7 @@
     }
 
     <span class="kw">pub fn </span>is_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">let </span>kind = <span class="self">self</span>.default_value().map(|val| val.kind());
+        <span class="kw">let </span>kind = <span class="self">self</span>.default_value().map(|val| <span class="kw-2">&amp;</span>val.kind);
         <span class="macro">matches!</span>(kind, <span class="prelude-val">Some</span>(DefaultKind::Expression(<span class="kw-2">ref </span>expr)) <span class="kw">if </span>expr == <span class="kw-2">&amp;</span>ValueGenerator::new_autoincrement())
     }
 

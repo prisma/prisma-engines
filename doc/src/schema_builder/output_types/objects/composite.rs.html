@@ -33,6 +33,10 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::unnecessary_to_owned)]
 
 </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -42,7 +46,7 @@
 /// need all composites to be present, then we can compute fields in a second pass.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
     ctx.composite_types().into_iter().for_each(|composite| {
-        <span class="kw">let </span>ident = Identifier::new(composite.name.clone(), MODEL_NAMESPACE);
+        <span class="kw">let </span>ident = Identifier::new(composite.name(), MODEL_NAMESPACE);
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, <span class="prelude-val">None</span>)));
     });
 }
@@ -58,7 +62,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, ct: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; ObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(ct.name.clone(), MODEL_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new(ct.name(), MODEL_NAMESPACE);
     ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
         .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)
 }
@@ -66,7 +70,11 @@
 <span class="doccomment">/// Computes composite output type fields.
 /// Requires an initialized cache.
 </span><span class="kw">fn </span>compute_composite_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, composite: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; Vec&lt;OutputField&gt; {
-    composite.fields().map(|f| field::map_output_field(ctx, <span class="kw-2">&amp;</span>f)).collect()
+    composite
+        .fields()
+        .into_iter()
+        .map(|f| field::map_output_field(ctx, <span class="kw-2">&amp;</span>f))
+        .collect()
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

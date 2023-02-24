@@ -1355,6 +1355,14 @@
 <a href="#1355" id="1355">1355</a>
 <a href="#1356" id="1356">1356</a>
 <a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -1472,6 +1480,14 @@
     </span><span class="kw">pub fn </span>as_composite_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::CompositeTypeId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ScalarFieldType::CompositeType(id) =&gt; <span class="prelude-val">Some</span>(id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Try to interpret this field type as an enum.
+    </span><span class="kw">pub fn </span>as_enum(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::EnumId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScalarFieldType::Enum(id) =&gt; <span class="prelude-val">Some</span>(id),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

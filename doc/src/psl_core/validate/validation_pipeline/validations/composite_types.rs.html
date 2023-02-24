@@ -196,10 +196,10 @@
         };
 
         <span class="kw">match </span>field.r#type() {
-            ScalarFieldType::CompositeType(ctid) <span class="kw">if </span>field.composite_type().composite_type_id() == <span class="kw-2">*</span>ctid =&gt; {
+            ScalarFieldType::CompositeType(ctid) <span class="kw">if </span>field.composite_type().composite_type_id() == ctid =&gt; {
                 <span class="kw">let </span>msg = <span class="string">&quot;The type is the same as the parent and causes an endless cycle. Please change the field to be either optional or a list.&quot;</span>;
                 errors.push((
-                    <span class="kw-2">*</span>ctid,
+                    ctid,
                     DatamodelError::new_composite_type_field_validation_error(
                         msg,
                         field.composite_type().name(),
@@ -208,13 +208,13 @@
                     ),
                 ));
             }
-            ScalarFieldType::CompositeType(ctid) <span class="kw">if </span>visited.first() == <span class="prelude-val">Some</span>(ctid) =&gt; {
+            ScalarFieldType::CompositeType(ctid) <span class="kw">if </span>visited.first() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ctid) =&gt; {
                 <span class="kw">let </span>msg = <span class="macro">format!</span>(
                     <span class="string">&quot;The types cause an endless cycle in the path {path}. Please change one of the fields to be either optional or a list to break the cycle.&quot;
                 </span>);
 
                 errors.push((
-                    <span class="kw-2">*</span>ctid,
+                    ctid,
                     DatamodelError::new_composite_type_field_validation_error(
                         <span class="kw-2">&amp;</span>msg,
                         field.composite_type().name(),
@@ -224,9 +224,9 @@
                 ));
             }
             ScalarFieldType::CompositeType(ctid) =&gt; {
-                visited.push(<span class="kw-2">*</span>ctid);
+                visited.push(ctid);
 
-                <span class="kw">for </span>field <span class="kw">in </span>ctx.db.walk(<span class="kw-2">*</span>ctid).fields().filter(|f| f.arity().is_required()) {
+                <span class="kw">for </span>field <span class="kw">in </span>ctx.db.walk(ctid).fields().filter(|f| f.arity().is_required()) {
                     <span class="kw">let </span>path = Rc::new(path.link(field.composite_type()));
                     fields_to_traverse.push((field, <span class="prelude-val">Some</span>(path)));
                 }

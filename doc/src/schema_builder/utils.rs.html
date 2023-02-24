@@ -157,7 +157,7 @@
 }
 
 <span class="doccomment">/// Field convenience wrapper function.
-</span><span class="kw">pub fn </span>input_field&lt;T, S&gt;(name: T, field_types: S, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt;) -&gt; InputField
+</span><span class="kw">pub fn </span>input_field&lt;T, S&gt;(name: T, field_types: S, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;) -&gt; InputField
 <span class="kw">where
     </span>T: Into&lt;String&gt;,
     S: Into&lt;Vec&lt;InputType&gt;&gt;,

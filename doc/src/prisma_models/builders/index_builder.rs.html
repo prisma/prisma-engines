@@ -34,10 +34,7 @@
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
 <a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Index, IndexType, ScalarFieldRef, ScalarFieldWeak};
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>IndexBuilder {
@@ -64,12 +61,11 @@
         field_names
             .into_iter()
             .map(|name| {
-                <span class="kw">let </span>field = fields
+                fields
                     .iter()
-                    .find(|sf| sf.name == name)
-                    .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Unable to resolve field &#39;{name}&#39;&quot;</span>));
-
-                Arc::downgrade(field)
+                    .find(|sf| sf.name() == name)
+                    .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Unable to resolve field &#39;{name}&#39;&quot;</span>))
+                    .clone()
             })
             .collect()
     }

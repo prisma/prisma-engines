@@ -173,183 +173,179 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>};
-<span class="kw">use </span>dml::{DefaultValue, FieldArity, NativeTypeInstance};
-<span class="kw">use </span>psl::parser_database::walkers;
-<span class="kw">use </span>std::{
-    fmt::{Debug, Display},
-    hash::{Hash, Hasher},
-    sync::{Arc, Weak},
-};
+<span class="kw">use </span>dml::{FieldArity, NativeTypeInstance};
+<span class="kw">use </span>psl::parser_database::{walkers, ScalarFieldType};
+<span class="kw">use </span>std::fmt::{Debug, Display};
 
-<span class="kw">pub type </span>ScalarFieldRef = Arc&lt;ScalarField&gt;;
-<span class="kw">pub type </span>ScalarFieldWeak = Weak&lt;ScalarField&gt;;
+<span class="kw">pub type </span>ScalarField = <span class="kw">crate</span>::Zipper&lt;ScalarFieldId&gt;;
+<span class="kw">pub type </span>ScalarFieldRef = ScalarField;
+<span class="kw">pub type </span>ScalarFieldWeak = ScalarField;
 
-<span class="attr">#[derive(Debug, Clone)]
+<span class="attr">#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>ScalarFieldId {
     InModel(walkers::ScalarFieldId),
     InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 
-<span class="kw">pub struct </span>ScalarField {
-    <span class="kw">pub </span>id: ScalarFieldId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) type_identifier: TypeIdentifier,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) is_id: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) is_auto_generated_int_id: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) is_autoincrement: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) is_updated_at: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) internal_enum: <span class="prelude-ty">Option</span>&lt;ast::EnumId&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) arity: FieldArity,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) default_value: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) native_type: <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) container: ParentContainer,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) is_unique: bool,
-}
-
 <span class="kw">impl </span>ScalarField {
-    <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
-        <span class="self">self</span>.container.internal_data_model()
-    }
-
     <span class="kw">pub fn </span>is_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_id
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).is_single_pk(),
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
     }
 
     <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::List)
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity(), FieldArity::List)
     }
 
     <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.arity, FieldArity::Required)
+        <span class="macro">matches!</span>(<span class="self">self</span>.arity(), FieldArity::Required)
     }
 
     <span class="kw">pub fn </span>unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_unique || <span class="self">self</span>.is_id()
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).is_unique(),
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>, <span class="comment">// TODO: is this right?
+        </span>}
     }
 
     <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.db_name.as_deref().unwrap_or(<span class="self">self</span>.name.as_str())
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).database_name(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).database_name(),
+        }
     }
 
     <span class="kw">pub fn </span>type_identifier_with_arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (TypeIdentifier, FieldArity) {
-        (<span class="self">self</span>.type_identifier.clone(), <span class="self">self</span>.arity)
+        (<span class="self">self</span>.type_identifier(), <span class="self">self</span>.arity())
     }
 
     <span class="kw">pub fn </span>is_read_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">let </span>dm = <span class="self">self</span>.internal_data_model();
         <span class="kw">let </span>sfid = <span class="kw">match </span><span class="self">self</span>.id {
             ScalarFieldId::InModel(id) =&gt; id,
             ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
         };
-        <span class="kw">let </span>sf = dm.walk(sfid);
+        <span class="kw">let </span>sf = <span class="self">self</span>.dm.walk(sfid);
         <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = sf.model().relation_fields();
         relation_fields.any(|rf| rf.fields().into_iter().flatten().any(|sf2| sf.id == sf2.id))
     }
 
     <span class="kw">pub fn </span>is_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.type_identifier.is_numeric()
+        <span class="self">self</span>.type_identifier().is_numeric()
     }
 
-    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ParentContainer {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.container
+    <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParentContainer {
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.dm.walk(id).model().id).into(),
+            ScalarFieldId::InCompositeType((id, <span class="kw">_</span>)) =&gt; <span class="self">self</span>.dm.find_composite_type_by_id(id).into(),
+        }
     }
 
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.name.as_ref()
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).name(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).name(),
+        }
     }
 
     <span class="kw">pub fn </span>type_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeIdentifier {
-        <span class="self">self</span>.type_identifier.clone()
+        <span class="kw">let </span>scalar_field_type = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).scalar_field_type(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).r#type(),
+        };
+
+        <span class="kw">match </span>scalar_field_type {
+            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            ScalarFieldType::Enum(x) =&gt; TypeIdentifier::Enum(x),
+            ScalarFieldType::BuiltInScalar(scalar) =&gt; scalar.into(),
+            ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; TypeIdentifier::Unsupported,
+        }
     }
 
     <span class="kw">pub fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldArity {
-        <span class="self">self</span>.arity
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).ast_field().arity,
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).arity(),
+        }
     }
 
     <span class="kw">pub fn </span>internal_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::InternalEnum&gt; {
-        <span class="self">self</span>.internal_enum.map(|id| <span class="self">self</span>.internal_data_model().zip(id))
+        <span class="kw">let </span>enum_id = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).scalar_field_type().as_enum(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).r#type().as_enum(),
+        }<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.dm.clone().zip(enum_id))
     }
 
-    <span class="kw">pub fn </span>default_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DefaultValue&gt; {
-        <span class="self">self</span>.default_value.as_ref()
+    <span class="kw">pub fn </span>default_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt; {
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; {
+                <span class="kw">let </span>walker = <span class="self">self</span>.dm.walk(id);
+                walker.default_value().map(|dv| {
+                    dml::dml_default_kind(<span class="kw-2">&amp;</span>dv.ast_attribute().arguments.arguments[<span class="number">0</span>].value, walker.scalar_type())
+                })
+            }
+            ScalarFieldId::InCompositeType(id) =&gt; {
+                <span class="kw">let </span>walker = <span class="self">self</span>.dm.walk(id);
+                walker
+                    .default_value()
+                    .map(|dv| dml::dml_default_kind(dv, walker.scalar_type()))
+            }
+        }
     }
 
     <span class="kw">pub fn </span>is_updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_updated_at
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).is_updated_at(),
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
     }
 
     <span class="kw">pub fn </span>is_auto_generated_int_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_auto_generated_int_id
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; {
+                <span class="kw">let </span>walker = <span class="self">self</span>.dm.walk(id);
+                walker.is_single_pk()
+                    &amp;&amp; <span class="macro">matches!</span>(
+                        walker.default_value().map(|v| v.value()),
+                        <span class="prelude-val">Some</span>(ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if </span>name == <span class="string">&quot;autoincrement&quot; </span>|| name == <span class="string">&quot;sequence&quot;
+                    </span>)
+                    &amp;&amp; <span class="macro">matches!</span>(walker.scalar_type(), <span class="prelude-val">Some</span>(psl::parser_database::ScalarType::Int))
+            }
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
     }
 
-    <span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NativeTypeInstance&gt; {
-        <span class="self">self</span>.native_type.as_ref()
+    <span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="kw">let </span>(<span class="kw">_</span>, name, args, span) = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
+        }<span class="question-mark">?</span>;
+        <span class="kw">let </span>connector = <span class="self">self</span>.dm.schema.connector;
+
+        <span class="kw">let </span>nt = connector
+            .parse_native_type(name, args, span, <span class="kw-2">&amp;mut </span>Default::default())
+            .unwrap();
+
+        <span class="prelude-val">Some</span>(dml::NativeTypeInstance {
+            native_type: nt,
+            connector,
+        })
     }
 
     <span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_autoincrement
-    }
-}
-
-<span class="kw">impl </span>Debug <span class="kw">for </span>ScalarField {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_struct(<span class="string">&quot;ScalarField&quot;</span>)
-            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;type_identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.type_identifier)
-            .field(<span class="string">&quot;is_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_id)
-            .field(<span class="string">&quot;is_auto_generated_int_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_auto_generated_int_id)
-            .field(<span class="string">&quot;is_autoincrement&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_autoincrement)
-            .field(<span class="string">&quot;internal_enum&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.internal_enum)
-            .field(<span class="string">&quot;is_updated_at&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_updated_at)
-            .field(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.arity)
-            .field(<span class="string">&quot;db_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.db_name)
-            .field(<span class="string">&quot;default_value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.default_value)
-            .field(<span class="string">&quot;container&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.container().name())
-            .field(<span class="string">&quot;is_unique&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_unique)
-            .finish()
+        <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).is_autoincrement(),
+            ScalarFieldId::InCompositeType(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
     }
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>ScalarField {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name)
-    }
-}
-
-<span class="kw">impl </span>Eq <span class="kw">for </span>ScalarField {}
-
-<span class="kw">impl </span>Hash <span class="kw">for </span>ScalarField {
-    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
-        <span class="self">self</span>.name.hash(state);
-        <span class="self">self</span>.type_identifier.hash(state);
-        <span class="self">self</span>.is_id.hash(state);
-        <span class="self">self</span>.is_auto_generated_int_id.hash(state);
-        <span class="self">self</span>.internal_enum.hash(state);
-        <span class="self">self</span>.is_updated_at.hash(state);
-        <span class="self">self</span>.is_unique.hash(state);
-        <span class="self">self</span>.container.hash(state);
-        <span class="self">self</span>.arity.hash(state);
-        <span class="self">self</span>.db_name.hash(state);
-    }
-}
-
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>ScalarField {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.name == other.name
-            &amp;&amp; <span class="self">self</span>.type_identifier == other.type_identifier
-            &amp;&amp; <span class="self">self</span>.is_id == other.is_id
-            &amp;&amp; <span class="self">self</span>.is_auto_generated_int_id == other.is_auto_generated_int_id
-            &amp;&amp; <span class="self">self</span>.internal_enum == other.internal_enum
-            &amp;&amp; <span class="self">self</span>.is_updated_at == other.is_updated_at
-            &amp;&amp; <span class="self">self</span>.default_value == other.default_value
-            &amp;&amp; <span class="self">self</span>.is_unique == other.is_unique
-            &amp;&amp; <span class="self">self</span>.container == other.container
-            &amp;&amp; <span class="self">self</span>.arity == other.arity
-            &amp;&amp; <span class="self">self</span>.db_name == other.db_name
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name())
     }
 }
 </code></pre></div>

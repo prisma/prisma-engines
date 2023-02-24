@@ -241,31 +241,6 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -275,8 +250,10 @@
 <span class="kw">pub use </span>scalar::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{ast, ModelRef};
-<span class="kw">use </span>dml::ScalarType;
-<span class="kw">use </span>std::{borrow::Cow, hash::Hash, sync::Arc};
+<span class="kw">use </span>psl::parser_database::{walkers, ScalarType};
+<span class="kw">use </span>std::{borrow::Cow, hash::Hash};
+
+<span class="kw">pub type </span>FieldWeak = Field;
 
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>Field {
@@ -288,7 +265,7 @@
 <span class="kw">impl </span>Field {
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.name(),
             Field::Relation(<span class="kw-2">ref </span>rf) =&gt; rf.walker().name(),
             Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.name(),
         }
@@ -323,7 +300,7 @@
 
     <span class="kw">pub fn </span>is_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
-            Field::Scalar(sf) =&gt; sf.is_id,
+            Field::Scalar(sf) =&gt; sf.is_id(),
             Field::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             Field::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
@@ -362,7 +339,7 @@
 
     <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModelRef&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Scalar(sf) =&gt; sf.container.as_model(),
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.container().as_model(),
             <span class="self">Self</span>::Relation(rf) =&gt; <span class="prelude-val">Some</span>(rf.model()),
             <span class="self">Self</span>::Composite(cf) =&gt; cf.container().as_model(),
         }
@@ -374,14 +351,6 @@
             <span class="self">Self</span>::Relation(rf) =&gt; rf.scalar_fields(),
             <span class="self">Self</span>::Composite(_cf) =&gt; <span class="macro">vec!</span>[], <span class="comment">// [Composites] todo
         </span>}
-    }
-
-    <span class="kw">pub fn </span>downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldWeak {
-        <span class="kw">match </span><span class="self">self </span>{
-            Field::Relation(field) =&gt; FieldWeak::Relation(field.clone()),
-            Field::Scalar(field) =&gt; FieldWeak::Scalar(Arc::downgrade(field)),
-            Field::Composite(field) =&gt; FieldWeak::Composite(field.clone()),
-        }
     }
 
     <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; {
@@ -398,51 +367,6 @@
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
-    }
-}
-
-<span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>FieldWeak {
-    Relation(RelationFieldWeak),
-    Scalar(ScalarFieldWeak),
-    Composite(CompositeFieldWeak),
-}
-
-<span class="kw">impl </span>FieldWeak {
-    <span class="kw">pub fn </span>upgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Field {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Relation(rf) =&gt; rf.clone().into(),
-            <span class="self">Self</span>::Scalar(sf) =&gt; sf.upgrade().unwrap().into(),
-            <span class="self">Self</span>::Composite(cf) =&gt; cf.clone().into(),
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Field&gt; <span class="kw">for </span>FieldWeak {
-    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>Field) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>f {
-            Field::Scalar(sf) =&gt; sf.into(),
-            Field::Relation(rf) =&gt; rf.into(),
-            Field::Composite(cf) =&gt; cf.into(),
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; <span class="kw">for </span>FieldWeak {
-    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self </span>{
-        FieldWeak::Scalar(Arc::downgrade(f))
-    }
-}
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; <span class="kw">for </span>FieldWeak {
-    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="self">Self </span>{
-        FieldWeak::Relation(f.clone())
-    }
-}
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; <span class="kw">for </span>FieldWeak {
-    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
-        FieldWeak::Composite(f.clone())
     }
 }
 
@@ -499,6 +423,32 @@
     Date,
     Time,
     DateTime,
+}
+
+<span class="kw">impl </span>From&lt;(<span class="kw">crate</span>::InternalDataModelRef, walkers::CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from((dm, sf): (<span class="kw">crate</span>::InternalDataModelRef, walkers::CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>sf.r#type().as_composite_type().is_some() {
+            Field::Composite(dm.zip(CompositeFieldId::InCompositeType(sf.id)))
+        } <span class="kw">else </span>{
+            Field::Scalar(dm.zip(ScalarFieldId::InCompositeType(sf.id)))
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;(<span class="kw">crate</span>::InternalDataModelRef, walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from((dm, sf): (<span class="kw">crate</span>::InternalDataModelRef, walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>sf.scalar_field_type().as_composite_type().is_some() {
+            Field::Composite(dm.zip(CompositeFieldId::InModel(sf.id)))
+        } <span class="kw">else </span>{
+            Field::Scalar(dm.zip(ScalarFieldId::InModel(sf.id)))
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;(<span class="kw">crate</span>::InternalDataModelRef, walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from((dm, rf): (<span class="kw">crate</span>::InternalDataModelRef, walkers::RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;)) -&gt; <span class="self">Self </span>{
+        Field::Relation(dm.zip(rf.id))
+    }
 }
 
 <span class="kw">impl </span>From&lt;ScalarFieldRef&gt; <span class="kw">for </span>Field {

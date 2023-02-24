@@ -168,64 +168,20 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::pk::PrimaryKey;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>std::{collections::BTreeSet, sync::Arc};
+<span class="kw">use </span>psl::parser_database::ScalarFieldType;
+<span class="kw">use </span>std::collections::BTreeSet;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Fields {
-    all: Vec&lt;Field&gt;,
     primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;,
-    scalar: OnceCell&lt;Vec&lt;ScalarFieldWeak&gt;&gt;,
     model: ModelWeakRef,
-    updated_at: OnceCell&lt;Vec&lt;ScalarFieldRef&gt;&gt;,
 }
 
 <span class="kw">impl </span>Fields {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(all: Vec&lt;Field&gt;, model: ModelWeakRef, primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;) -&gt; Fields {
-        Fields {
-            all,
-            primary_key,
-            scalar: OnceCell::new(),
-            updated_at: OnceCell::new(),
-            model,
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: ModelWeakRef, primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKey&gt;) -&gt; Fields {
+        Fields { primary_key, model }
     }
 
     <span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrimaryKey&gt; {
@@ -245,24 +201,24 @@
         </span>}
     }
 
-    <span class="kw">pub fn </span>updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;ScalarFieldRef&gt; {
-        <span class="self">self</span>.updated_at.get_or_init(|| {
-            <span class="self">self</span>.scalar_weak()
-                .iter()
-                .map(|sf| sf.upgrade().unwrap())
-                .filter(|sf| sf.is_updated_at)
-                .collect()
-        })
+    <span class="kw">pub fn </span>updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; {
+        <span class="self">self</span>.scalar().into_iter().filter(|sf| sf.is_updated_at())
     }
 
     <span class="kw">pub fn </span>scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
-        <span class="self">self</span>.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
-    }
-
-    <span class="kw">fn </span>scalar_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ScalarFieldWeak] {
-        <span class="self">self</span>.scalar
-            .get_or_init(|| <span class="self">self</span>.all.iter().fold(Vec::new(), <span class="self">Self</span>::scalar_filter))
-            .as_slice()
+        <span class="kw">let </span>model = <span class="self">self</span>.model();
+        <span class="kw">let </span>internal_data_model = model.internal_data_model();
+        internal_data_model
+            .walk(model.id)
+            .scalar_fields()
+            .filter(|sf| {
+                !<span class="macro">matches!</span>(
+                    sf.scalar_field_type(),
+                    ScalarFieldType::CompositeType(<span class="kw">_</span>) | ScalarFieldType::Unsupported(<span class="kw">_</span>)
+                )
+            })
+            .map(|rf| internal_data_model.clone().zip(ScalarFieldId::InModel(rf.id)))
+            .collect()
     }
 
     <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;RelationFieldRef&gt; {
@@ -296,37 +252,25 @@
     }
 
     <span class="kw">pub fn </span>find_many_from_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, names: <span class="kw-2">&amp;</span>BTreeSet&lt;String&gt;) -&gt; Vec&lt;ScalarFieldRef&gt; {
-        <span class="self">self</span>.scalar_weak()
-            .iter()
-            .filter(|field| names.contains(<span class="kw-2">&amp;</span>field.upgrade().unwrap().name))
-            .map(|field| field.upgrade().unwrap())
+        <span class="self">self</span>.scalar()
+            .into_iter()
+            .filter(|field| names.contains(field.name()))
             .collect()
     }
 
     <span class="kw">pub fn </span>find_from_all(<span class="kw-2">&amp;</span><span class="self">self</span>, prisma_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Field&gt; {
-        <span class="self">self</span>.all
-            .iter()
-            .find(|field| field.name() == prisma_name)
-            .map(Clone::clone)
+        <span class="kw">let </span>model = <span class="self">self</span>.model();
+        <span class="kw">let </span>internal_data_model = model.internal_data_model();
+        <span class="kw">let </span>model_walker = internal_data_model.walk(model.id);
+        <span class="kw">let </span><span class="kw-2">mut </span>scalar_fields = model_walker.scalar_fields();
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = model_walker.relation_fields();
+        scalar_fields
+            .find(|f| f.name() == prisma_name)
+            .map(|w| Field::from((internal_data_model.clone(), w)))
             .or_else(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.model();
-                <span class="kw">let </span>internal_data_model = model.internal_data_model();
-                <span class="kw">let </span>id = internal_data_model
-                    .walk(model.id)
-                    .scalar_fields()
-                    .find(|sf| sf.name() == prisma_name)
-                    .map(|sf| sf.id);
-                id.map(|id| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(id))))
-            })
-            .or_else(|| {
-                <span class="kw">let </span>model = <span class="self">self</span>.model();
-                <span class="kw">let </span>internal_data_model = model.internal_data_model();
-                <span class="kw">let </span>id = internal_data_model
-                    .walk(model.id)
-                    .relation_fields()
-                    .find(|rf| rf.name() == prisma_name)
-                    .map(|rf| rf.id);
-                id.map(|id| Field::from(internal_data_model.clone().zip(id)))
+                relation_fields
+                    .find(|f| f.name() == prisma_name)
+                    .map(|w| Field::from((internal_data_model.clone(), w)))
             })
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: prisma_name.to_string(),
@@ -351,7 +295,7 @@
     <span class="kw">pub fn </span>find_from_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ScalarFieldRef&gt; {
         <span class="self">self</span>.scalar()
             .into_iter()
-            .find(|field| field.name == name)
+            .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
                 container_name: <span class="self">self</span>.model().name.clone(),
@@ -373,38 +317,24 @@
             })
     }
 
-    <span class="kw">fn </span>scalar_filter(<span class="kw-2">mut </span>acc: Vec&lt;ScalarFieldWeak&gt;, field: <span class="kw-2">&amp;</span>Field) -&gt; Vec&lt;ScalarFieldWeak&gt; {
-        <span class="kw">if let </span>Field::Scalar(scalar_field) = field {
-            acc.push(Arc::downgrade(scalar_field));
-        };
-
-        acc
-    }
-
     <span class="kw">pub fn </span>filter_all&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; Vec&lt;Field&gt;
     <span class="kw">where
         </span>P: Fn(&amp;&amp;Field) -&gt; bool,
     {
         <span class="kw">let </span>model = <span class="self">self</span>.model();
         <span class="kw">let </span>internal_data_model = model.internal_data_model();
-        <span class="kw">let </span>rf = internal_data_model
-            .walk(model.id)
-            .relation_fields()
-            .filter(|rf| !rf.relation().is_ignored())
-            .map(|rf| Field::from(internal_data_model.clone().zip(rf.id)))
-            .filter(|f| predicate(<span class="kw-2">&amp;</span>f));
-        <span class="kw">let </span>composite_type_fields = internal_data_model
-            .walk(model.id)
+        <span class="kw">let </span>model_walker = internal_data_model.walk(model.id);
+        model_walker
             .scalar_fields()
-            .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
-            .map(|sf| Field::from(internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id))))
-            .filter(|f| predicate(<span class="kw-2">&amp;</span>f));
-        <span class="self">self</span>.all
-            .iter()
-            .filter(<span class="kw-2">&amp;</span>predicate)
-            .map(Clone::clone)
-            .chain(rf)
-            .chain(composite_type_fields)
+            .filter(|f| !f.is_ignored() &amp;&amp; !f.is_unsupported())
+            .map(|w| Field::from((internal_data_model.clone(), w)))
+            .chain(
+                model_walker
+                    .relation_fields()
+                    .filter(|rf| !rf.relation().is_ignored())
+                    .map(|w| Field::from((internal_data_model.clone(), w))),
+            )
+            .filter(|f| predicate(<span class="kw-2">&amp;</span>f))
             .collect()
     }
 }

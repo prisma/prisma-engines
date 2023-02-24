@@ -48,8 +48,8 @@
 <span class="doccomment">/// Represents an instance of a native type declared in the Prisma schema.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>NativeTypeInstance {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) native_type: PslNativeTypeInstance,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+    <span class="kw">pub </span>native_type: PslNativeTypeInstance,
+    <span class="kw">pub </span>connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>NativeTypeInstance {

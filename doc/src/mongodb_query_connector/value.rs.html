@@ -484,6 +484,7 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
@@ -597,13 +598,14 @@
     <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
         <span class="kw">let </span>(sf, value) = <span class="self">self</span>;
 
-        <span class="kw">let </span>mongo_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>MongoDbType&gt; = sf.native_type().map(|nt| nt.deserialize_native_type());
+        <span class="kw">let </span>nt = sf.native_type();
+        <span class="kw">let </span>mongo_type: <span class="prelude-ty">Option</span>&lt;MongoDbType&gt; = nt.map(|nt| nt.deserialize_native_type::&lt;MongoDbType&gt;().to_owned());
 
         <span class="comment">// If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
         </span><span class="kw">match </span>(mongo_type, <span class="kw-2">&amp;</span>sf.type_identifier(), value) {
             <span class="comment">// We assume this is always valid if it arrives here.
             </span>(<span class="kw">_</span>, <span class="kw">_</span>, PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(Bson::Null),
-            (<span class="prelude-val">Some</span>(mt), <span class="kw">_</span>, value) =&gt; (mt, value).into_bson(),
+            (<span class="prelude-val">Some</span>(mt), <span class="kw">_</span>, value) =&gt; (<span class="kw-2">&amp;</span>mt, value).into_bson(),
             (<span class="kw">_</span>, field_type, value) =&gt; (field_type, value).into_bson(),
         }
     }

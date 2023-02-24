@@ -195,13 +195,9 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::scalar::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{Filter, JsonCompare, ScalarFilter};
-
 <span class="kw">use </span>prisma_models::ScalarFieldRef;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 </span><span class="kw">pub enum </span>JsonTargetType {
@@ -226,7 +222,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -241,7 +237,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -256,7 +252,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -271,7 +267,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -286,7 +282,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -301,7 +297,7 @@
                 path,
                 target_type: <span class="prelude-val">Some</span>(target_type),
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -316,7 +312,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -331,7 +327,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -346,7 +342,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -361,7 +357,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -376,7 +372,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }
@@ -391,7 +387,7 @@
                 path,
                 target_type: <span class="prelude-val">None</span>,
             }),
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             mode: QueryMode::Default,
         })
     }

@@ -439,9 +439,6 @@
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
@@ -552,10 +549,7 @@
 
     <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.
     </span><span class="kw">pub fn </span>field_type_as_enum(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;EnumWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
-        <span class="kw">match </span><span class="self">self</span>.scalar_field_type() {
-            ScalarFieldType::Enum(enum_id) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.db.walk(enum_id)),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        }
+        <span class="self">self</span>.scalar_field_type().as_enum().map(|id| <span class="self">self</span>.db.walk(id))
     }
 
     <span class="doccomment">/// The name in the `@map(&lt;name&gt;)` attribute.

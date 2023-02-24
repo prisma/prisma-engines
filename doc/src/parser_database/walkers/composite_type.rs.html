@@ -238,14 +238,14 @@
     }
 
     <span class="doccomment">/// The type of the field, e.g. `String` in `streetName String?`.
-    </span><span class="kw">pub fn </span>r#type(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarFieldType {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.field().r#type
+    </span><span class="kw">pub fn </span>r#type(<span class="self">self</span>) -&gt; ScalarFieldType {
+        <span class="self">self</span>.field().r#type
     }
 
     <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).
     </span><span class="kw">pub fn </span>scalar_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
         <span class="kw">match </span><span class="self">self</span>.r#type() {
-            ScalarFieldType::BuiltInScalar(scalar) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>scalar),
+            ScalarFieldType::BuiltInScalar(scalar) =&gt; <span class="prelude-val">Some</span>(scalar),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

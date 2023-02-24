@@ -302,15 +302,13 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Display;
-
-<span class="kw">use crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
     parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, ScalarFieldRef,
     SelectionResult,
 };
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>std::fmt::Display;
 
 <span class="doccomment">/// A selection of fields from a model.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
@@ -331,7 +329,7 @@
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     </span><span class="kw">pub fn </span>is_superset_of(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         other.selections.iter().all(|selection| <span class="kw">match </span>selection {
-            SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>sf.name),
+            SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(sf.name()),
             SelectedField::Composite(other_cs) =&gt; <span class="self">self
                 </span>.get(other_cs.field.name())
                 .and_then(|selection| selection.as_composite())
@@ -458,7 +456,7 @@
 <span class="kw">impl </span>SelectedField {
     <span class="kw">pub fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
+            SelectedField::Scalar(sf) =&gt; sf.name(),
             SelectedField::Composite(cf) =&gt; cf.field.name(),
         }
     }
@@ -479,7 +477,7 @@
 
     <span class="kw">pub fn </span>container(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParentContainer {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; sf.container().clone(),
+            SelectedField::Scalar(sf) =&gt; sf.container(),
             SelectedField::Composite(cs) =&gt; cs.field.container(),
         }
     }
@@ -487,7 +485,7 @@
     <span class="doccomment">/// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     </span><span class="kw">pub fn </span>coerce_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; value.coerce(<span class="kw-2">&amp;</span>sf.type_identifier),
+            SelectedField::Scalar(sf) =&gt; value.coerce(<span class="kw-2">&amp;</span>sf.type_identifier()),
             SelectedField::Composite(cs) =&gt; cs.coerce_value(value),
         }
     }
@@ -503,7 +501,7 @@
     <span class="kw">pub fn </span>is_superset_of(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="self">self</span>.field.typ() == other.field.typ()
             &amp;&amp; other.selections.iter().all(|selection| <span class="kw">match </span>selection {
-                SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>sf.name),
+                SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.contains(sf.name()),
                 SelectedField::Composite(other_cs) =&gt; <span class="self">self
                     </span>.get(other_cs.field.name())
                     .and_then(|selection| selection.as_composite())

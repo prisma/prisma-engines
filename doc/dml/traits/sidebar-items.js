@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["Ignorable",""],["WithDatabaseName",""],["WithName",""]]};
+window.SIDEBAR_ITEMS = {"trait":[["WithDatabaseName",""],["WithName",""]]};

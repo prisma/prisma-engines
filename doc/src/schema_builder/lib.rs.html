@@ -336,7 +336,7 @@
     }
 
     <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeTypeRef&gt; {
-        <span class="self">self</span>.internal_data_model.composite_types().to_owned()
+        <span class="self">self</span>.internal_data_model.composite_types().collect()
     }
 
     <span class="kw">pub fn </span>supports_any(<span class="kw-2">&amp;</span><span class="self">self</span>, capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability]) -&gt; bool {

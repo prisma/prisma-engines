@@ -601,13 +601,9 @@
 <a href="#601" id="601">601</a>
 <a href="#602" id="602">602</a>
 <a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">impl </span>ScalarCompare <span class="kw">for </span>ScalarFieldRef {
     <span class="doccomment">/// Field is in a given value
@@ -616,7 +612,7 @@
         </span>T: Into&lt;ConditionListValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::In(values.into()),
             mode: QueryMode::Default,
         })
@@ -628,7 +624,7 @@
         </span>T: Into&lt;ConditionListValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotIn(values.into()),
             mode: QueryMode::Default,
         })
@@ -640,7 +636,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::Equals(val.into()),
             mode: QueryMode::Default,
         })
@@ -652,7 +648,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -664,7 +660,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::Contains(val.into()),
             mode: QueryMode::Default,
         })
@@ -676,7 +672,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotContains(val.into()),
             mode: QueryMode::Default,
         })
@@ -688,7 +684,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::StartsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -700,7 +696,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotStartsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -712,7 +708,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::EndsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -724,7 +720,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotEndsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -736,7 +732,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::LessThan(val.into()),
             mode: QueryMode::Default,
         })
@@ -748,7 +744,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -760,7 +756,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::GreaterThan(val.into()),
             mode: QueryMode::Default,
         })
@@ -772,7 +768,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -783,7 +779,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::Search(val.into(), <span class="macro">vec!</span>[]),
             mode: QueryMode::Default,
         })
@@ -794,7 +790,7 @@
         </span>T: Into&lt;ConditionValue&gt;,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::NotSearch(val.into(), <span class="macro">vec!</span>[]),
             mode: QueryMode::Default,
         })
@@ -802,7 +798,7 @@
 
     <span class="kw">fn </span>is_set(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool) -&gt; Filter {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(<span class="self">self</span>)),
+            projection: ScalarProjection::Single(<span class="self">self</span>.clone()),
             condition: ScalarCondition::IsSet(val),
             mode: QueryMode::Default,
         })

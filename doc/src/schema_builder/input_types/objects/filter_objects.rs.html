@@ -524,7 +524,7 @@
 <span class="doccomment">/// Object used for full composite equality, e.g. `{ field: &quot;value&quot;, field2: 123 } == { field: &quot;value&quot; }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ().name), PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ().name()), PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -533,7 +533,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
 
     <span class="kw">let </span>composite_type = cf.typ();
-    <span class="kw">let </span>input_fields = composite_type.fields().map(|f| <span class="kw">match </span>f {
+    <span class="kw">let </span>input_fields = composite_type.fields().into_iter().map(|f| <span class="kw">match </span>f {
         ModelField::Scalar(sf) =&gt; input_field(sf.name(), map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>sf), <span class="prelude-val">None</span>)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list()),

@@ -100,11 +100,6 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::ScalarFieldExt, Context};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::{Field, ModelProjection, RelationField, ScalarField};
@@ -197,18 +192,13 @@
     }
 }
 
-<span class="kw">impl</span>&lt;T&gt; AsColumn <span class="kw">for </span>T
-<span class="kw">where
-    </span>T: AsRef&lt;ScalarField&gt;,
-{
+<span class="kw">impl </span>AsColumn <span class="kw">for </span>ScalarField {
     <span class="kw">fn </span>as_column(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Column&lt;<span class="lifetime">&#39;static</span>&gt; {
-        <span class="kw">let </span>sf = <span class="self">self</span>.as_ref();
-
         <span class="comment">// Unwrap is safe: SQL connectors do not anything other than models as field containers.
-        </span><span class="kw">let </span>full_table_name = <span class="kw">super</span>::table::db_name_with_schema(<span class="kw-2">&amp;</span>sf.container().as_model().unwrap(), ctx);
-        <span class="kw">let </span>col = sf.db_name().to_string();
+        </span><span class="kw">let </span>full_table_name = <span class="kw">super</span>::table::db_name_with_schema(<span class="kw-2">&amp;</span><span class="self">self</span>.container().as_model().unwrap(), ctx);
+        <span class="kw">let </span>col = <span class="self">self</span>.db_name().to_string();
 
-        <span class="kw">let </span>column = Column::from((full_table_name, col)).type_family(sf.type_family());
+        <span class="kw">let </span>column = Column::from((full_table_name, col)).type_family(<span class="self">self</span>.type_family());
         column.default(quaint::ast::DefaultValue::Generated)
     }
 }

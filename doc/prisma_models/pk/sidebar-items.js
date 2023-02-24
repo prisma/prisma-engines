@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["PrimaryKey",""],["PrimaryKeyTemplate",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["PrimaryKey",""]]};

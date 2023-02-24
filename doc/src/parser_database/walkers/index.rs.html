@@ -614,7 +614,7 @@
     </span><span class="kw">pub fn </span>scalar_field_type(<span class="self">self</span>) -&gt; ScalarFieldType {
         <span class="kw">match </span><span class="self">self </span>{
             IndexFieldWalker::Scalar(sf) =&gt; sf.scalar_field_type(),
-            IndexFieldWalker::Composite(cf) =&gt; <span class="kw-2">*</span>cf.r#type(),
+            IndexFieldWalker::Composite(cf) =&gt; cf.r#type(),
         }
     }
 

@@ -231,11 +231,11 @@
             TypeIdentifier::Json <span class="kw">if </span>supports_advanced_json =&gt; {
                 <span class="kw">let </span>enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
 
-                input_field(sf.name(), <span class="macro">vec!</span>[enum_type, typ], sf.default_value().cloned())
+                input_field(sf.name(), <span class="macro">vec!</span>[enum_type, typ], sf.default_value())
                     .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
             }
 
-            <span class="kw">_ </span>=&gt; input_field(sf.name(), typ, sf.default_value().cloned())
+            <span class="kw">_ </span>=&gt; input_field(sf.name(), typ, sf.default_value())
                 .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
                 .nullable_if(!sf.is_required()),
         }
@@ -265,7 +265,7 @@
         <span class="kw">let </span>input_type = InputType::object(input_object);
 
         <span class="comment">// Shorthand type (`list_field: &lt;typ&gt;`) + full object (`list_field: { set: { &lt;typ&gt; }}`)
-        </span>input_field(sf.name(), <span class="macro">vec!</span>[input_type, typ], sf.default_value().cloned()).optional()
+        </span>input_field(sf.name(), <span class="macro">vec!</span>[input_type, typ], sf.default_value()).optional()
     }
 
     <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
@@ -363,7 +363,7 @@
         <span class="string">&quot;&quot;
     </span>};
 
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}CreateEnvelopeInput&quot;</span>, cf.typ().name, arity);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}CreateEnvelopeInput&quot;</span>, cf.typ().name(), arity);
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -394,7 +394,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_create_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="comment">// It&#39;s called &quot;Create&quot; input because it&#39;s used across multiple create-type operations, not only &quot;set&quot;.
-    </span><span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, cf.typ().name);
+    </span><span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, cf.typ().name());
 
     <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);

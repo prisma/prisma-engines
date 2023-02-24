@@ -892,7 +892,7 @@
 
         <span class="kw">for </span>f <span class="kw">in </span>updated_at_fields {
             <span class="kw">if </span><span class="self">self</span>.args.get(f.db_name()).is_none() {
-                <span class="self">self</span>.args.insert(f.into(), WriteOperation::scalar_set(value.clone()));
+                <span class="self">self</span>.args.insert((<span class="kw-2">&amp;</span>f).into(), WriteOperation::scalar_set(value.clone()));
             }
         }
     }

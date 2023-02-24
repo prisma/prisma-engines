@@ -425,9 +425,6 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{<span class="self">self </span><span class="kw">as </span>dml, <span class="kw-2">*</span>};
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl_core::{
@@ -500,17 +497,14 @@
 
         <span class="kw">for </span>field <span class="kw">in </span>walker.fields() {
             <span class="kw">let </span>field = CompositeTypeField {
-                id: field.id,
                 name: field.name().to_owned(),
-                r#type: <span class="self">self</span>.lift_composite_type_field_type(field, field.r#type()),
+                r#type: <span class="self">self</span>.lift_composite_type_field_type(field, <span class="kw-2">&amp;</span>field.r#type()),
                 arity: field.arity(),
                 database_name: field.mapped_name().map(String::from),
-                documentation: field.documentation().map(ToString::to_string),
                 default_value: field.default_value().map(|value| DefaultValue {
                     kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
                     db_name: <span class="prelude-val">None</span>,
                 }),
-                is_commented_out: <span class="bool-val">false</span>,
             };
 
             fields.push(field);

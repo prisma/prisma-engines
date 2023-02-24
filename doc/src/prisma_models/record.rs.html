@@ -391,7 +391,7 @@
                 field
                     .scalar_fields()
                     .into_iter()
-                    .map(|source_field| <span class="self">self</span>.get_field_value(field_names, <span class="kw-2">&amp;</span>source_field.name))
+                    .map(|source_field| <span class="self">self</span>.get_field_value(field_names, source_field.name()))
             })
             .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 

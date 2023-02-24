@@ -366,23 +366,11 @@
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
 <a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
 </pre><pre class="rust"><code><span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>std::fmt;
 
 <span class="doccomment">/// Represents a default specified on a field.
-</span><span class="attr">#[derive(Clone, PartialEq)]
+</span><span class="attr">#[derive(Clone, PartialEq, Debug)]
 </span><span class="kw">pub struct </span>DefaultValue {
     <span class="kw">pub </span>kind: DefaultKind,
     <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -434,6 +422,25 @@
             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;called DefaultValue::unwrap_single() on wrong variant&quot;</span>),
         }
     }
+
+    <span class="comment">// Returns the dbgenerated function for a default value
+    // intended for primary key values!
+    </span><span class="kw">pub fn </span>to_dbgenerated_func(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            DefaultKind::Expression(<span class="kw-2">ref </span>expr) <span class="kw">if </span>expr.is_dbgenerated() =&gt; expr.args.get(<span class="number">0</span>).map(|val| val.<span class="number">1</span>.to_string()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v.clone()),
+            DefaultKind::Expression(<span class="kw-2">ref </span>g) =&gt; g.generate(),
+        }
+    }
 }
 
 <span class="kw">impl </span>DefaultValue {
@@ -448,28 +455,6 @@
         <span class="kw">match </span><span class="self">self</span>.kind {
             DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DefaultKind {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
-    }
-
-    <span class="kw">pub fn </span>into_kind(<span class="self">self</span>) -&gt; DefaultKind {
-        <span class="self">self</span>.kind
-    }
-
-    <span class="kw">pub fn </span>mut_kind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>DefaultKind {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.kind
-    }
-
-    <span class="doccomment">/// Returns either a copy of the contained single value or produces a new
-    /// value as defined by the expression.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
-    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
-        <span class="kw">match </span><span class="self">self</span>.kind {
-            DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v.clone()),
-            DefaultKind::Expression(<span class="kw-2">ref </span>g) =&gt; g.generate(),
         }
     }
 
@@ -522,15 +507,6 @@
     <span class="doccomment">/// The default value constraint name.
     </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="self">self</span>.db_name.as_deref()
-    }
-
-    <span class="comment">// Returns the dbgenerated function for a default value
-    // intended for primary key values!
-    </span><span class="kw">pub fn </span>to_dbgenerated_func(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">match </span><span class="self">self</span>.kind {
-            DefaultKind::Expression(<span class="kw-2">ref </span>expr) <span class="kw">if </span>expr.is_dbgenerated() =&gt; expr.args.get(<span class="number">0</span>).map(|val| val.<span class="number">1</span>.to_string()),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        }
     }
 }
 
@@ -697,9 +673,9 @@
     }
 }
 
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>DefaultValue {
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>DefaultKind {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
             DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DefaultValue::Single({v:?})&quot;</span>),
             DefaultKind::Expression(g) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DefaultValue::Expression({}(){:?})&quot;</span>, g.name(), g.args),
         }

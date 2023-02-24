@@ -142,16 +142,6 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeTypeRef, CompositeTypeWeakRef, Field, InternalDataModelRef, ModelRef, ModelWeakRef};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::hash::{Hash, Hasher};
@@ -168,7 +158,7 @@
         <span class="comment">// Unwraps are safe - the models and composites must exist after DML translation.
         </span><span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(model) =&gt; model.upgrade().unwrap().internal_data_model(),
-            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().internal_data_model(),
+            ParentContainer::CompositeType(composite) =&gt; composite.dm.clone(),
         }
     }
 
@@ -189,21 +179,21 @@
     <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeTypeRef&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            ParentContainer::CompositeType(ct) =&gt; ct.upgrade(),
+            ParentContainer::CompositeType(ct) =&gt; <span class="prelude-val">Some</span>(ct.clone()),
         }
     }
 
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(model) =&gt; model.upgrade().unwrap().name.clone(),
-            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().name.clone(),
+            ParentContainer::CompositeType(composite) =&gt; composite.walker().name().to_owned(),
         }
     }
 
     <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Field&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(model) =&gt; model.upgrade().unwrap().fields().filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>),
-            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().fields().collect(),
+            ParentContainer::CompositeType(composite) =&gt; composite.fields().collect(),
         }
     }
 
@@ -212,11 +202,7 @@
         </span><span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(weak) =&gt; weak.upgrade().unwrap().fields().find_from_all(prisma_name).ok(),
 
-            ParentContainer::CompositeType(weak) =&gt; weak
-                .upgrade()
-                .unwrap()
-                .fields()
-                .find(|field| field.name() == prisma_name),
+            ParentContainer::CompositeType(weak) =&gt; weak.fields().into_iter().find(|field| field.name() == prisma_name),
         }
     }
 
@@ -249,23 +235,17 @@
 
 <span class="kw">impl </span>From&lt;CompositeTypeRef&gt; <span class="kw">for </span>ParentContainer {
     <span class="kw">fn </span>from(composite: CompositeTypeRef) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::CompositeType(Arc::downgrade(<span class="kw-2">&amp;</span>composite))
-    }
-}
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CompositeTypeRef&gt; <span class="kw">for </span>ParentContainer {
-    <span class="kw">fn </span>from(composite: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::CompositeType(Arc::downgrade(composite))
-    }
-}
-
-<span class="kw">impl </span>From&lt;CompositeTypeWeakRef&gt; <span class="kw">for </span>ParentContainer {
-    <span class="kw">fn </span>from(composite: CompositeTypeWeakRef) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::CompositeType(composite)
     }
 }
 
-<span class="kw">impl </span>Debug <span class="kw">for </span>ParentContainer {
+<span class="comment">// impl From&lt;&amp;CompositeTypeRef&gt; for ParentContainer {
+//     fn from(composite: &amp;CompositeTypeRef) -&gt; Self {
+//         Self::CompositeType(composite.clone())
+//     }
+// }
+
+</span><span class="kw">impl </span>Debug <span class="kw">for </span>ParentContainer {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(m) =&gt; f
@@ -277,7 +257,7 @@
             ParentContainer::CompositeType(ct) =&gt; f
                 .debug_struct(<span class="string">&quot;ParentContainer&quot;</span>)
                 .field(<span class="string">&quot;enum_variant&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;CompositeType&quot;</span>)
-                .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span>ct.upgrade().unwrap().name)
+                .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span>ct.walker().name())
                 .finish(),
         }
     }
@@ -288,7 +268,7 @@
         <span class="comment">// Unwraps are safe - the models and composites must exist after DML translation.
         </span><span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(model) =&gt; model.upgrade().unwrap().hash(state),
-            ParentContainer::CompositeType(composite) =&gt; composite.upgrade().unwrap().hash(state),
+            ParentContainer::CompositeType(composite) =&gt; composite.hash(state),
         }
     }
 }

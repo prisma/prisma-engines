@@ -123,6 +123,11 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>psl::schema_ast::ast;
@@ -145,7 +150,6 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) dml_model: dml::Model,
 
     <span class="kw">pub </span>internal_data_model: InternalDataModelWeakRef,
-    <span class="kw">pub </span>supports_create_operation: bool,
 }
 
 <span class="kw">impl </span>Model {
@@ -185,7 +189,13 @@
     }
 
     <span class="kw">pub fn </span>supports_create_operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.supports_create_operation
+        <span class="kw">let </span>dm = <span class="self">self</span>.internal_data_model();
+        <span class="kw">let </span>walker = dm.walk(<span class="self">self</span>.id);
+        <span class="kw">let </span>has_unsupported_field = walker
+            .scalar_fields()
+            .any(|sf| sf.ast_field().arity.is_required() &amp;&amp; sf.is_unsupported() &amp;&amp; sf.default_value().is_none());
+
+        !has_unsupported_field
     }
 
     <span class="kw">pub fn </span>indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Index] {

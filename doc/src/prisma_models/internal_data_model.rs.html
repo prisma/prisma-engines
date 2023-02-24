@@ -83,8 +83,6 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>psl::schema_ast::ast;
@@ -96,7 +94,6 @@
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>InternalDataModel {
     <span class="kw">pub</span>(<span class="kw">crate</span>) models: OnceCell&lt;Vec&lt;ModelRef&gt;&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) composite_types: OnceCell&lt;Vec&lt;CompositeTypeRef&gt;&gt;,
 
     <span class="kw">pub </span>schema: Arc&lt;psl::ValidatedSchema&gt;,
 }
@@ -106,8 +103,11 @@
         <span class="self">self</span>.models.get().unwrap()
     }
 
-    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[CompositeTypeRef] {
-        <span class="self">self</span>.composite_types.get().unwrap()
+    <span class="kw">pub fn </span>composite_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompositeTypeRef&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.schema
+            .db
+            .walk_composite_types()
+            .map(<span class="kw">move </span>|ct| <span class="self">self</span>.clone().zip(ct.id))
     }
 
     <span class="kw">pub fn </span>models_cloned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ModelRef&gt; {
@@ -138,12 +138,8 @@
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    <span class="kw">pub fn </span>find_composite_type_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, ctid: ast::CompositeTypeId) -&gt; CompositeTypeRef {
-        <span class="self">self</span>.composite_types
-            .get()
-            .and_then(|ct| ct.iter().find(|ct| ct.id == ctid))
-            .cloned()
-            .unwrap()
+    <span class="kw">pub fn </span>find_composite_type_by_id(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, ctid: ast::CompositeTypeId) -&gt; CompositeTypeRef {
+        <span class="self">self</span>.clone().zip(ctid)
     }
 
     <span class="kw">pub fn </span>find_model_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId) -&gt; ModelRef {

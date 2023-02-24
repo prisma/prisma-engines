@@ -637,15 +637,9 @@
 <a href="#637" id="637">637</a>
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
-<span class="kw">use </span>prisma_models::{
-    dml::{<span class="self">self</span>, DefaultValue},
-    CompositeFieldRef, PrismaValue,
-};
+<span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="doccomment">/// Builds filter types for the given model field.
@@ -685,7 +679,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>types = <span class="macro">vec!</span>[InputType::object(full_scalar_filter_type(
                 ctx,
                 <span class="kw-2">&amp;</span>sf.type_identifier(),
-                sf.native_type(),
+                sf.native_type().as_ref(),
                 sf.is_list(),
                 !sf.is_required(),
                 <span class="bool-val">false</span>,
@@ -774,7 +768,7 @@
 <span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>nullable = <span class="kw">if </span>cf.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
     <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ().name), nullable),
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(cf.typ().name()), nullable),
         PRISMA_NAMESPACE,
     );
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -787,7 +781,7 @@
 
     ctx.cache_input_type(ident, object.clone());
 
-    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
+    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
@@ -812,7 +806,7 @@
 
 <span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(<span class="kw-2">&amp;</span>cf.typ().name)),
+        <span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(cf.typ().name())),
         PRISMA_NAMESPACE,
     );
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -824,7 +818,7 @@
     <span class="kw">let </span>object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
+    <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
@@ -1196,7 +1190,7 @@
         <span class="kw">let </span>field = input_field(
             filters::MODE,
             InputType::enum_type(enum_type),
-            <span class="prelude-val">Some</span>(DefaultValue::new_single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 
