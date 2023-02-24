@@ -259,8 +259,6 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::{RelationField, RelationFieldId},
@@ -374,9 +372,7 @@
 
     <span class="doccomment">/// The relation this field is part of.
     </span><span class="kw">pub fn </span>relation(<span class="self">self</span>) -&gt; RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="kw">let </span>model = <span class="self">self</span>.model();
-        <span class="kw">let </span><span class="kw-2">mut </span>relations = model.relations_from().chain(model.relations_to());
-        relations.find(|r| r.has_field(<span class="self">self</span>.id.<span class="number">0</span>, <span class="self">self</span>.id.<span class="number">1</span>)).unwrap()
+        <span class="self">self</span>.walk(<span class="self">self</span>.db.relations[<span class="self">self</span>.id])
     }
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,

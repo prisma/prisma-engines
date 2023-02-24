@@ -147,17 +147,6 @@
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::{
     ast::FieldArity,
@@ -207,21 +196,11 @@
     }
 
     <span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
-        <span class="kw">let </span>model = <span class="self">self</span>.model();
-        <span class="kw">let </span>fields = model.fields();
         <span class="self">self</span>.walker()
             .fields()
             .into_iter()
             .flatten()
-            .map(|f| {
-                fields.find_from_scalar(f.name()).unwrap_or_else(|<span class="kw">_</span>| {
-                    <span class="macro">panic!</span>(
-                        <span class="string">&quot;Expected &#39;{}&#39; to be a scalar field on model &#39;{}&#39;, found none.&quot;</span>,
-                        f.name(),
-                        model.name()
-                    )
-                })
-            })
+            .map(|f| <span class="self">self</span>.dm.clone().zip(ScalarFieldId::InModel(f.id)))
             .collect()
     }
 
@@ -269,7 +248,7 @@
             .referenced_fields()
             .into_iter()
             .flatten()
-            .map(|field| <span class="self">self</span>.related_model().fields().find_from_scalar(field.name()).unwrap())
+            .map(|field| <span class="self">self</span>.dm.clone().zip(ScalarFieldId::InModel(field.id)))
             .collect()
     }
 
@@ -289,18 +268,17 @@
         <span class="kw">match </span>relation.refine() {
             walkers::RefinedRelationWalker::Inline(rel) =&gt; {
                 <span class="kw">let </span>forward = rel.forward_relation_field().unwrap();
-                <span class="kw">let </span>model = <span class="self">self</span>.model();
                 <span class="kw">if </span>forward.id == <span class="self">self</span>.id {
                     forward
                         .fields()
                         .unwrap()
-                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .map(|sf| <span class="self">self</span>.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 } <span class="kw">else </span>{
                     forward
                         .referenced_fields()
                         .unwrap()
-                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .map(|sf| <span class="self">self</span>.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 }
             }

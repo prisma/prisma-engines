@@ -117,10 +117,6 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>implicit_many_to_many;
 <span class="kw">mod </span>inline;
 <span class="kw">mod </span>two_way_embedded_many_to_many;
@@ -189,10 +185,6 @@
     /// ```
     </span><span class="kw">pub fn </span>explicit_relation_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
         <span class="self">self</span>.get().relation_name.map(|string_id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[string_id])
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_field(<span class="self">self</span>, model_id: ast::ModelId, field_id: ast::FieldId) -&gt; bool {
-        <span class="self">self</span>.get().has_field(model_id, field_id)
     }
 
     <span class="doccomment">/// The relation name, explicit or inferred.
