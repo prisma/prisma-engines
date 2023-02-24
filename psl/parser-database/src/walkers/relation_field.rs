@@ -111,9 +111,7 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The relation this field is part of.
     pub fn relation(self) -> RelationWalker<'db> {
-        let model = self.model();
-        let mut relations = model.relations_from().chain(model.relations_to());
-        relations.find(|r| r.has_field(self.id.0, self.id.1)).unwrap()
+        self.walk(self.db.relations[self.id])
     }
 
     /// The name of the relation. Either uses the `name` (or default) argument,

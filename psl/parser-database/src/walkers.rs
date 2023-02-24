@@ -130,13 +130,13 @@ impl crate::ParserDatabase {
     pub fn walk_complete_inline_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'_>> + '_ {
         self.relations
             .iter_relations()
-            .filter(|(_, _, relation)| !relation.is_implicit_many_to_many())
-            .filter_map(move |(model_a, model_b, relation)| {
+            .filter(|(relation, _)| !relation.is_implicit_many_to_many())
+            .filter_map(move |(relation, _)| {
                 relation
                     .as_complete_fields()
                     .map(|(field_a, field_b)| CompleteInlineRelationWalker {
-                        side_a: (model_a, field_a),
-                        side_b: (model_b, field_b),
+                        side_a: (relation.model_a, field_a),
+                        side_b: (relation.model_b, field_b),
                         db: self,
                     })
             })

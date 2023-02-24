@@ -47,21 +47,11 @@ impl RelationField {
     }
 
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
-        let model = self.model();
-        let fields = model.fields();
         self.walker()
             .fields()
             .into_iter()
             .flatten()
-            .map(|f| {
-                fields.find_from_scalar(f.name()).unwrap_or_else(|_| {
-                    panic!(
-                        "Expected '{}' to be a scalar field on model '{}', found none.",
-                        f.name(),
-                        model.name()
-                    )
-                })
-            })
+            .map(|f| self.dm.clone().zip(ScalarFieldId::InModel(f.id)))
             .collect()
     }
 
@@ -109,7 +99,7 @@ impl RelationField {
             .referenced_fields()
             .into_iter()
             .flatten()
-            .map(|field| self.related_model().fields().find_from_scalar(field.name()).unwrap())
+            .map(|field| self.dm.clone().zip(ScalarFieldId::InModel(field.id)))
             .collect()
     }
 
@@ -129,18 +119,17 @@ impl RelationField {
         match relation.refine() {
             walkers::RefinedRelationWalker::Inline(rel) => {
                 let forward = rel.forward_relation_field().unwrap();
-                let model = self.model();
                 if forward.id == self.id {
                     forward
                         .fields()
                         .unwrap()
-                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .map(|sf| self.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 } else {
                     forward
                         .referenced_fields()
                         .unwrap()
-                        .map(|sf| model.fields().find_from_scalar(sf.name()).unwrap())
+                        .map(|sf| self.dm.clone().zip(ScalarFieldId::InModel(sf.id)))
                         .collect()
                 }
             }
