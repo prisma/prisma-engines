@@ -8,7 +8,7 @@ use connector::filter::Filter;
 use prisma_models::ModelRef;
 use schema::ConnectorContext;
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Creates a top level delete record query and adds it to the query graph.
 pub fn delete_record(
@@ -23,12 +23,12 @@ pub fn delete_record(
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
-    let mut read_query = read::find_unique(field, Arc::clone(&model))?;
+    let mut read_query = read::find_unique(field, model.clone())?;
     read_query.add_filter(filter.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));
     let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-        model: Arc::clone(&model),
+        model: model.clone(),
         record_filter: Some(filter.into()),
     }));
 

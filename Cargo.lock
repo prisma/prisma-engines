@@ -3022,7 +3022,6 @@ dependencies = [
  "chrono",
  "dml",
  "itertools",
- "once_cell",
  "prisma-value",
  "psl",
  "serde",

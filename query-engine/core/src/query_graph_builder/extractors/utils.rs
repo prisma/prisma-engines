@@ -10,14 +10,18 @@ pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<ScalarFie
     model
         .fields()
         .compound_id()
-        .and_then(|pk| (name == schema_builder::compound_id_field_name(pk)).then(|| pk.fields()))
+        .and_then(|pk| (name == schema_builder::compound_id_field_name(&pk)).then(|| pk.fields()))
 }
 
 /// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
 pub fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
     model
         .unique_indexes()
-        .into_iter()
         .find(|index| schema_builder::compound_index_field_name(index) == name)
-        .map(|index| index.fields())
+        .map(|index| {
+            index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect()
+        })
 }

@@ -7,7 +7,7 @@ use crate::{
 use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested update (single record) cases.
 ///
@@ -82,7 +82,7 @@ pub fn nested_update(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let update_node =
-            update::update_record_node(graph, connector_ctx, filter, Arc::clone(child_model), data.try_into()?)?;
+            update::update_record_node(graph, connector_ctx, filter, child_model.clone(), data.try_into()?)?;
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -145,7 +145,7 @@ pub fn nested_update_many(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
         let update_many_node =
-            update::update_many_record_node(graph, connector_ctx, Filter::empty(), Arc::clone(child_model), data_map)?;
+            update::update_many_record_node(graph, connector_ctx, Filter::empty(), child_model.clone(), data_map)?;
 
         graph.create_edge(
             &find_child_records_node,

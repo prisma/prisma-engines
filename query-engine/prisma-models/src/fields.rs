@@ -5,30 +5,26 @@ use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
 pub struct Fields {
-    primary_key: Option<PrimaryKey>,
     model: ModelWeakRef,
 }
 
 impl Fields {
-    pub(crate) fn new(model: ModelWeakRef, primary_key: Option<PrimaryKey>) -> Fields {
-        Fields { primary_key, model }
+    pub(crate) fn new(model: ModelWeakRef) -> Fields {
+        Fields { model }
     }
 
-    pub fn id(&self) -> Option<&PrimaryKey> {
-        self.primary_key.as_ref()
+    pub fn id(&self) -> Option<PrimaryKey> {
+        self.model.walker().primary_key().map(|pk| PrimaryKey {
+            fields: pk
+                .fields()
+                .map(|f| self.model.dm.clone().zip(ScalarFieldId::InModel(f.id)))
+                .collect::<Vec<_>>(),
+            alias: pk.name().map(ToOwned::to_owned),
+        })
     }
 
-    pub fn compound_id(&self) -> Option<&PrimaryKey> {
-        if self
-            .primary_key
-            .as_ref()
-            .map(|pk| pk.fields().len() > 1)
-            .unwrap_or(false)
-        {
-            self.primary_key.as_ref()
-        } else {
-            None
-        }
+    pub fn compound_id(&self) -> Option<PrimaryKey> {
+        self.id().filter(|pk| pk.fields().len() > 1)
     }
 
     pub fn updated_at(&self) -> impl Iterator<Item = ScalarFieldRef> {
@@ -104,7 +100,7 @@ impl Fields {
             })
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: prisma_name.to_string(),
-                container_name: self.model().name.clone(),
+                container_name: self.model().name().to_owned(),
                 container_type: "model",
             })
     }
@@ -117,7 +113,7 @@ impl Fields {
             .next()
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
-                container_name: self.model().name.clone(),
+                container_name: self.model().name().to_owned(),
                 container_type: "model",
             })
     }
@@ -128,13 +124,13 @@ impl Fields {
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
-                container_name: self.model().name.clone(),
+                container_name: self.model().name().to_owned(),
                 container_type: "model",
             })
     }
 
-    fn model(&self) -> ModelRef {
-        self.model.upgrade().unwrap()
+    fn model(&self) -> &ModelRef {
+        &self.model
     }
 
     pub fn find_from_relation_fields(&self, name: &str) -> Result<RelationFieldRef> {
@@ -143,7 +139,7 @@ impl Fields {
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::RelationFieldNotFound {
                 name: name.to_string(),
-                model: self.model().name.clone(),
+                model: self.model().name().to_owned(),
             })
     }
 

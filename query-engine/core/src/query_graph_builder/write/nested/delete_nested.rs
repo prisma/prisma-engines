@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::{Filter, RecordFilter};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
 ///
@@ -42,7 +42,7 @@ pub fn nested_delete(
         let filter_len = filters.len();
         let or_filter = Filter::Or(filters);
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(&child_model),
+            model: child_model.clone(),
             record_filter: or_filter.clone().into(),
         });
 
@@ -101,7 +101,7 @@ pub fn nested_delete(
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
 
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-                model: Arc::clone(&child_model),
+                model: child_model.clone(),
                 record_filter: Some(filter.into()),
             })));
 
@@ -161,7 +161,7 @@ pub fn nested_delete_many(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(&child_model),
+            model: child_model.clone(),
             record_filter: RecordFilter::empty(),
         });
 

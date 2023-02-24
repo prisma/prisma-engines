@@ -8,7 +8,7 @@ use crate::{
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
@@ -26,7 +26,7 @@ pub fn nested_create(
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()?))
+        .map(|value| create::create_record_node(graph, connector_ctx, child_model.clone(), value.try_into()?))
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
@@ -445,7 +445,7 @@ pub fn nested_create_many(
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     let query = CreateManyRecords {
-        model: Arc::clone(child_model),
+        model: child_model.clone(),
         args,
         skip_duplicates,
     };

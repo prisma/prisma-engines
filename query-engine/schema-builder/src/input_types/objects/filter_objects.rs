@@ -1,5 +1,4 @@
 use super::*;
-
 use constants::filters;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 use std::sync::Arc;
@@ -17,7 +16,7 @@ pub(crate) fn scalar_filter_object_type(
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
-    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(Arc::downgrade(model))));
+    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
@@ -109,18 +108,22 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_uniques: Vec<_> = model
         .unique_indexes()
         .into_iter()
-        .filter(|index| index.fields.len() > 1)
+        .filter(|index| index.fields().len() > 1)
         .map(|index| {
-            let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
-            let name = compound_index_field_name(index);
+            let fields = index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect();
+            let typ = compound_field_unique_object_type(ctx, model, index.name(), fields);
+            let name = compound_index_field_name(&index);
 
             (name, typ)
         })
         .collect();
     // @@id compound field (there can be only one per model).
     let compound_id = model.fields().compound_id().map(|pk| {
-        let name = compound_id_field_name(pk);
-        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
+        let name = compound_id_field_name(&pk);
+        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_deref(), pk.fields());
 
         (name, typ)
     });
@@ -170,7 +173,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_id_field = compound_id.map(|(name, typ)| input_field(name, InputType::object(typ), None).optional());
 
     // Boolean operators AND/OR/NOT, which are _not_ where unique inputs
-    let where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(Arc::downgrade(model))));
+    let where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(model.clone())));
     let boolean_operators = vec![
         input_field(
             filters::AND,
@@ -209,7 +212,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 fn compound_field_unique_object_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
-    alias: Option<&String>,
+    alias: Option<&str>,
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(

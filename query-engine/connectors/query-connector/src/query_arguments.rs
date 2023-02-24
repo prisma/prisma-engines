@@ -140,11 +140,12 @@ impl QueryArguments {
             stable_candidates.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
-        let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
-            index
-                .fields()
-                .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+        let order_by_contains_unique_index = self.model.unique_indexes().any(|index| {
+            index.fields().into_iter().all(|f| {
+                on_model
+                    .iter()
+                    .any(|o| Some(o.field.id) == f.as_scalar_field().map(|sf| ScalarFieldId::InModel(sf.id)))
+            })
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());

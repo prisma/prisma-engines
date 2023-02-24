@@ -8,7 +8,7 @@ use crate::{
 use connector::Filter;
 use prisma_models::RelationFieldRef;
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles a nested upsert.
 /// The constructed query graph can have different shapes based on the relation
@@ -137,12 +137,12 @@ pub fn nested_upsert(
 
         let if_node = graph.create_node(Flow::default_if());
         let create_node =
-            create::create_record_node(graph, connector_ctx, Arc::clone(&child_model), create_input.try_into()?)?;
+            create::create_record_node(graph, connector_ctx, child_model.clone(), create_input.try_into()?)?;
         let update_node = update::update_record_node(
             graph,
             connector_ctx,
             filter.clone(),
-            Arc::clone(&child_model),
+            child_model.clone(),
             update_input.try_into()?,
         )?;
 
