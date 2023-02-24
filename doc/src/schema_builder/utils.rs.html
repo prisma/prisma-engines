@@ -103,11 +103,10 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::pk::PrimaryKey;
-<span class="kw">use </span>prisma_models::{dml, ModelRef};
+<span class="kw">use </span>prisma_models::{dml, walkers, ModelRef};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Object type convenience wrapper function.
@@ -192,10 +191,9 @@
 }
 
 <span class="doccomment">/// Computes a compound field name based on an index.
-</span><span class="kw">pub fn </span>compound_index_field_name(index: <span class="kw-2">&amp;</span>Index) -&gt; String {
-    index.name.clone().unwrap_or_else(|| {
-        <span class="kw">let </span>index_fields = index.fields();
-        <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = index_fields.iter().map(|sf| sf.name()).collect();
+</span><span class="kw">pub fn </span>compound_index_field_name(index: <span class="kw-2">&amp;</span>walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+    index.name().map(ToOwned::to_owned).unwrap_or_else(|| {
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = index.fields().map(|sf| sf.name()).collect();
 
         field_names.join(<span class="string">&quot;_&quot;</span>)
     })

@@ -1015,7 +1015,7 @@
 <span class="kw">use </span>connector::{Filter, IntoFilter};
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>schema_builder::constants::args;
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested connect or create cases.
 ///
@@ -1120,7 +1120,7 @@
             filter,
         ));
 
-        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
 
         <span class="kw">let </span>connect_exists_node =
@@ -1282,8 +1282,8 @@
         ));
 
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-        <span class="kw">let </span>update_child_node = utils::update_records_node_placeholder(graph, filter, Arc::clone(child_model));
-        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)<span class="question-mark">?</span>;
+        <span class="kw">let </span>update_child_node = utils::update_records_node_placeholder(graph, filter, child_model.clone());
+        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
 
         graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
         graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>update_child_node, QueryGraphDependency::Then)<span class="question-mark">?</span>;
@@ -1424,7 +1424,7 @@
     graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
     <span class="kw">let </span>return_existing = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
     <span class="kw">let </span>return_create = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
 
@@ -1586,7 +1586,7 @@
     graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)<span class="question-mark">?</span>;
     <span class="kw">let </span>return_existing = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
     <span class="kw">let </span>return_create = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
 

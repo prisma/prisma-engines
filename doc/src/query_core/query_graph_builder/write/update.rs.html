@@ -210,7 +210,7 @@
 <span class="kw">use </span>prisma_models::ModelRef;
 <span class="kw">use </span>schema::ConnectorContext;
 <span class="kw">use </span>schema_builder::constants::args;
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Creates an update record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
 </span><span class="kw">pub fn </span>update_record(
@@ -227,7 +227,7 @@
     </span><span class="kw">let </span>data_argument = field.arguments.lookup(args::DATA).unwrap();
     <span class="kw">let </span>data_map: ParsedInputMap = data_argument.value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>update_node = update_record_node(graph, connector_ctx, filter.clone(), Arc::clone(<span class="kw-2">&amp;</span>model), data_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update_record_node(graph, connector_ctx, filter.clone(), model.clone(), data_map)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));

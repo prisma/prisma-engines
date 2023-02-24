@@ -80,87 +80,33 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>psl::schema_ast::ast;
-<span class="kw">use </span>std::{
-    fmt::Debug,
-    hash::{Hash, Hasher},
-    sync::{Arc, Weak},
-};
+<span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
 
-<span class="kw">pub type </span>ModelRef = Arc&lt;Model&gt;;
-<span class="kw">pub type </span>ModelWeakRef = Weak&lt;Model&gt;;
+<span class="kw">pub type </span>Model = <span class="kw">crate</span>::Zipper&lt;ast::ModelId&gt;;
+<span class="kw">pub type </span>ModelRef = Model;
+<span class="kw">pub type </span>ModelWeakRef = Model;
 
-<span class="kw">pub struct </span>Model {
-    <span class="kw">pub </span>id: ast::ModelId,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) manifestation: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: OnceCell&lt;Fields&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) indexes: OnceCell&lt;Vec&lt;Index&gt;&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) primary_identifier: OnceCell&lt;FieldSelection&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) dml_model: dml::Model,
+<span class="comment">// pub struct Model {
+//     pub id: ast::ModelId,
+//     pub(crate) name: String,
+//     pub(crate) manifestation: Option&lt;String&gt;,
+//     pub(crate) fields: OnceCell&lt;Fields&gt;,
+//     pub(crate) primary_identifier: OnceCell&lt;FieldSelection&gt;,
+//     pub(crate) dml_model: dml::Model,
 
-    <span class="kw">pub </span>internal_data_model: InternalDataModelWeakRef,
-}
+//     pub internal_data_model: InternalDataModelWeakRef,
+// }
 
-<span class="kw">impl </span>Model {
+</span><span class="kw">impl </span>Model {
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.name
+        <span class="self">self</span>.walker().name()
     }
 
     <span class="doccomment">/// Returns the schema name for the model
     /// which is the contents of the @@schema(&quot;...&quot;) attribute
     </span><span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="self">self</span>.dml_model.schema.clone()
+        <span class="self">self</span>.walker().schema_name().map(ToOwned::to_owned)
     }
 
     <span class="doccomment">/// Returns the set of fields to be used as the primary identifier for a record of that model.
@@ -168,24 +114,24 @@
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
     /// implementation detail that is used to reason over a fixed set of fields.
     </span><span class="kw">pub fn </span>primary_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
-        <span class="self">self</span>.primary_identifier.get_or_init(||{
-            <span class="kw">let </span>dml_fields = <span class="self">self</span>.dml_model.first_unique_criterion();
-            <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = dml_fields
-                .iter()
-                .map(|dml_field| {
-                    <span class="self">self</span>.fields().find_from_scalar(<span class="kw-2">&amp;</span>dml_field.name).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.&quot;</span>, <span class="kw-2">&amp;</span>dml_field.name))
-                })
+        <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+            </span>.walker()
+            .unique_criterias()
+            .next()
+            .unwrap()
+            .fields()
+            .map(|f| {
+                <span class="self">self</span>.dm
+                    .clone()
+                    .zip(ScalarFieldId::InModel(f.as_scalar_field().unwrap().id))
+            })
             .collect();
 
-            FieldSelection::from(fields)
-        }).clone()
+        FieldSelection::from(fields)
     }
 
-    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Fields {
-        <span class="self">self</span>.fields
-            .get()
-            .ok_or_else(|| String::from(<span class="string">&quot;Model fields must be set!&quot;</span>))
-            .unwrap()
+    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Fields {
+        Fields::new(<span class="self">self</span>.clone())
     }
 
     <span class="kw">pub fn </span>supports_create_operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -198,64 +144,22 @@
         !has_unsupported_field
     }
 
-    <span class="kw">pub fn </span>indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Index] {
-        <span class="self">self</span>.indexes
-            .get()
-            .ok_or_else(|| String::from(<span class="string">&quot;Model indexes must be set!&quot;</span>))
-            .unwrap()
-    }
-
-    <span class="kw">pub fn </span>unique_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>Index&gt; {
-        <span class="self">self</span>.indexes()
-            .iter()
-            .filter(|index| index.typ == IndexType::Unique)
-            .collect()
-    }
-
     <span class="doccomment">/// The name of the model in the database
     /// For a sql database this will be the Table name for this model
     </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.db_name_opt().unwrap_or_else(|| <span class="self">self</span>.name.as_ref())
+        <span class="self">self</span>.walker().database_name()
     }
 
     <span class="kw">pub fn </span>db_name_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-        <span class="self">self</span>.manifestation.as_ref().map(|m| m.as_ref())
+        <span class="self">self</span>.walker().mapped_name()
     }
 
     <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
-        <span class="self">self</span>.internal_data_model
-            .upgrade()
-            .expect(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
+        <span class="self">self</span>.dm.clone()
     }
-}
 
-<span class="kw">impl </span>Debug <span class="kw">for </span>Model {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_struct(<span class="string">&quot;Model&quot;</span>)
-            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;schema&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.schema_name().unwrap_or_default())
-            .field(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.manifestation)
-            .field(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fields)
-            .field(<span class="string">&quot;indexes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.indexes)
-            .field(<span class="string">&quot;primary_identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.primary_identifier)
-            .field(<span class="string">&quot;dml_model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.dml_model)
-            .field(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
-            .finish()
-    }
-}
-
-<span class="kw">impl </span>Hash <span class="kw">for </span>Model {
-    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
-        <span class="comment">// Names are unique in the data model.
-        </span><span class="self">self</span>.name.hash(state);
-    }
-}
-
-<span class="kw">impl </span>Eq <span class="kw">for </span>Model {}
-
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>Model {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Model) -&gt; bool {
-        <span class="self">self</span>.name == other.name
+    <span class="kw">pub fn </span>unique_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.walker().indexes().filter(|idx| idx.is_unique())
     }
 }
 </code></pre></div>

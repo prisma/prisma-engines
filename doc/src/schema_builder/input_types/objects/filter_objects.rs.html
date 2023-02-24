@@ -279,8 +279,10 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-
 <span class="kw">use </span>constants::filters;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 <span class="kw">use </span>std::sync::Arc;
@@ -298,7 +300,7 @@
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
-    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(Arc::downgrade(model))));
+    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
     <span class="kw">let </span>input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
@@ -390,18 +392,22 @@
     </span><span class="kw">let </span>compound_uniques: Vec&lt;<span class="kw">_</span>&gt; = model
         .unique_indexes()
         .into_iter()
-        .filter(|index| index.fields.len() &gt; <span class="number">1</span>)
+        .filter(|index| index.fields().len() &gt; <span class="number">1</span>)
         .map(|index| {
-            <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
-            <span class="kw">let </span>name = compound_index_field_name(index);
+            <span class="kw">let </span>fields = index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect();
+            <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, index.name(), fields);
+            <span class="kw">let </span>name = compound_index_field_name(<span class="kw-2">&amp;</span>index);
 
             (name, typ)
         })
         .collect();
     <span class="comment">// @@id compound field (there can be only one per model).
     </span><span class="kw">let </span>compound_id = model.fields().compound_id().map(|pk| {
-        <span class="kw">let </span>name = compound_id_field_name(pk);
-        <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, pk.alias.as_ref(), pk.fields());
+        <span class="kw">let </span>name = compound_id_field_name(<span class="kw-2">&amp;</span>pk);
+        <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, pk.alias.as_deref(), pk.fields());
 
         (name, typ)
     });
@@ -451,7 +457,7 @@
     </span><span class="kw">let </span>compound_id_field = compound_id.map(|(name, typ)| input_field(name, InputType::object(typ), <span class="prelude-val">None</span>).optional());
 
     <span class="comment">// Boolean operators AND/OR/NOT, which are _not_ where unique inputs
-    </span><span class="kw">let </span>where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(Arc::downgrade(model))));
+    </span><span class="kw">let </span>where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(model.clone())));
     <span class="kw">let </span>boolean_operators = <span class="macro">vec!</span>[
         input_field(
             filters::AND,
@@ -490,7 +496,7 @@
 </span><span class="kw">fn </span>compound_field_unique_object_type(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
     model: <span class="kw-2">&amp;</span>ModelRef,
-    alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;,
+    alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     from_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new(

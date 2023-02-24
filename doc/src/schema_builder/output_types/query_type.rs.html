@@ -230,7 +230,7 @@
             <span class="macro">vec!</span>[arg],
             OutputType::object(objects::model::map_type(ctx, model)),
             <span class="prelude-val">Some</span>(QueryInfo {
-                model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+                model: <span class="prelude-val">Some</span>(model.clone()),
                 tag: QueryTag::FindUnique,
             }),
         )
@@ -249,7 +249,7 @@
             <span class="macro">vec!</span>[arg],
             OutputType::object(objects::model::map_type(ctx, model)),
             <span class="prelude-val">Some</span>(QueryInfo {
-                model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+                model: <span class="prelude-val">Some</span>(model.clone()),
                 tag: QueryTag::FindUniqueOrThrow,
             }),
         )
@@ -267,7 +267,7 @@
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::FindFirst,
         }),
     )
@@ -285,7 +285,7 @@
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::FindFirstOrThrow,
         }),
     )
@@ -303,7 +303,7 @@
         args,
         OutputType::list(OutputType::object(object_type)),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::FindMany,
         }),
     )
@@ -316,7 +316,7 @@
         arguments::relation_to_many_selection_arguments(ctx, model, <span class="bool-val">false</span>),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::Aggregate,
         }),
     )
@@ -331,7 +331,7 @@
             ctx, model,
         ))),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::GroupBy,
         }),
     )

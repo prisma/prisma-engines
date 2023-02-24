@@ -31,6 +31,10 @@
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::AsColumns, Context};
 <span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>quaint::ast::{Column, Table};
@@ -59,7 +63,11 @@
         <span class="kw">let </span>table = table.add_unique_index(id_cols);
 
         <span class="self">self</span>.unique_indexes().into_iter().fold(table, |table, index| {
-            <span class="kw">let </span>index: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = index.fields().as_columns(ctx).collect();
+            <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = index
+                .fields()
+                .map(|f| prisma_models::ScalarFieldRef::from((<span class="self">self</span>.dm.clone(), f)))
+                .collect();
+            <span class="kw">let </span>index: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = fields.as_columns(ctx).collect();
             table.add_unique_index(index)
         })
     }

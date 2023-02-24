@@ -208,7 +208,7 @@
         args,
         OutputType::object(objects::model::map_type(ctx, model)),
         <span class="prelude-val">Some</span>(QueryInfo {
-            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            model: <span class="prelude-val">Some</span>(model.clone()),
             tag: QueryTag::CreateOne,
         }),
     )

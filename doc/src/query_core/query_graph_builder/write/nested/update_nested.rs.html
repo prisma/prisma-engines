@@ -175,7 +175,7 @@
 <span class="kw">use </span>connector::Filter;
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>schema_builder::constants::args;
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested update (single record) cases.
 ///
@@ -250,7 +250,7 @@
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
         <span class="kw">let </span>update_node =
-            update::update_record_node(graph, connector_ctx, filter, Arc::clone(child_model), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            update::update_record_node(graph, connector_ctx, filter, child_model.clone(), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -313,7 +313,7 @@
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>update_many_node =
-            update::update_many_record_node(graph, connector_ctx, Filter::empty(), Arc::clone(child_model), data_map)<span class="question-mark">?</span>;
+            update::update_many_record_node(graph, connector_ctx, Filter::empty(), child_model.clone(), data_map)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>find_child_records_node,

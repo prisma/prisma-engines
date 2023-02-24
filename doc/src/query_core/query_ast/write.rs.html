@@ -323,7 +323,7 @@
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
 <span class="kw">use </span>connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::{collections::HashMap, sync::Arc};
+<span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>WriteQuery {
@@ -393,13 +393,13 @@
 
     <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::CreateRecord(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
-            <span class="self">Self</span>::CreateManyRecords(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
-            <span class="self">Self</span>::UpdateRecord(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
+            <span class="self">Self</span>::CreateRecord(q) =&gt; q.model.clone(),
+            <span class="self">Self</span>::CreateManyRecords(q) =&gt; q.model.clone(),
+            <span class="self">Self</span>::UpdateRecord(q) =&gt; q.model.clone(),
             <span class="self">Self</span>::Upsert(q) =&gt; q.model().clone(),
-            <span class="self">Self</span>::DeleteRecord(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
-            <span class="self">Self</span>::UpdateManyRecords(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
-            <span class="self">Self</span>::DeleteManyRecords(q) =&gt; Arc::clone(<span class="kw-2">&amp;</span>q.model),
+            <span class="self">Self</span>::DeleteRecord(q) =&gt; q.model.clone(),
+            <span class="self">Self</span>::UpdateManyRecords(q) =&gt; q.model.clone(),
+            <span class="self">Self</span>::DeleteManyRecords(q) =&gt; q.model.clone(),
             <span class="self">Self</span>::ConnectRecords(q) =&gt; q.relation_field.model(),
             <span class="self">Self</span>::DisconnectRecords(q) =&gt; q.relation_field.model(),
             <span class="self">Self</span>::ExecuteRaw(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),

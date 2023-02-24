@@ -241,6 +241,7 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 
@@ -383,11 +384,12 @@
             stable_candidates.iter().partition(|o| o.path.is_empty());
 
         <span class="comment">// Indicates whether or not a combination of contained fields is on the source model (we don&#39;t check for relations for now).
-        </span><span class="kw">let </span>order_by_contains_unique_index = <span class="self">self</span>.model.unique_indexes().into_iter().any(|index| {
-            index
-                .fields()
-                .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+        </span><span class="kw">let </span>order_by_contains_unique_index = <span class="self">self</span>.model.unique_indexes().any(|index| {
+            index.fields().into_iter().all(|f| {
+                on_model
+                    .iter()
+                    .any(|o| <span class="prelude-val">Some</span>(o.field.id) == f.as_scalar_field().map(|sf| ScalarFieldId::InModel(sf.id)))
+            })
         });
 
         <span class="kw">let </span>source_contains_unique = on_model.iter().any(|o| o.field.unique());

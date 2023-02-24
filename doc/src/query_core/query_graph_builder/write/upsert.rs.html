@@ -270,7 +270,6 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -280,7 +279,6 @@
 <span class="kw">use </span>connector::IntoFilter;
 <span class="kw">use </span>prisma_models::ModelRef;
 <span class="kw">use </span>schema::ConnectorContext;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Handles a top-level upsert
 ///
@@ -375,9 +373,9 @@
     <span class="kw">let </span>read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     <span class="kw">let </span>read_parent_records_node = graph.create_node(read_parent_records);
 
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(<span class="kw-2">&amp;</span>model), create_argument)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, model.clone(), create_argument)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>update_node = update::update_record_node(graph, connector_ctx, filter, Arc::clone(<span class="kw-2">&amp;</span>model), update_argument)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update::update_record_node(graph, connector_ctx, filter, model.clone(), update_argument)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>read_node_create = graph.create_node(Query::Read(read_query.clone()));
     <span class="kw">let </span>read_node_update = graph.create_node(Query::Read(read_query));

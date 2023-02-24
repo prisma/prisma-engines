@@ -21,6 +21,10 @@
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
 </pre><pre class="rust"><code><span class="kw">use </span>prisma_models::{ModelRef, ScalarFieldRef};
 
 <span class="doccomment">/// Attempts to resolve a field name to a compound field.
@@ -33,16 +37,20 @@
     model
         .fields()
         .compound_id()
-        .and_then(|pk| (name == schema_builder::compound_id_field_name(pk)).then(|| pk.fields()))
+        .and_then(|pk| (name == schema_builder::compound_id_field_name(<span class="kw-2">&amp;</span>pk)).then(|| pk.fields()))
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
 </span><span class="kw">pub fn </span>resolve_index_fields(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
     model
         .unique_indexes()
-        .into_iter()
         .find(|index| schema_builder::compound_index_field_name(index) == name)
-        .map(|index| index.fields())
+        .map(|index| {
+            index
+                .fields()
+                .map(|f| ScalarFieldRef::from((model.dm.clone(), f)))
+                .collect()
+        })
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

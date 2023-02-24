@@ -645,9 +645,6 @@
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
 <a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -658,7 +655,6 @@
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>std::convert::TryInto;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Handles nested connect cases.
 ///
@@ -844,7 +840,7 @@
         )<span class="question-mark">?</span>;
     } <span class="kw">else </span>{
         <span class="kw">let </span>expected_id_count = child_filter.size();
-        <span class="kw">let </span>update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
+        <span class="kw">let </span>update_node = utils::update_records_node_placeholder(graph, child_filter, child_model.clone());
         <span class="kw">let </span>check_node = graph.create_node(Node::Empty);
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_model_name = parent_relation_field.model().name().to_owned();
@@ -1060,8 +1056,7 @@
 
     <span class="comment">// If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     </span><span class="kw">if </span>relation_inlined_child {
-        <span class="kw">let </span>update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        <span class="kw">let </span>update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
@@ -1241,8 +1236,7 @@
 
     <span class="comment">// If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     </span><span class="kw">if </span>relation_inlined_child {
-        <span class="kw">let </span>update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        <span class="kw">let </span>update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();

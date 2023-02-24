@@ -4,43 +4,11 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
-<a href="#8" id="8">8</a>
-<a href="#9" id="9">9</a>
-<a href="#10" id="10">10</a>
-<a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a>
-<a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{builders, InternalDataModel, InternalDataModelRef};
-<span class="kw">use </span>once_cell::sync::OnceCell;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{InternalDataModel, InternalDataModelRef};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;) -&gt; InternalDataModelRef {
-    <span class="kw">let </span>datamodel = dml::lift(<span class="kw-2">&amp;</span>schema);
-
-    <span class="kw">let </span>models = builders::model_builders(<span class="kw-2">&amp;</span>datamodel, <span class="kw-2">&amp;</span>schema);
-
-    <span class="kw">let </span>internal_data_model = Arc::new(InternalDataModel {
-        models: OnceCell::new(),
-        schema,
-    });
-
-    <span class="kw">let </span>models = models
-        .into_iter()
-        .map(|mt| mt.build(Arc::downgrade(<span class="kw-2">&amp;</span>internal_data_model), <span class="kw-2">&amp;</span>internal_data_model.schema))
-        .collect();
-
-    internal_data_model.models.set(models).unwrap();
-    internal_data_model
+    Arc::new(InternalDataModel { schema })
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="prisma_models" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

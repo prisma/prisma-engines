@@ -200,7 +200,7 @@
 };
 <span class="kw">use </span>connector::{Filter, RecordFilter};
 <span class="kw">use </span>prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Adds a delete (single) record node to the graph and connects it to the parent.
 ///
@@ -236,7 +236,7 @@
         <span class="kw">let </span>filter_len = filters.len();
         <span class="kw">let </span>or_filter = Filter::Or(filters);
         <span class="kw">let </span>delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(<span class="kw-2">&amp;</span>child_model),
+            model: child_model.clone(),
             record_filter: or_filter.clone().into(),
         });
 
@@ -295,7 +295,7 @@
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
             <span class="kw">let </span>delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-                model: Arc::clone(<span class="kw-2">&amp;</span>child_model),
+                model: child_model.clone(),
                 record_filter: <span class="prelude-val">Some</span>(filter.into()),
             })));
 
@@ -355,7 +355,7 @@
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
         <span class="kw">let </span>delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(<span class="kw-2">&amp;</span>child_model),
+            model: child_model.clone(),
             record_filter: RecordFilter::empty(),
         });
 

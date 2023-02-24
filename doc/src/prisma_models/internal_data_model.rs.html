@@ -82,9 +82,7 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
-<span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::sync::{Arc, Weak};
 
@@ -93,14 +91,16 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>InternalDataModel {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) models: OnceCell&lt;Vec&lt;ModelRef&gt;&gt;,
-
     <span class="kw">pub </span>schema: Arc&lt;psl::ValidatedSchema&gt;,
 }
 
 <span class="kw">impl </span>InternalDataModel {
-    <span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ModelRef] {
-        <span class="self">self</span>.models.get().unwrap()
+    <span class="kw">pub fn </span>models&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ModelRef&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.schema
+            .db
+            .walk_models()
+            .chain(<span class="self">self</span>.schema.db.walk_views())
+            .map(|model| <span class="self">self</span>.clone().zip(model.id))
     }
 
     <span class="kw">pub fn </span>composite_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompositeTypeRef&gt; + <span class="lifetime">&#39;a </span>{
@@ -110,8 +110,8 @@
             .map(<span class="kw">move </span>|ct| <span class="self">self</span>.clone().zip(ct.id))
     }
 
-    <span class="kw">pub fn </span>models_cloned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ModelRef&gt; {
-        <span class="self">self</span>.models.get().unwrap().iter().map(Arc::clone).collect()
+    <span class="kw">pub fn </span>models_cloned(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; Vec&lt;ModelRef&gt; {
+        <span class="self">self</span>.models().collect()
     }
 
     <span class="kw">pub fn </span>relations&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationRef&gt; + Clone + <span class="lifetime">&#39;a </span>{
@@ -130,11 +130,13 @@
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    <span class="kw">pub fn </span>find_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ModelRef&gt; {
-        <span class="self">self</span>.models
-            .get()
-            .and_then(|models| models.iter().find(|model| model.name == name))
-            .cloned()
+    <span class="kw">pub fn </span>find_model(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ModelRef&gt; {
+        <span class="self">self</span>.schema
+            .db
+            .walk_models()
+            .chain(<span class="self">self</span>.schema.db.walk_views())
+            .find(|model| model.name() == name)
+            .map(|m| <span class="self">self</span>.clone().zip(m.id))
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
@@ -142,12 +144,8 @@
         <span class="self">self</span>.clone().zip(ctid)
     }
 
-    <span class="kw">pub fn </span>find_model_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId) -&gt; ModelRef {
-        <span class="self">self</span>.models
-            .get()
-            .and_then(|models| models.iter().find(|model| model.id == model_id))
-            .cloned()
-            .unwrap()
+    <span class="kw">pub fn </span>find_model_by_id(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, model_id: ast::ModelId) -&gt; ModelRef {
+        <span class="self">self</span>.clone().zip(model_id)
     }
 
     <span class="doccomment">/// Finds all inline relation fields pointing to the given model.

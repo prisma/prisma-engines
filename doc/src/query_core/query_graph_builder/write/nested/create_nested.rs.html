@@ -496,7 +496,7 @@
 <span class="kw">use </span>connector::{Filter, IntoFilter};
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>schema_builder::constants::args;
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
@@ -514,7 +514,7 @@
     <span class="comment">// Build all create nodes upfront.
     </span><span class="kw">let </span>creates: Vec&lt;NodeRef&gt; = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()<span class="question-mark">?</span>))
+        .map(|value| create::create_record_node(graph, connector_ctx, child_model.clone(), value.try_into()<span class="question-mark">?</span>))
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;NodeRef&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
     <span class="kw">if </span>relation.is_many_to_many() {
@@ -933,7 +933,7 @@
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>query = CreateManyRecords {
-        model: Arc::clone(child_model),
+        model: child_model.clone(),
         args,
         skip_duplicates,
     };

@@ -304,7 +304,7 @@
 <span class="kw">use </span>connector::Filter;
 <span class="kw">use </span>prisma_models::RelationFieldRef;
 <span class="kw">use </span>schema_builder::constants::args;
-<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles a nested upsert.
 /// The constructed query graph can have different shapes based on the relation
@@ -433,12 +433,12 @@
 
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
         <span class="kw">let </span>create_node =
-            create::create_record_node(graph, connector_ctx, Arc::clone(<span class="kw-2">&amp;</span>child_model), create_input.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            create::create_record_node(graph, connector_ctx, child_model.clone(), create_input.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>update_node = update::update_record_node(
             graph,
             connector_ctx,
             filter.clone(),
-            Arc::clone(<span class="kw-2">&amp;</span>child_model),
+            child_model.clone(),
             update_input.try_into()<span class="question-mark">?</span>,
         )<span class="question-mark">?</span>;
 

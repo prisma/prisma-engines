@@ -365,15 +365,12 @@
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_ast::<span class="kw-2">*</span>, query_graph::<span class="kw-2">*</span>, ParsedInputValue};
 <span class="kw">use </span>connector::Filter;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>std::convert::TryInto;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Only for x-to-many relations.
 ///
@@ -629,7 +626,7 @@
 
     <span class="comment">// Update (connect) case: Check left diff IDs
     </span><span class="kw">let </span>connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    <span class="kw">let </span>update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(<span class="kw-2">&amp;</span>child_model));
+    <span class="kw">let </span>update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
         <span class="kw-2">&amp;</span>diff_node,
@@ -689,8 +686,7 @@
 
     <span class="comment">// Update (disconnect) case: Check right diff IDs.
     </span><span class="kw">let </span>disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    <span class="kw">let </span>update_disconnect_node =
-        utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(<span class="kw-2">&amp;</span>child_model));
+    <span class="kw">let </span>update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
 
     <span class="kw">let </span>child_side_required = parent_relation_field.related_field().is_required();
     <span class="kw">let </span>rf = parent_relation_field.clone();
