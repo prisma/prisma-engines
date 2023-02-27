@@ -71,10 +71,10 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         // can't handle 1 schema per test in a database well at this point in time.
         match self.version {
             Some(CockroachDbVersion::V221) if is_ci => {
-                format!("postgresql://prisma@test-db-cockroachdb:26257/{database}?schema={database}")
+                format!("postgresql://prisma@test-db-cockroachdb-22-1:26257/{database}?schema={database}")
             }
             Some(CockroachDbVersion::V222) if is_ci => {
-                format!("postgresql://prisma@test-db-cockroachdb:26259/{database}?schema={database}")
+                format!("postgresql://prisma@test-db-cockroachdb-22-2:26259/{database}?schema={database}")
             }
             Some(CockroachDbVersion::V221) => {
                 format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
