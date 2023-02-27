@@ -28,6 +28,7 @@ pub struct ValidationError {
 #[derive(Debug, Serialize)]
 pub enum ValidationErrorKind {
     EmptySelection,
+    UnknownSelectionField,
 }
 
 impl crate::UserFacingError for ValidationError {
@@ -43,6 +44,16 @@ impl ValidationError {
         let message = String::from("Expected a minimum of 1 field, found 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
+            meta: o.into(),
+            message,
+            path,
+        }
+    }
+
+    pub fn unkown_selection_field(field_name: String, path: Vec<String>, o: OutputTypeDescription) -> Self {
+        let message = format!("Field '{}' not found on enclosing type '{}'", field_name, o.name);
+        ValidationError {
+            kind: ValidationErrorKind::UnknownSelectionField,
             meta: o.into(),
             message,
             path,

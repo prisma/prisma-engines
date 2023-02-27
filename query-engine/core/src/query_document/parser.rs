@@ -42,12 +42,17 @@ impl QueryDocumentParser {
 
         selections
             .iter()
-            .map(|selection| match schema_object.find_field(selection.name()) {
-                Some(ref field) => self.parse_field(path.clone(), selection, field),
-                None => Err(QueryParserError::Legacy {
-                    path: path.add(selection.name().into()),
-                    error_kind: QueryParserErrorKind::FieldNotFoundError,
-                }),
+            .map(|selection| {
+                let field_name = selection.name();
+                match schema_object.find_field(field_name) {
+                    Some(ref field) => self.parse_field(path.clone(), selection, field),
+                    None => Err(ValidationError::unkown_selection_field(
+                        field_name.to_string(),
+                        path.segments.clone(),
+                        conversions::schema_object_to_output_type_description(schema_object),
+                    )
+                    .into()),
+                }
             })
             .collect::<QueryParserResult<Vec<_>>>()
             .map(|fields| ParsedObject { fields })

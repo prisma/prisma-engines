@@ -1,0 +1,1 @@
+{"is_panic":false,"message":"Field 'notAField' not found on enclosing type 'User'","meta":{"kind":"UnknownSelectionField","path":["Query","findManyUser","User"],"outputType":{"name":"User","fields":[{"name":"id","type_name":"Int","is_relation":false},{"name":"email","type_name":"String","is_relation":false}]}},"error_code":"P2009"}
