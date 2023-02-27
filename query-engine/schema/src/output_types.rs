@@ -12,6 +12,23 @@ pub enum OutputType {
     Scalar(ScalarType),
 }
 
+impl std::fmt::Display for OutputType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OutputType::Enum(_) => write!(f, "enum"),
+            OutputType::List(o) => write!(f, "{o}"),
+            OutputType::Object(o) => write!(
+                f,
+                "{}",
+                o.upgrade()
+                    .map(|f| f.identifier().to_string())
+                    .unwrap_or_else(|| String::from("Object"))
+            ),
+            OutputType::Scalar(s) => write!(f, "{s}"),
+        }
+    }
+}
+
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
         OutputType::List(Arc::new(containing))
@@ -78,6 +95,13 @@ impl OutputType {
             OutputType::Object(obj) => Some(obj.into_arc()),
             OutputType::Scalar(_) => None,
         }
+    }
+
+    // Is relation determines whether the given output type is a relation, i.e. is an object and
+    // that object is backed by a model, meaning that it is not an scalar list
+    pub fn is_relation(&self) -> bool {
+        let o = self.as_object_type();
+        o.is_some() && o.unwrap().model.is_some()
     }
 
     pub fn is_list(&self) -> bool {

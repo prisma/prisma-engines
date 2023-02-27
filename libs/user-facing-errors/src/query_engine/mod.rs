@@ -1,9 +1,8 @@
-mod validation;
+pub mod validation;
 
 use serde::Serialize;
 use std::fmt;
 use user_facing_error_macros::*;
-pub use validation::*;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]

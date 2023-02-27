@@ -180,7 +180,7 @@ impl From<CoreError> for user_facing_errors::Error {
                         })
                     }
                     _ => user_facing_errors::KnownError::new(
-                        user_facing_errors::query_engine::LegacyQueryValidationFailed {
+                        user_facing_errors::query_engine::validation::LegacyQueryValidationFailed {
                             query_validation_error: format!("{}", error_kind),
                             query_position: format!("{}", path),
                         },
@@ -190,10 +190,11 @@ impl From<CoreError> for user_facing_errors::Error {
                 known_error.into()
             }
 
-            CoreError::QueryParserError(QueryParserError::Structured(se))
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
-                QueryParserError::Structured(se),
-            )) => user_facing_errors::KnownError::new(se).into(),
+            // TODO. Once legacy is removed, promote this
+            CoreError::QueryParserError(e)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(e)) => {
+                e.into_user_facing_error()
+            }
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,

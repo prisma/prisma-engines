@@ -6,6 +6,7 @@ use indexmap::IndexSet;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
 use std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc};
+use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
 pub struct QueryDocumentParser {
@@ -32,10 +33,11 @@ impl QueryDocumentParser {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
 
         if selections.is_empty() {
-            return Err(QueryParserError::Legacy {
-                path,
-                error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(Some(1), None, None, 0)),
-            });
+            return Err(ValidationError::empty_selection(
+                path.segments,
+                conversions::schema_object_to_output_type_description(schema_object),
+            )
+            .into());
         }
 
         selections

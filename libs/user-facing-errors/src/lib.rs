@@ -192,6 +192,12 @@ pub fn new_backtrace() -> backtrace::Backtrace {
     backtrace::Backtrace::new()
 }
 
+impl<T: UserFacingError> From<T> for Error {
+    fn from(err: T) -> Self {
+        Self::from(KnownError::new(err))
+    }
+}
+
 impl From<UnknownError> for Error {
     fn from(unknown_error: UnknownError) -> Self {
         Error {

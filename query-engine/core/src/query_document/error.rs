@@ -1,37 +1,69 @@
 use crate::{schema::InputType, ArgumentValue};
 use fmt::Display;
 use itertools::Itertools;
-use serde::Serialize;
 use std::fmt;
-use user_facing_errors::UserFacingError;
+use user_facing_errors::query_engine::validation::{self, ValidationError};
+
+pub(crate) mod conversions {
+    use user_facing_errors::query_engine::validation::{OutputTypeDescription, OutputTypeDescriptionField};
+
+    use super::*;
+
+    /// converts an schema object to the narrower validation::OutputTypeDescription
+    /// representation of an output field that is part of a validation error information.
+    pub(crate) fn schema_object_to_output_type_description(
+        o: &schema::ObjectTypeStrongRef,
+    ) -> validation::OutputTypeDescription {
+        let name = o.identifier.name().to_owned();
+        let fields: Vec<OutputTypeDescriptionField> = o
+            .get_fields()
+            .iter()
+            .map(|field| {
+                let name = field.name.to_owned();
+                let type_name = format!("{}", field.field_type);
+                let is_relation = field.field_type.is_relation();
+
+                OutputTypeDescriptionField::new(name, type_name, is_relation)
+            })
+            .collect();
+        OutputTypeDescription::new(name, fields)
+    }
+}
 
 #[derive(Debug)]
 pub enum QueryParserError {
-    Structured(StructuredQueryParseError),
+    New(ValidationError),
     Legacy {
         path: QueryPath,
         error_kind: QueryParserErrorKind,
     },
 }
 
+impl QueryParserError {
+    // TODO: remove after refactoring and removal of Legacy errors
+    pub fn into_user_facing_error(self) -> user_facing_errors::Error {
+        match self {
+            QueryParserError::New(err) => user_facing_errors::Error::from(err),
+            _ => todo!(),
+        }
+    }
+}
+
+impl From<ValidationError> for QueryParserError {
+    fn from(err: ValidationError) -> Self {
+        QueryParserError::New(err)
+    }
+}
+
+// TODO: remove in favor of derived display on QueryParserError once Legacy is removed
 impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Legacy { path, error_kind } => {
                 write!(f, "Query parsing/validation error at `{}`: {}", path, error_kind,)
             }
-            Self::Structured(_) => todo!(),
+            _ => unreachable!(),
         }
-    }
-}
-#[derive(Debug, Serialize, Clone)]
-pub struct StructuredQueryParseError {}
-
-impl UserFacingError for StructuredQueryParseError {
-    const ERROR_CODE: &'static str = "P2009";
-
-    fn message(&self) -> String {
-        todo!()
     }
 }
 
@@ -129,13 +161,9 @@ impl Display for FieldCountError {
                     "Expected a minimum of {} and at most {} fields to be present, got {}.",
                     min, max, self.got
                 ),
-                (Some(min), None) => write!(
-                    f,
-                    "Expected a minimum of {} fields to be present, got {}.",
-                    min, self.got
-                ),
                 (None, Some(max)) => write!(f, "Expected at most {} fields to be present, got {}.", max, self.got),
                 (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
+                _ => unreachable!(),
             },
             Some(fields) => match (self.min, self.max) {
                 (Some(1), Some(1)) => {
