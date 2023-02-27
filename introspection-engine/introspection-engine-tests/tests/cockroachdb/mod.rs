@@ -163,7 +163,7 @@ async fn scalar_list_defaults_work_on_22_1(api: &TestApi) -> TestResult {
             text_c_escape TEXT[] NOT NULL DEFAULT E'{ \'abc\', \'def\' }',
             colors COLOR[] NOT NULL DEFAULT '{ RED, GREEN }',
             int_defaults INT4[] NOT NULL DEFAULT '{ 9, 12999, -4, 0, 1249849 }',
-            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0.0, 9.12, 3.14, 0.1242, 124949.124949 }',
+            float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT '{ 0, 9.12, 3.14, 0.1242, 124949.124949 }',
             bool_defaults BOOLEAN[] NOT NULL DEFAULT '{ true, true, true, false }',
             datetime_defaults TIMESTAMPTZ[] NOT NULL DEFAULT '{ "2022-09-01T08:00Z","2021-09-01T08:00Z"}'
         );
@@ -188,7 +188,7 @@ async fn scalar_list_defaults_work_on_22_1(api: &TestApi) -> TestResult {
           text_c_escape     String[]   @default(["abc", "def"])
           colors            color[]    @default([RED, GREEN])
           int_defaults      Int[]      @default([9, 12999, -4, 0, 1249849])
-          float_defaults    Float[]    @default([0.0, 9.12, 3.14, 0.1242, 124949.124949])
+          float_defaults    Float[]    @default([0, 9.12, 3.14, 0.1242, 124949.124949])
           bool_defaults     Boolean[]  @default([true, true, true, false])
           datetime_defaults DateTime[] @default(dbgenerated("'{\"''2022-09-01 08:00:00+00:00''::TIMESTAMPTZ\",\"''2021-09-01 08:00:00+00:00''::TIMESTAMPTZ\"}'::TIMESTAMPTZ[]")) @db.Timestamptz
         }

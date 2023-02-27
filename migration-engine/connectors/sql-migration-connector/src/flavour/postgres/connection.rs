@@ -1,6 +1,7 @@
 //! All the quaint-wrangling for the postgres connector should happen here.
 
 use enumflags2::BitFlags;
+use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, Namespaces};
 use psl::PreviewFeature;
 use quaint::{
@@ -29,15 +30,14 @@ impl Connection {
         let version = quaint.version().await.map_err(quaint_err(&url))?;
 
         if version.map(|v| v.starts_with("CockroachDB CCL v22.2")).unwrap_or(false) {
-            // issue: https://github.com/prisma/prisma/issues/16909
+            // first config issue: https://github.com/prisma/prisma/issues/16909
+            // second config value: Currently at least version 22.2.5, enums are
+            // not case-sensitive without this.
             quaint
-                .raw_cmd("SET enable_implicit_transaction_for_batch_statements=false")
-                .await
-                .map_err(quaint_err(&url))?;
-
-            // Until at least version 22.2.5, enums are not type-sensitive without this.
-            quaint
-                .raw_cmd("SET use_declarative_schema_changer=off")
+                .raw_cmd(indoc! {r#"
+                    SET enable_implicit_transaction_for_batch_statements=false;
+                    SET use_declarative_schema_changer=off
+                "#})
                 .await
                 .map_err(quaint_err(&url))?;
         }
