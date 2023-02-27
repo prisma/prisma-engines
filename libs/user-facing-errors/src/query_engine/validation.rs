@@ -31,10 +31,12 @@ pub struct ValidationError {
 pub enum ValidationErrorKind {
     /// See [`ValidationError::empty_selection`]
     EmptySelection,
-    /// See [`ValidationError::unkown_selection_field`]
-    UnknownSelectionField,
     /// See [`ValidationError::unkown_argument`]
     UnkownArgument,
+    /// See [`ValidationError::unknown_input_field`]
+    UnkownInputField,
+    /// See [`ValidationError::unkown_selection_field`]
+    UnknownSelectionField,
 }
 
 impl crate::UserFacingError for ValidationError {
@@ -68,6 +70,80 @@ impl ValidationError {
         }
     }
 
+    /// Creates an ValidationErrorKind::UnkownArgument kind of error, which happens when the
+    /// arguments for a query are not congruent with those expressed in the schema
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "foo": "123"
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
+    pub fn unknown_argument(
+        argument_name: String,
+        path: Vec<String>,
+        argument_path: Vec<String>,
+        arguments: Vec<ArgumentDescription>,
+    ) -> Self {
+        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("/"));
+        ValidationError {
+            kind: ValidationErrorKind::UnkownArgument,
+            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
+            message,
+            path,
+        }
+    }
+
+    /// Creates an ValidationErrorKind::UnknownInputField kind of error, which happens when the
+    /// argument value for a query contains a field that does not exist in the schema for the
+    /// input type.
+    ///
+    /// TODO:
+    ///   how is this conceptually different from an unknown argument? This used to be a
+    ///   FieldNotFoundError, see https://github.com/prisma/prisma-engines/blob/67a4547ade8a13a5d77a8c05c859eb3b3ba2979d/query-engine/core/src/query_document/parser.rs#L531-L534
+    ///   But the same FieldNotFoundError was used to denote what's now an UnknownSelectionField.
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "where": {
+    ///                 "foo": 2
+    ///             }
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
+    pub fn unknown_input_field(
+        field_name: String,
+        path: Vec<String>,
+        input_type_description: InputTypeDescription,
+    ) -> Self {
+        let message = format!(
+            "Field '{}' not found on input type '{}'",
+            field_name, input_type_description.name
+        );
+        ValidationError {
+            kind: ValidationErrorKind::UnkownInputField,
+            meta: Some(json!({ "inputType": input_type_description })),
+            message,
+            path,
+        }
+    }
+
     /// Creates an ValidationErrorKind::UnknownSelectionField kind of error, which happens when the
     /// selection of fields for a query contains a field that does not exist in the schema for the
     /// enclosing type
@@ -95,27 +171,6 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
             meta: Some(json!({ "outputType": output_type_description })),
-            message,
-            path,
-        }
-    }
-
-    /// Creates an ValidationErrorKind::UnkownArgument kind of error, which happens when the
-    /// selection of fields for a query contains a field that does not exist in the schema for the
-    /// enclosing type
-    ///
-    /// Example json query:
-    ///
-    pub fn unknown_argument(
-        argument_name: String,
-        path: Vec<String>,
-        argument_path: Vec<String>,
-        arguments: Vec<ArgumentDescription>,
-    ) -> Self {
-        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("/"));
-        ValidationError {
-            kind: ValidationErrorKind::UnkownArgument,
-            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
             message,
             path,
         }
@@ -156,11 +211,27 @@ pub struct InputTypeDescription {
     fields: Vec<InputTypeDescriptionField>,
 }
 
+impl InputTypeDescription {
+    pub fn new(name: String, fields: Vec<InputTypeDescriptionField>) -> Self {
+        Self { name, fields }
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub struct InputTypeDescriptionField {
     name: String,
     type_names: Vec<String>,
-    is_relation: bool,
+    required: bool,
+}
+
+impl InputTypeDescriptionField {
+    pub fn new(name: String, type_names: Vec<String>, required: bool) -> Self {
+        Self {
+            name,
+            type_names,
+            required,
+        }
+    }
 }
 
 #[derive(Debug, Serialize)]

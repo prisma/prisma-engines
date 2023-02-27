@@ -543,19 +543,19 @@ impl QueryDocumentParser {
         // or unknown fields and parsing errors.
         let mut map = object
             .into_iter()
-            .map(|(k, v)| {
-                let field = schema_object.find_field(k.as_str()).ok_or_else(|| {
-                    let error_kind = QueryParserErrorKind::FieldNotFoundError;
-                    QueryParserError::Legacy {
-                        path: path.add(k.clone()),
-                        error_kind,
-                    }
+            .map(|(field_name, value)| {
+                let field = schema_object.find_field(field_name.as_str()).ok_or_else(|| {
+                    ValidationError::unknown_input_field(
+                        field_name.clone(),
+                        path.clone().segments,
+                        conversions::schema_input_object_type_to_input_type_description(&schema_object),
+                    )
                 })?;
 
                 let path = path.add(field.name.clone());
-                let parsed = self.parse_input_value(path, v, &field.field_types)?;
+                let parsed = self.parse_input_value(path, value, &field.field_types)?;
 
-                Ok((k, parsed))
+                Ok((field_name, parsed))
             })
             .collect::<QueryParserResult<ParsedInputMap>>()?;
 

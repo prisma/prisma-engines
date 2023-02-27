@@ -5,10 +5,6 @@ use std::fmt;
 use user_facing_errors::query_engine::validation::{self, ValidationError};
 
 pub(crate) mod conversions {
-    use user_facing_errors::query_engine::validation::{
-        ArgumentDescription, OutputTypeDescription, OutputTypeDescriptionField,
-    };
-
     use super::*;
 
     /// converts an schema object to the narrower validation::OutputTypeDescription
@@ -17,7 +13,7 @@ pub(crate) mod conversions {
         o: &schema::ObjectTypeStrongRef,
     ) -> validation::OutputTypeDescription {
         let name = o.identifier.name().to_owned();
-        let fields: Vec<OutputTypeDescriptionField> = o
+        let fields: Vec<validation::OutputTypeDescriptionField> = o
             .get_fields()
             .iter()
             .map(|field| {
@@ -25,19 +21,35 @@ pub(crate) mod conversions {
                 let type_name = field.field_type.to_string();
                 let is_relation = field.field_type.is_relation();
 
-                OutputTypeDescriptionField::new(name, type_name, is_relation)
+                validation::OutputTypeDescriptionField::new(name, type_name, is_relation)
             })
             .collect();
-        OutputTypeDescription::new(name, fields)
+        validation::OutputTypeDescription::new(name, fields)
+    }
+
+    pub(crate) fn schema_input_object_type_to_input_type_description(
+        i: &schema::InputObjectTypeStrongRef,
+    ) -> validation::InputTypeDescription {
+        let name = i.identifier.to_string();
+        let fields: Vec<validation::InputTypeDescriptionField> = i
+            .get_fields()
+            .iter()
+            .map(|field| {
+                let name = field.name.clone();
+                let type_names: Vec<String> = field.field_types.iter().map(|typ| typ.to_string()).collect();
+                validation::InputTypeDescriptionField::new(name, type_names, field.is_required)
+            })
+            .collect();
+        validation::InputTypeDescription::new(name, fields)
     }
 
     pub(crate) fn schema_arguments_to_argument_description_vec(
-        arguments: &Vec<schema::InputFieldRef>,
+        arguments: &[schema::InputFieldRef],
     ) -> Vec<validation::ArgumentDescription> {
         arguments
             .iter()
             .map(|input_field_ref| {
-                ArgumentDescription::new(
+                validation::ArgumentDescription::new(
                     input_field_ref.name.to_string(),
                     input_field_ref.field_types.iter().map(|typ| typ.to_string()).collect(),
                 )
@@ -116,7 +128,6 @@ impl fmt::Display for QueryPath {
 pub enum QueryParserErrorKind {
     AssertionError(String),
     RequiredValueNotSetError,
-    FieldNotFoundError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
     ValueTypeMismatchError { have: ArgumentValue, want: InputType },
@@ -129,7 +140,6 @@ impl Display for QueryParserErrorKind {
         match self {
             Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
             Self::RequiredValueNotSetError => write!(f, "A value is required but not set."),
-            Self::FieldNotFoundError => write!(f, "Field does not exist on enclosing type."),
             Self::FieldCountError(err) => write!(f, "{err}"),
             Self::ValueParseError(reason) => write!(f, "Error parsing value: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(
@@ -175,9 +185,13 @@ impl Display for FieldCountError {
                     "Expected a minimum of {} and at most {} fields to be present, got {}.",
                     min, max, self.got
                 ),
+                (Some(min), None) => write!(
+                    f,
+                    "Expected a minimum of {} fields to be present, got {}.",
+                    min, self.got
+                ),
                 (None, Some(max)) => write!(f, "Expected at most {} fields to be present, got {}.", max, self.got),
                 (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
-                _ => unreachable!(),
             },
             Some(fields) => match (self.min, self.max) {
                 (Some(1), Some(1)) => {
