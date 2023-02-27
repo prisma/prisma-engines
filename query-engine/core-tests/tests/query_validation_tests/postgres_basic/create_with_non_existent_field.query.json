@@ -1,8 +1,0 @@
-{
-    "action": "createOne",
-    "modelName": "User",
-    "query": {
-        "arguments": { "data": { "hasPets": true } },
-        "selection": { "id": true }
-    }
-}

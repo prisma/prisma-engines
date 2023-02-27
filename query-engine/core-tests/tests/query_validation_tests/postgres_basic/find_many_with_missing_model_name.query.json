@@ -1,5 +1,0 @@
-{
-    "action": "findMany",
-    "query": { "selection": { "id": true } }
-}
-
