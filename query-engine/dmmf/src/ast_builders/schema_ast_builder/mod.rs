@@ -118,11 +118,11 @@ impl RenderContext {
         self.mark_as_rendered(identifier);
     }
 
-    pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
+    pub(crate) fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {
                 let model_name = model.name();
-                let tag_str = format!("{}", &info.tag);
+                let tag_str = info.tag.to_string();
                 let model_op = self
                     .mappings
                     .model_operations

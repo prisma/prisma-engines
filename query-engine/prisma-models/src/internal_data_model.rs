@@ -16,6 +16,7 @@ impl InternalDataModel {
             .db
             .walk_models()
             .chain(self.schema.db.walk_views())
+            .filter(|model| !model.is_ignored())
             .map(|model| self.clone().zip(model.id))
     }
 
