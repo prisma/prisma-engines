@@ -3,18 +3,6 @@ use psl::{parser_database::walkers, schema_ast::ast};
 
 pub type Model = crate::Zipper<ast::ModelId>;
 pub type ModelRef = Model;
-pub type ModelWeakRef = Model;
-
-// pub struct Model {
-//     pub id: ast::ModelId,
-//     pub(crate) name: String,
-//     pub(crate) manifestation: Option<String>,
-//     pub(crate) fields: OnceCell<Fields>,
-//     pub(crate) primary_identifier: OnceCell<FieldSelection>,
-//     pub(crate) dml_model: dml::Model,
-
-//     pub internal_data_model: InternalDataModelWeakRef,
-// }
 
 impl Model {
     pub fn name(&self) -> &str {

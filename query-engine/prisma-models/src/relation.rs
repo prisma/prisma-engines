@@ -6,8 +6,6 @@ use psl::{
 };
 
 pub type Relation = crate::Zipper<RelationId>;
-pub type RelationRef = Relation;
-pub type RelationWeakRef = Relation;
 
 impl Relation {
     pub fn name(&self) -> String {

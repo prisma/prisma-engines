@@ -5,11 +5,11 @@ use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
 pub struct Fields {
-    model: ModelWeakRef,
+    model: Model,
 }
 
 impl Fields {
-    pub(crate) fn new(model: ModelWeakRef) -> Fields {
+    pub(crate) fn new(model: Model) -> Fields {
         Fields { model }
     }
 

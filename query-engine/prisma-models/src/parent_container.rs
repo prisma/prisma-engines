@@ -1,11 +1,11 @@
-use crate::{CompositeTypeRef, CompositeTypeWeakRef, Field, InternalDataModelRef, ModelRef, ModelWeakRef};
+use crate::{CompositeType, Field, InternalDataModelRef, Model, ModelRef};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 #[derive(Clone)]
 pub enum ParentContainer {
-    Model(ModelWeakRef),
-    CompositeType(CompositeTypeWeakRef),
+    Model(Model),
+    CompositeType(CompositeType),
 }
 
 impl ParentContainer {
@@ -24,14 +24,14 @@ impl ParentContainer {
         }
     }
 
-    pub fn as_model_weak(&self) -> Option<ModelWeakRef> {
+    pub fn as_model_weak(&self) -> Option<Model> {
         match self {
             ParentContainer::Model(m) => Some(m.clone()),
             ParentContainer::CompositeType(_) => None,
         }
     }
 
-    pub fn as_composite(&self) -> Option<CompositeTypeRef> {
+    pub fn as_composite(&self) -> Option<CompositeType> {
         match self {
             ParentContainer::Model(_) => None,
             ParentContainer::CompositeType(ct) => Some(ct.clone()),
@@ -82,8 +82,8 @@ impl From<ModelRef> for ParentContainer {
     }
 }
 
-impl From<CompositeTypeRef> for ParentContainer {
-    fn from(composite: CompositeTypeRef) -> Self {
+impl From<CompositeType> for ParentContainer {
+    fn from(composite: CompositeType) -> Self {
         Self::CompositeType(composite)
     }
 }

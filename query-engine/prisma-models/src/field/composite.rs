@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, CompositeTypeRef};
+use crate::{parent_container::ParentContainer, CompositeType};
 use dml::FieldArity;
 use psl::{parser_database::walkers, schema_ast::ast};
 use std::fmt::{Debug, Display};
@@ -21,7 +21,7 @@ impl CompositeField {
         }
     }
 
-    pub fn typ(&self) -> CompositeTypeRef {
+    pub fn typ(&self) -> CompositeType {
         let id = match self.id {
             CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).scalar_field_type().as_composite_type().unwrap(),
             CompositeFieldId::InCompositeType(ctid) => self.dm.walk(ctid).r#type().as_composite_type().unwrap(),
