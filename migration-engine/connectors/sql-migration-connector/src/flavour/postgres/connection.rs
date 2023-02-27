@@ -31,7 +31,7 @@ impl Connection {
         if version.map(|v| v.starts_with("CockroachDB CCL v22.2")).unwrap_or(false) {
             // issue: https://github.com/prisma/prisma/issues/16909
             quaint
-                .raw_cmd("SET enable_implicit_transaction_for_batch_statements=off")
+                .raw_cmd("SET enable_implicit_transaction_for_batch_statements=false")
                 .await
                 .map_err(quaint_err(&url))?;
 
