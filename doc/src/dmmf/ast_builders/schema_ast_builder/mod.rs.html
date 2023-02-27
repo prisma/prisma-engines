@@ -330,11 +330,11 @@
         <span class="self">self</span>.mark_as_rendered(identifier);
     }
 
-    <span class="kw">pub fn </span>add_mapping(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, operation: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryInfo&gt;) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_mapping(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, operation: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryInfo&gt;) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(info) = operation {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>model) = info.model {
                 <span class="kw">let </span>model_name = model.name();
-                <span class="kw">let </span>tag_str = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>info.tag);
+                <span class="kw">let </span>tag_str = info.tag.to_string();
                 <span class="kw">let </span>model_op = <span class="self">self
                     </span>.mappings
                     .model_operations
