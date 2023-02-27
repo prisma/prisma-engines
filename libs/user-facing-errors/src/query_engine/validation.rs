@@ -15,6 +15,8 @@ pub struct LegacyQueryValidationFailed {
     pub query_position: String,
 }
 
+/// A validation error is a Serializable object that contains the path where the validation error
+/// of a certain `kind` ocurred, and an optional and arbitrary piece of `meta`-information.
 #[derive(Debug, Serialize)]
 pub struct ValidationError {
     kind: ValidationErrorKind,
@@ -27,8 +29,12 @@ pub struct ValidationError {
 
 #[derive(Debug, Serialize)]
 pub enum ValidationErrorKind {
+    /// See [`ValidationError::empty_selection`]
     EmptySelection,
+    /// See [`ValidationError::unkown_selection_field`]
     UnknownSelectionField,
+    /// See [`ValidationError::unkown_argument`]
+    UnkownArgument,
 }
 
 impl crate::UserFacingError for ValidationError {
@@ -40,21 +46,76 @@ impl crate::UserFacingError for ValidationError {
 }
 
 impl ValidationError {
-    pub fn empty_selection(path: Vec<String>, o: OutputTypeDescription) -> Self {
+    /// Creates an ValidationErrorKind::EmptySelection kind of error, which happens when the
+    /// selection of fields is empty for a query.
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "selection": {}
+    ///     }
+    /// }
+    pub fn empty_selection(path: Vec<String>, output_type_description: OutputTypeDescription) -> Self {
         let message = String::from("Expected a minimum of 1 field, found 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
-            meta: o.into(),
+            meta: Some(json!({ "outputType": output_type_description })),
             message,
             path,
         }
     }
 
-    pub fn unkown_selection_field(field_name: String, path: Vec<String>, o: OutputTypeDescription) -> Self {
-        let message = format!("Field '{}' not found on enclosing type '{}'", field_name, o.name);
+    /// Creates an ValidationErrorKind::UnknownSelectionField kind of error, which happens when the
+    /// selection of fields for a query contains a field that does not exist in the schema for the
+    /// enclosing type
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "selection": {
+    ///             "notAField": true
+    ///         }
+    ///     }
+    // }
+    pub fn unkown_selection_field(
+        field_name: String,
+        path: Vec<String>,
+        output_type_description: OutputTypeDescription,
+    ) -> Self {
+        let message = format!(
+            "Field '{}' not found on enclosing type '{}'",
+            field_name, output_type_description.name
+        );
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
-            meta: o.into(),
+            meta: Some(json!({ "outputType": output_type_description })),
+            message,
+            path,
+        }
+    }
+
+    /// Creates an ValidationErrorKind::UnkownArgument kind of error, which happens when the
+    /// selection of fields for a query contains a field that does not exist in the schema for the
+    /// enclosing type
+    ///
+    /// Example json query:
+    ///
+    pub fn unknown_argument(
+        argument_name: String,
+        path: Vec<String>,
+        argument_path: Vec<String>,
+        arguments: Vec<ArgumentDescription>,
+    ) -> Self {
+        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("/"));
+        ValidationError {
+            kind: ValidationErrorKind::UnkownArgument,
+            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
             message,
             path,
         }
@@ -73,12 +134,6 @@ impl OutputTypeDescription {
     }
 }
 
-impl From<OutputTypeDescription> for Option<serde_json::Value> {
-    fn from(o: OutputTypeDescription) -> Self {
-        Some(json!({ "outputType": o }))
-    }
-}
-
 #[derive(Debug, Serialize)]
 pub struct OutputTypeDescriptionField {
     name: String,
@@ -88,7 +143,7 @@ pub struct OutputTypeDescriptionField {
 
 impl OutputTypeDescriptionField {
     pub fn new(name: String, type_name: String, is_relation: bool) -> Self {
-        OutputTypeDescriptionField {
+        Self {
             name,
             type_name,
             is_relation,
@@ -106,4 +161,16 @@ pub struct InputTypeDescriptionField {
     name: String,
     type_names: Vec<String>,
     is_relation: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ArgumentDescription {
+    name: String,
+    type_names: Vec<String>,
+}
+
+impl ArgumentDescription {
+    pub fn new(name: String, type_names: Vec<String>) -> Self {
+        Self { name, type_names }
+    }
 }

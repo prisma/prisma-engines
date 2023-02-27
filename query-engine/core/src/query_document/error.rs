@@ -5,7 +5,9 @@ use std::fmt;
 use user_facing_errors::query_engine::validation::{self, ValidationError};
 
 pub(crate) mod conversions {
-    use user_facing_errors::query_engine::validation::{OutputTypeDescription, OutputTypeDescriptionField};
+    use user_facing_errors::query_engine::validation::{
+        ArgumentDescription, OutputTypeDescription, OutputTypeDescriptionField,
+    };
 
     use super::*;
 
@@ -20,13 +22,27 @@ pub(crate) mod conversions {
             .iter()
             .map(|field| {
                 let name = field.name.to_owned();
-                let type_name = format!("{}", field.field_type);
+                let type_name = field.field_type.to_string();
                 let is_relation = field.field_type.is_relation();
 
                 OutputTypeDescriptionField::new(name, type_name, is_relation)
             })
             .collect();
         OutputTypeDescription::new(name, fields)
+    }
+
+    pub(crate) fn schema_arguments_to_argument_description_vec(
+        arguments: &Vec<schema::InputFieldRef>,
+    ) -> Vec<validation::ArgumentDescription> {
+        arguments
+            .iter()
+            .map(|input_field_ref| {
+                ArgumentDescription::new(
+                    input_field_ref.name.to_string(),
+                    input_field_ref.field_types.iter().map(|typ| typ.to_string()).collect(),
+                )
+            })
+            .collect::<Vec<_>>()
     }
 }
 
@@ -101,7 +117,6 @@ pub enum QueryParserErrorKind {
     AssertionError(String),
     RequiredValueNotSetError,
     FieldNotFoundError,
-    ArgumentNotFoundError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
     ValueTypeMismatchError { have: ArgumentValue, want: InputType },
@@ -115,7 +130,6 @@ impl Display for QueryParserErrorKind {
             Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
             Self::RequiredValueNotSetError => write!(f, "A value is required but not set."),
             Self::FieldNotFoundError => write!(f, "Field does not exist on enclosing type."),
-            Self::ArgumentNotFoundError => write!(f, "Argument does not exist on enclosing type."),
             Self::FieldCountError(err) => write!(f, "{err}"),
             Self::ValueParseError(reason) => write!(f, "Error parsing value: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(

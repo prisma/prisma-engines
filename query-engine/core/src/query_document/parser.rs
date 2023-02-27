@@ -109,10 +109,15 @@ impl QueryDocumentParser {
 
         invalid_argument_names
             .map(|extra_arg| {
-                Err(QueryParserError::Legacy {
-                    path: parent_path.add(extra_arg.to_string()),
-                    error_kind: QueryParserErrorKind::ArgumentNotFoundError,
-                })
+                let path = parent_path.clone();
+                let argument_path = parent_path.add(extra_arg.to_string());
+                Err(ValidationError::unknown_argument(
+                    extra_arg.to_string(),
+                    path.segments,
+                    argument_path.segments,
+                    conversions::schema_arguments_to_argument_description_vec(&schema_field.arguments),
+                )
+                .into())
             })
             .collect::<QueryParserResult<Vec<()>>>()?;
 

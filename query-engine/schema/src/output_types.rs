@@ -15,16 +15,16 @@ pub enum OutputType {
 impl std::fmt::Display for OutputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            OutputType::Enum(_) => write!(f, "enum"),
-            OutputType::List(o) => write!(f, "{o}"),
-            OutputType::Object(o) => write!(
+            Self::Enum(_) => write!(f, "enum"),
+            Self::List(o) => write!(f, "{o}"),
+            Self::Object(o) => write!(
                 f,
                 "{}",
                 o.upgrade()
                     .map(|f| f.identifier().to_string())
                     .unwrap_or_else(|| String::from("Object"))
             ),
-            OutputType::Scalar(s) => write!(f, "{s}"),
+            Self::Scalar(s) => write!(f, "{s}"),
         }
     }
 }
