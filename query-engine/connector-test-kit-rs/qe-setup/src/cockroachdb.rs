@@ -37,7 +37,7 @@ fn drop_db_when_thread_exits(admin_url: Url, db_name: &str) {
     static DB_DROP_THREAD: OnceCell<mpsc::SyncSender<String>> = OnceCell::new();
 
     let sender = DB_DROP_THREAD.get_or_init(|| {
-        let (sender, receiver) = mpsc::sync_channel::<String>(1024);
+        let (sender, receiver) = mpsc::sync_channel::<String>(4096);
 
         thread::spawn(move || {
             let mut admin_url = admin_url;
