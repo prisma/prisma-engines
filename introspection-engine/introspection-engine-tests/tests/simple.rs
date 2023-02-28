@@ -9,7 +9,7 @@ use sql_introspection_connector::SqlIntrospectionConnector;
 use std::{fs, io::Write as _, path};
 use test_setup::{
     mssql::init_mssql_database, mysql::create_mysql_database, postgres::create_postgres_database,
-    runtime::run_with_thread_local_runtime as tok,
+    runtime::run_with_thread_local_runtime as tok, sqlite_test_url,
 };
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/simple");
@@ -70,7 +70,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
         return;
     }
 
-    let database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
+    let mut database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
 Missing TEST_DATABASE_URL from environment.
 
 If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
@@ -80,16 +80,29 @@ Example usage:
 source .test_database_urls/mysql_5_6
     "#);
 
+    if database_url == "sqlite" {
+        database_url = format!("{}.db", sqlite_test_url(test_function_name));
+
+        let file = database_url.trim_start_matches("file:");
+        std::fs::remove_file(&file).ok();
+    }
+
     let conn = tok(Quaint::new(&database_url)).unwrap();
     let version = tok(conn.version()).unwrap();
 
     let provider = if version.map(|v| v.contains("CockroachDB")).unwrap_or(false) {
         "cockroachdb"
     } else {
-        database_url
+        let provider = database_url
             .find(':')
             .map(|prefix_end| &database_url[..prefix_end])
-            .unwrap_or_else(|| database_url.as_str())
+            .unwrap_or_else(|| database_url.as_str());
+
+        if provider == "file" {
+            "sqlite"
+        } else {
+            provider
+        }
     };
 
     match provider {
@@ -112,6 +125,8 @@ source .test_database_urls/mysql_5_6
             .insert("database".to_string(), test_function_name.to_string());
 
         jdbc.to_string().trim_start_matches("jdbc:").to_string()
+    } else if provider == "sqlite" {
+        database_url.clone()
     } else {
         format!("{database_url}/{test_function_name}")
     };
@@ -155,7 +170,7 @@ source .test_database_urls/mysql_5_6
         )
     };
 
-    let config = format!("{datasource}\n\n{generator}");
+    let config = dbg!(format!("{datasource}\n\n{generator}"));
 
     let psl = psl::validate(config.into());
 

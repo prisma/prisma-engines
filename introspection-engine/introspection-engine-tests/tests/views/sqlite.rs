@@ -2,15 +2,58 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite), preview_features("views"))]
-async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_column_arity_and_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
-        CREATE TABLE A (
+        CREATE TABLE User (
             id INT NOT NULL PRIMARY KEY,
             first_name VARCHAR(255) NOT NULL,
             last_name VARCHAR(255) NULL
         );
 
-        CREATE VIEW B AS SELECT id, first_name, last_name FROM A;
+        CREATE VIEW Schwuser AS
+            SELECT id, first_name, last_name FROM User;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let input = indoc! {r#"
+        model User {
+          id         Int     @id
+          first_name String
+          last_name  String?
+        }
+
+        view Schwuser {
+          id         Int     @unique
+          first_name String
+          last_name  String?
+        }  
+    "#};
+
+    let expected = expect![[r#"
+        model User {
+          id         Int     @id
+          first_name String
+          last_name  String?
+        }
+
+        view Schwuser {
+          id         Int     @unique
+          first_name String
+          last_name  String?
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Sqlite), preview_features("views"))]
+async fn defaults_are_introspected(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE A (id INT NOT NULL PRIMARY KEY, val INT DEFAULT 2);
+        CREATE VIEW B AS SELECT id, val FROM A;
     "#};
 
     api.raw_cmd(setup).await;
@@ -27,16 +70,20 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
         }
 
         model A {
-          id         Int     @id
-          first_name String
-          last_name  String?
+          id  Int  @id
+          val Int? @default(2)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view B {
+          id  Int?
+          val Int?
+
+          @@ignore
         }
     "#]];
 
     api.expect_datamodel(&expected).await;
-
-    let expected = expect![[r#"[]"#]];
-    api.expect_warnings(&expected).await;
 
     Ok(())
 }

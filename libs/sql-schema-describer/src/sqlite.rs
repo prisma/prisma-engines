@@ -3,8 +3,9 @@
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
-    SqlSchemaDescriberBackend, View,
+    SqlSchemaDescriberBackend,
 };
+use either::Either;
 use indexmap::IndexMap;
 use quaint::{
     ast::Value,
@@ -100,18 +101,24 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     pub async fn describe_impl(&self) -> DescriberResult<SqlSchema> {
         let mut schema = SqlSchema::default();
-        let table_ids = self.get_table_names(&mut schema).await?;
+        let container_ids = self.get_table_names(&mut schema).await?;
+        let table_ids: IndexMap<&str, TableId> = container_ids
+            .iter()
+            .filter_map(|(name, id)| id.left().map(|id| (name.as_str(), id)))
+            .collect();
 
-        for (table_name, table_id) in &table_ids {
-            self.push_table(table_name, *table_id, &mut schema).await?;
+        for (container_name, container_id) in &container_ids {
+            push_columns(container_name, *container_id, &mut schema, self.conn).await?;
+
+            if let Either::Left(table_id) = container_id {
+                push_indexes(container_name, *table_id, &mut schema, self.conn).await?;
+            }
         }
 
         for (table_name, table_id) in &table_ids {
             self.push_foreign_keys(table_name, *table_id, &table_ids, &mut schema)
                 .await?;
         }
-
-        schema.views = self.get_views().await?;
 
         Ok(schema)
     }
@@ -138,22 +145,41 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(names)
     }
 
-    async fn get_table_names(&self, schema: &mut SqlSchema) -> DescriberResult<IndexMap<String, TableId>> {
-        let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
+    async fn get_table_names(
+        &self,
+        schema: &mut SqlSchema,
+    ) -> DescriberResult<IndexMap<String, Either<TableId, ViewId>>> {
+        let sql = r#"SELECT name, type, sql FROM sqlite_master WHERE type='table' OR type='view' ORDER BY name ASC"#;
 
         let result_set = self.conn.query_raw(sql, &[]).await?;
 
         let names = result_set
             .into_iter()
-            .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
-            .filter(|table_name| !is_system_table(table_name));
+            .map(|row| {
+                let r#type = row.get("type").and_then(|x| x.to_string()).unwrap();
+                let name = row.get("name").and_then(|x| x.to_string()).unwrap();
+                let definition = row.get("sql").and_then(|x| x.to_string());
+
+                (name, r#type, definition)
+            })
+            .filter(|(table_name, _, _)| !is_system_table(table_name));
 
         let mut map = IndexMap::default();
 
-        for name in names {
+        for (name, r#type, definition) in names {
             let cloned_name = name.clone();
-            let id = schema.push_table(name, Default::default());
-            map.insert(cloned_name, id);
+
+            match r#type.as_str() {
+                "table" => {
+                    let id = schema.push_table(name, Default::default());
+                    map.insert(cloned_name, Either::Left(id));
+                }
+                "view" => {
+                    let id = schema.push_view(name, Default::default(), definition);
+                    map.insert(cloned_name, Either::Right(id));
+                }
+                _ => unreachable!(),
+            }
         }
 
         Ok(map)
@@ -170,32 +196,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(size.try_into().unwrap())
     }
 
-    async fn push_table(&self, name: &str, table_id: TableId, schema: &mut SqlSchema) -> DescriberResult<()> {
-        push_columns(name, table_id, schema, self.conn).await?;
-        push_indexes(name, table_id, schema, self.conn).await
-    }
-
-    async fn get_views(&self) -> DescriberResult<Vec<View>> {
-        let sql = "SELECT name AS view_name, sql AS view_sql FROM sqlite_master WHERE type = 'view'";
-        let result_set = self.conn.query_raw(sql, &[]).await?;
-        let mut views = Vec::with_capacity(result_set.len());
-
-        for row in result_set.into_iter() {
-            views.push(View {
-                namespace_id: NamespaceId(0),
-                name: row.get_expect_string("view_name"),
-                definition: row.get_string("view_sql"),
-            })
-        }
-
-        Ok(views)
-    }
-
     async fn push_foreign_keys(
         &self,
         table_name: &str,
         table_id: TableId,
-        table_ids: &IndexMap<String, TableId>,
+        table_ids: &IndexMap<&str, TableId>,
         schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let sql = format!(r#"PRAGMA foreign_key_list("{table_name}");"#);
@@ -206,11 +211,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         fn get_ids(
             row: &ResultRow,
             table_id: TableId,
-            table_ids: &IndexMap<String, TableId>,
+            table_ids: &IndexMap<&str, TableId>,
             schema: &SqlSchema,
         ) -> Option<(TableColumnId, TableId, Option<TableColumnId>)> {
             let column = schema.walk(table_id).column(&row.get_expect_string("from"))?.id;
-            let referenced_table = schema.walk(*table_ids.get(&row.get_expect_string("table"))?);
+            let referenced_table = schema.walk(*table_ids.get(row.get_expect_string("table").as_str())?);
             // this can be null if the primary key and shortened fk syntax was used
             let referenced_column = row
                 .get_string("to")
@@ -318,7 +323,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
 async fn push_columns(
     table_name: &str,
-    table_id: TableId,
+    container_id: Either<TableId, ViewId>,
     schema: &mut SqlSchema,
     conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
@@ -391,51 +396,62 @@ async fn push_columns(
             Some(_) => None,
         };
 
-        let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
-        let column_id = TableColumnId(schema.table_columns.len() as u32);
+        let column = Column {
+            name: row.get_expect_string("name"),
+            tpe,
+            auto_increment: false,
+        };
 
-        if let Some(default) = default {
-            schema.push_table_default_value(column_id, default);
-        }
+        match container_id {
+            Either::Left(table_id) => {
+                let pk_col = row.get("pk").and_then(|x| x.as_integer()).expect("primary key");
+                let column_id = schema.push_table_column(table_id, column);
 
-        let column_id = schema.push_table_column(
-            table_id,
-            Column {
-                name: row.get_expect_string("name"),
-                tpe,
-                auto_increment: false,
-            },
-        );
+                if pk_col > 0 {
+                    pk_cols.insert(pk_col, column_id);
+                }
 
-        if pk_col > 0 {
-            pk_cols.insert(pk_col, column_id);
+                if let Some(default) = default {
+                    schema.push_table_default_value(column_id, default);
+                }
+            }
+            Either::Right(view_id) => {
+                let column_id = schema.push_view_column(view_id, column);
+
+                if let Some(default) = default {
+                    schema.push_view_default_value(column_id, default);
+                }
+            }
         }
     }
 
-    if !pk_cols.is_empty() {
-        let pk_id = schema.push_primary_key(table_id, String::new());
-        for column_id in pk_cols.values() {
-            schema.push_index_column(crate::IndexColumn {
-                index_id: pk_id,
-                column_id: *column_id,
-                sort_order: None,
-                length: None,
-            });
-        }
+    if let Either::Left(table_id) = container_id {
+        if !pk_cols.is_empty() {
+            let pk_id = schema.push_primary_key(table_id, String::new());
+            for column_id in pk_cols.values() {
+                schema.push_index_column(crate::IndexColumn {
+                    index_id: pk_id,
+                    column_id: *column_id,
+                    sort_order: None,
+                    length: None,
+                });
+            }
 
-        // Integer ID columns are always implemented with either row id or autoincrement
-        if pk_cols.len() == 1 {
-            let pk_col_id = *pk_cols.values().next().unwrap();
-            let pk_col = &mut schema.table_columns[pk_col_id.0 as usize];
-            // See https://www.sqlite.org/lang_createtable.html for the exact logic.
-            if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
-                pk_col.1.auto_increment = true;
-                pk_col.1.tpe.arity = ColumnArity::Required;
+            // Integer ID columns are always implemented with either row id or autoincrement
+            if pk_cols.len() == 1 {
+                let pk_col_id = *pk_cols.values().next().unwrap();
+                let pk_col = &mut schema.table_columns[pk_col_id.0 as usize];
+                // See https://www.sqlite.org/lang_createtable.html for the exact logic.
+                if pk_col.1.tpe.full_data_type.eq_ignore_ascii_case("INTEGER") {
+                    pk_col.1.auto_increment = true;
+                    pk_col.1.tpe.arity = ColumnArity::Required;
+                }
             }
         }
     }
 
     schema.table_default_values.sort_by_key(|(column_id, _)| *column_id);
+    schema.view_default_values.sort_by_key(|(column_id, _)| *column_id);
 
     Ok(())
 }

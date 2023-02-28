@@ -345,6 +345,16 @@ impl SqlSchema {
         id
     }
 
+    pub fn push_view(&mut self, name: String, namespace_id: NamespaceId, definition: Option<String>) -> ViewId {
+        let id = ViewId(self.views.len() as u32);
+        self.views.push(View {
+            namespace_id,
+            name,
+            definition,
+        });
+        id
+    }
+
     pub fn push_table_with_properties(
         &mut self,
         name: String,

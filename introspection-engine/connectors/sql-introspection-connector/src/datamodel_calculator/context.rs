@@ -1,3 +1,5 @@
+mod flavour;
+
 use crate::{
     introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
     introspection_map::{IntrospectionMap, RelationName},
@@ -15,6 +17,8 @@ use quaint::prelude::SqlFamily;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
+pub(super) use flavour::IntrospectionFlavour;
+
 pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) config: &'a Configuration,
     pub(crate) render_config: bool,
@@ -24,10 +28,18 @@ pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
     pub(crate) introspection_map: IntrospectionMap<'a>,
     pub(crate) force_namespaces: Option<&'a [String]>,
+    pub(crate) flavour: Box<dyn IntrospectionFlavour>,
 }
 
 impl<'a> DatamodelCalculatorContext<'a> {
     pub(crate) fn new(ctx: &'a IntrospectionContext, sql_schema: &'a sql::SqlSchema) -> Self {
+        let flavour: Box<dyn IntrospectionFlavour> = match ctx.sql_family() {
+            SqlFamily::Postgres => Box::new(flavour::PostgresIntrospectionFlavour),
+            SqlFamily::Mysql => Box::new(flavour::MysqlIntrospectionFlavour),
+            SqlFamily::Sqlite => Box::new(flavour::SqliteIntrospectionFlavour),
+            SqlFamily::Mssql => Box::new(flavour::SqlServerIntrospectionFlavour),
+        };
+
         let mut ctx = DatamodelCalculatorContext {
             version: Version::NonPrisma,
             config: ctx.configuration(),
@@ -37,6 +49,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             previous_schema: ctx.previous_schema(),
             introspection_map: Default::default(),
             force_namespaces: ctx.namespaces(),
+            flavour,
         };
 
         ctx.introspection_map = IntrospectionMap::new(&ctx);
