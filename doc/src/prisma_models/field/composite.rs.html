@@ -71,7 +71,7 @@
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeTypeRef};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeType};
 <span class="kw">use </span>dml::FieldArity;
 <span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
 <span class="kw">use </span>std::fmt::{Debug, Display};
@@ -94,7 +94,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>typ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompositeTypeRef {
+    <span class="kw">pub fn </span>typ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompositeType {
         <span class="kw">let </span>id = <span class="kw">match </span><span class="self">self</span>.id {
             CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).scalar_field_type().as_composite_type().unwrap(),
             CompositeFieldId::InCompositeType(ctid) =&gt; <span class="self">self</span>.dm.walk(ctid).r#type().as_composite_type().unwrap(),

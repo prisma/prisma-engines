@@ -251,7 +251,7 @@
 
 <span class="kw">use </span>cache::TypeRefCache;
 <span class="kw">use </span>prisma_models::{
-    ast, CompositeTypeRef, Field <span class="kw">as </span>ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
+    ast, CompositeType, Field <span class="kw">as </span>ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 <span class="kw">use </span>psl::{
     datamodel_connector::{Connector, ConnectorCapability},
@@ -332,10 +332,10 @@
     }
 
     <span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ModelRef&gt; {
-        <span class="self">self</span>.internal_data_model.models_cloned()
+        <span class="self">self</span>.internal_data_model.models().collect()
     }
 
-    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeTypeRef&gt; {
+    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeType&gt; {
         <span class="self">self</span>.internal_data_model.composite_types().collect()
     }
 

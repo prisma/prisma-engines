@@ -78,25 +78,19 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, CompositeTypeRef, InternalEnumRef};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, CompositeType, InternalEnum};
 <span class="kw">use </span>psl::schema_ast::ast;
-<span class="kw">use </span>std::sync::{Arc, Weak};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub type </span>InternalDataModelRef = Arc&lt;InternalDataModel&gt;;
-<span class="kw">pub type </span>InternalDataModelWeakRef = Weak&lt;InternalDataModel&gt;;
+<span class="kw">pub type </span>InternalDataModelRef = InternalDataModel;
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>InternalDataModel {
     <span class="kw">pub </span>schema: Arc&lt;psl::ValidatedSchema&gt;,
 }
 
 <span class="kw">impl </span>InternalDataModel {
-    <span class="kw">pub fn </span>models&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ModelRef&gt; + <span class="lifetime">&#39;a </span>{
+    <span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ModelRef&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.schema
             .db
             .walk_models()
@@ -105,18 +99,14 @@
             .map(|model| <span class="self">self</span>.clone().zip(model.id))
     }
 
-    <span class="kw">pub fn </span>composite_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompositeTypeRef&gt; + <span class="lifetime">&#39;a </span>{
+    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompositeType&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.schema
             .db
             .walk_composite_types()
             .map(<span class="kw">move </span>|ct| <span class="self">self</span>.clone().zip(ct.id))
     }
 
-    <span class="kw">pub fn </span>models_cloned(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; Vec&lt;ModelRef&gt; {
-        <span class="self">self</span>.models().collect()
-    }
-
-    <span class="kw">pub fn </span>relations&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationRef&gt; + Clone + <span class="lifetime">&#39;a </span>{
+    <span class="kw">pub fn </span>relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Relation&gt; + Clone + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.schema
             .db
             .walk_relations()
@@ -124,7 +114,7 @@
             .map(|relation| <span class="self">self</span>.clone().zip(relation.id))
     }
 
-    <span class="kw">pub fn </span>find_enum(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;InternalEnumRef&gt; {
+    <span class="kw">pub fn </span>find_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;InternalEnum&gt; {
         <span class="self">self</span>.schema
             .db
             .find_enum(name)
@@ -132,7 +122,7 @@
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    <span class="kw">pub fn </span>find_model(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ModelRef&gt; {
+    <span class="kw">pub fn </span>find_model(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ModelRef&gt; {
         <span class="self">self</span>.schema
             .db
             .walk_models()
@@ -142,16 +132,16 @@
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    <span class="kw">pub fn </span>find_composite_type_by_id(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, ctid: ast::CompositeTypeId) -&gt; CompositeTypeRef {
+    <span class="kw">pub fn </span>find_composite_type_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, ctid: ast::CompositeTypeId) -&gt; CompositeType {
         <span class="self">self</span>.clone().zip(ctid)
     }
 
-    <span class="kw">pub fn </span>find_model_by_id(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, model_id: ast::ModelId) -&gt; ModelRef {
+    <span class="kw">pub fn </span>find_model_by_id(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ast::ModelId) -&gt; ModelRef {
         <span class="self">self</span>.clone().zip(model_id)
     }
 
     <span class="doccomment">/// Finds all inline relation fields pointing to the given model.
-    </span><span class="kw">pub fn </span>fields_pointing_to_model(<span class="self">self</span>: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;RelationFieldRef&gt; {
+    </span><span class="kw">pub fn </span>fields_pointing_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;RelationFieldRef&gt; {
         <span class="self">self</span>.walk(model.id)
             .relations_to()
             .filter_map(|rel| rel.refine().as_inline())
@@ -164,7 +154,7 @@
         <span class="self">self</span>.schema.db.walk(id)
     }
 
-    <span class="kw">pub fn </span>zip&lt;I&gt;(<span class="self">self</span>: Arc&lt;InternalDataModel&gt;, id: I) -&gt; <span class="kw">crate</span>::Zipper&lt;I&gt; {
+    <span class="kw">pub fn </span>zip&lt;I&gt;(<span class="self">self</span>, id: I) -&gt; <span class="kw">crate</span>::Zipper&lt;I&gt; {
         <span class="kw">crate</span>::Zipper { id, dm: <span class="self">self </span>}
     }
 }

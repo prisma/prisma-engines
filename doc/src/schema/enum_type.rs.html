@@ -124,7 +124,7 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>prisma_models::{InternalEnumRef, PrismaValue, ScalarFieldRef};
+<span class="kw">use </span>prisma_models::{InternalEnum, PrismaValue, ScalarFieldRef};
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub enum </span>EnumType {
@@ -152,7 +152,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>database(identifier: Identifier, internal_enum: InternalEnumRef) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>database(identifier: Identifier, internal_enum: InternalEnum) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Database(DatabaseEnumType {
             identifier,
             internal_enum,
@@ -192,7 +192,7 @@
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>DatabaseEnumType {
     <span class="kw">pub </span>identifier: Identifier,
-    <span class="kw">pub </span>internal_enum: InternalEnumRef,
+    <span class="kw">pub </span>internal_enum: InternalEnum,
 }
 
 <span class="kw">impl </span>DatabaseEnumType {

@@ -40,7 +40,7 @@
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::unnecessary_to_owned)]
 
 </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>prisma_models::CompositeTypeRef;
+<span class="kw">use </span>prisma_models::CompositeType;
 
 <span class="doccomment">/// Compute initial composites cache. No fields are computed because we first
 /// need all composites to be present, then we can compute fields in a second pass.
@@ -61,7 +61,7 @@
     });
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, ct: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; ObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, ct: <span class="kw-2">&amp;</span>CompositeType) -&gt; ObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new(ct.name(), MODEL_NAMESPACE);
     ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
         .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)
@@ -69,7 +69,7 @@
 
 <span class="doccomment">/// Computes composite output type fields.
 /// Requires an initialized cache.
-</span><span class="kw">fn </span>compute_composite_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, composite: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; Vec&lt;OutputField&gt; {
+</span><span class="kw">fn </span>compute_composite_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, composite: <span class="kw-2">&amp;</span>CompositeType) -&gt; Vec&lt;OutputField&gt; {
     composite
         .fields()
         .into_iter()

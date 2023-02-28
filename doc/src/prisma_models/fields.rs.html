@@ -171,11 +171,11 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Fields {
-    model: ModelWeakRef,
+    model: Model,
 }
 
 <span class="kw">impl </span>Fields {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: ModelWeakRef) -&gt; Fields {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: Model) -&gt; Fields {
         Fields { model }
     }
 

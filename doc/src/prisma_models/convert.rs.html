@@ -4,11 +4,11 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{InternalDataModel, InternalDataModelRef};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::InternalDataModel;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;) -&gt; InternalDataModelRef {
-    Arc::new(InternalDataModel { schema })
+<span class="kw">pub fn </span>convert(schema: Arc&lt;psl::ValidatedSchema&gt;) -&gt; InternalDataModel {
+    InternalDataModel { schema }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="prisma_models" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

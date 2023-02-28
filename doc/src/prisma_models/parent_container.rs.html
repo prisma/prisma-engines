@@ -126,14 +126,14 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeTypeRef, CompositeTypeWeakRef, Field, InternalDataModelRef, ModelRef, ModelWeakRef};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{CompositeType, Field, InternalDataModelRef, Model, ModelRef};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::hash::{Hash, Hasher};
 
 <span class="attr">#[derive(Clone)]
 </span><span class="kw">pub enum </span>ParentContainer {
-    Model(ModelWeakRef),
-    CompositeType(CompositeTypeWeakRef),
+    Model(Model),
+    CompositeType(CompositeType),
 }
 
 <span class="kw">impl </span>ParentContainer {
@@ -152,14 +152,14 @@
         }
     }
 
-    <span class="kw">pub fn </span>as_model_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModelWeakRef&gt; {
+    <span class="kw">pub fn </span>as_model_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Model&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(m) =&gt; <span class="prelude-val">Some</span>(m.clone()),
             ParentContainer::CompositeType(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeTypeRef&gt; {
+    <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeType&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ParentContainer::Model(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             ParentContainer::CompositeType(ct) =&gt; <span class="prelude-val">Some</span>(ct.clone()),
@@ -210,8 +210,8 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;CompositeTypeRef&gt; <span class="kw">for </span>ParentContainer {
-    <span class="kw">fn </span>from(composite: CompositeTypeRef) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;CompositeType&gt; <span class="kw">for </span>ParentContainer {
+    <span class="kw">fn </span>from(composite: CompositeType) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::CompositeType(composite)
     }
 }
