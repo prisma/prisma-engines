@@ -187,9 +187,27 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.
 
 </span><span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>indoc::indoc;
 <span class="kw">use </span>migration_connector::{ConnectorError, ConnectorResult, Namespaces};
 <span class="kw">use </span>psl::PreviewFeature;
 <span class="kw">use </span>quaint::{
@@ -210,11 +228,27 @@
                 details: err.to_string(),
             })
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(Connection(
-            connector::PostgreSql::new(url.clone())
+
+        <span class="kw">let </span>quaint = connector::PostgreSql::new(url.clone())
+            .<span class="kw">await
+            </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>version = quaint.version().<span class="kw">await</span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
+
+        <span class="kw">if </span>version.map(|v| v.starts_with(<span class="string">&quot;CockroachDB CCL v22.2&quot;</span>)).unwrap_or(<span class="bool-val">false</span>) {
+            <span class="comment">// first config issue: https://github.com/prisma/prisma/issues/16909
+            // second config value: Currently at least version 22.2.5, enums are
+            // not case-sensitive without this.
+            </span>quaint
+                .raw_cmd(<span class="macro">indoc! </span>{<span class="string">r#&quot;
+                    SET enable_implicit_transaction_for_batch_statements=false;
+                    SET use_declarative_schema_changer=off
+                &quot;#</span>})
                 .<span class="kw">await
-                </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>,
-        ))
+                </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(Connection(quaint))
     }
 
     <span class="attr">#[tracing::instrument(skip(<span class="self">self</span>, circumstances, params))]

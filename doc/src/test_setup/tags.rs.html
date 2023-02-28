@@ -52,6 +52,8 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
 </pre><pre class="rust"><code><span class="kw">use </span>enumflags2::<span class="kw-2">*</span>;
 
 <span class="macro">macro_rules! </span>tags {
@@ -92,6 +94,8 @@
     Postgres15 = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>,
     Postgres11 = <span class="number">1 </span>&lt;&lt; <span class="number">17</span>,
     Postgres13 = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>,
+    CockroachDb221 = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>,
+    CockroachDb222 = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>,
 ];
 
 <span class="kw">pub fn </span>tags_from_comma_separated_list(input: <span class="kw-2">&amp;</span>str) -&gt; BitFlags&lt;Tags&gt; {

@@ -311,6 +311,7 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
 
 </span><span class="kw">mod </span>config;
@@ -563,6 +564,7 @@
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt;,
 ) {
     <span class="kw">let </span>config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>= <span class="kw-2">&amp;</span><span class="kw">crate</span>::CONFIG;
+
     <span class="kw">if </span>!ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         <span class="kw">return</span>;
     }
