@@ -106,3 +106,37 @@ pub(super) fn provider_completion(completion_list: &mut CompletionList) {
         ..Default::default()
     })
 }
+
+pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
+    completion_list.items.push(CompletionItem {
+        label: "engines env".to_owned(),
+        insert_text: Some(r#"env($0)"#.to_owned()),
+        insert_text_format: Some(InsertTextFormat::SNIPPET),
+        kind: Some(CompletionItemKind::PROPERTY),
+        documentation: Some(Documentation::MarkupContent(MarkupContent {
+            kind: MarkupKind::Markdown,
+            value: generate_pretty_doc(
+                r#"env(_ environmentVariable: string)"#,
+                r#"Specifies a datasource via an environment variable. When running a Prisma CLI command that needs the database connection URL (e.g. `prisma generate`), you need to make sure that the `DATABASE_URL` environment variable is set. One way to do so is by creating a `.env` file. Note that the file must be in the same directory as your schema.prisma file to automatically be picked up by the Prisma CLI.""#
+            ),
+        })),
+        ..Default::default()
+    })
+}
+
+pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
+    completion_list.items.push(CompletionItem {
+        label: r#"engines """#.to_owned(),
+        insert_text: Some(r#""$0""#.to_owned()),
+        insert_text_format: Some(InsertTextFormat::SNIPPET),
+        kind: Some(CompletionItemKind::PROPERTY),
+        documentation: Some(Documentation::MarkupContent(MarkupContent {
+            kind: MarkupKind::Markdown,
+            value: generate_pretty_doc(
+                r#""connectionString""#,
+                r#"Connection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/prisma-schema)."#
+            ),
+        })),
+        ..Default::default()
+    })
+}
