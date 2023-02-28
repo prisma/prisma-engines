@@ -3183,7 +3183,6 @@ name = "qe-setup"
 version = "0.1.0"
 dependencies = [
  "connection-string",
- "crossbeam-channel",
  "enumflags2",
  "migration-core",
  "mongodb",
