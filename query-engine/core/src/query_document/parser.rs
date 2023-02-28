@@ -70,29 +70,36 @@ impl QueryDocumentParser {
         // Parse and validate all provided arguments for the field
         self.parse_arguments(path.clone(), schema_field, selection.arguments())
             .and_then(|arguments| {
-                // If the output type of the field is an object type of any form, validate the sub selection as well.
-                let nested_fields = schema_field
-                    .field_type
-                    .as_object_type()
-                    .map(|obj| self.parse_object(path.clone(), selection.nested_selections(), &obj));
+                if !selection.nested_selections().is_empty() && schema_field.field_type.is_scalar() {
+                    Err(
+                        ValidationError::selection_set_on_scalar(selection.name().to_string(), parent_path.segments)
+                            .into(),
+                    )
+                } else {
+                    // If the output type of the field is an object type of any form, validate the sub selection as well.
+                    let nested_fields = schema_field
+                        .field_type
+                        .as_object_type()
+                        .map(|obj| self.parse_object(path.clone(), selection.nested_selections(), &obj));
 
-                let nested_fields = match nested_fields {
-                    Some(sub) => Some(sub?),
-                    None => None,
-                };
+                    let nested_fields = match nested_fields {
+                        Some(sub) => Some(sub?),
+                        None => None,
+                    };
 
-                let schema_field = Arc::clone(schema_field);
-                let parsed_field = ParsedField {
-                    name: selection.name().to_string(),
-                    alias: selection.alias().clone(),
-                    arguments,
-                    nested_fields,
-                };
+                    let schema_field = Arc::clone(schema_field);
+                    let parsed_field = ParsedField {
+                        name: selection.name().to_string(),
+                        alias: selection.alias().clone(),
+                        arguments,
+                        nested_fields,
+                    };
 
-                Ok(FieldPair {
-                    parsed_field,
-                    schema_field,
-                })
+                    Ok(FieldPair {
+                        parsed_field,
+                        schema_field,
+                    })
+                }
             })
     }
 

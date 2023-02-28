@@ -31,6 +31,8 @@ pub struct ValidationError {
 pub enum ValidationErrorKind {
     /// See [`ValidationError::empty_selection`]
     EmptySelection,
+    /// See [`ValidationError::selection_set_on_scalar`]
+    SelectionSetOnScalar,
     /// See [`ValidationError::unkown_argument`]
     UnkownArgument,
     /// See [`ValidationError::unknown_input_field`]
@@ -171,6 +173,34 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
             meta: Some(json!({ "outputType": output_type_description })),
+            message,
+            path,
+        }
+    }
+
+    /// Creates an ValidationErrorKind::SelectionSetOnScalar kind of error, which happens when there
+    /// is a nested selection block on a scalar field
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "selection": {
+    ///             "email": {
+    ///                 "selection": {
+    ///                     "id": true
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    pub fn selection_set_on_scalar(field_name: String, path: Vec<String>) -> Self {
+        let message = format!("Cannot select over scalar field '{}'", field_name);
+        ValidationError {
+            kind: ValidationErrorKind::SelectionSetOnScalar,
+            meta: None,
             message,
             path,
         }

@@ -56,17 +56,19 @@ impl JsonProtocolAdapter {
 
         let mut selection = Selection::new(&field.name, None, arguments, Vec::new());
 
-        if let Some(schema_object) = field.field_type.as_object_type() {
-            let json_selection = query_selection.selection();
+        let json_selection = query_selection.selection();
 
-            for (selection_name, selected) in json_selection {
-                match selected {
-                    // $scalars: true
-                    crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
+        for (selection_name, selected) in json_selection {
+            match selected {
+                // $scalars: true
+                crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
+                    if let Some(schema_object) = field.field_type.as_object_type() {
                         Self::default_scalar_selection(&schema_object, &mut selection);
                     }
-                    // $composites: true
-                    crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
+                }
+                // $composites: true
+                crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
+                    if let Some(schema_object) = field.field_type.as_object_type() {
                         if let Some(container) = container {
                             Self::default_composite_selection(
                                 &mut selection,
@@ -76,20 +78,22 @@ impl JsonProtocolAdapter {
                             )?;
                         }
                     }
-                    // <field_name>: true
-                    crate::SelectionSetValue::Shorthand(true) => {
-                        if all_scalars_set {
-                            return Err(HandlerError::query_conversion(format!(
-                                "Cannot select both '$scalars: true' and a specific scalar field '{selection_name}'.",
-                            )));
-                        }
-
-                        selection.push_nested_selection(Selection::with_name(selection_name));
+                }
+                // <field_name>: true
+                crate::SelectionSetValue::Shorthand(true) => {
+                    if all_scalars_set {
+                        return Err(HandlerError::query_conversion(format!(
+                            "Cannot select both '$scalars: true' and a specific scalar field '{selection_name}'.",
+                        )));
                     }
-                    // <field_name>: false
-                    crate::SelectionSetValue::Shorthand(false) => (),
-                    // <field_name>: { query: { ... }, arguments: { ... } }
-                    crate::SelectionSetValue::Nested(nested_query) => {
+
+                    selection.push_nested_selection(Selection::with_name(selection_name));
+                }
+                // <field_name>: false
+                crate::SelectionSetValue::Shorthand(false) => (),
+                // <field_name>: { selection: { ... }, arguments: { ... } }
+                crate::SelectionSetValue::Nested(nested_query) => {
+                    if let Some(schema_object) = field.field_type.as_object_type() {
                         let schema_field = schema_object.find_field(&selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(format!(
                                 "Unknown nested field '{}' for operation {} does not match any query.",

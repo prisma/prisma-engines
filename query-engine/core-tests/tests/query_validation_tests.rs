@@ -84,9 +84,9 @@ fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_h
     Ok(())
 }
 
-// #[test]
-// fn postgres_basic_create_with_non_existent_field() {
-//     run_query_validation_test("postgres_basic/selection_is_empty.query.json");
-// }
+#[test]
+fn foo() {
+    run_query_validation_test("postgres_basic/selection_set_on_scalar.query.json");
+}
 
-include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));
+// include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));
