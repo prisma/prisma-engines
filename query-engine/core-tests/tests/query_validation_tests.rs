@@ -1,5 +1,6 @@
 use query_core::query_graph_builder::QueryGraphBuilder;
 use request_handlers::JsonSingleQuery;
+use serde_json::json;
 use std::{io::Write as _, path::Path, sync::Arc};
 
 const TESTS_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/query_validation_tests");
@@ -17,7 +18,7 @@ fn run_query_validation_test(query_file_path: &str) {
 
     let err_string = match validate(&query, schema) {
         Ok(()) => panic!("these tests are only for errors, the query should fail to validate, but it did not"),
-        Err(err) => err.to_string(),
+        Err(err) => json!(user_facing_errors::Error::from(err)).to_string(),
     };
 
     let snapshot_path = query_file_path.parent().unwrap().with_file_name(
@@ -82,5 +83,10 @@ fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_h
         .map_err(query_core::CoreError::from)?;
     Ok(())
 }
+
+// #[test]
+// fn postgres_basic_create_with_non_existent_field() {
+//     run_query_validation_test("postgres_basic/selection_is_empty.query.json");
+// }
 
 include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));

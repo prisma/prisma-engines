@@ -32,7 +32,7 @@ impl QueryDocumentParser {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
 
         if selections.is_empty() {
-            return Err(QueryParserError {
+            return Err(QueryParserError::Legacy {
                 path,
                 error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(Some(1), None, None, 0)),
             });
@@ -42,7 +42,7 @@ impl QueryDocumentParser {
             .iter()
             .map(|selection| match schema_object.find_field(selection.name()) {
                 Some(ref field) => self.parse_field(path.clone(), selection, field),
-                None => Err(QueryParserError {
+                None => Err(QueryParserError::Legacy {
                     path: path.add(selection.name().into()),
                     error_kind: QueryParserErrorKind::FieldNotFoundError,
                 }),
@@ -102,7 +102,7 @@ impl QueryDocumentParser {
 
         invalid_argument_names
             .map(|extra_arg| {
-                Err(QueryParserError {
+                Err(QueryParserError::Legacy {
                     path: parent_path.add(extra_arg.to_string()),
                     error_kind: QueryParserErrorKind::ArgumentNotFoundError,
                 })
@@ -134,7 +134,7 @@ impl QueryDocumentParser {
                     )),
 
                     None if !schema_input_arg.is_required => None,
-                    _ => Some(Err(QueryParserError {
+                    _ => Some(Err(QueryParserError::Legacy {
                         path,
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     })),
@@ -173,7 +173,7 @@ impl QueryDocumentParser {
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_val = serde_json::to_value(list).map_err(|err| QueryParserError {
+                    let json_val = serde_json::to_value(list).map_err(|err| QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::ValueParseError(format!(
                             "Cannot deserialize argument value: {err}"
@@ -188,7 +188,7 @@ impl QueryDocumentParser {
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                         Ok(ParsedInputValue::Single(PrismaValue::Null))
                     }
-                    (PrismaValue::Null, _) => Err(QueryParserError {
+                    (PrismaValue::Null, _) => Err(QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     }),
@@ -209,7 +209,7 @@ impl QueryDocumentParser {
                         self.parse_enum(&parent_path, value, &et.into_arc())
                     }
                     // Invalid combinations
-                    _ => Err(QueryParserError {
+                    _ => Err(QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::ValueTypeMismatchError {
                             have: value.clone(),
@@ -229,7 +229,7 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::Map),
 
                 // Invalid combinations
-                _ => Err(QueryParserError {
+                _ => Err(QueryParserError::Legacy {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
                         have: value.clone(),
@@ -247,7 +247,7 @@ impl QueryDocumentParser {
             if failures.len() == 1 {
                 failures.pop().unwrap()
             } else {
-                Err(QueryParserError {
+                Err(QueryParserError::Legacy {
                     path: parent_path,
                     error_kind: QueryParserErrorKind::InputUnionParseError {
                         parsing_errors: failures
@@ -311,28 +311,31 @@ impl QueryDocumentParser {
             (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
             (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
-                None => Err(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
-                            format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap())))),
+                None => {
+                    let error_kind = QueryParserErrorKind::ValueFitError(format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap()));
+                    Err(QueryParserError::Legacy {
+                        path: parent_path.clone(),
+                        error_kind,
+                    })
+                }
             },
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // All other combinations are value type mismatches.
-            (qv, _) => {
-                Err(QueryParserError {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: qv.into(),
-                        want: InputType::Scalar(scalar_type.clone()),
-                    },
-                })
-            },
+            (qv, _) => Err(QueryParserError::Legacy {
+                path: parent_path.clone(),
+                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                    have: qv.into(),
+                    want: InputType::Scalar(scalar_type.clone()),
+                },
+            }),
         }
     }
 
     fn parse_datetime(&self, path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_value::parse_datetime(s).map_err(|err| QueryParserError {
+        prisma_value::parse_datetime(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!(
                 "Invalid DateTime: '{s}' (must be ISO 8601 compatible). Underlying error: {err}"
@@ -343,7 +346,7 @@ impl QueryDocumentParser {
     fn parse_bytes(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         prisma_value::decode_bytes(&s)
             .map(PrismaValue::Bytes)
-            .map_err(|_| QueryParserError {
+            .map_err(|_| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!(
                     "'{s}' is not a valid base64 encoded string."
@@ -354,27 +357,28 @@ impl QueryDocumentParser {
     fn parse_decimal(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
         BigDecimal::from_str(&s)
             .map(PrismaValue::Float)
-            .map_err(|_| QueryParserError {
+            .map_err(|_| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid decimal string")),
             })
     }
 
     fn parse_bigint(&self, path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
-        s.parse::<i64>().map(PrismaValue::BigInt).map_err(|_| QueryParserError {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid big integer string")),
-        })
+        s.parse::<i64>()
+            .map(PrismaValue::BigInt)
+            .map_err(|_| QueryParserError::Legacy {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid big integer string")),
+            })
     }
 
     fn parse_json_list_from_str(&self, path: &QueryPath, s: &str) -> QueryParserResult<PrismaValue> {
         let json = self.parse_json(path, s)?;
-
         self.parse_json_list_from_value(path, json)
     }
 
     fn parse_json_list_from_value(&self, path: &QueryPath, json: serde_json::Value) -> QueryParserResult<PrismaValue> {
-        let values = json.as_array().ok_or_else(|| QueryParserError {
+        let values = json.as_array().ok_or_else(|| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::AssertionError("JSON parameter needs to be an array".into()),
         })?;
@@ -382,7 +386,7 @@ impl QueryDocumentParser {
         let mut prisma_values = Vec::with_capacity(values.len());
 
         for v in values.iter() {
-            let pv = PrismaValue::try_from(v.clone()).map_err(|_| QueryParserError {
+            let pv = PrismaValue::try_from(v.clone()).map_err(|_| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::AssertionError("Nested JSON arguments are not supported".into()),
             })?;
@@ -394,7 +398,7 @@ impl QueryDocumentParser {
     }
 
     fn parse_json(&self, path: &QueryPath, s: &str) -> QueryParserResult<serde_json::Value> {
-        serde_json::from_str(s).map_err(|err| QueryParserError {
+        serde_json::from_str(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
         })
@@ -402,7 +406,7 @@ impl QueryDocumentParser {
 
     fn to_json(&self, path: &QueryPath, value: &ArgumentValue) -> QueryParserResult<PrismaValue> {
         serde_json::to_string(&value)
-            .map_err(|err| QueryParserError {
+            .map_err(|err| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
             })
@@ -410,7 +414,7 @@ impl QueryDocumentParser {
     }
 
     fn parse_uuid(&self, path: &QueryPath, s: &str) -> QueryParserResult<Uuid> {
-        Uuid::parse_str(s).map_err(|err| QueryParserError {
+        Uuid::parse_str(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid UUID: {err}")),
         })
@@ -434,7 +438,7 @@ impl QueryDocumentParser {
             PrismaValue::String(s) => s,
             PrismaValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
-                return Err(QueryParserError {
+                return Err(QueryParserError::Legacy {
                     path: path.clone(),
                     error_kind: QueryParserErrorKind::ValueParseError(format!(
                         "Unexpected Enum value type {:?} for enum {}",
@@ -446,7 +450,7 @@ impl QueryDocumentParser {
         };
 
         let err = |name: &str| {
-            Err(QueryParserError {
+            Err(QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!(
                     "Enum value '{raw}' is invalid for enum type {name}"
@@ -513,8 +517,8 @@ impl QueryDocumentParser {
                     }
                     None => {
                         if field.is_required {
-                            let kind = QueryParserErrorKind::RequiredValueNotSetError;
-                            Some(Err(QueryParserError::new(path, kind)))
+                            let error_kind = QueryParserErrorKind::RequiredValueNotSetError;
+                            Some(Err(QueryParserError::Legacy { path, error_kind }))
                         } else {
                             None
                         }
@@ -529,8 +533,11 @@ impl QueryDocumentParser {
             .into_iter()
             .map(|(k, v)| {
                 let field = schema_object.find_field(k.as_str()).ok_or_else(|| {
-                    let kind = QueryParserErrorKind::FieldNotFoundError;
-                    QueryParserError::new(path.add(k.clone()), kind)
+                    let error_kind = QueryParserErrorKind::FieldNotFoundError;
+                    QueryParserError::Legacy {
+                        path: path.add(k.clone()),
+                        error_kind,
+                    }
                 })?;
 
                 let path = path.add(field.name.clone());
@@ -579,7 +586,7 @@ impl QueryDocumentParser {
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
             ));
-            return Err(QueryParserError::new(path, error_kind));
+            return Err(QueryParserError::Legacy { path, error_kind });
         }
 
         map.set_tag(schema_object.tag.clone());

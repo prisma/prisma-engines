@@ -1,6 +1,9 @@
+mod validation;
+
 use serde::Serialize;
 use std::fmt;
 use user_facing_error_macros::*;
+pub use validation::*;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]
@@ -126,19 +129,6 @@ pub struct TypeMismatchInvalidCustomType {
 pub struct QueryParsingFailed {
     /// Error(s) encountered when trying to parse a query in the query engine
     pub query_parsing_error: String,
-
-    /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
-    pub query_position: String,
-}
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2009",
-    message = "Failed to validate the query: `{query_validation_error}` at `{query_position}`"
-)]
-pub struct QueryValidationFailed {
-    /// Error(s) encountered when trying to validate a query in the query engine
-    pub query_validation_error: String,
 
     /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
     pub query_position: String,

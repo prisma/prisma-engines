@@ -1,5 +1,5 @@
-use super::{GQLBatchResponse, GQLResponse};
-use crate::{PrismaResponse, RequestBody};
+use super::GQLResponse;
+use crate::{GQLError, PrismaResponse, RequestBody};
 use futures::FutureExt;
 use indexmap::IndexMap;
 use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
@@ -51,27 +51,19 @@ impl<'a> RequestHandler<'a> {
                 }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
-            Err(err) => match err.as_known_error() {
-                Some(transformed) => PrismaResponse::Single(user_facing_errors::Error::new_known(transformed).into()),
-                None => PrismaResponse::Single(err.into()),
-            },
+
+            Err(err) => PrismaResponse::Single(GQLError::from_handler_error(err).into()),
         }
     }
 
     async fn handle_single(&self, query: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
-        use user_facing_errors::Error;
-
         let gql_response = match AssertUnwindSafe(self.handle_request(query, tx_id, trace_id))
             .catch_unwind()
             .await
         {
             Ok(Ok(response)) => response.into(),
-            Ok(Err(err)) => err.into(),
-            Err(err) => {
-                // panicked
-                let error = Error::from_panic_payload(err);
-                error.into()
-            }
+            Ok(Err(err)) => GQLError::from_core_error(err).into(),
+            Err(err) => GQLError::from_panic_payload(err).into(),
         };
 
         PrismaResponse::Single(gql_response)
@@ -84,8 +76,6 @@ impl<'a> RequestHandler<'a> {
         tx_id: Option<TxId>,
         trace_id: Option<String>,
     ) -> PrismaResponse {
-        use user_facing_errors::Error;
-
         match AssertUnwindSafe(self.executor.execute_all(
             tx_id,
             queries,
@@ -102,20 +92,14 @@ impl<'a> RequestHandler<'a> {
                     .into_iter()
                     .map(|response| match response {
                         Ok(data) => data.into(),
-                        Err(err) => err.into(),
+                        Err(err) => GQLError::from_core_error(err).into(),
                     })
                     .collect();
 
                 PrismaResponse::Multi(gql_responses.into())
             }
-            Ok(Err(err)) => PrismaResponse::Multi(err.into()),
-            Err(err) => {
-                // panicked
-                let error = Error::from_panic_payload(err);
-                let resp: GQLBatchResponse = error.into();
-
-                PrismaResponse::Multi(resp)
-            }
+            Ok(Err(err)) => PrismaResponse::Multi(GQLError::from_core_error(err).into()),
+            Err(err) => PrismaResponse::Multi(GQLError::from_panic_payload(err).into()),
         }
     }
 
@@ -125,8 +109,6 @@ impl<'a> RequestHandler<'a> {
         tx_id: Option<TxId>,
         trace_id: Option<String>,
     ) -> PrismaResponse {
-        use user_facing_errors::Error;
-
         let plural_name = document.plural_name();
         let singular_name = document.single_name();
         let keys = document.keys;
@@ -201,13 +183,10 @@ impl<'a> RequestHandler<'a> {
                 PrismaResponse::Multi(results.into())
             }
 
-            Ok(Err(err)) => PrismaResponse::Multi(err.into()),
+            Ok(Err(err)) => PrismaResponse::Multi(GQLError::from_core_error(err).into()),
 
             // panicked
-            Err(err) => {
-                let error = Error::from_panic_payload(err);
-                PrismaResponse::Multi(error.into())
-            }
+            Err(err) => PrismaResponse::Multi(GQLError::from_panic_payload(err).into()),
         }
     }
 

@@ -1,9 +1,10 @@
-use crate::HandlerError;
 use indexmap::IndexMap;
 use query_core::{
     response_ir::{Item, Map, ResponseData},
     CoreError,
 };
+
+use crate::HandlerError;
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct GQLResponse {
@@ -47,6 +48,28 @@ impl GQLError {
 
     pub fn batch_request_idx(&self) -> Option<usize> {
         self.user_facing_error.batch_request_idx()
+    }
+
+    pub fn from_user_facing_error(err: user_facing_errors::Error) -> Self {
+        GQLError {
+            error: err.message().to_owned(),
+            user_facing_error: err,
+        }
+    }
+
+    pub fn from_core_error(err: CoreError) -> Self {
+        GQLError {
+            error: format!("{err}"),
+            user_facing_error: user_facing_errors::Error::from(err),
+        }
+    }
+
+    pub fn from_handler_error(err: HandlerError) -> Self {
+        Self::from_user_facing_error(user_facing_errors::Error::from(err))
+    }
+
+    pub fn from_panic_payload(panic_payload: Box<dyn std::any::Any + Send + 'static>) -> Self {
+        Self::from_user_facing_error(user_facing_errors::Error::from_panic_payload(panic_payload))
     }
 }
 
@@ -94,51 +117,12 @@ impl GQLResponse {
     }
 }
 
-impl From<HandlerError> for GQLResponse {
-    fn from(err: HandlerError) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
-    }
-}
-
 impl From<GQLError> for GQLResponse {
     fn from(err: GQLError) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
-    }
-}
+        let mut gql_response = Self::default();
 
-impl From<HandlerError> for GQLError {
-    fn from(other: HandlerError) -> Self {
-        GQLError::from(user_facing_errors::Error::from_dyn_error(&other))
-    }
-}
-
-impl From<user_facing_errors::Error> for GQLResponse {
-    fn from(err: user_facing_errors::Error) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
-    }
-}
-
-impl From<user_facing_errors::Error> for GQLError {
-    fn from(err: user_facing_errors::Error) -> GQLError {
-        GQLError {
-            error: err.message().to_owned(),
-            user_facing_error: err,
-        }
-    }
-}
-
-impl From<CoreError> for GQLError {
-    fn from(err: CoreError) -> GQLError {
-        GQLError {
-            error: format!("{err}"),
-            user_facing_error: err.into(),
-        }
+        gql_response.insert_error(err);
+        gql_response
     }
 }
 
@@ -147,15 +131,6 @@ impl From<ResponseData> for GQLResponse {
         let mut gql_response = GQLResponse::with_capacity(1);
 
         gql_response.insert_data(response.key, response.data);
-        gql_response
-    }
-}
-
-impl From<CoreError> for GQLResponse {
-    fn from(err: CoreError) -> GQLResponse {
-        let mut gql_response = GQLResponse::default();
-
-        gql_response.insert_error(err);
         gql_response
     }
 }
@@ -192,28 +167,12 @@ impl GQLBatchResponse {
     }
 }
 
-impl From<user_facing_errors::Error> for GQLBatchResponse {
-    fn from(err: user_facing_errors::Error) -> Self {
-        let mut batch_response = Self::default();
-        batch_response.insert_error(err);
-        batch_response
-    }
-}
-
-impl From<CoreError> for GQLBatchResponse {
-    fn from(err: CoreError) -> Self {
+impl From<GQLError> for GQLBatchResponse {
+    fn from(err: GQLError) -> Self {
         let mut batch_response = Self::default();
 
         batch_response.insert_error(err);
         batch_response
-    }
-}
-
-impl From<HandlerError> for GQLBatchResponse {
-    fn from(err: HandlerError) -> Self {
-        let mut responses = Self::default();
-        responses.insert_error(err);
-        responses
     }
 }
 

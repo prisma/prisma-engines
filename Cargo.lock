@@ -529,6 +529,7 @@ dependencies = [
  "schema",
  "schema-builder",
  "serde_json",
+ "user-facing-errors",
 ]
 
 [[package]]

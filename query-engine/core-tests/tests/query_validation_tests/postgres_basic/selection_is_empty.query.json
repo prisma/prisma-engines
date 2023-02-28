@@ -1,0 +1,7 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "selection": {}
+    }
+}

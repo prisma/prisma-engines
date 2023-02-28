@@ -6,6 +6,7 @@ use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
+use user_facing_errors::UnknownError;
 
 #[derive(Debug, Error)]
 #[error(
@@ -166,22 +167,33 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            CoreError::QueryParserError(query_parser_error)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                let known_error = match query_parser_error.error_kind {
+            // legacy query validation errors. This block should go away
+            CoreError::QueryParserError(QueryParserError::Legacy { path, error_kind })
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
+                path,
+                error_kind,
+            })) => {
+                let known_error = match error_kind {
                     QueryParserErrorKind::RequiredValueNotSetError => {
                         user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", query_parser_error.path),
+                            path: format!("{}", path),
                         })
                     }
-                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: format!("{}", query_parser_error.error_kind),
-                        query_position: format!("{}", query_parser_error.path),
-                    }),
+                    _ => user_facing_errors::KnownError::new(
+                        user_facing_errors::query_engine::LegacyQueryValidationFailed {
+                            query_validation_error: format!("{}", error_kind),
+                            query_position: format!("{}", path),
+                        },
+                    ),
                 };
 
                 known_error.into()
             }
+
+            CoreError::QueryParserError(QueryParserError::Structured(se))
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
+                QueryParserError::Structured(se),
+            )) => user_facing_errors::KnownError::new(se).into(),
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,
@@ -285,7 +297,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 inner_error
             }
 
-            _ => user_facing_errors::Error::from_dyn_error(&err),
+            _ => UnknownError::new(&err).into(),
         }
     }
 }

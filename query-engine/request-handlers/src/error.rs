@@ -1,7 +1,6 @@
-use graphql_parser::query::ParseError;
 use query_core::CoreError;
 use thiserror::Error;
-use user_facing_errors::KnownError;
+use user_facing_errors::{KnownError, UnknownError};
 
 #[derive(Debug, Error)]
 #[allow(clippy::large_enum_variant)]
@@ -43,17 +42,6 @@ impl HandlerError {
     pub fn value_fit(details: impl ToString) -> Self {
         Self::ValueFitError(details.to_string())
     }
-
-    pub fn as_known_error(&self) -> Option<KnownError> {
-        match self {
-            HandlerError::ValueFitError(details) => {
-                Some(KnownError::new(user_facing_errors::query_engine::ValueFitError {
-                    details: details.clone(),
-                }))
-            }
-            _ => None,
-        }
-    }
 }
 
 impl From<url::ParseError> for HandlerError {
@@ -68,8 +56,22 @@ impl From<connection_string::Error> for HandlerError {
     }
 }
 
-impl From<ParseError> for HandlerError {
-    fn from(e: ParseError) -> Self {
+impl From<graphql_parser::query::ParseError> for HandlerError {
+    fn from(e: graphql_parser::query::ParseError) -> Self {
         Self::configuration(format!("Error parsing GraphQL query: {e}"))
+    }
+}
+
+impl From<HandlerError> for user_facing_errors::Error {
+    fn from(err: HandlerError) -> Self {
+        match err {
+            HandlerError::Core(ce) => user_facing_errors::Error::from(ce),
+
+            HandlerError::ValueFitError(details) => {
+                KnownError::new(user_facing_errors::query_engine::ValueFitError { details }).into()
+            }
+
+            _ => UnknownError::new(&err).into(),
+        }
     }
 }
