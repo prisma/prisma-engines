@@ -86,7 +86,7 @@ fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_h
 
 #[test]
 fn foo() {
-    run_query_validation_test("postgres_basic/selection_set_on_scalar.query.json");
+    run_query_validation_test("postgres_basic/required_argument_is_missing.query.json");
 }
 
 // include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));

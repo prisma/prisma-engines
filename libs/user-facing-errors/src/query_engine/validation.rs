@@ -1,7 +1,8 @@
+use crate::KnownError;
 use core::fmt;
-
 use serde::Serialize;
 use serde_json::json;
+use std::borrow::Cow;
 use user_facing_error_macros::*;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -41,24 +42,45 @@ pub enum ValidationErrorKind {
     EmptySelection,
     /// See [`ValidationError::selection_set_on_scalar`]
     SelectionSetOnScalar,
+    /// See [`ValidationError::required_value_not_set`]
+    RequiredArgumentMissing,
     /// See [`ValidationError::unkown_argument`]
     UnkownArgument,
     /// See [`ValidationError::unknown_input_field`]
-    UnkownInputField,
+    UnknownInputField,
     /// See [`ValidationError::unkown_selection_field`]
     UnknownSelectionField,
 }
 
-impl crate::UserFacingError for ValidationError {
-    const ERROR_CODE: &'static str = "P2009";
+impl ValidationErrorKind {
+    /// Returns the appropriate code code for the different validation errors.
+    ///
+    /// TODO: Ideally each all validation errors should have the same error code (P2009), or distinct
+    /// type each of them should have an individual error code. For the time being, we keep the
+    /// semantics documented in the [error reference][r] as users might be relying on the error
+    /// codes when subscribing to error events. Otherwise, we could be introducing a breaking change.
+    ///
+    /// [r]: https://www.prisma.io/docs/reference/api-reference/error-reference
+    fn code(&self) -> &'static str {
+        match self {
+            ValidationErrorKind::RequiredArgumentMissing => "P2012",
+            _ => "P2009",
+        }
+    }
+}
 
-    fn message(&self) -> String {
-        self.message.clone()
+impl From<ValidationError> for crate::KnownError {
+    fn from(err: ValidationError) -> Self {
+        KnownError {
+            message: err.message.clone(),
+            meta: serde_json::to_value(&err).expect("Failed to render validation error to JSON"),
+            error_code: Cow::from(err.kind.code()),
+        }
     }
 }
 
 impl ValidationError {
-    /// Creates an ValidationErrorKind::EmptySelection kind of error, which happens when the
+    /// Creates an [`ValidationErrorKind::EmptySelection`] kind of error, which happens when the
     /// selection of fields is empty for a query.
     ///
     /// Example json query:
@@ -80,7 +102,29 @@ impl ValidationError {
         }
     }
 
-    /// Creates an ValidationErrorKind::UnkownArgument kind of error, which happens when the
+    /// Creates an [`ValidationErrorKind::RequiredArgumentMissing`] kind of error, which happens
+    /// when the selection of fields is empty for a query.
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "selection": {}
+    ///     }
+    /// }
+    pub fn required_argument_missing(path: Vec<String>) -> Self {
+        let message = format!("`{}`: A value is required but not set.", path.join("."));
+        ValidationError {
+            kind: ValidationErrorKind::RequiredArgumentMissing,
+            meta: None,
+            message,
+            path,
+        }
+    }
+
+    /// Creates an [`ValidationErrorKind::UnkownArgument`] kind of error, which happens when the
     /// arguments for a query are not congruent with those expressed in the schema
     ///
     /// Example json query:
@@ -103,7 +147,7 @@ impl ValidationError {
         argument_path: Vec<String>,
         arguments: Vec<ArgumentDescription>,
     ) -> Self {
-        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("/"));
+        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("."));
         ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
@@ -112,14 +156,16 @@ impl ValidationError {
         }
     }
 
-    /// Creates an ValidationErrorKind::UnknownInputField kind of error, which happens when the
+    /// Creates a [`ValidationErrorKind::UnknownInputField`] kind of error, which happens when the
     /// argument value for a query contains a field that does not exist in the schema for the
     /// input type.
     ///
     /// TODO:
     ///   how is this conceptually different from an unknown argument? This used to be a
-    ///   FieldNotFoundError, see https://github.com/prisma/prisma-engines/blob/67a4547ade8a13a5d77a8c05c859eb3b3ba2979d/query-engine/core/src/query_document/parser.rs#L531-L534
-    ///   But the same FieldNotFoundError was used to denote what's now an UnknownSelectionField.
+    ///   FieldNotFoundError (see [old code][c]), but the same FieldNotFoundError was used to
+    ///   denote what's now an UnknownSelectionField.
+    ///
+    /// [c]: https://www.prisma.io/docs/reference/api-reference/error-reference
     ///
     /// Example json query:
     ///
@@ -147,15 +193,15 @@ impl ValidationError {
             field_name, input_type_description.name
         );
         ValidationError {
-            kind: ValidationErrorKind::UnkownInputField,
+            kind: ValidationErrorKind::UnknownInputField,
             meta: Some(json!({ "inputType": input_type_description })),
             message,
             path,
         }
     }
 
-    /// Creates an ValidationErrorKind::UnknownSelectionField kind of error, which happens when the
-    /// selection of fields for a query contains a field that does not exist in the schema for the
+    /// Creates an [`ValidationErrorKind::UnknownSelectionField`] kind of error, which happens when
+    /// the selection of fields for a query contains a field that does not exist in the schema for the
     /// enclosing type
     ///
     /// Example json query:
@@ -186,7 +232,7 @@ impl ValidationError {
         }
     }
 
-    /// Creates an ValidationErrorKind::SelectionSetOnScalar kind of error, which happens when there
+    /// Creates an [`ValidationErrorKind::SelectionSetOnScalar`] kind of error, which happens when there
     /// is a nested selection block on a scalar field
     ///
     /// Example json query:

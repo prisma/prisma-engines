@@ -1,0 +1,9 @@
+{
+    "action": "findUnique",
+    "modelName": "User",
+    "query": {
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

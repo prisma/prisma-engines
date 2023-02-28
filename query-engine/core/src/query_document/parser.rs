@@ -153,10 +153,7 @@ impl QueryDocumentParser {
                     )),
 
                     None if !schema_input_arg.is_required => None,
-                    _ => Some(Err(QueryParserError::Legacy {
-                        path,
-                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                    })),
+                    _ => Some(Err(ValidationError::required_argument_missing(path.segments).into())),
                 }
             })
             .collect::<Vec<QueryParserResult<ParsedArgument>>>()
@@ -207,11 +204,9 @@ impl QueryDocumentParser {
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                         Ok(ParsedInputValue::Single(PrismaValue::Null))
                     }
-                    (PrismaValue::Null, _) => Err(QueryParserError::Legacy {
-                        path: parent_path.clone(),
-                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                    }),
-
+                    (PrismaValue::Null, _) => {
+                        Err(ValidationError::required_argument_missing(parent_path.clone().segments).into())
+                    }
                     // Scalar handling
                     (value, InputType::Scalar(scalar)) => self
                         .parse_scalar(&parent_path, value, &scalar)
@@ -536,8 +531,7 @@ impl QueryDocumentParser {
                     }
                     None => {
                         if field.is_required {
-                            let error_kind = QueryParserErrorKind::RequiredValueNotSetError;
-                            Some(Err(QueryParserError::Legacy { path, error_kind }))
+                            Some(Err(ValidationError::required_argument_missing(path.segments).into()))
                         } else {
                             None
                         }

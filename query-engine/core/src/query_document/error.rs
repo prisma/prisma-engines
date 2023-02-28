@@ -71,7 +71,7 @@ impl QueryParserError {
     // TODO: remove after refactoring and removal of Legacy errors
     pub fn into_user_facing_error(self) -> user_facing_errors::Error {
         match self {
-            QueryParserError::New(err) => user_facing_errors::Error::from(err),
+            QueryParserError::New(err) => user_facing_errors::KnownError::from(err).into(),
             _ => todo!(),
         }
     }
@@ -127,7 +127,6 @@ impl fmt::Display for QueryPath {
 #[derive(Debug)]
 pub enum QueryParserErrorKind {
     AssertionError(String),
-    RequiredValueNotSetError,
     FieldCountError(FieldCountError),
     ValueParseError(String),
     ValueTypeMismatchError { have: ArgumentValue, want: InputType },
@@ -139,7 +138,6 @@ impl Display for QueryParserErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
-            Self::RequiredValueNotSetError => write!(f, "A value is required but not set."),
             Self::FieldCountError(err) => write!(f, "{err}"),
             Self::ValueParseError(reason) => write!(f, "Error parsing value: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(

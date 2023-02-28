@@ -1,6 +1,5 @@
 use crate::{
-    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
-    RelationViolation, TransactionError,
+    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation, TransactionError,
 };
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
@@ -172,23 +171,13 @@ impl From<CoreError> for user_facing_errors::Error {
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
                 path,
                 error_kind,
-            })) => {
-                let known_error = match error_kind {
-                    QueryParserErrorKind::RequiredValueNotSetError => {
-                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", path),
-                        })
-                    }
-                    _ => user_facing_errors::KnownError::new(
-                        user_facing_errors::query_engine::validation::LegacyQueryValidationFailed {
-                            query_validation_error: format!("{}", error_kind),
-                            query_position: format!("{}", path),
-                        },
-                    ),
-                };
-
-                known_error.into()
-            }
+            })) => user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::validation::LegacyQueryValidationFailed {
+                    query_validation_error: format!("{}", error_kind),
+                    query_position: format!("{}", path),
+                },
+            )
+            .into(),
 
             // TODO. Once legacy is removed, promote this
             CoreError::QueryParserError(e)
