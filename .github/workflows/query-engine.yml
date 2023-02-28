@@ -10,6 +10,7 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
+      - 'introspection-engine/**'
 
 jobs:
   rust-vitess-tests:
