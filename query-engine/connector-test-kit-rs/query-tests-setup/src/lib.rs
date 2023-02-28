@@ -250,6 +250,7 @@ pub fn run_connector_test_impl(
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
     let config: &'static _ = &crate::CONFIG;
+
     if !ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         return;
     }

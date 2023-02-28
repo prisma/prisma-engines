@@ -421,8 +421,8 @@ fn escaped_characters_in_string_defaults(api: TestApi) {
     expect_col("sideNames", "top\ndown");
 }
 
-#[test_connector(tags(CockroachDb))]
-fn cockroachdb_sequences_must_work(api: TestApi) {
+#[test_connector(tags(CockroachDb221))]
+fn cockroachdb_22_1_sequences_must_work(api: TestApi) {
     // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
     let sql = r#"
         -- Defaults
@@ -482,6 +482,79 @@ fn cockroachdb_sequences_must_work(api: TestApi) {
                     start_value: 1,
                     min_value: 1,
                     max_value: 9223372036854775807,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                    virtual: false,
+                },
+            ],
+            extensions: [],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
+}
+
+#[test_connector(tags(CockroachDb222))]
+fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
+    // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
+    let sql = r#"
+        -- Defaults
+        CREATE SEQUENCE "test";
+
+        -- Not cycling. All crdb sequences are like that.
+        CREATE SEQUENCE "testnotcycling" NO CYCLE;
+
+        -- Other options
+        CREATE SEQUENCE "testmore" 
+            INCREMENT 4
+            MINVALUE 10
+            MAXVALUE 100
+            START 20
+            CACHE 7;
+    "#;
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let ext: &PostgresSchemaExt = schema.downcast_connector_data();
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [],
+            sequences: [
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "test",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
+                    increment_by: 1,
+                    cycle: false,
+                    cache_size: 1,
+                    virtual: false,
+                },
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "testmore",
+                    start_value: 20,
+                    min_value: 10,
+                    max_value: 100,
+                    increment_by: 4,
+                    cycle: false,
+                    cache_size: 7,
+                    virtual: false,
+                },
+                Sequence {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "testnotcycling",
+                    start_value: 1,
+                    min_value: 1,
+                    max_value: 2147483647,
                     increment_by: 1,
                     cycle: false,
                     cache_size: 1,
