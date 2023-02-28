@@ -49,7 +49,7 @@ pub enum SchemaPosition<'ast> {
     /// In an enum
     Enum(ast::EnumId, EnumPosition<'ast>),
     /// In a datasource
-    DataSource(ast::SourceId, SourcePosition),
+    DataSource(ast::SourceId, SourcePosition<'ast>),
 }
 
 /// A cursor position in a context.
@@ -325,20 +325,20 @@ impl<'ast> ExpressionPosition<'ast> {
 }
 
 #[derive(Debug)]
-pub enum SourcePosition {
+pub enum SourcePosition<'ast> {
     /// In the general datasource
     Source,
     /// In a property
-    Property,
-    ///
+    Property(&'ast str, PropertyPosition<'ast>),
+    /// Outside of the braces
     Outer,
 }
 
-impl SourcePosition {
-    fn new(source: &ast::SourceConfig, position: usize) -> Self {
-        for prop in &source.properties {
-            if prop.span.contains(position) {
-                return SourcePosition::Property;
+impl<'ast> SourcePosition<'ast> {
+    fn new(source: &'ast ast::SourceConfig, position: usize) -> Self {
+        for property in &source.properties {
+            if property.span.contains(position) {
+                return SourcePosition::Property(&property.name.name, PropertyPosition::new(property, position));
             }
         }
 
@@ -347,5 +347,23 @@ impl SourcePosition {
         }
 
         SourcePosition::Outer
+    }
+}
+
+#[derive(Debug)]
+pub enum PropertyPosition<'ast> {
+    /// prop
+    Property,
+    ///
+    Argument(&'ast str, usize),
+}
+
+impl<'ast> PropertyPosition<'ast> {
+    fn new(property: &'ast ast::ConfigBlockProperty, position: usize) -> Self {
+        if property.span.contains(position) && !property.name.span.contains(position) {
+            return PropertyPosition::Argument(&property.name.name, position);
+        }
+
+        PropertyPosition::Property
     }
 }

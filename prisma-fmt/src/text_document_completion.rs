@@ -138,6 +138,13 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             }
         }
 
+        ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _))
+        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("directUrl", _))
+        | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("shadowDatabaseUrl", _)) => {
+            datasource::url_env_completion(completion_list);
+            datasource::url_quotes_completion(completion_list);
+        }
+
         position => ctx.connector().push_completions(ctx.db, position, completion_list),
     }
 }
@@ -185,6 +192,10 @@ fn is_inside_quote(position: &lsp_types::Position, schema: &str) -> bool {
     }
 }
 
-fn generate_pretty_doc(example: &str, description: &str) -> String {
+fn generate_pretty_doc(
+    example: &str,
+    description: &str,
+    // params: Option<HashMap<String, String>>
+) -> String {
     format!("```prisma\n{example}\n```\n___\n{description}")
 }
