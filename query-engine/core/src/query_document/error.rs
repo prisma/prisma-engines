@@ -88,9 +88,9 @@ impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Legacy { path, error_kind } => {
-                write!(f, "Query parsing/validation error at `{}`: {}", path, error_kind,)
+                write!(f, "Query parsing/validation error at `{}`: {}", path, error_kind)
             }
-            _ => unreachable!(),
+            QueryParserError::New(ve) => write!(f, "Query parsing/validation error. Message: {}", ve),
         }
     }
 }

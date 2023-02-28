@@ -1,3 +1,5 @@
+use core::fmt;
+
 use serde::Serialize;
 use serde_json::json;
 use user_facing_error_macros::*;
@@ -25,6 +27,12 @@ pub struct ValidationError {
     path: Vec<String>,
     #[serde(flatten)]
     meta: Option<serde_json::Value>,
+}
+
+impl fmt::Display for ValidationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.message)
+    }
 }
 
 #[derive(Debug, Serialize)]
