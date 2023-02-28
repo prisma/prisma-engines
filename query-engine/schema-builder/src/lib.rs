@@ -44,7 +44,7 @@ pub use self::utils::{compound_id_field_name, compound_index_field_name};
 
 use cache::TypeRefCache;
 use prisma_models::{
-    ast, CompositeTypeRef, Field as ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
+    ast, CompositeType, Field as ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
 };
 use psl::{
     datamodel_connector::{Connector, ConnectorCapability},
@@ -125,10 +125,10 @@ impl BuilderContext {
     }
 
     pub fn models(&self) -> Vec<ModelRef> {
-        self.internal_data_model.models_cloned()
+        self.internal_data_model.models().collect()
     }
 
-    pub fn composite_types(&self) -> Vec<CompositeTypeRef> {
+    pub fn composite_types(&self) -> Vec<CompositeType> {
         self.internal_data_model.composite_types().collect()
     }
 

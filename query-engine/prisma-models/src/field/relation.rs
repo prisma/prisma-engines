@@ -55,7 +55,7 @@ impl RelationField {
             .collect()
     }
 
-    pub fn relation(&self) -> RelationRef {
+    pub fn relation(&self) -> Relation {
         let internal_data_model = self.model().internal_data_model();
         let relation_id = internal_data_model.walk(self.id).relation().id;
         internal_data_model.zip(relation_id)

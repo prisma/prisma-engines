@@ -264,17 +264,17 @@ fn duplicate_relation_name() {
     convert(schema);
 }
 
-fn convert(datamodel: &str) -> Arc<InternalDataModel> {
+fn convert(datamodel: &str) -> InternalDataModel {
     let schema = psl::parse_schema(datamodel).unwrap();
     prisma_models::convert(Arc::new(schema))
 }
 
 trait DatamodelAssertions {
-    fn assert_model(self: &Arc<Self>, name: &str) -> Model;
+    fn assert_model(&self, name: &str) -> Model;
 }
 
 impl DatamodelAssertions for InternalDataModel {
-    fn assert_model(self: &Arc<Self>, name: &str) -> Model {
+    fn assert_model(&self, name: &str) -> Model {
         self.clone().find_model(name).unwrap()
     }
 }

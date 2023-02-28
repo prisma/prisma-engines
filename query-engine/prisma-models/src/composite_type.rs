@@ -2,8 +2,6 @@ use crate::Field;
 use psl::schema_ast::ast;
 
 pub type CompositeType = crate::Zipper<ast::CompositeTypeId>;
-pub type CompositeTypeRef = CompositeType;
-pub type CompositeTypeWeakRef = CompositeType;
 
 impl CompositeType {
     pub fn name(&self) -> &str {

@@ -1,7 +1,7 @@
 #![allow(clippy::unnecessary_to_owned)]
 
 use super::*;
-use prisma_models::CompositeTypeRef;
+use prisma_models::CompositeType;
 
 /// Compute initial composites cache. No fields are computed because we first
 /// need all composites to be present, then we can compute fields in a second pass.
@@ -22,7 +22,7 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext) {
     });
 }
 
-pub(crate) fn map_type(ctx: &mut BuilderContext, ct: &CompositeTypeRef) -> ObjectTypeWeakRef {
+pub(crate) fn map_type(ctx: &mut BuilderContext, ct: &CompositeType) -> ObjectTypeWeakRef {
     let ident = Identifier::new(ct.name(), MODEL_NAMESPACE);
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each composite.")
@@ -30,7 +30,7 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, ct: &CompositeTypeRef) -> Objec
 
 /// Computes composite output type fields.
 /// Requires an initialized cache.
-fn compute_composite_object_type_fields(ctx: &mut BuilderContext, composite: &CompositeTypeRef) -> Vec<OutputField> {
+fn compute_composite_object_type_fields(ctx: &mut BuilderContext, composite: &CompositeType) -> Vec<OutputField> {
     composite
         .fields()
         .into_iter()

@@ -1,17 +1,16 @@
-use crate::{prelude::*, CompositeTypeRef, InternalEnumRef};
+use crate::{prelude::*, CompositeType, InternalEnum};
 use psl::schema_ast::ast;
-use std::sync::{Arc, Weak};
+use std::sync::Arc;
 
-pub type InternalDataModelRef = Arc<InternalDataModel>;
-pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
+pub type InternalDataModelRef = InternalDataModel;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InternalDataModel {
     pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {
-    pub fn models<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = ModelRef> + 'a {
+    pub fn models(&self) -> impl Iterator<Item = ModelRef> + '_ {
         self.schema
             .db
             .walk_models()
@@ -20,18 +19,14 @@ impl InternalDataModel {
             .map(|model| self.clone().zip(model.id))
     }
 
-    pub fn composite_types<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = CompositeTypeRef> + 'a {
+    pub fn composite_types(&self) -> impl Iterator<Item = CompositeType> + '_ {
         self.schema
             .db
             .walk_composite_types()
             .map(move |ct| self.clone().zip(ct.id))
     }
 
-    pub fn models_cloned(self: &Arc<Self>) -> Vec<ModelRef> {
-        self.models().collect()
-    }
-
-    pub fn relations<'a>(self: &'a Arc<Self>) -> impl Iterator<Item = RelationRef> + Clone + 'a {
+    pub fn relations(&self) -> impl Iterator<Item = Relation> + Clone + '_ {
         self.schema
             .db
             .walk_relations()
@@ -39,7 +34,7 @@ impl InternalDataModel {
             .map(|relation| self.clone().zip(relation.id))
     }
 
-    pub fn find_enum(self: &Arc<Self>, name: &str) -> crate::Result<InternalEnumRef> {
+    pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnum> {
         self.schema
             .db
             .find_enum(name)
@@ -47,7 +42,7 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    pub fn find_model(self: &Arc<Self>, name: &str) -> crate::Result<ModelRef> {
+    pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
         self.schema
             .db
             .walk_models()
@@ -57,16 +52,16 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_composite_type_by_id(self: &Arc<Self>, ctid: ast::CompositeTypeId) -> CompositeTypeRef {
+    pub fn find_composite_type_by_id(&self, ctid: ast::CompositeTypeId) -> CompositeType {
         self.clone().zip(ctid)
     }
 
-    pub fn find_model_by_id(self: &Arc<Self>, model_id: ast::ModelId) -> ModelRef {
+    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
         self.clone().zip(model_id)
     }
 
     /// Finds all inline relation fields pointing to the given model.
-    pub fn fields_pointing_to_model(self: &Arc<Self>, model: &ModelRef) -> Vec<RelationFieldRef> {
+    pub fn fields_pointing_to_model(&self, model: &ModelRef) -> Vec<RelationFieldRef> {
         self.walk(model.id)
             .relations_to()
             .filter_map(|rel| rel.refine().as_inline())
@@ -79,7 +74,7 @@ impl InternalDataModel {
         self.schema.db.walk(id)
     }
 
-    pub fn zip<I>(self: Arc<InternalDataModel>, id: I) -> crate::Zipper<I> {
+    pub fn zip<I>(self, id: I) -> crate::Zipper<I> {
         crate::Zipper { id, dm: self }
     }
 }

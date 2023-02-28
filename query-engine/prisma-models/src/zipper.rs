@@ -42,5 +42,4 @@ impl<I: Hash> Hash for Zipper<I> {
 }
 
 pub type InternalEnum = Zipper<ast::EnumId>;
-pub type InternalEnumRef = InternalEnum;
 pub type InternalEnumValue = Zipper<ast::EnumValueId>;
