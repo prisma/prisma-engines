@@ -447,7 +447,7 @@
     </span><span class="kw">pub fn </span>to_user_facing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; user_facing_errors::Error {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.user_facing_error {
             <span class="prelude-val">Some</span>(known_error) =&gt; known_error.clone().into(),
-            <span class="prelude-val">None </span>=&gt; user_facing_errors::Error::from_dyn_error(<span class="self">self</span>),
+            <span class="prelude-val">None </span>=&gt; user_facing_errors::UnknownError::new(<span class="self">self</span>).into(),
         }
     }
 

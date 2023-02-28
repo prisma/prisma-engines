@@ -13,7 +13,6 @@
 <a href="#13" id="13">13</a>
 <a href="#14" id="14">14</a>
 <a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Query graph builder module.
 
 </span><span class="kw">mod </span>builder;
@@ -22,11 +21,10 @@
 <span class="kw">mod </span>read;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>write;
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>error::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>extractors::<span class="kw-2">*</span>;
 
 <span class="kw">pub use </span>builder::QueryGraphBuilder;
+<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Query graph builder sub-result type.
 </span><span class="kw">pub type </span>QueryGraphBuilderResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, QueryGraphBuilderError&gt;;

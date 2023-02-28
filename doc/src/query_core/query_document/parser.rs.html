@@ -587,6 +587,13 @@
 <a href="#587" id="587">587</a>
 <a href="#588" id="588">588</a>
 <a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -621,7 +628,7 @@
         <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
 
         <span class="kw">if </span>selections.is_empty() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path,
                 error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="number">0</span>)),
             });
@@ -631,7 +638,7 @@
             .iter()
             .map(|selection| <span class="kw">match </span>schema_object.find_field(selection.name()) {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>field) =&gt; <span class="self">self</span>.parse_field(path.clone(), selection, field),
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                     path: path.add(selection.name().into()),
                     error_kind: QueryParserErrorKind::FieldNotFoundError,
                 }),
@@ -691,7 +698,7 @@
 
         invalid_argument_names
             .map(|extra_arg| {
-                <span class="prelude-val">Err</span>(QueryParserError {
+                <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                     path: parent_path.add(extra_arg.to_string()),
                     error_kind: QueryParserErrorKind::ArgumentNotFoundError,
                 })
@@ -723,7 +730,7 @@
                     )),
 
                     <span class="prelude-val">None </span><span class="kw">if </span>!schema_input_arg.is_required =&gt; <span class="prelude-val">None</span>,
-                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError {
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError::Legacy {
                         path,
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     })),
@@ -762,7 +769,7 @@
                 </span>(list @ ArgumentValue::List(<span class="kw">_</span>), InputType::Scalar(ScalarType::JsonList))
                     <span class="kw">if </span>get_engine_protocol().is_json() =&gt;
                 {
-                    <span class="kw">let </span>json_val = serde_json::to_value(list).map_err(|err| QueryParserError {
+                    <span class="kw">let </span>json_val = serde_json::to_value(list).map_err(|err| QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                             <span class="string">&quot;Cannot deserialize argument value: {err}&quot;
@@ -777,7 +784,7 @@
                     </span>(PrismaValue::Null, InputType::Scalar(ScalarType::Null)) =&gt; {
                         <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Null))
                     }
-                    (PrismaValue::Null, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                    (PrismaValue::Null, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     }),
@@ -798,7 +805,7 @@
                         <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>et.into_arc())
                     }
                     <span class="comment">// Invalid combinations
-                    </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                    </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                         path: parent_path.clone(),
                         error_kind: QueryParserErrorKind::ValueTypeMismatchError {
                             have: value.clone(),
@@ -818,7 +825,7 @@
                     .map(ParsedInputValue::Map),
 
                 <span class="comment">// Invalid combinations
-                </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError {
+                </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                     path: parent_path.clone(),
                     error_kind: QueryParserErrorKind::ValueTypeMismatchError {
                         have: value.clone(),
@@ -836,7 +843,7 @@
             <span class="kw">if </span>failures.len() == <span class="number">1 </span>{
                 failures.pop().unwrap()
             } <span class="kw">else </span>{
-                <span class="prelude-val">Err</span>(QueryParserError {
+                <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                     path: parent_path,
                     error_kind: QueryParserErrorKind::InputUnionParseError {
                         parsing_errors: failures
@@ -900,28 +907,31 @@
             (PrismaValue::Float(f), ScalarType::Decimal) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Float(f)),
             (PrismaValue::Float(f), ScalarType::Int) =&gt; <span class="kw">match </span>f.to_i64() {
                 <span class="prelude-val">Some</span>(converted) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Int(converted)),
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryParserError::new(parent_path.clone(), QueryParserErrorKind::ValueFitError(
-                            <span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, f, parent_path.last().unwrap())))),
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>error_kind = QueryParserErrorKind::ValueFitError(<span class="macro">format!</span>(<span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`.&quot;</span>, f, parent_path.last().unwrap()));
+                    <span class="prelude-val">Err</span>(QueryParserError::Legacy {
+                        path: parent_path.clone(),
+                        error_kind,
+                    })
+                }
             },
 
             <span class="comment">// UUID coercion matchers
             </span>(PrismaValue::Uuid(uuid), ScalarType::String) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::String(uuid.to_string())),
 
             <span class="comment">// All other combinations are value type mismatches.
-            </span>(qv, <span class="kw">_</span>) =&gt; {
-                <span class="prelude-val">Err</span>(QueryParserError {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: qv.into(),
-                        want: InputType::Scalar(scalar_type.clone()),
-                    },
-                })
-            },
+            </span>(qv, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
+                path: parent_path.clone(),
+                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
+                    have: qv.into(),
+                    want: InputType::Scalar(scalar_type.clone()),
+                },
+            }),
         }
     }
 
     <span class="kw">fn </span>parse_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
-        prisma_value::parse_datetime(s).map_err(|err| QueryParserError {
+        prisma_value::parse_datetime(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                 <span class="string">&quot;Invalid DateTime: &#39;{s}&#39; (must be ISO 8601 compatible). Underlying error: {err}&quot;
@@ -932,7 +942,7 @@
     <span class="kw">fn </span>parse_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         prisma_value::decode_bytes(<span class="kw-2">&amp;</span>s)
             .map(PrismaValue::Bytes)
-            .map_err(|<span class="kw">_</span>| QueryParserError {
+            .map_err(|<span class="kw">_</span>| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                     <span class="string">&quot;&#39;{s}&#39; is not a valid base64 encoded string.&quot;
@@ -943,27 +953,28 @@
     <span class="kw">fn </span>parse_decimal(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         BigDecimal::from_str(<span class="kw-2">&amp;</span>s)
             .map(PrismaValue::Float)
-            .map_err(|<span class="kw">_</span>| QueryParserError {
+            .map_err(|<span class="kw">_</span>| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;&#39;{s}&#39; is not a valid decimal string&quot;</span>)),
             })
     }
 
     <span class="kw">fn </span>parse_bigint(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
-        s.parse::&lt;i64&gt;().map(PrismaValue::BigInt).map_err(|<span class="kw">_</span>| QueryParserError {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;&#39;{s}&#39; is not a valid big integer string&quot;</span>)),
-        })
+        s.parse::&lt;i64&gt;()
+            .map(PrismaValue::BigInt)
+            .map_err(|<span class="kw">_</span>| QueryParserError::Legacy {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;&#39;{s}&#39; is not a valid big integer string&quot;</span>)),
+            })
     }
 
     <span class="kw">fn </span>parse_json_list_from_str(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         <span class="kw">let </span>json = <span class="self">self</span>.parse_json(path, s)<span class="question-mark">?</span>;
-
         <span class="self">self</span>.parse_json_list_from_value(path, json)
     }
 
     <span class="kw">fn </span>parse_json_list_from_value(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, json: serde_json::Value) -&gt; QueryParserResult&lt;PrismaValue&gt; {
-        <span class="kw">let </span>values = json.as_array().ok_or_else(|| QueryParserError {
+        <span class="kw">let </span>values = json.as_array().ok_or_else(|| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::AssertionError(<span class="string">&quot;JSON parameter needs to be an array&quot;</span>.into()),
         })<span class="question-mark">?</span>;
@@ -971,7 +982,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>prisma_values = Vec::with_capacity(values.len());
 
         <span class="kw">for </span>v <span class="kw">in </span>values.iter() {
-            <span class="kw">let </span>pv = PrismaValue::try_from(v.clone()).map_err(|<span class="kw">_</span>| QueryParserError {
+            <span class="kw">let </span>pv = PrismaValue::try_from(v.clone()).map_err(|<span class="kw">_</span>| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="string">&quot;Nested JSON arguments are not supported&quot;</span>.into()),
             })<span class="question-mark">?</span>;
@@ -983,7 +994,7 @@
     }
 
     <span class="kw">fn </span>parse_json(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;serde_json::Value&gt; {
-        serde_json::from_str(s).map_err(|err| QueryParserError {
+        serde_json::from_str(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;Invalid json: {err}&quot;</span>)),
         })
@@ -991,7 +1002,7 @@
 
     <span class="kw">fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, value: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         serde_json::to_string(<span class="kw-2">&amp;</span>value)
-            .map_err(|err| QueryParserError {
+            .map_err(|err| QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;Invalid json: {err}&quot;</span>)),
             })
@@ -999,7 +1010,7 @@
     }
 
     <span class="kw">fn </span>parse_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>QueryPath, s: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;Uuid&gt; {
-        Uuid::parse_str(s).map_err(|err| QueryParserError {
+        Uuid::parse_str(s).map_err(|err| QueryParserError::Legacy {
             path: path.clone(),
             error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(<span class="string">&quot;Invalid UUID: {err}&quot;</span>)),
         })
@@ -1023,7 +1034,7 @@
             PrismaValue::String(s) =&gt; s,
             PrismaValue::Boolean(b) =&gt; <span class="kw">if </span>b { <span class="string">&quot;true&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;false&quot; </span>}.to_owned(), <span class="comment">// Case where a bool was misinterpreted as constant literal
             </span><span class="kw">_ </span>=&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::Legacy {
                     path: path.clone(),
                     error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                         <span class="string">&quot;Unexpected Enum value type {:?} for enum {}&quot;</span>,
@@ -1035,7 +1046,7 @@
         };
 
         <span class="kw">let </span>err = |name: <span class="kw-2">&amp;</span>str| {
-            <span class="prelude-val">Err</span>(QueryParserError {
+            <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(<span class="macro">format!</span>(
                     <span class="string">&quot;Enum value &#39;{raw}&#39; is invalid for enum type {name}&quot;
@@ -1102,8 +1113,8 @@
                     }
                     <span class="prelude-val">None </span>=&gt; {
                         <span class="kw">if </span>field.is_required {
-                            <span class="kw">let </span>kind = QueryParserErrorKind::RequiredValueNotSetError;
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError::new(path, kind)))
+                            <span class="kw">let </span>error_kind = QueryParserErrorKind::RequiredValueNotSetError;
+                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(QueryParserError::Legacy { path, error_kind }))
                         } <span class="kw">else </span>{
                             <span class="prelude-val">None
                         </span>}
@@ -1118,8 +1129,11 @@
             .into_iter()
             .map(|(k, v)| {
                 <span class="kw">let </span>field = schema_object.find_field(k.as_str()).ok_or_else(|| {
-                    <span class="kw">let </span>kind = QueryParserErrorKind::FieldNotFoundError;
-                    QueryParserError::new(path.add(k.clone()), kind)
+                    <span class="kw">let </span>error_kind = QueryParserErrorKind::FieldNotFoundError;
+                    QueryParserError::Legacy {
+                        path: path.add(k.clone()),
+                        error_kind,
+                    }
                 })<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>path = path.add(field.name.clone());
@@ -1168,7 +1182,7 @@
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
             ));
-            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::new(path, error_kind));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::Legacy { path, error_kind });
         }
 
         map.set_tag(schema_object.tag.clone());

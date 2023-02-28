@@ -354,7 +354,7 @@ var sourcesIndex = JSON.parse('{\
 "untrusted":["",[],["untrusted.rs"]],\
 "url":["",[],["host.rs","lib.rs","origin.rs","parser.rs","path_segments.rs","quirks.rs","slicing.rs"]],\
 "user_facing_error_macros":["",[],["lib.rs"]],\
-"user_facing_errors":["",[],["common.rs","introspection_engine.rs","lib.rs","migration_engine.rs","panic_hook.rs","quaint.rs","query_engine.rs"]],\
+"user_facing_errors":["",[["query_engine",[],["mod.rs","validation.rs"]]],["common.rs","introspection_engine.rs","lib.rs","migration_engine.rs","panic_hook.rs","quaint.rs"]],\
 "utf8_width":["",[],["lib.rs"]],\
 "utf8parse":["",[],["lib.rs","types.rs"]],\
 "uuid":["",[["external",[],["mod.rs","serde_support.rs"]]],["builder.rs","error.rs","fmt.rs","lib.rs","macros.rs","parser.rs","rng.rs","v4.rs"]],\

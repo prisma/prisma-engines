@@ -211,8 +211,6 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(unsafe_code, warnings, rust_2018_idioms)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -278,6 +276,15 @@
     <span class="kw">pub </span>backtrace: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
+<span class="kw">impl </span>UnknownError {
+    <span class="kw">pub fn </span>new(err: <span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error) -&gt; <span class="self">Self </span>{
+        UnknownError {
+            message: err.to_string(),
+            backtrace: <span class="prelude-val">None</span>,
+        }
+    }
+}
+
 <span class="attr">#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 </span><span class="kw">pub struct </span>Error {
     is_panic: bool,
@@ -320,17 +327,6 @@
             inner: ErrorType::Unknown(UnknownError {
                 message,
                 backtrace: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, backtrace::Backtrace::new())),
-            }),
-            is_panic: <span class="bool-val">false</span>,
-            batch_request_idx: <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub fn </span>from_dyn_error(err: <span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error) -&gt; <span class="self">Self </span>{
-        Error {
-            inner: ErrorType::Unknown(UnknownError {
-                message: err.to_string(),
-                backtrace: <span class="prelude-val">None</span>,
             }),
             is_panic: <span class="bool-val">false</span>,
             batch_request_idx: <span class="prelude-val">None</span>,

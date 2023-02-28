@@ -281,7 +281,7 @@
                     .collect::&lt;QueryParserResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             )),
 
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of ParsedInputValue ({v:?}) into PrismaValue failed.&quot;
@@ -297,7 +297,7 @@
     <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::Map(val) =&gt; <span class="prelude-val">Ok</span>(val),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-map ParsedInputValue ({v:?}) into map failed.&quot;
@@ -314,7 +314,7 @@
         <span class="kw">match </span>value {
             ParsedInputValue::Single(PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             ParsedInputValue::Map(val) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(val)),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-map ParsedInputValue ({v:?}) into Option map failed.&quot;
@@ -330,7 +330,7 @@
     <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;Vec&lt;ParsedInputValue&gt;&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::List(vals) =&gt; <span class="prelude-val">Ok</span>(vals),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-list ParsedInputValue ({v:?}) into list failed.&quot;
@@ -349,7 +349,7 @@
                 .into_iter()
                 .map(|val| val.try_into())
                 .collect::&lt;QueryParserResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;(),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-list ParsedInputValue ({v:?}) into prisma value list failed.&quot;
@@ -369,7 +369,7 @@
             PrismaValue::String(s) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s)),
             PrismaValue::Enum(s) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s)),
             PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-String Prisma value type ({v:?}) into String failed.&quot;
@@ -385,7 +385,7 @@
     <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;OrderBy&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::OrderBy(ord) =&gt; <span class="prelude-val">Ok</span>(ord),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-order-by enum ({v:?}) into order by enum value failed.&quot;
@@ -401,7 +401,7 @@
     <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;ScalarFieldRef&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::ScalarField(f) =&gt; <span class="prelude-val">Ok</span>(f),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-field-ref enum ({v:?}) into scalar field reference value failed.&quot;
@@ -420,7 +420,7 @@
         <span class="kw">match </span>prisma_value {
             PrismaValue::Float(d) =&gt; <span class="prelude-val">Ok</span>(d.to_f64()),
             PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-float Prisma value type ({v:?}) into float failed.&quot;
@@ -439,7 +439,7 @@
         <span class="kw">match </span>prisma_value {
             PrismaValue::Boolean(b) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(b)),
             PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-bool Prisma value type ({v:?}) into bool failed.&quot;
@@ -458,7 +458,7 @@
         <span class="kw">match </span>prisma_value {
             PrismaValue::DateTime(dt) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(dt)),
             PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-DateTime Prisma value type ({v:?}) into DateTime failed.&quot;
@@ -477,7 +477,7 @@
         <span class="kw">match </span>prisma_value {
             PrismaValue::Int(i) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(i)),
             PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-int Prisma value type ({v:?}) into int failed.&quot;
@@ -495,7 +495,7 @@
 
         <span class="kw">match </span>prisma_value {
             PrismaValue::Boolean(b) =&gt; <span class="prelude-val">Ok</span>(b),
-            v =&gt; <span class="prelude-val">Err</span>(QueryParserError {
+            v =&gt; <span class="prelude-val">Err</span>(QueryParserError::Legacy {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(
                     <span class="string">&quot;Attempted conversion of non-boolean Prisma value type ({v:?}) into bool failed.&quot;

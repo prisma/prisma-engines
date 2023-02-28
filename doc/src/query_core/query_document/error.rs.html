@@ -173,31 +173,49 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{schema::InputType, ArgumentValue};
 <span class="kw">use </span>fmt::Display;
 <span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>user_facing_errors::UserFacingError;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>QueryParserError {
-    <span class="kw">pub </span>path: QueryPath,
-    <span class="kw">pub </span>error_kind: QueryParserErrorKind,
-}
-
-<span class="kw">impl </span>QueryParserError {
-    <span class="doccomment">/// Create a new instance of `QueryParserError`.
-    </span><span class="kw">pub fn </span>new(path: QueryPath, error_kind: QueryParserErrorKind) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ path, error_kind }
-    }
+</span><span class="kw">pub enum </span>QueryParserError {
+    Structured(StructuredQueryParseError),
+    Legacy {
+        path: QueryPath,
+        error_kind: QueryParserErrorKind,
+    },
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>QueryParserError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(
-            f,
-            <span class="string">&quot;Query parsing/validation error at `{}`: {}&quot;</span>,
-            <span class="self">self</span>.path, <span class="self">self</span>.error_kind,
-        )
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Legacy { path, error_kind } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Query parsing/validation error at `{}`: {}&quot;</span>, path, error_kind,)
+            }
+            <span class="self">Self</span>::Structured(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+        }
+    }
+}
+<span class="attr">#[derive(Debug, Serialize, Clone)]
+</span><span class="kw">pub struct </span>StructuredQueryParseError {}
+
+<span class="kw">impl </span>UserFacingError <span class="kw">for </span>StructuredQueryParseError {
+    <span class="kw">const </span>ERROR_CODE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;P2009&quot;</span>;
+
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">todo!</span>()
     }
 }
 
@@ -342,7 +360,7 @@
 
 <span class="kw">impl </span>From&lt;prisma_models::DomainError&gt; <span class="kw">for </span>QueryParserError {
     <span class="kw">fn </span>from(err: prisma_models::DomainError) -&gt; <span class="self">Self </span>{
-        QueryParserError {
+        QueryParserError::Legacy {
             path: QueryPath::default(),
             error_kind: QueryParserErrorKind::AssertionError(<span class="macro">format!</span>(<span class="string">&quot;Domain error occurred: {err}&quot;</span>)),
         }

@@ -289,6 +289,18 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
     RelationViolation, TransactionError,
@@ -297,6 +309,7 @@
 <span class="kw">use </span>connector::error::ConnectorError;
 <span class="kw">use </span>prisma_models::DomainError;
 <span class="kw">use </span>thiserror::Error;
+<span class="kw">use </span>user_facing_errors::UnknownError;
 
 <span class="attr">#[derive(Debug, Error)]
 #[error(
@@ -457,22 +470,33 @@
                 ..
             })) =&gt; user_facing_error.into(),
 
-            CoreError::QueryParserError(query_parser_error)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) =&gt; {
-                <span class="kw">let </span>known_error = <span class="kw">match </span>query_parser_error.error_kind {
+            <span class="comment">// legacy query validation errors. This block should go away
+            </span>CoreError::QueryParserError(QueryParserError::Legacy { path, error_kind })
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
+                path,
+                error_kind,
+            })) =&gt; {
+                <span class="kw">let </span>known_error = <span class="kw">match </span>error_kind {
                     QueryParserErrorKind::RequiredValueNotSetError =&gt; {
                         user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.path),
+                            path: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, path),
                         })
                     }
-                    <span class="kw">_ </span>=&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.error_kind),
-                        query_position: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.path),
-                    }),
+                    <span class="kw">_ </span>=&gt; user_facing_errors::KnownError::new(
+                        user_facing_errors::query_engine::LegacyQueryValidationFailed {
+                            query_validation_error: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, error_kind),
+                            query_position: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, path),
+                        },
+                    ),
                 };
 
                 known_error.into()
             }
+
+            CoreError::QueryParserError(QueryParserError::Structured(se))
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
+                QueryParserError::Structured(se),
+            )) =&gt; user_facing_errors::KnownError::new(se).into(),
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,
@@ -576,7 +600,7 @@
                 inner_error
             }
 
-            <span class="kw">_ </span>=&gt; user_facing_errors::Error::from_dyn_error(<span class="kw-2">&amp;</span>err),
+            <span class="kw">_ </span>=&gt; UnknownError::new(<span class="kw-2">&amp;</span>err).into(),
         }
     }
 }

@@ -257,29 +257,8 @@
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{GQLBatchResponse, GQLResponse};
-<span class="kw">use crate</span>::{PrismaResponse, RequestBody};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::GQLResponse;
+<span class="kw">use crate</span>::{GQLError, PrismaResponse, RequestBody};
 <span class="kw">use </span>futures::FutureExt;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
@@ -331,27 +310,19 @@
                 </span>}
                 BatchDocument::Compact(compacted) =&gt; <span class="self">self</span>.handle_compacted(compacted, tx_id, trace_id).<span class="kw">await</span>,
             },
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">match </span>err.as_known_error() {
-                <span class="prelude-val">Some</span>(transformed) =&gt; PrismaResponse::Single(user_facing_errors::Error::new_known(transformed).into()),
-                <span class="prelude-val">None </span>=&gt; PrismaResponse::Single(err.into()),
-            },
+
+            <span class="prelude-val">Err</span>(err) =&gt; PrismaResponse::Single(GQLError::from_handler_error(err).into()),
         }
     }
 
     <span class="kw">async fn </span>handle_single(<span class="kw-2">&amp;</span><span class="self">self</span>, query: Operation, tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;, trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; PrismaResponse {
-        <span class="kw">use </span>user_facing_errors::Error;
-
         <span class="kw">let </span>gql_response = <span class="kw">match </span>AssertUnwindSafe(<span class="self">self</span>.handle_request(query, tx_id, trace_id))
             .catch_unwind()
             .<span class="kw">await
         </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(response)) =&gt; response.into(),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; err.into(),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="comment">// panicked
-                </span><span class="kw">let </span>error = Error::from_panic_payload(err);
-                error.into()
-            }
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; GQLError::from_core_error(err).into(),
+            <span class="prelude-val">Err</span>(err) =&gt; GQLError::from_panic_payload(err).into(),
         };
 
         PrismaResponse::Single(gql_response)
@@ -364,8 +335,6 @@
         tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; PrismaResponse {
-        <span class="kw">use </span>user_facing_errors::Error;
-
         <span class="kw">match </span>AssertUnwindSafe(<span class="self">self</span>.executor.execute_all(
             tx_id,
             queries,
@@ -382,20 +351,14 @@
                     .into_iter()
                     .map(|response| <span class="kw">match </span>response {
                         <span class="prelude-val">Ok</span>(data) =&gt; data.into(),
-                        <span class="prelude-val">Err</span>(err) =&gt; err.into(),
+                        <span class="prelude-val">Err</span>(err) =&gt; GQLError::from_core_error(err).into(),
                     })
                     .collect();
 
                 PrismaResponse::Multi(gql_responses.into())
             }
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; PrismaResponse::Multi(err.into()),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="comment">// panicked
-                </span><span class="kw">let </span>error = Error::from_panic_payload(err);
-                <span class="kw">let </span>resp: GQLBatchResponse = error.into();
-
-                PrismaResponse::Multi(resp)
-            }
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; PrismaResponse::Multi(GQLError::from_core_error(err).into()),
+            <span class="prelude-val">Err</span>(err) =&gt; PrismaResponse::Multi(GQLError::from_panic_payload(err).into()),
         }
     }
 
@@ -405,8 +368,6 @@
         tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; PrismaResponse {
-        <span class="kw">use </span>user_facing_errors::Error;
-
         <span class="kw">let </span>plural_name = document.plural_name();
         <span class="kw">let </span>singular_name = document.single_name();
         <span class="kw">let </span>keys = document.keys;
@@ -481,13 +442,10 @@
                 PrismaResponse::Multi(results.into())
             }
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; PrismaResponse::Multi(err.into()),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; PrismaResponse::Multi(GQLError::from_core_error(err).into()),
 
             <span class="comment">// panicked
-            </span><span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>error = Error::from_panic_payload(err);
-                PrismaResponse::Multi(error.into())
-            }
+            </span><span class="prelude-val">Err</span>(err) =&gt; PrismaResponse::Multi(GQLError::from_panic_payload(err).into()),
         }
     }
 
