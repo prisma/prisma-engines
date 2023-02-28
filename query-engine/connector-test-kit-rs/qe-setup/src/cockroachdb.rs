@@ -9,11 +9,14 @@ pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> Connect
     let db_name = quaint_url.dbname();
     let conn = create_admin_conn(&mut url).await?;
 
-    let query = format!("DROP DATABASE \"{db_name}\"");
-    conn.raw_cmd(&query).await.ok();
+    let query = format!(
+        r#"
+        DROP DATABASE IF EXISTS "{db_name}";
+        CREATE DATABASE "{db_name}";
+        "#
+    );
 
-    let query = format!("CREATE DATABASE \"{db_name}\"");
-    conn.raw_cmd(&query).await.ok();
+    conn.raw_cmd(&query).await.unwrap();
 
     crate::diff_and_apply(prisma_schema).await;
 
