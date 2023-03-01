@@ -86,12 +86,10 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-new-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}
