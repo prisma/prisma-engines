@@ -5,7 +5,7 @@ mod metrics {
     use query_engine_metrics::{
         PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL,
     };
-    use query_engine_tests::ConnectorVersion::{MongoDb, SqlServer, Sqlite};
+    use query_engine_tests::ConnectorVersion::*;
     use query_engine_tests::*;
     use serde_json::Value;
 
@@ -30,8 +30,10 @@ mod metrics {
             Sqlite => assert_eq!(total_queries, 9),
             SqlServer(_) => assert_eq!(total_queries, 15),
             MongoDb(_) => assert_eq!(total_queries, 5),
+            CockroachDb => assert_eq!(total_queries, 10),
             _ => assert_eq!(total_queries, 11),
         }
+
         assert_eq!(total_operations, 2);
         Ok(())
     }

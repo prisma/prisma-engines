@@ -3187,6 +3187,7 @@ dependencies = [
  "migration-core",
  "mongodb",
  "mongodb-client",
+ "once_cell",
  "parking_lot 0.12.1",
  "psl",
  "quaint",
