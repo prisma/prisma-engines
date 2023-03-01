@@ -92,6 +92,10 @@ impl OutputType {
         matches!(self, OutputType::Scalar(_))
     }
 
+    pub fn is_enum(&self) -> bool {
+        matches!(self, OutputType::Enum(_))
+    }
+
     pub fn is_scalar_list(&self) -> bool {
         match self {
             OutputType::List(typ) => typ.is_scalar(),
