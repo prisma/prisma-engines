@@ -429,8 +429,7 @@ impl QueryEngine {
                 let dmmf = dmmf::render_dmmf(&engine.query_schema);
 
                 let json = {
-                    let span = tracing::info_span!("prisma:engine:dmmf_to_json");
-                    let _guard = span.enter();
+                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
                     serde_json::to_string(&dmmf)?
                 };
 
