@@ -130,16 +130,24 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine test setup.
+
 </span><span class="attr">#![allow(clippy::await_holding_lock)]
-</span><span class="kw">mod </span>mongodb;
+
+</span><span class="kw">mod </span>cockroachdb;
+<span class="kw">mod </span>mongodb;
 <span class="kw">mod </span>mssql;
 <span class="kw">mod </span>mysql;
 <span class="kw">mod </span>postgres;
 
 <span class="kw">pub use </span>migration_core::migration_connector::ConnectorError;
 
-<span class="kw">use </span><span class="self">self</span>::{mongodb::<span class="kw-2">*</span>, mssql::<span class="kw-2">*</span>, mysql::<span class="kw-2">*</span>, postgres::<span class="kw-2">*</span>};
+<span class="kw">use </span><span class="self">self</span>::{cockroachdb::<span class="kw-2">*</span>, mongodb::<span class="kw-2">*</span>, mssql::<span class="kw-2">*</span>, mysql::<span class="kw-2">*</span>, postgres::<span class="kw-2">*</span>};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>migration_core::{
     json_rpc::types::<span class="kw-2">*</span>,
@@ -172,9 +180,10 @@
     <span class="kw">let </span>(source, url, _preview_features) = parse_configuration(prisma_schema)<span class="question-mark">?</span>;
 
     <span class="kw">match </span><span class="kw-2">&amp;</span>source.active_provider {
-        provider <span class="kw">if </span>[POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) =&gt; {
+        provider <span class="kw">if </span>[POSTGRES.provider_name()].contains(provider) =&gt; {
             postgres_setup(url, prisma_schema, db_schemas).<span class="kw">await</span><span class="question-mark">?
         </span>}
+        provider <span class="kw">if </span>COCKROACH.is_provider(provider) =&gt; cockroach_setup(url, prisma_schema).<span class="kw">await</span><span class="question-mark">?</span>,
         provider <span class="kw">if </span>MSSQL.is_provider(provider) =&gt; mssql_setup(url, prisma_schema, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>,
         provider <span class="kw">if </span>MYSQL.is_provider(provider) =&gt; {
             mysql_reset(<span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -198,7 +207,7 @@
     <span class="kw">let </span>(source, url, <span class="kw">_</span>) = parse_configuration(prisma_schema)<span class="question-mark">?</span>;
 
     <span class="kw">match </span><span class="kw-2">&amp;</span>source.active_provider {
-        provider <span class="kw">if </span>[POSTGRES.provider_name(), COCKROACH.provider_name()].contains(provider) =&gt; {
+        provider <span class="kw">if </span>[POSTGRES.provider_name()].contains(provider) =&gt; {
             postgres_teardown(<span class="kw-2">&amp;</span>url, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
@@ -208,6 +217,7 @@
                 MSSQL.provider_name(),
                 MYSQL.provider_name(),
                 MONGODB.provider_name(),
+                COCKROACH.provider_name(),
             ]
             .contains(provider) =&gt; {}
 
