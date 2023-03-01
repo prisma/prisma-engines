@@ -245,7 +245,7 @@ impl JsonProtocolAdapter {
         for scalar in schema_object
             .get_fields()
             .iter()
-            .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list())
+            .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list() || f.field_type.is_enum())
         {
             selection.push_nested_selection(Selection::with_name(scalar.name.to_owned()));
         }
@@ -359,6 +359,7 @@ mod tests {
             id String @id @map("_id")
             name String?
             email String @unique
+            role Role
             tags  String[]
             posts Post[]
             address Address
@@ -374,6 +375,11 @@ mod tests {
             number Int
             street String
             zipCode Int
+          }
+
+          enum Role {
+            Admin
+            User
           }
         "#;
         let mut schema = psl::validate(schema_str.into());
@@ -421,6 +427,12 @@ mod tests {
                     },
                     Selection {
                         name: "email",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: "role",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
@@ -586,6 +598,12 @@ mod tests {
                         nested_selections: [],
                     },
                     Selection {
+                        name: "role",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
                         name: "tags",
                         alias: None,
                         arguments: [],
@@ -641,6 +659,12 @@ mod tests {
                     },
                     Selection {
                         name: "email",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: "role",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
