@@ -1346,6 +1346,30 @@
 <a href="#1346" id="1346">1346</a>
 <a href="#1347" id="1347">1347</a>
 <a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
@@ -1593,7 +1617,7 @@
         <span class="kw">for </span>scalar <span class="kw">in </span>schema_object
             .get_fields()
             .iter()
-            .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list())
+            .filter(|f| f.field_type.is_scalar() || f.field_type.is_scalar_list() || f.field_type.is_enum())
         {
             selection.push_nested_selection(Selection::with_name(scalar.name.to_owned()));
         }
@@ -1707,6 +1731,7 @@
             id String @id @map(&quot;_id&quot;)
             name String?
             email String @unique
+            role Role
             tags  String[]
             posts Post[]
             address Address
@@ -1722,6 +1747,11 @@
             number Int
             street String
             zipCode Int
+          }
+
+          enum Role {
+            Admin
+            User
           }
         &quot;#</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>schema = psl::validate(schema_str.into());
@@ -1769,6 +1799,12 @@
                     },
                     Selection {
                         name: &quot;email&quot;,
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: &quot;role&quot;,
                         alias: None,
                         arguments: [],
                         nested_selections: [],
@@ -1934,6 +1970,12 @@
                         nested_selections: [],
                     },
                     Selection {
+                        name: &quot;role&quot;,
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
                         name: &quot;tags&quot;,
                         alias: None,
                         arguments: [],
@@ -1989,6 +2031,12 @@
                     },
                     Selection {
                         name: &quot;email&quot;,
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [],
+                    },
+                    Selection {
+                        name: &quot;role&quot;,
                         alias: None,
                         arguments: [],
                         nested_selections: [],
