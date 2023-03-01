@@ -33,7 +33,6 @@ mod metrics {
             CockroachDb => assert_eq!(total_queries, 10),
             _ => assert_eq!(total_queries, 11),
         }
-
         assert_eq!(total_operations, 2);
         Ok(())
     }
