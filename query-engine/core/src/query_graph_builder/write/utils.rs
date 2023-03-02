@@ -158,7 +158,7 @@ pub fn insert_1to1_idempotent_connect_checks(
                 if child_ids.is_empty() {
                     return Err(QueryGraphBuilderError::RecordNotFound(format!(
                         "No '{}' record to connect was found for a nested connect on one-to-one relation '{}'.",
-                        child_model.name(), 
+                        child_model.name(),
                         relation_name
                     )));
                 }
