@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use lsp_types::{
     CompletionItem, CompletionItemKind, CompletionList, Documentation, InsertTextFormat, MarkupContent, MarkupKind,
 };
@@ -15,6 +17,7 @@ pub(super) fn schemas_completion(completion_list: &mut CompletionList) {
             value: generate_pretty_doc(
                 r#"schemas = ["foo", "bar", "baz"]"#,
                 "The list of database schemas. [Learn More](https://pris.ly/d/multi-schema-configuration)",
+                None,
             ),
         })),
         // detail: Some("schemas".to_owned()),
@@ -32,7 +35,8 @@ pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
             kind: MarkupKind::Markdown,
             value: generate_pretty_doc(
                 r#"relationMode = "foreignKeys" | "prisma""#,
-                r#"Set the global relation mode for all relations. Values can be either "foreignKeys" (Default), or "prisma". [Learn more](https://pris.ly/d/relation-mode)"#
+                r#"Set the global relation mode for all relations. Values can be either "foreignKeys" (Default), or "prisma". [Learn more](https://pris.ly/d/relation-mode)"#,
+                None,
             ),
         })),
         ..Default::default()
@@ -49,7 +53,8 @@ pub(super) fn direct_url_completion(completion_list: &mut CompletionList) {
             kind: MarkupKind::Markdown,
             value: generate_pretty_doc(
                 r#"directUrl = "String" | env("ENVIRONMENT_VARIABLE")"#,
-                r#"Connection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli)."#
+                r#"Connection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli)."#,
+                None,
             )
         })),
         ..Default::default()
@@ -67,6 +72,7 @@ pub(super) fn shadow_db_completion(completion_list: &mut CompletionList) {
             value: generate_pretty_doc(
                 r#"shadowDatabaseUrl = "String" | env("ENVIRONMENT_VARIABLE")"#,
                 r#"Connection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow)."#,
+                None,
             ),
         })),
         ..Default::default()
@@ -84,6 +90,7 @@ pub(super) fn url_completion(completion_list: &mut CompletionList) {
             value: generate_pretty_doc(
                 r#"url = "String" | env("ENVIRONMENT_VARIABLE")"#,
                 r#"Connection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/connection-strings)."#,
+                None,
             ),
         })),
         ..Default::default()
@@ -101,6 +108,7 @@ pub(super) fn provider_completion(completion_list: &mut CompletionList) {
             value: generate_pretty_doc(
                 r#"provider = "foo""#,
                 r#"Describes which datasource connector to use. Can be one of the following datasource providers: `postgresql`, `mysql`, `sqlserver`, `sqlite`, `mongodb` or `cockroachdb`."#,
+                None,
             ),
         })),
         ..Default::default()
@@ -117,7 +125,11 @@ pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
             kind: MarkupKind::Markdown,
             value: generate_pretty_doc(
                 r#"env(_ environmentVariable: string)"#,
-                r#"Specifies a datasource via an environment variable. When running a Prisma CLI command that needs the database connection URL (e.g. `prisma generate`), you need to make sure that the `DATABASE_URL` environment variable is set. One way to do so is by creating a `.env` file. Note that the file must be in the same directory as your schema.prisma file to automatically be picked up by the Prisma CLI.""#
+                r#"Specifies a datasource via an environment variable. When running a Prisma CLI command that needs the database connection URL (e.g. `prisma generate`), you need to make sure that the `DATABASE_URL` environment variable is set. One way to do so is by creating a `.env` file. Note that the file must be in the same directory as your schema.prisma file to automatically be picked up by the Prisma CLI.""#,
+                Some(HashMap::from([(
+                    "environmentVariable",
+                    "The environment variable in which the database connection URL is stored.",
+                )])),
             ),
         })),
         ..Default::default()
@@ -134,7 +146,8 @@ pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
             kind: MarkupKind::Markdown,
             value: generate_pretty_doc(
                 r#""connectionString""#,
-                r#"Connection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/prisma-schema)."#
+                r#"Connection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/prisma-schema)."#,
+                None,
             ),
         })),
         ..Default::default()
