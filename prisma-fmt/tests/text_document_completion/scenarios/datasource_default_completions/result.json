@@ -6,7 +6,7 @@
       "kind": 5,
       "documentation": {
         "kind": "markdown",
-        "value": "```prisma\nprovider = \"foo\"\n```\n___\nDescribes which datasource connector to use. Can be one of the following datasource providers: `postgresql`, `mysql`, `sqlserver`, `sqlite`, `mongodb` or `cockroachdb`."
+        "value": "```prisma\nprovider = \"foo\"\n```\n___\nDescribes which datasource connector to use. Can be one of the following datasource providers: `postgresql`, `mysql`, `sqlserver`, `sqlite`, `mongodb` or `cockroachdb`.\n\n"
       },
       "insertText": "provider = $0",
       "insertTextFormat": 2
@@ -16,7 +16,7 @@
       "kind": 5,
       "documentation": {
         "kind": "markdown",
-        "value": "```prisma\nurl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/connection-strings)."
+        "value": "```prisma\nurl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info. Each datasource provider documents the URL syntax. Most providers use the syntax provided by the database. [Learn more](https://pris.ly/d/connection-strings).\n\n"
       },
       "insertText": "url = $0",
       "insertTextFormat": 2
@@ -26,7 +26,7 @@
       "kind": 5,
       "documentation": {
         "kind": "markdown",
-        "value": "```prisma\nshadowDatabaseUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow)."
+        "value": "```prisma\nshadowDatabaseUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL including authentication info to use for Migrate's [shadow database](https://pris.ly/d/migrate-shadow).\n\n"
       },
       "insertText": "shadowDatabaseUrl = $0",
       "insertTextFormat": 2
@@ -36,7 +36,7 @@
       "kind": 5,
       "documentation": {
         "kind": "markdown",
-        "value": "```prisma\ndirectUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli)."
+        "value": "```prisma\ndirectUrl = \"String\" | env(\"ENVIRONMENT_VARIABLE\")\n```\n___\nConnection URL for direct connection to the database. [Learn more](https://pris.ly/d/data-proxy-cli).\n\n"
       },
       "insertText": "directUrl = $0",
       "insertTextFormat": 2
@@ -46,7 +46,7 @@
       "kind": 5,
       "documentation": {
         "kind": "markdown",
-        "value": "```prisma\nrelationMode = \"foreignKeys\" | \"prisma\"\n```\n___\nSet the global relation mode for all relations. Values can be either \"foreignKeys\" (Default), or \"prisma\". [Learn more](https://pris.ly/d/relation-mode)"
+        "value": "```prisma\nrelationMode = \"foreignKeys\" | \"prisma\"\n```\n___\nSet the global relation mode for all relations. Values can be either \"foreignKeys\" (Default), or \"prisma\". [Learn more](https://pris.ly/d/relation-mode)\n\n"
       },
       "insertText": "relationmode = $0",
       "insertTextFormat": 2
