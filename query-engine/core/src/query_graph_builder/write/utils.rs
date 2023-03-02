@@ -157,9 +157,10 @@ pub fn insert_1to1_idempotent_connect_checks(
             Box::new(move |mut diff_node, child_ids| {
                 if child_ids.is_empty() {
                     return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record to connect was found was found for a nested connect on one-to-one relation '{}'.",
-                        child_model.name(), relation_name
-                    )))
+                        "No '{}' record to connect was found for a nested connect on one-to-one relation '{}'.",
+                        child_model.name(),
+                        relation_name
+                    )));
                 }
 
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
