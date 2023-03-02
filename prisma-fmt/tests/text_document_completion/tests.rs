@@ -38,4 +38,7 @@ scenarios! {
     referential_actions_with_trailing_comma
     datasource_default_completions
     datasource_multischema
+    datasource_url_arguments
+    datasource_direct_url_arguments
+    datasource_shadowdb_url_arguments
 }
