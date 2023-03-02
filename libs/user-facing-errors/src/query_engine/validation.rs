@@ -184,7 +184,7 @@ impl ValidationError {
     ///     }
     /// }
     pub fn unknown_input_field(path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
-        let message = String::from("Field does not exist in enclosing type.");
+        let message = format!("`{}`: Field does not exist in enclosing type.", path.join("."));
 
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
@@ -215,7 +215,7 @@ impl ValidationError {
         output_type_description: OutputTypeDescription,
     ) -> Self {
         let message = format!(
-            "Field '{}' not found on enclosing type '{}'",
+            "Field '{}' not found in enclosing type '{}'",
             field_name, output_type_description.name
         );
         ValidationError {

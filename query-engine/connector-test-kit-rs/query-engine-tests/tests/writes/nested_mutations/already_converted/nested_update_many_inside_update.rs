@@ -44,7 +44,7 @@ mod um_inside_update {
               }}
             }}"#, parent = parent, selection = t.parent().selection()),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptNestedInput.updateMany`: Field does not exist on enclosing type."
+            "`Mutation.updateOneParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptNestedInput.updateMany`: Field does not exist in enclosing type."
         );
 
         Ok(())

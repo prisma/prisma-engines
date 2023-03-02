@@ -616,7 +616,7 @@ mod update {
             data: { a: { update: { a_1: { unset: true } } } }
           ) { id }}"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -800,7 +800,7 @@ mod update {
               data: { a: { unset: true } }
             ) { id }}"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.unset`: Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -817,7 +817,7 @@ mod update {
               data: { a: { upsert: { set: {}, update: {} } } }
             ) { id }}"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.upsert`: Field does not exist on enclosing type."
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.upsert`: Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -840,7 +840,7 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist in enclosing type."
         );
 
         assert_error!(
@@ -856,7 +856,7 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c.CCreateInput.update`: Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -919,7 +919,7 @@ mod update {
           }
         }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.update`: Field does not exist in enclosing type."
       );
 
         Ok(())
@@ -940,7 +940,7 @@ mod update {
               }
             }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.updateMany`: Field does not exist in enclosing type."
         );
 
         // Fails on optional to-one
@@ -954,7 +954,7 @@ mod update {
             }
           }"#,
           2009,
-          "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+          "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.updateMany`: Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -975,7 +975,7 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.deleteMany`: Field does not exist in enclosing type."
       );
 
         // Fails on optional to-one
@@ -989,7 +989,7 @@ mod update {
           }
         }"#,
         2009,
-        "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
+        "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.deleteMany`: Field does not exist in enclosing type."
       );
 
         Ok(())

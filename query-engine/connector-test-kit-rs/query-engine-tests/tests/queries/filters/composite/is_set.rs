@@ -520,7 +520,7 @@ mod is_set_scalar {
             runner,
             r#"{ findManyTestModel(where: { id: { isSet: true } }) { id } }"#,
             2009,
-            "Query.findManyTestModel.where.TestModelWhereInput.id.IntFilter.isSet`: Field does not exist on enclosing type"
+            "Query.findManyTestModel.where.TestModelWhereInput.id.IntFilter.isSet`: Field does not exist in enclosing type"
         );
 
         Ok(())
