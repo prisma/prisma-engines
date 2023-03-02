@@ -8,7 +8,7 @@ use psl::{
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::position_to_offset;
 
@@ -192,10 +192,15 @@ fn is_inside_quote(position: &lsp_types::Position, schema: &str) -> bool {
     }
 }
 
-fn generate_pretty_doc(
-    example: &str,
-    description: &str,
-    // params: Option<HashMap<String, String>>
-) -> String {
-    format!("```prisma\n{example}\n```\n___\n{description}")
+fn generate_pretty_doc(example: &str, description: &str, params: Option<HashMap<&str, &str>>) -> String {
+    let param_docs: String = match params {
+        Some(params) => params
+            .into_iter()
+            .map(|(param_label, param_doc)| format!("_@param_ {param_label} {param_doc}"))
+            .collect::<Vec<String>>()
+            .join("\n"),
+        None => Default::default(),
+    };
+
+    format!("```prisma\n{example}\n```\n___\n{description}\n\n{param_docs}")
 }
