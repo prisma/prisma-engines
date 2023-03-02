@@ -1073,7 +1073,7 @@
                     <span class="kw">let </span>child_id = <span class="kw">match </span>child_ids.pop() {
                         <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
-                            <span class="string">&quot;No &#39;{child_model_name}&#39; record to connect was found was found for a nested connect on one-to-one relation &#39;{relation_name}&#39;.&quot;
+                            <span class="string">&quot;No &#39;{child_model_name}&#39; record to connect was found for a nested connect on one-to-one relation &#39;{relation_name}&#39;.&quot;
                         </span>))),
                     }<span class="question-mark">?</span>;
 
@@ -1253,7 +1253,7 @@
                     <span class="kw">let </span>child_id = <span class="kw">match </span>child_ids.pop() {
                         <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
-                            <span class="string">&quot;No &#39;{child_model_name}&#39; record to connect was found was found for a nested connect on one-to-one relation &#39;{relation_name}&#39;.&quot;
+                            <span class="string">&quot;No &#39;{child_model_name}&#39; record to connect was found for a nested connect on one-to-one relation &#39;{relation_name}&#39;.&quot;
                         </span>))),
                     }<span class="question-mark">?</span>;
 
