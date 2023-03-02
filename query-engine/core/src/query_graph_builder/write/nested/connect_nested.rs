@@ -426,7 +426,7 @@ fn handle_one_to_one_parent_update(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
+                            "No '{child_model_name}' record to connect was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -606,7 +606,7 @@ fn handle_one_to_one_parent_create(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
+                            "No '{child_model_name}' record to connect was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
