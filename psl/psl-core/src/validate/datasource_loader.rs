@@ -6,7 +6,10 @@ use crate::{
     Datasource,
 };
 use diagnostics::DatamodelWarning;
-use parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
+use parser_database::{
+    ast::{Expression, WithDocumentation},
+    coerce, coerce_array, coerce_opt,
+};
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -14,6 +17,7 @@ const SCHEMAS_KEY: &str = "schemas";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 const DIRECT_URL_KEY: &str = "directUrl";
+const PROVIDER_KEY: &str = "provider";
 
 /// Loads all datasources from the provided schema AST.
 /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
@@ -49,84 +53,66 @@ fn lift_datasource(
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry,
 ) -> Option<Datasource> {
-    let source_name = &ast_source.name.name;
-    let mut args: HashMap<_, _> = ast_source
+    let source_name = ast_source.name.name.as_str();
+    let mut args: HashMap<_, (_, &Expression)> = ast_source
         .properties
         .iter()
-        .map(|arg| (arg.name.name.as_str(), (arg.span, &arg.value)))
-        .collect();
+        .map(|arg| match &arg.value {
+            Some(expr) => Some((arg.name.name.as_str(), (arg.span, expr))),
+            None => {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    &arg.name.name,
+                    source_name,
+                    "datasource",
+                    ast_source.span,
+                ));
+                None
+            }
+        })
+        .collect::<Option<HashMap<_, (_, _)>>>()?;
 
-    let (_, provider_arg) = match args.remove("provider") {
-        Some(provider) => provider,
+    // (arg.name.name.as_str(), (arg.span, &arg.value))
+
+    let (provider, provider_arg) = match args.remove(PROVIDER_KEY) {
+        Some((_span, provider_arg)) => {
+            if provider_arg.is_env_expression() {
+                let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
+                diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
+                return None;
+            }
+
+            let provider = match coerce_opt::string(provider_arg) {
+                Some("") => {
+                    diagnostics.push_error(DatamodelError::new_source_validation_error(
+                        "The provider argument in a datasource must not be empty",
+                        source_name,
+                        provider_arg.span(),
+                    ));
+                    return None;
+                }
+                None => {
+                    diagnostics.push_error(DatamodelError::new_source_validation_error(
+                        "The provider argument in a datasource must be a string literal",
+                        source_name,
+                        provider_arg.span(),
+                    ));
+                    return None;
+                }
+                Some(provider) => provider,
+            };
+
+            (provider, provider_arg)
+        }
+
         None => {
             diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
                 "provider",
-                &ast_source.name.name,
+                source_name,
                 ast_source.span,
             ));
             return None;
         }
     };
-
-    if provider_arg.is_env_expression() {
-        let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
-        diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
-        return None;
-    }
-
-    let provider = match coerce_opt::string(provider_arg) {
-        Some("") => {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                "The provider argument in a datasource must not be empty",
-                source_name,
-                provider_arg.span(),
-            ));
-            return None;
-        }
-        None => {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                "The provider argument in a datasource must be a string literal",
-                source_name,
-                provider_arg.span(),
-            ));
-            return None;
-        }
-        Some(provider) => provider,
-    };
-
-    let (_, url_arg) = match args.remove(URL_KEY) {
-        Some(url_arg) => url_arg,
-        None => {
-            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
-                URL_KEY,
-                &ast_source.name.name,
-                ast_source.span,
-            ));
-            return None;
-        }
-    };
-
-    let url = StringFromEnvVar::coerce(url_arg, diagnostics)?;
-    let shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
-
-    let direct_url_arg = args.remove(DIRECT_URL_KEY).map(|(_, url)| url);
-    let direct_url = direct_url_arg.and_then(|url_arg| StringFromEnvVar::coerce(url_arg, diagnostics));
-
-    let shadow_database_url: Option<(StringFromEnvVar, Span)> =
-        if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
-            match StringFromEnvVar::coerce(shadow_database_url_arg, diagnostics) {
-                Some(shadow_database_url) => Some(shadow_database_url)
-                    .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
-                    .map(|url| (url, shadow_database_url_arg.span())),
-                None => None,
-            }
-        } else {
-            None
-        };
-
-    preview_features_guardrail(&mut args, diagnostics);
-
-    let documentation = ast_source.documentation().map(String::from);
 
     let active_connector: &'static dyn crate::datamodel_connector::Connector =
         match connectors.iter().find(|c| c.is_provider(provider)) {
@@ -143,32 +129,70 @@ fn lift_datasource(
 
     let relation_mode = get_relation_mode(&mut args, ast_source, diagnostics, active_connector);
 
-    let (schemas, schemas_span) = args
-        .remove(SCHEMAS_KEY)
-        .and_then(|(_, expr)| coerce_array(expr, &coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
-        .map(|(mut schemas, span)| {
-            if schemas.is_empty() {
-                let error = DatamodelError::new_schemas_array_empty_error(span);
-
-                diagnostics.push_error(error);
-            }
-
-            schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
-
-            for pair in schemas.windows(2) {
-                if pair[0].0 == pair[1].0 {
-                    diagnostics.push_error(DatamodelError::new_static(
-                        "Duplicated schema names are not allowed",
-                        pair[0].1,
-                    ))
-                }
-            }
-
-            (schemas, Some(span))
-        })
-        .unwrap_or_default();
-
     let connector_data = active_connector.parse_datasource_properties(&mut args, diagnostics);
+
+    let (url, url_span) = match args.remove(URL_KEY) {
+        Some((_span, url_arg)) => (StringFromEnvVar::coerce(url_arg, diagnostics)?, url_arg.span()),
+
+        None => {
+            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
+                URL_KEY,
+                source_name,
+                ast_source.span,
+            ));
+
+            return None;
+        }
+    };
+
+    let shadow_database_url = match args.remove(SHADOW_DATABASE_URL_KEY) {
+        Some((_span, shadow_db_url_arg)) => match StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
+            Some(shadow_db_url) => Some(shadow_db_url)
+                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(false))
+                .map(|url| (url, shadow_db_url_arg.span())),
+            None => None,
+        },
+
+        _ => None,
+    };
+
+    let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
+        Some((direct_url_arg, direct_url)) => (StringFromEnvVar::coerce(direct_url, diagnostics), Some(direct_url_arg)),
+
+        None => (None, None),
+    };
+
+    preview_features_guardrail(&mut args, diagnostics);
+
+    let documentation = ast_source.documentation().map(String::from);
+
+    let (schemas, schemas_span) = match args.remove(SCHEMAS_KEY) {
+        Some((_span, schemas)) => coerce_array(schemas, &coerce::string_with_span, diagnostics)
+            .map(|b| (b, schemas.span()))
+            .and_then(|(mut schemas, span)| {
+                if schemas.is_empty() {
+                    diagnostics.push_error(DatamodelError::new_schemas_array_empty_error(span));
+
+                    return None;
+                }
+
+                schemas.sort_by(|(a, _), (b, _)| a.cmp(b));
+
+                for pair in schemas.windows(2) {
+                    if pair[0].0 == pair[1].0 {
+                        diagnostics.push_error(DatamodelError::new_static(
+                            "Duplicated schema names are not allowed",
+                            pair[0].1,
+                        ))
+                    }
+                }
+
+                Some((schemas, Some(span)))
+            })
+            .unwrap_or_default(),
+
+        None => Default::default(),
+    };
 
     for (name, (span, _)) in args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
@@ -177,13 +201,13 @@ fn lift_datasource(
     Some(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         schemas_span,
-        name: source_name.to_string(),
+        name: source_name.to_owned(),
         provider: provider.to_owned(),
         active_provider: active_connector.provider_name(),
         url,
-        url_span: url_arg.span(),
+        url_span,
         direct_url,
-        direct_url_span: direct_url_arg.map(|arg| arg.span()),
+        direct_url_span,
         documentation,
         active_connector,
         shadow_database_url,

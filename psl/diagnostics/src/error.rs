@@ -381,6 +381,16 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_config_property_missing_value_error(
+        property_name: &str,
+        config_name: &str,
+        config_kind: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!("Property {property_name} in {config_kind} {config_name} needs to be assigned a value");
+        Self::new(msg, span)
+    }
+
     pub fn span(&self) -> Span {
         self.span
     }
