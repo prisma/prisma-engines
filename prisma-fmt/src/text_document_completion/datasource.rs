@@ -153,3 +153,20 @@ pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
         ..Default::default()
     })
 }
+
+pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: &str) {
+    let text = match kind {
+        "url" => "DATABASE_URL",
+        "directUrl" => "DIRECT_URL",
+        "shadowDatabaseUrl" => "SHADOW_DATABASE_URL",
+        _ => unreachable!(),
+    };
+
+    completion_list.items.push(CompletionItem {
+        label: format!("engines {text}"),
+        insert_text: Some(text.to_owned()),
+        insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+        kind: Some(CompletionItemKind::PROPERTY),
+        ..Default::default()
+    })
+}

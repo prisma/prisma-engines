@@ -355,13 +355,24 @@ pub enum PropertyPosition<'ast> {
     /// prop
     Property,
     ///
-    Argument(&'ast str, usize),
+    Value(&'ast str),
+    ///
+    FunctionValue(&'ast str),
 }
 
 impl<'ast> PropertyPosition<'ast> {
     fn new(property: &'ast ast::ConfigBlockProperty, position: usize) -> Self {
+        if let Some(val) = &property.value {
+            if val.span().contains(position) && val.is_function() {
+                let func = val.as_function().unwrap();
+
+                if func.0 == "env" {
+                    return PropertyPosition::FunctionValue("env");
+                }
+            }
+        }
         if property.span.contains(position) && !property.name.span.contains(position) {
-            return PropertyPosition::Argument(&property.name.name, position);
+            return PropertyPosition::Value(&property.name.name);
         }
 
         PropertyPosition::Property

@@ -41,4 +41,7 @@ scenarios! {
     datasource_url_arguments
     datasource_direct_url_arguments
     datasource_shadowdb_url_arguments
+    datasource_env_db_url
+    datasource_env_db_direct_url
+    datasource_env_db_shadowdb_url
 }
