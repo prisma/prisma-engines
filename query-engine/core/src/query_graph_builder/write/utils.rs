@@ -160,7 +160,7 @@ pub fn insert_1to1_idempotent_connect_checks(
                         "No '{}' record to connect was found for a nested connect on one-to-one relation '{}'.",
                         child_model.name(), 
                         relation_name
-                    )))
+                    )));
                 }
 
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
