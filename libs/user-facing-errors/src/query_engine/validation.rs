@@ -183,15 +183,9 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
-    pub fn unknown_input_field(
-        field_name: String,
-        path: Vec<String>,
-        input_type_description: InputTypeDescription,
-    ) -> Self {
-        let message = format!(
-            "Field '{}' not found on input type '{}'",
-            field_name, input_type_description.name
-        );
+    pub fn unknown_input_field(path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
+        let message = String::from("Field does not exist in enclosing type.");
+
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             meta: Some(json!({ "inputType": input_type_description })),

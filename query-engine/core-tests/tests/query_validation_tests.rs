@@ -83,10 +83,4 @@ fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_h
         .map_err(query_core::CoreError::from)?;
     Ok(())
 }
-
-#[test]
-fn foo() {
-    run_query_validation_test("postgres_basic/required_argument_is_missing.query.json");
-}
-
-// include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));
+include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));

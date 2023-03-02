@@ -204,7 +204,7 @@ mod json {
             &runner,
             r#"query { findManyTestModel(where: { json: null }) { id }}"#,
             2012,
-            "Missing a required value at `Query.findManyTestModel.where.TestModelWhereInput.json`"
+            "`Query.findManyTestModel.where.TestModelWhereInput.json`: A value is required but not set"
         );
 
         Ok(())
