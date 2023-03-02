@@ -143,7 +143,7 @@ mod upsert {
             }
           }"#,
           2009,
-          "Mutation.upsertOneWithDefaultValue.create.WithDefaultValueCreateInput.reqString`: A value is required but not set."
+          "Mutation.upsertOneWithDefaultValue.create.WithDefaultValueCreateInput.reqString`: A value is required but not set"
         );
 
         Ok(())

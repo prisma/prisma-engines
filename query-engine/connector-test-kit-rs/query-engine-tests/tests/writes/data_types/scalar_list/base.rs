@@ -229,7 +229,7 @@ mod basic_types {
             }){ strings, ints, floats, booleans, enums, dateTimes }
           }"#,
           2009,
-          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."
+          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set"
       );
 
         Ok(())

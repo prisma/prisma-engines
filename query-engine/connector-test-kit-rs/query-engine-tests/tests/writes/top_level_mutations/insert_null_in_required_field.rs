@@ -38,7 +38,7 @@ mod insert_null {
                 }
               }"#,
               2009,
-              "`Mutation.updateOneA.data.AUpdateInput.key.StringFieldUpdateOperationsInput.set`: A value is required but not set."
+              "`Mutation.updateOneA.data.AUpdateInput.key.StringFieldUpdateOperationsInput.set`: A value is required but not set"
           );
         }
 
@@ -72,7 +72,7 @@ mod insert_null {
             }
           }"#,
             2009,
-            "Mutation.createOneA.data.ACreateInput.key`: A value is required but not set."
+            "Mutation.createOneA.data.ACreateInput.key`: A value is required but not set"
         );
 
         Ok(())

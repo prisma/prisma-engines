@@ -364,7 +364,7 @@ mod json_create {
                     }
                   }"#,
                 2009,
-                "A value is required but not set."
+                "A value is required but not set"
             );
         }
 

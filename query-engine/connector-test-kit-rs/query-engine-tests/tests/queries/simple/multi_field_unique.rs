@@ -107,7 +107,7 @@ mod multi_field_unique {
             }
             "# },
             2012,
-            "`Query.findUniqueUser.where.UserWhereUniqueInput.FirstName_LastName.UserFirstNameLastNameCompoundUniqueInput.LastName`: A value is required but not set."
+            "`Query.findUniqueUser.where.UserWhereUniqueInput.FirstName_LastName.UserFirstNameLastNameCompoundUniqueInput.LastName`: A value is required but not set"
         );
 
         Ok(())

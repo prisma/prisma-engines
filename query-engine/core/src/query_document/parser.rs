@@ -119,7 +119,6 @@ impl QueryDocumentParser {
                 let path = parent_path.clone();
                 let argument_path = parent_path.add(extra_arg.to_string());
                 Err(ValidationError::unknown_argument(
-                    extra_arg.to_string(),
                     path.segments,
                     argument_path.segments,
                     conversions::schema_arguments_to_argument_description_vec(&schema_field.arguments),

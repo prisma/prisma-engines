@@ -93,7 +93,7 @@ impl ValidationError {
     ///     }
     /// }
     pub fn empty_selection(path: Vec<String>, output_type_description: OutputTypeDescription) -> Self {
-        let message = String::from("Expected a minimum of 1 field, found 0");
+        let message = String::from("Expected a minimum of 1 field to be present, got 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
             meta: Some(json!({ "outputType": output_type_description })),
@@ -115,7 +115,7 @@ impl ValidationError {
     ///     }
     /// }
     pub fn required_argument_missing(path: Vec<String>) -> Self {
-        let message = format!("`{}`: A value is required but not set.", path.join("."));
+        let message = format!("`{}`: A value is required but not set", path.join("."));
         ValidationError {
             kind: ValidationErrorKind::RequiredArgumentMissing,
             meta: None,
@@ -142,12 +142,11 @@ impl ValidationError {
     ///     }
     /// }
     pub fn unknown_argument(
-        argument_name: String,
         path: Vec<String>,
         argument_path: Vec<String>,
         arguments: Vec<ArgumentDescription>,
     ) -> Self {
-        let message = format!("'{argument_name}' is an invalid argument in path '{}'", path.join("."));
+        let message = String::from("Argument does not exist in enclosing type");
         ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),

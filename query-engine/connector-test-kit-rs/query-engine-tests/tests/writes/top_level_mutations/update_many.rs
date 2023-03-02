@@ -397,7 +397,7 @@ mod json_update_many {
                 }
               }"#,
                 2009,
-                "A value is required but not set."
+                "A value is required but not set"
             );
         }
 

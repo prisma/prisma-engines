@@ -349,7 +349,7 @@ mod filter_spec {
             runner,
             "{ findManyUser(where: { unique: { not: null }}){ unique } }",
             2009,
-            "`Query.findManyUser.where.UserWhereInput.unique.IntFilter.not`: A value is required but not set."
+            "`Query.findManyUser.where.UserWhereInput.unique.IntFilter.not`: A value is required but not set"
         );
 
         Ok(())

@@ -255,7 +255,7 @@ mod create {
             }
           }"#,
             2009,
-            "Mutation.createOneTestModel.data.TestModelCreateInput.b.BCreateInput.c`: A value is required but not set."
+            "Mutation.createOneTestModel.data.TestModelCreateInput.b.BCreateInput.c`: A value is required but not set"
         );
 
         Ok(())
@@ -883,8 +883,8 @@ mod update {
 
         // Missing required field without default failure on field `B.c`
         assert_error!(
-                runner,
-                r#"mutation {
+            runner,
+            r#"mutation {
                 updateOneTestModel(
                   where: { id: 1 }
                   data: {
@@ -894,9 +894,9 @@ mod update {
                   id
                 }
               }"#,
-                2009,
-                "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set."
-            );
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set"
+        );
 
         Ok(())
     }

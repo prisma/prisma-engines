@@ -341,7 +341,7 @@ mod edge_cases {
               }
             }"#,
             2009,
-            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many`: A value is required but not set."
+            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many`: A value is required but not set"
         );
 
         assert_error!(
@@ -356,7 +356,7 @@ mod edge_cases {
               }
             }"#,
             2009,
-            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many.CompositeListCreateEnvelopeInput.set`: A value is required but not set."
+            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many.CompositeListCreateEnvelopeInput.set`: A value is required but not set"
         );
 
         Ok(())
@@ -376,7 +376,7 @@ mod edge_cases {
               }
             }"#,
             2009,
-            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many`: A value is required but not set."
+            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many`: A value is required but not set"
         );
 
         assert_error!(
@@ -391,7 +391,7 @@ mod edge_cases {
               }
             }"#,
             2009,
-            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many.CompositeListUpdateEnvelopeInput.set`: A value is required but not set."
+            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many.CompositeListUpdateEnvelopeInput.set`: A value is required but not set"
         );
 
         Ok(())
