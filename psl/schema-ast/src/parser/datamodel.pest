@@ -78,7 +78,7 @@ config_block = {
     ~ BLOCK_CLOSE
     }
 
-key_value = { identifier ~ "=" ~ expression ~ trailing_comment? }
+key_value = { identifier ~ "=" ~ expression? ~ trailing_comment? }
 
 config_contents = {
     ((key_value ~ NEWLINE) | comment_block | empty_lines| BLOCK_LEVEL_CATCH_ALL)*

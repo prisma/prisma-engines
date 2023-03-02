@@ -81,7 +81,7 @@ fn parse_key_value(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> ConfigBlock
     }
 
     match (name, value) {
-        (Some(name), Some(value)) => ConfigBlockProperty {
+        (Some(name), value) => ConfigBlockProperty {
             name,
             value,
             span: Span::from(pair_span),
