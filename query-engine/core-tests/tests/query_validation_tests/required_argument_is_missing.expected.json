@@ -1,1 +1,1 @@
-{"is_panic":false,"message":"Missing a required value at Query.findUniqueUser.where","meta":{"kind":"RequiredArgumentMissing","path":["Query","findUniqueUser","where"]},"error_code":"P2012"}
+{"is_panic":false,"message":"`Query.findUniqueUser.where`: A value is required but not set.","meta":{"kind":"RequiredArgumentMissing","path":["Query","findUniqueUser","where"]},"error_code":"P2012"}
