@@ -71,8 +71,6 @@ fn lift_datasource(
         })
         .collect::<Option<HashMap<_, (_, _)>>>()?;
 
-    // (arg.name.name.as_str(), (arg.span, &arg.value))
-
     let (provider, provider_arg) = match args.remove(PROVIDER_KEY) {
         Some((_span, provider_arg)) => {
             if provider_arg.is_env_expression() {
