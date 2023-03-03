@@ -1120,7 +1120,7 @@ mod connect_inside_update {
     fn p1_c1_child_compound_unique_schema() -> String {
         let schema = indoc! {
             r#"model Parent {
-              id   Int    @id
+              #id(id, Int, @id)
             
               to_compound_unique Child?
             }
