@@ -598,13 +598,30 @@
 <a href="#598" id="598">598</a>
 <a href="#599" id="599">599</a>
 <a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.
 
 </span><span class="kw">use crate</span>::{
     getters::Getter, ids::<span class="kw-2">*</span>, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
     DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
-    SqlSchemaDescriberBackend, View,
+    SqlSchemaDescriberBackend,
 };
+<span class="kw">use </span>either::Either;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>quaint::{
     ast::Value,
@@ -700,18 +717,24 @@
 
     <span class="kw">pub async fn </span>describe_impl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DescriberResult&lt;SqlSchema&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>schema = SqlSchema::default();
-        <span class="kw">let </span>table_ids = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>container_ids = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>table_ids: IndexMap&lt;<span class="kw-2">&amp;</span>str, TableId&gt; = container_ids
+            .iter()
+            .filter_map(|(name, id)| id.left().map(|id| (name.as_str(), id)))
+            .collect();
 
-        <span class="kw">for </span>(table_name, table_id) <span class="kw">in </span><span class="kw-2">&amp;</span>table_ids {
-            <span class="self">self</span>.push_table(table_name, <span class="kw-2">*</span>table_id, <span class="kw-2">&amp;mut </span>schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for </span>(container_name, container_id) <span class="kw">in </span><span class="kw-2">&amp;</span>container_ids {
+            push_columns(container_name, <span class="kw-2">*</span>container_id, <span class="kw-2">&amp;mut </span>schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="kw">if let </span>Either::Left(table_id) = container_id {
+                push_indexes(container_name, <span class="kw-2">*</span>table_id, <span class="kw-2">&amp;mut </span>schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
+            }
         }
 
         <span class="kw">for </span>(table_name, table_id) <span class="kw">in </span><span class="kw-2">&amp;</span>table_ids {
             <span class="self">self</span>.push_foreign_keys(table_name, <span class="kw-2">*</span>table_id, <span class="kw-2">&amp;</span>table_ids, <span class="kw-2">&amp;mut </span>schema)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
         }
-
-        schema.views = <span class="self">self</span>.get_views().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(schema)
     }
@@ -738,22 +761,41 @@
         <span class="prelude-val">Ok</span>(names)
     }
 
-    <span class="kw">async fn </span>get_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;IndexMap&lt;String, TableId&gt;&gt; {
-        <span class="kw">let </span>sql = <span class="string">r#&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39; ORDER BY name ASC&quot;#</span>;
+    <span class="kw">async fn </span>get_table_names(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+    ) -&gt; DescriberResult&lt;IndexMap&lt;String, Either&lt;TableId, ViewId&gt;&gt;&gt; {
+        <span class="kw">let </span>sql = <span class="string">r#&quot;SELECT name, type, sql FROM sqlite_master WHERE type=&#39;table&#39; OR type=&#39;view&#39; ORDER BY name ASC&quot;#</span>;
 
         <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>names = result_set
             .into_iter()
-            .map(|row| row.get(<span class="string">&quot;name&quot;</span>).and_then(|x| x.to_string()).unwrap())
-            .filter(|table_name| !is_system_table(table_name));
+            .map(|row| {
+                <span class="kw">let </span>r#type = row.get(<span class="string">&quot;type&quot;</span>).and_then(|x| x.to_string()).unwrap();
+                <span class="kw">let </span>name = row.get(<span class="string">&quot;name&quot;</span>).and_then(|x| x.to_string()).unwrap();
+                <span class="kw">let </span>definition = row.get(<span class="string">&quot;sql&quot;</span>).and_then(|x| x.to_string());
+
+                (name, r#type, definition)
+            })
+            .filter(|(table_name, <span class="kw">_</span>, <span class="kw">_</span>)| !is_system_table(table_name));
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>name <span class="kw">in </span>names {
+        <span class="kw">for </span>(name, r#type, definition) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = name.clone();
-            <span class="kw">let </span>id = schema.push_table(name, Default::default());
-            map.insert(cloned_name, id);
+
+            <span class="kw">match </span>r#type.as_str() {
+                <span class="string">&quot;table&quot; </span>=&gt; {
+                    <span class="kw">let </span>id = schema.push_table(name, Default::default());
+                    map.insert(cloned_name, Either::Left(id));
+                }
+                <span class="string">&quot;view&quot; </span>=&gt; {
+                    <span class="kw">let </span>id = schema.push_view(name, Default::default(), definition);
+                    map.insert(cloned_name, Either::Right(id));
+                }
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+            }
         }
 
         <span class="prelude-val">Ok</span>(map)
@@ -770,32 +812,11 @@
         <span class="prelude-val">Ok</span>(size.try_into().unwrap())
     }
 
-    <span class="kw">async fn </span>push_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, table_id: TableId, schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
-        push_columns(name, table_id, schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
-        push_indexes(name, table_id, schema, <span class="self">self</span>.conn).<span class="kw">await
-    </span>}
-
-    <span class="kw">async fn </span>get_views(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DescriberResult&lt;Vec&lt;View&gt;&gt; {
-        <span class="kw">let </span>sql = <span class="string">&quot;SELECT name AS view_name, sql AS view_sql FROM sqlite_master WHERE type = &#39;view&#39;&quot;</span>;
-        <span class="kw">let </span>result_set = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>views = Vec::with_capacity(result_set.len());
-
-        <span class="kw">for </span>row <span class="kw">in </span>result_set.into_iter() {
-            views.push(View {
-                namespace_id: NamespaceId(<span class="number">0</span>),
-                name: row.get_expect_string(<span class="string">&quot;view_name&quot;</span>),
-                definition: row.get_string(<span class="string">&quot;view_sql&quot;</span>),
-            })
-        }
-
-        <span class="prelude-val">Ok</span>(views)
-    }
-
     <span class="kw">async fn </span>push_foreign_keys(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         table_name: <span class="kw-2">&amp;</span>str,
         table_id: TableId,
-        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+        table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;<span class="kw-2">&amp;</span>str, TableId&gt;,
         schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     ) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>sql = <span class="macro">format!</span>(<span class="string">r#&quot;PRAGMA foreign_key_list(&quot;{table_name}&quot;);&quot;#</span>);
@@ -806,11 +827,11 @@
         <span class="kw">fn </span>get_ids(
             row: <span class="kw-2">&amp;</span>ResultRow,
             table_id: TableId,
-            table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+            table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;<span class="kw-2">&amp;</span>str, TableId&gt;,
             schema: <span class="kw-2">&amp;</span>SqlSchema,
         ) -&gt; <span class="prelude-ty">Option</span>&lt;(TableColumnId, TableId, <span class="prelude-ty">Option</span>&lt;TableColumnId&gt;)&gt; {
             <span class="kw">let </span>column = schema.walk(table_id).column(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;from&quot;</span>))<span class="question-mark">?</span>.id;
-            <span class="kw">let </span>referenced_table = schema.walk(<span class="kw-2">*</span>table_ids.get(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;table&quot;</span>))<span class="question-mark">?</span>);
+            <span class="kw">let </span>referenced_table = schema.walk(<span class="kw-2">*</span>table_ids.get(row.get_expect_string(<span class="string">&quot;table&quot;</span>).as_str())<span class="question-mark">?</span>);
             <span class="comment">// this can be null if the primary key and shortened fk syntax was used
             </span><span class="kw">let </span>referenced_column = row
                 .get_string(<span class="string">&quot;to&quot;</span>)
@@ -918,7 +939,7 @@
 
 <span class="kw">async fn </span>push_columns(
     table_name: <span class="kw-2">&amp;</span>str,
-    table_id: TableId,
+    container_id: Either&lt;TableId, ViewId&gt;,
     schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     conn: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Connection + Send + Sync),
 ) -&gt; DescriberResult&lt;()&gt; {
@@ -991,51 +1012,62 @@
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="kw">let </span>pk_col = row.get(<span class="string">&quot;pk&quot;</span>).and_then(|x| x.as_integer()).expect(<span class="string">&quot;primary key&quot;</span>);
-        <span class="kw">let </span>column_id = TableColumnId(schema.table_columns.len() <span class="kw">as </span>u32);
+        <span class="kw">let </span>column = Column {
+            name: row.get_expect_string(<span class="string">&quot;name&quot;</span>),
+            tpe,
+            auto_increment: <span class="bool-val">false</span>,
+        };
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = default {
-            schema.push_table_default_value(column_id, default);
-        }
+        <span class="kw">match </span>container_id {
+            Either::Left(table_id) =&gt; {
+                <span class="kw">let </span>pk_col = row.get(<span class="string">&quot;pk&quot;</span>).and_then(|x| x.as_integer()).expect(<span class="string">&quot;primary key&quot;</span>);
+                <span class="kw">let </span>column_id = schema.push_table_column(table_id, column);
 
-        <span class="kw">let </span>column_id = schema.push_table_column(
-            table_id,
-            Column {
-                name: row.get_expect_string(<span class="string">&quot;name&quot;</span>),
-                tpe,
-                auto_increment: <span class="bool-val">false</span>,
-            },
-        );
+                <span class="kw">if </span>pk_col &gt; <span class="number">0 </span>{
+                    pk_cols.insert(pk_col, column_id);
+                }
 
-        <span class="kw">if </span>pk_col &gt; <span class="number">0 </span>{
-            pk_cols.insert(pk_col, column_id);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = default {
+                    schema.push_table_default_value(column_id, default);
+                }
+            }
+            Either::Right(view_id) =&gt; {
+                <span class="kw">let </span>column_id = schema.push_view_column(view_id, column);
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = default {
+                    schema.push_view_default_value(column_id, default);
+                }
+            }
         }
     }
 
-    <span class="kw">if </span>!pk_cols.is_empty() {
-        <span class="kw">let </span>pk_id = schema.push_primary_key(table_id, String::new());
-        <span class="kw">for </span>column_id <span class="kw">in </span>pk_cols.values() {
-            schema.push_index_column(<span class="kw">crate</span>::IndexColumn {
-                index_id: pk_id,
-                column_id: <span class="kw-2">*</span>column_id,
-                sort_order: <span class="prelude-val">None</span>,
-                length: <span class="prelude-val">None</span>,
-            });
-        }
+    <span class="kw">if let </span>Either::Left(table_id) = container_id {
+        <span class="kw">if </span>!pk_cols.is_empty() {
+            <span class="kw">let </span>pk_id = schema.push_primary_key(table_id, String::new());
+            <span class="kw">for </span>column_id <span class="kw">in </span>pk_cols.values() {
+                schema.push_index_column(<span class="kw">crate</span>::IndexColumn {
+                    index_id: pk_id,
+                    column_id: <span class="kw-2">*</span>column_id,
+                    sort_order: <span class="prelude-val">None</span>,
+                    length: <span class="prelude-val">None</span>,
+                });
+            }
 
-        <span class="comment">// Integer ID columns are always implemented with either row id or autoincrement
-        </span><span class="kw">if </span>pk_cols.len() == <span class="number">1 </span>{
-            <span class="kw">let </span>pk_col_id = <span class="kw-2">*</span>pk_cols.values().next().unwrap();
-            <span class="kw">let </span>pk_col = <span class="kw-2">&amp;mut </span>schema.table_columns[pk_col_id.<span class="number">0 </span><span class="kw">as </span>usize];
-            <span class="comment">// See https://www.sqlite.org/lang_createtable.html for the exact logic.
-            </span><span class="kw">if </span>pk_col.<span class="number">1</span>.tpe.full_data_type.eq_ignore_ascii_case(<span class="string">&quot;INTEGER&quot;</span>) {
-                pk_col.<span class="number">1</span>.auto_increment = <span class="bool-val">true</span>;
-                pk_col.<span class="number">1</span>.tpe.arity = ColumnArity::Required;
+            <span class="comment">// Integer ID columns are always implemented with either row id or autoincrement
+            </span><span class="kw">if </span>pk_cols.len() == <span class="number">1 </span>{
+                <span class="kw">let </span>pk_col_id = <span class="kw-2">*</span>pk_cols.values().next().unwrap();
+                <span class="kw">let </span>pk_col = <span class="kw-2">&amp;mut </span>schema.table_columns[pk_col_id.<span class="number">0 </span><span class="kw">as </span>usize];
+                <span class="comment">// See https://www.sqlite.org/lang_createtable.html for the exact logic.
+                </span><span class="kw">if </span>pk_col.<span class="number">1</span>.tpe.full_data_type.eq_ignore_ascii_case(<span class="string">&quot;INTEGER&quot;</span>) {
+                    pk_col.<span class="number">1</span>.auto_increment = <span class="bool-val">true</span>;
+                    pk_col.<span class="number">1</span>.tpe.arity = ColumnArity::Required;
+                }
             }
         }
     }
 
     schema.table_default_values.sort_by_key(|(column_id, <span class="kw">_</span>)| <span class="kw-2">*</span>column_id);
+    schema.view_default_values.sort_by_key(|(column_id, <span class="kw">_</span>)| <span class="kw-2">*</span>column_id);
 
     <span class="prelude-val">Ok</span>(())
 }

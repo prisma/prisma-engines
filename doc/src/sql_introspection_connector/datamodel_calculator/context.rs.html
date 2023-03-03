@@ -390,7 +390,22 @@
 <a href="#390" id="390">390</a>
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+</pre><pre class="rust"><code><span class="kw">mod </span>flavour;
+
+<span class="kw">use crate</span>::{
     introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
     introspection_map::{IntrospectionMap, RelationName},
     pair::{EnumPair, ModelPair, Pair, RelationFieldDirection, ViewPair},
@@ -407,6 +422,8 @@
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::borrow::Cow;
 
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>flavour::IntrospectionFlavour;
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
     <span class="kw">pub</span>(<span class="kw">crate</span>) render_config: bool,
@@ -416,10 +433,18 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) previous_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema,
     <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: IntrospectionMap&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) force_namespaces: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[String]&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) flavour: Box&lt;<span class="kw">dyn </span>IntrospectionFlavour&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DatamodelCalculatorContext&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext, sql_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>flavour: Box&lt;<span class="kw">dyn </span>IntrospectionFlavour&gt; = <span class="kw">match </span>ctx.sql_family() {
+            SqlFamily::Postgres =&gt; Box::new(flavour::PostgresIntrospectionFlavour),
+            SqlFamily::Mysql =&gt; Box::new(flavour::MysqlIntrospectionFlavour),
+            SqlFamily::Sqlite =&gt; Box::new(flavour::SqliteIntrospectionFlavour),
+            SqlFamily::Mssql =&gt; Box::new(flavour::SqlServerIntrospectionFlavour),
+        };
+
         <span class="kw">let </span><span class="kw-2">mut </span>ctx = DatamodelCalculatorContext {
             version: Version::NonPrisma,
             config: ctx.configuration(),
@@ -429,6 +454,7 @@
             previous_schema: ctx.previous_schema(),
             introspection_map: Default::default(),
             force_namespaces: ctx.namespaces(),
+            flavour,
         };
 
         ctx.introspection_map = IntrospectionMap::new(<span class="kw-2">&amp;</span>ctx);
