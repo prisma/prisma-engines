@@ -494,7 +494,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     Self::dbgenerated_expression(&default_string)
                                 } else {
                                     DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
-                                        &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                                        &default_string
+                                            .replace("_utf8mb4", "")
+                                            .replace("\\\'", "")
+                                            .replace("''", "'"),
                                     )))
                                 }
                             }
@@ -840,6 +843,6 @@ fn push_enum_variants(full_data_type: &str, enum_id: EnumId, sql_schema: &mut Sq
     // full_data_type for enum columns follows the pattern "enum('a','b')"
     let vals = &full_data_type[5..len];
     for variant in vals.split(',').map(unquote_string) {
-        sql_schema.push_enum_variant(enum_id, variant);
+        sql_schema.push_enum_variant(enum_id, variant.replace("''", "'"));
     }
 }
