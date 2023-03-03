@@ -2,7 +2,7 @@
   "isIncomplete": false,
   "items": [
     {
-      "label": "engines env",
+      "label": "env",
       "kind": 10,
       "documentation": {
         "kind": "markdown",
@@ -12,7 +12,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines \"\"",
+      "label": "\"\"",
       "kind": 10,
       "documentation": {
         "kind": "markdown",

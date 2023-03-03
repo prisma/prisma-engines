@@ -8,7 +8,7 @@ use super::generate_pretty_doc;
 
 pub(super) fn schemas_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines schemas".to_owned(),
+        label: "schemas".to_owned(),
         insert_text: Some(r#"schemas = [$0]"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -27,7 +27,7 @@ pub(super) fn schemas_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines relationMode".to_owned(),
+        label: "relationMode".to_owned(),
         insert_text: Some(r#"relationmode = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -45,7 +45,7 @@ pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn direct_url_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines directUrl".to_owned(),
+        label: "directUrl".to_owned(),
         insert_text: Some(r#"directUrl = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -63,7 +63,7 @@ pub(super) fn direct_url_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn shadow_db_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines shadowDatabaseUrl".to_owned(),
+        label: "shadowDatabaseUrl".to_owned(),
         insert_text: Some(r#"shadowDatabaseUrl = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -81,7 +81,7 @@ pub(super) fn shadow_db_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn url_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines url".to_owned(),
+        label: "url".to_owned(),
         insert_text: Some(r#"url = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -99,7 +99,7 @@ pub(super) fn url_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn provider_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines provider".to_owned(),
+        label: "provider".to_owned(),
         insert_text: Some(r#"provider = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
@@ -117,7 +117,7 @@ pub(super) fn provider_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "engines env".to_owned(),
+        label: "env".to_owned(),
         insert_text: Some(r#"env($0)"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::PROPERTY),
@@ -138,7 +138,7 @@ pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
 
 pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: r#"engines """#.to_owned(),
+        label: r#""""#.to_owned(),
         insert_text: Some(r#""$0""#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::PROPERTY),
@@ -163,7 +163,7 @@ pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: 
     };
 
     completion_list.items.push(CompletionItem {
-        label: format!("engines {text}"),
+        label: text.to_owned(),
         insert_text: Some(text.to_owned()),
         insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
         kind: Some(CompletionItemKind::PROPERTY),

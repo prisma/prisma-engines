@@ -2,7 +2,7 @@
   "isIncomplete": false,
   "items": [
     {
-      "label": "engines provider",
+      "label": "provider",
       "kind": 5,
       "documentation": {
         "kind": "markdown",
@@ -12,7 +12,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines url",
+      "label": "url",
       "kind": 5,
       "documentation": {
         "kind": "markdown",
@@ -22,7 +22,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines shadowDatabaseUrl",
+      "label": "shadowDatabaseUrl",
       "kind": 5,
       "documentation": {
         "kind": "markdown",
@@ -32,7 +32,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines directUrl",
+      "label": "directUrl",
       "kind": 5,
       "documentation": {
         "kind": "markdown",
@@ -42,7 +42,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines relationMode",
+      "label": "relationMode",
       "kind": 5,
       "documentation": {
         "kind": "markdown",
@@ -52,7 +52,7 @@
       "insertTextFormat": 2
     },
     {
-      "label": "engines schemas",
+      "label": "schemas",
       "kind": 5,
       "documentation": {
         "kind": "markdown",

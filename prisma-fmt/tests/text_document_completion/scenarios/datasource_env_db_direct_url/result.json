@@ -2,7 +2,7 @@
   "isIncomplete": false,
   "items": [
     {
-      "label": "engines DIRECT_URL",
+      "label": "DIRECT_URL",
       "kind": 10,
       "insertText": "DIRECT_URL",
       "insertTextFormat": 1

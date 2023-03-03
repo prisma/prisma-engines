@@ -2,7 +2,7 @@
   "isIncomplete": false,
   "items": [
     {
-      "label": "engines DATABASE_URL",
+      "label": "DATABASE_URL",
       "kind": 10,
       "insertText": "DATABASE_URL",
       "insertTextFormat": 1
