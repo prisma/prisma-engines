@@ -22,7 +22,7 @@ impl Model {
     pub fn primary_identifier(&self) -> FieldSelection {
         let fields: Vec<_> = self
             .walker()
-            .unique_criterias()
+            .required_unique_criterias()
             .next()
             .unwrap()
             .fields()
