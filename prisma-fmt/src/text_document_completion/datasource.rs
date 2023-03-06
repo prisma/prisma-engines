@@ -125,7 +125,7 @@ pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
             kind: MarkupKind::Markdown,
             value: generate_pretty_doc(
                 r#"env(_ environmentVariable: string)"#,
-                r#"Specifies a datasource via an environment variable. When running a Prisma CLI command that needs the database connection URL (e.g. `prisma generate`), you need to make sure that the `DATABASE_URL` environment variable is set. One way to do so is by creating a `.env` file. Note that the file must be in the same directory as your schema.prisma file to automatically be picked up by the Prisma CLI.""#,
+                r#"Specifies a datasource via an environment variable. When running a Prisma CLI command that needs the database connection URL (e.g. `prisma db pull`), you need to make sure that the `DATABASE_URL` environment variable is set. One way to do so is by creating a `.env` file. Note that the file must be in the same directory as your schema.prisma file to automatically be picked up by the Prisma CLI.""#,
                 Some(HashMap::from([(
                     "environmentVariable",
                     "The environment variable in which the database connection URL is stored.",
