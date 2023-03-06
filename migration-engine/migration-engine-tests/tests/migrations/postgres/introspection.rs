@@ -207,12 +207,10 @@ CREATE TABLE capitals (
 }}
 
 model capitals {{
-  name       String  @unique
+  name       String  @unique(map: "cities_name_key")
   population Float?  @db.Real
   elevation  Int?
   state      String? @db.Char(2)
-
-  @@ignore
 }}
 
 /// This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.
