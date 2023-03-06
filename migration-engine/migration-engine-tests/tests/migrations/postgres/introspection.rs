@@ -153,6 +153,7 @@ model cities {{
     pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
 }
 
+// Demonstrates https://github.com/prisma/prisma/issues/12304
 #[test]
 fn inherited_table_detect_primary_key() {
     let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
@@ -205,9 +206,8 @@ CREATE TABLE capitals (
   url      = "{}"
 }}
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model capitals {{
-  name       String
+  name       String  @unique
   population Float?  @db.Real
   elevation  Int?
   state      String? @db.Char(2)
