@@ -264,3 +264,50 @@ qe-node-api: build target/debug/libquery_engine.node
 # otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
 	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
 	cp $< $@
+
+.PHONY: amazon-image run-amazon qe-aws qe-stub-aws qe-stub-debug qe-static-aws
+.PHONY: cross-x86 qe-cross-x86 qe-stub-cross-x86
+
+amazon-image:
+	docker build -t prisma-lambda -f Dockerfile.amazonlinux .
+
+CMD ?= bash
+run-amazon: amazon-image
+	mkdir -p target/aws/cargo-cache/{git,registry}
+	docker run \
+		-v $(shell pwd):/engines \
+		-v $(shell pwd)/target/aws:/engines/target \
+		-v $(shell pwd)/target/aws/cargo-cache/git:/root/.cargo/git \
+		-v $(shell pwd)/target/aws/cargo-cache/registry:/root/.cargo/registry \
+		-it prisma-lambda $(CMD)
+
+qe-aws:
+	$(MAKE) run-amazon CMD="cargo build --release -p query-engine-node-api"
+	rm -f target/aws/release/libquery_engine.node
+	ln target/aws/release/libquery_engine.{so,node}
+
+qe-stub-aws:
+	$(MAKE) run-amazon CMD="cargo build --release -p stub-node-api"
+	rm -f target/aws/release/libquery_engine_stub.node
+	ln target/aws/release/libquery_engine_stub.{so,node}
+
+qe-stub-debug: build target/debug/libquery_engine_stub.node
+
+qe-static-aws:
+	$(MAKE) run-amazon CMD="bash -c 'LIBZ_SYS_STATIC=1 cargo build --release -p query-engine-node-api --features vendored-openssl'"
+	rm -f target/aws/release/libquery_engine.node
+	ln target/aws/release/libquery_engine.{so,node}
+
+CROSS_X86_PACKAGE ?= query-engine-node-api
+cross-x86:
+	LIBZ_SYS_STATIC=1 cargo zigbuild --release --target x86_64-unknown-linux-gnu.2.17 -p $(CROSS_X86_PACKAGE) --features vendored-openssl
+
+qe-cross-x86:
+	$(MAKE) cross-x86 CROSS_X86_PACKAGE=query-engine-node-api
+	rm -f target/x86_64-unknown-linux-gnu/release/libquery_engine.node
+	ln target/x86_64-unknown-linux-gnu/release/libquery_engine.{so,node}
+
+qe-stub-cross-x86:
+	$(MAKE) cross-x86 CROSS_X86_PACKAGE=stub-node-api
+	rm -f target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.node
+	ln target/x86_64-unknown-linux-gnu/release/libquery_engine_stub.{so,node}
