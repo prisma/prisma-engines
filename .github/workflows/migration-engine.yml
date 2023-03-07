@@ -21,11 +21,11 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: "mongodb42"
+          - name: mongodb42
             url: "mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true"
-          - name: "mongodb44"
+          - name: mongodb44
             url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
-          - name: "mongodb5"
+          - name: mongodb5
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -40,6 +40,44 @@ jobs:
 
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}-single
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - run: cargo test -p mongodb-introspection-connector
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+      - run: cargo test -p mongodb-migration-connector
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+
+  test-mongodb-introspection-and-migration-connector-windows:
+    name: "Test ${{ matrix.database.name }} on Windows"
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          # - name: mongodb42
+          #   url: "mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true"
+          # - name: mongodb44
+          #   url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
+          - name: mongodb5
+            url: "mongodb://localhost:C2y6yDjf5%2FR%2Bob0N8A7Cgv30VRDJIWEHLM%2B4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw%2FJw%3D%3D@localhost:10255/foo?ssl=true&retryWrites=false&tlsAllowInvalidCertificates=true"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: janpio/cosmos-emulator-github-action@main
+        with:
+          parameter_string: "-Timeout 300 -EnableMongoDb 4.0"
+
+      # - name: "Start ${{ matrix.database.name }}"
+      #   run: make start-${{ matrix.database.name }}-single
 
       - uses: actions-rs/toolchain@v1
         with:
