@@ -102,6 +102,13 @@ impl OutputType {
             _ => false,
         }
     }
+
+    pub fn is_enum_list(&self) -> bool {
+        match self {
+            OutputType::List(typ) => typ.is_enum(),
+            _ => false,
+        }
+    }
 }
 
 pub struct ObjectType {
