@@ -135,8 +135,8 @@ impl crate::ParserDatabase {
                 relation
                     .as_complete_fields()
                     .map(|(field_a, field_b)| CompleteInlineRelationWalker {
-                        side_a: (relation.model_a, field_a),
-                        side_b: (relation.model_b, field_b),
+                        side_a: field_a,
+                        side_b: field_b,
                         db: self,
                     })
             })

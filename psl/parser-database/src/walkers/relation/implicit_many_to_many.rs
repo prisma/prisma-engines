@@ -35,9 +35,7 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
     pub fn field_a(self) -> RelationFieldWalker<'db> {
         let rel = self.get();
         match rel.attributes {
-            RelationAttributes::ImplicitManyToMany { field_a, field_b: _ } => {
-                self.walk(crate::walkers::RelationFieldId(rel.model_a, field_a))
-            }
+            RelationAttributes::ImplicitManyToMany { field_a, field_b: _ } => self.walk(field_a),
             _ => unreachable!(),
         }
     }
@@ -46,9 +44,7 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
     pub fn field_b(self) -> RelationFieldWalker<'db> {
         let rel = self.get();
         match rel.attributes {
-            RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => {
-                self.walk(crate::walkers::RelationFieldId(rel.model_b, field_b))
-            }
+            RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.walk(field_b),
             _ => unreachable!(),
         }
     }

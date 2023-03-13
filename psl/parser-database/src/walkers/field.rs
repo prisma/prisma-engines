@@ -1,5 +1,5 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
-use crate::ScalarType;
+use crate::{types::RelationField, ScalarType};
 use schema_ast::ast;
 
 /// A model field, scalar or relation.
@@ -23,13 +23,9 @@ impl<'db> FieldWalker<'db> {
 
     /// Find out which kind of field this is.
     pub fn refine(self) -> RefinedFieldWalker<'db> {
-        let (model_id, field_id) = self.id;
-        if self.db.types.relation_fields.contains_key(&self.id) {
-            RefinedFieldWalker::Relation(self.walk(super::RelationFieldId(model_id, field_id)))
-        } else if self.db.types.scalar_fields.contains_key(&self.id) {
-            RefinedFieldWalker::Scalar(self.walk(super::ScalarFieldId(model_id, field_id)))
-        } else {
-            unreachable!("{:?} is neither a scalar field nor a relation field", self.id)
+        match self.db.types.refine_field(self.id) {
+            either::Either::Left(id) => RefinedFieldWalker::Relation(self.walk(id)),
+            either::Either::Right(id) => RefinedFieldWalker::Scalar(self.walk(id)),
         }
     }
 }
@@ -54,9 +50,10 @@ impl<'db> From<ScalarFieldWalker<'db>> for FieldWalker<'db> {
 
 impl<'db> From<RelationFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: RelationFieldWalker<'db>) -> Self {
+        let RelationField { model_id, field_id, .. } = w.db.types[w.id];
         Walker {
             db: w.db,
-            id: (w.id.0, w.id.1),
+            id: (model_id, field_id),
         }
     }
 }

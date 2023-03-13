@@ -10,11 +10,6 @@ use std::{borrow::Cow, fmt, hash::Hasher};
 pub type RelationFieldWalker<'db> = Walker<'db, RelationFieldId>;
 
 impl<'db> RelationFieldWalker<'db> {
-    /// The ID of the AST node of the field.
-    pub fn field_id(self) -> ast::FieldId {
-        self.id.1
-    }
-
     /// The relation starts or ends to a view.
     pub fn one_side_is_view(self) -> bool {
         self.model().ast_model().is_view() || self.related_model().ast_model().is_view()
@@ -32,11 +27,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The AST node of the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.id.0][self.id.1]
+        let RelationField { model_id, field_id, .. } = self.db.types[self.id];
+        &self.db.ast[model_id][field_id]
     }
 
     pub(crate) fn attributes(self) -> &'db RelationField {
-        &self.db.types.relation_fields[&self.id.coarsen()]
+        &self.db.types[self.id]
     }
 
     /// The onDelete argument on the relation.
@@ -76,7 +72,7 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The model containing the field.
     pub fn model(self) -> ModelWalker<'db> {
-        self.db.walk(self.id.0)
+        self.walk(self.attributes().model_id)
     }
 
     /// A valid relation is defined by two relation fields. This method returns the _other_
@@ -160,12 +156,11 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
-        let model_id = self.id.0;
-        let attributes = self.attributes();
+        let attributes = &self.db.types[self.id];
         attributes.fields.as_ref().map(move |fields| {
             fields
                 .iter()
-                .map(move |field_id| self.db.walk(super::ScalarFieldId(model_id, *field_id)))
+                .map(move |field_id| self.db.walk(super::ScalarFieldId(attributes.model_id, *field_id)))
         })
     }
 }

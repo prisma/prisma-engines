@@ -27,7 +27,7 @@ pub(super) struct Types {
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
-    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
+    relation_fields: Vec<RelationField>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes>,
     /// Sorted array of scalar fields that have an `@default()` attribute with a function that is
@@ -50,12 +50,72 @@ impl Types {
         self.scalar_fields.remove(&(model_id, field_id))
     }
 
-    pub(super) fn take_relation_field(
-        &mut self,
+    pub(super) fn iter_relation_field_ids(&self) -> impl Iterator<Item = RelationFieldId> + 'static {
+        (0..self.relation_fields.len()).map(|idx| RelationFieldId(idx as u32))
+    }
+
+    pub(super) fn iter_relation_fields(&self) -> impl Iterator<Item = (RelationFieldId, &RelationField)> {
+        self.relation_fields
+            .iter()
+            .enumerate()
+            .map(|(idx, rf)| (RelationFieldId(idx as u32), rf))
+    }
+
+    pub(super) fn range_model_relation_fields(
+        &self,
         model_id: ast::ModelId,
-        field_id: ast::FieldId,
-    ) -> Option<RelationField> {
-        self.relation_fields.remove(&(model_id, field_id))
+    ) -> impl Iterator<Item = (RelationFieldId, &RelationField)> + Clone {
+        self.relation_fields
+            .binary_search_by_key(&model_id, |rf| rf.model_id)
+            .into_iter()
+            .flat_map(move |anchor| {
+                let back = self.relation_fields[..anchor]
+                    .iter()
+                    .rev()
+                    .take_while(move |rf| rf.model_id == model_id)
+                    .enumerate()
+                    .map(move |(idx, rf)| (RelationFieldId((anchor.saturating_sub(1) - idx) as u32), rf));
+
+                let forward = self.relation_fields[anchor..]
+                    .iter()
+                    .take_while(move |rf| rf.model_id == model_id)
+                    .enumerate()
+                    .map(move |(idx, rf)| (RelationFieldId((anchor + idx) as u32), rf));
+
+                back.chain(forward)
+            })
+    }
+
+    pub(super) fn refine_field(
+        &self,
+        id: (ast::ModelId, ast::FieldId),
+    ) -> Either<RelationFieldId, crate::walkers::ScalarFieldId> {
+        self.relation_fields
+            .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
+            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            // INVARIANT: every field is either a relation field or a scalar field, so we don't
+            // need to check.
+            .unwrap_or_else(|_| Either::Right(crate::walkers::ScalarFieldId(id.0, id.1)))
+    }
+
+    pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
+        let id = RelationFieldId(self.relation_fields.len() as u32);
+        self.relation_fields.push(relation_field);
+        id
+    }
+}
+
+impl std::ops::Index<RelationFieldId> for Types {
+    type Output = RelationField;
+
+    fn index(&self, index: RelationFieldId) -> &Self::Output {
+        &self.relation_fields[index.0 as usize]
+    }
+}
+
+impl std::ops::IndexMut<RelationFieldId> for Types {
+    fn index_mut(&mut self, index: RelationFieldId) -> &mut Self::Output {
+        &mut self.relation_fields[index.0 as usize]
     }
 }
 
@@ -198,6 +258,8 @@ pub(crate) struct ScalarField {
 
 #[derive(Debug)]
 pub(crate) struct RelationField {
+    pub(crate) model_id: ast::ModelId,
+    pub(crate) field_id: ast::FieldId,
     pub(crate) referenced_model: ast::ModelId,
     pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
     pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
@@ -214,8 +276,10 @@ pub(crate) struct RelationField {
 }
 
 impl RelationField {
-    fn new(referenced_model: ast::ModelId) -> Self {
+    fn new(model_id: ast::ModelId, field_id: ast::FieldId, referenced_model: ast::ModelId) -> Self {
         RelationField {
+            model_id,
+            field_id,
             referenced_model,
             on_delete: None,
             on_update: None,
@@ -547,8 +611,8 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
-                let rf = RelationField::new(referenced_model);
-                ctx.types.relation_fields.insert((model_id, field_id), rf);
+                let rf = RelationField::new(model_id, field_id, referenced_model);
+                ctx.types.push_relation_field(rf);
             }
             Ok(FieldType::Scalar(scalar_field_type)) => {
                 let field_data = ScalarField {
@@ -1354,12 +1418,5 @@ impl ScalarType {
 }
 
 /// An opaque identifier for a model relation field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq)]
-pub struct RelationFieldId(pub(crate) ast::ModelId, pub(crate) ast::FieldId);
-
-impl RelationFieldId {
-    /// Coarsen the relation field identifier to a generic field identifier.
-    pub fn coarsen(self) -> (ast::ModelId, ast::FieldId) {
-        (self.0, self.1)
-    }
-}
+#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
+pub struct RelationFieldId(u32);

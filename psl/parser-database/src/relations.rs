@@ -15,7 +15,7 @@ use std::{
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     let mut relations = Relations::default();
 
-    for rf in ctx.types.relation_fields.iter() {
+    for rf in ctx.types.iter_relation_fields() {
         let evidence = relation_evidence(rf, ctx);
         ingest_relation(evidence, &mut relations, ctx);
     }
@@ -136,33 +136,33 @@ impl Relations {
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(super) enum OneToManyRelationFields {
-    Forward(ast::FieldId),
-    Back(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
+    Forward(RelationFieldId),
+    Back(RelationFieldId),
+    Both(RelationFieldId, RelationFieldId),
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(super) enum OneToOneRelationFields {
-    Forward(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
+    Forward(RelationFieldId),
+    Both(RelationFieldId, RelationFieldId),
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(super) enum RelationAttributes {
     ImplicitManyToMany {
-        field_a: ast::FieldId,
-        field_b: ast::FieldId,
+        field_a: RelationFieldId,
+        field_b: RelationFieldId,
     },
     TwoWayEmbeddedManyToMany {
-        field_a: ast::FieldId,
-        field_b: ast::FieldId,
+        field_a: RelationFieldId,
+        field_b: RelationFieldId,
     },
     OneToOne(OneToOneRelationFields),
     OneToMany(OneToManyRelationFields),
 }
 
 impl RelationAttributes {
-    pub(crate) fn fields(&self) -> (Option<ast::FieldId>, Option<ast::FieldId>) {
+    pub(crate) fn fields(&self) -> (Option<RelationFieldId>, Option<RelationFieldId>) {
         match self {
             RelationAttributes::ImplicitManyToMany { field_a, field_b }
             | RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b }
@@ -191,7 +191,7 @@ impl Relation {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
-    pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
+    pub(crate) fn as_complete_fields(&self) -> Option<(RelationFieldId, RelationFieldId)> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
@@ -213,35 +213,34 @@ pub(super) struct RelationEvidence<'db> {
     pub(super) ast_model: &'db ast::Model,
     pub(super) model_id: ast::ModelId,
     pub(super) ast_field: &'db ast::Field,
-    pub(super) field_id: ast::FieldId,
+    pub(super) field_id: RelationFieldId,
     pub(super) is_self_relation: bool,
     pub(super) is_two_way_embedded_many_to_many_relation: bool,
     pub(super) relation_field: &'db RelationField,
     pub(super) opposite_model: &'db ast::Model,
-    pub(super) opposite_relation_field: Option<(ast::FieldId, &'db ast::Field, &'db RelationField)>,
+    pub(super) opposite_relation_field: Option<(RelationFieldId, &'db ast::Field, &'db RelationField)>,
 }
 
 pub(super) fn relation_evidence<'db>(
-    ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField),
+    (relation_field_id, relation_field): (RelationFieldId, &'db RelationField),
     ctx: &'db Context<'db>,
 ) -> RelationEvidence<'db> {
     let ast = ctx.ast;
-    let ast_model = &ast[*model_id];
-    let ast_field = &ast_model[*field_id];
+    let ast_model = &ast[relation_field.model_id];
+    let ast_field = &ast_model[relation_field.field_id];
     let opposite_model = &ast[relation_field.referenced_model];
-    let is_self_relation = *model_id == relation_field.referenced_model;
-    let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &'db RelationField)> = ctx
+    let is_self_relation = relation_field.model_id == relation_field.referenced_model;
+    let opposite_relation_field: Option<(RelationFieldId, &ast::Field, &'db RelationField)> = ctx
         .types
-        .relation_fields
-        .range(
-            (relation_field.referenced_model, ast::FieldId::MIN)..(relation_field.referenced_model, ast::FieldId::MAX),
-        )
+        .range_model_relation_fields(relation_field.referenced_model)
         // Only considers relations between the same models
-        .filter(|(_, opposite_relation_field)| opposite_relation_field.referenced_model == *model_id)
+        .filter(|(_, opposite_relation_field)| opposite_relation_field.referenced_model == relation_field.model_id)
         // Filter out the field itself, in case of self-relations
-        .filter(|((_, opp_relation_field_id), _)| !is_self_relation || opp_relation_field_id != field_id)
+        .filter(|(_, opposite_relation_field)| {
+            !is_self_relation || opposite_relation_field.field_id != relation_field.field_id
+        })
         .find(|(_, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
-        .map(|((opp_model_id, opp_field_id), opp_rf)| (*opp_field_id, &ast[*opp_model_id][*opp_field_id], opp_rf));
+        .map(|(opp_field_id, opp_rf)| (opp_field_id, &ast[opp_rf.model_id][opp_rf.field_id], opp_rf));
 
     let is_two_way_embedded_many_to_many_relation = match (relation_field, opposite_relation_field) {
         (left, Some((_, _, right))) => left.fields.is_some() || right.fields.is_some(),
@@ -250,9 +249,9 @@ pub(super) fn relation_evidence<'db>(
 
     RelationEvidence {
         ast_model,
-        model_id: *model_id,
+        model_id: relation_field.model_id,
         ast_field,
-        field_id: *field_id,
+        field_id: relation_field_id,
         relation_field,
         opposite_model,
         is_self_relation,
@@ -400,14 +399,9 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
     let relation_id = RelationId(relations.relations_storage.len() as u32);
 
     relations.relations_storage.push(relation);
-    relations
-        .fields
-        .insert(RelationFieldId(evidence.model_id, evidence.field_id), relation_id);
+    relations.fields.insert(evidence.field_id, relation_id);
     if let Some((opposite_field_id, _, _)) = evidence.opposite_relation_field {
-        relations.fields.insert(
-            RelationFieldId(evidence.relation_field.referenced_model, opposite_field_id),
-            relation_id,
-        );
+        relations.fields.insert(opposite_field_id, relation_id);
     }
 
     relations
