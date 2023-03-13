@@ -13,7 +13,7 @@ mod bigint {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { bInt } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"bInt":"10000000000"}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod bigint {
                 let res = run_query!(runner, r#"{ findManyTestModel { bInt } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"bInt":"10000000000"},{"bInt":"-10000000000"},{"bInt":null}]}}"###
                 );
             }

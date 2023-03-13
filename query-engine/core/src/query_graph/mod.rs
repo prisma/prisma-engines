@@ -846,7 +846,6 @@ impl ToGraphviz for QueryGraph {
         let nodes = self
             .graph
             .node_indices()
-            .into_iter()
             .map(|idx| (idx, self.graph.node_weight(idx).unwrap().borrow().unwrap()))
             .map(|(idx, node)| {
                 if self.is_result_node(&NodeRef { node_ix: idx }) {
@@ -878,7 +877,6 @@ impl ToGraphviz for QueryGraph {
         let edges = self
             .graph
             .edge_references()
-            .into_iter()
             .map(|edge| {
                 let idx = edge.id();
                 let edge_content = self.graph.edge_weight(idx).unwrap().borrow().unwrap();

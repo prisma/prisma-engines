@@ -13,7 +13,7 @@ mod float {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { float } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"float":1.2}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod float {
                 let res = run_query!(runner, r#"{ findManyTestModel { float } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":null}]}}"###
                 );
             }

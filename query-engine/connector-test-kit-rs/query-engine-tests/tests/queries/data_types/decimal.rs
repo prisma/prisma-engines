@@ -24,7 +24,7 @@ mod decimal {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { decimal } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"decimal":"12.3456"}}}"###
                 );
             }
@@ -65,7 +65,7 @@ mod decimal {
                 let res = run_query!(runner, r#"{ findManyTestModel { decimal } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"decimal":"12.3456"},{"decimal":"-1.2345678"},{"decimal":null}]}}"###
                 );
             }

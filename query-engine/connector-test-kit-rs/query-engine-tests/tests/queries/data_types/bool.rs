@@ -13,7 +13,7 @@ mod bool {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { bool } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"bool":true}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod bool {
                 let res = run_query!(runner, r#"{ findManyTestModel { bool } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"bool":true},{"bool":false},{"bool":null}]}}"###
                 );
             }

@@ -77,7 +77,6 @@ impl ModelProjection {
                 Field::Relation(rf) => rf.scalar_fields(),
                 Field::Composite(_) => todo!(), // [Composites] todo
             })
-            .into_iter()
             .unique_by(|field| field.name().to_owned())
     }
 

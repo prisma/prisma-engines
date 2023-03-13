@@ -57,7 +57,7 @@ impl ParentContainer {
         match self {
             ParentContainer::Model(weak) => weak.fields().find_from_all(prisma_name).ok(),
 
-            ParentContainer::CompositeType(weak) => weak.fields().into_iter().find(|field| field.name() == prisma_name),
+            ParentContainer::CompositeType(weak) => weak.fields().find(|field| field.name() == prisma_name),
         }
     }
 

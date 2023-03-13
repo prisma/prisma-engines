@@ -394,7 +394,7 @@ mod tests {
     #[test]
     pub fn default_scalar_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "findFirst",
             "query": {
@@ -452,7 +452,7 @@ mod tests {
     #[test]
     pub fn default_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "createOne",
             "query": {
@@ -505,7 +505,7 @@ mod tests {
     #[test]
     pub fn explicit_select() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "findFirst",
             "query": {
@@ -542,7 +542,7 @@ mod tests {
     #[test]
     pub fn arguments() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "findFirst",
             "query": {
@@ -618,7 +618,7 @@ mod tests {
     #[test]
     pub fn nested_arguments() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "findFirst",
             "query": {
@@ -722,7 +722,7 @@ mod tests {
     #[test]
     pub fn composite_selection_should_be_based_on_schema_1() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "deleteMany",
             "query": {
@@ -759,7 +759,7 @@ mod tests {
     #[test]
     pub fn simple_mutation() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -796,7 +796,7 @@ mod tests {
     #[test]
     pub fn scalar_wildcard_and_scalar_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -824,7 +824,7 @@ mod tests {
     #[test]
     pub fn composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -855,7 +855,7 @@ mod tests {
     #[test]
     pub fn composite_wildcard_and_scalar_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -920,7 +920,7 @@ mod tests {
     #[test]
     pub fn custom_arg_datetime() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -955,7 +955,7 @@ mod tests {
     #[test]
     pub fn custom_arg_bigint() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -1001,7 +1001,7 @@ mod tests {
     #[test]
     pub fn custom_arg_decimal() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -1036,7 +1036,7 @@ mod tests {
     #[test]
     pub fn custom_arg_bytes() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -1076,7 +1076,7 @@ mod tests {
     #[test]
     pub fn custom_arg_json() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -1111,7 +1111,7 @@ mod tests {
     #[test]
     pub fn unknown_custom_arg() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "updateOne",
             "query": {
@@ -1155,7 +1155,7 @@ mod tests {
     #[test]
     pub fn invalid_operation() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "modelName": "User",
             "action": "queryRaw",
             "query": {
@@ -1184,7 +1184,7 @@ mod tests {
     #[test]
     pub fn query_raw() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
             "action": "runCommandRaw",
             "query": {
                 "arguments": {
@@ -1269,7 +1269,7 @@ mod tests {
     #[test]
     fn nested_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"
+            r#"
             {
               "modelName": "Comment",
               "action": "createOne",
@@ -1340,7 +1340,7 @@ mod tests {
     #[test]
     pub fn nested_composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
-            &r#"{
+            r#"{
                 "modelName": "Comment",
                 "action": "createOne",
                 "query": {

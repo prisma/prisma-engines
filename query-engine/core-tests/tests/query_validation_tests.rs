@@ -10,7 +10,7 @@ fn run_query_validation_test(query_file_path: &str) {
     let schema_path = query_file_path.with_file_name("schema.prisma");
 
     let query = std::fs::read_to_string(&query_file_path).unwrap();
-    let schema = std::fs::read_to_string(&schema_path).unwrap();
+    let schema = std::fs::read_to_string(schema_path).unwrap();
 
     let parsed_schema = psl::parse_schema(schema).unwrap();
     let prisma_models_schema = prisma_models::convert(Arc::new(parsed_schema));
@@ -76,7 +76,7 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk<'_>>) -> String {
 }
 
 fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_handlers::HandlerError> {
-    let json_request: JsonSingleQuery = serde_json::from_str(&query).unwrap();
+    let json_request: JsonSingleQuery = serde_json::from_str(query).unwrap();
     let operation = request_handlers::JsonProtocolAdapter::convert_single(json_request, &schema)?;
     QueryGraphBuilder::new(schema)
         .build(operation)

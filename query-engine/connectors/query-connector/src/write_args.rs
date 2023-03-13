@@ -441,7 +441,6 @@ impl WriteArgs {
 pub fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
     let pairs = projection
         .scalar_fields()
-        .into_iter()
         .filter_map(|field| {
             args.get_field_value(field.db_name())
                 .map(|v| (DatasourceFieldName::from(&field), v.clone()))

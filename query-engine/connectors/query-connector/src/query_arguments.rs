@@ -141,7 +141,7 @@ impl QueryArguments {
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().any(|index| {
-            index.fields().into_iter().all(|f| {
+            index.fields().all(|f| {
                 on_model
                     .iter()
                     .any(|o| Some(o.field.id) == f.as_scalar_field().map(|sf| ScalarFieldId::InModel(sf.id)))

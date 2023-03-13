@@ -173,19 +173,18 @@ impl From<CoreError> for user_facing_errors::Error {
                 path,
                 error_kind,
             })) => {
-                let known_error = match error_kind {
-                    QueryParserErrorKind::RequiredValueNotSetError => {
-                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", path),
-                        })
-                    }
-                    _ => user_facing_errors::KnownError::new(
-                        user_facing_errors::query_engine::LegacyQueryValidationFailed {
-                            query_validation_error: format!("{}", error_kind),
-                            query_position: format!("{}", path),
-                        },
-                    ),
-                };
+                let known_error =
+                    match error_kind {
+                        QueryParserErrorKind::RequiredValueNotSetError => user_facing_errors::KnownError::new(
+                            user_facing_errors::query_engine::MissingRequiredValue { path: path.to_string() },
+                        ),
+                        _ => user_facing_errors::KnownError::new(
+                            user_facing_errors::query_engine::LegacyQueryValidationFailed {
+                                query_validation_error: error_kind.to_string(),
+                                query_position: path.to_string(),
+                            },
+                        ),
+                    };
 
                 known_error.into()
             }

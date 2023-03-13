@@ -185,11 +185,9 @@ impl<'a> ScalarFilterParser<'a> {
             aggregations::UNDERSCORE_MIN => self.aggregation_filter(input, Filter::min, false),
             aggregations::UNDERSCORE_MAX => self.aggregation_filter(input, Filter::max, false),
 
-            _ => {
-                return Err(QueryGraphBuilderError::InputError(format!(
-                    "{filter_name} is not a valid scalar filter operation"
-                )))
-            }
+            _ => Err(QueryGraphBuilderError::InputError(format!(
+                "{filter_name} is not a valid scalar filter operation"
+            ))),
         }
     }
 
@@ -396,11 +394,9 @@ impl<'a> ScalarFilterParser<'a> {
                 JsonTargetType::String,
             )]),
 
-            _ => {
-                return Err(QueryGraphBuilderError::InputError(format!(
-                    "{filter_name} is not a valid scalar filter operation"
-                )))
-            }
+            _ => Err(QueryGraphBuilderError::InputError(format!(
+                "{filter_name} is not a valid scalar filter operation"
+            ))),
         }
     }
 

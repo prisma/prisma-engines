@@ -13,7 +13,7 @@ mod string {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { string } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"string":"abc"}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod string {
                 let res = run_query!(runner, r#"{ findManyTestModel { string } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"string":"abc"},{"string":"defg"},{"string":null}]}}"###
                 );
             }

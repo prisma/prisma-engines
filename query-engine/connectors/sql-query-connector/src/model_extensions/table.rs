@@ -25,7 +25,7 @@ impl AsTable for Model {
 
         let table = table.add_unique_index(id_cols);
 
-        self.unique_indexes().into_iter().fold(table, |table, index| {
+        self.unique_indexes().fold(table, |table, index| {
             let fields: Vec<_> = index
                 .fields()
                 .map(|f| prisma_models::ScalarFieldRef::from((self.dm.clone(), f)))

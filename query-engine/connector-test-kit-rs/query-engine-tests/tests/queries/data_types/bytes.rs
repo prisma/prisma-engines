@@ -13,7 +13,7 @@ mod bytes {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { bytes } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"bytes":"AQID"}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod bytes {
                 let res = run_query!(runner, r#"{ findManyTestModel { bytes } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"bytes":"AQID"},{"bytes":"dGVzdA=="},{"bytes":null}]}}"###
                 );
             }
