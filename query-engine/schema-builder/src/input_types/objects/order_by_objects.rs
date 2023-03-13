@@ -40,10 +40,7 @@ pub(crate) fn order_by_object_type(
     container: &ParentContainer,
     options: &OrderByOptions,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}OrderBy{}Input", container.name(), options.type_suffix()),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}OrderBy{}Input", container.name(), options.type_suffix()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -165,7 +162,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
 }
 
 fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new("SortOrderInput", PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("SortOrderInput");
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -208,10 +205,7 @@ fn order_by_object_type_aggregate(
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}{}OrderByAggregateInput", container.name(), suffix),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}{}OrderByAggregateInput", container.name(), suffix));
 
     return_cached_input!(ctx, &ident);
 
@@ -239,10 +233,7 @@ fn order_by_to_many_aggregate_object_type(
         ParentContainer::CompositeType(_) => "Composite",
     };
 
-    let ident = Identifier::new(
-        format!("{}OrderBy{}AggregateInput", container.name(), container_type),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}OrderBy{}AggregateInput", container.name(), container_type));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -292,7 +283,7 @@ fn order_by_object_type_text_search(
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}OrderByRelevanceInput", container.name()), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(format!("{}OrderByRelevanceInput", container.name()));
 
     return_cached_input!(ctx, &ident);
 

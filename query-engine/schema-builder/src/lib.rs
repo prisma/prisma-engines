@@ -43,9 +43,7 @@ mod utils;
 pub use self::utils::{compound_id_field_name, compound_index_field_name};
 
 use cache::TypeRefCache;
-use prisma_models::{
-    ast, CompositeType, Field as ModelField, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier,
-};
+use prisma_models::{ast, Field as ModelField, InternalDataModel, ModelRef, RelationFieldRef, TypeIdentifier};
 use psl::{
     datamodel_connector::{Connector, ConnectorCapability},
     PreviewFeature, PreviewFeatures,
@@ -54,19 +52,18 @@ use schema::*;
 use std::sync::Arc;
 use utils::*;
 
-pub(crate) struct BuilderContext {
-    internal_data_model: InternalDataModelRef,
+pub(crate) struct BuilderContext<'a> {
+    internal_data_model: &'a InternalDataModel,
     enable_raw_queries: bool,
     cache: TypeCache,
     connector: &'static dyn Connector,
     preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
     nested_update_inputs_queue: NestedInputsQueue,
-    // enums?
 }
 
-impl BuilderContext {
-    fn new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
+impl<'a> BuilderContext<'a> {
+    fn new(internal_data_model: &'a InternalDataModel, enable_raw_queries: bool) -> Self {
         let connector = internal_data_model.schema.connector;
         let preview_features = internal_data_model.schema.configuration.preview_features();
         Self {
@@ -124,14 +121,6 @@ impl BuilderContext {
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
-    pub fn models(&self) -> Vec<ModelRef> {
-        self.internal_data_model.models().collect()
-    }
-
-    pub fn composite_types(&self) -> Vec<CompositeType> {
-        self.internal_data_model.composite_types().collect()
-    }
-
     pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
         capabilities.iter().any(|c| self.connector.has_capability(*c))
     }
@@ -172,8 +161,8 @@ impl TypeCache {
     }
 }
 
-pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> QuerySchema {
-    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries);
+pub fn build(internal_data_model: InternalDataModel, enable_raw_queries: bool) -> QuerySchema {
+    let mut ctx = BuilderContext::new(&internal_data_model, enable_raw_queries);
 
     output_types::objects::initialize_caches(&mut ctx);
 
@@ -192,6 +181,7 @@ pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool
 
     let query_type = Arc::new(query_type);
     let mutation_type = Arc::new(mutation_type);
+    let capabilities = ctx.connector.capabilities().to_owned();
 
     QuerySchema::new(
         query_type,
@@ -199,8 +189,8 @@ pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool
         input_objects,
         output_objects,
         enum_types,
-        ctx.internal_data_model,
-        ctx.connector.capabilities().to_owned(),
+        internal_data_model,
+        capabilities,
     )
 }
 

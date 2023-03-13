@@ -15,9 +15,6 @@ pub use renderer::*;
 
 use std::sync::{Arc, Weak};
 
-pub static PRISMA_NAMESPACE: &str = "prisma";
-pub static MODEL_NAMESPACE: &str = "model";
-
 pub type ObjectTypeStrongRef = Arc<ObjectType>;
 pub type ObjectTypeWeakRef = Weak<ObjectType>;
 

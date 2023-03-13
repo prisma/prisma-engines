@@ -17,7 +17,7 @@ pub(crate) fn initialize_caches(ctx: &mut BuilderContext) {
 }
 
 pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
-    let ident = Identifier::new("AffectedRowsOutput".to_owned(), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("AffectedRowsOutput".to_owned());
     return_cached_output!(ctx, &ident);
 
     let object_type = Arc::new(object_type(

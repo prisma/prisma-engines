@@ -66,10 +66,7 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &Relatio
 
 fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
-    let ident = Identifier::new(
-        format!("{}ListRelationFilter", capitalize(related_model.name())),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}ListRelationFilter", capitalize(related_model.name())));
 
     return_cached_input!(ctx, &ident);
 
@@ -94,10 +91,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
 fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-    let ident = Identifier::new(
-        format!("{}RelationFilter", capitalize(related_model.name())),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}RelationFilter", capitalize(related_model.name())));
 
     return_cached_input!(ctx, &ident);
     let mut object = init_input_object_type(ident.clone());
@@ -128,10 +122,7 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &Compos
 
 fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let nullable = if cf.is_optional() { "Nullable" } else { "" };
-    let ident = Identifier::new(
-        format!("{}{}CompositeFilter", capitalize(cf.typ().name()), nullable),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}{}CompositeFilter", capitalize(cf.typ().name()), nullable));
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -166,10 +157,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
 }
 
 fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}CompositeListFilter", capitalize(cf.typ().name())),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}CompositeListFilter", capitalize(cf.typ().name())));
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -207,16 +195,13 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        scalar_filter_name(
-            &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
-            true,
-            !sf.is_required(),
-            false,
-            false,
-        ),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(scalar_filter_name(
+        &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
+        true,
+        !sf.is_required(),
+        false,
+        false,
+    ));
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -262,10 +247,13 @@ fn full_scalar_filter_type(
     let native_type_name = native_type.map(|nt| nt.name());
     let scalar_type_name = typ.type_name(&ctx.internal_data_model.schema).into_owned();
     let type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
-    let ident = Identifier::new(
-        scalar_filter_name(&type_name, list, nullable, nested, include_aggregates),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(scalar_filter_name(
+        &type_name,
+        list,
+        nullable,
+        nested,
+        include_aggregates,
+    ));
 
     return_cached_input!(ctx, &ident);
 

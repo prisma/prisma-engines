@@ -3,7 +3,7 @@ use crate::constants::{filters, itx, json_null, ordering};
 use schema::EnumType;
 
 pub(crate) fn sort_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(ordering::SORT_ORDER, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(ordering::SORT_ORDER);
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(
@@ -16,7 +16,7 @@ pub(crate) fn sort_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 }
 
 pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(ordering::NULLS_ORDER, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(ordering::NULLS_ORDER);
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(
@@ -29,7 +29,7 @@ pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 }
 
 pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_id: ast::EnumId) -> EnumTypeWeakRef {
-    let ident = Identifier::new(ctx.internal_data_model.walk(enum_id).name(), MODEL_NAMESPACE);
+    let ident = Identifier::new_model(ctx.internal_data_model.walk(enum_id).name());
     return_cached_enum!(ctx, &ident);
 
     let schema_enum = ctx.internal_data_model.clone().zip(enum_id);
@@ -41,7 +41,7 @@ pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_id: ast::EnumI
 
 pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> EnumTypeWeakRef {
     let name = format!("{}ScalarFieldEnum", capitalize(model.name()));
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_enum!(ctx, &ident);
 
     let values = model
@@ -58,7 +58,7 @@ pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> En
 }
 
 pub(crate) fn json_null_filter_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(json_null::FILTER_ENUM_NAME, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(json_null::FILTER_ENUM_NAME);
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(
@@ -76,9 +76,9 @@ pub(crate) fn json_null_filter_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef
 
 pub(crate) fn json_null_input_enum(ctx: &mut BuilderContext, nullable: bool) -> EnumTypeWeakRef {
     let ident = if nullable {
-        Identifier::new(json_null::NULLABLE_INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::NULLABLE_INPUT_ENUM_NAME)
     } else {
-        Identifier::new(json_null::INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::INPUT_ENUM_NAME)
     };
 
     return_cached_enum!(ctx, &ident);
@@ -102,7 +102,7 @@ pub(crate) fn order_by_relevance_enum(
     values: Vec<String>,
 ) -> EnumTypeWeakRef {
     let name = format!("{container}OrderByRelevanceFieldEnum");
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(ident.clone(), values));
@@ -112,7 +112,7 @@ pub(crate) fn order_by_relevance_enum(
 }
 
 pub(crate) fn query_mode_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new("QueryMode", PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("QueryMode");
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(
@@ -125,7 +125,7 @@ pub(crate) fn query_mode_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 }
 
 pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext) -> Option<EnumTypeWeakRef> {
-    let ident = Identifier::new("TransactionIsolationLevel", PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("TransactionIsolationLevel");
     if let e @ Some(_) = ctx.get_enum_type(&ident) {
         return e;
     }

@@ -14,14 +14,11 @@ pub(crate) fn nested_connect_or_create_input_object(
         return None;
     }
 
-    let ident = Identifier::new(
-        format!(
-            "{}CreateOrConnectWithout{}Input",
-            related_model.name(),
-            capitalize(parent_field.related_field().name())
-        ),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}CreateOrConnectWithout{}Input",
+        related_model.name(),
+        capitalize(parent_field.related_field().name())
+    ));
 
     let create_types = create_one::create_one_input_types(ctx, &related_model, Some(parent_field));
 

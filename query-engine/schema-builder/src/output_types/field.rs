@@ -111,7 +111,7 @@ where
     F: Fn(&mut BuilderContext, &RelationFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
-    let ident = Identifier::new(format!("{}CountOutputType", capitalize(model.name())), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(format!("{}CountOutputType", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
     let fields: Vec<OutputField> = fields

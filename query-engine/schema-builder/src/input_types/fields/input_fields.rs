@@ -57,7 +57,7 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &Relation
     let nested_ident = &create_type.into_arc().identifier;
     let name = format!("{}Envelope", nested_ident.name());
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

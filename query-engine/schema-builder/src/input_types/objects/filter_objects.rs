@@ -9,10 +9,7 @@ pub(crate) fn scalar_filter_object_type(
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
     let aggregate = if include_aggregates { "WithAggregates" } else { "" };
-    let ident = Identifier::new(
-        format!("{}ScalarWhere{}Input", model.name(), aggregate),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}ScalarWhere{}Input", model.name(), aggregate));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -55,7 +52,7 @@ where
     T: Into<ParentContainer>,
 {
     let container = container.into();
-    let ident = Identifier::new(format!("{}WhereInput", container.name()), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(format!("{}WhereInput", container.name()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -95,7 +92,7 @@ where
 }
 
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}WhereUniqueInput", model.name()), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(format!("{}WhereUniqueInput", model.name()));
     return_cached_input!(ctx, &ident);
 
     // Split unique & ID fields vs all the other fields
@@ -214,14 +211,11 @@ fn compound_field_unique_object_type(
     alias: Option<&str>,
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!(
-            "{}{}CompoundUniqueInput",
-            model.name(),
-            compound_object_name(alias, &from_fields)
-        ),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}{}CompoundUniqueInput",
+        model.name(),
+        compound_object_name(alias, &from_fields)
+    ));
 
     return_cached_input!(ctx, &ident);
 
@@ -245,7 +239,7 @@ fn compound_field_unique_object_type(
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
 pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}ObjectEqualityInput", cf.typ().name()), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(format!("{}ObjectEqualityInput", cf.typ().name()));
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
